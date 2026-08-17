@@ -24,6 +24,8 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_pins.py`: datasheetのpin表からpackage pin/function候補を作る
 - `docs/extraction-survey.ja.md`: 上記2 toolでの実測と、機械抽出できる範囲の調査結果
 
+全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin functionを取得できています。対象SKUをどこまで広げるかは未合意です。
+
 ## Sample recordの状態
 
 | Exact SKU | 主な目的 | Package pin | Pin function |
