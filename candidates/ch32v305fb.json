@@ -1,0 +1,835 @@
+{
+  "part_number": "CH32V305FB",
+  "_provenance": {
+    "datasheet": "CH32V307/datasheet_en/CH32V20x_30xDS0.PDF",
+    "manual": "CH32V307/datasheet_en/CH32FV2x_V3xRM.PDF",
+    "header": "CH32V307/EVT/EXAM/SRC/Peripheral/inc/ch32v30x.h",
+    "pin_table": "Table 3-1",
+    "pin_column": "TSSOP20"
+  },
+  "product_attributes": {
+    "Pin count": "20",
+    "Code FLASH (bytes)": "224K",
+    "Flash (bytes)": "128K",
+    "SRAM (bytes)": "32K",
+    "GPIO port count": "17",
+    "GPIO power supply": "Shared",
+    "Timer": "4",
+    "ADC/TKey": "2",
+    "DAC (Unit)": "DAC2",
+    "OPA/CMP": "-",
+    "RNG": "1",
+    "Communicationinterfaces": "USART1USART3",
+    "Package form": "TSSOP20"
+  },
+  "route_selectors": [
+    {
+      "id": "afio-can2-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "CAN2_REMAP",
+      "bit_offset": 22,
+      "bit_width": 1,
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-tim1-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "TIM1_REMAP",
+      "bit_offset": 6,
+      "bit_width": 2,
+      "valid_values": [
+        0,
+        1,
+        3
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-tim2-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "TIM2_REMAP",
+      "bit_offset": 8,
+      "bit_width": 2,
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-tim3-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "TIM3_REMAP",
+      "bit_offset": 10,
+      "bit_width": 2,
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-usart1-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "USART1_REMAP",
+      "bit_offset": 2,
+      "bit_width": 1,
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-usart3-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "USART3_REMAP",
+      "bit_offset": 4,
+      "bit_width": 2,
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子",
+      "reset_value": 0
+    }
+  ],
+  "pins": [
+    {
+      "number": 1,
+      "pad": "NRST",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": []
+    },
+    {
+      "number": 2,
+      "pad": "PA1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "USART2_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "ADC_IN1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM5_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "OPA3_OUT0",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_RX_CL",
+          "route": "default"
+        },
+        {
+          "signal": "K",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RMII_REF_CLK",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RGMII_RXD3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "TIM9_BKIN",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PB10",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "I2C2_SCL",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "default"
+        },
+        {
+          "signal": "OPA2_CH0N",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_RX_ER",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "TIM10_BKIN",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "PB11",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "I2C2_SDA",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "default"
+        },
+        {
+          "signal": "OPA1_CH0N",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_TX_EN",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RMII_TX_E",
+          "route": "default"
+        },
+        {
+          "signal": "N",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "TIM10_ETR",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "pad": "PB12",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SPI2_NSS",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "default"
+        },
+        {
+          "signal": "I2C2_SMBA",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_BKIN",
+          "route": "default"
+        },
+        {
+          "signal": "OPA4_CH0P",
+          "route": "default"
+        },
+        {
+          "signal": "CAN2_RX",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_TXD0",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RMII_TXD0",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "pad": "PB13",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SPI2_SCK",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_CK",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH1N",
+          "route": "default"
+        },
+        {
+          "signal": "OPA3_CH0P",
+          "route": "default"
+        },
+        {
+          "signal": "CAN2_TX",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_TXD1",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RMII_TXD1",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RGMII_MDI",
+          "route": "default"
+        },
+        {
+          "signal": "O",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart3-remap",
+            "values": [
+              1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "pad": "PB14",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SPI2_MISO",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH2N",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "OPA2_CH0P",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D0",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart3-remap",
+            "values": [
+              1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "pad": "PB15",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SPI2_MOSI",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "default"
+        },
+        {
+          "signal": "OPA1_CH0P",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D1",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "pad": "PC6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "I2S2_MCK",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D6",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RXP",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH1",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "pad": "PC7",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "I2S3_MCK",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "pad": "PC8",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM8_CH3",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D0",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_TXP",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH3",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "pad": "PA9",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART1_TX",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "OTG_FS_VBUS",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "default"
+        },
+        {
+          "signal": "I2S3_SD",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "pad": "PA13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM10_CH2N",
+          "route": "default"
+        },
+        {
+          "signal": "PA13",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM8_CH1N",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart3-remap",
+            "values": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 15,
+      "pad": "PA14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM10_CH3N",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH2N",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        },
+        {
+          "signal": "UART8_TX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart3-remap",
+            "values": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "pad": "PB6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "I2C1_SCL",
+          "route": "default"
+        },
+        {
+          "signal": "TIM4_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "default"
+        },
+        {
+          "signal": "USBHS_DM",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "CAN2_TX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-can2-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "TIM8_CH1",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "pad": "PB7",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "I2C1_SDA",
+          "route": "default"
+        },
+        {
+          "signal": "FSMC_NADV",
+          "route": "default"
+        },
+        {
+          "signal": "TIM4_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "USBHS_DP",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "TIM8_CH2",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "pad+value"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 19,
+      "pad": "OSC_IN",
+      "kind": "other",
+      "_pin_type": "I/A",
+      "functions": [
+        {
+          "signal": "PD0",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "pad": "OSC_OUT",
+      "kind": "other",
+      "_pin_type": "O/A",
+      "functions": [
+        {
+          "signal": "PD1",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    }
+  ],
+  "signal_aliases": {}
+}

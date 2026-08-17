@@ -183,7 +183,8 @@ WCHはQFN等の露出パッドをpin番号`0`で表します。schemaの`EP`表�
 
 ### 解決できない崩れ
 
-- **テキスト層の文字欠落**。CH32X035のPA6行はセル実体が`MISO/T3C1/O1N0/A`で、`A6`の`6`がテキスト層に存在しません。remap列も`T1BK_1`で、正しくは`T1BKIN_1`です。紙面には出るがテキスト層に無く、パーサでは復元できません。同じ欠落は変種列の見出しでも起きます（CH32V208の1列、CH32V317の`LQFP100`）
+- **datasheetの記述そのものが不完全**。CH32X035のPA6行はセル実体が`MISO/T3C1/O1N0/A`、remap列が`T1BK_1`です。当初これをテキスト層の欠落と判断しましたが、**ページを画像化して確認したところ紙面も同じ**でした。`A`は`A6`の、`T1BK`は`T1BKIN`の省略で、recordの値は人が補ったものです。パーサでは復元できません
+- **テキスト層の欠落**。変種列の見出しで起きます。CH32V208 Table 3-1は4列目`QFN68`が消えて5列目を誤検出し、CH32V317 Table 3-2は`LQFP100`の末尾`0`が段落ちして`LQFP10`と`0`の2列に割れます。いずれも画像化で正しい見出しを確認しました
 - **datasheetの誤植**。CH32V003 Table 2-1のPD4行は`TIETR_2`（正しくは`T1ETR_2`）です。`T1ETR`系13出現のうちこの1件だけ`I`と`1`が入れ替わっています。抽出器は忠実に再現するため、そのまま取り込むと誤りが入ります
 
 ### 自己申告できない誤りが残る
@@ -423,6 +424,77 @@ CH32X035のRMにはremap格子がありません。経路はregister field表の
 | datasheetのremap列の接尾辞・AF番号 | 全family |
 | RMのremap格子 | V003, M030, H417 |
 | RMのregister説明文 | X035, M030, V003 |
+
+## 全SKUへの適用
+
+[`tools/build_all.py`](../tools/build_all.py)が、比較表が挙げる全SKUに対して候補を生成します。reference manualの読み取りが支配的なので、familyごとに1回解析して各SKUで使い回します。
+
+生成結果は[`candidates/`](../candidates/)に置いています。**人のreviewを経ていない機械出力**で、`devices/`とは別物です。
+
+| family | SKU | pin取得 | pin | function | 解決経路 | selector |
+|---|---:|---:|---:|---:|---:|---:|
+| CH32H417 | 5 | 5 | 391 | 3644 | 241 | 10 |
+| CH32L103 | 7 | 5 | 145 | 1001 | 555 | 45 |
+| CH32M030 | 5 | 3 | 115 | 486 | 253 | 21 |
+| CH32V003 | 4 | 4 | 68 | 359 | 162 | 18 |
+| CH32V006 | 26 | 20 | 398 | 3078 | 2191 | 112 |
+| CH32V103 | 4 | 4 | 196 | 366 | 83 | 22 |
+| CH32V20x | 14 | 13 | 587 | 1931 | 316 | 56 |
+| CH32V307 | 13 | 11 | 693 | 3638 | 915 | 116 |
+| CH32V407 | 6 | 6 | 440 | 2800 | 0 | 0 |
+| CH32X035 | 8 | 8 | 245 | 1300 | 587 | 52 |
+| **合計** | **92** | **79** | **3278** | **18603** | **5303** | **452** |
+
+### SKUとpin表の列を対応付ける
+
+比較表のSKUと、pin表の列は直接はつながりません。CH32V003だけが`Package Form=TSSOP20`という属性を持ち、他familyは持たないためです。
+
+3段階で決めています。
+
+1. 列見出しが型番そのもの（CH32V006、CH32V407）ならそれを使う
+2. 比較表にpackage属性があればそれで引く
+3. なければ比較表の**pin数**で候補を絞り、型番の**末尾から2文字目**でpackage種別を決める
+
+3の規則（`M`=SOP、`P`=TSSOP、`U`=QFN、`T`=LQFP、`R`=QSOP）は、人手作成の8 recordすべてと例外なく一致します。
+
+### hand researchに回すもの
+
+13 SKUでpin表の列を特定できませんでした。抽出器の限界がSKU単位で出ています。
+
+| SKU | 状況 |
+|---|---|
+| CH32M030C8U3 / C8U7 | `QFN48`と`QFN48X7_A`のどちらか決まらない |
+| CH32L103K8U6 / K8U7 | 同上 |
+| CH32V006E8R6 / E8R7、CH32V007E8R6 / E8R7 / K8U6 / K8U7 | pin数から候補を絞れない |
+| CH32V208WB、CH32V303CB、CH32V305CC | 比較表の接尾辞が省略形で、pin表の列と結び付かない |
+
+**CH32V407にはreference manualがmirrorされていません。** datasheetのみのため、440 pin・2800 functionは取れていますが経路が0件です。資料側の欠落であり、抽出器の問題ではありません。
+
+## 画像化による確認
+
+テキスト層と紙面が食い違う箇所は、`pypdfium2`でページを描画して目視確認します。同じPDFに対する第2の手法として機能し、実際に判定を覆した例があります。
+
+| 対象 | テキスト層 | 紙面 | 判定 |
+|---|---|---|---|
+| CH32V208 Table 3-1の列 | `QFN28,QFN48,LQFP64,col3,col4` | `QFN28,QFN48,LQFP64,QFN68` の4列 | テキスト層の欠落 |
+| CH32V317 Table 3-2の列 | `QFN68,LQFP10,col2` | `QFN68,LQFP100` の2列 | テキスト層の欠落 |
+| CH32X035 PA6行 | `MISO/T3C1/O1N0/A` `T1BK_1` | **同じ** | datasheet側の省略。当初の「テキスト層の欠落」という判断は誤り |
+
+確認済みの見出しは[`curated/pin-table-columns.json`](../curated/pin-table-columns.json)に、確認方法とページ番号つきで保持します。抽出器はこれを見出しの正解として優先します。**機械抽出が復元できない箇所を、人が確認した事実で上書きする唯一の経路**です。
+
+## Ordering情報からのpackage確定
+
+datasheet末尾の「Package and Ordering Information」表は、order modelとpackageの対応を明示します。body sizeとpin pitch、packing typeもここにしかありません。
+
+```
+Package Form | Body Size | Pin Pitch | Package Description | Order Model
+QFN48X7_A    | 7*7mm     | 0.5mm     | Quad Flat No-lead   | CH32M030C8U3
+QFN48        | 5*5mm     | 0.35mm    | Quad Flat No-lead   | CH32M030C8U7
+```
+
+[`tools/extract_ordering.py`](../tools/extract_ordering.py)が読みます。16 datasheet中14に存在します（CH32V20x_30xDS0にはありません）。列順と綴りは一定でなく、CH32V103はorder modelが先頭でpacking typeが増え、CH32V208は`Bidy Size`と誤記しています。
+
+**これがSKUとpackageの最も強い根拠**で、`QFN48`と`QFN48X7_A`のようにpin数だけでは決まらない組を確定できます。CH32M030は5 SKU中3 SKUしか列を決められませんでしたが、ordering表を第一根拠にして5/5になりました。
 
 ## 仕組みの方針
 

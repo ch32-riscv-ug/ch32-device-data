@@ -26,11 +26,16 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_registers.py`: RMのregister field表から bit位置・`reset_value` 候補を作る。説明文に書かれた経路も読む
 - `tools/extract_products.py`: datasheetの製品比較表から全SKUとその属性を取る。ユニーク型番92件を確認済み
 - `tools/build_candidate.py`: 上記4 toolの出力を結合し、pinから参照されるselectorだけを残した候補を作る
+- `tools/extract_ordering.py`: datasheetのordering表からorder model・package・body size・pin pitchを取る
+- `tools/build_all.py`: 全SKUに対して候補を生成する。出力は`candidates/`（未review）
+- `curated/pin-table-columns.json`: テキスト層が落とす列見出しを、画像確認した値で上書きする
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 
 全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin function（要確認252件）を取得できています。対象SKUをどこまで広げるかは未合意です。
 
-未採取のCH32V006K8U7で`build_candidate.py`を走らせると、selector 6件（bit位置・`valid_values`・`reset_value`つき）と33 pin・244 functionの候補が得られます。review前提の素材であり、recordへは反映していません。
+`tools/build_all.py`で全92 SKUの候補を`candidates/`へ生成済みです（79 SKUでpin取得、3278 pin・18603 function・5303経路・452 selector）。**未reviewの機械出力**であり、`devices/`へは反映していません。
+
+hand researchが要るのは、pin表の列を特定できなかった13 SKUと、reference manualがmirrorされていないCH32V407です。
 
 ## Sample recordの状態
 

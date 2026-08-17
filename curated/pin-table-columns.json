@@ -1,0 +1,20 @@
+{
+  "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, in column order.",
+  "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually. The method is recorded per entry.",
+  "CH32V208DS0.PDF": {
+    "Table 3-1": {
+      "columns": ["QFN28", "QFN48", "LQFP64", "QFN68"],
+      "note": "テキスト層は4列目 QFN68 を落とし、5列目を誤検出する",
+      "verified_by": "page-image",
+      "page": 19
+    }
+  },
+  "CH32V20x_30xDS0.PDF": {
+    "Table 3-2": {
+      "columns": ["QFN68", "LQFP100"],
+      "note": "LQFP100 の末尾 0 が段落ち。テキスト層では LQFP10 と 0 の2列に割れる",
+      "verified_by": "page-image",
+      "page": 42
+    }
+  }
+}

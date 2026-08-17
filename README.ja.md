@@ -16,6 +16,7 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/validate.py`: JSON Schemaと追加の整合性規則を検査するvalidator
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するreview支援tool。recordは書き換えない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
+- `candidates/*.json`: 全SKUの機械抽出結果。未reviewで、schemaにも準拠しない
 - `docs/schema-notes.ja.md`: schema調査、確認済みの構造差、未決定事項
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
 - `docs/handoff.ja.md`: 作業状態、既知の資料矛盾、再開手順
