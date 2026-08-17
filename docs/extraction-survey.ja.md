@@ -10,7 +10,7 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 測定は2段階です。まず精度を測るため、すでに人手で作成した3 record（CH32V003F4P6、CH32X035F8U6、CH32M030C8T7）をground truthとして抽出器の出力と照合しました。次に適用範囲を測るため、mirrorしている全datasheetを掃引しました。
 
-抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)と[`tools/extract_pins.py`](../tools/extract_pins.py)にあり、いずれも候補を表示するだけでrecordを書き換えません。
+抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`tools/extract_pins.py`](../tools/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`tools/extract_registers.py`](../tools/extract_registers.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
 
 ## 前提
 
@@ -53,8 +53,8 @@ bit位置は取りこぼしも誤りもありません。手作業で発見し�
 
 ### ヘッダから得られないもの
 
-- **`reset_value`**: 27件すべて取得不能。RM必須
-- **`valid_values`**: 原理的に不能。ヘッダは列挙値とbit index補助定義を区別しません。CH32V003では`AFIO_PCFR1_TIM1_REMAP_1`（bit index）と`AFIO_PCFR1_TIM1_REMAP_PARTIALREMAP_1`（実際の値）がどちらも`0x80`です。X035/M030は単ビットの補助定義しか持たず、CH32M030の`TIM1_REMAP`はrecordが3bit幅に5値（予約値あり）を持つのに対しヘッダからは`[1,2,4]`しか出ません
+- **`reset_value`**: 27件すべて取得不能。RMのregister field表から取れる（後述、27/27）
+- **`valid_values`**: ヘッダからは原理的に不能。RMのremap格子から取れる（後述、7/7）。ヘッダは列挙値とbit index補助定義を区別しません。CH32V003では`AFIO_PCFR1_TIM1_REMAP_1`（bit index）と`AFIO_PCFR1_TIM1_REMAP_PARTIALREMAP_1`（実際の値）がどちらも`0x80`です。X035/M030は単ビットの補助定義しか持たず、CH32M030の`TIM1_REMAP`はrecordが3bit幅に5値（予約値あり）を持つのに対しヘッダからは`[1,2,4]`しか出ません
 - **fieldの併合**: `I2C1_REMAP`(bit 1)と`I2C1_HIGH_BIT_REMAP`(bit 22)が同一fieldだという情報はどこにもありません。抽出器は命名規則から推測しており、これは人手規則です
 - **非連続fieldのbit順序**: 値のLSBがどの物理bitかはヘッダから決まりません。CH32V003では結果的に昇順一致でしたがRM確認が要ります
 - **route selectorか否か**: CH32M030は46件抽出して採用8件、83%が捨て対象です。`EXTEN_UDP_DAC`（6bit DAC値）、`EXTEN_ISINK1_ADJ`のように実在するfieldだがpin routeでないものが多数あります。`EXTEN_KEY_R = 0xFFFFFFFF`のようなunlock keyも混ざるため、field幅の上限で弾いています
@@ -109,9 +109,20 @@ CH32V407は`LENGTH = 136K-1K`、CH32H417は`ORIGIN = (0x200C0000+512+256)`と式
 |---|---|---:|---:|---:|
 | CH32V003 | TSSOP20 | 20/20 | 83/84 | 75/84 |
 | CH32X035 | QFN20 | 21/21 | 102/105 | 83/105 |
-| CH32M030 | LQFP48 | 45/48 | 148/171 | 141/171 |
+| CH32M030 | LQFP48 | 46/48 | 151/171 | 144/171 |
 
-**CH32M030のremap列は`_N`形式の経路番号を使いません。** remap情報がRM側にあるため、抽出器は該当functionを「経路番号なし・要確認」として報告します。黙って誤った値を出してはいません。
+### 経路の書き方が2系統ある
+
+同じ「Remapping function」列でも、familyによって書式が異なります。
+
+| 書式 | 例 | 意味 | family |
+|---|---|---|---|
+| selector値の接尾辞 | `TIM1_CH1_2` | AFIO remap registerの値2 | V003, V006, X035, M030, V103, V20x, V30x, V407 |
+| alternate function番号 | `TIM8_CH1(AF0)` | pinごとのAF多重化の番号0 | H415, H416, H417 |
+
+**CH32H41xはAFIO remap方式ではなく、pinごとのalternate function多重化です。** 共有のAFIO fieldではなく各pinのAFR fieldが経路を決めるため、現在の`route_selectors`（controller・register・fieldを一度定義して各functionが参照する構造）では表現できません。schema上の論点として未決定事項に挙げています。
+
+抽出器は両書式を読み分け、前者を`remap-2`、後者を`af-0`として記録します。
 
 ### 全datasheetの掃引
 
@@ -123,6 +134,7 @@ CH32V407は`LENGTH = 136K-1K`、CH32H417は`ORIGIN = (0x200C0000+512+256)`と式
 | 変種列 | 102（うちpinを得られたもの97） |
 | 合計 pin | 4035 |
 | 合計 pin function | 21853 |
+| 要確認 | 252 |
 
 取得できた製品はCH32V002/V003/V004/V005/V006/V007/M007/M030/M103/L103/V103/V203/V205/V303/V305/V307/V317/V407/V467/X033/X035/H415/H416/H417です。
 
@@ -147,7 +159,7 @@ pinを得られなかった5列は、テキスト層で見出しが失われた�
 
 ### セルの崩れ
 
-- **pad名に脚注が付く**（`PA7(7)`、`PC16(4)(9)`）。`VDD`が`V\nDD`と改行で分断されることもあります
+- **pad名に脚注が付く**（`PA7(7)`、`PC16(4)(9)`）。`VDD`が`V\nDD`と改行で分断されることもあります。折返しが脚注の内側に入る例もあり（CH32M030の`PA13(7\n)`）、空白除去を脚注除去より先に行わないと1 pin落とします
 - **セルがトークン途中で折り返す**（`T2C1N_`/`6`、`C1P`/`0`、`A3(`/`3)`、`USART1_TX`/`_8`）。信号名は数字で始まらないため、「次行が数字始まり、または前行が`_`か`(`で終わる、または次行が`_`か`)`で始まるなら継続」で判別できます
 
 ### pad名の列挙は破綻する
@@ -178,6 +190,195 @@ CH32V003でrecordと食い違った9件のうち、抽出器が「要確認」�
 
 **datasheetのpin表は、その機能がselector制御されていることを表記しません。** RMを読まないと分からない差が、確定扱いで紛れ込みます。
 
+## Reference manualからのremap経路抽出
+
+datasheetのpin表は、その package にbond-outされた経路しか書きません。またremap selectorの`valid_values`とdefault経路（値0）も持ちません。RMはこれらを格子で持っています。
+
+```
+Alternate function | TIM1_RM=000 Default | TIM1_RM=001 Partial | ...
+TIM1_ETR           | PC1                 | PC1                 | ...
+TIM1_CH1           | PB9                 | PB9                 | ...
+```
+
+[`tools/extract_remap.py`](../tools/extract_remap.py)がこの格子を`(field, value, signal, pad)`へ読み込みます。datasheet側の抽出と突き合わせる相互確認の材料になります。
+
+### 測定結果
+
+| 対象 | 抽出経路 | selector field | recordとの一致 |
+|---|---:|---:|---|
+| CH32M030 RM | 149 | 7 | 116/124 |
+| CH32H417 RM | 102 | 3 | record未採取のため未照合 |
+
+CH32M030の残差8件の内訳は、ADC trigger 2件（後述の資料矛盾）、`PB5PB6_RM` 2件（RMの格子にない）、`TIM3_ETR` 4件（recordが`TIM3_CH1_ETR`を`TIM3_CH1`と`TIM3_ETR`へ分割保持している）です。いずれも既知の構造差で、抽出誤りではありません。
+
+RM側にのみある経路のうち30件は`value=0`のdefault経路です。recordはdefaultにselector値を持たないため、未決定事項「default routeでもselector値0を明示すべきか」がそのまま差分として現れます。
+
+### 資料矛盾が自動的に浮上する
+
+CH32M030の照合で次が出ます。
+
+```
+RMが文章で書いている経路 (2件):
+  ADC1_ETRGIN=0 -> PB6    (ADC External triggerconversion)
+  ADC1_ETRGIN=1 -> PA14
+record のみ:
+  ADC1_ETRGIN=0   ADC1_ETR   PA14
+  ADC1_ETRGIN=1   ADC1_ETR   PB6
+```
+
+recordがdatasheet Table 2-1・RM register説明・EVT実装の3資料に従って採用した`0=PA14`と、RM Table 6-15の記述が逆であることが、そのまま差分に出ます。**この矛盾を毎回再提起させないために、裁定を機械可読で保持する必要がある**という論点の具体例です。
+
+### siliconとpackageの差も現れる
+
+CH32M030でRM側にのみある非default経路は`TIM1_RM=3 → TIM1_CH4 → PC5`の1件だけで、PC5はLQFP48にbond-outされていません。照合はこれを「このpackageにない」と注記します。**RMはsiliconを、recordはpackageを記述している**という区別が、そのまま観測できます。
+
+### RM側で見つかった崩れ
+
+- **don't-care表記**。CH32H417は`SDMMC_RM=1x`と書きます。`1`として読むと値1に誤って割り当てられ、値2と3が失われます。**静かに間違える種類の崩れ**なので、`x`を展開して複数値にする必要があります
+- **表題と中身の不一致**。CH32H417 Table 9-29は"ADC2 external trigger injection"と題しながら、中身はADC1の表の複製です。Table 9-31も"TIM1 alternate function remapping"と題しながら`TIM2ITR1_RM`の内部経路を記述しています
+- **pad対応が文章で書かれる行**。CH32M030 Table 6-15とCH32H417のADC系はpad名ではなく"connected to PB6"のような文章です。抽出器は文章からpadを拾い、`_pad_from_prose`として区別します
+- **peripheral名のinstance番号が資料間で揺れる**。RMは`SPI_RM`・`I2C1_SCL`、recordは`SPI1_REMAP`・`I2C_SCL`です。「番号がなければinstance 1」と読む正規化を入れないと照合が0件になります
+- **pad名を持たない内部経路**。CH32H417の`TIM2ITR1_RM`はTIM2_ITR1を内部接続へ切り替えるだけでpadがありません。CH32V003の`TIM1_1_RM`と同じ分類です
+
+## Reference manualからのregister field抽出
+
+RMは各registerの節にfield表を持ちます。
+
+```
+6.3.2.1 Remap Register 1 (AFIO_PCFR1)
+Bit      | Name          | Access | Description | Reset value
+[26:24]  | SWCFG[2:0]    | RW     | ...         | 0
+15       | ADC_ETRGIN_RM | RW     | ...         | 0
+```
+
+[`tools/extract_registers.py`](../tools/extract_registers.py)がこれを読みます。**EVTヘッダから取れなかった`reset_value`の出所であり、bit位置の第二の独立な出所でもあります。**
+
+| family | RMに存在 | bit一致 | reset一致 |
+|---|---:|---:|---:|
+| CH32V003 | 10/10 | 8/10 | 10/10 |
+| CH32X035 | 9/9 | 9/9 | 9/9 |
+| CH32M030 | 8/8 | 8/8 | 8/8 |
+| 計 | 27/27 | 25/27 | **27/27** |
+
+bitの不一致2件は、CH32V003の非連続fieldをRMも別fieldとして記述しているためです（`I2C1_RM`(bit 1)と`I2C1REMAP1`(bit 22)、`USART1_RM`(bit 2)と`USART1_RM1`(bit 21)）。EVTヘッダと同じく、併合は人手規則です。
+
+同じ概念に3資料で3通りの綴りが使われます。
+
+| 概念 | EVTヘッダ | RM field表 | record |
+|---|---|---|---|
+| I2C1 remapの上位bit | `I2C1_HIGH_BIT_REMAP` | `I2C1REMAP1` | `I2C1_REMAP`に併合 |
+| USART1 remapの上位bit | `USART1_HIGH_BIT_REMAP` | `USART1_RM1` | `USART1_REMAP`に併合 |
+| TIM1内部LSI経路 | `TIM1_1_RM` | `TIM1_IREMAP` | 未収録 |
+
+### valid_valuesはremap格子から取れる
+
+EVTヘッダから原理的に取れなかった`valid_values`は、RMのremap格子の列見出しが値を列挙しています。CH32M030で照合しました。
+
+| selector | RM列挙 | record | |
+|---|---|---|---|
+| afio-i2c1-remap | [0,1,2,3] | [0,1,2,3] | ○ |
+| afio-uart1-remap | [0,1,2,3,4,5] | [0,1,2,3,4,5] | ○ |
+| afio-spi1-remap | [0,1,2,3] | [0,1,2,3] | ○ |
+| afio-tim1-remap | [0,1,2,3,4] | [0,1,2,3,4] | ○ |
+| afio-tim2-remap | [0,1,2,3] | [0,1,2,3] | ○ |
+| afio-tim3-remap | [0,1,2,3,4] | [0,1,2,3,4] | ○ |
+| afio-adc-etrgin-remap | [0,1] | [0,1] | ○ |
+
+**7/7一致**です。3bit幅に5値しかない`tim1`・`tim3`の予約値も正しく出ます。`afio-pb5-pb6-remap`だけは格子を持たないため、RMのfield説明文（`1: 水晶発振子ピン / 0: GPIO`）を人が読む必要があります。
+
+### route_selectorの必須項目はすべて機械由来にできる
+
+| 項目 | 出所 | 実測 |
+|---|---|---|
+| controller / register / field | EVTヘッダ、RM field表 | 27/27 |
+| bit位置 | EVTヘッダ（27/27）とRM field表（25/27）の2系統 | 相互確認可能 |
+| `valid_values` | RM remap格子 | 7/7 |
+| `reset_value` | RM field表 | 27/27 |
+| `evidence` | — | 人手 |
+| route selectorか否かの採否 | — | 人手（CH32M030で83%が捨て） |
+
+## 4資料の統合
+
+[`tools/build_candidate.py`](../tools/build_candidate.py)が上記4抽出器の出力を1つの候補へ結合します。
+
+| 資料 | 与えるもの |
+|---|---|
+| EVTヘッダ | selectorのbit位置 |
+| RM register field表 | `reset_value`、bit位置の第二の出所 |
+| RM remap格子 | `valid_values`、値ごとのpad |
+| datasheet pin表 | packageにbond-outされたpin |
+
+**selectorの採否が自動化できます。** pinから参照されたselectorだけを残すと、CH32M030でヘッダ由来46候補が7件に絞られました。人手で83%を捨てていた作業がここで消えます。
+
+### 未採取SKUで動かす
+
+`devices/ch32v006k8u7.json`は`pins`が空のままです。CH32V006K8U7で走らせると次が得られました。
+
+| 項目 | 生成 |
+|---|---|
+| route_selectors | 6（すべてbit位置・`valid_values`・`reset_value`つき） |
+| pins | 33（32 lead + exposed pad） |
+| pin function | 244（うちselection解決済み180、未解決6） |
+
+CH32V006は`CH32V00XRM.PDF`をV002/V004/V005/V007と共有しますが、そのまま扱えます。
+
+### 測定結果
+
+3 recordに対する照合です。
+
+| family | route_selector | selection付き経路 | selector未解決 |
+|---|---|---|---:|
+| CH32M030 LQFP48 | record 8 / 候補 7（7/7 全項目一致） | 107/124 | 0 |
+| CH32V003 TSSOP20 | record 10 / 候補 5 | 51/74 | 14 |
+| CH32X035 QFN20 | record 9 / 候補 6 | 45/87 | 18 |
+
+CH32M030では候補に入った7 selectorすべてが、bit位置・`valid_values`・`reset_value`のすべてでrecordと一致します。**完全なselector定義が資料から自動生成できています。**
+
+### CH32V003で止まる理由: 同一製品内での語彙の不一致
+
+CH32V003は同じ製品のdatasheetとRMが別の名前を使います。
+
+| 資料 | signal名 |
+|---|---|
+| datasheet Table 2-1 | `T1CH1`、`SCL`、`UCK`、`MOSI` |
+| RM remap格子 | `TIM1_CH1`、`I2C1_SCL`、`USART1_CK`、`SPI1_MOSI` |
+
+signal名だけで突き合わせると**0/74**になります。未決定事項として挙げられていた「canonical signal IDとvendor表記の分離」が、ここで具体的なコストとして現れます。CH32M030が107/124まで届くのは、そのdatasheetとRMがどちらも長い形を使っているからにすぎません。
+
+### 対応表は資料から導出できる
+
+signal名を使わず「padと selector値」で突き合わせれば、経路は名前なしで同定できます。そこから逆に名前の対応表が得られます。
+
+```
+datasheet T1CH1  = RM TIM1_CH1
+datasheet T1BKIN = RM TIM1_BKIN
+datasheet SCL    = RM I2C1_SCL
+datasheet UCK    = RM USART1_CK
+datasheet TIETR  = RM TIM1_ETR
+```
+
+導出した対応を二巡目で全体に適用すると、CH32V003は0/74から**51/74**まで上がります。最後の行が示すとおり、**datasheetの誤植`TIETR`も`T1ETR`と同じ経路に落ちるため正しい対応が付きます。**
+
+ただし、pad+値が複数の経路を指す箇所からは何も学べません。同じpadを別のperipheralが同じ値で使う場合で、そこは対応付けを見送っています。導出結果は対応表の**素案**であって確定ではありません。
+
+### 経路の書かれ方は3系統ある
+
+CH32X035のRMにはremap格子がありません。経路はregister field表のDescription列に文章で書かれています。
+
+```
+[4:2] I2C1_RM[2:0] RW  001: Mapping (SCL/PA13, SDA/PA14)  0
+```
+
+ここから219経路を読み取れます。信号名はfield名から補完できるので（`I2C1_RM` + `SCL` → `I2C1_SCL`）、格子と同じ形に揃います。これを併用してCH32X035は0/87から**45/87**になりました。
+
+まとめると経路の出所は次の3つで、familyごとにどれがあるかが違います。
+
+| 出所 | 例 |
+|---|---|
+| datasheetのremap列の接尾辞・AF番号 | 全family |
+| RMのremap格子 | V003, M030, H417 |
+| RMのregister説明文 | X035, M030, V003 |
+
 ## 仕組みの方針
 
 以上から、次を提案します。決定ではありません。
@@ -200,6 +401,8 @@ CH32V003でrecordと食い違った9件のうち、抽出器が「要確認」�
 
 ```sh
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
+uv run tools/extract_remap.py <manual>.PDF --compare devices/<id>.json
+uv run tools/extract_registers.py <manual>.PDF --compare devices/<id>.json
 
 uv run tools/extract_pins.py <datasheet>.PDF --list
 uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare devices/<id>.json
@@ -212,15 +415,26 @@ uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --emit > candida
 
 ### 要確認件数は表の作りに比例する
 
-掃引全体で要確認は683件ですが、うち478件はCH32H415の1製品です。この表にはdefault alternate function列がなく、抽出器がremap列のみを採取したためにすべてがflag対象になります。**要確認件数は抽出精度ではなく、その表がどれだけRM参照を要求するかの指標**として読むべきです。
+掃引全体で要確認は252件で、うち47件はCH32H415の1製品です。この表にはdefault alternate function列がなく、remap列のみからの採取になるためflagが集中します。**要確認件数は抽出精度ではなく、その表がどれだけRM参照を要求するかの指標**として読むべきです。
+
+4資料をまとめて1候補にするには次を使います。
+
+```sh
+uv run tools/build_candidate.py \
+  --header <EVT>/Peripheral/inc/ch32xxx.h \
+  --manual <manual>.PDF --datasheet <datasheet>.PDF --package LQFP48 \
+  --compare devices/<id>.json
+```
 
 `tools/validate.py`は標準libraryだけで動く状態を維持しており、`python3 -S tools/validate.py`のfallback検査も従来どおりです。
 
 ## 未決定事項
 
-1. CH32M030・CH32H415系のremap表をRMから読む抽出器を作るか
-2. 抽出候補JSONをschema準拠の形にして、未採取SKUの入力に使うか
-3. datasheetの誤植とテキスト層欠落を、reviewのどの段階で検出する仕組みにするか
-4. 資料矛盾の裁定を保持する構造をschemaへ追加するか
-5. family repositoryのREADME手製表を禁止対象として明記するか
-6. 掃引で見つかった製品のうち、どこまでを対象SKUとするか。現状4035 pinが取得可能だが、対象範囲は未合意である
+1. `build_candidate.py`が導出するsignal名対応表を、canonical signal辞書としてrepositoryへ持つか
+2. `extract_remap.py`が拾う内部経路（padを持たない`TIM2ITR1_RM`等）を同じschemaへ入れるか分離するか
+3. CH32H41xのalternate function多重化（pinごとのAFR field）を`route_selectors`でどう表現するか。共有fieldを前提とした現在の構造では表せない
+4. datasheetの誤植とテキスト層欠落を、reviewのどの段階で検出する仕組みにするか
+5. 資料矛盾の裁定を保持する構造をschemaへ追加するか
+6. family repositoryのREADME手製表を禁止対象として明記するか
+7. RMのdefault経路（value=0）をrecordへ明示するか
+8. 掃引で見つかった製品のうち、どこまでを対象SKUとするか。現状4035 pinが取得可能だが、対象範囲は未合意である

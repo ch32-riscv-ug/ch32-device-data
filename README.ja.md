@@ -14,7 +14,8 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `schemas/device.schema.json`: exact SKU、CPU、memory、package、peripheral、pin、出典のschema草案
 - `devices/*.json`: schemaを評価するための代表SKUデータ
 - `tools/validate.py`: JSON Schemaと追加の整合性規則を検査するvalidator
-- `tools/extract_selectors.py`、`tools/extract_pins.py`: EVTヘッダとdatasheetから候補を抽出するreview支援tool。recordは書き換えない
+- `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するreview支援tool。recordは書き換えない
+- `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
 - `docs/schema-notes.ja.md`: schema調査、確認済みの構造差、未決定事項
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
 - `docs/handoff.ja.md`: 作業状態、既知の資料矛盾、再開手順
@@ -51,4 +52,6 @@ python3 tools/validate.py
 ```sh
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
 uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20 --compare devices/<id>.json
+uv run tools/extract_remap.py <manual>.PDF --compare devices/<id>.json
+uv run tools/extract_registers.py <manual>.PDF --compare devices/<id>.json
 ```
