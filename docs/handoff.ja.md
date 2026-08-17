@@ -24,6 +24,7 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_pins.py`: datasheetのpin表からpackage pin/function候補を作る
 - `tools/extract_remap.py`: RMのremap格子から`(field, value, signal, pad)`候補を作る。datasheetにない default 経路とsilicon全体の経路を補い、datasheet側抽出との相互確認に使う
 - `tools/extract_registers.py`: RMのregister field表から bit位置・`reset_value` 候補を作る。説明文に書かれた経路も読む
+- `tools/extract_products.py`: datasheetの製品比較表から全SKUとその属性を取る。ユニーク型番92件を確認済み
 - `tools/build_candidate.py`: 上記4 toolの出力を結合し、pinから参照されるselectorだけを残した候補を作る
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 
@@ -121,5 +122,5 @@ uv run tools/extract_registers.py \
 - 旧Arduino core、EVT tree、公式PDFを新repositoryへ無断コピーしない
 - `ch32_riscv_tools/PinAlternateFunctions`の手製表を検証根拠やimport元にしない
 - sample recordをArduino対応宣言として扱わない
-- schema・対象範囲・初期SKUを合意なしに決定済みへ変更しない
+- schemaは拡張してよい。対象は全SKU・全項目とし、正規化と分解は公開時に行う
 - commit、push、releaseは依頼または合意なしに行わない

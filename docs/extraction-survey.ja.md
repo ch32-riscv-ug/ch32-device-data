@@ -18,6 +18,15 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 したがって抽出器は常時稼働するpipelineではなく、必要時に一度走らせて人がreviewするためのtoolとして位置づけます。
 
+### 方針
+
+- **対象は全SKU・全項目**とする。取れる情報は取れるだけ取る
+- schemaは未確定であり、必要に応じて拡張してよい。正規化・分解は公開時に行う
+- 自動抽出の限界に達したら、hand researchで確認してcoverageを上げる
+- 一つの資料・一つの手法で確定させず、**複数の手法で突き合わせて確度を上げる**
+
+この方針に沿って、資料ごとの抽出結果は元のラベルを保ったまま保持し、schemaへの写像は後段で行います。
+
 ## 切り分けの原則
 
 調査の結果、資料の種類ではなく**記述の性質**で切るのが妥当だと分かりました。
@@ -189,6 +198,42 @@ CH32V003でrecordと食い違った9件のうち、抽出器が「要確認」�
 | TIETR | そのまま採用 | datasheetの誤植 |
 
 **datasheetのpin表は、その機能がselector制御されていることを表記しません。** RMを読まないと分からない差が、確定扱いで紛れ込みます。
+
+## Datasheetからの製品比較表抽出
+
+各datasheetの冒頭には、注文可能な全modelをmemory・pin数・周辺機器数とともに並べた比較表があります。**SKUの母集合そのものと、recordのidentity・memory・package・peripheralsの出所**です。
+
+[`tools/extract_products.py`](../tools/extract_products.py)がこれを読みます。値はschemaへ写さず、資料が使っているラベルのまま保持します。
+
+### 2つのレイアウト
+
+| レイアウト | 例 | family |
+|---|---|---|
+| 1 model 1行 | `Model \| Flash memory \| SRAM \| Pin No. \| ...` | V003, V002, V004, V006, V007 |
+| 1 model 1列（転置） | `Model/Resource \| \| C8U3 \| C8T7 \| ...` | M030, L103, H417, V103, V20x, V30x, V407, X035 |
+
+転置形はさらに2種類あります。CH32L103・CH32V407・CH32H417は上段にfamily名（`CH32V407` / `CH32V467`）、下段に接尾辞（`VET6` / `WEU6`）を置いて結合します。CH32M030はfamily行を持たず、文書題名から補います。
+
+接尾辞の形も一定ではありません。`C8T6`のように英数交互のもの、`VET6`・`RDU6`のようにそうでないもの、CH32V303/V208の`CB`・`RB`・`VC`のように2文字だけのものがあります。狭いパターンを仮定すると、V407・H417・V20x/V30xがまとめて落ちます。
+
+### 結果
+
+16 datasheetすべてから取得でき、**ユニーク型番92件**になりました。
+
+| datasheet | SKU | datasheet | SKU |
+|---|---:|---|---:|
+| CH32V003DS0 | 4 | CH32V103DS0 | 4 |
+| CH32V002DS0 | 5 | CH32V203DS0 | 6 |
+| CH32V004DS0 | 2 | CH32V205DS0 | 4 |
+| CH32V006DS0 | 11 | CH32V208DS0 | 4 |
+| CH32V007DS0 | 8 | CH32V20x_30xDS0 | 13 |
+| CH32M030DS0 | 5 | CH32V407DS0 | 6 |
+| CH32L103DS0 | 7 | CH32X035DS0 | 8 |
+| CH32H417DS0 | 5 | | |
+
+CH32V007の表にはCH32M007のSKUが、CH32L103の表にはCH32M103が、CH32V407の表にはCH32V467が、CH32H417の表にはCH32H416/H415が入ります。**datasheetのfamily名とSKUのfamily名は一致しません。**
+
+CH32V303/V305/V208の比較表は`CH32V303CB`のように接尾辞を省略しています。完全な注文型番はordering information側にあり、突き合わせが必要です。
 
 ## Reference manualからのremap経路抽出
 
@@ -437,4 +482,4 @@ uv run tools/build_candidate.py \
 5. 資料矛盾の裁定を保持する構造をschemaへ追加するか
 6. family repositoryのREADME手製表を禁止対象として明記するか
 7. RMのdefault経路（value=0）をrecordへ明示するか
-8. 掃引で見つかった製品のうち、どこまでを対象SKUとするか。現状4035 pinが取得可能だが、対象範囲は未合意である
+8. CH32V303/V305/V208の省略された接尾辞を、ordering information側と突き合わせて完全な注文型番にする
