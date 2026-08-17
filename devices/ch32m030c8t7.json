@@ -1,0 +1,212 @@
+{
+  "schema_version": "0.1-draft",
+  "kind": "orderable-device",
+  "id": "ch32m030c8t7",
+  "identity": {
+    "manufacturer": "WCH",
+    "part_number": "CH32M030C8T7",
+    "series": "CH32M030"
+  },
+  "cpu": {
+    "cores": [
+      {
+        "id": "main",
+        "vendor_core": "QingKe RISC-V3B",
+        "isa_claim": "RV32IMCB",
+        "clock_profiles": [{ "name": "datasheet-maximum", "frequency_hz": 72000000 }],
+        "role": "primary"
+      }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Features; Section 1.4.1 QingKe RISC-V3B processor" }]
+  },
+  "memory": {
+    "regions": [
+      { "id": "code-flash", "kind": "code-flash", "size_bytes": 65536, "attributes": ["ecc"] },
+      { "id": "sram", "kind": "sram", "size_bytes": 12288 }
+    ],
+    "evidence": [
+      { "source": "ds-en", "locator": "Product resource comparison table, C8T7 column; Figure 2-2; Table 2-1 LQFP48 column" },
+      { "source": "evt-schematic", "locator": "CH32M030C8T7 evaluation-board schematic, U1" }
+    ]
+  },
+  "package": {
+    "name": "LQFP48",
+    "pin_count": 48,
+    "gpio_count": 35,
+    "special_io_counts": [
+      { "kind": "medium-voltage-pre-drive", "count": 8 },
+      { "kind": "high-voltage-io", "count": 0 }
+    ],
+    "temperature_grade": "industrial -40 C to 105 C",
+    "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table, C8T7 column" }]
+  },
+  "peripherals": [
+    { "kind": "half-bridge-gate-driver", "instances": 4, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "opa", "instances": 4, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "comparator", "instances": 3, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "usbfs", "instances": 1, "features": ["host", "device"], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "usbpd", "instances": 1, "features": ["CC1", "CC2", "CC3", "CC4"], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table, C8T7 column" }] },
+    { "kind": "adc", "instances": 1, "channels": [{ "kind": "external", "count": 20 }], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] }
+  ],
+  "route_selectors": [
+    { "id": "afio-i2c1-remap", "controller": "afio", "register": "PCFR1", "field": "I2C1_REMAP", "bit_offset": 0, "bit_width": 2, "valid_values": [0, 1, 2, 3], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-14 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_I2C1_REMAP" }] },
+    { "id": "afio-uart1-remap", "controller": "afio", "register": "PCFR1", "field": "UART1_REMAP", "bit_offset": 2, "bit_width": 3, "valid_values": [0, 1, 2, 3, 4, 5], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-12 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define (USART1 naming)" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_UART1_REMAP" }] },
+    { "id": "afio-spi1-remap", "controller": "afio", "register": "PCFR1", "field": "SPI1_REMAP", "bit_offset": 5, "bit_width": 2, "valid_values": [0, 1, 2, 3], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-13 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_SPI1_REMAP" }] },
+    { "id": "afio-tim1-remap", "controller": "afio", "register": "PCFR1", "field": "TIM1_REMAP", "bit_offset": 7, "bit_width": 3, "valid_values": [0, 1, 2, 3, 4], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-9 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_TIM1_REMAP" }] },
+    { "id": "afio-tim2-remap", "controller": "afio", "register": "PCFR1", "field": "TIM2_REMAP", "bit_offset": 10, "bit_width": 2, "valid_values": [0, 1, 2, 3], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-10 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_TIM2_REMAP" }] },
+    { "id": "afio-tim3-remap", "controller": "afio", "register": "PCFR1", "field": "TIM3_REMAP", "bit_offset": 12, "bit_width": 3, "valid_values": [0, 1, 2, 3, 4], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Table 6-11 and Section 6.3.2.1" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_define" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_TIM3_REMAP" }] },
+    { "id": "afio-adc-etrgin-remap", "controller": "afio", "register": "PCFR1", "field": "ADC_ETRGIN_REMAP", "bit_offset": 15, "bit_width": 1, "valid_values": [0, 1], "reset_value": 0, "evidence": [{ "source": "ds-en", "locator": "Table 2-1, PA14 and PB6" }, { "source": "rm-en", "locator": "Section 6.3.2.1 register description; Table 6-15 has reversed labels" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_ADC1_ETRG" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_ADC_ETRGIN_REMAP" }] },
+    { "id": "afio-pb5-pb6-remap", "controller": "afio", "register": "PCFR1", "field": "PB5PB6_REMAP", "bit_offset": 16, "bit_width": 1, "valid_values": [0, 1], "reset_value": 0, "evidence": [{ "source": "rm-en", "locator": "Section 6.3.2.1, PB5PB6_RM" }, { "source": "evt-gpio-header", "locator": "GPIO_Remap_PB5_6" }, { "source": "evt-device-header", "locator": "AFIO_PCFR1_PB5PB6_REMAP" }] }
+  ],
+  "pins": [
+    { "number": 1, "pad": "PA10", "kind": "gpio", "functions": [{ "signal": "ISP2", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 1" }] },
+    { "number": 2, "pad": "PA11", "kind": "gpio", "functions": [{ "signal": "ADC_IN8", "peripheral": "adc1", "route": "default" }, { "signal": "ISN2", "route": "default" }, { "signal": "SPI_MOSI", "peripheral": "spi1", "route": "remap-2", "selection": { "selector": "afio-spi1-remap", "values": [2] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 2" }] },
+    { "number": 3, "pad": "PA12", "kind": "gpio", "functions": [{ "signal": "ADC_IN19", "peripheral": "adc1", "route": "default" }, { "signal": "QII1", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 3" }] },
+    { "number": 4, "pad": "PA13", "kind": "gpio", "functions": [{ "signal": "ADC_IN18", "peripheral": "adc1", "route": "default" }, { "signal": "QII2", "route": "default" }, { "signal": "TIM1_BKIN", "peripheral": "tim1", "route": "remap-1", "selection": { "selector": "afio-tim1-remap", "values": [1] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 4" }] },
+    { "number": 5, "pad": "PA14", "kind": "gpio", "functions": [{ "signal": "ADC_IN9", "peripheral": "adc1", "route": "default" }, { "signal": "ADC_ETR", "peripheral": "adc1", "route": "default", "selection": { "selector": "afio-adc-etrgin-remap", "values": [0] } }, { "signal": "UART_CTS", "peripheral": "uart1", "route": "default" }, { "signal": "UART_CTS", "peripheral": "uart1", "route": "remap-1", "selection": { "selector": "afio-uart1-remap", "values": [1] } }, { "signal": "I2C_SDA", "peripheral": "i2c1", "route": "remap-2", "selection": { "selector": "afio-i2c1-remap", "values": [2] } }, { "signal": "Q_DET1", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 5" }] },
+    { "number": 6, "pad": "PA15", "kind": "gpio", "functions": [{ "signal": "ADC_IN10", "peripheral": "adc1", "route": "default" }, { "signal": "TIM1_BKIN", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_BKIN", "peripheral": "tim1", "route": "remap-2-to-4", "selection": { "selector": "afio-tim1-remap", "values": [2, 3, 4] } }, { "signal": "UART_RTS", "peripheral": "uart1", "route": "default" }, { "signal": "UART_RTS", "peripheral": "uart1", "route": "remap-1", "selection": { "selector": "afio-uart1-remap", "values": [1] } }, { "signal": "I2C_SCL", "peripheral": "i2c1", "route": "remap-2", "selection": { "selector": "afio-i2c1-remap", "values": [2] } }, { "signal": "RST", "peripheral": "system", "route": "user-option" }, { "signal": "Q_DET2", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 4, LQFP48 pin 6" }] },
+    { "number": 7, "pad": "PB2", "kind": "gpio", "functions": [{ "signal": "ADC_IN0", "peripheral": "adc1", "route": "default" }, { "signal": "TIM3_CH1N", "peripheral": "tim3", "route": "default" }, { "signal": "I2C_SDA", "peripheral": "i2c1", "route": "default" }, { "signal": "CMP3_N3", "peripheral": "comparator3", "route": "default" }, { "signal": "TIM2_CH4", "peripheral": "tim2", "route": "remap-1-or-3", "selection": { "selector": "afio-tim2-remap", "values": [1, 3] } }, { "signal": "TIM2_CH2N", "peripheral": "tim2", "route": "remap-1-or-3", "selection": { "selector": "afio-tim2-remap", "values": [1, 3] } }, { "signal": "TIM3_CH1", "peripheral": "tim3", "route": "remap-2", "selection": { "selector": "afio-tim3-remap", "values": [2] } }, { "signal": "TIM3_ETR", "peripheral": "tim3", "route": "remap-2", "selection": { "selector": "afio-tim3-remap", "values": [2] } }, { "signal": "TIM3_CH2", "peripheral": "tim3", "route": "remap-1", "selection": { "selector": "afio-tim3-remap", "values": [1] } }, { "signal": "UART_CTS", "peripheral": "uart1", "route": "remap-3-to-5", "selection": { "selector": "afio-uart1-remap", "values": [3, 4, 5] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 7" }] },
+    { "number": 8, "pad": "PB3", "kind": "gpio", "functions": [{ "signal": "ADC_IN1", "peripheral": "adc1", "route": "default" }, { "signal": "TIM3_CH2N", "peripheral": "tim3", "route": "default" }, { "signal": "I2C_SCL", "peripheral": "i2c1", "route": "default" }, { "signal": "CMP3_P3", "peripheral": "comparator3", "route": "default" }, { "signal": "TIM3_CH2", "peripheral": "tim3", "route": "remap-2", "selection": { "selector": "afio-tim3-remap", "values": [2] } }, { "signal": "TIM3_CH2N", "peripheral": "tim3", "route": "remap-1", "selection": { "selector": "afio-tim3-remap", "values": [1] } }, { "signal": "UART_RTS", "peripheral": "uart1", "route": "remap-3-to-5", "selection": { "selector": "afio-uart1-remap", "values": [3, 4, 5] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 8" }] },
+    { "number": 9, "pad": "PB4", "kind": "gpio", "functions": [{ "signal": "ADC_IN17", "peripheral": "adc1", "route": "default" }, { "signal": "CMP3_OUT1", "peripheral": "comparator3", "route": "default" }, { "signal": "V_DET", "route": "default" }, { "signal": "TIM3_CH1N", "peripheral": "tim3", "route": "remap-2", "selection": { "selector": "afio-tim3-remap", "values": [2] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 9" }] },
+    { "number": 10, "pad": "PB5", "kind": "gpio", "functions": [{ "signal": "ADC_IN3", "peripheral": "adc1", "route": "default" }, { "signal": "XI", "peripheral": "oscillator", "route": "remap-1", "selection": { "selector": "afio-pb5-pb6-remap", "values": [1] } }, { "signal": "CMP3_OUT2", "peripheral": "comparator3", "route": "default" }, { "signal": "CMP2_P0", "peripheral": "comparator2", "route": "default" }, { "signal": "TIM3_CH2N", "peripheral": "tim3", "route": "remap-2", "selection": { "selector": "afio-tim3-remap", "values": [2] } }, { "signal": "TIM3_CH2", "peripheral": "tim3", "route": "remap-3", "selection": { "selector": "afio-tim3-remap", "values": [3] } }, { "signal": "TIM2_CH1", "peripheral": "tim2", "route": "remap-3", "selection": { "selector": "afio-tim2-remap", "values": [3] } }, { "signal": "TIM2_ETR", "peripheral": "tim2", "route": "remap-3", "selection": { "selector": "afio-tim2-remap", "values": [3] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "remap-2", "selection": { "selector": "afio-uart1-remap", "values": [2] } }, { "signal": "SPI_MOSI", "peripheral": "spi1", "route": "remap-1", "selection": { "selector": "afio-spi1-remap", "values": [1] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 10" }] },
+    { "number": 11, "pad": "PB6", "kind": "gpio", "functions": [{ "signal": "ADC_IN4", "peripheral": "adc1", "route": "default" }, { "signal": "XO", "peripheral": "oscillator", "route": "remap-1", "selection": { "selector": "afio-pb5-pb6-remap", "values": [1] } }, { "signal": "CMP2_N0", "peripheral": "comparator2", "route": "default" }, { "signal": "ADC_ETR", "peripheral": "adc1", "route": "remap-1", "selection": { "selector": "afio-adc-etrgin-remap", "values": [1] } }, { "signal": "TIM2_CH2", "peripheral": "tim2", "route": "remap-3", "selection": { "selector": "afio-tim2-remap", "values": [3] } }, { "signal": "TIM3_CH2N", "peripheral": "tim3", "route": "remap-3", "selection": { "selector": "afio-tim3-remap", "values": [3] } }, { "signal": "UART_TX", "peripheral": "uart1", "route": "remap-2", "selection": { "selector": "afio-uart1-remap", "values": [2] } }, { "signal": "I2C_SDA", "peripheral": "i2c1", "route": "remap-1", "selection": { "selector": "afio-i2c1-remap", "values": [1] } }, { "signal": "SPI_SCK", "peripheral": "spi1", "route": "remap-1", "selection": { "selector": "afio-spi1-remap", "values": [1] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 11" }] },
+    { "number": 12, "pad": "PB8", "kind": "gpio", "functions": [{ "signal": "LO0", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH1N", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH1N", "peripheral": "tim1", "route": "remap-1-2-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 2, 4] } }], "electrical_classes": ["medium-voltage-pre-drive", "fixed-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Notes 1/3, LQFP48 pin 12" }] },
+    { "number": 13, "pad": "VS0", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 13" }] },
+    { "number": 14, "pad": "VB0", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 14" }] },
+    { "number": 15, "pad": "PB9", "kind": "gpio", "functions": [{ "signal": "HO0", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH1", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH1", "peripheral": "tim1", "route": "remap-1-2-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 2, 4] } }], "electrical_classes": ["medium-voltage-pre-drive", "output-only"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 1, LQFP48 pin 15" }] },
+    { "number": 16, "pad": "PB10", "kind": "gpio", "functions": [{ "signal": "LO1", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH2N", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH2N", "peripheral": "tim1", "route": "remap-1-2-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 2, 4] } }], "electrical_classes": ["medium-voltage-pre-drive", "fixed-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Notes 1/3, LQFP48 pin 16" }] },
+    { "number": 17, "pad": "VS1", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 17" }] },
+    { "number": 18, "pad": "VB1", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 18" }] },
+    { "number": 19, "pad": "PB11", "kind": "gpio", "functions": [{ "signal": "HO1", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH2", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH2", "peripheral": "tim1", "route": "remap-1-2-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 2, 4] } }], "electrical_classes": ["medium-voltage-pre-drive", "output-only"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 1, LQFP48 pin 19" }] },
+    { "number": 20, "pad": "PB12", "kind": "gpio", "functions": [{ "signal": "LO2", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH3N", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH3N", "peripheral": "tim1", "route": "remap-1-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 4] } }, { "signal": "TIM2_CH3", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM2_CH1N", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM3_CH1N", "peripheral": "tim3", "route": "remap-4", "selection": { "selector": "afio-tim3-remap", "values": [4] } }], "electrical_classes": ["medium-voltage-pre-drive", "fixed-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Notes 1/3, LQFP48 pin 20" }] },
+    { "number": 21, "pad": "VS2", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 21" }] },
+    { "number": 22, "pad": "VB2", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 22" }] },
+    { "number": 23, "pad": "PB13", "kind": "gpio", "functions": [{ "signal": "HO2", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH3", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_CH3", "peripheral": "tim1", "route": "remap-1-or-4", "selection": { "selector": "afio-tim1-remap", "values": [1, 4] } }, { "signal": "TIM2_CH1", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM2_ETR", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM3_CH1", "peripheral": "tim3", "route": "remap-4", "selection": { "selector": "afio-tim3-remap", "values": [4] } }, { "signal": "TIM3_ETR", "peripheral": "tim3", "route": "remap-4", "selection": { "selector": "afio-tim3-remap", "values": [4] } }], "electrical_classes": ["medium-voltage-pre-drive", "output-only"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 1, LQFP48 pin 23" }] },
+    { "number": 24, "pad": "PB14", "kind": "gpio", "functions": [{ "signal": "LO3", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH3N", "peripheral": "tim1", "route": "remap-2", "selection": { "selector": "afio-tim1-remap", "values": [2] } }, { "signal": "TIM2_CH4", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM2_CH2N", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM3_CH2N", "peripheral": "tim3", "route": "remap-4", "selection": { "selector": "afio-tim3-remap", "values": [4] } }], "electrical_classes": ["medium-voltage-pre-drive", "fixed-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Notes 1/3, LQFP48 pin 24" }] },
+    { "number": 25, "pad": "VS3", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 25" }] },
+    { "number": 26, "pad": "VB3", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 26" }] },
+    { "number": 27, "pad": "PB15", "kind": "gpio", "functions": [{ "signal": "HO3", "peripheral": "half-bridge-gate-driver", "route": "default" }, { "signal": "TIM1_CH3", "peripheral": "tim1", "route": "remap-2", "selection": { "selector": "afio-tim1-remap", "values": [2] } }, { "signal": "TIM1_CH4", "peripheral": "tim1", "route": "remap-1", "selection": { "selector": "afio-tim1-remap", "values": [1] } }, { "signal": "TIM2_CH2", "peripheral": "tim2", "route": "remap-2", "selection": { "selector": "afio-tim2-remap", "values": [2] } }, { "signal": "TIM3_CH2", "peripheral": "tim3", "route": "remap-4", "selection": { "selector": "afio-tim3-remap", "values": [4] } }], "electrical_classes": ["medium-voltage-pre-drive", "output-only"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 1, LQFP48 pin 27" }] },
+    { "number": 28, "pad": "VDD8", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 28" }] },
+    { "number": 29, "pad": "PC0", "kind": "gpio", "functions": [{ "signal": "TIM1_CH4", "peripheral": "tim1", "route": "default" }, { "signal": "RST", "peripheral": "system", "route": "user-option" }, { "signal": "TIM3_CH1", "peripheral": "tim3", "route": "default" }, { "signal": "TIM3_ETR", "peripheral": "tim3", "route": "default" }, { "signal": "TIM3_CH1", "peripheral": "tim3", "route": "remap-1", "selection": { "selector": "afio-tim3-remap", "values": [1] } }, { "signal": "TIM3_ETR", "peripheral": "tim3", "route": "remap-1", "selection": { "selector": "afio-tim3-remap", "values": [1] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "default" }, { "signal": "TIM1_CH3N", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 4, LQFP48 pin 29" }] },
+    { "number": 30, "pad": "PC1", "kind": "gpio", "functions": [{ "signal": "TIM1_ETR", "peripheral": "tim1", "route": "default" }, { "signal": "TIM1_ETR", "peripheral": "tim1", "route": "remap-1", "selection": { "selector": "afio-tim1-remap", "values": [1] } }, { "signal": "TIM3_CH2", "peripheral": "tim3", "route": "default" }, { "signal": "UART_TX", "peripheral": "uart1", "route": "default" }, { "signal": "TIM1_CH2N", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }, { "signal": "TIM3_CH1N", "peripheral": "tim3", "route": "remap-1", "selection": { "selector": "afio-tim3-remap", "values": [1] } }, { "signal": "UART_TX", "peripheral": "uart1", "route": "remap-1", "selection": { "selector": "afio-uart1-remap", "values": [1] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 30" }] },
+    { "number": 31, "pad": "PC2", "kind": "gpio", "functions": [{ "signal": "TIM1_CH4", "peripheral": "tim1", "route": "remap-2", "selection": { "selector": "afio-tim1-remap", "values": [2] } }, { "signal": "TIM1_CH1N", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "remap-1", "selection": { "selector": "afio-uart1-remap", "values": [1] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 31" }] },
+    { "number": 32, "pad": "PC3", "kind": "gpio", "functions": [{ "signal": "SPI_MOSI", "peripheral": "spi1", "route": "default" }, { "signal": "TIM1_CH1", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 32" }] },
+    { "number": 33, "pad": "PC4", "kind": "gpio", "functions": [{ "signal": "SPI_MISO", "peripheral": "spi1", "route": "default" }, { "signal": "TIM1_CH2", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }, { "signal": "SPI_MISO", "peripheral": "spi1", "route": "remap-2", "selection": { "selector": "afio-spi1-remap", "values": [2] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 33" }] },
+    { "number": 34, "pad": "VDD33", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 34" }] },
+    { "number": 35, "pad": "VHV", "kind": "power", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 35" }] },
+    { "number": 36, "pad": "GND", "kind": "ground", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 36" }] },
+    { "number": 37, "pad": "PA0", "kind": "gpio", "functions": [{ "signal": "ADC_IN13", "peripheral": "adc1", "route": "default" }, { "signal": "CC1", "peripheral": "usbpd", "route": "default" }, { "signal": "SPI_NSS", "peripheral": "spi1", "route": "default" }, { "signal": "TIM1_CH3", "peripheral": "tim1", "route": "remap-3-or-4", "selection": { "selector": "afio-tim1-remap", "values": [3, 4] } }, { "signal": "SPI_NSS", "peripheral": "spi1", "route": "remap-2", "selection": { "selector": "afio-spi1-remap", "values": [2] } }], "electrical_classes": ["high-voltage-resistant"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Sections 1.4.16/1.4.22, LQFP48 pin 37" }] },
+    { "number": 38, "pad": "PA1", "kind": "gpio", "functions": [{ "signal": "ADC_IN14", "peripheral": "adc1", "route": "default" }, { "signal": "CC2", "peripheral": "usbpd", "route": "default" }, { "signal": "SPI_SCK", "peripheral": "spi1", "route": "default" }, { "signal": "TIM1_CH4", "peripheral": "tim1", "route": "remap-4", "selection": { "selector": "afio-tim1-remap", "values": [4] } }, { "signal": "SPI_SCK", "peripheral": "spi1", "route": "remap-2-or-3", "selection": { "selector": "afio-spi1-remap", "values": [2, 3] } }], "electrical_classes": ["high-voltage-resistant"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Sections 1.4.16/1.4.22, LQFP48 pin 38" }] },
+    { "number": 39, "pad": "PA2", "kind": "gpio", "functions": [{ "signal": "ADC_IN15", "peripheral": "adc1", "route": "default" }, { "signal": "SWCLK", "peripheral": "debug", "route": "default" }, { "signal": "CC3", "peripheral": "usbpd", "route": "default" }, { "signal": "TIM3_CH1", "peripheral": "tim3", "route": "remap-3", "selection": { "selector": "afio-tim3-remap", "values": [3] } }, { "signal": "TIM3_ETR", "peripheral": "tim3", "route": "remap-3", "selection": { "selector": "afio-tim3-remap", "values": [3] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "remap-4", "selection": { "selector": "afio-uart1-remap", "values": [4] } }, { "signal": "UART_TX", "peripheral": "uart1", "route": "remap-5", "selection": { "selector": "afio-uart1-remap", "values": [5] } }, { "signal": "UART_CTS", "peripheral": "uart1", "route": "remap-2", "selection": { "selector": "afio-uart1-remap", "values": [2] } }, { "signal": "I2C_SCL", "peripheral": "i2c1", "route": "remap-1-or-3", "selection": { "selector": "afio-i2c1-remap", "values": [1, 3] } }, { "signal": "SPI_NSS", "peripheral": "spi1", "route": "remap-1-or-3", "selection": { "selector": "afio-spi1-remap", "values": [1, 3] } }], "electrical_classes": ["high-voltage-resistant"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Sections 1.4.16/1.4.22, LQFP48 pin 39" }] },
+    { "number": 40, "pad": "PA3", "kind": "gpio", "functions": [{ "signal": "ADC_IN16", "peripheral": "adc1", "route": "default" }, { "signal": "SWDIO", "peripheral": "debug", "route": "default" }, { "signal": "SWIM", "peripheral": "debug", "route": "default" }, { "signal": "CC4", "peripheral": "usbpd", "route": "default" }, { "signal": "CMP3_P0", "peripheral": "comparator3", "route": "default" }, { "signal": "TIM2_CH1", "peripheral": "tim2", "route": "remap-1", "selection": { "selector": "afio-tim2-remap", "values": [1] } }, { "signal": "TIM2_ETR", "peripheral": "tim2", "route": "remap-1", "selection": { "selector": "afio-tim2-remap", "values": [1] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "remap-5", "selection": { "selector": "afio-uart1-remap", "values": [5] } }, { "signal": "UART_TX", "peripheral": "uart1", "route": "remap-4", "selection": { "selector": "afio-uart1-remap", "values": [4] } }, { "signal": "I2C_SDA", "peripheral": "i2c1", "route": "remap-3", "selection": { "selector": "afio-i2c1-remap", "values": [3] } }], "electrical_classes": ["high-voltage-resistant"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Sections 1.4.16/1.4.22, LQFP48 pin 40" }] },
+    { "number": 41, "pad": "PB0", "kind": "gpio", "functions": [{ "signal": "ADC_IN11", "peripheral": "adc1", "route": "default" }, { "signal": "UDP", "peripheral": "usbfs", "route": "default" }, { "signal": "CMP3_P1", "peripheral": "comparator3", "route": "default" }, { "signal": "TIM2_CH2", "peripheral": "tim2", "route": "remap-1", "selection": { "selector": "afio-tim2-remap", "values": [1] } }, { "signal": "UART_RX", "peripheral": "uart1", "route": "remap-3", "selection": { "selector": "afio-uart1-remap", "values": [3] } }], "electrical_classes": ["controllable-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 3, LQFP48 pin 41" }] },
+    { "number": 42, "pad": "PB1", "kind": "gpio", "functions": [{ "signal": "ADC_IN12", "peripheral": "adc1", "route": "default" }, { "signal": "UDM", "peripheral": "usbfs", "route": "default" }, { "signal": "CMP3_P2", "peripheral": "comparator3", "route": "default" }, { "signal": "TIM2_CH3", "peripheral": "tim2", "route": "remap-1-or-3", "selection": { "selector": "afio-tim2-remap", "values": [1, 3] } }, { "signal": "TIM2_CH1N", "peripheral": "tim2", "route": "remap-1-or-3", "selection": { "selector": "afio-tim2-remap", "values": [1, 3] } }, { "signal": "UART_TX", "peripheral": "uart1", "route": "remap-3", "selection": { "selector": "afio-uart1-remap", "values": [3] } }], "electrical_classes": ["controllable-pulldown"], "evidence": [{ "source": "ds-en", "locator": "Table 2-1 and Note 3, LQFP48 pin 42" }] },
+    { "number": 43, "pad": "PA4", "kind": "gpio", "functions": [{ "signal": "ADC_IN5", "peripheral": "adc1", "route": "default" }, { "signal": "TIM2_CH4", "peripheral": "tim2", "route": "default" }, { "signal": "TIM2_CH2N", "peripheral": "tim2", "route": "default" }, { "signal": "ISOURCE1", "route": "default" }, { "signal": "TIM1_ETR", "peripheral": "tim1", "route": "remap-2-to-4", "selection": { "selector": "afio-tim1-remap", "values": [2, 3, 4] } }, { "signal": "TIM3_CH1N", "peripheral": "tim3", "route": "remap-3", "selection": { "selector": "afio-tim3-remap", "values": [3] } }, { "signal": "UART_RTS", "peripheral": "uart1", "route": "remap-2", "selection": { "selector": "afio-uart1-remap", "values": [2] } }, { "signal": "SPI_MISO", "peripheral": "spi1", "route": "remap-1-or-3", "selection": { "selector": "afio-spi1-remap", "values": [1, 3] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 43" }] },
+    { "number": 44, "pad": "PA5", "kind": "gpio", "functions": [{ "signal": "ADC_IN6", "peripheral": "adc1", "route": "default" }, { "signal": "TIM2_CH1", "peripheral": "tim2", "route": "default" }, { "signal": "TIM2_ETR", "peripheral": "tim2", "route": "default" }, { "signal": "CMP3_N0", "peripheral": "comparator3", "route": "default" }, { "signal": "ISOURCE2", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 44" }] },
+    { "number": 45, "pad": "PA6", "kind": "gpio", "functions": [{ "signal": "TIM2_CH2", "peripheral": "tim2", "route": "default" }, { "signal": "CMP3_N1", "peripheral": "comparator3", "route": "default" }, { "signal": "ISINK1", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 45" }] },
+    { "number": 46, "pad": "PA7", "kind": "gpio", "functions": [{ "signal": "ADC_IN2", "peripheral": "adc1", "route": "default" }, { "signal": "TIM2_CH3", "peripheral": "tim2", "route": "default" }, { "signal": "TIM2_CH1N", "peripheral": "tim2", "route": "default" }, { "signal": "CMP3_N2", "peripheral": "comparator3", "route": "default" }, { "signal": "ISINK2", "route": "default" }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 46" }] },
+    { "number": 47, "pad": "PA8", "kind": "gpio", "functions": [{ "signal": "ADC_IN7", "peripheral": "adc1", "route": "default" }, { "signal": "MCO", "peripheral": "system", "route": "default" }, { "signal": "CMP3_OUT0", "peripheral": "comparator3", "route": "default" }, { "signal": "ISN1", "route": "default" }, { "signal": "SPI_MOSI", "peripheral": "spi1", "route": "remap-3", "selection": { "selector": "afio-spi1-remap", "values": [3] } }], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 47" }] },
+    { "number": 48, "pad": "ISP1", "kind": "analog", "functions": [], "evidence": [{ "source": "ds-en", "locator": "Table 2-1, LQFP48 pin 48" }] }
+  ],
+  "sources": [
+    {
+      "id": "ds-en",
+      "kind": "datasheet",
+      "title": "CH32M030 Datasheet",
+      "language": "en",
+      "document_version": "V1.2",
+      "url": "https://www.wch-ic.com/download/file?id=408",
+      "sha256": "aa4331e7649686faf4edcc36024f01f67938594aeb3ae8de6f5d702461f7394c",
+      "hash_scope": "download-artifact",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32M030.git",
+        "commit": "4c42f7407c06e099de134880e29598b7cec3966e",
+        "path": "datasheet_en/CH32M030DS0.PDF"
+      }
+    },
+    {
+      "id": "evt-schematic",
+      "kind": "evt",
+      "title": "CH32M030 EVT schematic",
+      "language": "en",
+      "document_version": "EVT 2026.03",
+      "url": "https://file.wch.cn/download/file?id=505",
+      "sha256": "35af0b7a5473f94887653742d07df31c80a73e933889575e244fbf1f899d476d",
+      "hash_scope": "source-file",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32M030.git",
+        "commit": "4c42f7407c06e099de134880e29598b7cec3966e",
+        "path": "EVT/PUB/CH32M030SCH.pdf"
+      }
+    },
+    {
+      "id": "rm-en",
+      "kind": "reference-manual",
+      "title": "CH32M030 Reference Manual",
+      "language": "en",
+      "document_version": "V1.2",
+      "url": "https://www.wch-ic.com/download/file?id=420",
+      "sha256": "3143314893b1ecc3b04f3c5714c0ee4b7a249c29446c37fb58f9e388e1cce347",
+      "hash_scope": "download-artifact",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32M030.git",
+        "commit": "4c42f7407c06e099de134880e29598b7cec3966e",
+        "path": "datasheet_en/CH32M030RM.PDF"
+      }
+    },
+    {
+      "id": "evt-gpio-header",
+      "kind": "evt",
+      "title": "CH32M030 EVT GPIO remap definitions",
+      "language": "en",
+      "document_version": "V1.0.0 (EVT 2026.03)",
+      "url": "https://file.wch.cn/download/file?id=505",
+      "sha256": "a10c90ca175f4995b4008a895a1627dee69c75133d4126a34a59907ec7bd40eb",
+      "hash_scope": "source-file",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32M030.git",
+        "commit": "4c42f7407c06e099de134880e29598b7cec3966e",
+        "path": "EVT/EXAM/SRC/Peripheral/inc/ch32m030_gpio.h"
+      }
+    },
+    {
+      "id": "evt-device-header",
+      "kind": "evt",
+      "title": "CH32M030 EVT device register definitions",
+      "language": "en",
+      "document_version": "V1.0.5 (EVT 2026.03)",
+      "url": "https://file.wch.cn/download/file?id=505",
+      "sha256": "d2511f2d37c3b0e22b2c9550047234b86d8e2a73408121c442a397a04b8f0500",
+      "hash_scope": "source-file",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32M030.git",
+        "commit": "4c42f7407c06e099de134880e29598b7cec3966e",
+        "path": "EVT/EXAM/SRC/Peripheral/inc/ch32m030.h"
+      }
+    }
+  ],
+  "coverage": {
+    "identity": "complete",
+    "cpu": "complete",
+    "memory": "complete",
+    "package": "complete",
+    "peripherals": "partial",
+    "package_pins": "complete",
+    "pin_functions": "complete"
+  },
+  "verification": {
+    "identity": "single-source",
+    "cpu": "single-source",
+    "memory": "single-source",
+    "package": "cross-checked",
+    "peripherals": "single-source",
+    "package_pins": "cross-checked",
+    "pin_functions": "cross-checked"
+  },
+  "notes": [
+    "High-voltage I/O, medium-voltage pre-drive I/O, and built-in Type-C resistors vary by orderable package SKU and must not be inherited from the series globally.",
+    "All 48 LQFP leads, 35 GPIO, and the functions published for the C8T7 bond-out are captured. Digital remap routes were cross-checked against RM Tables 6-9 through 6-14, AFIO_PCFR1, and EVT definitions; hardware behavior is not yet verified.",
+    "Unlike C8U7, C8T7 exposes CC1 and CC2 without the R suffix and therefore is not assigned the built-in controllable Type-C Rd components.",
+    "RM Table 6-15 labels ADC_ETRGIN_RM=0 as PB6 and =1 as PA14, but datasheet Table 2-1, the RM register description/reset value, and the EVT set-bit implementation consistently indicate 0=PA14 and 1=PB6. This record follows the latter three sources and flags Table 6-15 as a likely documentation error."
+  ]
+}

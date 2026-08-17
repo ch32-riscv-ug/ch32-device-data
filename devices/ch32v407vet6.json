@@ -1,0 +1,85 @@
+{
+  "schema_version": "0.1-draft",
+  "kind": "orderable-device",
+  "id": "ch32v407vet6",
+  "identity": {
+    "manufacturer": "WCH",
+    "part_number": "CH32V407VET6",
+    "series": "CH32V407"
+  },
+  "cpu": {
+    "cores": [
+      {
+        "id": "main",
+        "vendor_core": "QingKe RISC-V3V",
+        "isa_claim": "ICBM-X with V-vector extension",
+        "clock_profiles": [{ "name": "datasheet-maximum", "frequency_hz": 200000000 }],
+        "role": "primary"
+      }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Features; Section 1.4.1 QingKe RISC-V3V processor" }]
+  },
+  "memory": {
+    "regions": [
+      { "id": "code-flash", "kind": "code-flash", "size_bytes": 1015808, "notes": "Total program memory stated in Features." },
+      { "id": "zero-wait-flash", "kind": "code-flash", "size_bytes": 524288, "attributes": ["zero-wait"], "subset_of": "code-flash" },
+      { "id": "sram", "kind": "sram", "size_bytes": 204800, "notes": "64 KiB can be configured as zero-wait flash, leaving 136 KiB data SRAM." }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Features; product resource comparison table and note 2" }]
+  },
+  "package": {
+    "name": "LQFP100",
+    "pin_count": 100,
+    "gpio_count": 77,
+    "temperature_grade": "industrial -40 C to 85 C",
+    "evidence": [{ "source": "ds-en", "locator": "CH32V407/V467 product resource comparison table, VET6 column" }]
+  },
+  "peripherals": [
+    { "kind": "usbhs", "instances": 2, "features": ["integrated PHY", "host", "device"], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "ethernet", "instances": 1, "features": ["MAC", "10/100M PHY"], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "adc", "instances": 2, "channels": [{ "kind": "external", "count": 16 }, { "kind": "internal", "count": 2 }], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "usart", "instances": 10, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "spi", "instances": 3, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "i2c", "instances": 1, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "i3c", "instances": 1, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "ltdc", "instances": 1, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "fsmc", "instances": 1, "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] }
+  ],
+  "pins": [],
+  "sources": [
+    {
+      "id": "ds-en",
+      "kind": "datasheet",
+      "title": "CH32V407/V467 Datasheet",
+      "language": "en",
+      "document_version": "V1.2",
+      "url": "https://www.wch-ic.com/download/file?id=442",
+      "sha256": "b0bb7b390d186bee35b57aeec56c8526304b43d251a393acf198a2b02bc8d766",
+      "hash_scope": "download-artifact",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32V407.git",
+        "commit": "0497bbdde6bff4ab57bf904bf8844b88c133135f",
+        "path": "datasheet_en/CH32V407DS0.PDF"
+      }
+    }
+  ],
+  "coverage": {
+    "identity": "complete",
+    "cpu": "complete",
+    "memory": "complete",
+    "package": "complete",
+    "peripherals": "partial",
+    "package_pins": "not-started",
+    "pin_functions": "not-started"
+  },
+  "verification": {
+    "identity": "single-source",
+    "cpu": "single-source",
+    "memory": "single-source",
+    "package": "single-source",
+    "peripherals": "single-source",
+    "package_pins": "not-verified",
+    "pin_functions": "not-verified"
+  },
+  "notes": ["The zero-wait flash region overlaps the total program-memory figure and is represented with subset_of rather than added to it."]
+}

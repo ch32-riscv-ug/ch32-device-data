@@ -1,0 +1,84 @@
+{
+  "schema_version": "0.1-draft",
+  "kind": "orderable-device",
+  "id": "ch32v103c8t6",
+  "identity": {
+    "manufacturer": "WCH",
+    "part_number": "CH32V103C8T6",
+    "series": "CH32V103"
+  },
+  "cpu": {
+    "cores": [
+      {
+        "id": "main",
+        "vendor_core": "QingKe RISC-V3A",
+        "isa_claim": "RV32IMAC",
+        "clock_profiles": [
+          { "name": "typical", "frequency_hz": 72000000 },
+          { "name": "datasheet-maximum", "frequency_hz": 80000000 }
+        ],
+        "role": "primary"
+      }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Features; Section 1.4.1 QingKe RISC-V3A processor" }]
+  },
+  "memory": {
+    "regions": [
+      { "id": "code-flash", "kind": "code-flash", "size_bytes": 65536 },
+      { "id": "sram", "kind": "sram", "size_bytes": 20480 }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Table 1-1 CH32V103x product resource allocation" }]
+  },
+  "package": {
+    "name": "LQFP48",
+    "pin_count": 48,
+    "gpio_count": 37,
+    "body": "7 x 7 mm, 0.5 mm pitch",
+    "temperature_grade": "industrial -40 C to 85 C",
+    "evidence": [{ "source": "ds-en", "locator": "Table 1-1; Chapter 4 Package and Ordering Information" }]
+  },
+  "peripherals": [
+    { "kind": "adc", "instances": 1, "channels": [{ "kind": "external-or-touch", "count": 10 }], "evidence": [{ "source": "ds-en", "locator": "Table 1-1" }] },
+    { "kind": "usbhd", "instances": 1, "features": ["USB 2.0 full-speed host/device"], "evidence": [{ "source": "ds-en", "locator": "Table 1-1" }] },
+    { "kind": "usart", "instances": 3, "evidence": [{ "source": "ds-en", "locator": "Table 1-1" }] },
+    { "kind": "spi", "instances": 2, "evidence": [{ "source": "ds-en", "locator": "Table 1-1" }] },
+    { "kind": "i2c", "instances": 2, "evidence": [{ "source": "ds-en", "locator": "Table 1-1" }] }
+  ],
+  "pins": [],
+  "sources": [
+    {
+      "id": "ds-en",
+      "kind": "datasheet",
+      "title": "CH32V103 Datasheet",
+      "language": "en",
+      "document_version": "V1.2",
+      "url": "https://www.wch-ic.com/download/file?id=312",
+      "sha256": "5719208b1846c735434e9e630a9c43068b38898f9bf6432556255187f3a213d4",
+      "hash_scope": "download-artifact",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32V103.git",
+        "commit": "547be14180864517f2a1afad1ae80d020f124275",
+        "path": "datasheet_en/CH32V103DS0.PDF"
+      }
+    }
+  ],
+  "coverage": {
+    "identity": "complete",
+    "cpu": "complete",
+    "memory": "complete",
+    "package": "complete",
+    "peripherals": "partial",
+    "package_pins": "not-started",
+    "pin_functions": "not-started"
+  },
+  "verification": {
+    "identity": "single-source",
+    "cpu": "single-source",
+    "memory": "single-source",
+    "package": "single-source",
+    "peripherals": "single-source",
+    "package_pins": "not-verified",
+    "pin_functions": "not-verified"
+  },
+  "notes": ["The datasheet gives 72 MHz as typical and 80 MHz as the maximum; both are retained as clock profiles."]
+}
