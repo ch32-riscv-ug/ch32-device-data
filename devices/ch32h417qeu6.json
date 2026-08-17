@@ -1,0 +1,96 @@
+{
+  "schema_version": "0.1-draft",
+  "kind": "orderable-device",
+  "id": "ch32h417qeu6",
+  "identity": {
+    "manufacturer": "WCH",
+    "part_number": "CH32H417QEU6",
+    "series": "CH32H417"
+  },
+  "cpu": {
+    "cores": [
+      {
+        "id": "core1",
+        "vendor_core": "QingKe RISC-V5F",
+        "isa_claim": "RV32IMAFBC-X",
+        "clock_profiles": [
+          { "name": "datasheet-maximum", "frequency_hz": 400000000 },
+          { "name": "performance-mode", "frequency_hz": 500000000, "conditions": "LDO_VDDK = 101; electrical characteristics performance mode" }
+        ],
+        "role": "performance"
+      },
+      {
+        "id": "core0",
+        "vendor_core": "QingKe RISC-V3F",
+        "isa_claim": "RV32IMAFBC-X",
+        "clock_profiles": [
+          { "name": "datasheet-maximum", "frequency_hz": 160000000 },
+          { "name": "performance-mode", "frequency_hz": 200000000, "conditions": "LDO_VDDK = 101; electrical characteristics performance mode" }
+        ],
+        "role": "control"
+      }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "Features; dual-core architecture; processor sections" }]
+  },
+  "memory": {
+    "regions": [
+      { "id": "code-flash", "kind": "code-flash", "size_bytes": 983040, "attributes": ["nonzero-wait"] },
+      { "id": "core1-itcm", "kind": "itcm", "size_bytes": 131072 },
+      { "id": "core1-dtcm", "kind": "dtcm", "size_bytes": 262144 },
+      { "id": "shared-sram", "kind": "sram", "size_bytes": 524288, "attributes": ["shared-code-and-data"] }
+    ],
+    "evidence": [{ "source": "ds-en", "locator": "CH32H417/H416/H415 product resource comparison table, QEU6 column" }]
+  },
+  "package": {
+    "name": "QFN128",
+    "pin_count": 128,
+    "gpio_count": 95,
+    "evidence": [{ "source": "ds-en", "locator": "CH32H417/H416/H415 product resource comparison table, QEU6 column" }]
+  },
+  "peripherals": [
+    { "kind": "usbss", "instances": 1, "features": ["USB 3.2 Gen1", "integrated PHY", "host", "device"], "evidence": [{ "source": "ds-en", "locator": "Features; product resource comparison table" }] },
+    { "kind": "usbhs", "instances": 1, "features": ["USB 2.0 high-speed", "integrated PHY", "host", "device"], "evidence": [{ "source": "ds-en", "locator": "Features; product resource comparison table" }] },
+    { "kind": "usbpd", "instances": 1, "features": ["PD 3.2", "EPR", "sink", "source", "dual-role"], "evidence": [{ "source": "ds-en", "locator": "Features; product resource comparison table" }] },
+    { "kind": "ethernet", "instances": 1, "features": ["MAC", "10/100M PHY", "RGMII"], "evidence": [{ "source": "ds-en", "locator": "Features; product resource comparison table" }] },
+    { "kind": "pioc", "instances": 1, "features": ["programmable protocol I/O"], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "adc", "instances": 2, "channels": [{ "kind": "external", "count": 16 }, { "kind": "internal", "count": 2 }], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] },
+    { "kind": "hsadc", "instances": 1, "channels": [{ "kind": "external", "count": 7 }], "evidence": [{ "source": "ds-en", "locator": "Product resource comparison table" }] }
+  ],
+  "pins": [],
+  "sources": [
+    {
+      "id": "ds-en",
+      "kind": "datasheet",
+      "title": "CH32H417/H416/H415 Datasheet",
+      "language": "en",
+      "document_version": "V1.8",
+      "url": "https://www.wch-ic.com/download/file?id=423",
+      "sha256": "686bcd003996cca45401c598c7fca4b9eb9acbb5c780cde64a23c76660fd4fb1",
+      "hash_scope": "download-artifact",
+      "mirror": {
+        "repository": "https://github.com/ch32-riscv-ug/CH32H417.git",
+        "commit": "a6f4c719a76eceb88a3792bfd97e2e2f1e2a4144",
+        "path": "datasheet_en/CH32H417DS0.PDF"
+      }
+    }
+  ],
+  "coverage": {
+    "identity": "complete",
+    "cpu": "complete",
+    "memory": "complete",
+    "package": "complete",
+    "peripherals": "partial",
+    "package_pins": "not-started",
+    "pin_functions": "not-started"
+  },
+  "verification": {
+    "identity": "single-source",
+    "cpu": "single-source",
+    "memory": "single-source",
+    "package": "single-source",
+    "peripherals": "single-source",
+    "package_pins": "not-verified",
+    "pin_functions": "not-verified"
+  },
+  "notes": ["This record exercises dual-core and split-memory schema needs; it does not place CH32H417 in the initial Arduino release scope."]
+}
