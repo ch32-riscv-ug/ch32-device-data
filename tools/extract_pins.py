@@ -336,8 +336,18 @@ def pins_for(
             notes.append(f"{pad}: pin type {pin_type!r} を分類できず other とした")
         functions = []
         if default_col is not None:
-            for signal in signals(cells[default_col]):
-                functions.append({"signal": signal, "route": "default"})
+            for token in signals(cells[default_col]):
+                # CH32H41x puts its alternate-function numbers in this column too.
+                af = ALTERNATE.match(token)
+                functions.append(
+                    {
+                        "signal": af.group("signal"),
+                        "route": f"af-{af.group('value')}",
+                        "_alternate_function": int(af.group("value")),
+                    }
+                    if af
+                    else {"signal": token, "route": "default"}
+                )
         for token in signals(cells[remap_col]):
             af = ALTERNATE.match(token)
             if af:

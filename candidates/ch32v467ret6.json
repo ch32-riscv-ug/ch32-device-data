@@ -1,0 +1,2322 @@
+{
+  "part_number": "CH32V467RET6",
+  "_provenance": {
+    "datasheet": "CH32V407/datasheet_en/CH32V407DS0.PDF",
+    "manual": null,
+    "header": "CH32V407/EVT/EXAM/SRC/Peripheral/inc/ch32v4x7.h",
+    "pin_table": "Table 2-1",
+    "pin_column": "CH32V467RET6"
+  },
+  "product_attributes": {
+    "Chip pin number": "64",
+    "Zero-wait Flash (Bytes)(2)": "512K",
+    "Zero-wait SRAM (Bytes)(2)": "200K",
+    "Extended PSRAM (Bytes)": "4M",
+    "GPIO port number": "48",
+    "Timer": "2",
+    "ADC": "2",
+    "DAC (Unit)": "2",
+    "OPA": "1",
+    "RNG": "1",
+    "USART": "10",
+    "SPI/I2S": "3/2",
+    "I2C": "1",
+    "I3C": "1",
+    "CAN": "1",
+    "SDIO": "1",
+    "USBHS (Include PHY)": "1(USBHS1)",
+    "DVP": "1",
+    "FSMC": "-",
+    "LTDC": "1",
+    "ARGB": "1",
+    "Package form": "LQFP64"
+  },
+  "route_selectors": [],
+  "pins": [
+    {
+      "number": 1,
+      "pad": "VBAT",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 5,
+      "pad": "OSC_IN",
+      "kind": "other",
+      "_pin_type": "I/A",
+      "functions": [
+        {
+          "signal": "PD0（4）",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "pad": "OSC_OUT",
+      "kind": "other",
+      "_pin_type": "O/A",
+      "functions": [
+        {
+          "signal": "PD1（4）",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "pad": "NRST",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": []
+    },
+    {
+      "number": 8,
+      "pad": "PC0",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN10",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T6_TX",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_R0",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_R0",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "pad": "PC1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN11",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "default"
+        },
+        {
+          "signal": "USART7_CK",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_R1",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_R1",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "pad": "PC2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN12",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_R2",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_CTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_R2",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "pad": "PC3",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN13",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T6_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_R3",
+          "route": "default"
+        },
+        {
+          "signal": "USART6_RTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_R3",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "pad": "VSSA",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 13,
+      "pad": "VREF+",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 14,
+      "pad": "PA0-WKUP",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "WKUP",
+          "route": "default"
+        },
+        {
+          "signal": "ADC_IN0",
+          "route": "default"
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_ETR",
+          "route": "default"
+        },
+        {
+          "signal": "TIM5_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_ETR",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH1",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "TIM2_ETR",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "TIM8_ETR",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "pad": "PA1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN1",
+          "route": "default"
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "TIM5_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_R4",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "LTDC_R4",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "pad": "PA2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_C",
+          "route": "default"
+        },
+        {
+          "signal": "H3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM5_CH3",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T2_TX",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_R5",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_R5",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "pad": "PA3",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_C",
+          "route": "default"
+        },
+        {
+          "signal": "H4",
+          "route": "default"
+        },
+        {
+          "signal": "TIM5_CH4",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_R6",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 19,
+      "pad": "PA4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN4",
+          "route": "default"
+        },
+        {
+          "signal": "DAC1_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "USART2_CK",
+          "route": "default"
+        },
+        {
+          "signal": "SPI1_NSS",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_HSYNC",
+          "route": "default"
+        },
+        {
+          "signal": "USART9_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI3_NSS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I2S3_WS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_G5",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_HSYNC",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "pad": "PA5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN5",
+          "route": "default"
+        },
+        {
+          "signal": "DAC2_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_V",
+          "route": "default"
+        },
+        {
+          "signal": "SYNC",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_N2",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART9_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "pad": "PA6",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN6",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_B",
+          "route": "default"
+        },
+        {
+          "signal": "KIN",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_PCLK",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_P2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_BKIN",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_PCLK",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "pad": "PA7",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN7",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_C",
+          "route": "default"
+        },
+        {
+          "signal": "H1N",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T8_CK",
+          "route": "default"
+        },
+        {
+          "signal": "SPI1_MOSI",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_R7",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_OUT1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "TIM1_CH1N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_R7",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "pad": "PC4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN14",
+          "route": "default"
+        },
+        {
+          "signal": "USART7_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_G0",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART4_CTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART7_CTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_G0",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "pad": "PC5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN15",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T7_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "USART8_RX",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_G1",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART4_RTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART7_RTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_G1",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "pad": "PB0",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN8",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_C",
+          "route": "default"
+        },
+        {
+          "signal": "H2N",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH2N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM3_CH3",
+          "route": "remap-2",
+          "_selector_value": 2
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "pad": "PB1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN9",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_C",
+          "route": "default"
+        },
+        {
+          "signal": "H4",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH3N",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_OUT2",
+          "route": "default"
+        },
+        {
+          "signal": "USART8_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "USART9_TX",
+          "route": "default"
+        },
+        {
+          "signal": "LTD",
+          "route": "default"
+        },
+        {
+          "signal": "C_G3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM3_CH4",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART4_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART5_RTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART5_RTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_G3",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "pad": "VDDK",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 28,
+      "pad": "MDIRN",
+      "kind": "other",
+      "_pin_type": "ETH",
+      "functions": []
+    },
+    {
+      "number": 29,
+      "pad": "MDIRP",
+      "kind": "other",
+      "_pin_type": "ETH",
+      "functions": []
+    },
+    {
+      "number": 30,
+      "pad": "MDITN",
+      "kind": "other",
+      "_pin_type": "ETH",
+      "functions": []
+    },
+    {
+      "number": 31,
+      "pad": "MDITP",
+      "kind": "other",
+      "_pin_type": "ETH",
+      "functions": []
+    },
+    {
+      "number": 32,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "Main V",
+          "route": "default"
+        },
+        {
+          "signal": "DD",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 34,
+      "pad": "VDD18",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 35,
+      "pad": "PB12",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "TIM1_BKIN",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_P1",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "default"
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "default"
+        },
+        {
+          "signal": "FSMC_D10",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_G6",
+          "route": "default"
+        },
+        {
+          "signal": "USART8_RTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_RTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_G6",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D10",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "pad": "PB13",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "TIM1_CH1N",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_N1",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "SPI2_SCK",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_C",
+          "route": "default"
+        },
+        {
+          "signal": "K",
+          "route": "default"
+        },
+        {
+          "signal": "FSMC_D11",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART8_CTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_CTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D11",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "pad": "PB14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH2N",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "SPI2_MISO",
+          "route": "default"
+        },
+        {
+          "signal": "FSMC_D12",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D0",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B0",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART8_RX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_RX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_B0",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D0",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D12",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "pad": "PB15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH3N",
+          "route": "default"
+        },
+        {
+          "signal": "SPI2_MOSI",
+          "route": "default"
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "default"
+        },
+        {
+          "signal": "S",
+          "route": "default"
+        },
+        {
+          "signal": "DIO_D1",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D1",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "pad": "PB11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART3_RX",
+          "route": "default"
+        },
+        {
+          "signal": "I3C_SDA",
+          "route": "default"
+        },
+        {
+          "signal": "FSMC_D9",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D9",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "pad": "PB10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART3_TX",
+          "route": "default"
+        },
+        {
+          "signal": "I3C_SCL",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_BKIN",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_B3",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "pad": "PD14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "FSMC_D0",
+          "route": "default"
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART10_RTS_2US",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "ART10_RTS_3LED0",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D0",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "pad": "PD15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "FSMC_D1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM4_CH4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LED1",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "FSMC_D1",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "pad": "PA8",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "MCO",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "default"
+        },
+        {
+          "signal": "I2S3_MCK",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH1",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_CK",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_CK",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D2",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "pad": "PA9",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T1_TX",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_DE",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D6",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "pad": "PA10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH3",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T1_RX",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D1",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH3",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "LTDC_CLK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D7",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D1",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "pad": "PA11",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "TIM1_CH4",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T1_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "USBHS1_DM",
+          "route": "default"
+        },
+        {
+          "signal": "CA",
+          "route": "default"
+        },
+        {
+          "signal": "N_RX",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "pad": "PA12",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "TIM1_ETR",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "T1_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "USBHS1_DP",
+          "route": "default"
+        },
+        {
+          "signal": "CAN_TX",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_ETR",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "pad": "PA13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART4_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "SW",
+          "route": "default"
+        },
+        {
+          "signal": "DIO",
+          "route": "default"
+        },
+        {
+          "signal": "SWIO",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B5",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH1N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "LTDC_B5",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 50,
+      "pad": "PA14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "SWCLK",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH2N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART6_CTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "pad": "PA15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "SPI3_NSS",
+          "route": "default"
+        },
+        {
+          "signal": "I2S3_W",
+          "route": "default"
+        },
+        {
+          "signal": "S",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_B7",
+          "route": "default"
+        },
+        {
+          "signal": "ARGB_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH3N",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM2_CH1",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM2_ETR",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM2_CH1",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "TIM2_ETR",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART6_RTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART8_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI1_NSS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_B7",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "pad": "PC10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART4_TX",
+          "route": "default"
+        },
+        {
+          "signal": "SDI",
+          "route": "default"
+        },
+        {
+          "signal": "O_D2",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D8",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI3_SCK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I2S3_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D2",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D8",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "pad": "PC11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART4_RX",
+          "route": "default"
+        },
+        {
+          "signal": "SDI",
+          "route": "default"
+        },
+        {
+          "signal": "O_D3",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D4",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI3_MISO",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_D3",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D4",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "pad": "PC12",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART4_CK",
+          "route": "default"
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_CK",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D9",
+          "route": "default"
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI3_MOSI",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I2S3_SD",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SDIO_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D9",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "pad": "PD2",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_ETR",
+          "route": "default"
+        },
+        {
+          "signal": "USAR",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_ETR",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "pad": "PB3",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART5_CTS",
+          "route": "default"
+        },
+        {
+          "signal": "SPI3_SCK",
+          "route": "default"
+        },
+        {
+          "signal": "I2S3_C",
+          "route": "default"
+        },
+        {
+          "signal": "K",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART5_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_G4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 57,
+      "pad": "PB4",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART5_RTS",
+          "route": "default"
+        },
+        {
+          "signal": "SPI3_MISO",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH1",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I3C_SCL",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D3",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "pad": "PB5",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "USART5_CK",
+          "route": "default"
+        },
+        {
+          "signal": "I2C_SMBA",
+          "route": "default"
+        },
+        {
+          "signal": "SPI3_MOSI",
+          "route": "default"
+        },
+        {
+          "signal": "I2S3_SD",
+          "route": "default"
+        },
+        {
+          "signal": "LTDC_V",
+          "route": "default"
+        },
+        {
+          "signal": "SYNC",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART5_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I3C_SDA",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "SPI1_MOSI",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D10",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 61,
+      "pad": "PB8",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM4_CH3",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D4",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH3",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "TIM8_CH3",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART4_CTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART4_CTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART5_CTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART10_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I2C_SCL",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "CAN_RX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "SDIO_D4",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 62,
+      "pad": "PB9",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM4_CH4",
+          "route": "default"
+        },
+        {
+          "signal": "SDIO_D5",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D7",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_BKIN",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART4_RTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "USART4_RTS",
+          "route": "remap-3",
+          "_selector_value": 3
+        },
+        {
+          "signal": "USART5_RTS",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART10_RX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "I2C_SDA",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "CAN_TX",
+          "route": "remap-2",
+          "_selector_value": 2
+        },
+        {
+          "signal": "SDIO_D5",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "DVP_D7",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    },
+    {
+      "number": 63,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 64,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": "59(1\n2)",
+      "pad": "PB6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM4_CH1",
+          "route": "default"
+        },
+        {
+          "signal": "I2C_S",
+          "route": "default"
+        },
+        {
+          "signal": "CL",
+          "route": "default"
+        },
+        {
+          "signal": "USBHS2_DM",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH1",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-1",
+          "_selector_value": 1
+        },
+        {
+          "signal": "USART7_CTS",
+          "route": "remap-2",
+          "_selector_value": 2
+        }
+      ]
+    },
+    {
+      "number": "60(1",
+      "pad": "PB7",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM4_CH2",
+          "route": "default"
+        },
+        {
+          "signal": "I2C_S",
+          "route": "default"
+        },
+        {
+          "signal": "TIM8_CH2",
+          "route": "remap-1",
+          "_selector_value": 1
+        }
+      ]
+    }
+  ],
+  "signal_aliases": {}
+}

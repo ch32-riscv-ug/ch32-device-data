@@ -1,0 +1,2921 @@
+{
+  "part_number": "CH32H415REU6",
+  "_provenance": {
+    "datasheet": "CH32H417/datasheet_en/CH32H417DS0.PDF",
+    "manual": "CH32H417/datasheet_en/CH32H417RM.PDF",
+    "header": "CH32H417/EVT/EXAM/SRC/Peripheral/inc/ch32h417.h",
+    "pin_table": "Table 2-1-3",
+    "pin_column": "H415REU6"
+  },
+  "product_attributes": {
+    "Chip pin number": "60",
+    "Nonzero wait Code FLASH": "960KB",
+    "SRAM": "128KB",
+    "GPIO port number": "54",
+    "Timer": "2",
+    "RTC": "√",
+    "ADC/TKey": "2",
+    "HSADC": "1",
+    "DAC (Unit)": "2",
+    "OPA": "2 (OPA1/3)",
+    "CMP": "1",
+    "DFSDM": "1",
+    "RNG": "1",
+    "LTDC": "1",
+    "GPHA": "1",
+    "DVP": "1",
+    "USART": "8",
+    "SPI/I2S": "4/2",
+    "QSPI": "-",
+    "I2C": "4",
+    "I3C": "1",
+    "UHSIF": "-",
+    "CAN(5)": "3",
+    "SDIO": "1",
+    "SDMMC": "-",
+    "SAI": "1",
+    "SWPMI": "1",
+    "PDUSB": "1",
+    "SerDes(4)": "-",
+    "Ethernet(5)": "-",
+    "FMC": "-",
+    "PIOC": "1",
+    "Package form": "QFN60X6"
+  },
+  "route_selectors": [],
+  "pins": [
+    {
+      "number": 1,
+      "pad": "PE3",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM8_CH1",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM4_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM12_CH1",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "PIOC_IO0",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_SD_B",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D3",
+          "route": "af-13",
+          "_alternate_function": 13
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "pad": "PE4",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM8_CH2",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM4_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM12_CH2",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "PIOC_IO1",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI4_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_FS_A",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "DVP_D4",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B0",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PE5",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM8_CH3",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM12_CH3",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM9_CH3",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI4_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_SCK_A",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G0",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "PE6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM8_CH4",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM1_BKIN2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM4_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM12_CH4",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM9_CH4",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI4_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_SD_A",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CMP_OUT",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D7",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G1",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "pad": "VDDK",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 6,
+      "pad": "VDD33",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "Main V",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "DD33",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "pad": "XI",
+      "kind": "other",
+      "_pin_type": "I/A",
+      "functions": []
+    },
+    {
+      "number": 8,
+      "pad": "XO",
+      "kind": "other",
+      "_pin_type": "O/A",
+      "functions": []
+    },
+    {
+      "number": 9,
+      "pad": "PC0",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN10",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "HSADC_IN0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM8_BKIN",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "DFSDM_CKIN0",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "PIOC_IO1",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_MCLK_A",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "I2C2_SCL",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SIO3",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "LTDC_G2",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "LTDC_R5",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "pad": "PC1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN11",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "HSADC_IN1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM8_CH1N",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM5_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "DFSDM_DATIN0",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI2_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_SD_A",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "PIOC_IO0",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "I2C2_SDA",
+          "route": "af-9",
+          "_alternate_function": 9
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "pad": "PC2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN12",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "HSADC_IN2",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_P0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM8_CH2N",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM5_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "DFSDM_CKIN1",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI2_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "DFSDM_CKOUT",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "SAI_SCK_A",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "PIOC_IO1",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "I2C2_SMBA",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SIOX0",
+          "route": "af-10",
+          "_alternate_function": 10
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "pad": "PC3",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN13",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "HSADC_IN3",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_N0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM8_CH3N",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM5_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "DFSDM_DATIN1",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI2_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_FS_A",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "QSPI2_SIOX1",
+          "route": "af-10",
+          "_alternate_function": 10
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "pad": "VDD33A",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 14,
+      "pad": "PA0",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_OUT0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM2_CH1_ETR",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM5_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_ETR",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "QSPI2_SIOX2",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "PIOC_IO0",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "TIM9_CH1",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "SDIO_CMD",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_R0",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "pad": "PA1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM5_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "QSPI2_SIOX3",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "TIM9_CH2",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "QSPI1_SIO3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_R2",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "pad": "PA2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN2",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_P1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM5_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM9_CH3",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "USART2_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_R1",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "pad": "PA3",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN3",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_N1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM2_CH4",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM5_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM9_CH4",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "USART2_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "TIM10_CH3",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_B5",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "pad": "PA4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN4",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "DAC1_OUT",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA3_OUT1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM5_ETR",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM9_ETR",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SPI3_NSS",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_WS",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART2_CK",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "TIM10_CH4",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_HSYNC",
+          "route": "af-13",
+          "_alternate_function": 13
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "pad": "PA5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN5",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "DAC2_OUT",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_OUT1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM2_CH1_ETR",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM1_BKIN2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH1N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "TIM10_ETR",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "LTDC_R4",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "pad": "PA6",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN6",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_P1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_BKIN",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM3_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_BKIN",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "TIM10_CH1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "CMP_OUT",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_PCLK",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G2",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "pad": "PA7",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN7",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_N1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_CH1N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH1N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI1_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "TIM10_CH2",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "pad": "PC4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN14",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_OUT0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "CMP_N1",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "CAN3_RX",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I3C_SCL",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_R7",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "pad": "PB0",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN8",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_P0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "CMP_P0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "MCO",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM1_CH2N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM3_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH2N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM5_CH4",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "DFSDM_CKOUT",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART6_CTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_R3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "TIM12_ETR",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G1",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "pad": "PB1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "ADC_IN9",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "OPA1_N0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "CMP_N0",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM3_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH3N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM12_CH1",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "DFSDM_DATIN1",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "LTDC_R6",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_G0",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "pad": "PE11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "SPI4_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "QSPI2_SCSN",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D3",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_G3",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "pad": "PE12",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH3N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "SPI4_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "QSPI2_SIO0",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D4",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CMP_OUT",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "pad": "PE13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH3",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM12_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI4_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "pad": "PE14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH4",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM12_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "I3C_SCL",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI4_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "QSPI2_SIO2",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D6",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_CLK",
+          "route": "af-13",
+          "_alternate_function": 13
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "pad": "PE15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_BKIN",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM12_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "I3C_SDA",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "QSPI2_SIO3",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D7",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "USART5_CK",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "CMP_OUT",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_R7",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "pad": "PB11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM2_CH4",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "LPTIM2_ETR",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2C2_SDA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_CK",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "TIM9_CH4",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SIOX0",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "LTDC_G5",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "pad": "VDD33",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 32,
+      "pad": "PB12",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_BKIN",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM8_BKIN",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "I2C2_SMBA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "DFSDM_DATIN1",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "TIM9_CH3",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CAN2_RX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "QSPI2_SIOX1",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "CMP_OUT",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "DVP_PCLK",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "pad": "PB13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH1N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM8_BKIN2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "LPTIM2_OC",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM9_ETR",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_CK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "DFSDM_CKIN1",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "DVP_HSYNC",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CAN2_TX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SIOX0",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D2",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "pad": "PB14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH2N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM9_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH2N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "af-4",
+          "_alternate_function": 4
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "pad": "PB15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM1_CH3N",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM9_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH3N",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART6_CTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "SDIO_D1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "pad": "PC6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH1",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2S2_MCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART4_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D6",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "SWPMI_IO",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "pad": "PC7",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH2",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2S3_MCK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART4_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D7",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "SWPMI_TX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D1",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G6",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "pad": "PC8",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH3",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "TIM9_ETR",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART4_CK",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART7_RTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "SWPMI_RX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D2",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G4",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 39,
+      "pad": "PC9",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM8_CH4",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2C3_SDA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI3_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "TIM9_CH1",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART7_CTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "QSPI1_SIO0",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_G3",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SWPMI_SUP",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D3",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "SAI_MCLK_B",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "pad": "PA9",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "OTG_VBUS",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "I2C3_SMBA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_CK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_R5",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 41,
+      "pad": "PA10",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "OTG_ID",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_CH3",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "DVP_D1",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 42,
+      "pad": "PA11",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "OTG_DM",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "af-1",
+          "_alternate_function": 1
+        }
+      ]
+    },
+    {
+      "number": 43,
+      "pad": "PA12",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "OTG_DP",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM1_ETR",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_CK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "CAN1_TX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "TIM1_BKIN2",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "LTDC_R5",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 44,
+      "pad": "PA13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "SPI3_MOSI",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "I2S3_SD",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "CAN_RX",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C3_SDA",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "SAI_SD_B",
+          "route": "af-13",
+          "_alternate_function": 13
+        }
+      ]
+    },
+    {
+      "number": 45,
+      "pad": "PA14",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "SPI3_SCK",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "I2S3_CK",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "CAN_TX",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C3_SCL",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "SAI_SCK_B",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_R0",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 46,
+      "pad": "PA15",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM2_CH1_ETR",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_CTS",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SPI3_NSS",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_WS",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2C3_SMBA",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_RTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_R3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "SAI_FS_B",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_CLK",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "pad": "PC10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM9_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI3_SCK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_CK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "QSPI1_SIO1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SWPMI_RX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D8",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_R2",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 48,
+      "pad": "PC11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM9_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI3_MISO",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "QSPI1_SCSXN",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D4",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 49,
+      "pad": "PC12",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM9_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI3_MOSI",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_SD",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "af-7",
+          "_alternate_function": 7
+        }
+      ]
+    },
+    {
+      "number": 50,
+      "pad": "PD3",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM11_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "DFSDM_CKOUT",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI2_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_CK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_CK",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "TIM3_CH1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_R6",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 51,
+      "pad": "PF3",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "CAN3_TX",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART4_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "QSPI1_SIOX2",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D9",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B0",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_G5",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 52,
+      "pad": "PF4",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "LPTIM1_ETR",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "CAN3_RX",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "SPI1_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART4_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_G3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D8",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D2",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B2",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_G6",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 53,
+      "pad": "PF5",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "LPTIM1_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART5_RX",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "QSPI1_SIOX3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D3",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B3",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 54,
+      "pad": "PE0",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "LPTIM1_CH1",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "USART4_RTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "LTDC_B4",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "DVP_D0",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "TIM11_CH1",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_B3",
+          "route": "af-15",
+          "_alternate_function": 15
+        }
+      ]
+    },
+    {
+      "number": 55,
+      "pad": "PB3",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM2_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "CC1",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SPI3_SCK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_CK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "SDIO_D2",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "USART8_RX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "TIM12_ETR",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 56,
+      "pad": "PB4",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM3_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "CC2",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SPI3_MISO",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D3",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "TIM4_ETR",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "USART8_TX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "USART7_CK",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 57,
+      "pad": "PB6",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM10_CH1",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM4_CH1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2C1_SCL",
+          "route": "af-4",
+          "_alternate_function": 4
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "pad": "PB7",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "TIM10_CH2",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "TIM4_CH2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "CAN1_TX",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "I2C4_SDA",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "af-13",
+          "_alternate_function": 13
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "pad": "PB8",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SWCLK",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "USBHS_DP",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM10_CH3",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "I2C1_SCL",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "PIOC_IO0",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C4_SCL",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "SDIO_D4",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": 60,
+      "pad": "PB9",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "SWIO",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "SWDIO",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "USBHS_DM",
+          "route": null,
+          "_needs_review": true
+        },
+        {
+          "signal": "TIM10_CH4",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "TIM4_CH4",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C4_SDA",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "PIOC_IO1",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CAN1_TX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "SDIO_D5",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "I2C4_SMBA",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D7",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B7",
+          "route": "af-14",
+          "_alternate_function": 14
+        }
+      ]
+    },
+    {
+      "number": "EP",
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    }
+  ],
+  "signal_aliases": {}
+}

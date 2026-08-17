@@ -51,7 +51,12 @@ def bits_of(selector: dict) -> list[int]:
     return list(range(selector["bit_offset"], selector["bit_offset"] + selector["bit_width"]))
 
 
-def build(header: Path, manual: Path, datasheet: Path, package: str) -> tuple[dict, list[str]]:
+def read_silicon(header: Path, manual: Path) -> tuple[list[dict], list[dict], list[dict], list[str]]:
+    """Parse everything that is the same for every package of one silicon.
+
+    Reading a reference manual is the slow part, so a bulk run does this once per
+    family and reuses it for each of its SKUs.
+    """
     notes: list[str] = []
 
     selectors, sel_notes = extract_selectors.build(header)
@@ -68,10 +73,23 @@ def build(header: Path, manual: Path, datasheet: Path, package: str) -> tuple[di
     described = [r for f in reg_fields for r in extract_registers.routes_in(f)]
     if described:
         notes.append(f"[register] 説明文から読めた経路 {len(described)} 件を併用")
-    routes = routes + described
+    return selectors, reg_fields, routes + described, notes
 
+
+def build(header: Path, manual: Path, datasheet: Path, package: str) -> tuple[dict, list[str]]:
+    selectors, reg_fields, routes, notes = read_silicon(header, manual)
     pins, pin_notes, _ = extract_pins.build(datasheet, package, "", "")
     notes += [f"[pins] {n}" for n in pin_notes[:5]]
+    return join(selectors, reg_fields, routes, pins, notes)
+
+
+def join(
+    selectors: list[dict],
+    reg_fields: list[dict],
+    routes: list[dict],
+    pins: list[dict],
+    notes: list[str],
+) -> tuple[dict, list[str]]:
 
     # Manual-side lookups, keyed the way the documents disagree least.
     reset_of: dict[str, int] = {}
@@ -109,7 +127,8 @@ def build(header: Path, manual: Path, datasheet: Path, package: str) -> tuple[di
         name = alias.get(fn["signal"], fn["signal"])
         signal = canonical_signal(name)
         key = field_of_route.get((signal, value, pin["pad"]))
-        if key:
+        # The manual may route a field the header does not expose as a selector.
+        if key in by_canonical:
             return key, "alias" if name != fn["signal"] else "signal"
         # The documents may name the same route differently. Align on the pad and
         # value instead, which identifies the route without using the name at all.
