@@ -21,19 +21,44 @@ from pathlib import Path
 
 import pdfplumber
 
-# "Table 2-1 Pin definitions" leads with one pin-number column per package, then
-# pad, type, reset function, default alternate and remapping. The number of package
-# columns is family-specific (CH32V003 has 4, CH32X035 has 7), so it is detected
-# from the header rather than assumed.
+# The pin table leads with one pin-number column per orderable variant, then pad,
+# type, reset function, default alternate and remapping. Neither the number of
+# variant columns nor the position of the rest is stable across families: CH32V003
+# heads four columns with package names, CH32X035 seven, while CH32V006 and
+# CH32V407 head theirs with part numbers and CH32V407 inserts an extra "I/O
+# structure" column. Both are therefore read from the header labels.
 PACKAGE_PREFIXES = ("SOP", "QFN", "LQFP", "TSSOP", "QSOP", "TQFP")
+PART_NUMBER = re.compile(r"^(CH32)?[A-Z]{0,2}\d{3}[A-Z0-9]{2,}$")
+
+# Header label -> the column it marks, matched against the merged header text with
+# punctuation and case removed.
+COLUMN_LABELS = {
+    "pad": ("pinname",),
+    "type": ("pintype",),
+    "default": ("defaultalternate", "defaultalter"),
+    "remap": ("remapping",),
+}
 
 PAD = re.compile(r"^P[A-H]\d{1,2}$")
 POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
+
+# Supply and special pads are named per family (CH32M030 alone adds VS0-3, VB0-3,
+# VHV, VDD8, VDD33, ISP1), so rows are recognised by their pin-type cell instead of
+# by a list of pad names. Types read like P, A, O, I/O, I/O/A, I/O/FT.
+PIN_TYPE = re.compile(r"^[A-Z]{1,3}(?:/[A-Z]{1,3}){0,3}$")
+PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,7}$")
 FOOTNOTE = re.compile(r"\(\d+\)")
 ROUTED = re.compile(r"^(?P<signal>.+?)_(?P<value>\d+)$")
 
-# Pin type letters in the datasheet's "Pin type" column.
-KIND_BY_TYPE = {"P": "power", "I/O": "gpio", "I/O/A": "gpio", "I/O/FT": "gpio"}
+def kind_for(pin_type: str) -> str | None:
+    """Map the datasheet's pin-type letters onto the schema's pin kinds.
+
+    The table types every supply pin as P, so ground is not distinguishable here
+    and stays a human refinement.
+    """
+    if "I/O" in pin_type:
+        return "gpio"
+    return {"P": "power", "A": "analog"}.get(pin_type)
 
 
 def normalise_pad(cell: str) -> str:
@@ -44,69 +69,153 @@ def normalise_pad(cell: str) -> str:
     return FOOTNOTE.sub("", cell).replace("\n", "").replace(" ", "")
 
 
+def is_variant(name: str) -> bool:
+    return name.startswith(PACKAGE_PREFIXES) or bool(PART_NUMBER.match(name))
+
+
 def read_package_header(cells: list[str]) -> list[str] | None:
-    """Package names are printed rotated, so the text layer holds them reversed."""
+    """Variant column headings are printed rotated, so the text layer holds them reversed."""
     names = []
     for cell in cells:
-        name = cell[::-1]
-        if not cell or not name.startswith(PACKAGE_PREFIXES):
+        name = FOOTNOTE.sub("", cell.replace("\n", ""))[::-1].strip()
+        if not name or not is_variant(name):
             break
         names.append(name)
-    return names if len(names) >= 2 else None
+    return names or None
 
 
-def stop_position(page, stop_label: str) -> float | None:
-    """Y coordinate where the next table's caption starts, if it is on this page."""
+def normalise_label(text: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+def read_layout(rows: list[list[str]]) -> tuple[dict[str, int], list[str]] | None:
+    """Locate the pad/type/default/remap columns and the variant headings.
+
+    Header labels wrap over several rows, so the rows above the first pad row are
+    merged per column before matching. The variant row is the header row whose
+    filled cells all sit left of the pad column.
+    """
+    first_data = next(
+        (
+            i
+            for i, row in enumerate(rows)
+            if any(PAD.match(normalise_pad(c)) or normalise_pad(c) in POWER_PADS for c in row)
+        ),
+        None,
+    )
+    if not first_data:
+        return None
+    width = max(len(r) for r in rows[:first_data])
+    merged = [
+        normalise_label("".join(row[col] for row in rows[:first_data] if col < len(row)))
+        for col in range(width)
+    ]
+    layout: dict[str, int] = {}
+    for key, keywords in COLUMN_LABELS.items():
+        for col, text in enumerate(merged):
+            if any(k in text for k in keywords):
+                layout[key] = col
+                break
+    if set(layout) != set(COLUMN_LABELS):
+        return None
+    variants = None
+    for row in rows[:first_data]:
+        found = read_package_header(row)
+        if found and len(found) == layout["pad"]:
+            variants = found
+            break
+    return (layout, variants) if variants else None
+
+
+CAPTION = re.compile(r"^(Table\s+[\d]+(?:-[\d]+)*)\s+(\S.*)$")
+
+
+def captions(pdf) -> list[tuple[str, str, int]]:
+    """Every table caption, as (label, title, page index)."""
+    out = []
+    for pno, page in enumerate(pdf.pages):
+        for line in page.extract_text_lines() or []:
+            m = CAPTION.match(line["text"].strip())
+            if m:
+                out.append((m.group(1), m.group(2), pno))
+    return out
+
+
+def choose_table(pdf) -> tuple[str, str]:
+    """Pick the first pin-definition table and the caption that ends it.
+
+    Families number these differently -- Table 2-1, Table 2-1-1, Table 3-1-1 -- so
+    the caption is found by its wording rather than by a fixed label.
+    """
+    found = captions(pdf)
+    for i, (label, title, _) in enumerate(found):
+        if "pin definition" in title.lower():
+            following = found[i + 1][0] if i + 1 < len(found) else "\x00"
+            return label, following
+    raise SystemExit("pin definition の表見出しが見つかりませんでした")
+
+
+def caption_position(page, label: str) -> float | None:
+    """Y coordinate of a table caption, if it is on this page."""
     try:
-        hits = page.search(re.escape(stop_label))
+        hits = page.search(re.escape(label))
     except Exception:  # pragma: no cover - older pdfplumber without search()
-        return 0.0 if stop_label in (page.extract_text() or "") else None
+        return 0.0 if label in (page.extract_text() or "") else None
     return min((h["top"] for h in hits), default=None)
 
 
-def find_pin_tables(pdf, table_label: str, stop_label: str) -> tuple[list[list], list[str], int]:
+def find_pin_tables(
+    pdf, table_label: str, stop_label: str
+) -> tuple[list[list], list[str], dict[str, int]]:
     """Collect data rows of the pin-definition table across the pages it spans.
 
-    The table routinely continues onto the page that also carries the next table's
-    caption, so the cut is made at the caption's y position rather than at the page
-    boundary. Continuation pages repeat the header but are otherwise identical, and
-    a table whose column count differs belongs to a different product.
+    Consecutive pin tables share pages: a page can carry the tail of the previous
+    table, this table's caption and the next table's caption. Both ends are therefore
+    cut at caption y positions rather than at page boundaries. Continuation tables may
+    drop the header entirely (CH32V003) or repeat it (CH32V006), so the layout found
+    first is carried forward and a table whose column count differs is treated as
+    belonging to another product.
     """
     rows: list[list] = []
-    packages: list[str] = []
+    variants: list[str] = []
+    layout: dict[str, int] = {}
     width = 0
     started = False
     for page in pdf.pages:
-        text = page.extract_text() or ""
-        if table_label in text:
+        begin = caption_position(page, table_label)
+        if begin is not None:
             started = True
         elif not started:
             continue
-        cut = stop_position(page, stop_label) if started else None
+        cut = caption_position(page, stop_label)
         for table in page.find_tables():
+            if begin is not None and table.bbox[3] <= begin:
+                continue
             if cut is not None and table.bbox[1] >= cut:
                 continue
-            extracted = table.extract()
-            if width and extracted and len(extracted[0]) != width:
+            extracted = [[(c or "").strip() for c in row] for row in table.extract()]
+            if not extracted:
                 continue
-            for row in extracted:
-                cells = [(c or "").strip() for c in row]
-                if not packages:
-                    found = read_package_header(cells)
-                    if found:
-                        packages, width = found, len(cells)
-                        continue
-                if packages:
-                    pad_col = len(packages)
-                    if pad_col >= len(cells):
-                        continue
-                    pad = normalise_pad(cells[pad_col])
-                    if PAD.match(pad) or pad in POWER_PADS:
-                        cells[pad_col] = pad
-                        rows.append(cells)
+            if width and len(extracted[0]) != width:
+                continue
+            if not layout:
+                found = read_layout(extracted)
+                if not found:
+                    continue
+                layout, variants = found
+                width = len(extracted[0])
+            pad_col, type_col = layout["pad"], layout["type"]
+            for cells in extracted:
+                if max(pad_col, type_col) >= len(cells):
+                    continue
+                pad = normalise_pad(cells[pad_col])
+                pin_type = normalise_pad(cells[type_col])
+                if PAD.match(pad) or (PAD_TOKEN.match(pad) and PIN_TYPE.match(pin_type)):
+                    cells[pad_col] = pad
+                    rows.append(cells)
         if cut is not None:
             break
-    return rows, packages, len(packages)
+    return rows, variants, layout
 
 
 def unwrap(cell: str) -> str:
@@ -123,7 +232,7 @@ def unwrap(cell: str) -> str:
     for part in parts:
         joined = (
             out.endswith(("/", "_", "("))
-            or part.startswith(("/", ")"))
+            or part.startswith(("/", ")", "_"))
             or part[0].isdigit()
         )
         if out and not joined:
@@ -142,13 +251,26 @@ def build(
 ) -> tuple[list[dict], list[str], list[str]]:
     notes: list[str] = []
     with pdfplumber.open(pdf_path) as pdf:
-        rows, packages, pad_col = find_pin_tables(pdf, table_label, stop_label)
+        if not table_label:
+            table_label, stop_label = choose_table(pdf)
+            notes.append(f"表を自動選択: {table_label}（{stop_label} まで）")
+        rows, packages, layout = find_pin_tables(pdf, table_label, stop_label)
     if not packages:
-        raise SystemExit(f"{table_label} のパッケージ列見出しを認識できませんでした")
+        raise SystemExit(f"{table_label} の列見出しを認識できませんでした")
     if package not in packages:
         raise SystemExit(f"{package} は表にありません。候補: {', '.join(packages)}")
+    pins, more = pins_for(rows, packages, layout, package)
+    return pins, notes + more, packages
+
+
+def pins_for(
+    rows: list[list[str]], packages: list[str], layout: dict[str, int], package: str
+) -> tuple[list[dict], list[str]]:
+    """Slice the shared table rows down to one variant's pins."""
+    notes: list[str] = []
     index = packages.index(package)
-    type_col, default_col, remap_col = pad_col + 1, pad_col + 3, pad_col + 4
+    pad_col, type_col = layout["pad"], layout["type"]
+    default_col, remap_col = layout["default"], layout["remap"]
 
     pins: list[dict] = []
     for cells in rows:
@@ -159,9 +281,11 @@ def build(
         if number in {"-", ""}:
             continue
         pad = cells[pad_col]
-        kind = KIND_BY_TYPE.get(cells[type_col], "other")
-        if kind == "other" and cells[type_col]:
-            notes.append(f"{pad}: pin type {cells[type_col]!r} を分類できず other とした")
+        pin_type = normalise_pad(cells[type_col])
+        kind = kind_for(pin_type)
+        if kind is None:
+            kind = "other"
+            notes.append(f"{pad}: pin type {pin_type!r} を分類できず other とした")
         functions = []
         for signal in signals(cells[default_col]):
             functions.append({"signal": signal, "route": "default"})
@@ -185,25 +309,33 @@ def build(
             number_value: int | str = int(number)
         except ValueError:
             number_value = number
+        if number_value == 0:
+            # WCH numbers the exposed thermal pad 0; the schema spells it EP.
+            number_value = "EP"
+            notes.append(f"{pad}: pin番号0をexposed pad (EP) として扱った")
         pins.append({"number": number_value, "pad": pad, "kind": kind, "functions": functions})
 
     pins.sort(key=lambda p: (isinstance(p["number"], str), p["number"]))
-    return pins, notes, packages
+    return pins, notes
+
+
+def print_err(*args):
+    print(*args, file=sys.stderr)
 
 
 def score(pins: list[dict], record: Path) -> None:
     rec = json.loads(record.read_text(encoding="utf-8"))
     truth = rec.get("pins", [])
-    print(f"\n照合: {record.name}  record {len(truth)} pin / 抽出 {len(pins)} pin")
-    print("-" * 74)
+    print_err(f"\n照合: {record.name}  record {len(truth)} pin / 抽出 {len(pins)} pin")
+    print_err("-" * 74)
 
     got_pads = {(p["number"], p["pad"]) for p in pins}
     want_pads = {(p["number"], p["pad"]) for p in truth}
-    print(f"  pin番号とpadの対応:  一致 {len(got_pads & want_pads)}/{len(want_pads)}")
+    print_err(f"  pin番号とpadの対応:  一致 {len(got_pads & want_pads)}/{len(want_pads)}")
     for miss in sorted(want_pads - got_pads, key=lambda x: str(x[0])):
-        print(f"    record にあり抽出になし: {miss}")
+        print_err(f"    record にあり抽出になし: {miss}")
     for extra in sorted(got_pads - want_pads, key=lambda x: str(x[0])):
-        print(f"    抽出にあり record になし: {extra}")
+        print_err(f"    抽出にあり record になし: {extra}")
 
     def pairs(source):
         return {(p["pad"], f["signal"]) for p in source for f in p["functions"]}
@@ -211,18 +343,18 @@ def score(pins: list[dict], record: Path) -> None:
     got, want = pairs(pins), pairs(truth)
     n_got = sum(len(p["functions"]) for p in pins)
     n_want = sum(len(p["functions"]) for p in truth)
-    print(f"\n  pin function 数: record {n_want} / 抽出 {n_got}")
-    print(f"  (pad, signal) 一致: {len(got & want)}/{len(want)}")
+    print_err(f"\n  pin function 数: record {n_want} / 抽出 {n_got}")
+    print_err(f"  (pad, signal) 一致: {len(got & want)}/{len(want)}")
     only_record = sorted(want - got)
     only_extract = sorted(got - want)
     if only_record:
-        print(f"\n  record のみ ({len(only_record)}件):")
+        print_err(f"\n  record のみ ({len(only_record)}件):")
         for pad, sig in only_record:
-            print(f"    {pad:5} {sig}")
+            print_err(f"    {pad:5} {sig}")
     if only_extract:
-        print(f"\n  抽出のみ ({len(only_extract)}件):")
+        print_err(f"\n  抽出のみ ({len(only_extract)}件):")
         for pad, sig in only_extract:
-            print(f"    {pad:5} {sig}")
+            print_err(f"    {pad:5} {sig}")
 
     def routes(source):
         """(pad, signal) -> the selector values that reach it, 'default' included.
@@ -246,40 +378,50 @@ def score(pins: list[dict], record: Path) -> None:
     got_r, want_r = routes(pins), routes(truth)
     shared = got_r.keys() & want_r.keys()
     same = {k for k in shared if got_r[k] == want_r[k]}
-    print(f"\n  (pad, signal) ごとの selector 値集合 一致: {len(same)}/{len(want_r)}")
+    print_err(f"\n  (pad, signal) ごとの selector 値集合 一致: {len(same)}/{len(want_r)}")
     differing = sorted(shared - same)
     if differing:
-        print(f"\n  signalは一致するが selector 値が異なる ({len(differing)}件):")
+        print_err(f"\n  signalは一致するが selector 値が異なる ({len(differing)}件):")
         for key in differing:
-            print(f"    {key[0]:6} {key[1]:10} 抽出={sorted(got_r[key], key=str)} record={sorted(want_r[key], key=str)}")
+            print_err(f"    {key[0]:6} {key[1]:10} 抽出={sorted(got_r[key], key=str)} record={sorted(want_r[key], key=str)}")
 
     review = sum(1 for p in pins for f in p["functions"] if f.get("_needs_review"))
-    print(f"\n  経路番号がなく人手確認が要る function: {review}")
+    print_err(f"\n  経路番号がなく人手確認が要る function: {review}")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("pdf", type=Path)
-    ap.add_argument("--package", required=True, help="例: TSSOP20")
-    ap.add_argument("--table", default="Table 2-1", help="pin定義表の見出し")
-    ap.add_argument("--stop", default="Table 2-2", help="読み取りを止める次表の見出し")
+    ap.add_argument("--package", help="列見出し。パッケージ名か型番（例: TSSOP20, V006K8U7）")
+    ap.add_argument("--table", default="", help="pin定義表の見出し。既定は自動選択")
+    ap.add_argument("--stop", default="", help="読み取りを止める次表の見出し")
+    ap.add_argument("--list", action="store_true", help="表見出しと列の一覧だけ表示する")
     ap.add_argument("--compare", type=Path)
     ap.add_argument("--emit", action="store_true")
     args = ap.parse_args()
 
+    if args.list:
+        with pdfplumber.open(args.pdf) as pdf:
+            for label, title, pno in captions(pdf):
+                if "pin definition" in title.lower():
+                    print_err(f"  {label:<14} p{pno + 1:<4} {title}")
+        return 0
+    if not args.package:
+        ap.error("--package か --list が要ります")
+
     pins, notes, packages = build(args.pdf, args.package, args.table, args.stop)
-    print(f"入力: {args.pdf}")
-    print(f"表にあるパッケージ: {', '.join(packages)}")
-    print(f"{args.package} の抽出 pin: {len(pins)} / function: {sum(len(p['functions']) for p in pins)}")
+    print_err(f"入力: {args.pdf}")
+    print_err(f"表にある列: {', '.join(packages)}")
+    print_err(f"{args.package} の抽出 pin: {len(pins)} / function: {sum(len(p['functions']) for p in pins)}")
     if notes:
-        print(f"\n要確認 {len(notes)} 件:")
+        print_err(f"\n要確認 {len(notes)} 件:")
         for n in notes:
-            print(f"  - {n}")
+            print_err(f"  - {n}")
     if args.compare:
         score(pins, args.compare)
     if args.emit:
         json.dump(pins, sys.stdout, indent=2, ensure_ascii=False)
-        print()
+        print_err()
     return 0
 
 
