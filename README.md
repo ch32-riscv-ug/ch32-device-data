@@ -11,7 +11,8 @@ The repository is the canonical home of the device database. The current schema 
 - `schemas/device.schema.json`: JSON Schema for exact orderable SKUs
 - `devices/*.json`: representative device records
 - `tools/validate.py`: schema and cross-reference validator
-- `docs/`: Japanese design notes and work handoff
+- `tools/extract_selectors.py`, `tools/extract_pins.py`: review aids that propose candidates from EVT headers and datasheets; they never modify records
+- `docs/`: Japanese design notes, extraction survey, and work handoff
 
 ## Validation
 
@@ -21,5 +22,12 @@ python3 -S tools/validate.py
 ```
 
 The second command exercises the standard-library fallback without the optional `jsonschema` package.
+
+The extraction aids need third-party packages and run through uv, which resolves them from `pyproject.toml` and `uv.lock`:
+
+```sh
+uv run tools/extract_selectors.py <evt>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
+uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20 --compare devices/<id>.json
+```
 
 Official PDFs, EVT trees, legacy Arduino core sources, and hand-written legacy pin tables are not copied into this repository. Records retain URLs, hashes, revisions, and document locators instead.

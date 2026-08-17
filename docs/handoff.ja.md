@@ -8,7 +8,7 @@
 
 ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON Schemaと8つのstress sampleを管理しています。Arduino対応SKUの宣言ではありません。
 
-2026-08-17に`ArduinoCore-CH32`の仮置き領域から、この独立repositoryへ移しました。変更はまだcommitされていないため、引継ぎ時は両repositoryの`git status --short`を確認してください。
+2026-08-17に`ArduinoCore-CH32`の仮置き領域から、この独立repositoryへ移しました（`b31e9ba`）。同日、抽出toolingを追加しています（`8775837`）。引継ぎ時は`git status --short`で未commitの変更を確認してください。
 
 ## 作成済みファイル
 
@@ -16,6 +16,13 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `devices/*.json`: 8 sample record
 - `tools/validate.py`: JSON Schema＋relation validator。`jsonschema`なしでも主要relationを検査
 - `docs/schema-notes.ja.md`: schemaで確認したfamily/package差と未決定事項
+
+抽出tooling（`8775837`、`docs/extraction-survey.ja.md`のみ後追い）:
+
+- `pyproject.toml` / `uv.lock`: tool用のuv project定義。`jsonschema`と`pdfplumber`を固定
+- `tools/extract_selectors.py`: EVTヘッダのregister bit定義からroute selector候補を作る
+- `tools/extract_pins.py`: datasheetのpin表からpackage pin/function候補を作る
+- `docs/extraction-survey.ja.md`: 上記2 toolでの実測と、機械抽出できる範囲の調査結果
 
 ## Sample recordの状態
 
@@ -69,6 +76,17 @@ python3 -S tools/validate.py
 git diff --check
 ```
 
+抽出toolを使う場合はuv経由です。recordは書き換えず、候補と要確認事項を表示するだけです。
+
+```sh
+uv run tools/extract_selectors.py \
+  /home/mt/dev_wch/CH32V003/EVT/EXAM/SRC/Peripheral/inc/ch32v00x.h \
+  --compare devices/ch32v003f4p6.json
+uv run tools/extract_pins.py \
+  /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF \
+  --package TSSOP20 --compare devices/ch32v003f4p6.json
+```
+
 `python3 -S`は`jsonschema`なしのfallback pathを確認します。mirror hash検査には、recordの`mirror.repository`に対応する兄弟repositoryが`/home/mt/dev_wch/`以下に必要です。
 
 テストで生成したPDF text、`__pycache__`、`.pyc`等はrepositoryへ残しません。
@@ -81,6 +99,8 @@ git diff --check
 4. verificationをfunction/selector単位まで細分化するか決める
 5. Arduino側のdata lock/consumer形式を作る
 6. CH32V006とCH32V103のpin/register構造でschemaを再度stress testする
+
+2について、生成先である各family repositoryのpin表はpackage横断の1表であり、必要SKU数を規定します。詳細は[抽出可能性の事前調査](extraction-survey.ja.md)を参照してください。同文書の末尾に、抽出toolingから出てきた未決定事項も記録しています。
 
 ## 禁止・注意事項
 
