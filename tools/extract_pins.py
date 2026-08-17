@@ -35,9 +35,12 @@ PART_NUMBER = re.compile(r"^(CH32)?[A-Z]{0,2}\d{3}[A-Z0-9]{2,}$")
 COLUMN_LABELS = {
     "pad": ("pinname",),
     "type": ("pintype",),
-    "default": ("defaultalternate", "defaultalter"),
+    # CH32H417 heads the default-route column "Pin function(2)" instead, and the
+    # CH32H415 table omits it entirely, so this one column is optional.
+    "default": ("defaultalternate", "defaultalter", "pinfunction"),
     "remap": ("remapping",),
 }
+REQUIRED_COLUMNS = ("pad", "type", "remap")
 
 PAD = re.compile(r"^P[A-H]\d{1,2}$")
 POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
@@ -73,15 +76,33 @@ def is_variant(name: str) -> bool:
     return name.startswith(PACKAGE_PREFIXES) or bool(PART_NUMBER.match(name))
 
 
-def read_package_header(cells: list[str]) -> list[str] | None:
-    """Variant column headings are printed rotated, so the text layer holds them reversed."""
-    names = []
-    for cell in cells:
-        name = FOOTNOTE.sub("", cell.replace("\n", ""))[::-1].strip()
-        if not name or not is_variant(name):
-            break
-        names.append(name)
-    return names or None
+def read_variant(cell: str) -> str | None:
+    """Read one variant heading.
+
+    Multi-column headings are printed rotated, so the text layer holds them
+    reversed; a table with a single variant column has room to print it upright
+    (CH32V203 Table 3-1-4). Both readings are therefore tried.
+    """
+    text = FOOTNOTE.sub("", cell.replace("\n", "")).strip()
+    for candidate in (text[::-1].strip(), text):
+        if candidate and is_variant(candidate):
+            return candidate
+    return None
+
+
+def read_package_header(cells: list[str], count: int) -> list[str] | None:
+    """Name the first `count` columns, leaving a placeholder where the text is lost.
+
+    CH32V208 leaves one heading blank in the text layer and CH32V317 splits
+    LQFP100 across two cells, so a heading row is accepted when some -- not
+    necessarily all -- of its cells resolve.
+    """
+    names, resolved = [], 0
+    for col in range(count):
+        found = read_variant(cells[col]) if col < len(cells) else None
+        names.append(found or f"col{col}")
+        resolved += found is not None
+    return names if resolved else None
 
 
 def normalise_label(text: str) -> str:
@@ -116,15 +137,17 @@ def read_layout(rows: list[list[str]]) -> tuple[dict[str, int], list[str]] | Non
             if any(k in text for k in keywords):
                 layout[key] = col
                 break
-    if set(layout) != set(COLUMN_LABELS):
+    if any(key not in layout for key in REQUIRED_COLUMNS):
         return None
-    variants = None
+    best: tuple[int, list[str]] | None = None
     for row in rows[:first_data]:
-        found = read_package_header(row)
-        if found and len(found) == layout["pad"]:
-            variants = found
-            break
-    return (layout, variants) if variants else None
+        found = read_package_header(row, layout["pad"])
+        if not found:
+            continue
+        resolved = sum(1 for n in found if not n.startswith("col"))
+        if best is None or resolved > best[0]:
+            best = (resolved, found)
+    return (layout, best[1]) if best else None
 
 
 CAPTION = re.compile(r"^(Table\s+[\d]+(?:-[\d]+)*)\s+(\S.*)$")
@@ -150,18 +173,33 @@ def choose_table(pdf) -> tuple[str, str]:
     found = captions(pdf)
     for i, (label, title, _) in enumerate(found):
         if "pin definition" in title.lower():
-            following = found[i + 1][0] if i + 1 < len(found) else "\x00"
-            return label, following
+            return label, next_caption(found, i)
     raise SystemExit("pin definition の表見出しが見つかりませんでした")
 
 
+def next_caption(found: list[tuple[str, str, int]], index: int) -> str:
+    """The label that ends the table at `index`.
+
+    A caption repeated on continuation pages is the same table, not the next one
+    (CH32V103 Table 2-2), so identical labels are skipped.
+    """
+    label = found[index][0]
+    for following, _, _ in found[index + 1:]:
+        if following != label:
+            return following
+    return "\x00"
+
+
 def caption_position(page, label: str) -> float | None:
-    """Y coordinate of a table caption, if it is on this page."""
-    try:
-        hits = page.search(re.escape(label))
-    except Exception:  # pragma: no cover - older pdfplumber without search()
-        return 0.0 if label in (page.extract_text() or "") else None
-    return min((h["top"] for h in hits), default=None)
+    """Y coordinate of a table caption, if it is on this page.
+
+    The label must end where it ends: "Table 3-1" is not an occurrence of
+    "Table 3-1-1", which numbers a different table.
+    """
+    for line in page.extract_text_lines() or []:
+        if re.match(re.escape(label) + r"(?![-\d])", line["text"].strip()):
+            return line["top"]
+    return None
 
 
 def find_pin_tables(
@@ -270,7 +308,9 @@ def pins_for(
     notes: list[str] = []
     index = packages.index(package)
     pad_col, type_col = layout["pad"], layout["type"]
-    default_col, remap_col = layout["default"], layout["remap"]
+    default_col, remap_col = layout.get("default"), layout["remap"]
+    if default_col is None:
+        notes.append("この表には default alternate function 列がなく、remap列のみ採取した")
 
     pins: list[dict] = []
     for cells in rows:
@@ -287,8 +327,9 @@ def pins_for(
             kind = "other"
             notes.append(f"{pad}: pin type {pin_type!r} を分類できず other とした")
         functions = []
-        for signal in signals(cells[default_col]):
-            functions.append({"signal": signal, "route": "default"})
+        if default_col is not None:
+            for signal in signals(cells[default_col]):
+                functions.append({"signal": signal, "route": "default"})
         for token in signals(cells[remap_col]):
             m = ROUTED.match(token)
             if m:
