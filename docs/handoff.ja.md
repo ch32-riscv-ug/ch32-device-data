@@ -22,9 +22,14 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `pyproject.toml` / `uv.lock`: tool用のuv project定義。`jsonschema`と`pdfplumber`を固定
 - `tools/extract_selectors.py`: EVTヘッダのregister bit定義からroute selector候補を作る
 - `tools/extract_pins.py`: datasheetのpin表からpackage pin/function候補を作る
-- `docs/extraction-survey.ja.md`: 上記2 toolでの実測と、機械抽出できる範囲の調査結果
+- `tools/extract_remap.py`: RMのremap格子から`(field, value, signal, pad)`候補を作る。datasheetにない default 経路とsilicon全体の経路を補い、datasheet側抽出との相互確認に使う
+- `tools/extract_registers.py`: RMのregister field表から bit位置・`reset_value` 候補を作る。説明文に書かれた経路も読む
+- `tools/build_candidate.py`: 上記4 toolの出力を結合し、pinから参照されるselectorだけを残した候補を作る
+- `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 
-全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin functionを取得できています。対象SKUをどこまで広げるかは未合意です。
+全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin function（要確認252件）を取得できています。対象SKUをどこまで広げるかは未合意です。
+
+未採取のCH32V006K8U7で`build_candidate.py`を走らせると、selector 6件（bit位置・`valid_values`・`reset_value`つき）と33 pin・244 functionの候補が得られます。review前提の素材であり、recordへは反映していません。
 
 ## Sample recordの状態
 
@@ -47,11 +52,12 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - AFIO以外のOPA input selectorも同じ`selection`構造で表現できる
 - CH32V003の`TIM1_1_RM`はTIM1_CH1を内部LSIへ接続し、package pin recordだけでは表せない
 - exact SKUのflat recordではsilicon共通selectorがpackageごとに重複する
-- signal名が`T1C1`/`TIM1_CH1`、`UART`/`USART`などseries・資料間で統一されていない
+- signal名が`T1C1`/`TIM1_CH1`、`UART`/`USART`などseries・資料間で統一されていない。RMとrecordでinstance番号の有無も揺れる（`SPI_RM`/`SPI1_REMAP`、`I2C1_SCL`/`I2C_SCL`）
+- CH32H41xはAFIO remapではなくpinごとのalternate function多重化（`TIM8_CH1(AF0)`）で、現在の`route_selectors`では表せない
 
 ## 一次資料の矛盾
 
-- CH32M030 RM Table 6-15の`ADC_ETRGIN_RM`対応は他の3根拠と逆。recordはdatasheet Table 2-1、RM register説明/reset、EVT実装が一致する`0=PA14`、`1=PB6`を採用
+- CH32M030 RM Table 6-15の`ADC_ETRGIN_RM`対応は他の3根拠と逆。recordはdatasheet Table 2-1、RM register説明/reset、EVT実装が一致する`0=PA14`、`1=PB6`を採用。`tools/extract_remap.py`はこの矛盾を照合時に自動で提示する
 - CH32V003 RMの`ADC_ETRGINJ_RM` register説明はregular triggerのPD3/PC2を誤って繰り返す。recordはdatasheet Table 2-2とRM Table 7-13が一致する`0=PD1`、`1=PA2`を採用
 
 いずれも実機未確認であり、document error候補としてrecordの`notes`に残しています。
@@ -87,6 +93,12 @@ uv run tools/extract_selectors.py \
 uv run tools/extract_pins.py \
   /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF \
   --package TSSOP20 --compare devices/ch32v003f4p6.json
+uv run tools/extract_remap.py \
+  /home/mt/dev_wch/CH32M030/datasheet_en/CH32M030RM.PDF \
+  --compare devices/ch32m030c8t7.json
+uv run tools/extract_registers.py \
+  /home/mt/dev_wch/CH32M030/datasheet_en/CH32M030RM.PDF \
+  --compare devices/ch32m030c8t7.json
 ```
 
 `python3 -S`は`jsonschema`なしのfallback pathを確認します。mirror hash検査には、recordの`mirror.repository`に対応する兄弟repositoryが`/home/mt/dev_wch/`以下に必要です。
@@ -95,9 +107,9 @@ uv run tools/extract_pins.py \
 
 ## 次に必要な判断
 
-1. canonical signal IDとvendor表記の分離方法を決める
+1. canonical signal IDとvendor表記の分離方法を決める。CH32V003はdatasheetが`T1CH1`、RMが`TIM1_CH1`で、辞書なしでは資料間の結合が0件になる
 2. silicon/package/exact SKUを正規化するか、flat recordを当面の正本にするか決める
-3. pinを持たないinternal routeを同じschemaに入れるか分離する
+3. pinを持たないinternal routeを同じschemaに入れるか分離する。あわせてCH32H41xのAF多重化の表現も決める
 4. verificationをfunction/selector単位まで細分化するか決める
 5. Arduino側のdata lock/consumer形式を作る
 6. CH32V006とCH32V103のpin/register構造でschemaを再度stress testする

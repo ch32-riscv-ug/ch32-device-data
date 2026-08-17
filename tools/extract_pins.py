@@ -51,7 +51,12 @@ POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
 PIN_TYPE = re.compile(r"^[A-Z]{1,3}(?:/[A-Z]{1,3}){0,3}$")
 PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,7}$")
 FOOTNOTE = re.compile(r"\(\d+\)")
+
+# Two unrelated ways of naming the route the signal arrives on. Families with an
+# AFIO remap register suffix the selector value (TIM1_CH1_2); CH32H41x instead
+# multiplexes per pin and names the alternate-function number (TIM8_CH1(AF0)).
 ROUTED = re.compile(r"^(?P<signal>.+?)_(?P<value>\d+)$")
+ALTERNATE = re.compile(r"^(?P<signal>.+?)\((?:AF|af)(?P<value>\d+)\)$")
 
 def kind_for(pin_type: str) -> str | None:
     """Map the datasheet's pin-type letters onto the schema's pin kinds.
@@ -61,15 +66,18 @@ def kind_for(pin_type: str) -> str | None:
     """
     if "I/O" in pin_type:
         return "gpio"
-    return {"P": "power", "A": "analog"}.get(pin_type)
+    # CH32M030 types its output-only medium-voltage pins "O"; they are still GPIO.
+    return {"P": "power", "A": "analog", "O": "gpio"}.get(pin_type)
 
 
 def normalise_pad(cell: str) -> str:
-    """Strip footnote markers and the line wrap the pad column picks up.
+    """Strip the line wrap the pad column picks up, then its footnote markers.
 
-    CH32X035 prints PA7(7), PC16(4)(9) and wraps VDD as "V\\nDD".
+    CH32X035 prints PA7(7), PC16(4)(9) and wraps VDD as "V\\nDD". The wrap can also
+    fall inside the marker, as CH32M030 does with "PA13(7\\n)", so whitespace has to
+    go first for the marker to be recognisable at all.
     """
-    return FOOTNOTE.sub("", cell).replace("\n", "").replace(" ", "")
+    return FOOTNOTE.sub("", cell.replace("\n", "").replace(" ", ""))
 
 
 def is_variant(name: str) -> bool:
@@ -331,6 +339,16 @@ def pins_for(
             for signal in signals(cells[default_col]):
                 functions.append({"signal": signal, "route": "default"})
         for token in signals(cells[remap_col]):
+            af = ALTERNATE.match(token)
+            if af:
+                functions.append(
+                    {
+                        "signal": af.group("signal"),
+                        "route": f"af-{af.group('value')}",
+                        "_alternate_function": int(af.group("value")),
+                    }
+                )
+                continue
             m = ROUTED.match(token)
             if m:
                 functions.append(
@@ -354,7 +372,15 @@ def pins_for(
             # WCH numbers the exposed thermal pad 0; the schema spells it EP.
             number_value = "EP"
             notes.append(f"{pad}: pin番号0をexposed pad (EP) として扱った")
-        pins.append({"number": number_value, "pad": pad, "kind": kind, "functions": functions})
+        pins.append(
+            {
+                "number": number_value,
+                "pad": pad,
+                "kind": kind,
+                "_pin_type": pin_type,
+                "functions": functions,
+            }
+        )
 
     pins.sort(key=lambda p: (isinstance(p["number"], str), p["number"]))
     return pins, notes
