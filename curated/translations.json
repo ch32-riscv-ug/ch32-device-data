@@ -1,0 +1,23 @@
+{
+  "_comment": "zh-only の表記を英語表示にするための人手翻訳辞書。キーはPDF抽出の空白を除去した原文。未登録のCJKが表に残ると tools/check_tables.py が失敗するので、ここに追加する。",
+  "labels": {
+    "CPU主频": "CPU main frequency",
+    "主要应用及特点": "Main applications and features",
+    "信号解码QII": "Signal decoding QII",
+    "可编程灌电流模块ISINK": "Programmable current-sink module ISINK",
+    "工作电压": "Operating voltage",
+    "源电流模块ISOURCE": "Current-source module ISOURCE",
+    "电流采样ISP,ISN": "Current sampling ISP/ISN",
+    "通信接口": "Communication interfaces",
+    "额定电压": "Rated voltage"
+  },
+  "values": {
+    "典型：72MHz": "Typ. 72MHz",
+    "差分*1单端*1": "1 differential + 1 single-ended",
+    "差分*2": "2 differential",
+    "带预驱，电机专用": "With pre-driver, motor-dedicated",
+    "通用，引脚优化": "General purpose, pin-optimized",
+    "通用，引脚兼容": "General purpose, pin-compatible",
+    "通用，电机主控": "General purpose, motor main control"
+  }
+}
