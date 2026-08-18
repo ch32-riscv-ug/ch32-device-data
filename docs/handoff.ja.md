@@ -136,4 +136,4 @@ uv run tools/extract_registers.py \
 - `ch32_riscv_tools/PinAlternateFunctions`の手製表を検証根拠やimport元にしない
 - sample recordをArduino対応宣言として扱わない
 - schemaは拡張してよい。対象は全SKU・全項目とし、正規化と分解は公開時に行う
-- commit、push、releaseは依頼または合意なしに行わない
+- git操作（add・commit・push・reset等の書き込み操作）は一切行わない。mirrorリポジトリも含め、すべてユーザーが操作する。作業はファイル編集までで止め、commit/pushすべき内容を報告する
