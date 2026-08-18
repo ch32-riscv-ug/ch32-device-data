@@ -102,6 +102,11 @@ WIDE = str.maketrans({"×": "X", "－": "-", "～": "~", "，": ",", "（": "(",
 # The second-to-last character of a full part number names the package family.
 # Checked against all 84 ordering entries and the 8 hand-made records, no exception.
 PACKAGE_LETTER = {"T": "LQFP", "U": "QFN", "P": "TSSOP", "M": "SOP", "R": "QSOP"}
+# The final digit names the temperature grade. Checked against all 32 stated
+# temperatures with no exception; other digits (1, 3) mark package variants and
+# carry no temperature claim.
+TEMP_GRADE = {"6": "-40..85C", "7": "-40..105C"}
+MAX_ONLY = re.compile(r"^(-?\d+)\s*[℃°CcＣ]*$")
 FULL_PART = re.compile(r"^CH32[A-Z]\d{3}[A-Z][0-9A-Z][A-Z]\d$")
 SERIES = re.compile(r"^(CH32[A-Z]\d{3})")
 # The lead count a package name itself states: LQFP100 -> 100, QFN48X7_A -> 48.
@@ -375,10 +380,32 @@ def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
         stated = next((v for _, v in pkg_sources if v), None)
         judge_field(row, "package", pkg_sources, package_letter_check(part, stated))
 
-        for field in ("flash_bytes", "sram_bytes", "temperature"):
+        for field in ("flash_bytes", "sram_bytes"):
             judge_field(row, field, [
                 ("products:zh", zh_attr.get(field)), ("products:en", en_attr.get(field)),
             ])
+
+        # Temperature: the comparison table states a range or only a maximum
+        # ("最大工作环境温度 105℃"); the part number's final digit states the grade.
+        # A stated range is a reading, a stated maximum is a check against the
+        # grade's range, and the grade rule supplies the range where nothing else
+        # does -- a reference value until something corroborates it.
+        grade = TEMP_GRADE.get(part[-1]) if FULL_PART.match(part) else None
+        temp_sources, temp_checks = [], []
+        for source, value in (("products:zh", zh_attr.get("temperature")),
+                              ("products:en", en_attr.get("temperature"))):
+            if not value:
+                continue
+            m = MAX_ONLY.match(value)
+            if m and grade:
+                temp_checks.append((f"{source}(max)", grade.endswith(f"..{m.group(1)}C")))
+            elif m:
+                temp_sources.append((source, f"max{m.group(1)}C"))
+            else:
+                temp_sources.append((source, value))
+        if grade:
+            temp_sources.append(("rule:pn-temp-grade", grade))
+        judge_field(row, "temperature", temp_sources, temp_checks)
 
         table_leads, table_gpio = pin_table_counts(part)
         # Sizes and lead counts are properties of the package, not the product.
