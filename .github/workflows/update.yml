@@ -39,6 +39,16 @@ jobs:
       - name: Refresh the catalogue
         run: python tools/sync_catalog.py --write
 
+      # documents.csv is the catalogue's relational projection; it is the one
+      # table whose source changes without a person touching the repository, so
+      # it follows the catalogue in the same commit. The join check then fails
+      # the run if the fresh catalogue broke a reference (a renamed or removed
+      # document that series/products still point at) -- the signal to look.
+      - name: Regenerate documents.csv and check table joins
+        run: |
+          python tools/build_documents.py
+          python tools/check_tables.py
+
       - name: Check the mirrors against it
         env:
           GITHUB_TOKEN: ${{ github.token }}
