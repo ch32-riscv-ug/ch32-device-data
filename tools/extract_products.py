@@ -142,7 +142,9 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
     with pdfplumber.open(pdf_path) as pdf:
         title = ""
         for line in pdf.pages[0].extract_text_lines() or []:
-            m = re.match(r"^(CH32[A-Z0-9]+)\s", line["text"].strip())
+            # The English cover reads "CH32M030 Datasheet", the Chinese one
+            # "CH32M030数据手册" with no space, so the name is not delimited.
+            m = re.match(r"^(CH32[A-Z][0-9A-Z]{2,5}?)(?=[\s\u4e00-\u9fff]|$)", line["text"].strip())
             if m:
                 title = m.group(1)
                 break
