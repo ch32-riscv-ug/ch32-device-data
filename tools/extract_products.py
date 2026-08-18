@@ -36,11 +36,13 @@ MODEL = re.compile(r"^CH32[A-Z0-9]{4,}$")
 FAMILY = re.compile(r"^CH32[A-Z]\d{3}$")
 # A model suffix as the transposed layout writes it. The shape varies widely --
 # C8T6, K8U7 and F6P1 alternate letters and digits, VET6 and RDU6 do not, and
-# CH32V303 is listed simply as CB, RB, RC. Anything short and uppercase qualifies,
-# which is only safe because a family name must head the column group.
-SUFFIX = re.compile(r"^[A-Z][A-Z0-9]{1,5}$")
+# CH32V303 is listed simply as CB, RB, RC. CH32V203 writes F8x6 and C8x6, the
+# lower-case x standing for either package letter, so one column covers both
+# F8P6 and F8U6. Anything short and upper-case (plus that x) qualifies, which is
+# only safe because a family name must head the column group.
+SUFFIX = re.compile(r"^[A-Z][A-Z0-9x]{1,5}$")
 # The narrower shape, which is unambiguous enough to stand without a family row.
-PLAIN_SUFFIX = re.compile(r"^[A-Z]{1,2}\d[A-Z]\d?[A-Z]?\d?$")
+PLAIN_SUFFIX = re.compile(r"^[A-Z]{1,2}\d[A-Zx]\d?[A-Z]?\d?$")
 MAX_PAGES = 16
 
 

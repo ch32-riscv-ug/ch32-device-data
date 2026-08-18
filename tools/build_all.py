@@ -161,8 +161,13 @@ def merge_sku_lists(products: list[dict], ordering: dict[str, dict]) -> list[dic
     for full in sorted(ordering):
         match = by_pn.get(full)
         if match is None:
-            # An abbreviated entry is a prefix of the full order model.
-            prefixes = [q for q in by_pn if full.startswith(q) and len(full) - len(q) <= 2]
+            # An abbreviated entry is a prefix of the full order model, or a
+            # wildcard column: CH32V203C6x6 covers both C6T6 and C6U6.
+            prefixes = [
+                q for q in by_pn
+                if ("x" in q and re.fullmatch(q.replace("x", "[A-Z0-9]"), full))
+                or (full.startswith(q) and len(full) - len(q) <= 2)
+            ]
             match = by_pn[prefixes[0]] if len(prefixes) == 1 else None
         if match is not None:
             claimed.add(match["part_number"])
