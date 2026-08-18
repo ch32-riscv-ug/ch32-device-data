@@ -26,6 +26,13 @@
     "PIOC 1-wire interface": "√",
     "Package form": "QFN20"
   },
+  "ordering": {
+    "part_number": "CH32X035F8U6",
+    "body_size": "3*3mm",
+    "pin_pitch": "0.4mm",
+    "package": "QFN20",
+    "page": 40
+  },
   "route_selectors": [
     {
       "id": "afio-i2c1-remap",

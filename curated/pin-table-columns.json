@@ -1,20 +1,44 @@
 {
-  "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, in column order.",
-  "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually. The method is recorded per entry.",
+  "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, position by position. A '-' marks a column the table grid contains but the printed table does not, which pdfplumber picks up from a stray rule.",
+  "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually, then confirming the data columns line up with the parsed grid.",
   "CH32V208DS0.PDF": {
     "Table 3-1": {
-      "columns": ["QFN28", "QFN48", "LQFP64", "QFN68"],
-      "note": "テキスト層は4列目 QFN68 を落とし、5列目を誤検出する",
+      "columns": [
+        "QFN28",
+        "QFN48",
+        "LQFP64",
+        "-",
+        "QFN68"
+      ],
+      "note": "紙面は QFN28/QFN48/LQFP64/QFN68 の4列。テキスト層は QFN68 を落とし、3列目に空の誤検出列が入るため4列目が QFN68 のデータになる",
       "verified_by": "page-image",
       "page": 19
     }
   },
   "CH32V20x_30xDS0.PDF": {
     "Table 3-2": {
-      "columns": ["QFN68", "LQFP100"],
-      "note": "LQFP100 の末尾 0 が段落ち。テキスト層では LQFP10 と 0 の2列に割れる",
+      "columns": [
+        "QFN68",
+        "LQFP100",
+        "-"
+      ],
+      "note": "紙面は QFN68/LQFP100 の2列。LQFP100 の末尾 0 が段落ちしてテキスト層では LQFP10 になり、3列目に空の誤検出列が入る",
       "verified_by": "page-image",
       "page": 42
+    }
+  },
+  "CH32V203DS0.PDF": {
+    "Table 3-1-1": {
+      "columns": [
+        "QFN20",
+        "LQFP32",
+        "QFN32",
+        "LQFP48/QFN48X7",
+        "-"
+      ],
+      "note": "紙面は4列。4列目は LQFP48 と QFN48X7 を1セルに積んだ見出しで両packageが同じpin番号を共有する。テキスト層では2列に割れ、5列目が空になる",
+      "verified_by": "page-image",
+      "page": 24
     }
   }
 }

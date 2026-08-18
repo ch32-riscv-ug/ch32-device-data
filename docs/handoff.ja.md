@@ -33,9 +33,9 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 
 全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin function（要確認252件）を取得できています。対象SKUをどこまで広げるかは未合意です。
 
-`tools/build_all.py`で全92 SKUの候補を`candidates/`へ生成済みです（79 SKUでpin取得、3278 pin・18603 function・5303経路・452 selector）。**未reviewの機械出力**であり、`devices/`へは反映していません。
+`tools/build_all.py`で全SKUの候補を`candidates/`へ生成済みです（98ファイル・4.0MB、**全SKUでpin取得**、3989 pin・22186 function・7108経路・585 selector）。**未reviewの機械出力**であり、`devices/`へは反映していません。
 
-hand researchが要るのは、pin表の列を特定できなかった13 SKUと、reference manualがmirrorされていないCH32V407です。
+残る資料側の欠落は、reference manualがmirrorされていないCH32V407です（経路0件）。
 
 ## Sample recordの状態
 
@@ -60,6 +60,8 @@ hand researchが要るのは、pin表の列を特定できなかった13 SKUと�
 - exact SKUのflat recordではsilicon共通selectorがpackageごとに重複する
 - signal名が`T1C1`/`TIM1_CH1`、`UART`/`USART`などseries・資料間で統一されていない。RMとrecordでinstance番号の有無も揺れる（`SPI_RM`/`SPI1_REMAP`、`I2C1_SCL`/`I2C_SCL`）
 - CH32H41xはAFIO remapではなくpinごとのalternate function多重化（`TIM8_CH1(AF0)`）で、現在の`route_selectors`では表せない
+- 型番の末尾2文字目がpackage種別を表す（`T`=LQFP、`U`=QFN、`P`=TSSOP、`M`=SOP、`R`=QSOP）。ordering表84件と人手record 8件のすべてで一致し例外がない
+- SKUの母集合は製品比較表とordering表の和。ordering表だけが完全な注文型番を持つ（比較表の`CH32V208CB`はordering表では`CH32V208CBU6`）
 
 ## 一次資料の矛盾
 

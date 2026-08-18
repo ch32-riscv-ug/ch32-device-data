@@ -1,22 +1,20 @@
 {
-  "part_number": "CH32V208CB",
+  "part_number": "CH32V203C6T6",
   "_provenance": {
-    "datasheet": "CH32V20x/datasheet_en/CH32V208DS0.PDF",
+    "datasheet": "CH32V20x/datasheet_en/CH32V203DS0.PDF",
     "manual": "CH32V20x/datasheet_en/CH32FV2x_V3xRM.PDF",
     "header": "CH32V20x/EVT/EXAM/SRC/Peripheral/inc/ch32v20x.h",
-    "pin_table": "Table 3-1",
-    "pin_column": "QFN48"
+    "pin_table": "Table 3-1-1",
+    "pin_column": "LQFP48/QFN48X7"
   },
-  "product_attributes": {
-    "Pin count": "48",
-    "Flash (bytes) (1)": "128K(2)",
-    "SRAM (bytes)": "64K(2)",
-    "GPIO port count": "35",
-    "Timer": "1",
-    "ADC/TKey (channel@ unit count)": "10@1",
-    "OPA": "2",
-    "Communicationinterfaces": "4",
-    "Package": "QFN48"
+  "product_attributes": {},
+  "ordering": {
+    "part_number": "CH32V203C6T6",
+    "body_size": "7*7mm",
+    "pin_pitch": "0.5mm",
+    "description": "Low Profile Quad Flat Pack",
+    "package": "LQFP48",
+    "page": 59
   },
   "route_selectors": [
     {
@@ -124,28 +122,12 @@
       ],
       "_valid_values_source": "RM remap格子",
       "reset_value": 0
-    },
-    {
-      "id": "afio-usart3-remap",
-      "controller": "afio",
-      "register": "PCFR1",
-      "field": "USART3_REMAP",
-      "bit_offset": 4,
-      "bit_width": 2,
-      "valid_values": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "_valid_values_source": "RM remap格子",
-      "reset_value": 0
     }
   ],
   "pins": [
     {
-      "number": 4,
-      "pad": "VSSA",
+      "number": 1,
+      "pad": "VBAT",
       "kind": "power",
       "_pin_type": "P",
       "functions": []
@@ -155,14 +137,26 @@
       "pad": "OSC_IN",
       "kind": "other",
       "_pin_type": "I/A",
-      "functions": []
+      "functions": [
+        {
+          "signal": "PD0",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
     },
     {
       "number": 6,
       "pad": "OSC_OUT",
       "kind": "other",
       "_pin_type": "O/A",
-      "functions": []
+      "functions": [
+        {
+          "signal": "PD1",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
     },
     {
       "number": 7,
@@ -173,13 +167,20 @@
     },
     {
       "number": 8,
-      "pad": "VDDA",
+      "pad": "VSSA",
       "kind": "power",
       "_pin_type": "P",
       "functions": []
     },
     {
       "number": 9,
+      "pad": "VDDA",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 10,
       "pad": "PA0-WKUP",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -205,10 +206,6 @@
           "route": "default"
         },
         {
-          "signal": "TIM5_CH1",
-          "route": "default"
-        },
-        {
           "signal": "TIM2_CH1",
           "route": "remap-2",
           "_selector_value": 2,
@@ -235,7 +232,7 @@
       ]
     },
     {
-      "number": 10,
+      "number": 11,
       "pad": "PA1",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -246,10 +243,6 @@
         },
         {
           "signal": "ADC_IN1",
-          "route": "default"
-        },
-        {
-          "signal": "TIM5_CH2",
           "route": "default"
         },
         {
@@ -270,17 +263,13 @@
       ]
     },
     {
-      "number": 11,
+      "number": 12,
       "pad": "PA2",
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
         {
           "signal": "USART2_TX",
-          "route": "default"
-        },
-        {
-          "signal": "TIM5_CH3",
           "route": "default"
         },
         {
@@ -309,17 +298,13 @@
       ]
     },
     {
-      "number": 12,
+      "number": 13,
       "pad": "PA3",
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
         {
           "signal": "USART2_RX",
-          "route": "default"
-        },
-        {
-          "signal": "TIM5_CH4",
           "route": "default"
         },
         {
@@ -348,7 +333,7 @@
       ]
     },
     {
-      "number": 13,
+      "number": 14,
       "pad": "PA4",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -360,11 +345,19 @@
         {
           "signal": "USART2_CK",
           "route": "default"
+        },
+        {
+          "signal": "ADC_IN4",
+          "route": "default"
+        },
+        {
+          "signal": "OPA2_OUT1",
+          "route": "default"
         }
       ]
     },
     {
-      "number": 14,
+      "number": 15,
       "pad": "PA5",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -380,11 +373,23 @@
         {
           "signal": "OPA2_CH1N",
           "route": "default"
+        },
+        {
+          "signal": "USART4_TX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "pad+value"
         }
       ]
     },
     {
-      "number": 15,
+      "number": 16,
       "pad": "PA6",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -415,11 +420,17 @@
               1
             ]
           }
+        },
+        {
+          "signal": "USART4_CK",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 16,
+      "number": 17,
       "pad": "PA7",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -450,11 +461,17 @@
               1
             ]
           }
+        },
+        {
+          "signal": "USART4_CTS",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 17,
+      "number": 18,
       "pad": "PB0",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -469,6 +486,10 @@
         },
         {
           "signal": "OPA1_CH1P",
+          "route": "default"
+        },
+        {
+          "signal": "USART4_TX",
           "route": "default"
         },
         {
@@ -492,17 +513,11 @@
               2
             ]
           }
-        },
-        {
-          "signal": "UART4_TX",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 18,
+      "number": 19,
       "pad": "PB1",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -517,6 +532,10 @@
         },
         {
           "signal": "OPA1_OUT1",
+          "route": "default"
+        },
+        {
+          "signal": "USART4_RX",
           "route": "default"
         },
         {
@@ -540,24 +559,23 @@
               2
             ]
           }
-        },
-        {
-          "signal": "UART4_RX",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 19,
+      "number": 20,
       "pad": "PB2",
       "kind": "gpio",
       "_pin_type": "I/O",
-      "functions": []
+      "functions": [
+        {
+          "signal": "USART4_CK",
+          "route": "default"
+        }
+      ]
     },
     {
-      "number": 20,
+      "number": 21,
       "pad": "PB10",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -599,7 +617,7 @@
       ]
     },
     {
-      "number": 21,
+      "number": 22,
       "pad": "PB11",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -641,14 +659,21 @@
       ]
     },
     {
-      "number": 22,
+      "number": 23,
+      "pad": "VSS_1",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 24,
       "pad": "VDD_IO_1",
       "kind": "power",
       "_pin_type": "P",
       "functions": []
     },
     {
-      "number": 23,
+      "number": 25,
       "pad": "PB12",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -672,7 +697,7 @@
       ]
     },
     {
-      "number": 24,
+      "number": 26,
       "pad": "PB13",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -682,28 +707,17 @@
           "route": "default"
         },
         {
+          "signal": "USART3_CTS",
+          "route": "default"
+        },
+        {
           "signal": "TIM1_CH1N",
           "route": "default"
-        },
-        {
-          "signal": "USART3_CTS",
-          "route": "default"
-        },
-        {
-          "signal": "USART3_CTS",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "selection": {
-            "selector": "afio-usart3-remap",
-            "values": [
-              1
-            ]
-          }
         }
       ]
     },
     {
-      "number": 25,
+      "number": 27,
       "pad": "PB14",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -723,22 +737,11 @@
         {
           "signal": "OPA2_CH0P",
           "route": "default"
-        },
-        {
-          "signal": "USART3_RTS",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "selection": {
-            "selector": "afio-usart3-remap",
-            "values": [
-              1
-            ]
-          }
         }
       ]
     },
     {
-      "number": 26,
+      "number": 28,
       "pad": "PB15",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -758,7 +761,7 @@
       ]
     },
     {
-      "number": 27,
+      "number": 29,
       "pad": "PA8",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -800,7 +803,7 @@
       ]
     },
     {
-      "number": 28,
+      "number": 30,
       "pad": "PA9",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -827,7 +830,7 @@
       ]
     },
     {
-      "number": 29,
+      "number": 31,
       "pad": "PA10",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -854,7 +857,7 @@
       ]
     },
     {
-      "number": 30,
+      "number": 32,
       "pad": "PA11",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -900,7 +903,7 @@
       ]
     },
     {
-      "number": 31,
+      "number": 33,
       "pad": "PA12",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -946,7 +949,7 @@
       ]
     },
     {
-      "number": 32,
+      "number": 34,
       "pad": "PA13",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -959,20 +962,6 @@
       ]
     },
     {
-      "number": 33,
-      "pad": "VINTA",
-      "kind": "power",
-      "_pin_type": "P",
-      "functions": []
-    },
-    {
-      "number": 34,
-      "pad": "ANT",
-      "kind": "analog",
-      "_pin_type": "A",
-      "functions": []
-    },
-    {
       "number": 35,
       "pad": "VSS_2",
       "kind": "power",
@@ -981,6 +970,13 @@
     },
     {
       "number": 36,
+      "pad": "VDD_2",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
+      "number": 37,
       "pad": "PA14",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -993,7 +989,7 @@
       ]
     },
     {
-      "number": 37,
+      "number": 38,
       "pad": "PA15",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -1052,15 +1048,25 @@
               1
             ]
           }
+        },
+        {
+          "signal": "USART4_RTS",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 38,
+      "number": 39,
       "pad": "PB3",
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "USART4_CTS",
+          "route": "default"
+        },
         {
           "signal": "TIM2_CH2",
           "route": "remap-1",
@@ -1097,11 +1103,15 @@
       ]
     },
     {
-      "number": 39,
+      "number": 40,
       "pad": "PB4",
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "USART4_RTS",
+          "route": "default"
+        },
         {
           "signal": "TIM3_CH1",
           "route": "remap-2",
@@ -1127,7 +1137,7 @@
       ]
     },
     {
-      "number": 40,
+      "number": 41,
       "pad": "PB5",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -1157,11 +1167,17 @@
               1
             ]
           }
+        },
+        {
+          "signal": "USART4_RX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_unresolved_selector": true
         }
       ]
     },
     {
-      "number": 41,
+      "number": 42,
       "pad": "PB6",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -1192,7 +1208,7 @@
       ]
     },
     {
-      "number": 42,
+      "number": 43,
       "pad": "PB7",
       "kind": "gpio",
       "_pin_type": "I/O",
@@ -1223,14 +1239,14 @@
       ]
     },
     {
-      "number": 43,
+      "number": 44,
       "pad": "BOOT0",
       "kind": "other",
       "_pin_type": "I",
       "functions": []
     },
     {
-      "number": 44,
+      "number": 45,
       "pad": "PB8",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -1264,7 +1280,7 @@
       ]
     },
     {
-      "number": 45,
+      "number": 46,
       "pad": "PB9",
       "kind": "gpio",
       "_pin_type": "I/O/A",
@@ -1298,22 +1314,15 @@
       ]
     },
     {
-      "number": 46,
+      "number": 47,
       "pad": "VSS_3",
       "kind": "power",
       "_pin_type": "P",
       "functions": []
     },
     {
-      "number": 47,
-      "pad": "VDD_IO_3",
-      "kind": "power",
-      "_pin_type": "P",
-      "functions": []
-    },
-    {
       "number": 48,
-      "pad": "VBAT",
+      "pad": "VDD_IO_3",
       "kind": "power",
       "_pin_type": "P",
       "functions": []

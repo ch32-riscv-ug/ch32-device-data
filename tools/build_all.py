@@ -103,9 +103,15 @@ def choose_column(
     # The ordering table states the package outright and is the best evidence there is.
     named = (ordering or {}).get(part, {}).get("package", "")
     if named:
+        want = named.upper()
         for v in variants:
-            if v.upper() == named.upper():
-                return v, "ordering-table"
+            # A heading may stack the packages that share a numbering, as CH32V203
+            # does with "LQFP48/QFN48X7".
+            for got in (part.strip() for part in v.upper().split("/")):
+                # The two tables also spell one package differently: the ordering
+                # table says LQFP64M where the pin table says LQFP64.
+                if got and (got == want or want.startswith(got) or got.startswith(want)):
+                    return v, "ordering-table"
     for v in variants:
         if v == part or part.endswith(v) or v.endswith(part):
             return v, "part-number"
@@ -142,6 +148,37 @@ def choose_column(
     return None, ("候補=" + ",".join(rest)) if rest else "手掛かりなし"
 
 
+def merge_sku_lists(products: list[dict], ordering: dict[str, dict]) -> list[dict]:
+    """The SKU universe is both tables together.
+
+    The ordering table spells the part number in full where the comparison table
+    abbreviates it -- CH32V208 appears as CH32V208CB in one and CH32V208CBU6 in the
+    other -- and each table lists models the other omits.
+    """
+    by_pn = {p["part_number"]: p for p in products}
+    merged: list[dict] = []
+    claimed: set[str] = set()
+    for full in sorted(ordering):
+        match = by_pn.get(full)
+        if match is None:
+            # An abbreviated entry is a prefix of the full order model.
+            prefixes = [q for q in by_pn if full.startswith(q) and len(full) - len(q) <= 2]
+            match = by_pn[prefixes[0]] if len(prefixes) == 1 else None
+        if match is not None:
+            claimed.add(match["part_number"])
+        merged.append(
+            {
+                "part_number": full,
+                "attributes": (match or {}).get("attributes", {}),
+                "_listed_as": match["part_number"]
+                if match and match["part_number"] != full
+                else None,
+            }
+        )
+    merged += [p for p in products if p["part_number"] not in claimed]
+    return merged
+
+
 def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
     report: list[dict] = []
     header, manual = find_header(family), find_manual(family)
@@ -164,7 +201,7 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
         except Exception as exc:  # noqa: BLE001
             report.append({"family": family.name, "datasheet": datasheet.name, "error": str(exc)})
             continue
-        for product in products[: limit or None]:
+        for product in merge_sku_lists(products, ordering)[: limit or None]:
             part = product["part_number"]
             entry = {
                 "part_number": part,
