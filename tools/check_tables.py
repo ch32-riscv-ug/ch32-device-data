@@ -29,7 +29,8 @@ def main() -> int:
     args = ap.parse_args()
     t = {name: load(args.tables, name)
          for name in ("families", "series", "products", "packages",
-                      "cores", "documents", "pins", "pin_functions")}
+                      "cores", "documents", "pins", "pin_functions",
+                      "product_attributes", "remap_fields", "remap_routes")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -73,6 +74,14 @@ def main() -> int:
     for r in t["pin_functions"]:
         if (r["part_number"], r["pad"]) not in pin_pads:
             bad.append(f"pin_functions: {r['part_number']} の pad {r['pad']!r} が pins にない")
+    for r in t["product_attributes"]:
+        check("product_attributes", r["attribute"], r["part_number"], products, "products")
+    remap_fields = {(r["series"], r["selector"]) for r in t["remap_fields"]}
+    for r in t["remap_fields"]:
+        check("remap_fields", r["selector"], r["series"], series, "series")
+    for r in t["remap_routes"]:
+        if (r["series"], r["selector"]) not in remap_fields:
+            bad.append(f"remap_routes: ({r['series']}, {r['selector']}) が remap_fields にない")
 
     counts = {name: len(rows) for name, rows in t.items()}
     print("行数:", counts, file=sys.stderr)

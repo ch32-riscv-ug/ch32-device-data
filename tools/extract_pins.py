@@ -289,13 +289,16 @@ def unwrap(cell: str) -> str:
     signal, where it is not. CH32X035 splits T2C1N_6 as "T2C1N_" / "6", C1P0 as
     "C1P" / "0" and the footnote of A3(3) as "A3(" / "3)". No signal name begins
     with a digit, so a continuation is recognisable: a trailing "_" or "(" on the
-    previous line, or a leading digit or ")" on the next one.
+    previous line, or a leading digit or ")" on the next one. CH32H417 wraps in
+    the middle of a parenthesis -- "USART5_CK(A" / "F8)" -- so an unclosed "("
+    also marks a continuation.
     """
     parts = [p.strip() for p in cell.split("\n") if p.strip()]
     out = ""
     for part in parts:
         joined = (
             out.endswith(("/", "_", "("))
+            or out.count("(") > out.count(")")
             or part.startswith(("/", ")", "_"))
             or part[0].isdigit()
         )

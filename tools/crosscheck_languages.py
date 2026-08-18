@@ -45,15 +45,26 @@ def editions(family: str, name: str) -> dict[str, Path]:
 # "-40~105 C" and "-40~105℃". Comparing the reading rather than the wording keeps
 # the report on real differences.
 UNIT_WORDS = ("-channel", "路", "channel", "个", "组", "-group", "group")
+# Translation pairs that state the same value in each language's own word. The
+# longer phrase must come first so 非零等待 is not half-eaten by 零等待.
+EQUIVALENTS = (("非零等待", "nonzerowait"), ("non-zero-wait", "nonzerowait"),
+               ("non-zero wait", "nonzerowait"),
+               ("零等待", "zerowait"), ("zero-wait", "zerowait"),
+               ("zero wait", "zerowait"),
+               ("supported", "support"), ("支持", "support"))
 # Full-width punctuation in the Chinese edition against ASCII in the English one.
-PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "、": ",", "℃": "C", "　": ""})
+PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "、": ",",
+                             "：": ":", "；": ";", "℃": "C", "　": ""})
 
 
 def canonical_value(value) -> str:
-    text = str(value).translate(PUNCTUATION)
+    # Lower-case first, so "Supported" meets the equivalence for "supported".
+    text = str(value).translate(PUNCTUATION).lower()
+    for word, canon in EQUIVALENTS:
+        text = text.replace(word, canon)
     for word in UNIT_WORDS:
         text = text.replace(word, "")
-    return text.replace("°C", "C").replace(" ", "").strip().lower()
+    return text.replace("°c", "c").replace(" ", "").strip()
 
 
 def compare(left: dict, right: dict) -> tuple[list, list, list]:

@@ -409,6 +409,9 @@ def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
             temp_sources.append(("rule:pn-temp-grade", grade))
         judge_field(row, "temperature", temp_sources, temp_checks)
 
+        # The full attribute rows, judged later into product_attributes.csv.
+        row["_zh_attrs"] = zh_products.get(part, {})
+        row["_en_attrs"] = en_products.get(part, {})
         table_leads, table_gpio = pin_table_counts(part)
         # Sizes and lead counts are properties of the package, not the product.
         # The statements made here are stashed and judged once per package name.
@@ -470,6 +473,7 @@ def main() -> int:
     # unique (one model can appear in several datasheets), so the full key keeps
     # regeneration and later insertions reproducible with no tie left to chance.
     rows.sort(key=lambda r: (r["part_number"], r["family"], r["datasheet"]))
+    attributes = attribute_rows(rows)  # removes the stashed attribute dicts
     packages = package_rows(rows, dims)  # also removes the stashed evidence
     series = series_rows(rows)
     write_csv(args.out / "products.csv", rows, PRODUCT_COLUMNS)
@@ -477,7 +481,9 @@ def main() -> int:
     write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
     write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
     write_csv(args.out / "cores.csv", core_rows(), CORE_COLUMNS)
+    write_csv(args.out / "product_attributes.csv", attributes, ATTRIBUTE_COLUMNS)
     build_documents.write(args.out)
+    print(f"{args.out}/product_attributes.csv: {len(attributes)} 行", file=sys.stderr)
     (args.out / "silicon.csv").unlink(missing_ok=True)  # 旧名。series.csvに置き換え
     tally(args.out / "products.csv", rows)
     print(f"{args.out}/series.csv: {len(series)} 行", file=sys.stderr)
@@ -502,6 +508,7 @@ FAMILY_COLUMNS = [
     "cores", "datasheets", "reference_manuals", "evt",
 ]
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
+ATTRIBUTE_COLUMNS = ["part_number", "attribute", "value", "label_zh", "label_en"]
 
 
 def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
@@ -678,6 +685,85 @@ def package_rows(rows: list[dict], dims: dict) -> list[dict]:
                     dedup_evidence(a["pitch"], size_canon)
                     + package_dim_evidence(dims, name, "pin_pitch"), canon=size_canon)
         out.append(entry)
+    return out
+
+
+def attribute_name(label: str) -> str:
+    """A join-friendly name for a table row: 'ADC/TKey (channel@unitcount)' ->
+    'adc_tkey_channel_unitcount'. The original labels stay in their own columns."""
+    text = FOOTNOTE_TAIL.sub("", str(label))
+    text = re.sub(r"[^0-9a-zA-Z\u4e00-\u9fff]+", "_", text).strip("_").lower()
+    return text or "attr"
+
+
+FOOTNOTE_TAIL = re.compile(r"\s*[（(]\d+[)）]")
+
+
+def attribute_rows(rows: list[dict]) -> list[dict]:
+    """Every comparison-table row, long format: (part_number, attribute, value).
+
+    The promoted fields (flash, sram, package, ...) live as columns elsewhere and
+    are skipped here; everything else the table states is kept, so nothing the
+    document says is dropped just because the schema has no column yet.
+
+    The two editions word the labels differently (定时器 / Timer), so rows pair
+    by the longest common subsequence of their normalised values -- a translation
+    keeps the table's row order, so equal values in equal order are the same row.
+    A single unpaired row on each side between two anchors can only be the same
+    row stating different values: a conflict.
+    """
+    import difflib
+
+    out = []
+    for row in rows:
+        zh_attrs = row.pop("_zh_attrs", {}) or {}
+        en_attrs = row.pop("_en_attrs", {}) or {}
+        def keep(attrs: dict) -> list[tuple[str, str]]:
+            return [(label, str(value).strip())
+                    for label, value in attrs.items()
+                    if canonical_field(label) is None
+                    and str(value).strip() not in ("", "-", "—")]
+        zh = keep(zh_attrs)
+        en = keep(en_attrs)
+        zh_canon = [canonical_value(v) for _, v in zh]
+        en_canon = [canonical_value(v) for _, v in en]
+        matcher = difflib.SequenceMatcher(a=zh_canon, b=en_canon, autojunk=False)
+        pairs: list[tuple[int | None, int | None]] = []
+        zi = ei = 0
+        for block in matcher.get_matching_blocks():
+            gap_zh = list(range(zi, block.a))
+            gap_en = list(range(ei, block.b))
+            if len(gap_zh) == 1 and len(gap_en) == 1:
+                pairs.append((gap_zh[0], gap_en[0]))  # same row, different value
+            else:
+                pairs += [(i, None) for i in gap_zh]
+                pairs += [(None, j) for j in gap_en]
+            pairs += [(block.a + k, block.b + k) for k in range(block.size)]
+            zi, ei = block.a + block.size, block.b + block.size
+        used: set[str] = set()
+        for zh_i, en_i in pairs:
+            label_zh, value_zh = zh[zh_i] if zh_i is not None else ("", "")
+            label_en, value_en = en[en_i] if en_i is not None else ("", "")
+            if zh_i is not None and en_i is not None:
+                agree = canonical_value(value_zh) == canonical_value(value_en)
+                confidence = "confirmed" if agree else "conflict"
+                basis = "products:zh+products:en" if agree                     else f"products:zh+!products:en(={value_en})"
+            elif zh_i is not None:
+                confidence, basis = "reference", "products:zh"
+            else:
+                confidence, basis = "reference", "products:en"
+            name = attribute_name(label_en or label_zh)
+            while name in used:
+                name += "_"
+            used.add(name)
+            out.append({
+                "part_number": row["part_number"],
+                "attribute": name,
+                "value": value_zh or value_en,
+                "label_zh": label_zh, "label_en": label_en,
+                "confidence": confidence, "basis": basis,
+            })
+    out.sort(key=lambda r: (r["part_number"], r["attribute"]))
     return out
 
 
