@@ -2,7 +2,7 @@ core,isa,manual,note,#,isa_confidence,isa_basis
 QingKe V2A,RV32EC,QingKeV2_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V2C,RV32EmC,QingKeV2_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V3A,RV32IMAC,QingKeV3_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
-QingKe V3B,RV32I[M]C[B],QingKeV3_Processor_Manual.PDF,MとBは実装任意。搭載chip側のdatasheetが実際の組合せを述べる,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
+QingKe V3B,RV32I[M]C[B],QingKeV3_Processor_Manual.PDF,M and B extensions are optional in silicon; each chip's datasheet states the implemented combination,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V3C,RV32IMCB,QingKeV3_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V3F,RV32IMAFCB,QingKeV3_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V3V,RV32IMACB+Zve64x_zvbb,QingKeV3_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
@@ -10,5 +10,5 @@ QingKe V4A,RV32IMAC,QingKeV4_Processor_Manual.PDF,,#,confirmed,manual:qingke-man
 QingKe V4B,RV32IMAC,QingKeV4_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V4C,RV32IMAC,QingKeV4_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V4F,RV32IMACF,QingKeV4_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
-QingKe V4J,RV32IMAC,QingKeV4_Processor_Manual.PDF,I-Cache搭載,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
+QingKe V4J,RV32IMAC,QingKeV4_Processor_Manual.PDF,With instruction cache (I-Cache),#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ
 QingKe V5F,RV32IMABCF,QingKeV5_Processor_Manual.PDF,,#,confirmed,manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ

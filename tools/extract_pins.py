@@ -308,9 +308,15 @@ def unwrap(cell: str) -> str:
     return out
 
 
+CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
+
+
 def signals(cell: str) -> list[str]:
-    """Split a cell into signal tokens. '-' is the table's empty marker, not a signal."""
-    return [s for s in unwrap(FOOTNOTE.sub("", cell)).split("/") if s and s != "-"]
+    """Split a cell into signal tokens. '-' is the table's empty marker, not a
+    signal, and no signal name contains CJK -- such tokens are fragments of the
+    Chinese edition's prose bleeding into the cell, so they are dropped."""
+    return [s for s in unwrap(FOOTNOTE.sub("", cell)).split("/")
+            if s and s != "-" and not CJK.search(s)]
 
 
 def build(

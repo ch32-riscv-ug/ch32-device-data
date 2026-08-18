@@ -86,6 +86,27 @@ def main() -> int:
         if (r["series"], r["selector"]) not in remap_fields:
             bad.append(f"remap_routes: ({r['series']}, {r['selector']}) が remap_fields にない")
 
+    # Data columns carry no CJK: Chinese readings are evidence (kept in the
+    # *_basis and label_zh columns), never the displayed value. A leak here
+    # means the translation dictionary in curated/translations.json is missing
+    # an entry, or an extractor let prose fragments through.
+    import re
+    cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
+    for name, rows in t.items():
+        if not rows:
+            continue
+        columns = []
+        for column in rows[0]:
+            if column == "#":
+                break
+            if column != "label_zh":
+                columns.append(column)
+        for r in rows:
+            for column in columns:
+                value = r.get(column, "")
+                if value and cjk.search(value):
+                    bad.append(f"{name}: {column} にCJKが残っている: {value[:40]!r}")
+
     counts = {name: len(rows) for name, rows in t.items()}
     print("行数:", counts, file=sys.stderr)
     if bad:

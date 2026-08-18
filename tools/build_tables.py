@@ -510,7 +510,7 @@ FAMILY_COLUMNS = [
     "cores", "datasheets", "reference_manuals", "evt",
 ]
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
-ERRATA_COLUMNS = ["id", "series", "condition", "description", "source"]
+ERRATA_COLUMNS = ["id", "series", "condition", "description"]
 ATTRIBUTE_COLUMNS = ["part_number", "attribute", "value", "label_zh", "label_en"]
 
 
@@ -703,6 +703,37 @@ def attribute_name(label: str) -> str:
 
 
 FOOTNOTE_TAIL = re.compile(r"\s*[（(]\d+[)）]")
+COUNT = re.compile(r"\d+(?:[+/x*]\d+)*")
+TRANSLATIONS = REPO / "curated" / "translations.json"
+
+
+def load_translations() -> dict:
+    import json
+
+    if not TRANSLATIONS.exists():
+        return {"labels": {}, "values": {}}
+    return json.loads(TRANSLATIONS.read_text(encoding="utf-8"))
+
+
+def translated(text: str, table: dict) -> str:
+    """Look up the hand-made translation, spaces the PDF inserted removed."""
+    return table.get(text.replace(" ", "").replace("　", ""), text)
+
+
+def display_value(value_en: str, value_zh: str, confidence: str) -> str:
+    """The value to print: counts as bare numbers, otherwise readable but true.
+
+    "8路" and "8-channel" both state the count 8, so the number alone carries it
+    in either language. Elsewhere the English spelling reads better and the two
+    are verified equal when confirmed; a conflict keeps the Chinese original,
+    which is the authoritative edition.
+    """
+    for value in (value_en, value_zh):
+        if value and COUNT.fullmatch(canonical_value(value)):
+            return canonical_value(value)
+    # Chinese never carries the display when an English statement exists -- even
+    # a conflict shows the English value; the Chinese original moves to basis.
+    return value_en or value_zh
 
 
 def attribute_rows(rows: list[dict]) -> list[dict]:
@@ -720,6 +751,7 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
     """
     import difflib
 
+    translations = load_translations()
     out = []
     for row in rows:
         zh_attrs = row.pop("_zh_attrs", {}) or {}
@@ -753,19 +785,25 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
             if zh_i is not None and en_i is not None:
                 agree = canonical_value(value_zh) == canonical_value(value_en)
                 confidence = "confirmed" if agree else "conflict"
-                basis = "products:zh+products:en" if agree                     else f"products:zh+!products:en(={value_en})"
+                basis = "products:zh+products:en" if agree \
+                    else f"products:en+!products:zh(={value_zh})"
             elif zh_i is not None:
                 confidence, basis = "reference", "products:zh"
             else:
                 confidence, basis = "reference", "products:en"
-            name = attribute_name(label_en or label_zh)
+            if not label_en and label_zh:
+                label_en = ""  # no English source; the id gets the translation
+            name = attribute_name(
+                label_en or translated(label_zh, translations["labels"]))
             while name in used:
                 name += "_"
             used.add(name)
             out.append({
                 "part_number": row["part_number"],
                 "attribute": name,
-                "value": value_zh or value_en,
+                "value": translated(
+                    display_value(value_en, value_zh, confidence),
+                    translations["values"]),
                 "label_zh": label_zh, "label_en": label_en,
                 "confidence": confidence, "basis": basis,
             })

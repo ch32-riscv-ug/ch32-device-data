@@ -86,6 +86,12 @@ const FEATURE_ALIAS = { ART: "USART", UART: "USART", ADC: "ADC/DAC",
                         FSMC: "FSMC/SDIO", SDIO: "FSMC/SDIO", DAC: "ADC/DAC" };
 const ROUTES = [["default", "default"], ["remap", "remap"], ["af", "AF"],
                 ["unstated", "unstated"]];
+// Where the debug and console pins sit by default, as the READMEs also state.
+const DEFAULT_ROLES = [
+  ["SWDIO", /^(SWIO|SWDIO)$/], ["SWCLK", /^(SWCLK|SWCK)$/],
+  ["UART TX", /^(UTX|TX\d?|TXD\d?|USART1_TX|U1TX)$/],
+  ["UART RX", /^(URX|RX\d?|RXD\d?|USART1_RX|U1RX)$/],
+];
 
 function groupOf(signal) {
   for (const [name, rx] of GROUPS) if (rx.test(signal)) return name;
@@ -286,6 +292,19 @@ function rebuildFeatureBoxes(partNames) {
   }
 }
 
+function defaultsLine(partNames) {
+  const pads = DEFAULT_ROLES.map(() => new Set());
+  for (const r of state.fns) {
+    if (r.part_number !== partNames[0]) continue;
+    if (r.route !== "default" && r.route !== "main") continue;
+    DEFAULT_ROLES.forEach(([_, rx], i) => {
+      if (rx.test(r.signal) && r.signal !== r.pad) pads[i].add(r.pad);
+    });
+  }
+  return "<div class=\"count\"><b>Defaults:</b> " + DEFAULT_ROLES.map(([name], i) =>
+    `${name} = ${[...pads[i]].sort().join(",") || "-"}`).join(" &middot; ") + "</div>";
+}
+
 function render() {
   const sel = selection();
   const partNames = sel.parts.map(p => p.part_number);
@@ -293,6 +312,7 @@ function render() {
   if (sel.mode === "series") {
     $("title").textContent = sel.series + " - series view";
     $("crumb").innerHTML = "Pick a product column to open its pin map.";
+    html += defaultsLine(partNames);
     if (sel.parts.length > 1)
       html += "<h2>Product comparison</h2>" + comparisonHTML(sel.parts);
     const m = matrixHTML(partNames, false);
@@ -303,6 +323,7 @@ function render() {
     $("title").textContent = p.part_number + " (" + p.package + ") - product view";
     $("crumb").innerHTML =
       `Series: <a href="${chipLink(p.series)}">${p.series}</a>`;
+    html += defaultsLine(partNames);
     const m = matrixHTML(partNames, true);
     html += `<h2>Pin map <span class="count">(${m.note})</span></h2>` + m.html;
     html += remapHTML(p.series);
