@@ -92,6 +92,10 @@ class Data:
         self.fns_by_part = collections.defaultdict(list)
         for r in self.functions:
             self.fns_by_part[r["part_number"]].append(r)
+        try:
+            self.errata = load("errata")
+        except FileNotFoundError:
+            self.errata = []
 
     def family_series(self, family: str) -> list[dict]:
         return [s for s in self.series if s["family"] == family]
@@ -293,6 +297,33 @@ def remap_section(data: Data, family: str) -> list[str]:
     return out
 
 
+def errata_section(data: Data, family: str) -> list[str]:
+    """Errata rows for this family's series, from tables/errata.csv."""
+    mine = {s["series"] for s in data.family_series(family)}
+    rows = [e for e in data.errata
+            if mine & set(e["series"].split(";"))]
+    if not rows:
+        return []
+    out = ["## Errata", ""]
+    for e in sorted(rows, key=lambda e: e["id"]):
+        applies = ", ".join(e["series"].split(";"))
+        out.append(f"- {e['description']} *(applies: {applies}; {e['condition']})*")
+    out.append("")
+    return out
+
+
+def extras_section(family: str) -> list[str]:
+    """Hand-written content the tables cannot state (errata, repository notes).
+
+    Lives in curated/readme-extras/<FAMILY>.md and is carried into the generated
+    page verbatim, so regeneration never loses it.
+    """
+    path = REPO / "curated" / "readme-extras" / f"{family}.md"
+    if not path.exists():
+        return []
+    return [path.read_text(encoding="utf-8").rstrip(), ""]
+
+
 def images_section(family: str) -> list[str]:
     image_dir = MIRRORS / family / "image"
     if not image_dir.is_dir():
@@ -321,6 +352,8 @@ def render(data: Data, family: str) -> str:
         lines += pin_map_section(data, s)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
+    lines += errata_section(data, family)
+    lines += extras_section(family)
     lines += images_section(family)
     lines += ["---",
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"

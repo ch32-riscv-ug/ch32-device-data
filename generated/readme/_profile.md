@@ -14,7 +14,8 @@ This is a user group that uses RISC-V chips such as WCH's CH32V series.
 | [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) | CH32V003 | QingKe V2A | 4 | DS×1 RM EVT |
 | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | CH32M007, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2C | 26 | DS×5 RM EVT |
 | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) | CH32V103 | QingKe V3A | 4 | DS×1 RM EVT |
-| [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | CH32V203, CH32V205, CH32V208 | QingKe V3B, QingKe V4B, QingKe V4C | 20 | DS×3 RM EVT |
+| [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) | CH32V205 | QingKe V3B | 3 | DS×1 RM EVT |
+| [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | CH32V203, CH32V208 | QingKe V4B, QingKe V4C | 17 | DS×2 RM EVT |
 | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | CH32V303, CH32V305, CH32V307, CH32V317 | QingKe V4F | 14 | DS×1 RM EVT |
 | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | CH32V407, CH32V467 | QingKe V3V | 6 | DS×1 RM EVT |
 | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | CH32X033, CH32X035 | QingKe V4C | 8 | DS×1 RM EVT |

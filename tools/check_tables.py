@@ -30,7 +30,8 @@ def main() -> int:
     t = {name: load(args.tables, name)
          for name in ("families", "series", "products", "packages",
                       "cores", "documents", "pins", "pin_functions",
-                      "product_attributes", "remap_fields", "remap_routes")}
+                      "product_attributes", "remap_fields", "remap_routes",
+                      "errata")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -67,6 +68,8 @@ def main() -> int:
             check("families", r["family"], token, cores, "cores", " + ")
     for r in t["cores"]:
         check("cores", r["core"], r["manual"], documents, "documents")
+    for r in t["errata"]:
+        check("errata", r["id"], r["series"], series, "series", ";")
     for name in ("pins", "pin_functions"):
         for r in t[name]:
             check(name, r["part_number"], r["part_number"], products, "products")
