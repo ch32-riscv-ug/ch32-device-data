@@ -133,12 +133,8 @@ def documents_section(data: Data, family: str) -> list[str]:
             if d[f"page_url_{lang}"]:
                 links.append(f"[page]({d[f'page_url_{lang}']})")
             mirror = d[f"mirror_url_{lang}"]
-            if mirror and "/tree/" in mirror:
+            if mirror:
                 links.append(f"[mirror]({mirror})")
-            elif mirror:
-                # Serve the committed copy through GitHub Pages.
-                repo = d["repositories"].split(";")[0]
-                links.append(f"[mirror]({PAGES}/{repo}/datasheet_{lang}/{d['document']})")
             version = f" v{d[f'version_{lang}']}" if d[f"version_{lang}"] else ""
             cells[lang] = " ".join(links) + version if links else "-"
         out.append(f"| {d['document']} | {d['kind']} | {cells['en']} | {cells['zh']} |")
@@ -199,6 +195,17 @@ def notes_for(pad: str, defaults: dict[str, set[str]],
     return ", ".join(notes)
 
 
+VIEWER = f"{PAGES}/ch32-device-data/pins.html"
+FEATURES = ("ADC", "I2C", "SPI", "SYS", "TIM", "UART", "USB")
+
+
+def filter_links(series: str) -> str:
+    """The filterable pin-function viewer, pre-filtered per feature."""
+    links = [f"[ALL]({VIEWER}?chip={series})"]
+    links += [f"[{f}]({VIEWER}?chip={series}&features={f})" for f in FEATURES]
+    return "Pin functions (filterable): " + " ".join(links)
+
+
 def pin_map_section(data: Data, series: dict) -> list[str]:
     products = data.series_products(series["series"])
     parts = [p["part_number"] for p in products if data.pins_by_part[p["part_number"]]]
@@ -224,6 +231,7 @@ def pin_map_section(data: Data, series: dict) -> list[str]:
         return f"{suffix}&#8203;({package})"
 
     out = [f"### {series['series']} pin map", "",
+           filter_links(series["series"]), "",
            "| Pin name | Type | " + " | ".join(head(p) for p in parts)
            + " | Notes |",
            "|---|---|" + "---|" * len(parts) + "---|"]
