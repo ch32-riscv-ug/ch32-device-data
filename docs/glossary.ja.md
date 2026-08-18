@@ -68,7 +68,7 @@
 
 | 場所 | 中身 |
 |---|---|
-| mirror / 兄弟repository | `/home/mt/dev_wch/CH32*`（GitHub `ch32-riscv-ug/*`）。一次資料の保管場所 |
+| mirror / 兄弟repository | `/home/mt/dev_wch/CH32*`と`WCH-common`（GitHub `ch32-riscv-ug/*`）。一次資料の保管場所。`WCH-common`はfamily横断文書（QingKe core manual・WCH-Link・PACKAGE寸法図面）専用で、ファミリーではない |
 | `manifests/documents.json` | 取得すべき文書のカタログ。日次同期。mirrorはこれを読んで取得する |
 | `candidates/` | **未review**の機械抽出出力。根拠にはなるが確定ではない |
 | `curated/` | 人が確認して記録した確定情報（根拠・確認日つき） |
