@@ -1,17 +1,22 @@
 name: update
-
-# Daily mirror refresh. What to fetch comes from the catalogue in
-# ch32-riscv-ug/ch32-device-data, so this workflow is identical in every mirror.
+# Daily mirror refresh. update.sh reads the catalogue in
+# ch32-riscv-ug/ch32-device-data to learn which documents belong to this mirror,
+# so this workflow is identical in every mirror and needs no per-repo edits.
 # 取得対象は ch32-device-data のカタログが決めるため、この workflow は全mirror共通。
 
 on:
   schedule:
-    - cron: "17 21 * * *"   # 06:17 JST
+    # Daily 15:07 UTC (23:07 CST China / 00:07 JST) - China late-night.
+    # GitHub may delay runs by hours; scheduled early so it stays before
+    # China's heavy morning hours.
+    - cron: '07 15 * * *'
   workflow_dispatch:
 
+# Write permission is required to commit/push updated files.
 permissions:
   contents: write
 
+# Do not run overlapping updates.
 concurrency:
   group: update
   cancel-in-progress: false
@@ -20,34 +25,42 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Download documents
-        run: ./update.sh
+      # update.sh only downloads and extracts. It exits non-zero on a failed
+      # download (e.g. a changed URL), failing the job without overwriting
+      # good files.
+      - name: Download datasheets / EVT
+        run: |
+          chmod +x ./update.sh
+          ./update.sh
 
-      - name: Commit changes
+      - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "no change"
+            echo "No changes to commit."
           else
             git commit -m "update (automated)"
             git push
           fi
 
-      # A scheduled workflow is disabled after 60 days without repository activity.
-      # An empty commit on the last day of the window keeps it alive.
-      # 60日間活動がないと定期実行が無効化されるため、期限間際に空コミットで延命する。
-      - name: Keepalive
-        if: github.event_name == 'schedule'
+      # Keep the daily schedule from being auto-disabled after 60 days of
+      # repository inactivity: if the latest commit is older than 50 days, push
+      # one empty commit. Built-in GITHUB_TOKEN only (contents: write); no PAT,
+      # no third-party action.
+      - name: Keepalive (avoid 60-day schedule auto-disable)
         run: |
-          last=$(git log -1 --format=%ct)
-          age=$(( ($(date +%s) - last) / 86400 ))
-          if [ "$age" -ge 50 ]; then
+          age_days=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Last commit age: ${age_days} day(s)"
+          if [ "$age_days" -ge 50 ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit --allow-empty -m "keepalive: prevent scheduled workflow auto-disable"
             git push
           else
-            echo "last activity ${age} day(s) ago; no keepalive needed"
+            echo "Recent activity exists; no keepalive commit needed."
           fi
