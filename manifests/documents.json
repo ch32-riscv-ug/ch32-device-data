@@ -200,9 +200,12 @@
     {
       "name": "CH32FV2x_V3xRM.PDF",
       "kind": "reference-manual",
-      "repositories": [],
-      "status": "excluded",
-      "reason": "Cortex-M3系。対象をRISC-Vに限るため除外",
+      "repositories": [
+        "CH32V20x",
+        "CH32V307"
+      ],
+      "status": "assigned",
+      "reason": "V203/V208とV303/V305/V307の双方を覆う共通RM。両リポジトリに必要",
       "sources": {
         "en": {
           "file_id": 324,
@@ -735,7 +738,6 @@
       "name": "CH32V20x_30xDS0.PDF",
       "kind": "datasheet",
       "repositories": [
-        "CH32V20x",
         "CH32V307"
       ],
       "status": "assigned",
@@ -750,7 +752,8 @@
           "version": "3.5",
           "scope": "CH32V303CBT6、CH32V303RBT6、CH32V303RCT6、CH32V303VCT6、CH32V305FBP6、CH32V305GBU6、CH32V305CCT6、CH32V305RBT6、CH32V307RCT6、CH32V307WCU6、CH32V307VCT6、CH32V317WCU6、CH32V317VCT6"
         }
-      }
+      },
+      "reason": "scopeはV303/V305/V307/V317のみ。V20xの製品を覆わないためV307へ一本化"
     },
     {
       "name": "CH32V307DS0.PDF",

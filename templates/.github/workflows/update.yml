@@ -1,0 +1,53 @@
+name: update
+
+# Daily mirror refresh. What to fetch comes from the catalogue in
+# ch32-riscv-ug/ch32-device-data, so this workflow is identical in every mirror.
+# 取得対象は ch32-device-data のカタログが決めるため、この workflow は全mirror共通。
+
+on:
+  schedule:
+    - cron: "17 21 * * *"   # 06:17 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download documents
+        run: ./update.sh
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "no change"
+          else
+            git commit -m "update (automated)"
+            git push
+          fi
+
+      # A scheduled workflow is disabled after 60 days without repository activity.
+      # An empty commit on the last day of the window keeps it alive.
+      # 60日間活動がないと定期実行が無効化されるため、期限間際に空コミットで延命する。
+      - name: Keepalive
+        if: github.event_name == 'schedule'
+        run: |
+          last=$(git log -1 --format=%ct)
+          age=$(( ($(date +%s) - last) / 86400 ))
+          if [ "$age" -ge 50 ]; then
+            git commit --allow-empty -m "keepalive: prevent scheduled workflow auto-disable"
+            git push
+          else
+            echo "last activity ${age} day(s) ago; no keepalive needed"
+          fi
