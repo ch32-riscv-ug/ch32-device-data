@@ -1,0 +1,55 @@
+name: Check tables
+
+# Runs when the data or the tools that generate it actually change -- on push
+# and pull request -- unlike the daily catalogue job, whose only moving input
+# is documents.json. Verifies that every reference between the normalised
+# tables still joins, and that the device records still validate.
+# データが実際に変わるのはpush/PR時なので、参照結合の検査はそこで行う。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tables/**"
+      - "tools/**"
+      - "curated/**"
+      - "manifests/**"
+      - "devices/**"
+      - "schemas/**"
+  pull_request:
+    paths:
+      - "tables/**"
+      - "tools/**"
+      - "curated/**"
+      - "manifests/**"
+      - "devices/**"
+      - "schemas/**"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Standard library only; jsonschema is optional for the validator and
+      # exercised in both modes.
+      - name: Check table joins
+        run: python tools/check_tables.py
+
+      - name: Documents.csv matches the catalogue
+        run: |
+          python tools/build_documents.py
+          git diff --exit-code -- tables/documents.csv
+
+      - name: Validate device records
+        run: |
+          python -m pip install --quiet jsonschema
+          python tools/validate.py
+          python -S tools/validate.py

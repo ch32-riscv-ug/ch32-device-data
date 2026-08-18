@@ -33,6 +33,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import build_documents  # noqa: E402
 import extract_ordering  # noqa: E402
 import extract_package_dims  # noqa: E402
 import extract_products  # noqa: E402
@@ -44,16 +45,6 @@ CANDIDATES = REPO / "candidates"
 SERIES_FACTS = REPO / "curated" / "series-facts.json"
 CORE_FACTS = REPO / "curated" / "core-facts.json"
 DOCUMENTS = REPO / "manifests" / "documents.json"
-# WCH publishes every document behind stable URL shapes, verified live: a page
-# per file on each language site, a download endpoint per file id, and our
-# mirrors' raw paths. documents.csv materialises them so a name like
-# CH32L103DS0.PDF is a working reference, not just a string.
-PAGE_URL = {"zh": "https://www.wch.cn/downloads/{stem}_{ext}.html",
-            "en": "https://www.wch-ic.com/downloads/{stem}_{ext}.html"}
-DOWNLOAD_URL = {"zh": "https://file.wch.cn/download/file?id={id}",
-                "en": "https://www.wch-ic.com/download/file?id={id}"}
-MIRROR_PDF = "https://raw.githubusercontent.com/ch32-riscv-ug/{repo}/main/datasheet_{lang}/{name}"
-MIRROR_EVT = "https://github.com/ch32-riscv-ug/{repo}/tree/main/EVT"
 # WCH's package-drawing document: an independent statement of body size and pin
 # pitch per package name, read separately from each language edition.
 PACKAGE_PDF = {lang: MIRRORS / "WCH-common" / f"datasheet_{lang}" / "PACKAGE.PDF"
@@ -486,7 +477,7 @@ def main() -> int:
     write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
     write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
     write_csv(args.out / "cores.csv", core_rows(), CORE_COLUMNS)
-    write_csv(args.out / "documents.csv", document_rows(), DOCUMENT_COLUMNS)
+    build_documents.write(args.out)
     (args.out / "silicon.csv").unlink(missing_ok=True)  # 旧名。series.csvに置き換え
     tally(args.out / "products.csv", rows)
     print(f"{args.out}/series.csv: {len(series)} 行", file=sys.stderr)
@@ -511,11 +502,6 @@ FAMILY_COLUMNS = [
     "cores", "datasheets", "reference_manuals", "evt",
 ]
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
-DOCUMENT_COLUMNS = [
-    "document", "kind", "status", "repositories", "version_zh", "version_en",
-    "page_url_zh", "page_url_en", "download_url_zh", "download_url_en",
-    "mirror_url_zh", "mirror_url_en",
-]
 
 
 def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
@@ -706,45 +692,6 @@ def core_rows() -> list[dict]:
                  "manual": fact.get("manual", ""), "note": fact.get("note", "")}
         entry["isa_confidence"] = data.get("isa_confidence", "reference")
         entry["isa_basis"] = data.get("isa_basis", "")
-        out.append(entry)
-    return out
-
-
-def document_rows() -> list[dict]:
-    """One row per catalogued document, each with its working URLs.
-
-    A name like CH32L103DS0.PDF locates nothing on its own; this table turns it
-    into the original page and download on both language sites plus the mirror
-    copy, so every datasheet reference elsewhere joins to something fetchable.
-    """
-    import json
-
-    data = json.loads(DOCUMENTS.read_text())
-    items = data["documents"] if isinstance(data, dict) else data
-    out = []
-    for doc in sorted(items, key=lambda d: d["name"]):
-        name = doc["name"]
-        stem, _, ext = name.rpartition(".")
-        repos = sorted(doc.get("repositories", []))
-        entry = {
-            "document": name,
-            "kind": doc.get("kind", ""),
-            "status": doc.get("status", ""),
-            "repositories": ";".join(repos),
-        }
-        for lang in ("zh", "en"):
-            source = doc.get("sources", {}).get(lang)
-            entry[f"version_{lang}"] = (source or {}).get("version", "")
-            entry[f"page_url_{lang}"] =                 PAGE_URL[lang].format(stem=stem, ext=ext) if source else ""
-            entry[f"download_url_{lang}"] =                 DOWNLOAD_URL[lang].format(id=source["file_id"]) if source else ""
-            if not repos or not source:
-                entry[f"mirror_url_{lang}"] = ""
-            elif ext.upper() == "ZIP":
-                # The archive itself is not committed; the mirror holds the tree.
-                entry[f"mirror_url_{lang}"] = MIRROR_EVT.format(repo=repos[0])
-            else:
-                entry[f"mirror_url_{lang}"] = MIRROR_PDF.format(
-                    repo=repos[0], lang=lang, name=name)
         out.append(entry)
     return out
 
