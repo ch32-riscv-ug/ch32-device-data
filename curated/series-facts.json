@@ -1,0 +1,195 @@
+{
+  "verified": "2026-08-18",
+  "method": "datasheet_zh/datasheet_en の表紙・特徴・イントロ該当行を使い捨てスクリプトで提示させ、両言語を目視で突き合わせて確認。coreが中国語版にしか明記されないものはzhを根拠とする（原典）。",
+  "series": {
+    "CH32V002": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V002DS0)-features:zh",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V003": {
+      "core": "QingKe V2A",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V003DS0)-features:zh+en",
+      "isa": "RV32EC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V004": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V004DS0)-features:zh",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V005": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V006DS0)-features:zh（V005はV006と同一DS）",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V006": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V006DS0)-features:zh+memorymap:zh",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V007": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V007DS0)-features:zh",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32M007": {
+      "core": "QingKe V2C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V007DS0)-features:zh（M007はV007と同一DS）",
+      "isa": "RV32EmC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V103": {
+      "core": "QingKe V3A",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V103DS0)-intro:zh+en",
+      "isa": "RV32IMAC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32L103": {
+      "core": "QingKe V4C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(L103DS0)-features:zh+en",
+      "isa": "RV32IMAC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32M103": {
+      "core": "QingKe V4C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(L103DS0)-features:zh（M103はL103と同一DS）",
+      "isa": "RV32IMAC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32M030": {
+      "core": "QingKe V3B",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(M030DS0)-features:zh+en",
+      "isa": "RV32IMCB",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32V203": {
+      "core": "QingKe V4B",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V203DS0)-intro:zh（搭载青稞V4B内核）。例外: CH32V203CCT6はCH32V205DS0掲載の256K品で、V205（青稞V3B）と同一DS・同一比較表にあり内核の個別記述は未確認"
+    },
+    "CH32V205": {
+      "core": "QingKe V3B",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V205DS0)-features:zh+1.4.1節",
+      "isa": "RV32ICBM-X",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh"
+    },
+    "CH32V208": {
+      "core": "QingKe V4C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V208DS0)-intro:zh（CH32V208搭载V4C内核）"
+    },
+    "CH32V303": {
+      "core": "QingKe V4F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en（CH32V30x和CH32V31x系列基于青稞V4F）"
+    },
+    "CH32V305": {
+      "core": "QingKe V4F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en"
+    },
+    "CH32V307": {
+      "core": "QingKe V4F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en"
+    },
+    "CH32V317": {
+      "core": "QingKe V4F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en（V31xを明示的に含む）"
+    },
+    "CH32V407": {
+      "core": "QingKe V3V",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V407DS0)-features:zh+en",
+      "isa": "RV32IMABCV-X",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-architecture:zh"
+    },
+    "CH32V467": {
+      "core": "QingKe V3V",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(V407DS0)-features:zh+en（V467はV407と同一DS）",
+      "isa": "RV32IMABCV-X",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-architecture:zh"
+    },
+    "CH32X033": {
+      "core": "QingKe V4C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(X035DS0)-features:zh+en（X033はX035と同一DS）",
+      "isa": "RV32IMAC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32X035": {
+      "core": "QingKe V4C",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(X035DS0)-features:zh+en",
+      "isa": "RV32IMAC",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-features:zh+en"
+    },
+    "CH32X305": {
+      "core": "QingKe V3F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(X315DS0)-features:zh+en（X305はX315と同一DS）",
+      "isa": "RV32IMAFBC-X",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-architecture:zh"
+    },
+    "CH32X315": {
+      "core": "QingKe V3F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(X315DS0)-features:zh+en",
+      "isa": "RV32IMAFBC-X",
+      "isa_confidence": "confirmed",
+      "isa_basis": "manual:ds-architecture:zh"
+    },
+    "CH32H415": {
+      "core": "QingKe V5F + V3F",
+      "core_confidence": "reference",
+      "core_basis": "manual:ds(H417DS0)-intro:zh+en はCH32H417のみ双核と明記。H415は同一DS・同一ITCM構成だが個別記述は未確認"
+    },
+    "CH32H416": {
+      "core": "QingKe V5F + V3F",
+      "core_confidence": "reference",
+      "core_basis": "manual:ds(H417DS0)-intro:zh+en はCH32H417のみ双核と明記。H416は同一DS・同一ITCM構成だが個別記述は未確認"
+    },
+    "CH32H417": {
+      "core": "QingKe V5F + V3F",
+      "core_confidence": "confirmed",
+      "core_basis": "manual:ds(H417DS0)-intro+features:zh+en（双内核结构：青稞RISC-V5F和RISC-V3F）"
+    }
+  }
+}
