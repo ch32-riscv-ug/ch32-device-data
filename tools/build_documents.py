@@ -31,7 +31,9 @@ PAGE_URL = {"zh": "https://www.wch.cn/downloads/{stem}_{ext}.html",
             "en": "https://www.wch-ic.com/downloads/{stem}_{ext}.html"}
 DOWNLOAD_URL = {"zh": "https://file.wch.cn/download/file?id={id}",
                 "en": "https://www.wch-ic.com/download/file?id={id}"}
-MIRROR_PDF = "https://raw.githubusercontent.com/ch32-riscv-ug/{repo}/main/datasheet_{lang}/{name}"
+# GitHub Pages, not raw.githubusercontent: Pages serves PDFs inline with the
+# right content type, raw forces a download. Requires Pages enabled per mirror.
+MIRROR_PDF = "https://ch32-riscv-ug.github.io/{repo}/datasheet_{lang}/{name}"
 MIRROR_EVT = "https://github.com/ch32-riscv-ug/{repo}/tree/main/EVT"
 
 DOCUMENT_COLUMNS = [
