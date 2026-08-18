@@ -10,7 +10,7 @@
 
 | 用語 | 定義 | 例 | 対応 |
 |---|---|---|---|
-| **ファミリー family** | mirror repository = 文書の単位。共通のdatasheet群・reference manual・EVTを共有するシリーズの集まり。このプロジェクトがrepository構成に合わせて定めた単位で、WCH公式の分類名ではない | `CH32V20x` | `tables/families.csv`（1行1ファミリー） |
+| **ファミリー family** | mirror repository = 文書の単位。**分離規則はEVT単位（1 repository = 1 EVT archive）**。WCHが専用EVTを出す製品群は専用repositoryになる（CH32V205はV20xから分離）。このプロジェクトがrepository構成に合わせて定めた単位で、WCH公式の分類名ではない | `CH32V20x` | `tables/families.csv`（1行1ファミリー） |
 | **シリーズ series** | 型番の先頭8文字（`CH32`+英字1+数字3）が表す製品系列。die・coreの単位に最も近い | `CH32V203` | `tables/series.csv`（1行1シリーズ） |
 | **注文型番 part number** | 実際に注文できる完全型番。SKUと同義に使う | `CH32V006K8U7` | `tables/products.csv`（1行1型番） |
 | **package** | 物理パッケージ。同一型番＝単一package。寸法・pitch・lead数はpackageの属性としてマスタ表に正規化し、productsは名前で参照する | `LQFP48` | `tables/packages.csv`（1行1package） |

@@ -481,6 +481,7 @@ def main() -> int:
     write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
     write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
     write_csv(args.out / "cores.csv", core_rows(), CORE_COLUMNS)
+    write_csv(args.out / "errata.csv", errata_rows(), ERRATA_COLUMNS)
     write_csv(args.out / "product_attributes.csv", attributes, ATTRIBUTE_COLUMNS)
     build_documents.write(args.out)
     print(f"{args.out}/product_attributes.csv: {len(attributes)} 行", file=sys.stderr)
@@ -509,6 +510,7 @@ FAMILY_COLUMNS = [
     "cores", "datasheets", "reference_manuals", "evt",
 ]
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
+ERRATA_COLUMNS = ["id", "series", "condition", "description", "source"]
 ATTRIBUTE_COLUMNS = ["part_number", "attribute", "value", "label_zh", "label_en"]
 
 
@@ -769,6 +771,23 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
             })
     out.sort(key=lambda r: (r["part_number"], r["attribute"]))
     return out
+
+
+def errata_rows() -> list[dict]:
+    """curated/errata.csv, carried into tables/ with its judgement attached.
+
+    The items were transcribed from the hand-written mirror READMEs; until the
+    original WCH statement is located and recorded, they stay reference.
+    """
+    path = REPO / "curated" / "errata.csv"
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    for row in rows:
+        row["description_confidence"] = "reference"
+        row["description_basis"] = f"manual:{row.pop('source', '')}"
+    return sorted(rows, key=lambda r: r["id"])
 
 
 def core_rows() -> list[dict]:
