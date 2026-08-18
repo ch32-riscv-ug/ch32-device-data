@@ -92,6 +92,7 @@ class Data:
         self.fns_by_part = collections.defaultdict(list)
         for r in self.functions:
             self.fns_by_part[r["part_number"]].append(r)
+        self.attributes = load("product_attributes")
         try:
             self.errata = load("errata")
         except FileNotFoundError:
@@ -200,6 +201,49 @@ def notes_for(pad: str, defaults: dict[str, set[str]],
 
 
 VIEWER = f"{PAGES}/ch32-device-data/pins.html"
+
+
+def comparison_section(data: Data, series: dict) -> list[str]:
+    """The datasheet-style product comparison table, transposed: one column per
+    product, one row per stated attribute. This is the in-repository selector
+    the old README served with images -- which product of this series to pick.
+    """
+    products = data.series_products(series["series"])
+    if len(products) < 2:
+        return []
+    parts = [p["part_number"] for p in products]
+    by_part = {p: {} for p in parts}
+    labels: dict[str, str] = {}
+    order: list[str] = []
+    for r in data.attributes:
+        if r["part_number"] not in by_part:
+            continue
+        by_part[r["part_number"]][r["attribute"]] = r["value"]
+        labels.setdefault(r["attribute"], r["label_en"] or r["label_zh"])
+        if r["attribute"] not in order:
+            order.append(r["attribute"])
+
+    def head(part: str) -> str:
+        pkg = next(p["package"] for p in products if p["part_number"] == part)
+        return f"{part[:8]}&#8203;{part[8:]}&#8203;({pkg})"
+
+    out = [f"### {series['series']} product comparison", "",
+           "| | " + " | ".join(head(p) for p in parts) + " |",
+           "|---|" + "---|" * len(parts)]
+    fixed = [("Flash", "flash_bytes"), ("SRAM", "sram_bytes"),
+             ("GPIO", "gpio_count"), ("Temperature", "temperature")]
+    prod_by_part = {p["part_number"]: p for p in products}
+    for title, field in fixed:
+        values = [human_bytes(prod_by_part[p].get(field, "")) if "bytes" in field
+                  else (prod_by_part[p].get(field, "") or "-") for p in parts]
+        if any(v not in ("", "-") for v in values):
+            out.append(f"| **{title}** | " + " | ".join(values) + " |")
+    for attr in order:
+        values = [md_escape(by_part[p].get(attr, "-") or "-") for p in parts]
+        label = md_escape(labels.get(attr, attr))
+        out.append(f"| {label} | " + " | ".join(values) + " |")
+    out.append("")
+    return out
 FEATURES = ("ADC", "I2C", "SPI", "SYS", "TIM", "UART", "USB")
 
 
@@ -231,8 +275,8 @@ def pin_map_section(data: Data, series: dict) -> list[str]:
 
     def head(part: str) -> str:
         package = next(p["package"] for p in products if p["part_number"] == part)
-        suffix = part[8:] if part.startswith(series["series"]) else part
-        return f"{suffix}&#8203;({package})"
+        return (f"[{part[:8]}&#8203;{part[8:]}]({VIEWER}?chip={part})"
+                f"&#8203;({package})")
 
     out = [f"### {series['series']} pin map", "",
            filter_links(series["series"]), "",
@@ -347,6 +391,9 @@ def render(data: Data, family: str) -> str:
     lines += roles_section(data, family)
     lines += documents_section(data, family)
     if data.family_series(family):
+        lines += ["## Product comparison", ""]
+        for s in data.family_series(family):
+            lines += comparison_section(data, s)
         lines += ["## Pin definitions", ""]
     for s in data.family_series(family):
         lines += pin_map_section(data, s)
