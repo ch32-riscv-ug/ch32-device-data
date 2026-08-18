@@ -502,6 +502,7 @@ PACKAGE_COLUMNS = [
 SERIES_COLUMNS = [
     "series", "family", "core", "isa", "flash_bytes", "sram_bytes",
     "gpio_count", "temperature", "packages", "part_number_count", "datasheets",
+    "product_url_zh", "product_url_en",
 ]
 FAMILY_COLUMNS = [
     "family", "repository", "series", "series_count", "part_number_count",
@@ -592,6 +593,9 @@ def series_rows(rows: list[dict]) -> list[dict]:
             "family": members[0]["family"],
             "part_number_count": len(members),
             "datasheets": ";".join(sorted({m["datasheet"] for m in members})),
+            # Product-page URL shape verified live on both sites (2026-08-18).
+            "product_url_zh": f"https://www.wch.cn/products/{series}.html",
+            "product_url_en": f"https://www.wch-ic.com/products/{series}.html",
         }
         fact = facts.get(series, {})
         for key in ("core", "isa"):

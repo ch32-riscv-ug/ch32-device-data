@@ -45,7 +45,7 @@ MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
 
 # The "#" column separates data from metadata; see tables/README.ja.md.
-PIN_COLUMNS = ["part_number", "pin", "pad", "kind",
+PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type",
                "#", "confidence", "basis", "table", "datasheet"]
 FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route",
                     "#", "confidence", "basis", "table", "datasheet"]
@@ -125,8 +125,11 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
                                               {"table": table_number(label),
                                                "variant": component, "pins": {}})
                     for p in pins:
-                        cell["pins"][(p["number"], p["pad"])] = \
-                            p.get("kind") or p.get("_pin_type", "")
+                        # Both the normalised kind and the datasheet's own type
+                        # notation ("I/O/A", "I/O/FT"), which carries the 5V
+                        # tolerance and analogue capability the kind flattens.
+                        cell["pins"][(p["number"], p["pad"])] = (
+                            p.get("kind") or "", p.get("_pin_type", ""))
                 for p in pins:
                     for f in p.get("functions", []):
                         functions[(tkey, p["pad"])].add(
@@ -186,8 +189,8 @@ def merge_cells(zh: dict, en: dict) -> dict:
                 conf, basis = "reference", "pin-table:zh"
             else:
                 conf, basis = "reference", en_tag
-            kind = zh_pins.get((pin, pad)) or en_pins.get((pin, pad), "")
-            cell["pins"][(pin, pad)] = (kind, conf, basis)
+            kind, raw = zh_pins.get((pin, pad)) or en_pins.get((pin, pad), ("", ""))
+            cell["pins"][(pin, pad)] = (kind, raw, conf, basis)
         merged[key] = cell
     return merged
 
@@ -336,10 +339,11 @@ def main() -> int:
                 continue
             cell = cells[key]
             pads = set()
-            for (pin, pad), (kind, conf, basis) in cell["pins"].items():
+            for (pin, pad), (kind, raw, conf, basis) in cell["pins"].items():
                 pads.add(pad)
                 pin_rows.append({
-                    "part_number": part, "pin": pin, "pad": pad, "kind": kind,
+                    "part_number": part, "pin": pin, "pad": pad,
+                    "kind": kind, "type": raw,
                     "confidence": conf, "basis": basis,
                     "table": cell["table"], "datasheet": datasheet,
                 })
