@@ -13,6 +13,11 @@ families.csv        11行   ファミリー一覧（mirror repository = 文書�
   packages.csv    25行  package。寸法・pitch・lead数
   cores.csv       13行  QingKe core。ISAとcore manualへの参照
   documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
+
+付属表
+  product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
+  remap_fields.csv        154行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       2228行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -23,6 +28,9 @@ products.series                                        → series.series
 products.package                                       → packages.package
 series.core / families.cores                           → cores.core
 pins.part_number / pin_functions.part_number           → products.part_number
+product_attributes.part_number                          → products.part_number
+remap_fields.series                                     → series.series
+remap_routes.(series, selector)                         → remap_fields
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
@@ -55,6 +63,14 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 `route`の値: `main`（リセット後の主機能）/ `default`（既定の代替機能）/ `remap-N`（remap値N）/ `af-N`（H41x・X315系のalternate function番号）/ 空（経路番号が資料になく要確認）。
 
 両言語照合で吸収している表記ずれ: 表番号のずれ（X315はzh`表2-1-1`=en`Table 2-1`。表題中のシリーズ名で照合）、列見出しの綴り（`QFN48×7`、`QFN28(6)`、zh`LQFP64M`=en画像`LQFP64`は表内の消去法でペアリング）、1列が複数packageを兼ねる見出し（`LQFP48/QFN48X7`は成分ごとに登録）。
+
+### `product_attributes.csv`
+
+比較表の**全属性を縦持ち**で保持します（列に昇格済みのflash/sram/pin数/GPIO/温度/packageは除く）。両言語はラベルの語が違う（`定时器`↔`Timer`）ため、**正規化した値の並びのLCSで行を対応付け**ます——翻訳は表の行順を保つので、同値同順は同じ行です。対応付いて値が違う行はconflictになります（例: CH32H417WEU6のOPA数はzh=1/en=2で本物の食い違い）。`label_zh`/`label_en`に原文ラベルを残しています。
+
+### `remap_fields.csv` / `remap_routes.csv`
+
+AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）ですが、**根拠ごとの一致記録がファイルに残っていないため全行reference**です。EVTとRMの突き合わせを記録付きで再実行して確定へ昇格するのが次の課題です。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
 
 ### `cores.csv`
 
@@ -119,6 +135,9 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 | packages.csv | 25 | 73 | 2 | 0 |
 | series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
+| product_attributes.csv | 995 | 925 | 68 | 1 |
+| remap_fields.csv | 154 | 0 | 154 | 0 |
+| remap_routes.csv | 2228 | 0 | 2228 | 0 |
 | pins.csv | 4312 | 4022 (93%) | 290 | 0 |
 | pin_functions.csv | 29559 | 24702 (84%) | 4857 | 0 |
 
@@ -133,6 +152,7 @@ part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を�
 ```sh
 uv run tools/build_tables.py --out tables                     # families/series/products/packages/cores/documents
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
+uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ
 ```
