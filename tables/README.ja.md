@@ -5,12 +5,14 @@
 ```
 families.csv        11行   ファミリー一覧（mirror repository = 文書の単位）
   └ series.csv        27行   シリーズ（die）。core・ISA・共通スペック
-      └ products.csv    103行   注文型番。silicon以外はpackage名で参照
-          └ pins.csv         3835行  lead↔padの物理対応（datasheet×package列ごと）
-          └ pin_functions.csv 9876行  pad→signal/routeの論理機能（表ごとに1回）
+      └ products.csv    103行   注文型番
+          └ pins.csv          注文型番ごとのlead↔pad対応（キー: part_number）
+          └ pin_functions.csv 注文型番ごとのpad→signal/route（キー: part_number）
 
 packages.csv   25行  packageマスタ。寸法・pitch・lead数（productsから名前で参照）
 ```
+
+すべて `part_number` / `package` / `series` / `family` で結合できるリレーション構成です。pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
 
 pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
 
@@ -34,7 +36,7 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 
 ### `pins.csv` / `pin_functions.csv`
 
-pin定義表を物理と論理に分けたものです。**pins.csv**は「このpackageのlead Nにどのpadが載るか」で、1行1(datasheet, 表, package, pin, pad)。**pin_functions.csv**は「このpadがどの信号を持つか」で、機能は表の行（pad）に1回だけ書かれpackage列に依存しないため、package重複なしの1行1(datasheet, 表, pad, signal, route)です。
+**注文型番単位**です。pins.csvは1行1(part_number, pin, pad)で「この型番のlead Nにどのpadが載るか」、pin_functions.csvは1行1(part_number, pad, signal, route)で「この型番のpadが持つ機能」。datasheetのpin表は1つのpinoutを複数型番で共有します（表題が適用範囲を宣言: `CH32V103x8x6`、`CH32V006（除F4U6以外）`、`TSSOP20(F8)`）が、その解決は生成時に済ませてあり、**行はpart_numberでそのままproducts.csvと結合できます**。共有していた事実はメタ側のdatasheet/table列（出典）に残ります。
 
 `route`の値: `main`（リセット後の主機能）/ `default`（既定の代替機能）/ `remap-N`（remap値N）/ `af-N`（H41x・X315系のalternate function番号）/ 空（経路番号が資料になく要確認）。
 
@@ -62,6 +64,7 @@ pin定義表を物理と論理に分けたものです。**pins.csv**は「こ�
 | `pin-table` | pin定義表のlead数・GPIO数（candidates/から） | **soft**: 一致すれば確定を押し上げ、不一致は`?pin-table`と記録するだけ（表抽出の行落ちがありうるため） |
 | `package-pdf:zh/en` | PACKAGE.PDF（封装寸法図面）目次のbody size・pitch | 通常の根拠。`QFN48X7_A`のような変種suffixは基本名で引く |
 | `rule:pn-letter` | 型番末尾2文字目=package種別（T=LQFP等、84+8件無例外） | 照合。矛盾はconflict（`!`表記） |
+| `rule:pn-temp-grade` | 型番末尾数字=温度グレード（6=-40〜85℃、7=-40〜105℃。記載のある32件無例外） | temperatureの根拠・照合。比較表が最大値だけ載せる場合は`products:zh(max)`として照合に回る。末尾1・3は対象外 |
 | `rule:package-name` | package名の数字=lead数 | pin_countの根拠・照合 |
 | `rule:part-number-structure` | seriesは型番構造から決まる | seriesの根拠 |
 | `manual:…` | 人が確認して記録した根拠（curated/） | 確定として扱う |
@@ -84,17 +87,23 @@ pin定義表を物理と論理に分けたものです。**pins.csv**は「こ�
 
 - **行順**: 各表とも行の識別子の単純昇順。families=`family`、series=`series`、products=`(part_number, family, datasheet)`。productsのpart_numberだけでは一意保証がない（同じ型番が複数datasheetに載りうる）ため、識別子の組で並べます
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
+- **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
 ## 現況（2026-08-18生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
-| products.csv | 103 | 639 | 14 | 1 |
+| products.csv | 103 | 642 | 79 | 1 |
 | packages.csv | 25 | 73 | 2 | 0 |
-| pins.csv | 3835 | 3621 (94%) | 214 | 0 |
-| pin_functions.csv | 9876 | 8567 (87%) | 1309 | 0 |
+| series.csv | 27 | 100 | 4 | 0 |
+| pins.csv | 4312 | 4022 (93%) | 290 | 0 |
+| pin_functions.csv | 29559 | 24702 (84%) | 4857 | 0 |
 
-part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を除く）。temperatureのmissing（71件）は記載自体がない型番です。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
+pins系は全103型番がpin行を持ちます（型番→pin表列の解決失敗ゼロ）。
+
+series.csvはcore・ISAとも全27シリーズで値が入っています（ISAはdatasheetとQingKe core manual両方で確認。H415/H416のみcore推定に依存するためreference）。temperatureは型番末尾の温度グレード規則で補っており、規則単独の値はreferenceです。
+
+part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を除く）。productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
 
 ## 生成
 
