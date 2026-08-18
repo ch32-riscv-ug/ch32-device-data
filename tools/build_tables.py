@@ -38,7 +38,10 @@ import extract_products  # noqa: E402
 from crosscheck_languages import canonical_value  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
-CANDIDATES = Path(__file__).resolve().parent.parent / "candidates"
+REPO = Path(__file__).resolve().parent.parent
+CANDIDATES = REPO / "candidates"
+SERIES_FACTS = REPO / "curated" / "series-facts.json"
+DOCUMENTS = REPO / "manifests" / "documents.json"
 
 # Datasheet labels, in both languages, that mean the same measurement. Each family
 # words these differently -- "Flash memory", "Code FLASH（字节）", "闪存" -- so the
@@ -111,7 +114,8 @@ def as_range(value: str) -> str:
 
 def as_bytes(value: str) -> str:
     """Normalise 62K / 64KB / 20K to a byte count, leaving anything else alone."""
-    m = SIZE.match(str(value).strip().replace("（1）", "").replace("(1)", ""))
+    text = re.sub(r"\s*[（(]\d+[)）]\s*$", "", str(value).strip())
+    m = SIZE.match(text)
     if not m:
         return str(value).strip()
     scale = {"K": 1024, "M": 1024**2, "G": 1024**3}.get((m.group(2) or "").upper(), 1)
@@ -288,7 +292,7 @@ def build_rows(family: Path, datasheet_name: str) -> list[dict]:
         zh_ord = clean(zh_ordering.get(part, {}))
         en_ord = clean(en_ordering.get(part, {}))
 
-        row = {"part_number": part, "family_dir": family.name, "datasheet": datasheet_name}
+        row = {"part_number": part, "family": family.name, "datasheet": datasheet_name}
         if part in listed_as:
             row["listed_as"] = listed_as[part]
 
@@ -411,16 +415,46 @@ def main() -> int:
     if not rows:
         print("対象がありません", file=sys.stderr)
         return 1
-    write_csv(args.out / "products.csv", rows)
-    write_csv(args.out / "silicon.csv", roll_up(rows))
+    # Rows sort by the row's identity -- part number alone is not guaranteed
+    # unique (one model can appear in several datasheets), so the full key keeps
+    # regeneration and later insertions reproducible with no tie left to chance.
+    rows.sort(key=lambda r: (r["part_number"], r["family"], r["datasheet"]))
+    series = series_rows(rows)
+    write_csv(args.out / "products.csv", rows, PRODUCT_COLUMNS)
+    write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
+    write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
+    (args.out / "silicon.csv").unlink(missing_ok=True)  # 旧名。series.csvに置き換え
     tally(args.out / "products.csv", rows)
+    print(f"{args.out}/series.csv: {len(series)} 行", file=sys.stderr)
     return 0
 
 
-def write_csv(path: Path, rows: list[dict]) -> None:
-    columns = sorted(
-        {k for r in rows for k in r},
-        key=lambda k: (k.endswith("_basis"), k.endswith("_confidence"), k),
+# Value columns left to right by how much a reader wants them first; the matching
+# _confidence and _basis columns follow as blocks in the same order.
+PRODUCT_COLUMNS = [
+    "part_number", "series", "family", "package", "flash_bytes", "sram_bytes",
+    "pin_count", "gpio_count", "temperature", "body_size", "pin_pitch", "packing",
+    "listed_as", "datasheet",
+]
+SERIES_COLUMNS = [
+    "series", "family", "core", "isa", "flash_bytes", "sram_bytes", "pin_count",
+    "gpio_count", "temperature", "packages", "part_number_count", "datasheets",
+]
+FAMILY_COLUMNS = [
+    "family", "repository", "series", "series_count", "part_number_count",
+    "cores", "datasheets", "reference_manuals", "evt",
+]
+
+
+def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
+    keys = {k for r in rows for k in r}
+    plain = [k for k in keys if not k.endswith(("_confidence", "_basis"))]
+    values = [k for k in priority if k in keys]
+    values += sorted(k for k in plain if k not in values)  # safety net for new fields
+    columns = (
+        values
+        + [f"{k}_confidence" for k in values if f"{k}_confidence" in keys]
+        + [f"{k}_basis" for k in values if f"{k}_basis" in keys]
     )
     with path.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=columns)
@@ -437,25 +471,64 @@ def tally(path: Path, rows: list[dict]) -> None:
         print(f"  {state:12} {n}", file=sys.stderr)
 
 
-def roll_up(rows: list[dict]) -> list[dict]:
-    """One row per silicon, holding what all its packages agree on.
+def load_series_facts() -> dict:
+    """Hand-verified facts per series (core, ISA), recorded with their evidence.
 
-    Looking at what CH32V006 is should not mean opening a file per package. A value
-    every package shares belongs to the silicon; one that varies is a property of the
-    package and is left to products.csv.
+    Confirmation is a judgement, not necessarily an automated one: these were read
+    off the datasheets with a throwaway script and checked by eye in both language
+    editions, then written down here so the basis survives.
     """
+    import json
+
+    if not SERIES_FACTS.exists():
+        return {}
+    return json.loads(SERIES_FACTS.read_text()).get("series", {})
+
+
+def load_documents() -> dict[str, dict[str, list[str]]]:
+    """Assigned documents per mirror repository, from the daily-synced catalogue."""
+    import json
+
+    data = json.loads(DOCUMENTS.read_text())
+    items = data["documents"] if isinstance(data, dict) else data
+    by_repo: dict[str, dict[str, list[str]]] = collections.defaultdict(
+        lambda: collections.defaultdict(list)
+    )
+    for doc in items:
+        if doc.get("status") == "excluded":
+            continue
+        for repo in doc.get("repositories", []):
+            by_repo[repo][doc.get("kind", "other")].append(doc["name"])
+    return by_repo
+
+
+def series_rows(rows: list[dict]) -> list[dict]:
+    """One row per series: the die as the datasheets describe it.
+
+    The middle of the hierarchy families -> series -> products -> pins. Looking at
+    what CH32V006 is should not mean opening a file per package: a value every
+    package shares belongs here, one that varies stays in products.csv. A series
+    can span datasheets -- CH32V203CCT6 is documented in CH32V205DS0.
+    """
+    facts = load_series_facts()
     grouped: dict[str, list[dict]] = collections.defaultdict(list)
     for row in rows:
         grouped[row.get("series") or row["part_number"]].append(row)
     fields = ["flash_bytes", "sram_bytes", "pin_count", "gpio_count", "temperature"]
     out = []
-    for silicon, members in sorted(grouped.items()):
+    for series, members in sorted(grouped.items()):
         entry = {
-            "silicon": silicon,
-            "part_numbers": len(members),
-            "family_dir": members[0]["family_dir"],
-            "datasheet": members[0]["datasheet"],
+            "series": series,
+            "family": members[0]["family"],
+            "part_number_count": len(members),
+            "datasheets": ";".join(sorted({m["datasheet"] for m in members})),
         }
+        fact = facts.get(series, {})
+        for key in ("core", "isa"):
+            entry[key] = fact.get(key, "")
+            entry[f"{key}_confidence"] = fact.get(f"{key}_confidence",
+                                                  "missing" if not fact.get(key) else "reference")
+            entry[f"{key}_basis"] = fact.get(f"{key}_basis", "")
         for field in fields:
             values = {m[field] for m in members if m.get(field)}
             states = {m.get(f"{field}_confidence") for m in members if m.get(field)}
@@ -468,13 +541,42 @@ def roll_up(rows: list[dict]) -> list[dict]:
                     "confirmed" if states == {"confirmed"} else "partial"
                 )
             else:
-                # Differs between packages, so it is not a property of the silicon.
+                # Differs between packages, so it is not a property of the series.
                 entry[field] = ""
                 entry[f"{field}_confidence"] = "varies-by-package"
         entry["packages"] = ",".join(
             sorted({m["package"] for m in members if m.get("package")})
         )
         out.append(entry)
+    out.sort(key=lambda e: e["series"])
+    return out
+
+
+def family_rows(series: list[dict]) -> list[dict]:
+    """One row per family: the top of the hierarchy, one mirror repository each.
+
+    A family is the documentation unit -- the series that share datasheets, a
+    reference manual and an EVT. Everything here is a roll-up of series.csv plus
+    the document catalogue, so the whole tree is visible before descending.
+    """
+    documents = load_documents()
+    grouped: dict[str, list[dict]] = collections.defaultdict(list)
+    for row in series:
+        grouped[row["family"]].append(row)
+    out = []
+    for family, members in sorted(grouped.items()):
+        docs = documents.get(family, {})
+        out.append({
+            "family": family,
+            "repository": f"ch32-riscv-ug/{family}",
+            "series": ";".join(sorted(m["series"] for m in members)),
+            "series_count": len(members),
+            "part_number_count": sum(m["part_number_count"] for m in members),
+            "cores": ";".join(sorted({m["core"] for m in members if m["core"]})),
+            "datasheets": ";".join(sorted(docs.get("datasheet", []))),
+            "reference_manuals": ";".join(sorted(docs.get("reference-manual", []))),
+            "evt": ";".join(sorted(docs.get("evt", []))),
+        })
     return out
 
 
