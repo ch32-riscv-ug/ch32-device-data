@@ -32,13 +32,17 @@ PART_NUMBER = re.compile(r"^(CH32)?[A-Z]{0,2}\d{3}[A-Z0-9]{2,}$")
 
 # Header label -> the column it marks, matched against the merged header text with
 # punctuation and case removed.
+# The Chinese edition is the original and the English one a translation, so the
+# tables are laid out identically and only the labels differ. Both spellings are
+# matched so a document can be read in whichever language it is published in --
+# CH32V407's reference manual exists only in Chinese.
 COLUMN_LABELS = {
-    "pad": ("pinname",),
-    "type": ("pintype",),
+    "pad": ("pinname", "引脚名称"),
+    "type": ("pintype", "引脚类型"),
     # CH32H417 heads the default-route column "Pin function(2)" instead, and the
     # CH32H415 table omits it entirely, so this one column is optional.
-    "default": ("defaultalternate", "defaultalter", "pinfunction"),
-    "remap": ("remapping",),
+    "default": ("defaultalternate", "defaultalter", "pinfunction", "默认复用功能"),
+    "remap": ("remapping", "重映射功能"),
 }
 REQUIRED_COLUMNS = ("pad", "type", "remap")
 
@@ -114,7 +118,8 @@ def read_package_header(cells: list[str], count: int) -> list[str] | None:
 
 
 def normalise_label(text: str) -> str:
-    return re.sub(r"[^a-z0-9]", "", text.lower())
+    """Strip punctuation and case, keeping CJK so Chinese labels survive."""
+    return re.sub(r"[^a-z0-9\u4e00-\u9fff]", "", text.lower())
 
 
 def read_layout(rows: list[list[str]]) -> tuple[dict[str, int], list[str]] | None:
@@ -158,7 +163,9 @@ def read_layout(rows: list[list[str]]) -> tuple[dict[str, int], list[str]] | Non
     return (layout, best[1]) if best else None
 
 
-CAPTION = re.compile(r"^(Table\s+[\d]+(?:-[\d]+)*)\s+(\S.*)$")
+# "Table 2-1 Pin definitions" / "表2-1 引脚定义"
+CAPTION = re.compile(r"^((?:Table\s+|表)[\d]+(?:-[\d]+)*)\s*(\S.*)$")
+PIN_TABLE_TITLE = ("pin definition", "引脚定义")
 
 
 def captions(pdf) -> list[tuple[str, str, int]]:
@@ -180,7 +187,7 @@ def choose_table(pdf) -> tuple[str, str]:
     """
     found = captions(pdf)
     for i, (label, title, _) in enumerate(found):
-        if "pin definition" in title.lower():
+        if any(k in title.lower() for k in PIN_TABLE_TITLE):
             return label, next_caption(found, i)
     raise SystemExit("pin definition の表見出しが見つかりませんでした")
 
@@ -480,7 +487,7 @@ def main() -> int:
     if args.list:
         with pdfplumber.open(args.pdf) as pdf:
             for label, title, pno in captions(pdf):
-                if "pin definition" in title.lower():
+                if any(k in title.lower() for k in PIN_TABLE_TITLE):
                     print_err(f"  {label:<14} p{pno + 1:<4} {title}")
         return 0
     if not args.package:

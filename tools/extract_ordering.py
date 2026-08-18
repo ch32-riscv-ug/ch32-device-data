@@ -31,13 +31,15 @@ MAX_PAGES_FROM_END = 60
 # Label keyword -> field. Order matters: the more specific label is tried first so
 # that CH32X035, which heads its description column "Package Form" as well, does
 # not lose the real package column.
+# The Chinese edition is the original; both spellings are matched so a document can
+# be read in whichever language it is published in.
 COLUMNS = (
-    ("model", ("ordermodel",)),
-    ("packing", ("packingtype",)),
-    ("body_size", ("bodysize", "bidysize")),
-    ("pin_pitch", ("pinpitch",)),
-    ("description", ("packagedescription",)),
-    ("package", ("packageform",)),
+    ("model", ("ordermodel", "订购型号", "订货型号")),
+    ("packing", ("packingtype", "包装方式")),
+    ("body_size", ("bodysize", "bidysize", "塑体尺寸", "封装尺寸", "本体尺寸")),
+    ("pin_pitch", ("pinpitch", "引脚节距", "引脚间距")),
+    ("description", ("packagedescription", "封装说明")),
+    ("package", ("packageform", "封装形式", "封装")),
 )
 
 
@@ -46,7 +48,8 @@ def flatten(cell: str | None) -> str:
 
 
 def squash(text: str) -> str:
-    return re.sub(r"[^a-z]", "", text.lower())
+    """Strip punctuation and case, keeping CJK so Chinese labels survive."""
+    return re.sub(r"[^a-z\u4e00-\u9fff]", "", text.lower())
 
 
 def read_layout(row: list[str]) -> dict[str, int] | None:
