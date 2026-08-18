@@ -34,6 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import extract_ordering  # noqa: E402
+import extract_package_dims  # noqa: E402
 import extract_products  # noqa: E402
 from crosscheck_languages import canonical_value  # noqa: E402
 
@@ -42,6 +43,34 @@ REPO = Path(__file__).resolve().parent.parent
 CANDIDATES = REPO / "candidates"
 SERIES_FACTS = REPO / "curated" / "series-facts.json"
 DOCUMENTS = REPO / "manifests" / "documents.json"
+# WCH's package-drawing document: an independent statement of body size and pin
+# pitch per package name, read separately from each language edition.
+PACKAGE_PDF = {lang: MIRRORS / "WCH-common" / f"datasheet_{lang}" / "PACKAGE.PDF"
+               for lang in ("zh", "en")}
+
+
+def load_package_dims() -> dict[str, dict[str, dict]]:
+    dims: dict[str, dict[str, dict]] = {}
+    for lang, path in PACKAGE_PDF.items():
+        if path.exists():
+            dims[lang] = {e["package"]: e for e in extract_package_dims.extract(path)}
+    return dims
+
+
+def package_dim_evidence(dims: dict, package: str | None, key: str) -> list[tuple[str, str]]:
+    """What PACKAGE.PDF states for this package, per language edition.
+
+    A trailing variant suffix names the same outline: QFN48X7_A looks up QFN48X7.
+    """
+    if not package:
+        return []
+    names = (package, package.split("_")[0])
+    out = []
+    for lang in ("zh", "en"):
+        entry = next((dims.get(lang, {}).get(n) for n in names if n in dims.get(lang, {})), None)
+        if entry and entry.get(key):
+            out.append((f"package-pdf:{lang}", entry[key]))
+    return out
 
 # Datasheet labels, in both languages, that mean the same measurement. Each family
 # words these differently -- "Flash memory", "Code FLASH（字节）", "闪存" -- so the
@@ -91,7 +120,15 @@ def split_package(value: str | None) -> tuple[str | None, str | None]:
 
 
 def size_canon(value) -> str:
-    return canonical_value(str(value).upper().replace("MM", "").replace("X", "*"))
+    """Dimensions compare numerically: 3.0*3.0mm and 3*3 state the same size."""
+    text = str(value).upper().replace("MM", "").replace("X", "*")
+    parts = []
+    for part in text.split("*"):
+        try:
+            parts.append(f"{float(part):g}")
+        except ValueError:
+            parts.append(part.strip())
+    return canonical_value("*".join(parts))
 
 
 def squash(text: str) -> str:
@@ -266,7 +303,7 @@ def resolve_full_names(parts: set[str], full: set[str]) -> dict[str, list[str]]:
     return mapping
 
 
-def build_rows(family: Path, datasheet_name: str) -> list[dict]:
+def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
     en_path = family / "datasheet_en" / datasheet_name
     zh_path = family / "datasheet_zh" / datasheet_name
     en_products, en_ordering = read_edition(en_path) if en_path.exists() else ({}, {})
@@ -344,6 +381,15 @@ def build_rows(family: Path, datasheet_name: str) -> list[dict]:
             ])
 
         table_leads, table_gpio = pin_table_counts(part)
+        # Sizes and lead counts are properties of the package, not the product.
+        # The statements made here are stashed and judged once per package name.
+        row["_body"] = [("ordering:zh", zh_ord.get("body_size")),
+                        ("ordering:en", en_ord.get("body_size"))] + inline_sizes
+        row["_pitch"] = [("ordering:zh", zh_ord.get("pin_pitch")),
+                         ("ordering:en", en_ord.get("pin_pitch"))]
+        row["_pins"] = [("products:zh", zh_attr.get("pin_count")),
+                        ("products:en", en_attr.get("pin_count"))]
+        row["_leads"] = table_leads
 
         # GPIO count: the comparison table states it; the pin table's P-pad count
         # corroborates it where the extraction kept every row.
@@ -358,34 +404,9 @@ def build_rows(family: Path, datasheet_name: str) -> list[dict]:
             gpio_sources = [("pin-table", table_gpio)]
         judge_field(row, "gpio_count", gpio_sources, gpio_checks)
 
-        # Pin count: three statements of the same number -- the comparison table's
-        # pin column, the digits in the package name, the pin-definition table's
-        # lead count -- the strongest available carrying the value.
-        counted = package_pins(row["package"])
-        pin_sources = [
-            ("products:zh", zh_attr.get("pin_count")), ("products:en", en_attr.get("pin_count")),
-        ]
-        stated_pins = next((v for _, v in pin_sources if v), None)
-        checks = []
-        if not stated_pins and counted:
-            pin_sources = [("rule:package-name", counted)]
-            stated_pins, counted = counted, None
-        if stated_pins and counted:
-            checks.append(("rule:package-name", canonical_value(stated_pins) == counted))
-        if stated_pins and table_leads:
-            checks.append(("pin-table", canonical_value(stated_pins) == table_leads, True))
-        elif not stated_pins and table_leads:
-            pin_sources = [("pin-table", table_leads)]
-        judge_field(row, "pin_count", pin_sources, checks)
-
-        judge_field(row, "body_size", [
-            ("ordering:zh", zh_ord.get("body_size")),
-            ("ordering:en", en_ord.get("body_size")),
-        ] + inline_sizes, canon=size_canon)
-        for field in ("pin_pitch", "packing"):
-            judge_field(row, field, [
-                ("ordering:zh", zh_ord.get(field)), ("ordering:en", en_ord.get(field)),
-            ])
+        judge_field(row, "packing", [
+            ("ordering:zh", zh_ord.get("packing")), ("ordering:en", en_ord.get("packing")),
+        ])
         rows.append(row)
     return rows
 
@@ -397,6 +418,7 @@ def main() -> int:
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
+    dims = load_package_dims()
     rows: list[dict] = []
     for family in sorted(MIRRORS.glob("CH32*")):
         if args.family and family.name != args.family:
@@ -408,7 +430,7 @@ def main() -> int:
         }
         for name in sorted(names):
             try:
-                rows.extend(build_rows(family, name))
+                rows.extend(build_rows(family, name, dims))
             except Exception as exc:  # noqa: BLE001
                 print(f"{family.name}/{name}: 読めません {exc}", file=sys.stderr)
 
@@ -419,8 +441,10 @@ def main() -> int:
     # unique (one model can appear in several datasheets), so the full key keeps
     # regeneration and later insertions reproducible with no tie left to chance.
     rows.sort(key=lambda r: (r["part_number"], r["family"], r["datasheet"]))
+    packages = package_rows(rows, dims)  # also removes the stashed evidence
     series = series_rows(rows)
     write_csv(args.out / "products.csv", rows, PRODUCT_COLUMNS)
+    write_csv(args.out / "packages.csv", packages, PACKAGE_COLUMNS)
     write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
     write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
     (args.out / "silicon.csv").unlink(missing_ok=True)  # 旧名。series.csvに置き換え
@@ -433,11 +457,13 @@ def main() -> int:
 # _confidence and _basis columns follow as blocks in the same order.
 PRODUCT_COLUMNS = [
     "part_number", "series", "family", "package", "flash_bytes", "sram_bytes",
-    "pin_count", "gpio_count", "temperature", "body_size", "pin_pitch", "packing",
-    "listed_as", "datasheet",
+    "gpio_count", "temperature", "packing", "listed_as", "datasheet",
+]
+PACKAGE_COLUMNS = [
+    "package", "pin_count", "body_size", "pin_pitch", "product_count", "families",
 ]
 SERIES_COLUMNS = [
-    "series", "family", "core", "isa", "flash_bytes", "sram_bytes", "pin_count",
+    "series", "family", "core", "isa", "flash_bytes", "sram_bytes",
     "gpio_count", "temperature", "packages", "part_number_count", "datasheets",
 ]
 FAMILY_COLUMNS = [
@@ -451,15 +477,20 @@ def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
     plain = [k for k in keys if not k.endswith(("_confidence", "_basis"))]
     values = [k for k in priority if k in keys]
     values += sorted(k for k in plain if k not in values)  # safety net for new fields
-    columns = (
-        values
-        + [f"{k}_confidence" for k in values if f"{k}_confidence" in keys]
+    # An empty column named "#" separates the data from its metadata: everything
+    # to its right is confidence/basis, not the data itself. One file, so the two
+    # can never drift apart, and a reader can simply drop the columns from "#" on.
+    meta = (
+        [f"{k}_confidence" for k in values if f"{k}_confidence" in keys]
         + [f"{k}_basis" for k in values if f"{k}_basis" in keys]
     )
+    columns = values + ["#"] + meta if meta else values
     with path.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=columns)
         writer.writeheader()
-        writer.writerows(rows)
+        # The separator carries "#" in every row too, so the boundary is visible
+        # wherever one lands in the file, not only next to the header.
+        writer.writerows(({**row, "#": "#"} for row in rows) if meta else rows)
 
 
 def tally(path: Path, rows: list[dict]) -> None:
@@ -514,7 +545,7 @@ def series_rows(rows: list[dict]) -> list[dict]:
     grouped: dict[str, list[dict]] = collections.defaultdict(list)
     for row in rows:
         grouped[row.get("series") or row["part_number"]].append(row)
-    fields = ["flash_bytes", "sram_bytes", "pin_count", "gpio_count", "temperature"]
+    fields = ["flash_bytes", "sram_bytes", "gpio_count", "temperature"]
     out = []
     for series, members in sorted(grouped.items()):
         entry = {
@@ -549,6 +580,72 @@ def series_rows(rows: list[dict]) -> list[dict]:
         )
         out.append(entry)
     out.sort(key=lambda e: e["series"])
+    return out
+
+
+def dedup_evidence(evidence: list[tuple[str, str | None]], canon=canonical_value) -> list:
+    """One reading per (source, value): many products repeating the same statement
+    are one statement, but one source stating two values must stay visible."""
+    seen: set = set()
+    out = []
+    for source, value in evidence:
+        if not value:
+            continue
+        key = (source, canon(value))
+        if key not in seen:
+            seen.add(key)
+            out.append((source, value))
+    return out
+
+
+def package_rows(rows: list[dict], dims: dict) -> list[dict]:
+    """One row per package name: the master table of physical outlines.
+
+    Body size, pin pitch and lead count belong to the package, so every product's
+    ordering-table statement is pooled with PACKAGE.PDF's drawing entry and judged
+    once. Products refer to the package by name and carry none of it themselves.
+    """
+    agg: dict[str, dict] = {}
+    for row in rows:
+        body = row.pop("_body", [])
+        pitch = row.pop("_pitch", [])
+        pins = row.pop("_pins", [])
+        leads = row.pop("_leads", None)
+        name = row.get("package")
+        if not name:
+            continue
+        a = agg.setdefault(name, {"body": [], "pitch": [], "pins": [],
+                                  "leads": set(), "count": 0, "families": set()})
+        a["count"] += 1
+        a["families"].add(row["family"])
+        a["body"] += body
+        a["pitch"] += pitch
+        a["pins"] += pins
+        if leads:
+            a["leads"].add(leads)
+    out = []
+    for name, a in sorted(agg.items()):
+        entry = {"package": name, "product_count": a["count"],
+                 "families": ";".join(sorted(a["families"]))}
+        readings = []
+        counted = package_pins(name)
+        if counted:
+            readings.append(("rule:package-name", counted))
+        readings += dedup_evidence(a["pins"])
+        checks = []
+        if a["leads"] and readings:
+            agreed = a["leads"] == {canonical_value(readings[0][1])}
+            checks.append(("pin-table", agreed, True))
+        elif a["leads"]:
+            readings = [("pin-table", sorted(a["leads"])[0])]
+        judge_field(entry, "pin_count", readings, checks)
+        judge_field(entry, "body_size",
+                    dedup_evidence(a["body"], size_canon)
+                    + package_dim_evidence(dims, name, "body_size"), canon=size_canon)
+        judge_field(entry, "pin_pitch",
+                    dedup_evidence(a["pitch"], size_canon)
+                    + package_dim_evidence(dims, name, "pin_pitch"), canon=size_canon)
+        out.append(entry)
     return out
 
 

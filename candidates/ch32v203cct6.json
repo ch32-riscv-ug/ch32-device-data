@@ -43,7 +43,16 @@
       "pad": "VBAT",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "BAT",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 5,
@@ -51,6 +60,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "OSC_IN",
+          "route": "main"
+        },
         {
           "signal": "PD0",
           "route": null,
@@ -65,6 +78,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "OSC_OUT",
+          "route": "main"
+        },
+        {
           "signal": "PD1",
           "route": null,
           "_needs_review": true
@@ -76,21 +93,44 @@
       "pad": "NRST",
       "kind": "other",
       "_pin_type": "I",
-      "functions": []
+      "functions": [
+        {
+          "signal": "NRST",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 8,
       "pad": "VSSA",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "SSA",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 9,
       "pad": "VDDA",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DDA",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 10,
@@ -98,6 +138,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA0",
+          "route": "main"
+        },
         {
           "signal": "WKUP",
           "route": "default"
@@ -135,6 +179,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA1",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN1",
           "route": "default"
         },
@@ -161,6 +209,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA2",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN2",
           "route": "default"
@@ -197,6 +249,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA3",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN3",
           "route": "default"
         },
@@ -228,6 +284,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA4",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN4",
           "route": "default"
         },
@@ -253,6 +313,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA5",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN5",
           "route": "default"
@@ -289,6 +353,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA6",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN6",
           "route": "default"
@@ -336,6 +404,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA7",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN7",
           "route": "default"
         },
@@ -356,6 +428,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB0",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN8",
           "route": "default"
@@ -397,6 +473,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB1",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN9",
           "route": "default"
@@ -451,6 +531,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PB2",
+          "route": "main"
+        },
+        {
           "signal": "CMP1_CHP1",
           "route": "default"
         },
@@ -476,6 +560,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB10",
+          "route": "main"
+        },
         {
           "signal": "OPA2_CHN0",
           "route": "default"
@@ -508,6 +596,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB11",
+          "route": "main"
+        },
         {
           "signal": "OPA1_CHN0",
           "route": "default"
@@ -543,7 +635,16 @@
       "pad": "VSS_1",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "SS_1",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 25,
@@ -551,6 +652,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB12",
+          "route": "main"
+        },
         {
           "signal": "OPA1_CHP2",
           "route": "default"
@@ -576,6 +681,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB13",
+          "route": "main"
+        },
         {
           "signal": "OPA1_CHNVB",
           "route": "default"
@@ -603,6 +712,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB14",
+          "route": "main"
+        },
         {
           "signal": "OPA2_CHP0",
           "route": "default"
@@ -633,6 +746,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB15",
+          "route": "main"
+        },
         {
           "signal": "OPA2_CHNVB",
           "route": "default"
@@ -671,6 +788,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA8",
+          "route": "main"
+        },
+        {
           "signal": "CMP2_CHP1",
           "route": "default"
         },
@@ -703,6 +824,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA9",
+          "route": "main"
+        },
+        {
           "signal": "CMP2_CHN0",
           "route": "default"
         },
@@ -730,6 +855,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PA10",
+          "route": "main"
+        },
+        {
           "signal": "TIM1_CH3",
           "route": "af-0",
           "_alternate_function": 0
@@ -752,6 +881,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PA11",
+          "route": "main"
+        },
         {
           "signal": "USBFS_DM",
           "route": "default"
@@ -785,6 +918,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PA12",
+          "route": "main"
+        },
+        {
           "signal": "USBFS_DP",
           "route": "default"
         },
@@ -814,6 +951,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PA13",
+          "route": "main"
+        },
         {
           "signal": "SWDIO",
           "route": "default"
@@ -845,7 +986,16 @@
       "pad": "VSS_2",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "SS_2",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 37,
@@ -853,6 +1003,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PA14",
+          "route": "main"
+        },
         {
           "signal": "SWCLK",
           "route": "default"
@@ -896,6 +1050,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PA15",
+          "route": "main"
+        },
+        {
           "signal": "TIM1_CH3N",
           "route": "af-0",
           "_alternate_function": 0
@@ -934,6 +1092,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PB3",
+          "route": "main"
+        },
+        {
           "signal": "CMP1_CHN1",
           "route": "default"
         },
@@ -960,6 +1122,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB4",
+          "route": "main"
+        },
         {
           "signal": "TIM3_CH1",
           "route": "af-1",
@@ -993,6 +1159,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB5",
+          "route": "main"
+        },
         {
           "signal": "OPA1_CHP0",
           "route": "default"
@@ -1031,6 +1201,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PB6",
+          "route": "main"
+        },
+        {
           "signal": "TIM1_CH1",
           "route": "af-0",
           "_alternate_function": 0
@@ -1064,6 +1238,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PB7",
+          "route": "main"
+        },
+        {
           "signal": "TIM1_CH2",
           "route": "af-0",
           "_alternate_function": 0
@@ -1090,7 +1268,12 @@
       "pad": "BOOT0",
       "kind": "other",
       "_pin_type": "I",
-      "functions": []
+      "functions": [
+        {
+          "signal": "BOOT0",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 45,
@@ -1098,6 +1281,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB8",
+          "route": "main"
+        },
         {
           "signal": "CMP2_CHP0",
           "route": "default"
@@ -1151,6 +1338,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PB9",
+          "route": "main"
+        },
+        {
           "signal": "TIM1_BK",
           "route": "af-0",
           "_alternate_function": 0
@@ -1197,7 +1388,16 @@
       "pad": "VSS_3",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "SS_3",
+          "route": "main"
+        }
+      ]
     }
   ],
   "signal_aliases": {}

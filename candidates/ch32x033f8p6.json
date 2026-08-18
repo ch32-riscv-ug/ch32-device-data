@@ -152,6 +152,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PB12",
+          "route": "main"
+        },
+        {
           "signal": "CK1",
           "route": "remap-3",
           "_selector_value": 3,
@@ -196,6 +200,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
           "signal": "CC1",
           "route": "default"
         },
@@ -226,6 +234,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
           "signal": "CC2",
           "route": "default"
         },
@@ -255,6 +267,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PC1",
+          "route": "main"
+        },
         {
           "signal": "A11",
           "route": "default"
@@ -304,6 +320,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA0",
+          "route": "main"
+        },
+        {
           "signal": "T2C1",
           "route": "default"
         },
@@ -339,6 +359,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA1",
+          "route": "main"
+        },
         {
           "signal": "RTS2",
           "route": "default"
@@ -395,6 +419,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA2",
+          "route": "main"
+        },
         {
           "signal": "TX2",
           "route": "default"
@@ -466,6 +494,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA3",
+          "route": "main"
+        },
+        {
           "signal": "RX2",
           "route": "default"
         },
@@ -520,6 +552,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA4",
+          "route": "main"
+        },
+        {
           "signal": "CS",
           "route": "default"
         },
@@ -561,6 +597,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA5",
+          "route": "main"
+        },
         {
           "signal": "SCK",
           "route": "default"
@@ -605,6 +645,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA6",
+          "route": "main"
+        },
         {
           "signal": "MISO",
           "route": "default"
@@ -666,6 +710,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA7",
+          "route": "main"
+        },
+        {
           "signal": "MOSI",
           "route": "default"
         },
@@ -720,6 +768,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PB1",
+          "route": "main"
+        },
+        {
           "signal": "RX4",
           "route": "default"
         },
@@ -744,14 +796,24 @@
       "pad": "GND",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "GND",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 16,
       "pad": "VDD",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "VDD",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 17,
@@ -759,6 +821,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PC16",
+          "route": "main"
+        },
         {
           "signal": "UDM",
           "route": "default"
@@ -840,6 +906,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC17",
+          "route": "main"
+        },
+        {
           "signal": "UDP",
           "route": "default"
         },
@@ -919,6 +989,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PC18",
+          "route": "main"
+        },
         {
           "signal": "DIO",
           "route": "default"
@@ -1013,6 +1087,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PC19",
+          "route": "main"
+        },
         {
           "signal": "DCK",
           "route": "default"

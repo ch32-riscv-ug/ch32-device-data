@@ -33,7 +33,9 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `templates/`: 全mirror共通の`update.sh`とworkflow。file IDの直書きを持たない
 - `tools/sync_catalog.py` / `tools/check_mirrors.py`: カタログ同期とmirror追随確認。日次workflowが実行する
 - `tools/crosscheck_languages.py`: 中国語版と英語版を別々に抽出して突き合わせる
-- `tools/build_tables.py` / `tables/`: 正規化CSV。families→series→productsの階層で、値ごとに根拠一覧（basis）と確度を持つ。core/ISAは`curated/series-facts.json`（人手確認済み）から結合。確定の基準は`tables/README.ja.md`参照
+- `tools/build_tables.py` / `tables/`: 正規化CSV。families→series→productsの階層＋packagesマスタで、値ごとに根拠一覧（basis）と確度を持つ。core/ISAは`curated/series-facts.json`（人手確認済み）から結合。確定の基準は`tables/README.ja.md`参照
+- `tools/extract_package_dims.py`: PACKAGE.PDF（WCH-common mirror）目次からpackageごとのbody size・pitchを取る。両言語105件
+- `tools/build_pins.py`: pin定義表を`tables/pins.csv`（lead↔pad対応）と`tables/pin_functions.csv`（pad→signal/route）に正規化する。両言語を別々に読んで突き合わせる
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 - `docs/glossary.ja.md`: 用語集。ファミリー/シリーズの定義、型番の読み方、確度の語彙
 
