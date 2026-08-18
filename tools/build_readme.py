@@ -321,6 +321,69 @@ def render(data: Data, family: str) -> str:
     return "\n".join(lines)
 
 
+ORG_INTRO = """# CH32 RISC-V User Group
+
+This is a user group that uses RISC-V chips such as WCH's CH32V series.
+"""
+
+# Repositories the tables know nothing about; edited here, in the generator.
+ORG_STATIC = """## Toolchain mirror
+
+- https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror
+
+## Arduino IDE
+
+- https://github.com/ch32-riscv-ug/arduino_core_ch32_riscv_noneos \
+  (runs EVT code on the Arduino IDE)
+- https://github.com/ch32-riscv-ug/arduino_core_ch32_riscv_arduino \
+  (Arduino-compatible core)
+"""
+
+
+def org_profile(data: Data) -> str:
+    """The organisation landing page: which series live in which repository.
+
+    The family repositories are named after document families (CH32V20x holds
+    V203, V205 and V208), which hides what is inside; this table states it.
+    """
+    families = load("families")
+    lines = [ORG_INTRO, NOTICE, "", "## Device documentation mirrors", "",
+             "| Repository | Series inside | Cores | Products | Documents |",
+             "|---|---|---|---|---|"]
+    for f in families:
+        url = f"https://github.com/{f['repository']}"
+        series = ", ".join(f["series"].split(";"))
+        cores = ", ".join(sorted({c for token in f["cores"].split(";")
+                                  for c in token.split(" + ") if c}))
+        docs = []
+        if f["datasheets"]:
+            docs.append(f"DS×{len(f['datasheets'].split(';'))}")
+        if f["reference_manuals"]:
+            docs.append("RM")
+        if f["evt"]:
+            docs.append("EVT")
+        lines.append(f"| [{f['family']}]({url}) | {series} | {cores} "
+                     f"| {f['part_number_count']} | {' '.join(docs)} |")
+    common = sorted(d["document"] for d in data.documents
+                    if "WCH-common" in d["repositories"].split(";")
+                    and d["status"] == "assigned")
+    lines += ["",
+              "## Cross-family documents",
+              "",
+              "- [WCH-common](https://github.com/ch32-riscv-ug/WCH-common): "
+              + ", ".join(common),
+              "",
+              "## Data",
+              "",
+              "- [ch32-device-data](https://github.com/ch32-riscv-ug/"
+              "ch32-device-data): the normalised tables (series, products, "
+              "packages, pins, remap) every mirror README is generated from. "
+              "Each value carries its evidence and confidence.",
+              "",
+              ORG_STATIC]
+    return "\n".join(lines)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=REPO / "generated" / "readme")
@@ -342,6 +405,10 @@ def main() -> int:
         text = render(data, family)
         (args.out / f"{family}.md").write_text(text, encoding="utf-8")
         print(f"{args.out}/{family}.md: {len(text.splitlines())} 行", file=sys.stderr)
+    if not args.family:
+        profile = org_profile(data)
+        (args.out / "_profile.md").write_text(profile, encoding="utf-8")
+        print(f"{args.out}/_profile.md: {len(profile.splitlines())} 行", file=sys.stderr)
     return 0
 
 

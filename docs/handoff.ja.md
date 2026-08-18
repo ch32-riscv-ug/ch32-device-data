@@ -38,7 +38,7 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/build_pins.py`: pin定義表を`tables/pins.csv`（lead↔pad対応）と`tables/pin_functions.csv`（pad→signal/route）に正規化する。両言語を別々に読んで突き合わせる
 - `tools/build_remap.py`: candidatesから`tables/remap_fields.csv`/`remap_routes.csv`を生成。pin_functionsのremap-Nを解決する
 - `tools/build_documents.py` / `tools/check_tables.py`: 文書カタログのCSV投影（標準ライブラリのみ、日次workflowが実行）と、全テーブルの参照結合検査（push/PRのcheck workflowと日次が実行）
-- `tools/build_readme.py` / `generated/readme/`: **本来の目的である各mirror READMEの生成**。tablesから組み立ててここへcommitし、mirrorのupdate.shが日次で自分の分をfetchしてREADME.mdを置き換える（catalogueと同方式・クロスrepoトークン不要）。CH32V003で旧手製READMEとpin表72セル完全一致を確認済み。ch32_riscv_toolsへのリンクは生成版には無い（撤去方針）。画像はmirror側image/を生成時にスキャンして参照するだけで、手動維持
+- `tools/build_readme.py` / `generated/readme/`: **本来の目的である各mirror READMEの生成**。tablesから組み立ててここへcommitし、mirrorのupdate.shが日次で自分の分をfetchしてREADME.mdを置き換える（catalogueと同方式・クロスrepoトークン不要）。CH32V003で旧手製READMEとpin表72セル完全一致を確認済み。ch32_riscv_toolsへのリンクは生成版には無い（撤去方針）。画像はmirror側image/を生成時にスキャンして参照するだけで、手動維持。organizationプロフィール（`.github`リポジトリの`profile/README.md`、family→series対応表つき）も同方式で`generated/readme/_profile.md`から日次fetch
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 - `docs/glossary.ja.md`: 用語集。ファミリー/シリーズの定義、型番の読み方、確度の語彙
 
