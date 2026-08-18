@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import urllib.parse
 import urllib.request
@@ -39,10 +40,49 @@ QUERIES = ("CH32",)
 TIMEOUT = 120
 
 
+def note(message: str) -> None:
+    """A GitHub Actions warning annotation, so the run page shows it."""
+    if os.environ.get("GITHUB_ACTIONS"):
+        print(f"::warning::{message}")
+
+
+def summary(lines: list[str], remote: int, total: int, unassigned: list[str]) -> None:
+    """Write the run summary GitHub shows above the log."""
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if not path:
+        return
+    with open(path, "a", encoding="utf-8") as out:
+        out.write(f"## 文書カタログ\n\nサイト掲載 {remote} 件 / manifest {total} 件\n\n")
+        out.write("\n".join(lines) + "\n" if lines else "差分なし\n")
+        if unassigned:
+            out.write(f"\n### 割当先が未定 ({len(unassigned)})\n\n")
+            out.write("\n".join(f"- `{n}`" for n in unassigned) + "\n")
+
+
+class CatalogueError(RuntimeError):
+    """The site did not answer in the shape this tool expects.
+
+    WCH changes download ids and occasionally the API itself. Failing loudly is the
+    point: a silent empty answer would quietly empty the catalogue.
+    WCHはdownload idを変えることがあり、API自体が変わることもある。黙って空の
+    結果を書き込むより、失敗させて気付ける方がよい。
+    """
+
+
 def fetch_json(url: str) -> dict:
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+            body = resp.read().decode("utf-8")
+    except Exception as exc:  # noqa: BLE001 - the cause is reported, not swallowed
+        raise CatalogueError(f"{url} を取得できませんでした: {exc}") from exc
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise CatalogueError(f"{url} の応答がJSONではありません: {body[:120]!r}") from exc
+    if not isinstance(payload, dict) or "data" not in payload:
+        raise CatalogueError(f"{url} の応答に data がありません: {str(payload)[:120]}")
+    return payload
 
 
 def walk_files(node, out: list) -> None:
@@ -96,7 +136,23 @@ def main() -> int:
 
     manifest = load_manifest()
     known = {d["name"].upper(): d for d in manifest["documents"]}
-    remote = survey()
+    try:
+        remote = survey()
+    except CatalogueError as exc:
+        print(f"::error::{exc}" if os.environ.get("GITHUB_ACTIONS") else f"error: {exc}",
+              file=sys.stderr)
+        return 1
+    # A shape change upstream would come back as a handful of documents rather than
+    # an error. Treat a sudden collapse as a failure instead of writing it down.
+    # API側の仕様変更は「エラー」ではなく「極端に少ない結果」として現れる。
+    if known and len(remote) < len(known) * 0.8:
+        message = (
+            f"サイトから {len(remote)} 件しか取得できませんでした"
+            f"（manifestは {len(known)} 件）。APIの仕様変更を疑ってください"
+        )
+        print(f"::error::{message}" if os.environ.get("GITHUB_ACTIONS") else f"error: {message}",
+              file=sys.stderr)
+        return 1
 
     added, changed, gone = [], [], []
     for key, found in sorted(remote.items()):
@@ -125,16 +181,27 @@ def main() -> int:
         if key not in remote and doc.get("status") != "excluded":
             gone.append(doc["name"])
 
+    report = []
     print(f"サイト掲載 {len(remote)} 件 / manifest {len(known)} 件", file=sys.stderr)
     for line in changed:
         print(f"  版更新 {line}", file=sys.stderr)
+        report.append(f"- 版更新 `{line}`")
     for doc in added:
         ids = " ".join(f"{k}={v['file_id']}" for k, v in doc["sources"].items())
         print(f"  新規   {doc['name']:24} {ids}  ← 割当先の判断が要る", file=sys.stderr)
+        report.append(f"- 新規 `{doc['name']}` ({ids}) — 割当先が未定")
+        note(f"新しい文書 {doc['name']} は割当先が未定です")
     for name in gone:
         print(f"  消失   {name}  ← サイト一覧から消えた", file=sys.stderr)
+        report.append(f"- 消失 `{name}`")
+        note(f"{name} がサイトの一覧から消えました")
+    unassigned = [d["name"] for d in known.values() if d.get("status") == "unassigned"]
+    for name in unassigned:
+        note(f"{name} は割当先が未定のままです")
     if not (changed or added or gone):
         print("  差分なし", file=sys.stderr)
+
+    summary(report, len(remote), len(known) + len(added), unassigned)
 
     if args.write:
         manifest["documents"] = sorted(

@@ -1,0 +1,79 @@
+name: Update catalogue
+
+# Keeps manifests/documents.json in step with WCH's own file listing, and checks
+# that the mirrors still hold what the catalogue assigns them.
+#
+# The job is meant to fail when something upstream moves: WCH changes download ids
+# and occasionally the search API itself, and a silent empty answer would quietly
+# empty the catalogue. A red run is the signal to go and look.
+# WCHはdownload idを変えることがあり、API自体が変わることもある。黙って空の結果を
+# 書き込むより失敗させ、赤いrunを見直しの合図にする。
+
+on:
+  schedule:
+    # Daily 13:07 UTC (21:07 CST China / 22:07 JST). Two hours before the mirrors
+    # refresh at 15:07 UTC, so they pick up the same day's catalogue.
+    # mirror群の更新(15:07 UTC)より2時間早く回し、同じ日のカタログを使わせる。
+    - cron: '07 13 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Both tools use only the standard library, so nothing is installed here.
+      # The validator's optional jsonschema is installed for the checks below.
+      - name: Refresh the catalogue
+        run: python tools/sync_catalog.py --write
+
+      - name: Check the mirrors against it
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/check_mirrors.py
+
+      - name: Validate device records
+        run: |
+          python -m pip install --quiet jsonschema
+          python tools/validate.py
+          python -S tools/validate.py
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "update catalogue (automated)"
+            git push
+          fi
+
+      # Keep the daily schedule from being auto-disabled after 60 days of
+      # repository inactivity: if the latest commit is older than 50 days, push
+      # one empty commit. Built-in GITHUB_TOKEN only (contents: write).
+      - name: Keepalive (avoid 60-day schedule auto-disable)
+        run: |
+          age_days=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Last commit age: ${age_days} day(s)"
+          if [ "$age_days" -ge 50 ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "keepalive: prevent scheduled workflow auto-disable"
+            git push
+          else
+            echo "Recent activity exists; no keepalive commit needed."
+          fi
