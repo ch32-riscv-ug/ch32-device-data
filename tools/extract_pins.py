@@ -36,15 +36,22 @@ PART_NUMBER = re.compile(r"^(CH32)?[A-Z]{0,2}\d{3}[A-Z0-9]{2,}$")
 # tables are laid out identically and only the labels differ. Both spellings are
 # matched so a document can be read in whichever language it is published in --
 # CH32V407's reference manual exists only in Chinese.
+# The function columns come in up to three: the reset-state main function
+# ("Main function (after reset)" / "主功能（复位后）"), the default alternate
+# function, and the remap list. CH32V003 prints all three; CH32X315 prints main
+# plus one AF list that zh heads "引脚功能" and en "Default alternate function";
+# CH32H417 heads its single AF column "Pin function(2)" / "引脚功能(2)". Keys are
+# claimed in dict order with each column taken at most once, so the main column
+# never swallows the default slot.
 COLUMN_LABELS = {
     "pad": ("pinname", "引脚名称"),
     "type": ("pintype", "引脚类型"),
-    # CH32H417 heads the default-route column "Pin function(2)" instead, and the
-    # CH32H415 table omits it entirely, so this one column is optional.
-    "default": ("defaultalternate", "defaultalter", "pinfunction", "默认复用功能"),
+    "main": ("主功能", "mainfunction"),
+    "default": ("defaultalternate", "defaultalter", "pinfunction",
+                "默认复用功能", "引脚功能"),
     "remap": ("remapping", "重映射功能"),
 }
-REQUIRED_COLUMNS = ("pad", "type", "remap")
+REQUIRED_COLUMNS = ("pad", "type")  # plus at least one of default/remap
 
 PAD = re.compile(r"^P[A-H]\d{1,2}$")
 POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
@@ -145,12 +152,16 @@ def read_layout(rows: list[list[str]]) -> tuple[dict[str, int], list[str]] | Non
         for col in range(width)
     ]
     layout: dict[str, int] = {}
+    taken: set[int] = set()
     for key, keywords in COLUMN_LABELS.items():
-        for col, text in enumerate(merged):
-            if any(k in text for k in keywords):
+        for keyword in keywords:
+            col = next((c for c, text in enumerate(merged)
+                        if c not in taken and keyword in text), None)
+            if col is not None:
                 layout[key] = col
+                taken.add(col)
                 break
-    if any(key not in layout for key in REQUIRED_COLUMNS):
+    if any(key not in layout for key in REQUIRED_COLUMNS)             or not ({"default", "remap"} & layout.keys()):
         return None
     best: tuple[int, list[str]] | None = None
     for row in rows[:first_data]:
@@ -323,13 +334,18 @@ def pins_for(
     notes: list[str] = []
     index = packages.index(package)
     pad_col, type_col = layout["pad"], layout["type"]
-    default_col, remap_col = layout.get("default"), layout["remap"]
+    main_col = layout.get("main")
+    default_col, remap_col = layout.get("default"), layout.get("remap")
     if default_col is None:
         notes.append("この表には default alternate function 列がなく、remap列のみ採取した")
+    if remap_col is None:
+        notes.append("この表には remap 列がなく、default/主功能列のみ採取した")
+    last_col = max(c for c in (pad_col, type_col, main_col, default_col, remap_col)
+                   if c is not None)
 
     pins: list[dict] = []
     for cells in rows:
-        if remap_col >= len(cells):
+        if last_col >= len(cells):
             notes.append(f"列数不足の行を無視: {cells[:pad_col + 2]}")
             continue
         number = cells[index]
@@ -342,6 +358,11 @@ def pins_for(
             kind = "other"
             notes.append(f"{pad}: pin type {pin_type!r} を分類できず other とした")
         functions = []
+        if main_col is not None:
+            # The reset-state main function: usually the pad itself, but NRST
+            # and the oscillator pads state their special role here.
+            for token in signals(cells[main_col]):
+                functions.append({"signal": token, "route": "main"})
         if default_col is not None:
             for token in signals(cells[default_col]):
                 # CH32H41x puts its alternate-function numbers in this column too.
@@ -355,7 +376,7 @@ def pins_for(
                     if af
                     else {"signal": token, "route": "default"}
                 )
-        for token in signals(cells[remap_col]):
+        for token in signals(cells[remap_col]) if remap_col is not None else ():
             af = ALTERNATE.match(token)
             if af:
                 functions.append(

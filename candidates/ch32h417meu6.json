@@ -106,7 +106,16 @@
       "pad": "VDD33",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DD33",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 2,
@@ -114,6 +123,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/SDP",
       "functions": [
+        {
+          "signal": "PE3",
+          "route": "main"
+        },
         {
           "signal": "SERDES_TXP",
           "route": "default"
@@ -177,6 +190,10 @@
       "_pin_type": "I/O/SDP",
       "functions": [
         {
+          "signal": "PE4",
+          "route": "main"
+        },
+        {
           "signal": "SERDES_TXN",
           "route": "default"
         },
@@ -238,6 +255,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/SDP",
       "functions": [
+        {
+          "signal": "PE5",
+          "route": "main"
+        },
         {
           "signal": "SERDES_RXP",
           "route": "default"
@@ -310,6 +331,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/SDP",
       "functions": [
+        {
+          "signal": "PE6",
+          "route": "main"
+        },
         {
           "signal": "SERDES_RXN",
           "route": "default"
@@ -388,6 +413,14 @@
       "_pin_type": "P",
       "functions": [
         {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DDK",
+          "route": "main"
+        },
+        {
           "signal": "Main V",
           "route": "default"
         },
@@ -402,28 +435,48 @@
       "pad": "MDIRN",
       "kind": "other",
       "_pin_type": "ETH",
-      "functions": []
+      "functions": [
+        {
+          "signal": "MDIRN",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 8,
       "pad": "MDIRP",
       "kind": "other",
       "_pin_type": "ETH",
-      "functions": []
+      "functions": [
+        {
+          "signal": "MDIRP",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 9,
       "pad": "MDITN",
       "kind": "other",
       "_pin_type": "ETH",
-      "functions": []
+      "functions": [
+        {
+          "signal": "MDITN",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 10,
       "pad": "MDITP",
       "kind": "other",
       "_pin_type": "ETH",
-      "functions": []
+      "functions": [
+        {
+          "signal": "MDITP",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 11,
@@ -431,6 +484,14 @@
       "kind": "power",
       "_pin_type": "P",
       "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DD33",
+          "route": "main"
+        },
         {
           "signal": "Main V",
           "route": "default"
@@ -446,21 +507,36 @@
       "pad": "XI",
       "kind": "other",
       "_pin_type": "I/A",
-      "functions": []
+      "functions": [
+        {
+          "signal": "XI",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 13,
       "pad": "XO",
       "kind": "other",
       "_pin_type": "O/A",
-      "functions": []
+      "functions": [
+        {
+          "signal": "XO",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 14,
       "pad": "NRST",
       "kind": "other",
       "_pin_type": "I",
-      "functions": []
+      "functions": [
+        {
+          "signal": "NRST",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 15,
@@ -468,6 +544,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PC0",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN10",
           "route": "default"
@@ -555,6 +635,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PC1",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN11",
           "route": "default"
@@ -682,6 +766,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC2",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN12",
           "route": "default"
         },
@@ -803,6 +891,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC3",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN13",
           "route": "default"
         },
@@ -860,14 +952,32 @@
       "pad": "VDDIO",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DDIO",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 20,
       "pad": "VDD33A",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DD33A",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 21,
@@ -875,6 +985,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA0",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN0",
           "route": "default"
@@ -957,6 +1071,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA4",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN4",
           "route": "default"
         },
@@ -1006,6 +1124,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA5",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN5",
           "route": "default"
@@ -1071,6 +1193,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB0",
+          "route": "main"
+        },
         {
           "signal": "ADC_IN8",
           "route": "default"
@@ -1196,6 +1322,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PB1",
+          "route": "main"
+        },
+        {
           "signal": "ADC_IN9",
           "route": "default"
         },
@@ -1301,6 +1431,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PE10",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT5",
           "route": "default"
         },
@@ -1380,6 +1514,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PE11",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT6",
           "route": "default"
@@ -1461,6 +1599,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PE12",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT7",
           "route": "default"
@@ -1548,6 +1690,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PE13",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT8",
           "route": "default"
         },
@@ -1604,6 +1750,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PE14",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT9",
           "route": "default"
@@ -1666,6 +1816,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PE15",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT10",
           "route": "default"
@@ -1733,6 +1887,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB10",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT11",
           "route": "default"
@@ -1833,6 +1991,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PB11",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT12",
           "route": "default"
         },
@@ -1917,6 +2079,14 @@
       "_pin_type": "P",
       "functions": [
         {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "IO18",
+          "route": "main"
+        },
+        {
           "signal": "Main V",
           "route": "default"
         },
@@ -1933,6 +2103,14 @@
       "_pin_type": "P",
       "functions": [
         {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DDIO",
+          "route": "main"
+        },
+        {
           "signal": "Main V",
           "route": "default"
         },
@@ -1948,6 +2126,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB12",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT13",
           "route": "default"
@@ -2050,6 +2232,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB13",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT14",
           "route": "default"
@@ -2159,6 +2345,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB14",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT15",
           "route": "default"
@@ -2270,6 +2460,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD10",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT16",
           "route": "default"
         },
@@ -2338,6 +2532,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD11",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT17",
           "route": "default"
@@ -2431,6 +2629,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD12",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT18",
           "route": "default"
@@ -2536,6 +2738,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD13",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT19",
           "route": "default"
         },
@@ -2612,6 +2818,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD14",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT20",
           "route": "default"
         },
@@ -2668,6 +2878,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD15",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT21",
           "route": "default"
@@ -2726,6 +2940,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PF0",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT22",
           "route": "default"
         },
@@ -2777,6 +2995,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PF1",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT23",
           "route": "default"
@@ -2830,6 +3052,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PF2",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT24",
           "route": "default"
         },
@@ -2875,14 +3101,32 @@
       "pad": "VDDK",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DDK",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 49,
       "pad": "VIO18",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "IO18",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 50,
@@ -2890,6 +3134,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PC6",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_D6",
           "route": "default"
@@ -2978,6 +3226,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PC7",
+          "route": "main"
+        },
+        {
           "signal": "SDMMC_D7",
           "route": "default"
         },
@@ -3061,6 +3313,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PC8",
+          "route": "main"
+        },
+        {
           "signal": "SDMMC_D0",
           "route": "default"
         },
@@ -3131,6 +3387,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PC9",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_D1",
           "route": "default"
@@ -3235,6 +3495,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA9",
+          "route": "main"
+        },
+        {
           "signal": "OTG_VBUS",
           "route": "default"
         },
@@ -3291,6 +3555,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA10",
+          "route": "main"
+        },
         {
           "signal": "OTG_ID",
           "route": "default"
@@ -3354,6 +3622,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PA11",
+          "route": "main"
+        },
+        {
           "signal": "OTG_DM",
           "route": "default"
         },
@@ -3400,6 +3672,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PA12",
+          "route": "main"
+        },
         {
           "signal": "OTG_DP",
           "route": "default"
@@ -3478,6 +3754,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PA13",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT29",
           "route": "default"
         },
@@ -3543,7 +3823,16 @@
       "pad": "VDD33",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DD33",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 60,
@@ -3551,6 +3840,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PA14",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_D4",
           "route": "default"
@@ -3639,6 +3932,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PA15",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_D5",
           "route": "default"
@@ -3753,6 +4050,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PC10",
+          "route": "main"
+        },
+        {
           "signal": "SDMMC_D2",
           "route": "default"
         },
@@ -3824,6 +4125,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PC11",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_D3",
           "route": "default"
@@ -3947,6 +4252,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PC12",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_SDCK",
           "route": "default"
@@ -4083,6 +4392,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD0",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT35",
           "route": "default"
         },
@@ -4178,6 +4491,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD1",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT36",
           "route": "default"
         },
@@ -4267,6 +4584,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD2",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_STS",
           "route": "default"
@@ -4375,6 +4696,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD3",
+          "route": "main"
+        },
         {
           "signal": "SDMMC_STR",
           "route": "default"
@@ -4500,6 +4825,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD4",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT39",
           "route": "default"
         },
@@ -4600,6 +4929,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD5",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT40",
           "route": "default"
         },
@@ -4699,6 +5032,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PD6",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT41",
           "route": "default"
@@ -4825,6 +5162,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PD7",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT42",
           "route": "default"
         },
@@ -4890,6 +5231,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PF3",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT43",
           "route": "default"
@@ -4975,6 +5320,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PF4",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT44",
           "route": "default"
         },
@@ -5054,6 +5403,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PF5",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT45",
           "route": "default"
         },
@@ -5127,6 +5480,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PE0",
+          "route": "main"
+        },
         {
           "signal": "UHSIF_PORT46",
           "route": "default"
@@ -5207,6 +5564,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PE1",
+          "route": "main"
+        },
+        {
           "signal": "UHSIF_PORT47",
           "route": "default"
         },
@@ -5281,6 +5642,10 @@
       "_pin_type": "I/O",
       "functions": [
         {
+          "signal": "PF14",
+          "route": "main"
+        },
+        {
           "signal": "SDRAM_CLK",
           "route": "af-1",
           "_alternate_function": 1
@@ -5323,7 +5688,16 @@
       "pad": "VIO18",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "IO18",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": 80,
@@ -5331,6 +5705,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB3",
+          "route": "main"
+        },
         {
           "signal": "TIM2_CH2",
           "route": "af-1",
@@ -5394,6 +5772,10 @@
       "kind": "gpio",
       "_pin_type": "I/O",
       "functions": [
+        {
+          "signal": "PB4",
+          "route": "main"
+        },
         {
           "signal": "TIM3_CH1",
           "route": "af-2",
@@ -5463,6 +5845,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PB8",
+          "route": "main"
+        },
+        {
           "signal": "SWCLK",
           "route": "default"
         },
@@ -5518,6 +5904,10 @@
       "kind": "gpio",
       "_pin_type": "I/O/A",
       "functions": [
+        {
+          "signal": "PB9",
+          "route": "main"
+        },
         {
           "signal": "SWIO",
           "route": "default"
@@ -5617,14 +6007,32 @@
       "pad": "VDD12A",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "DD12A",
+          "route": "main"
+        }
+      ]
     },
     {
       "number": "EP",
       "pad": "VSS",
       "kind": "power",
       "_pin_type": "P",
-      "functions": []
+      "functions": [
+        {
+          "signal": "V",
+          "route": "main"
+        },
+        {
+          "signal": "SS",
+          "route": "main"
+        }
+      ]
     }
   ],
   "signal_aliases": {

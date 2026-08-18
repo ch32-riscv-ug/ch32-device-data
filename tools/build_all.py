@@ -69,7 +69,8 @@ def pin_tables(datasheet: Path) -> list[tuple[str, list[list[str]], list[str], d
         caps = extract_pins.captions(pdf)
         seen: set[str] = set()
         for i, (label, title, _) in enumerate(caps):
-            if "pin definition" not in title.lower() or label in seen:
+            # Both editions: "... Pin definition" / "...引脚定义".
+            if not any(t in title.lower() for t in extract_pins.PIN_TABLE_TITLE)                     or label in seen:
                 continue
             seen.add(label)
             stop = extract_pins.next_caption(caps, i)
