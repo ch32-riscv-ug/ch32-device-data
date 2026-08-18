@@ -3,60 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CH32 Pin Functions</title>
-<!-- Filterable pin-function viewer over tables/*.csv in this repository.
-     Served by GitHub Pages; the data updates whenever the tables do.
-     URL parameters: ?chip=CH32V003 (series or full part number)
-                     &features=ADC,TIM (see FEATURES below) -->
+<title>CH32 Pin Alternate Functions</title>
+<!-- Two views over tables/*.csv in this repository, chosen by what ?chip= names:
+       series view  (?chip=CH32V006)     - product comparison table for choosing a
+                                           product, and the pad x function matrix
+                                           without per-package noise
+       product view (?chip=CH32V006K8U7) - that product's pin numbers, functions
+                                           and the remap selectors that switch them
+     Cells follow the original PinAlternateFunctions notation: NAME = default,
+     NAME_n = AFIO remap value n, NAME(AFn) = alternate-function number.
+     Other parameters: &features=ADC,TIM (ART accepted for UART)
+                       &routes=default,remap,af,unstated -->
 <style>
   :root { color-scheme: light dark; }
-  body { font-family: system-ui, sans-serif; margin: 1rem auto; max-width: 72rem;
-         padding: 0 1rem; }
-  h1 { font-size: 1.3rem; }
-  .controls { display: flex; flex-wrap: wrap; gap: .6rem 1.2rem; align-items: center;
-              margin: .8rem 0; }
-  .features label { margin-right: .55rem; white-space: nowrap; }
-  select, input[type=search] { font-size: 1rem; padding: .2rem .4rem; }
-  table { border-collapse: collapse; width: 100%; }
-  th, td { border: 1px solid #8886; padding: .25rem .5rem; text-align: left;
-           font-size: .92rem; }
+  body { font-family: system-ui, sans-serif; margin: 1rem; }
+  h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
+  h2 { font-size: 1.05rem; margin: 1.1rem 0 .4rem; }
+  .controls { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; align-items: baseline;
+              margin: .4rem 0 .6rem; }
+  .controls .set { display: flex; flex-wrap: wrap; gap: .1rem .55rem; align-items: baseline; }
+  .set b { font-weight: 600; font-size: .85rem; color: #777; margin-right: .1rem; }
+  .set label { white-space: nowrap; font-size: .92rem; }
+  select, input[type=search] { font-size: 1rem; padding: .15rem .35rem; }
+  .wrap { overflow-x: auto; margin-bottom: .6rem; }
+  table { border-collapse: collapse; }
+  th, td { border: 1px solid #8886; padding: .2rem .45rem; font-size: .87rem;
+           text-align: left; vertical-align: top; }
   th { position: sticky; top: 0; background: Canvas; }
-  tbody tr:nth-child(even) { background: #8881; }
-  .route-default { color: #2b7a2b; } .route-remap { color: #a05a00; }
-  .route-af { color: #205a9e; } .route-main { color: #777; }
-  .count, footer { color: #777; font-size: .85rem; margin: .5rem 0; }
-  footer a { color: inherit; }
+  th.part { font-weight: 500; font-size: .78rem; max-width: 6.5rem; }
+  th a { color: inherit; }
+  td.pin { text-align: center; color: #666; }
+  td.pad, th.pad, td.label { position: sticky; left: 0; background: Canvas;
+                             font-weight: 600; }
+  tbody tr:nth-child(even) td { background: #8881; }
+  tbody tr:nth-child(even) td.pad,
+  tbody tr:nth-child(even) td.label { background: color-mix(in srgb, Canvas 92%, gray); }
+  .remap { color: #a05a00; } .af { color: #205a9e; } .noroute { color: #888; }
+  .count, footer, .crumb { color: #777; font-size: .85rem; margin: .4rem 0; }
+  .crumb a, footer a { color: inherit; }
 </style>
 </head>
 <body>
-<h1>CH32 Pin Functions</h1>
+<h1 id="title">CH32 Pin Alternate Functions</h1>
+<div class="crumb" id="crumb"></div>
 <div class="controls">
   <label>Chip <select id="chip"></select></label>
-  <span class="features" id="features"></span>
   <input type="search" id="search" placeholder="pad / signal...">
+  <span class="set" id="features"><b>Functions:</b></span>
+  <span class="set" id="routes"><b>Routes:</b></span>
 </div>
-<div class="count" id="count"></div>
-<table id="table"><thead></thead><tbody></tbody></table>
+<div id="content"></div>
 <footer>
-Generated from <a href="https://github.com/ch32-riscv-ug/ch32-device-data">ch32-device-data</a>
-tables (each value carries its evidence and confidence there).
-Routes: <span class="route-main">main</span> = after reset,
-<span class="route-default">default</span> = default alternate,
-<span class="route-remap">remap-N</span> = AFIO remap value,
-<span class="route-af">af-N</span> = alternate-function number.
+Cell notation: <b>NAME</b> = default function, <b>NAME<span class="remap">_n</span></b> = AFIO remap value n,
+<b>NAME<span class="af">(AFn)</span></b> = alternate-function number n,
+<b><span class="noroute">NAME?</span></b> = route not stated by the datasheet.
+Data: <a href="https://github.com/ch32-riscv-ug/ch32-device-data">ch32-device-data</a> tables
+(each value carries its evidence and confidence there).
 </footer>
 <script>
 "use strict";
-// Feature name -> signal test. Edit here when a family names signals differently.
-const FEATURES = {
-  ADC:  s => /^(ADC|A\d|ETRGIN|TKEY)/i.test(s),
-  I2C:  s => /^(I2C|SDA|SCL|SMBA)/i.test(s),
-  SPI:  s => /^(SPI|MOSI|MISO|SCK|NSS|QSPI)/i.test(s),
-  SYS:  s => /^(SW|NRST|RST|MCO|OSC|XTAL|WKUP|BOOT|VREF)/i.test(s),
-  TIM:  s => /^(T\d|TIM|LPTIM|AETR|BKIN)/i.test(s),
-  UART: s => /^(US?ART|U\d?(TX|RX|CK|CTS|RTS)|TXD?\d*$|RXD?\d*$|LIN)/i.test(s),
-  USB:  s => /^(USB|UDM|UDP|DM$|DP$|VBUS|PD|CC\d)/i.test(s),
-};
+// Column groups, in display order. TIM instances get their own columns, the way
+// the original page split TIM1 from TIM2; everything else groups by family.
+const GROUPS = [
+  ["ADC/DAC", /^(ADC|A\d|AETR|ETRGIN|DAC|HSADC|TKEY)/i],
+  // TIM columns are inserted here dynamically.
+  ["USART",   /^(US?ART|U\d?(TX|RX|CK|CTS|RTS)|TXD?\d*$|RXD?\d*$|LIN)/i],
+  ["I2C",     /^(I2C|SDA|SCL|SMBA)/i],
+  ["SPI/I2S", /^(Q?SPI|I2S|MOSI|MISO|SCK|NSS)/i],
+  ["USB/PD",  /^(USB|UDM|UDP|DM$|DP$|VBUS|PD\d|UCC|CC\d)/i],
+  ["CAN",     /^CAN/i],
+  ["ETH",     /^(ETH|R?G?MII|MDIO|MDC)/i],
+  ["FSMC/SDIO", /^(FSMC|SDIO|SDMMC|NADV)/i],
+  ["DVP",     /^DVP/i],
+  ["OPA/CMP", /^(OPA|OPN|OPP|OPO|CMP|COMP)/i],
+  ["SWD",     /^SW(IO|DIO|CLK|CK)/i],
+  ["SYS",     /^(NRST|RST\d*$|MCO|OSC|XTAL|WKUP|BOOT|RTC|TAMPER|LSE|HSE|VREF)/i],
+  ["PIOC",    /^PIOC/i],
+];
+const TIM = /^(?:T|TIM|LPTIM)(\d+)/i;
+const FEATURE_ALIAS = { ART: "USART", UART: "USART", ADC: "ADC/DAC",
+                        SPI: "SPI/I2S", USB: "USB/PD", OPA: "OPA/CMP",
+                        FSMC: "FSMC/SDIO", SDIO: "FSMC/SDIO", DAC: "ADC/DAC" };
+const ROUTES = [["default", "default"], ["remap", "remap"], ["af", "AF"],
+                ["unstated", "unstated"]];
+
+function groupOf(signal) {
+  for (const [name, rx] of GROUPS) if (rx.test(signal)) return name;
+  const m = TIM.exec(signal);
+  if (m) return (/^LPTIM/i.test(signal) ? "LPTIM" : "TIM") + m[1];
+  return "Other";
+}
+const isTimGroup = g => /^(LP)?TIM\d/.test(g);
+const routeKind = route =>
+  route.startsWith("remap") ? "remap" : route.startsWith("af") ? "af"
+  : route === "" ? "unstated" : "default";
 
 function parseCSV(text) {
   const rows = []; let row = [], cell = "", quoted = false;
@@ -78,110 +118,267 @@ function parseCSV(text) {
   const head = rows.shift();
   return rows.map(r => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ""])));
 }
-
 const load = name => fetch("tables/" + name + ".csv")
   .then(r => { if (!r.ok) throw new Error(name + ": HTTP " + r.status); return r.text(); })
   .then(parseCSV);
 
-const state = { products: [], pins: [], fns: [] };
+const state = {};
 const $ = id => document.getElementById(id);
-
-function padKey(pad) {
+const padKey = pad => {
   const m = /^P([A-Z])(\d+)$/.exec(pad);
   return m ? "0" + m[1] + m[2].padStart(3, "0") : "1" + pad;
-}
-function routeKey(route) {
-  return route === "main" ? "0" : route === "default" ? "1" : "2" + route;
-}
-function routeClass(route) {
-  return "route-" + (route.startsWith("remap") ? "remap"
-                     : route.startsWith("af") ? "af"
-                     : route === "main" ? "main" : "default");
+};
+const breakable = (part, pkg) =>
+  part.slice(0, 8) + "&#8203;" + part.slice(8) + (pkg ? "&#8203;(" + pkg + ")" : "");
+const chipLink = chip => { const u = new URLSearchParams(location.search);
+                           u.set("chip", chip); return "?" + u.toString(); };
+const human = v => { const n = parseInt(v, 10);
+                     return Number.isFinite(n) && n >= 1024 && n % 1024 === 0
+                       ? (n / 1024) + "K" : (v || "-"); };
+
+function decorate(signal, route) {
+  if (route.startsWith("remap-"))
+    return `${signal}<span class="remap">_${route.slice(6)}</span>`;
+  if (route.startsWith("af-"))
+    return `${signal}<span class="af">(AF${route.slice(3)})</span>`;
+  if (route === "") return `<span class="noroute">${signal}?</span>`;
+  return signal;
 }
 
-function selectedParts() {
+function selection() {
   const chip = $("chip").value;
-  const parts = state.products.filter(p => p.part_number === chip);
-  return parts.length ? parts : state.products.filter(p => p.series === chip);
+  const exact = state.products.filter(p => p.part_number === chip);
+  if (exact.length) return { mode: "product", parts: exact, series: exact[0].series };
+  return { mode: "series", parts: state.products.filter(p => p.series === chip),
+           series: chip };
+}
+
+// ---- The pad x function-group matrix, shared by both views. -----------------
+function matrixHTML(partNames, withPins) {
+  const features = [...document.querySelectorAll("#features input:checked")]
+    .map(e => e.value);
+  const routeSel = [...document.querySelectorAll("#routes input:checked")]
+    .map(e => e.value);
+  const needle = $("search").value.trim().toUpperCase();
+
+  const matrix = {}; const present = new Set(); const seen = new Set();
+  for (const r of state.fns) {
+    if (!partNames.includes(r.part_number)) continue;
+    if (r.route === "main" && r.signal === r.pad) continue;
+    if (routeSel.length && !routeSel.includes(routeKind(r.route))) continue;
+    const key = r.pad + "|" + r.signal + "|" + r.route;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const g = groupOf(r.signal);
+    ((matrix[r.pad] ??= {})[g] ??= []).push([r.signal, r.route]);
+    present.add(g);
+  }
+  const timCols = [...present].filter(isTimGroup)
+    .sort((a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, ""))
+                    || a.localeCompare(b));
+  let columns = ["ADC/DAC", ...timCols,
+                 ...GROUPS.map(g => g[0]).filter(g => g !== "ADC/DAC"), "Other"]
+    .filter(g => present.has(g));
+  if (features.length) {
+    const wantTim = features.includes("TIM");
+    columns = columns.filter(g => features.includes(g) || (wantTim && isTimGroup(g)));
+  }
+
+  const pinsOf = {};
+  if (withPins) for (const r of state.pins) {
+    if (!partNames.includes(r.part_number)) continue;
+    pinsOf[r.pad] = pinsOf[r.pad] ? pinsOf[r.pad] + "/" + r.pin : r.pin;
+  }
+
+  const pads = [...new Set([...Object.keys(matrix), ...Object.keys(pinsOf)])]
+    .sort((a, b) => padKey(a).localeCompare(padKey(b)));
+  let shown = 0;
+  const rows = [];
+  for (const pad of pads) {
+    const cells = columns.map(g => ((matrix[pad] || {})[g] || [])
+      .sort((x, y) => (x[1] + x[0]).localeCompare(y[1] + y[0]))
+      .map(([s, r]) => decorate(s, r)));
+    if ((features.length || routeSel.length) && cells.every(c => c.length === 0))
+      continue;
+    const rowText = (pad + " " + cells.flat().join(" ")).toUpperCase();
+    if (needle && !rowText.includes(needle)) continue;
+    shown++;
+    rows.push(`<tr><td class="pad">${pad}</td>`
+      + (withPins ? `<td class="pin">${pinsOf[pad] || "-"}</td>` : "")
+      + cells.map(c => `<td>${c.join("<br>")}</td>`).join("") + "</tr>");
+  }
+  const head = `<tr><th class="pad">Pin</th>`
+    + (withPins ? "<th>#</th>" : "")
+    + columns.map(g => `<th>${g}</th>`).join("") + "</tr>";
+  return { html: `<div class="wrap"><table><thead>${head}</thead>`
+                 + `<tbody>${rows.join("")}</tbody></table></div>`,
+           note: `${shown} pins x ${columns.length} function groups` };
+}
+
+// ---- Series view: the in-repository selector. -------------------------------
+function comparisonHTML(parts) {
+  const names = parts.map(p => p.part_number);
+  const byPart = Object.fromEntries(names.map(n => [n, {}]));
+  const labels = {}; const order = [];
+  for (const r of state.attrs) {
+    if (!(r.part_number in byPart)) continue;
+    byPart[r.part_number][r.attribute] = r.value;
+    labels[r.attribute] ??= r.label_en || r.label_zh || r.attribute;
+    if (!order.includes(r.attribute)) order.push(r.attribute);
+  }
+  const head = "<tr><th class=\"pad\"></th>" + parts.map(p =>
+    `<th class="part"><a href="${chipLink(p.part_number)}">`
+    + breakable(p.part_number, p.package) + "</a></th>").join("") + "</tr>";
+  const fixed = [["Flash", p => human(p.flash_bytes)], ["SRAM", p => human(p.sram_bytes)],
+                 ["GPIO", p => p.gpio_count || "-"], ["Temp", p => p.temperature || "-"]];
+  const rows = [];
+  for (const [label, fn] of fixed) {
+    const values = parts.map(fn);
+    if (values.some(v => v !== "-"))
+      rows.push(`<tr><td class="label">${label}</td>`
+        + values.map(v => `<td>${v}</td>`).join("") + "</tr>");
+  }
+  for (const attr of order) {
+    rows.push(`<tr><td class="label">${labels[attr]}</td>`
+      + names.map(n => `<td>${byPart[n][attr] || "-"}</td>`).join("") + "</tr>");
+  }
+  return `<div class="wrap"><table><thead>${head}</thead>`
+       + `<tbody>${rows.join("")}</tbody></table></div>`;
+}
+
+// ---- Product view extras: the remap selectors of its series. ----------------
+function remapHTML(series) {
+  const rows = state.remap.filter(r => r.series === series);
+  if (!rows.length) return "";
+  const body = rows.map(r =>
+    `<tr><td class="label">${r.field}</td><td>${r.register}</td>`
+    + `<td>${r.bits}</td><td>${r.valid_values}</td><td>${r.reset_value}</td></tr>`)
+    .join("");
+  return "<h2>Remap selectors (AFIO)</h2><div class=\"wrap\"><table>"
+    + "<thead><tr><th>Field</th><th>Register</th><th>Bits</th>"
+    + "<th>Values</th><th>Reset</th></tr></thead>"
+    + `<tbody>${body}</tbody></table></div>`;
+}
+
+function rebuildFeatureBoxes(partNames) {
+  const present = new Set();
+  for (const r of state.fns) {
+    if (!partNames.includes(r.part_number)) continue;
+    if (r.route === "main" && r.signal === r.pad) continue;
+    present.add(groupOf(r.signal));
+  }
+  const hasTim = [...present].some(isTimGroup);
+  const names = ["ADC/DAC", ...(hasTim ? ["TIM"] : []),
+                 ...GROUPS.map(g => g[0]).filter(g => g !== "ADC/DAC"), "Other"]
+    .filter(g => g === "TIM" || present.has(g));
+  const checked = new Set([...document.querySelectorAll("#features input:checked")]
+                          .map(e => e.value));
+  const box = $("features");
+  for (const el of [...box.querySelectorAll("label")]) el.remove();
+  for (const name of names) {
+    const label = document.createElement("label");
+    const cb = Object.assign(document.createElement("input"),
+                             { type: "checkbox", value: name });
+    cb.checked = checked.has(name);
+    cb.addEventListener("change", render);
+    label.append(cb, " " + name);
+    box.appendChild(label);
+  }
 }
 
 function render() {
-  const parts = selectedParts();
-  const partNames = parts.map(p => p.part_number);
-  const active = [...document.querySelectorAll(".features input:checked")].map(e => e.value);
-  const needle = $("search").value.trim().toUpperCase();
-
-  const pinsOf = {};  // part -> pad -> pin numbers
-  for (const r of state.pins) {
-    if (!partNames.includes(r.part_number)) continue;
-    (pinsOf[r.part_number] ??= {})[r.pad] =
-      (pinsOf[r.part_number][r.pad] ? pinsOf[r.part_number][r.pad] + "/" : "") + r.pin;
+  const sel = selection();
+  const partNames = sel.parts.map(p => p.part_number);
+  let html = "";
+  if (sel.mode === "series") {
+    $("title").textContent = sel.series + " - series view";
+    $("crumb").innerHTML = "Pick a product column to open its pin map.";
+    if (sel.parts.length > 1)
+      html += "<h2>Product comparison</h2>" + comparisonHTML(sel.parts);
+    const m = matrixHTML(partNames, false);
+    html += `<h2>Pin functions <span class="count">(${m.note}; pads only -- `
+      + "pin numbers are per product)</span></h2>" + m.html;
+  } else {
+    const p = sel.parts[0];
+    $("title").textContent = p.part_number + " (" + p.package + ") - product view";
+    $("crumb").innerHTML =
+      `Series: <a href="${chipLink(p.series)}">${p.series}</a>`;
+    const m = matrixHTML(partNames, true);
+    html += `<h2>Pin map <span class="count">(${m.note})</span></h2>` + m.html;
+    html += remapHTML(p.series);
   }
-  const seen = new Set(); const rows = [];
-  for (const r of state.fns) {
-    if (!partNames.includes(r.part_number)) continue;
-    const key = r.pad + " " + r.signal + " " + r.route;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    if (active.length && !active.some(f => FEATURES[f](r.signal))) continue;
-    if (needle && !r.pad.toUpperCase().includes(needle)
-               && !r.signal.toUpperCase().includes(needle)) continue;
-    rows.push(r);
-  }
-  rows.sort((a, b) => (padKey(a.pad) + routeKey(a.route) + a.signal)
-             .localeCompare(padKey(b.pad) + routeKey(b.route) + b.signal));
-
-  const shorten = p => p.startsWith("CH32") ? p.slice(8) : p;
-  const head = ["Pad", ...partNames.map(shorten), "Signal", "Route"];
-  $("table").tHead.innerHTML =
-    "<tr>" + head.map(h => `<th>${h}</th>`).join("") + "</tr>";
-  $("table").tBodies[0].innerHTML = rows.map(r =>
-    "<tr><td>" + r.pad + "</td>" +
-    partNames.map(p => `<td>${(pinsOf[p] || {})[r.pad] || "-"}</td>`).join("") +
-    `<td>${r.signal}</td><td class="${routeClass(r.route)}">${r.route || "?"}</td></tr>`
-  ).join("");
-  $("count").textContent =
-    `${rows.length} functions / ${partNames.length} product(s): ${partNames.join(", ")}`;
+  $("content").innerHTML = html;
 
   const params = new URLSearchParams();
   params.set("chip", $("chip").value);
-  if (active.length) params.set("features", active.join(","));
+  const features = [...document.querySelectorAll("#features input:checked")]
+    .map(e => e.value);
+  const routes = [...document.querySelectorAll("#routes input:checked")]
+    .map(e => e.value);
+  if (features.length) params.set("features", features.join(","));
+  if (routes.length) params.set("routes", routes.join(","));
   history.replaceState(null, "", "?" + params.toString());
 }
 
-Promise.all([load("products"), load("pins"), load("pin_functions")]).then(([products, pins, fns]) => {
-  state.products = products; state.pins = pins; state.fns = fns;
+Promise.all([load("products"), load("pins"), load("pin_functions"),
+             load("product_attributes"), load("remap_fields")])
+.then(([products, pins, fns, attrs, remap]) => {
+  Object.assign(state, { products, pins, fns, attrs, remap });
   const series = [...new Set(products.map(p => p.series))].sort();
   const chipSel = $("chip");
   const gs = document.createElement("optgroup"); gs.label = "Series";
   for (const s of series) gs.appendChild(new Option(s, s));
   chipSel.appendChild(gs);
   const gp = document.createElement("optgroup"); gp.label = "Products";
-  for (const p of products.map(p => p.part_number).sort()) gp.appendChild(new Option(p, p));
+  for (const p of products.map(p => p.part_number).sort())
+    gp.appendChild(new Option(p, p));
   chipSel.appendChild(gp);
 
-  const box = $("features");
-  for (const name of Object.keys(FEATURES)) {
+  const routeBox = $("routes");
+  for (const [value, text] of ROUTES) {
     const label = document.createElement("label");
     const cb = Object.assign(document.createElement("input"),
-                             { type: "checkbox", value: name });
+                             { type: "checkbox", value });
     cb.addEventListener("change", render);
-    label.append(cb, " " + name);
-    box.appendChild(label);
+    label.append(cb, " " + text);
+    routeBox.appendChild(label);
   }
 
   const params = new URLSearchParams(location.search);
   const chip = params.get("chip");
   chipSel.value = chip && [...chipSel.options].some(o => o.value === chip)
     ? chip : series[0];
-  for (const f of (params.get("features") || "").split(",")) {
-    const cb = document.querySelector(`.features input[value="${f.trim().toUpperCase()}"]`);
+  rebuildFeatureBoxes(selection().parts.map(p => p.part_number));
+  for (let f of (params.get("features") || "").split(",")) {
+    f = f.trim().toUpperCase();
+    f = FEATURE_ALIAS[f] || f;
+    const cb = [...document.querySelectorAll("#features input")]
+      .find(e => e.value.toUpperCase() === f);
     if (cb) cb.checked = true;
   }
-  chipSel.addEventListener("change", render);
+  for (const r of (params.get("routes") || "").split(",")) {
+    const cb = document.querySelector(`#routes input[value="${r.trim()}"]`);
+    if (cb) cb.checked = true;
+  }
+  chipSel.addEventListener("change", () => {
+    rebuildFeatureBoxes(selection().parts.map(p => p.part_number));
+    render();
+  });
   $("search").addEventListener("input", render);
+  // Column-header product links keep the page state; re-render on back/forward.
+  window.addEventListener("popstate", () => location.reload());
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a[href^='?']");
+    if (!a) return;
+    e.preventDefault();
+    history.pushState(null, "", a.getAttribute("href"));
+    const c = new URLSearchParams(location.search).get("chip");
+    if (c) { chipSel.value = c;
+             rebuildFeatureBoxes(selection().parts.map(p => p.part_number)); }
+    render();
+  });
   render();
-}).catch(err => { $("count").textContent = "Failed to load data: " + err.message; });
+}).catch(err => { $("content").textContent = "Failed to load data: " + err.message; });
 </script>
 </body>
 </html>
