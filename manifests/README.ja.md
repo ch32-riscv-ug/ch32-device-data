@@ -38,7 +38,7 @@ WCHのBLE系（CH572/573/583/585/587/592/595/596）はRISC-Vですが現時点�
 | `sources.<lang>.version` | サイトが表示する版数 |
 | `sources.<lang>.scope` | その文書が覆う製品・SKU（WCH記載のまま） |
 
-`repositories`が`ch32-device-data`の文書は、family横断のためこのリポジトリで出典管理します。PDFの複製はしません。
+family横断の文書（QingKe core manual・WCH-Link manual・PACKAGE寸法図面）は専用mirror **`WCH-common`** が保持します。WCHの原典は中国サイトの可用性が不安定なため、出典（言語別`file_id`と版）はこのカタログが記録し、実体の可用性はGitHub mirrorが担保します。`ch32-device-data`自体はPDFを持ちません。
 
 ## 更新
 
