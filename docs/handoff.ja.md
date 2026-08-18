@@ -32,6 +32,8 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する
 - `templates/`: 全mirror共通の`update.sh`とworkflow。file IDの直書きを持たない
 - `tools/sync_catalog.py` / `tools/check_mirrors.py`: カタログ同期とmirror追随確認。日次workflowが実行する
+- `tools/crosscheck_languages.py`: 中国語版と英語版を別々に抽出して突き合わせる
+- `tools/build_tables.py` / `tables/`: 正規化CSV（products/silicon）。値ごとに根拠一覧（basis）と確度を持つ。確定の基準は`tables/README.ja.md`参照
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 
 全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin function（要確認252件）を取得できています。対象SKUをどこまで広げるかは未合意です。
