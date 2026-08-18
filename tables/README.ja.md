@@ -9,10 +9,24 @@ families.csv        11行   ファミリー一覧（mirror repository = 文書�
           └ pins.csv          注文型番ごとのlead↔pad対応（キー: part_number）
           └ pin_functions.csv 注文型番ごとのpad→signal/route（キー: part_number）
 
-packages.csv   25行  packageマスタ。寸法・pitch・lead数（productsから名前で参照）
+マスタ表（各表から名前で参照される）
+  packages.csv    25行  package。寸法・pitch・lead数
+  cores.csv       13行  QingKe core。ISAとcore manualへの参照
+  documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
 ```
 
-すべて `part_number` / `package` / `series` / `family` で結合できるリレーション構成です。pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
+結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
+
+```
+series.family / products.family / packages.families   → families.family
+products.series                                        → series.series
+products.package                                       → packages.package
+series.core / families.cores                           → cores.core
+pins.part_number / pin_functions.part_number           → products.part_number
+*.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
+```
+
+pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
 
 pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
 
@@ -41,6 +55,14 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 `route`の値: `main`（リセット後の主機能）/ `default`（既定の代替機能）/ `remap-N`（remap値N）/ `af-N`（H41x・X315系のalternate function番号）/ 空（経路番号が資料になく要確認）。
 
 両言語照合で吸収している表記ずれ: 表番号のずれ（X315はzh`表2-1-1`=en`Table 2-1`。表題中のシリーズ名で照合）、列見出しの綴り（`QFN48×7`、`QFN28(6)`、zh`LQFP64M`=en画像`LQFP64`は表内の消去法でペアリング）、1列が複数packageを兼ねる見出し（`LQFP48/QFN48X7`は成分ごとに登録）。
+
+### `cores.csv`
+
+1行1 QingKe core。coreのISA仕様（core manual一覧表、両言語確認済み）と、どのmanualに書いてあるかを持ちます。series.csvのISAはchip側datasheetの記述で、coreの任意実装部分（V3Bの[M][B]等）をchipがどう選んだかを表すため、cores.csvのISAとは別の事実です。
+
+### `documents.csv`
+
+1行1文書。`CH32L103DS0.PDF`という名前だけでは場所が分からないため、**中国語/英語それぞれのオリジナルページ（.html）・ダウンロードURL・mirror（GitHub raw）URL**と版数を持ちます。除外文書も`status`付きで載る完全なカタログです。EVT（ZIP）はarchive自体をmirrorに置かないため、mirror URLは展開済みツリーを指します。
 
 ## 確定の基準は「根拠の総合判断」
 
@@ -96,6 +118,7 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 | products.csv | 103 | 642 | 79 | 1 |
 | packages.csv | 25 | 73 | 2 | 0 |
 | series.csv | 27 | 100 | 4 | 0 |
+| cores.csv | 13 | 13 | 0 | 0 |
 | pins.csv | 4312 | 4022 (93%) | 290 | 0 |
 | pin_functions.csv | 29559 | 24702 (84%) | 4857 | 0 |
 
@@ -108,7 +131,8 @@ part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を�
 ## 生成
 
 ```sh
-uv run tools/build_tables.py --out tables                     # families/series/products/packages
+uv run tools/build_tables.py --out tables                     # families/series/products/packages/cores/documents
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
+uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ
 ```

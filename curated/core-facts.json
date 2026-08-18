@@ -1,0 +1,21 @@
+{
+  "verified": "2026-08-18",
+  "method": "WCH-common mirrorのQingKe processor manual（V2/V3/V4/V5）冒頭のcore一覧表と本文を、使い捨てスクリプトで提示させ両言語を目視で突き合わせて確認。",
+  "cores": {
+    "QingKe V2A": {"isa": "RV32EC", "manual": "QingKeV2_Processor_Manual.PDF"},
+    "QingKe V2C": {"isa": "RV32EmC", "manual": "QingKeV2_Processor_Manual.PDF"},
+    "QingKe V3A": {"isa": "RV32IMAC", "manual": "QingKeV3_Processor_Manual.PDF"},
+    "QingKe V3B": {"isa": "RV32I[M]C[B]", "manual": "QingKeV3_Processor_Manual.PDF", "note": "MとBは実装任意。搭載chip側のdatasheetが実際の組合せを述べる"},
+    "QingKe V3C": {"isa": "RV32IMCB", "manual": "QingKeV3_Processor_Manual.PDF"},
+    "QingKe V3F": {"isa": "RV32IMAFCB", "manual": "QingKeV3_Processor_Manual.PDF"},
+    "QingKe V3V": {"isa": "RV32IMACB+Zve64x_zvbb", "manual": "QingKeV3_Processor_Manual.PDF"},
+    "QingKe V4A": {"isa": "RV32IMAC", "manual": "QingKeV4_Processor_Manual.PDF"},
+    "QingKe V4B": {"isa": "RV32IMAC", "manual": "QingKeV4_Processor_Manual.PDF"},
+    "QingKe V4C": {"isa": "RV32IMAC", "manual": "QingKeV4_Processor_Manual.PDF"},
+    "QingKe V4F": {"isa": "RV32IMACF", "manual": "QingKeV4_Processor_Manual.PDF"},
+    "QingKe V4J": {"isa": "RV32IMAC", "manual": "QingKeV4_Processor_Manual.PDF", "note": "I-Cache搭載"},
+    "QingKe V5F": {"isa": "RV32IMABCF", "manual": "QingKeV5_Processor_Manual.PDF"}
+  },
+  "isa_confidence": "confirmed",
+  "isa_basis": "manual:qingke-manual一覧表:zh+en（2026-08-18確認）。V2/V3/V4/V5とも自定义XW拡張を別途持つ"
+}

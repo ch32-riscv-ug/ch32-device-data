@@ -195,7 +195,7 @@
       "isa_basis": "manual:ds-architecture:zh＋manual:qingke-v3-manual:zh+en（V3系一覧表）。V3F=RV32IMAFCB"
     },
     "CH32H415": {
-      "core": "QingKe V5F + V3F",
+      "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "reference",
       "core_basis": "manual:ds(H417DS0)-intro:zh+en はCH32H417のみ双核と明記。H415は同一DS・同一ITCM構成だが個別記述は未確認",
       "isa": "RV32IMABCF + RV32IMAFCB",
@@ -203,7 +203,7 @@
       "isa_basis": "H417と同じ双核構成の推定に依存（coreがreferenceのため）"
     },
     "CH32H416": {
-      "core": "QingKe V5F + V3F",
+      "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "reference",
       "core_basis": "manual:ds(H417DS0)-intro:zh+en はCH32H417のみ双核と明記。H416は同一DS・同一ITCM構成だが個別記述は未確認",
       "isa": "RV32IMABCF + RV32IMAFCB",
@@ -211,7 +211,7 @@
       "isa_basis": "H417と同じ双核構成の推定に依存（coreがreferenceのため）"
     },
     "CH32H417": {
-      "core": "QingKe V5F + V3F",
+      "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "confirmed",
       "core_basis": "manual:ds(H417DS0)-intro+features:zh+en（双内核结构：青稞RISC-V5F和RISC-V3F）",
       "isa": "RV32IMABCF + RV32IMAFCB",
