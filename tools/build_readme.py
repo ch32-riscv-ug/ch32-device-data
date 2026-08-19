@@ -93,6 +93,7 @@ class Data:
         for r in self.functions:
             self.fns_by_part[r["part_number"]].append(r)
         self.attributes = load("product_attributes")
+        self.operating = load("operating_conditions")
         try:
             self.errata = load("errata")
         except FileNotFoundError:
@@ -106,17 +107,46 @@ class Data:
                       key=lambda p: p["part_number"])
 
 
+def operating_summary(data: Data, series: str) -> tuple[str, str]:
+    """(最大クロック, VDD範囲) -- tables/operating_conditions.csv のシリーズ行から。
+
+    クロックは F_HCLK を優先し、無ければコア周波数(F_CORE*)や F_SYS 系を使う。
+    条件違いで複数値があるときは "200/240" のように併記する。VDD は条件行を
+    まとめた包絡（最小のmin〜最大のmax）を出す。
+    """
+    rows = [r for r in data.operating
+            if series in r["series"].split(";")]
+    clock = "-"
+    for prefix in ("F_HCLK", "F_SYSCLK", "F_CORE"):
+        hits = [r for r in rows if r["symbol"].startswith(prefix)
+                and r["max"] and r["max"][0].isdigit()]
+        if hits:
+            values = list(dict.fromkeys(r["max"] for r in hits))
+            clock = "/".join(values) + " " + hits[0]["unit"]
+            break
+    vdd = "-"
+    vdd_rows = [r for r in rows if r["symbol"] == "V_DD" and r["min"] and r["max"]]
+    if vdd_rows:
+        lo = min(vdd_rows, key=lambda r: float(r["min"]))["min"]
+        hi = max(vdd_rows, key=lambda r: float(r["max"]))["max"]
+        vdd = f"{lo}-{hi}V"
+    return clock, vdd
+
+
 def series_section(data: Data, family: str) -> list[str]:
     if not data.family_series(family):
         return []
     out = ["## Series", "",
-           "| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |",
-           "|---|---|---|---|---|---|---|---|"]
+           "| Series | Core | ISA | Flash | SRAM | Max clock | VDD "
+           "| Packages | Products | Official |",
+           "|---|---|---|---|---|---|---|---|---|---|"]
     for s in data.family_series(family):
         official = (f"[en]({s['product_url_en']}) / [zh]({s['product_url_zh']})")
+        clock, vdd = operating_summary(data, s["series"])
         out.append(
             f"| **{s['series']}** | {s['core'] or '-'} | {s['isa'] or '-'} "
             f"| {human_bytes(s['flash_bytes'])} | {human_bytes(s['sram_bytes'])} "
+            f"| {clock} | {vdd} "
             f"| {s['packages'] or '-'} | {s['part_number_count']} | {official} |")
     out.append("")
     return out

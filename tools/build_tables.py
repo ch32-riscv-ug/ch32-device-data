@@ -814,8 +814,10 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
 def errata_rows() -> list[dict]:
     """curated/errata.csv, carried into tables/ with its judgement attached.
 
-    The items were transcribed from the hand-written mirror READMEs; until the
-    original WCH statement is located and recorded, they stay reference.
+    source_zh / source_en record where the statement appears in each
+    datasheet edition (PDF page numbers, verified via tools/scan_errata.py).
+    Both editions agreeing makes the row confirmed; a single edition stays
+    reference.  The match column only serves scan_errata.py and is dropped.
     """
     path = REPO / "curated" / "errata.csv"
     if not path.exists():
@@ -823,8 +825,16 @@ def errata_rows() -> list[dict]:
     with path.open(encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     for row in rows:
-        row["description_confidence"] = "reference"
-        row["description_basis"] = f"manual:{row.pop('source', '')}"
+        row.pop("match", "")
+        parts = []
+        for lang in ("zh", "en"):
+            source = row.pop(f"source_{lang}", "").strip()
+            if source:
+                doc, _, pages = source.partition(" ")
+                parts.append(f"{doc}:{lang}({pages})")
+        row["description_confidence"] = (
+            "confirmed" if len(parts) == 2 else "reference")
+        row["description_basis"] = "+".join(parts) or "manual:unsourced"
     return sorted(rows, key=lambda r: r["id"])
 
 

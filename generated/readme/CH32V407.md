@@ -4,10 +4,10 @@
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |
-|---|---|---|---|---|---|---|---|
-| **CH32V407** | QingKe V3V | RV32IMABCV-X | 512K | 200K | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V407.html) / [zh](https://www.wch.cn/products/CH32V407.html) |
-| **CH32V467** | QingKe V3V | RV32IMABCV-X | 512K | 200K | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V467.html) / [zh](https://www.wch.cn/products/CH32V467.html) |
+| Series | Core | ISA | Flash | SRAM | Max clock | VDD | Packages | Products | Official |
+|---|---|---|---|---|---|---|---|---|---|
+| **CH32V407** | QingKe V3V | RV32IMABCV-X | 512K | 200K | 200/240 MHz | 2.9-3.6V | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V407.html) / [zh](https://www.wch.cn/products/CH32V407.html) |
+| **CH32V467** | QingKe V3V | RV32IMABCV-X | 512K | 200K | 200/240 MHz | 2.9-3.6V | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V467.html) / [zh](https://www.wch.cn/products/CH32V467.html) |
 
 ## Debug / serial defaults
 
@@ -436,6 +436,13 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | VDD | DD, Main V | - | - | - | - |
 
 </details>
+
+## Errata
+
+- The non-zero-wait flash area additionally supports RVV instructions and 64-bit DMA access. *(applies: CH32V407, CH32V467; 5th-to-last digit of lot number > 0)*
+- Current consumption is higher than the CH32V407 values in the datasheet tables: about +2~22mA in operating mode and +90uA in stop mode. *(applies: CH32V467; all lots)*
+- PSRAM supports clocks above 200MHz, variable and instruction access, and byte write; in stop mode (voltage regulator in low-power mode) PSRAM data is retained. *(applies: CH32V467; 5th-to-last digit of lot number != 0)*
+- In stop mode with the voltage regulator in low-power mode, bit LDO18_EN in register PWR_CTLR must be configured to 0. *(applies: CH32V467; 5th-to-last digit of lot number = 0)*
 
 ---
 Data: [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data) (tables/ -- each value carries its evidence and confidence there).

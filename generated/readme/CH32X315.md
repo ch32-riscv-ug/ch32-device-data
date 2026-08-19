@@ -4,10 +4,10 @@
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |
-|---|---|---|---|---|---|---|---|
-| **CH32X305** | QingKe V3F | RV32IMAFBC-X | 480K | 64K | LQFP64 | 1 | [en](https://www.wch-ic.com/products/CH32X305.html) / [zh](https://www.wch.cn/products/CH32X305.html) |
-| **CH32X315** | QingKe V3F | RV32IMAFBC-X | 480K | 64K | QFN48,QFN68X7,QFN76 | 3 | [en](https://www.wch-ic.com/products/CH32X315.html) / [zh](https://www.wch.cn/products/CH32X315.html) |
+| Series | Core | ISA | Flash | SRAM | Max clock | VDD | Packages | Products | Official |
+|---|---|---|---|---|---|---|---|---|---|
+| **CH32X305** | QingKe V3F | RV32IMAFBC-X | 480K | 64K | 312.5/400 MHz | 2.8-3.6V | LQFP64 | 1 | [en](https://www.wch-ic.com/products/CH32X305.html) / [zh](https://www.wch.cn/products/CH32X305.html) |
+| **CH32X315** | QingKe V3F | RV32IMAFBC-X | 480K | 64K | 312.5/400 MHz | 2.8-3.6V | QFN48,QFN68X7,QFN76 | 3 | [en](https://www.wch-ic.com/products/CH32X315.html) / [zh](https://www.wch.cn/products/CH32X315.html) |
 
 ## Debug / serial defaults
 
@@ -324,6 +324,10 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | XO | PD1, PD1（2） | - | USART1_TX | - | I2C2_SDA | SPI1_SCK | - | - | - |
 
 </details>
+
+## Errata
+
+- The blue-marked sections of the clock tree diagram in the datasheet are not applicable (they only apply to chips whose 5th lot-number digit is greater than 0). *(applies: CH32X305, CH32X315; 5th digit of lot number = 0)*
 
 ---
 Data: [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data) (tables/ -- each value carries its evidence and confidence there).
