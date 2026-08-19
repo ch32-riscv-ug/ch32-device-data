@@ -3,7 +3,7 @@
 `tools/build_tables.py` が生成します。用語（ファミリー/シリーズ/確度…）の定義は [docs/glossary.ja.md](../docs/glossary.ja.md) にあります。**上から下に降りる階層**で、すべての値が「何を根拠にしているか」（`*_basis`列）を持ちます。
 
 ```
-families.csv        11行   ファミリー一覧（mirror repository = 文書の単位）
+families.csv        12行   ファミリー一覧（mirror repository = 文書の単位）
   └ series.csv        27行   シリーズ（die）。core・ISA・共通スペック
       └ products.csv    103行   注文型番
           └ pins.csv          注文型番ごとのlead↔pad対応（キー: part_number）
@@ -18,6 +18,8 @@ families.csv        11行   ファミリー一覧（mirror repository = 文書�
   product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
   remap_fields.csv        154行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       2228行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
+  operating_conditions.csv 62行  一般動作条件（クロック上限F_*とV_DD範囲）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -31,12 +33,11 @@ pins.part_number / pin_functions.part_number           → products.part_number
 product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
+errata.series / operating_conditions.series             → series.series
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
-
-pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、operating_conditions.csvは`tools/build_operating.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -71,6 +72,16 @@ pins系は`tools/build_pins.py`、それ以外は`tools/build_tables.py`が生�
 ### `remap_fields.csv` / `remap_routes.csv`
 
 AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）ですが、**根拠ごとの一致記録がファイルに残っていないため全行reference**です。EVTとRMの突き合わせを記録付きで再実行して確定へ昇格するのが次の課題です。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
+
+### `errata.csv`
+
+1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
+
+エラッタは今後のdatasheet改版で増えうるため、`tools/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
+
+### `operating_conditions.csv`
+
+datasheetの「一般動作条件（General operating conditions）」表からクロック上限（`F_HCLK`等のF_系）と動作電圧（`V_DD`、条件別の行あり）を抽出したものです。表示テキストは英語版、最小/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。電気特性章の残り（絶対最大定格・消費電流等）は未収集です（docs/extraction-survey.ja.md参照）。
 
 ### `cores.csv`
 
@@ -115,7 +126,7 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 ## 既知の要確認事項
 
-- **CH32V004F6U1のpackage（conflict）**: zh `QFN20L` / en `QFN20`。原典がzhなので`QFN20L`が正、翻訳で`L`欠落とみられる
+- **CH32V004F6U1のpackage**: zh `QFN20L` / en `QFN20`のconflictだったが、en版datasheetの改版で`QFN20L`に修正され、再生成で両言語4根拠一致のconfirmedへ自己解消（2026-08-19確認）
 - **CH32V203CCT6**: V205DS0掲載の256K品。series=V203に数えているが設計はV205（青稞V3B）系の可能性。内核の個別記述未確認
 - **CH32H415/H416のcore**: H417の記述（V5F+V3F双核）からの推定でreference
 
@@ -127,25 +138,27 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
 - **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
-## 現況（2026-08-18生成）
+## 現況（2026-08-19生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
-| products.csv | 103 | 642 | 79 | 1 |
+| products.csv | 103 | 643 | 79 | 0 |
 | packages.csv | 25 | 73 | 2 | 0 |
 | series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
-| product_attributes.csv | 995 | 925 | 68 | 1 |
+| product_attributes.csv | 995 | 926 | 68 | 1 |
 | remap_fields.csv | 154 | 0 | 154 | 0 |
 | remap_routes.csv | 2228 | 0 | 2228 | 0 |
-| pins.csv | 4312 | 4022 (93%) | 290 | 0 |
-| pin_functions.csv | 29559 | 24702 (84%) | 4857 | 0 |
+| errata.csv | 21 | 21 | 0 | 0 |
+| operating_conditions.csv | 62 | 61 | 1 | 0 |
+| pins.csv | 4312 | 4022 | 290 | 0 |
+| pin_functions.csv | 29493 | 24718 | 4775 | 0 |
 
 pins系は全103型番がpin行を持ちます（型番→pin表列の解決失敗ゼロ）。
 
 series.csvはcore・ISAとも全27シリーズで値が入っています（ISAはdatasheetとQingKe core manual両方で確認。H415/H416のみcore推定に依存するためreference）。temperatureは型番末尾の温度グレード規則で補っており、規則単独の値はreferenceです。
 
-part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を除く）。productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
+part_number・series・packageは全型番で確定（conflict 0件）。残るconflictはproduct_attributesの1件（CH32H417WEU6のOPA数: zh=1/en=2）です。productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
 
 ## 生成
 
@@ -153,6 +166,8 @@ part_number・series・packageは全型番で確定（conflict 1件=V004F6U1を�
 uv run tools/build_tables.py --out tables                     # families/series/products/packages/cores/documents
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
+uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
+uv run tools/scan_errata.py                                   # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ
 ```

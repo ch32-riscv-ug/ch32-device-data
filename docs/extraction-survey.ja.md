@@ -586,3 +586,25 @@ uv run tools/build_candidate.py \
 6. family repositoryのREADME手製表を禁止対象として明記するか
 7. RMのdefault経路（value=0）をrecordへ明示するか
 8. CH32V303/V305/V208の省略された接尾辞を、ordering information側と突き合わせて完全な注文型番にする
+
+## 電気的特性章の調査（2026-08-19追記）
+
+全16 datasheetの章構成を掃引した結果、全DS0が共通で「Electrical Characteristics」章（Test Conditions / Absolute Maximum Ratings / Electrical Characteristics）を持ち、ここが未収集情報の最大の塊でした。
+
+### 収集済みにしたもの
+
+- **一般動作条件（General operating conditions / 通用工作条件）表** → `tables/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
+- **ロット依存注記（エラッタ）** → `tables/errata.csv` 21行（`tools/scan_errata.py`で走査、`curated/errata.csv`で管理）
+
+抽出上の注意（build_operating.pyが吸収済み）: zh版の表題は「通用工作条件」（「一般」ではない）、絶対最大定格表が同一ページにあり`条件`列の有無で区別する、記号セルの折返しで`F_HCLK or F_SYS`が壊れる、脚注は全角括弧`（2）`、rowspanの単位セルはzh版で空になる。
+
+### 未収集（今後の候補）
+
+- **絶対最大定格**: 入力電圧上限・ESD耐圧・注入電流など。表構造は動作条件表と同型で抽出可能
+- **消費電流表**: Run/Sleep/Standby別・周波数別のtyp値。列構造がネストしており（HSI/HSE×周波数×周辺ON/OFF）抽出コストは高め
+- **flash耐久**: 擦写次数（例: V007は25℃で300K回）・データ保持期限（同20年）。小さい表で抽出しやすく、選定情報として価値が高い
+- **発振器特性・ウェイクアップ時間**: LSI/HSI精度、モード復帰時間
+
+### エラッタの増分監視
+
+エラッタはdatasheet改版で増えるため、`uv run tools/scan_errata.py`を単体実行すると全datasheetを走査して既知（`curated/errata.csv`の`match`列）と照合し、未知の記述をNEWとして報告します（終了コード1）。mirror PDFが必要なためCIではなく手動運用です。datasheet更新を取り込んだら一度回してNEW: 0を確認します。

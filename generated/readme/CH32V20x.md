@@ -4,10 +4,10 @@
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |
-|---|---|---|---|---|---|---|---|
-| **CH32V203** | QingKe V4B | RV32IMAC | - | - | LQFP32,LQFP48,LQFP64M,QFN20,QFN28,QFN32,QFN48X7,QSOP28,TSSOP20 | 13 | [en](https://www.wch-ic.com/products/CH32V203.html) / [zh](https://www.wch.cn/products/CH32V203.html) |
-| **CH32V208** | QingKe V4C | RV32IMAC | 128K | 64K | LQFP64M,QFN28,QFN48,QFN68 | 4 | [en](https://www.wch-ic.com/products/CH32V208.html) / [zh](https://www.wch.cn/products/CH32V208.html) |
+| Series | Core | ISA | Flash | SRAM | Max clock | VDD | Packages | Products | Official |
+|---|---|---|---|---|---|---|---|---|---|
+| **CH32V203** | QingKe V4B | RV32IMAC | - | - | 144 MHz | 1.8-3.6V | LQFP32,LQFP48,LQFP64M,QFN20,QFN28,QFN32,QFN48X7,QSOP28,TSSOP20 | 13 | [en](https://www.wch-ic.com/products/CH32V203.html) / [zh](https://www.wch.cn/products/CH32V203.html) |
+| **CH32V208** | QingKe V4C | RV32IMAC | 128K | 64K | 144 MHz | 2.4-3.6V | LQFP64M,QFN28,QFN48,QFN68 | 4 | [en](https://www.wch-ic.com/products/CH32V208.html) / [zh](https://www.wch.cn/products/CH32V208.html) |
 
 ## Debug / serial defaults
 
@@ -352,6 +352,11 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32V208 | USART3_REMAP | PCFR1 | 4;5 | 0;1;2;3 | 0 |
 
 </details>
+
+## Errata
+
+- The blue-dashed sections of the clock tree (Figure 2-4) are not applicable to these CH32V203RB lots (they only apply when the 5th-to-last lot digit is greater than 0). *(applies: CH32V203; 5th-to-last digit of lot number = 0 (CH32V203RB))*
+- CH32V203RB uses a 32MHz external crystal or clock (HSE); no load capacitors are needed with an external crystal as they are built in. *(applies: CH32V203; CH32V203RB (all lots))*
 
 ## Notes
 - CH32V205 has moved to its own repository: https://github.com/ch32-riscv-ug/CH32V205 (own datasheet, reference manual and EVT).

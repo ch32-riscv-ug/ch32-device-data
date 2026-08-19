@@ -4,9 +4,9 @@
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |
-|---|---|---|---|---|---|---|---|
-| **CH32M030** | QingKe V3B | RV32IMCB | 64K | 12K | LQFP48,QFN32,QFN48,QFN48X7_A,QSOP28 | 5 | [en](https://www.wch-ic.com/products/CH32M030.html) / [zh](https://www.wch.cn/products/CH32M030.html) |
+| Series | Core | ISA | Flash | SRAM | Max clock | VDD | Packages | Products | Official |
+|---|---|---|---|---|---|---|---|---|---|
+| **CH32M030** | QingKe V3B | RV32IMCB | 64K | 12K | 72/68 MHz | - | LQFP48,QFN32,QFN48,QFN48X7_A,QSOP28 | 5 | [en](https://www.wch-ic.com/products/CH32M030.html) / [zh](https://www.wch.cn/products/CH32M030.html) |
 
 ## Debug / serial defaults
 

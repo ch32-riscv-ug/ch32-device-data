@@ -4,9 +4,9 @@
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Packages | Products | Official |
-|---|---|---|---|---|---|---|---|
-| **CH32V205** | QingKe V3B | RV32ICBM-X | 256K | 32K | LQFP100,LQFP48,LQFP64 | 3 | [en](https://www.wch-ic.com/products/CH32V205.html) / [zh](https://www.wch.cn/products/CH32V205.html) |
+| Series | Core | ISA | Flash | SRAM | Max clock | VDD | Packages | Products | Official |
+|---|---|---|---|---|---|---|---|---|---|
+| **CH32V205** | QingKe V3B | RV32ICBM-X | 256K | 32K | - | 1.8-3.6V | LQFP100,LQFP48,LQFP64 | 3 | [en](https://www.wch-ic.com/products/CH32V205.html) / [zh](https://www.wch.cn/products/CH32V205.html) |
 
 ## Debug / serial defaults
 
@@ -240,6 +240,10 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | PA0-WKUP | ADC_IN0, WKUP | - | TIM1_ETR | TIM2_CH1_ETR | USART2_CTS | - | - | QSPI_SIO2 | - | CC1 |
 
 </details>
+
+## Errata
+
+- CAN and USBPD functions are not provided (applies to the products listed in CH32V205DS0, including CH32V203CCT6). *(applies: CH32V205; 5th digit of lot number = 0)*
 
 ## Diagrams
 
