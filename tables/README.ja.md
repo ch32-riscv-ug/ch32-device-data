@@ -174,6 +174,22 @@ series.csvはcore・ISAとも全27シリーズで値が入っています（ISA�
 
 part_number・series・packageは全型番で確定（conflict 0件）。残るconflictはproduct_attributesの1件（CH32H417WEU6のOPA数: zh=1/en=2）です。productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
 
+## 画像（現在は未使用）
+
+生成READMEは画像を参照していません。データシートから図を切り出す仕組みは
+用意しましたが（`tools/extract_images.py` / `tools/check_images.py`）、切り出し
+品質の調整が済んでいないため、生成物はミラーに置いていません。READMEはピン
+配置図の代わりに、パッケージ→型番→データシートの対応表を出します。
+
+切り出しで分かったこと（再開するときの前提）:
+
+- 図の見出しはデータシートごとに置き方も表記も違う。上・下・内側・1行に横並びの4通り、表記は完全型番・伏字（`CH32V103Cx`）・温度グレード省略（`CH32V007K8U`）・スラッシュ連結（`CH32V303RxT6/CH32V303RCT7`）の4通り
+- 90度回転した文字はPDF上の座標が実際の描画とずれるため、座標計算だけでは範囲が決まらない。描いた画像の縁を見て広げ直す必要がある
+- 同じピン配置でも型番ごとに図が別々にあるため、ファイル名の代表型番と図中の型番が食い違いうる（82枚中6枚）
+- CH32V407DS0のようにピン番号がフッタ罫線に重なる版がある
+
+シリーズ構成図（`system_*.png`）は原典のデータシートには無く、WCHの製品ページ由来です。手作りが27シリーズ中10枚あり、17シリーズ分が欠けています。`tools/build_system_figures.py` でtables/から同等の情報をSVGとして生成できますが、見た目が別物になるため採用は保留しています。
+
 ## 生成
 
 ```sh
@@ -182,6 +198,8 @@ uv run tools/build_pins.py --out tables                       # pins/pin_functio
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）
+uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
+uv run tools/check_images.py [--missing|--prune]              # 画像の必要一覧と検査
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
 uv run tools/scan_errata.py                                   # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ

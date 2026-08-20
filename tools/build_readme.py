@@ -407,33 +407,48 @@ PACKAGE_IMAGES = ("https://raw.githubusercontent.com/ch32-riscv-ug/"
                   "WCH-common/main/image")
 
 
-def pinout_images(data: Data, series: dict) -> list[str]:
-    """ピン配置図。名前は tools/check_images.py が決める規則そのままで、
-    存在確認はしない（未作成なら壊れた画像として見えるのが正しい）。
-    同じ配置の型番は1枚を共有するので、見出しに対象型番を並べる。"""
-    import check_images
-    products = data.series_products(series["series"])
-    mine = {p["part_number"] for p in products}
-    out = []
-    for (family, name), parts in sorted(check_images.pinout_groups().items()):
-        if not mine & set(parts):
-            continue
-        package = next(p["package"] for p in products
-                       if p["part_number"] == parts[0])
-        out += [f"**{', '.join(parts)}** ({package})", "",
-                f'<img src="image/{name}" alt="{parts[0]} pinout" />', "",
-                f"Package outline: "
-                f"[{package}]({PACKAGE_IMAGES}/package_{package}.png)", ""]
-    return out
-
-
-def images_section(data: Data, family: str) -> list[str]:
-    """ブロック図。シリーズごとに固定の名前で参照する。"""
+def block_diagrams(data: Data, family: str) -> list[str]:
+    """シリーズごとのブロック図。データシートの第1章から切り出したもので、
+    名前は固定（存在確認はしない）。"""
+    series = data.family_series(family)
+    if not series:
+        return []
     out = ["## Block diagrams", ""]
-    for s in data.family_series(family):
+    for s in series:
         out += [f"### {s['series']}",
                 f'<img src="image/architecture_{s["series"]}.png" '
                 f'alt="{s["series"]} block diagram" />', ""]
+    return out
+
+
+def pinout_reference(data: Data, family: str) -> list[str]:
+    """ピン配置図はデータシートの中にある。READMEには並べず、
+    どのパッケージがどの型番のものかだけを示して原典へ送る。
+
+    画像として切り出す仕組み（tools/extract_images.py）はあるが、切り出し
+    品質の調整が済むまで生成物は使わない。
+    """
+    import check_images
+    package_of = {p["part_number"]: p["package"] for p in data.products}
+    groups = [(name, parts) for (fam, name), parts
+              in check_images.pinout_groups().items() if fam == family]
+    if not groups:
+        return []
+    out = ["## Pinouts", "",
+           "Pinout drawings are in the datasheet (chapter *Pinouts*):", "",
+           "| Package | Products | Datasheet | Outline |", "|---|---|---|---|"]
+    documents = {d["document"]: d for d in data.documents}
+    for _, parts in sorted(groups, key=lambda g: g[1][0]):
+        product = next(p for p in data.products if p["part_number"] == parts[0])
+        document = documents.get(product["datasheet"], {})
+        links = " / ".join(
+            f"[{lang}]({document[f'mirror_url_{lang}']})"
+            for lang in ("en", "zh") if document.get(f"mirror_url_{lang}"))
+        package = package_of[parts[0]]
+        out.append(f"| {package} | {', '.join(parts)} "
+                   f"| {links or product['datasheet']} "
+                   f"| [drawing]({PACKAGE_IMAGES}/package_{package}.png) |")
+    out.append("")
     return out
 
 
@@ -459,20 +474,20 @@ def render(data: Data, family: str) -> str:
     lines += series_section(data, family)
     lines += roles_section(data, family)
     lines += documents_section(data, family)
+    lines += pinout_reference(data, family)
     if data.family_series(family):
         lines += ["## Product comparison", ""]
         for s in data.family_series(family):
             lines += comparison_section(data, s)
         lines += ["## Pin definitions", ""]
     for s in data.family_series(family):
-        lines += pinout_images(data, s)
         lines += pin_map_section(data, s)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
+    lines += block_diagrams(data, family)
     lines += errata_section(data, family)
     lines += evt_examples_section(data, family)
     lines += extras_section(family)
-    lines += images_section(data, family)
     lines += ["---",
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"
               "ch32-device-data) (tables/ -- each value carries its evidence "

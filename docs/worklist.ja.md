@@ -8,10 +8,10 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 
 | 区分 | 完了 | 残り |
 |---|---:|---:|
-| データ収集 | 3 | 4 |
-| README生成 | 2 | 4 |
-| 画像 | 0 | 2 |
-| 検査・運用 | 3 | 1 |
+| データ収集 | 5 | 4 |
+| README生成 | 3 | 3 |
+| 画像 | 0 | 3（保留） |
+| 検査・運用 | 4 | 1 |
 
 ## 着手順の方針
 
@@ -34,8 +34,8 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 - [x] ✅ **A1 エラッタ** — 21件、全件が中英両版のページ根拠つきconfirmed。`tools/scan_errata.py`で増分検出（NEWがあれば終了コード1）
 - [x] ✅ **A2 動作条件** — `tables/operating_conditions.csv` 62行。クロック上限F_*と動作電圧V_DD。全27シリーズ
 - [x] ✅ **A3 remap** — `remap_fields`/`remap_routes`（全行reference。根拠記録つき再実行で確定化するのは別課題）
-- [ ] 🔜 **A4 公称主周波数** — U2/U1が最初に見る値。**現状は誤解を招く**: CH32V003のMax clockが電気的特性の50MHzで出るが、公称は48MHz（DS1ページ目「48MHz system main frequency」）。product_attributesには8シリーズ分しか無く自由文（`Max: 144MHz`、`40MHz@Zero-wait; Max: 192MHz@Non-zero wait`）。DS第1章の特徴リストから全シリーズ抽出し、`Main clock`列と`Fmax (HCLK)`列を分離する
-- [ ] ⬜ **A5 EVT例題索引** — U1/U3への効果が最大。材料は全12リポジトリの`EVT/<FAMILY>_List_EN.txt`（周辺→例題→1行説明のツリー）に揃っている。パースして`tables/evt_examples.csv`へ
+- [x] ✅ **A4 公称主周波数** — U2/U1が最初に見る値。**現状は誤解を招く**: CH32V003のMax clockが電気的特性の50MHzで出るが、公称は48MHz（DS1ページ目「48MHz system main frequency」）。product_attributesには8シリーズ分しか無く自由文（`Max: 144MHz`、`40MHz@Zero-wait; Max: 192MHz@Non-zero wait`）。DS第1章の特徴リストから全シリーズ抽出し、`Main clock`列と`Fmax (HCLK)`列を分離する
+- [x] ✅ **A5 EVT例題索引** — U1/U3への効果が最大。材料は全12リポジトリの`EVT/<FAMILY>_List_EN.txt`（周辺→例題→1行説明のツリー）に揃っている。パースして`tables/evt_examples.csv`へ
 - [ ] ⬜ **A6 機能フラグ（USB/Ethernet/CAN/PD/DVP…）** — org TOPの「機能から探す」に必須。**現データでは作れない**（下記の調査結果）。DS 1.4機能説明からシリーズ単位で抽出する新規作業
 - [ ] ⬜ **A7 メモリマップ** — U4向け。Flash/RAM先頭アドレス・サイズ・周辺ベースアドレス。DS 1.2章
 - [ ] ⬜ **A8 書き込み方式** — U1の第一関門。1線式SDI（V003系）か2線式SWDか、WCH-Linkのどのモードか。シリーズ属性として`curated/`に記録
@@ -53,33 +53,32 @@ product_attributesからは機能フラグを作れません。datasheetの比�
 
 - [x] ✅ **B1 12リポジトリのTOP生成** — Series/Documents/比較表/ピン表/remap/Errata/Diagrams。日次でミラーが取得
 - [x] ✅ **B2 org TOPの生成** — 現行はリポジトリ一覧＋横断文書＋toolchain
-- [ ] 🔜 **B3 org TOP「型番から探す」** — **今あるデータだけで作れる**（series.csv: series→family、products.csv: part_number→family）。CH32M007がCH32V006に、CH32M103がCH32L103に、CH32V317がCH32V307に入っている件が検索者に見えるようになる。これができれば`curated/readme-extras/CH32V20x.md`（V205分離の手書きNotes）を削除して**特殊処理ゼロ**にできる
+- [x] ✅ **B3 org TOP「型番から探す」** — **今あるデータだけで作れる**（series.csv: series→family、products.csv: part_number→family）。CH32M007がCH32V006に、CH32M103がCH32L103に、CH32V317がCH32V307に入っている件が検索者に見えるようになる。これができれば`curated/readme-extras/CH32V20x.md`（V205分離の手書きNotes）を削除して**特殊処理ゼロ**にできる
 - [ ] ⬜ **B4 節構成の組み替え** — 現状はU3（開発中の人）向けの順序。U1→U2→U3順へ:
   `Quick start`(A8) → `Products` → `Pinout`(画像+表) → `Block diagram` → `Errata` → `EVT examples`(A5) → `Documents`(+同期日時・評価ボードPDF) → `Reference`(A7)
 - [ ] ⬜ **B5 org TOP「機能から探す」** — A6待ち
 - [ ] ⬜ **B6 評価ボード情報** — `EVT/PUB/`の回路図PDF・ボード説明書へのリンク（全リポジトリに存在）
 
-## C. 画像
+## C. 画像（保留）
 
-方針: 存在チェックをやめ、**必要な画像を固定ファイル名で常に参照**する。表で表せるものは画像にしない。
+**現時点では生成READMEに画像を使いません。** 切り出しの品質が実用水準に達していないためです。ピン配置図は「パッケージ→型番→データシート」の対応表で代替しています。
 
-- [ ] ❓ **C1 命名の確定** — `image/architecture_<SERIES>.png`（シリーズ1枚）は確定。ピン配置図を`pinout_<SERIES>_<PACKAGE>.png`（パッケージ単位・約40枚）にするか型番単位（103枚）にするかは**要判断**
-- [ ] ⬜ **C2 check_images.py** — リポジトリ×必要ファイル名×有無を一覧し、作るべき画像を確定させる
+- [ ] ⬜ **C1 切り出し品質** — `tools/extract_images.py`は134枚を生成できるが、図の縁の判定・ファイル名と図中型番の一致（82枚中6枚が不一致）に課題が残る
+- [ ] ⬜ **C2 ページ番号リンク** — `#page=N`はGitHub Pages配信のPDFで機能する（`content-type: application/pdf`を確認済み）。抽出時にページは分かるので`tables/figures.csv`として持てば、対応表からページ直リンクにできる
+- [ ] ❓ **C3 シリーズ構成図** — 原典のデータシートには無く、WCH製品ページ由来。手作りは27シリーズ中10枚のみで17枚不足。`tools/build_system_figures.py`でtables/から生成もできるが見た目が別物。**採用は保留**
 
-### 画像の判定
+### 不足している手作りsystem図（17シリーズ）
 
-| 現状 | 中身 | 判定 |
-|---|---|---|
-| `product_*.jpg` | 比較表そのものの画像 | **廃止**（生成済みの比較表が上位互換） |
-| `system_*.png` | 周辺数サマリ図 | **廃止**（同じデータを絵にしただけ） |
-| `architecture_*.png` | バス構造ブロック図 | **必須**（表で代替不能。V407/X315/M030が欠品） |
-| （未作成） | パッケージ外形のピン配置図 | **必須として新設**（U1の第一需要。ピン番号列では1番ピンが分からない） |
+CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH32V004, CH32V005, CH32V007, CH32V305, CH32V317, **CH32V407**, CH32V467, CH32X033, **CH32X305**, **CH32X315**
+
+太字はファミリーの主力シリーズ。CH32M030・CH32V407・CH32X315・CH32H417は図が1枚もない状態です。
 
 ## D. 検査・運用
 
 - [x] ✅ **D1 参照結合検査** — `tools/check_tables.py`が13テーブルの全FKを検査
 - [x] ✅ **D2 中国語混入検査** — `#`より左のデータ列にCJKがあればCIが落ちる
 - [x] ✅ **D3 エラッタ増分検査** — `tools/scan_errata.py`（ミラーPDFが要るのでCIではなく手動運用）
+- [x] ✅ **D5 画像の検査** — 寸法異常と同一切り出しの共有を機械検出（目視の前段。実際に4件の欠損を捕捉）
 - [ ] ⬜ **D4 同期日時の表示** — 各READMEに「いつ原典と同期したか」。U5（原典に到達できない人）が最初に確認する情報
 
 ## 利用状況（優先順位の根拠）

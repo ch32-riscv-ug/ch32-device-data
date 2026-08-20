@@ -1,0 +1,14 @@
+{
+  "description": "データシートの図キャプションの訂正。人が図の中身と製品仕様表を突き合わせて確認したものだけを載せる。tools/extract_images.py が参照する。",
+  "verified": "2026-08-19",
+  "corrections": {
+    "CH32H417DS0.PDF": {
+      "Figure 1-1-3": {
+        "series": "CH32H415",
+        "caption_says": "CH32H416 system block diagram",
+        "why": "英語版の誤植。原典である中国語版は「图1-1-3 CH32H415系统框图」と正しく書いている（英語版は 1-1-2 と 1-1-3 の両方を CH32H416 としている）。図の中身も CH32H415 と一致する: OPA*2・QSPI2なし・SDMMCなし（product_attributes の CH32H415REU6 は opa=2, qspi=-, sdmmc=-。CH32H416RDU6 は opa=3, qspi=1, sdmmc=1）。",
+        "basis": "CH32H417DS0.PDF:zh(p.7)+products:zh+products:en"
+      }
+    }
+  }
+}
