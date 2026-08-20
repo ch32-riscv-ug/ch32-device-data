@@ -28,6 +28,10 @@ from pathlib import Path
 
 import pdfplumber
 
+sys.path.insert(0, str(Path(__file__).parent))
+
+import signal_vocabulary  # noqa: E402
+
 # A remap column is headed by the selector field and the value it takes, wrapped
 # over several lines: "TIM1_R\nM=000\nDefault\nmapping". A digit may be "x" where
 # the manual does not care about that bit (CH32H417 writes SDMMC_RM=1x).
@@ -142,36 +146,10 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
     return routes, notes
 
 
-# The instance number is the trailing digits only; I2C and PB5PB6 carry digits
-# inside the name itself.
-INSTANCE = re.compile(r"^([A-Z][A-Z0-9]*?)(\d*)$")
-
-
-def canonical_peripheral(token: str) -> str:
-    """Spell a peripheral name with its instance number always present.
-
-    The manual and the datasheet disagree on whether the first instance is
-    numbered: CH32M030 writes SPI_RM and I2C1_SCL in the manual but SPI1_REMAP and
-    I2C_SCL in the record. Reading a missing number as 1 makes them comparable.
-    """
-    m = INSTANCE.match(token)
-    if not m:
-        return token
-    name, digits = m.groups()
-    return f"{name}{digits or '1'}"
-
-
-def canonical_field(field: str) -> str:
-    base = re.sub(r"_(?:RM|REMAP)$", "", field)
-    head, _, tail = base.partition("_")
-    return canonical_peripheral(head) + (f"_{tail}" if tail else "")
-
-
-def canonical_signal(signal: str) -> str:
-    head, sep, tail = signal.partition("_")
-    if not sep:
-        return signal
-    return f"{canonical_peripheral(head)}_{tail}"
+# Naming lives in one module, because the manual, the datasheet and the EVT header
+# each spell the same route differently and a second copy of the rules would drift.
+canonical_field = signal_vocabulary.canonical_field
+canonical_signal = signal_vocabulary.comparable
 
 
 def score(routes: list[dict], record: Path) -> None:

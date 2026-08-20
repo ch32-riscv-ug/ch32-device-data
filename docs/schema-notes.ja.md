@@ -54,7 +54,7 @@ ArduinoCore-CH32のQ-011にあるdevice/board manifest形式を決める前に�
 
 - CH32V003F4P6はTSSOP20の全20物理pinを採取し、18 GPIOと2 power pinの整合性を検査した
 - CH32V003F4P6は公開pin function 110 entryを採取し、digital remapをRM Tables 7-8〜7-14とEVT GPIO定義で相互確認した。OPA selectorもRM Chapter 17/EVTと照合した。個々のADC channel padと実機は未確認だが、公開表に対するcoverageは`complete`
-- CH32V003のI2C1/USART1 selectorは連続fieldではなく物理bit `[1,22]`/`[2,21]`に分散するため、LSB順の`bit_positions`で表現した
+- CH32V003のI2C1/USART1 selectorは連続fieldではなく物理bit 1と22 / 2と21に分散するため、LSB順の`bits`で表現した
 - CH32V003 RMの`ADC_ETRGINJ_RM` register説明はregular triggerのPD3/PC2対応を誤って繰り返している。datasheet Table 2-2とRM Table 7-13が一致する`0=PD1`、`1=PA2`を採用した
 - CH32X035F8U6はQFN20のlead 1〜20とexposed GND padを採取し、19 GPIO、CC1/CC2、USB D-/D+、PIOC、debug pinを表現した
 - CH32X035F8U6はQFN20にbond-outされたremap functionを採取し、datasheet Table 2-3、RM Section 8.3.2.1、EVT GPIO定義を相互確認した。複数のraw selector値が同じ配置を選ぶ場合も保持している

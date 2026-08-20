@@ -370,7 +370,10 @@ def remap_section(data: Data, family: str) -> list[str]:
            "| Series | Field | Register | Bits | Values | Reset |",
            "|---|---|---|---|---|---|"]
     for r in sorted(rows, key=lambda r: (r["series"], r["selector"])):
-        out.append(f"| {r['series']} | {r['field']} | {r['register']} "
+        # A field spanning two registers reads PCFR1|PCFR2, and a bare pipe would
+        # end the cell.
+        register = r["register"].replace("|", "\\|")
+        out.append(f"| {r['series']} | {r['field']} | {register} "
                    f"| {r['bits']} | {r['valid_values']} | {r['reset_value']} |")
     out += ["", "</details>", ""]
     return out

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 from pathlib import Path
 
@@ -86,18 +87,65 @@ def main() -> int:
             bad.append(f"pin_functions: {r['part_number']} の pad {r['pad']!r} が pins にない")
     for r in t["product_attributes"]:
         check("product_attributes", r["attribute"], r["part_number"], products, "products")
+    # The two remap tables have to agree with each other as well as join, because
+    # the ways they can disagree are the ways a consumer writes the wrong register
+    # and gets a different route with no error at all.
     remap_fields = {(r["series"], r["selector"]) for r in t["remap_fields"]}
+    field_by_key: dict[tuple[str, str], dict] = {}
     for r in t["remap_fields"]:
         check("remap_fields", r["selector"], r["series"], series, "series")
+        where = f"{r['series']} {r['selector']}"
+        field_by_key[(r["series"], r["selector"])] = r
+
+        bits = [b for b in r["bits"].split(";") if b]
+        if not bits:
+            bad.append(f"remap_fields: {where} に bits がない")
+            continue
+        if any(not re.fullmatch(r"[A-Z][A-Z0-9]*:(?:[0-9]|[12][0-9]|3[01])", b) for b in bits):
+            bad.append(f"remap_fields: {where} の bits が register:bit 形式でない: {r['bits']}")
+            continue
+        if len(set(bits)) != len(bits):
+            bad.append(f"remap_fields: {where} の bits に重複がある: {r['bits']}")
+        named = list(dict.fromkeys(b.split(":")[0] for b in bits))
+        if r["register"] != "|".join(named):
+            bad.append(
+                f"remap_fields: {where} の register {r['register']!r} が bits の register と一致しない"
+            )
+
+        values = [int(v) for v in r["valid_values"].split(";") if v != ""]
+        if not values:
+            bad.append(f"remap_fields: {where} に valid_values がない")
+            continue
+        # A value wider than the field cannot be written. Where this fired it was
+        # never a bad value: it was a field whose upper bits live in a second
+        # register that the row failed to name.
+        limit = 1 << len(bits)
+        outside = [v for v in values if v >= limit]
+        if outside:
+            bad.append(
+                f"remap_fields: {where} の valid_values {outside} が bits {len(bits)}bit に収まらない"
+            )
+        if r["reset_value"] and int(r["reset_value"]) not in values:
+            bad.append(f"remap_fields: {where} の reset_value が valid_values にない")
+
     for r in t["remap_routes"]:
-        if (r["series"], r["selector"]) not in remap_fields:
+        where = f"{r['series']} {r['selector']} 値{r['value']}"
+        field = field_by_key.get((r["series"], r["selector"]))
+        if field is None:
             bad.append(f"remap_routes: ({r['series']}, {r['selector']}) が remap_fields にない")
+            continue
+        values = {int(v) for v in field["valid_values"].split(";") if v != ""}
+        if int(r["value"]) not in values:
+            bad.append(f"remap_routes: {where} が remap_fields の valid_values にない")
+        # An empty pair means the vocabulary has no rule for that spelling, which
+        # is a recorded gap. One half filled is a bug in the rule.
+        if bool(r.get("peripheral")) != bool(r.get("role")):
+            bad.append(f"remap_routes: {where} の peripheral と role が片方だけ埋まっている")
 
     # Data columns carry no CJK: Chinese readings are evidence (kept in the
     # *_basis and label_zh columns), never the displayed value. A leak here
     # means the translation dictionary in curated/translations.json is missing
     # an entry, or an extractor let prose fragments through.
-    import re
     cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
     for name, rows in t.items():
         if not rows:

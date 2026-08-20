@@ -40,7 +40,12 @@ RESET = re.compile(r"^(0x[0-9A-Fa-f]+|\d+)$")
 # (CH1/PC0, CH2/PC1)". A group may list several signals on one pad, as in
 # "CH1/ETR/PA5", where the last token is the pad.
 DESCRIBED_ROUTE = re.compile(r"(?P<value>[01xX]{1,4})\s*:\s*[^()]{0,40}?\(([^()]*)\)")
-PAD_TOKEN = re.compile(r"^P[A-H]\d{1,2}$")
+# The manuals are not consistent about case inside a field description:
+# CH32X035 writes "010: mapping (rx/pc17, cts/pb15, tx/pc16, ...)" in lower
+# case for one row of USART4_RM and upper case for the rest. Dropping the
+# lower-case rows loses whole routes, and USART4 value 2 is the one whose
+# TX and RX sit on the same pads as value 5 but the other way round.
+PAD_TOKEN = re.compile(r"^P[A-Ha-h]\d{1,2}$")
 
 HEADER_CELLS = ("bit", "name", "access")
 RESET_CELL = "resetvalue"
@@ -147,7 +152,8 @@ def routes_in(field: dict) -> list[dict]:
     """
     peripheral = re.sub(r"_(?:RM|REMAP)$", "", field["field"])
     out: list[dict] = []
-    for m in DESCRIBED_ROUTE.finditer(field["description"]):
+    upper = field["description"].upper() if field.get("description") else ""
+    for m in DESCRIBED_ROUTE.finditer(upper):
         pattern = m.group("value")
         values = [pattern] if "x" not in pattern.lower() else None
         bits = [
@@ -158,7 +164,7 @@ def routes_in(field: dict) -> list[dict]:
             parts = [p.strip() for p in group.split("/") if p.strip()]
             if len(parts) < 2 or not PAD_TOKEN.match(parts[-1]):
                 continue
-            pad = parts[-1]
+            pad = parts[-1].upper()
             for name in parts[:-1]:
                 signal = name if name.startswith(peripheral) else f"{peripheral}_{name}"
                 for value in bits:
@@ -205,11 +211,10 @@ def score(fields: list[dict], record: Path) -> None:
             print(f"  RMに無し    {sel['id']}", file=sys.stderr)
             continue
         hit += 1
-        want_bits = (
-            list(range(sel["bit_offset"], sel["bit_offset"] + sel["bit_width"]))
-            if "bit_offset" in sel
-            else sel.get("bit_positions", [])
-        )
+        # The manual states one register at a time, so compare only the half of a
+        # split field that lives in the register this entry describes.
+        register = found["register"].rpartition("_")[2]
+        want_bits = [b["bit"] for b in sel.get("bits", []) if b["register"] == register]
         got_bits = list(range(found["bit_offset"], found["bit_offset"] + found["bit_width"]))
         same_bits = want_bits == got_bits
         same_reset = found["reset_value"] == sel["reset_value"]

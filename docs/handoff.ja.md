@@ -65,7 +65,8 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 
 - CH32X035は複数のraw selector値が同じpin routeを選ぶ
 - CH32M030はbit幅内にreserved selector値があり、`valid_values`が必要
-- CH32V003のI2C/USART selectorは非連続bit `[1,22]`/`[2,21]`で、`bit_positions`が必要
+- CH32V003のI2C/USART selectorは非連続bitで、bitを列挙する`bits`が必要
+- CH32L103/M103/V20x/V30x/V4x7ではselectorがPCFR1とPCFR2にまたがる。`bits`はbitごとにregisterを持ち、`register`は`PCFR1|PCFR2`と書く
 - AFIO以外のOPA input selectorも同じ`selection`構造で表現できる
 - CH32V003の`TIM1_1_RM`はTIM1_CH1を内部LSIへ接続し、package pin recordだけでは表せない
 - exact SKUのflat recordではsilicon共通selectorがpackageごとに重複する
@@ -90,7 +91,7 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - memory parent、integrated component、special-I/O ID
 - route selector ID/field一意性
 - register内のselector bit重複
-- 連続fieldとLSB順の非連続`bit_positions`
+- `bits`のregister名・bit範囲・重複、`register`列との一致
 - selectorのbit幅、有効値、reset値、reserved値
 - functionからselectorへの参照
 

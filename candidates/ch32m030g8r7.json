@@ -36,13 +36,17 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "ADC_ETRGIN_REMAP",
-      "bit_offset": 15,
-      "bit_width": 1,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 15
+        }
+      ],
       "valid_values": [
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     },
     {
@@ -50,31 +54,84 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "I2C1_REMAP",
-      "bit_offset": 0,
-      "bit_width": 2,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 0
+        },
+        {
+          "register": "PCFR1",
+          "bit": 1
+        }
+      ],
       "valid_values": [
         0,
         1,
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
+    },
+    {
+      "id": "extend-isink2-adj",
+      "controller": "extend",
+      "register": "CTR",
+      "field": "ISINK2_ADJ",
+      "bits": [
+        {
+          "register": "CTR",
+          "bit": 16
+        },
+        {
+          "register": "CTR",
+          "bit": 17
+        },
+        {
+          "register": "CTR",
+          "bit": 18
+        },
+        {
+          "register": "CTR",
+          "bit": 19
+        },
+        {
+          "register": "CTR",
+          "bit": 20
+        },
+        {
+          "register": "CTR",
+          "bit": 21
+        }
+      ],
+      "valid_values": [
+        0
+      ],
+      "_valid_values_source": "datasheet pin表",
+      "_reset_value_missing": true
     },
     {
       "id": "afio-spi1-remap",
       "controller": "afio",
       "register": "PCFR1",
       "field": "SPI1_REMAP",
-      "bit_offset": 5,
-      "bit_width": 2,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 5
+        },
+        {
+          "register": "PCFR1",
+          "bit": 6
+        }
+      ],
       "valid_values": [
         0,
         1,
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     },
     {
@@ -82,8 +139,20 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "TIM1_REMAP",
-      "bit_offset": 7,
-      "bit_width": 3,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 7
+        },
+        {
+          "register": "PCFR1",
+          "bit": 8
+        },
+        {
+          "register": "PCFR1",
+          "bit": 9
+        }
+      ],
       "valid_values": [
         0,
         1,
@@ -91,7 +160,7 @@
         3,
         4
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     },
     {
@@ -99,15 +168,23 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "TIM2_REMAP",
-      "bit_offset": 10,
-      "bit_width": 2,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 10
+        },
+        {
+          "register": "PCFR1",
+          "bit": 11
+        }
+      ],
       "valid_values": [
         0,
         1,
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     },
     {
@@ -115,8 +192,20 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "TIM3_REMAP",
-      "bit_offset": 12,
-      "bit_width": 3,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 12
+        },
+        {
+          "register": "PCFR1",
+          "bit": 13
+        },
+        {
+          "register": "PCFR1",
+          "bit": 14
+        }
+      ],
       "valid_values": [
         0,
         1,
@@ -124,7 +213,7 @@
         3,
         4
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     },
     {
@@ -132,8 +221,20 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "UART1_REMAP",
-      "bit_offset": 2,
-      "bit_width": 3,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 2
+        },
+        {
+          "register": "PCFR1",
+          "bit": 3
+        },
+        {
+          "register": "PCFR1",
+          "bit": 4
+        }
+      ],
       "valid_values": [
         0,
         1,
@@ -142,7 +243,7 @@
         4,
         5
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "reset_value": 0
     }
   ],
@@ -159,7 +260,13 @@
         },
         {
           "signal": "ADC_IN12",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "UDM",
@@ -238,15 +345,33 @@
         },
         {
           "signal": "ADC_IN2",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM2_CH3",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM2_CH1N",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "CMP3_N2",
@@ -254,7 +379,13 @@
         },
         {
           "signal": "ISINK2",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "extend-isink2-adj",
+            "values": [
+              0
+            ]
+          }
         }
       ]
     },
@@ -270,7 +401,13 @@
         },
         {
           "signal": "ADC_IN7",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "MCO",
@@ -337,7 +474,13 @@
         },
         {
           "signal": "ADC_IN8",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "ISN2",
@@ -368,7 +511,13 @@
         },
         {
           "signal": "ADC_IN17",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "CMP3_O",
@@ -407,7 +556,13 @@
         },
         {
           "signal": "ADC_IN18",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "QII2",
@@ -438,7 +593,13 @@
         },
         {
           "signal": "ADC_IN3",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "XI",
@@ -485,7 +646,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "UART_RX",
@@ -523,7 +684,13 @@
         },
         {
           "signal": "ADC_IN4",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "XO",
@@ -618,7 +785,13 @@
         },
         {
           "signal": "TIM1_CH1N",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1N",
@@ -703,7 +876,13 @@
         },
         {
           "signal": "TIM1_CH1",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1",
@@ -756,7 +935,13 @@
         },
         {
           "signal": "TIM1_CH2N",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2N",
@@ -841,7 +1026,13 @@
         },
         {
           "signal": "TIM1_CH2",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2",
@@ -894,7 +1085,13 @@
         },
         {
           "signal": "TIM1_CH3N",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3N",
@@ -1001,7 +1198,13 @@
         },
         {
           "signal": "TIM1_CH3",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3",
@@ -1036,7 +1239,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "TIM3_CH1_ETR",
@@ -1049,7 +1252,7 @@
               4
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -1125,7 +1328,13 @@
         },
         {
           "signal": "ADC_IN15",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SWCLK",
@@ -1146,7 +1355,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "UART_RX",
@@ -1239,7 +1448,13 @@
         },
         {
           "signal": "ADC_IN16",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SWDIO",
@@ -1268,7 +1483,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "UART_RX",
@@ -1317,7 +1532,13 @@
         },
         {
           "signal": "ADC_IN11",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "UDP",
@@ -1351,6 +1572,5 @@
         }
       ]
     }
-  ],
-  "signal_aliases": {}
+  ]
 }

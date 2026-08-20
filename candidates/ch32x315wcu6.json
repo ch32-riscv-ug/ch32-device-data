@@ -29,7 +29,25 @@
     "package": "QFN68X7",
     "page": 50
   },
-  "route_selectors": [],
+  "route_selectors": [
+    {
+      "id": "afio-pd0-1-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "PD0_1_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 15
+        }
+      ],
+      "valid_values": [
+        0
+      ],
+      "_valid_values_source": "datasheet pin表",
+      "_reset_value_missing": true
+    }
+  ],
   "pins": [
     {
       "number": 1,
@@ -43,7 +61,13 @@
         },
         {
           "signal": "PD0",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-pd0-1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "USART1_RX",
@@ -1851,6 +1875,5 @@
         }
       ]
     }
-  ],
-  "signal_aliases": {}
+  ]
 }

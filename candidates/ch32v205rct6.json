@@ -1,9 +1,9 @@
 {
   "part_number": "CH32V205RCT6",
   "_provenance": {
-    "datasheet": "CH32V20x/datasheet_en/CH32V205DS0.PDF",
-    "manual": "CH32V20x/datasheet_en/CH32FV2x_V3xRM.PDF",
-    "header": "CH32V20x/EVT/EXAM/SRC/Peripheral/inc/ch32v20x.h",
+    "datasheet": "CH32V205/datasheet_en/CH32V205DS0.PDF",
+    "manual": "CH32V205/datasheet_en/CH32V205RM.PDF",
+    "header": "CH32V205/EVT/EXAM/SRC/Peripheral/inc/ch32v205.h",
     "pin_table": "Table 2-1-1",
     "pin_column": "V205RCT6"
   },
@@ -697,12 +697,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH3N(A",
-          "route": "default"
-        },
-        {
-          "signal": "F0)",
-          "route": "default"
+          "signal": "TIM1_CH3N",
+          "route": "af-0",
+          "_alternate_function": 0
         },
         {
           "signal": "TIM3_CH4",
@@ -927,12 +924,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH2N(A",
-          "route": "default"
-        },
-        {
-          "signal": "F0)",
-          "route": "default"
+          "signal": "TIM1_CH2N",
+          "route": "af-0",
+          "_alternate_function": 0
         },
         {
           "signal": "USART3_RTS",
@@ -1224,12 +1218,9 @@
           "_alternate_function": 4
         },
         {
-          "signal": "CAN_RX(A",
-          "route": "default"
-        },
-        {
-          "signal": "F6)",
-          "route": "default"
+          "signal": "CAN_RX",
+          "route": "af-6",
+          "_alternate_function": 6
         }
       ]
     },
@@ -1278,12 +1269,9 @@
           "_alternate_function": 5
         },
         {
-          "signal": "CAN_TX(A",
-          "route": "default"
-        },
-        {
-          "signal": "F6)",
-          "route": "default"
+          "signal": "CAN_TX",
+          "route": "af-6",
+          "_alternate_function": 6
         }
       ]
     },
@@ -1914,6 +1902,5 @@
         }
       ]
     }
-  ],
-  "signal_aliases": {}
+  ]
 }
