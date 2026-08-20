@@ -94,6 +94,7 @@ class Data:
             self.fns_by_part[r["part_number"]].append(r)
         self.attributes = load("product_attributes")
         self.operating = load("operating_conditions")
+        self.evt_examples = load("evt_examples")
         try:
             self.errata = load("errata")
         except FileNotFoundError:
@@ -108,16 +109,18 @@ class Data:
 
 
 def operating_summary(data: Data, series: str) -> tuple[str, str]:
-    """(最大クロック, VDD範囲) -- tables/operating_conditions.csv のシリーズ行から。
+    """(クロック, VDD範囲) -- tables/operating_conditions.csv のシリーズ行から。
 
-    クロックは F_HCLK を優先し、無ければコア周波数(F_CORE*)や F_SYS 系を使う。
-    条件違いで複数値があるときは "200/240" のように併記する。VDD は条件行を
-    まとめた包絡（最小のmin〜最大のmax）を出す。
+    クロックはデータシート1ページ目が謳う系統主頻(F_MAIN)を最優先する。
+    電気的特性表のF_HCLKはAHBの上限値で、製品として謳われる周波数とは別物
+    （CH32V003は本文48MHz・上限50MHz）。F_MAINが無いシリーズはF_HCLK→
+    コア周波数の順で代替する。条件違いで複数値があるときは "200/240" と併記。
+    VDDは条件行をまとめた包絡（最小のmin〜最大のmax）を出す。
     """
     rows = [r for r in data.operating
             if series in r["series"].split(";")]
     clock = "-"
-    for prefix in ("F_HCLK", "F_SYSCLK", "F_CORE"):
+    for prefix in ("F_MAIN", "F_HCLK", "F_SYSCLK", "F_CORE"):
         hits = [r for r in rows if r["symbol"].startswith(prefix)
                 and r["max"] and r["max"][0].isdigit()]
         if hits:
@@ -137,7 +140,7 @@ def series_section(data: Data, family: str) -> list[str]:
     if not data.family_series(family):
         return []
     out = ["## Series", "",
-           "| Series | Core | ISA | Flash | SRAM | Max clock | VDD "
+           "| Series | Core | ISA | Flash | SRAM | Clock | VDD "
            "| Packages | Products | Official |",
            "|---|---|---|---|---|---|---|---|---|---|"]
     for s in data.family_series(family):
@@ -415,6 +418,23 @@ def images_section(family: str) -> list[str]:
     return out
 
 
+def evt_examples_section(data: Data, family: str) -> list[str]:
+    """EVT例題の要約。1600行超あるので周辺グループ単位の件数だけを出し、
+    中身はEVTツリーへのリンクで辿らせる。"""
+    rows = [r for r in data.evt_examples if r["family"] == family]
+    if not rows:
+        return []
+    groups: dict[str, int] = {}
+    for r in rows:
+        groups[r["group"]] = groups.get(r["group"], 0) + 1
+    base = f"https://github.com/ch32-riscv-ug/{family}/tree/main/EVT/EXAM"
+    listed = " · ".join(f"[{g}]({base}/{g}) {n}"
+                        for g, n in sorted(groups.items()))
+    return ["## EVT examples", "",
+            f"{len(rows)} routines in [EVT/EXAM]({base}):", "",
+            listed, ""]
+
+
 def render(data: Data, family: str) -> str:
     lines = [f"# {family}", "", NOTICE, ""]
     lines += series_section(data, family)
@@ -430,6 +450,7 @@ def render(data: Data, family: str) -> str:
         lines += functions_section(data, s)
     lines += remap_section(data, family)
     lines += errata_section(data, family)
+    lines += evt_examples_section(data, family)
     lines += extras_section(family)
     lines += images_section(family)
     lines += ["---",
@@ -482,6 +503,23 @@ def org_profile(data: Data) -> str:
             docs.append("EVT")
         lines.append(f"| [{f['family']}]({url}) | {series} | {cores} "
                      f"| {f['part_number_count']} | {' '.join(docs)} |")
+    # 型番から辿れるように。リポジトリ名は文書ファミリーの名前なので、
+    # CH32M007がCH32V006に、CH32M103がCH32L103に入っている等は
+    # 型番を知っているだけでは辿り着けない。
+    lines += ["", "## Find your part", "",
+              "Repository names follow the document family, not the part "
+              "number. Look up the series (the first 8 characters of a part "
+              "number) here:", "",
+              "| Series | Repository | Products | Example part numbers |",
+              "|---|---|---|---|"]
+    for s in data.series:
+        parts = [p["part_number"] for p in data.products
+                 if p["series"] == s["series"]]
+        shown = ", ".join(parts[:3]) + (", …" if len(parts) > 3 else "")
+        url = f"https://github.com/ch32-riscv-ug/{s['family']}"
+        lines.append(f"| **{s['series']}** | [{s['family']}]({url}) "
+                     f"| {len(parts)} | {shown} |")
+
     common = sorted(d["document"] for d in data.documents
                     if "WCH-common" in d["repositories"].split(";")
                     and d["status"] == "assigned")
