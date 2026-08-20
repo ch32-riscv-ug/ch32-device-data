@@ -1,9 +1,9 @@
 {
   "part_number": "CH32V203CCT6",
   "_provenance": {
-    "datasheet": "CH32V20x/datasheet_en/CH32V205DS0.PDF",
-    "manual": "CH32V20x/datasheet_en/CH32FV2x_V3xRM.PDF",
-    "header": "CH32V20x/EVT/EXAM/SRC/Peripheral/inc/ch32v20x.h",
+    "datasheet": "CH32V205/datasheet_en/CH32V205DS0.PDF",
+    "manual": "CH32V205/datasheet_en/CH32V205RM.PDF",
+    "header": "CH32V205/EVT/EXAM/SRC/Peripheral/inc/ch32v205.h",
     "pin_table": "Table 2-1-2",
     "pin_column": "V203CCT6"
   },
@@ -36,7 +36,25 @@
     "package": "LQFP48",
     "page": 75
   },
-  "route_selectors": [],
+  "route_selectors": [
+    {
+      "id": "afio-tim1-cap-rm",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "TIM1_CAP_RM",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 31
+        }
+      ],
+      "valid_values": [
+        0
+      ],
+      "_valid_values_source": "datasheet pin表",
+      "reset_value": 0
+    }
+  ],
   "pins": [
     {
       "number": 1,
@@ -492,7 +510,13 @@
         },
         {
           "signal": "TIM1_CH3",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-cap-rm",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "N",
@@ -661,12 +685,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_BK(A",
-          "route": "default"
-        },
-        {
-          "signal": "F0)",
-          "route": "default"
+          "signal": "TIM1_BK",
+          "route": "af-0",
+          "_alternate_function": 0
         },
         {
           "signal": "CMP1_OUT",
@@ -722,7 +743,13 @@
         },
         {
           "signal": "TIM1_CH2N",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-cap-rm",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "(AF0)",
@@ -926,12 +953,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_ETR(A",
-          "route": "default"
-        },
-        {
-          "signal": "F0)",
-          "route": "default"
+          "signal": "TIM1_ETR",
+          "route": "af-0",
+          "_alternate_function": 0
         },
         {
           "signal": "CMP2_OUT",
@@ -1399,6 +1423,5 @@
         }
       ]
     }
-  ],
-  "signal_aliases": {}
+  ]
 }

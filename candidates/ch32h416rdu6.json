@@ -56,15 +56,23 @@
       "controller": "afio",
       "register": "PCFR1",
       "field": "SDMMC_REMAP",
-      "bit_offset": 10,
-      "bit_width": 2,
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 10
+        },
+        {
+          "register": "PCFR1",
+          "bit": 11
+        }
+      ],
       "valid_values": [
         0,
         1,
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子",
+      "_valid_values_source": "RM remap格子+datasheet pin表",
       "_reset_value_missing": true
     }
   ],
@@ -533,12 +541,9 @@
           "_alternate_function": 6
         },
         {
-          "signal": "SAI_SCK_A(A",
-          "route": "default"
-        },
-        {
-          "signal": "F7)",
-          "route": "default"
+          "signal": "SAI_SCK_A",
+          "route": "af-7",
+          "_alternate_function": 7
         },
         {
           "signal": "PIOC_IO1",
@@ -1240,12 +1245,9 @@
           "_alternate_function": 6
         },
         {
-          "signal": "USART6_CTS(A",
-          "route": "default"
-        },
-        {
-          "signal": "F8)",
-          "route": "default"
+          "signal": "USART6_CTS",
+          "route": "af-8",
+          "_alternate_function": 8
         },
         {
           "signal": "LTDC_R3",
@@ -1530,8 +1532,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "alias"
+          }
         }
       ]
     },
@@ -1547,7 +1548,13 @@
         },
         {
           "signal": "SDMMC_D6",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_CH1",
@@ -1614,7 +1621,13 @@
         },
         {
           "signal": "SDMMC_D7",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_CH2",
@@ -1681,7 +1694,13 @@
         },
         {
           "signal": "SDMMC_D0",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_CH3",
@@ -1737,7 +1756,13 @@
         },
         {
           "signal": "SDMMC_D1",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_CH4",
@@ -1933,7 +1958,13 @@
         },
         {
           "signal": "SDMMC_D4",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SPI3_SCK",
@@ -2005,7 +2036,13 @@
         },
         {
           "signal": "SDMMC_D5",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM2_CH1_ETR",
@@ -2097,7 +2134,13 @@
         },
         {
           "signal": "SDMMC_D2",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM9_CH2",
@@ -2164,7 +2207,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_STS",
@@ -2176,7 +2219,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_CMD",
@@ -2188,7 +2231,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_CMD",
@@ -2200,7 +2243,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -2216,7 +2259,13 @@
         },
         {
           "signal": "SDMMC_D3",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM9_CH4",
@@ -2268,7 +2317,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_STR",
@@ -2280,7 +2329,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -2296,11 +2345,23 @@
         },
         {
           "signal": "SDMMC_SDCK",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDMMC_SLVCK",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM9_CH3",
@@ -2352,7 +2413,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_SDCK",
@@ -2364,7 +2425,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_SLVCK",
@@ -2376,7 +2437,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_SLVCK",
@@ -2388,7 +2449,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "prefix"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -2404,11 +2465,23 @@
         },
         {
           "signal": "SDMMC_STS",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDMMC_CMD",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_ETR",
@@ -2450,7 +2523,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_D2",
@@ -2462,7 +2535,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -2478,7 +2551,13 @@
         },
         {
           "signal": "SDMMC_STR",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM11_CH1",
@@ -2540,7 +2619,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SDMMC_D3",
@@ -2552,7 +2631,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "alias"
+          "_selector_resolved_by": "peripheral"
         }
       ]
     },
@@ -3032,16 +3111,5 @@
         }
       ]
     }
-  ],
-  "signal_aliases": {
-    "SDMMC_D2": [
-      "D2"
-    ],
-    "SDMMC_D3": [
-      "D3"
-    ],
-    "SDMMC_STR": [
-      "STR"
-    ]
-  }
+  ]
 }

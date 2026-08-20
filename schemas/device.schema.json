@@ -168,36 +168,32 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "controller", "register", "field", "valid_values", "reset_value", "evidence"],
-        "oneOf": [
-          {
-            "required": ["bit_offset", "bit_width"],
-            "not": { "required": ["bit_positions"] }
-          },
-          {
-            "required": ["bit_positions"],
-            "not": {
-              "anyOf": [
-                { "required": ["bit_offset"] },
-                { "required": ["bit_width"] }
-              ]
-            }
-          }
-        ],
+        "required": ["id", "controller", "register", "field", "bits", "valid_values", "reset_value", "evidence"],
         "properties": {
           "id": { "$ref": "#/$defs/id" },
           "controller": { "$ref": "#/$defs/id" },
-          "register": { "type": "string", "minLength": 1 },
+          "register": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The register the field lives in, or every register it spans joined by '|' in the order of bits: PCFR1|PCFR2.",
+            "pattern": "^[A-Z][A-Z0-9]*(\\|[A-Z][A-Z0-9]*)*$"
+          },
           "field": { "type": "string", "minLength": 1 },
-          "bit_offset": { "type": "integer", "minimum": 0 },
-          "bit_width": { "type": "integer", "minimum": 1 },
-          "bit_positions": {
+          "bits": {
             "type": "array",
             "minItems": 1,
             "maxItems": 32,
             "uniqueItems": true,
-            "description": "Physical register bit positions in selector-value LSB-to-MSB order.",
-            "items": { "type": "integer", "minimum": 0, "maximum": 31 }
+            "description": "The field's bits in selector-value LSB-to-MSB order, each named by the register it sits in. A field is not always one register wide: CH32L103 puts USART1's low bit in PCFR1 and its high bits in PCFR2, and writing only PCFR1 selects a different route with no error.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["register", "bit"],
+              "properties": {
+                "register": { "type": "string", "minLength": 1 },
+                "bit": { "type": "integer", "minimum": 0, "maximum": 31 }
+              }
+            }
           },
           "valid_values": {
             "type": "array",

@@ -193,7 +193,7 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
         return report
 
     silicon = None
-    if header and manual:
+    if header:
         try:
             silicon = build_candidate.read_silicon(header, manual)
         except Exception as exc:  # noqa: BLE001
@@ -274,7 +274,6 @@ def _write(out_dir, part, product, candidate, datasheet, family, table, column, 
         "ordering": ordering_entry,
         "route_selectors": (candidate or {}).get("route_selectors", []),
         "pins": (candidate or {}).get("pins", []),
-        "signal_aliases": (candidate or {}).get("_signal_aliases", {}),
     }
     (out_dir / f"{part.lower()}.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

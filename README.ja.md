@@ -16,6 +16,7 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/validate.py`: JSON Schemaと追加の整合性規則を検査するvalidator
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するreview支援tool。recordは書き換えない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
+- `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧とremap_routes.csvに対する当たり具合を出す
 - `candidates/*.json`: 全SKUの機械抽出結果。未reviewで、schemaにも準拠しない
 - `docs/schema-notes.ja.md`: schema調査、確認済みの構造差、未決定事項
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
@@ -26,7 +27,7 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - recordの単位は注文可能な正確な型番とする
 - WCHのseries名と、コア内部で共有する実装familyは同一と仮定しない
 - packageのbond-out差をdevice recordに保持する
-- pin routeは人間向けのroute名に加え、`route_selectors`でcontroller、register、field、bit位置、有効値、reset値を定義し、各functionの`selection`からraw selector値とともに参照する。AFIO remap以外のOPA入力選択などにも同じ構造を使う。連続fieldは`bit_offset`/`bit_width`、V003のような分散fieldはLSB順の`bit_positions`で表し、bit幅内でもreservedの値はvalidatorが拒否する
+- pin routeは人間向けのroute名に加え、`route_selectors`でcontroller、register、field、bit位置、有効値、reset値を定義し、各functionの`selection`からraw selector値とともに参照する。AFIO remap以外のOPA入力選択などにも同じ構造を使う。bit位置はLSB順の`bits`で表し、**bitごとにregister名を持つ**——CH32L103やCH32V30xではselectorがPCFR1とPCFR2にまたがり、PCFR1だけを書くとエラーにならずに別の経路が選ばれるため。bit幅内でもreservedの値はvalidatorが拒否する
 - board固有のLED、connector、clock、upload設定はdevice dataへ入れない
 - Arduino core固有のFQBN、variant、build flagはsource dataへ入れず、consumer側の生成物にする
 - compilerの`-march`/`-mabi`はdatasheetのISA表記から推測せず、toolchain認定後に追加する
@@ -49,6 +50,13 @@ python3 tools/validate.py
 `jsonschema` packageが利用可能ならJSON Schema全体を検査します。なくても標準libraryだけで、ID、出典参照、pin coverageなどの追加規則を検査します。
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。
+
+生成した表そのものの整合は、資料もEVTも要らずに検査できます。
+
+```sh
+uv run tools/check_tables.py                      # 表どうしの参照と、remap表の内部整合
+uv run tools/signal_vocabulary.py --tables tables # signal名の語彙規則と、その当たり具合
+```
 
 ```sh
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json

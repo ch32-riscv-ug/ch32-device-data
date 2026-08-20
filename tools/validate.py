@@ -86,7 +86,7 @@ def validate_relations(path: Path, record: dict[str, object]) -> list[str]:
         if len(selector_by_id) != len(route_selectors):
             errors.append("route-selector ids are missing or not unique")
         selector_fields: set[tuple[object, object, object]] = set()
-        occupied_bits: dict[tuple[object, object], set[int]] = {}
+        occupied_bits: dict[object, set[tuple[str, int]]] = {}
         for selector in route_selectors:
             if not isinstance(selector, dict):
                 continue
@@ -94,29 +94,31 @@ def validate_relations(path: Path, record: dict[str, object]) -> list[str]:
             if field_key in selector_fields:
                 errors.append(f"route-selector field {field_key!r} is defined more than once")
             selector_fields.add(field_key)
-            offset = selector.get("bit_offset")
-            width = selector.get("bit_width")
-            bit_positions = selector.get("bit_positions")
-            if isinstance(bit_positions, list):
-                if (
-                    not bit_positions
-                    or any(not isinstance(bit, int) or bit < 0 or bit > 31 for bit in bit_positions)
-                    or len(bit_positions) != len(set(bit_positions))
-                    or isinstance(offset, int)
-                    or isinstance(width, int)
-                ):
-                    errors.append(f"route selector {selector.get('id')!r} has invalid bit_positions")
-                    continue
-                width = len(bit_positions)
-                field_bits = set(bit_positions)
-            elif isinstance(offset, int) and isinstance(width, int):
-                if offset < 0 or width < 1 or offset + width > 32:
-                    errors.append(f"route selector {selector.get('id')!r} has an invalid 32-bit field range")
-                    continue
-                field_bits = set(range(offset, offset + width))
-            else:
-                errors.append(f"route selector {selector.get('id')!r} has an invalid 32-bit field range")
+            bits = selector.get("bits")
+            if (
+                not isinstance(bits, list)
+                or not bits
+                or any(
+                    not isinstance(bit, dict)
+                    or not isinstance(bit.get("register"), str)
+                    or not bit["register"]
+                    or not isinstance(bit.get("bit"), int)
+                    or not 0 <= bit["bit"] <= 31
+                    for bit in bits
+                )
+            ):
+                errors.append(f"route selector {selector.get('id')!r} has invalid bits")
                 continue
+            field_bits = {(bit["register"], bit["bit"]) for bit in bits}
+            if len(field_bits) != len(bits):
+                errors.append(f"route selector {selector.get('id')!r} repeats a bit")
+                continue
+            named = list(dict.fromkeys(bit["register"] for bit in bits))
+            if selector.get("register") != "|".join(named):
+                errors.append(
+                    f"route selector {selector.get('id')!r} register does not match its bits"
+                )
+            width = len(bits)
             valid_values = selector.get("valid_values")
             field_limit = 1 << width
             if (
@@ -128,10 +130,14 @@ def validate_relations(path: Path, record: dict[str, object]) -> list[str]:
                 errors.append(f"route selector {selector.get('id')!r} has invalid valid_values")
             elif selector.get("reset_value") not in valid_values:
                 errors.append(f"route selector {selector.get('id')!r} reset value is not valid")
-            register_key = (selector.get("controller"), selector.get("register"))
-            if field_bits & occupied_bits.setdefault(register_key, set()):
-                errors.append(f"route selector {selector.get('id')!r} overlaps another field in {register_key!r}")
-            occupied_bits[register_key].update(field_bits)
+            # Bits are compared per register, so a field split across PCFR1 and
+            # PCFR2 still cannot overlap either register's other fields.
+            controller = selector.get("controller")
+            if field_bits & occupied_bits.setdefault(controller, set()):
+                errors.append(
+                    f"route selector {selector.get('id')!r} overlaps another field in {controller!r}"
+                )
+            occupied_bits[controller].update(field_bits)
         numbers = [pin.get("number") for pin in pins if isinstance(pin, dict)]
         if len(numbers) != len(set(numbers)):
             errors.append("package pin numbers are not unique")
@@ -158,9 +164,9 @@ def validate_relations(path: Path, record: dict[str, object]) -> list[str]:
                     errors.append(f"pin {pin.get('number')!r} refers to unknown route selector {selector_id!r}")
                     continue
                 values = selection.get("values", [])
-                selector_width = selector.get("bit_width")
-                if not isinstance(selector_width, int) and isinstance(selector.get("bit_positions"), list):
-                    selector_width = len(selector["bit_positions"])
+                selector_width = (
+                    len(selector["bits"]) if isinstance(selector.get("bits"), list) else None
+                )
                 if isinstance(values, list) and isinstance(selector_width, int):
                     if not values or any(not isinstance(value, int) for value in values):
                         errors.append(f"pin {pin.get('number')!r} has empty or non-integer selection values")

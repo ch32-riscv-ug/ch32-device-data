@@ -578,14 +578,97 @@ uv run tools/build_candidate.py \
 
 ## 未決定事項
 
-1. `build_candidate.py`が導出するsignal名対応表を、canonical signal辞書としてrepositoryへ持つか
+1. ~~`build_candidate.py`が導出するsignal名対応表を、canonical signal辞書としてrepositoryへ持つか~~
+   → **決着**。辞書ではなく語彙規則にした（`tools/signal_vocabulary.py`）。pad一致で導出していた
+   `signal_aliases`は廃止。1つのpadは複数機能を持つので、pad一致から1対1の対応は原理的に決まらない。
+   `remap_routes.csv`の`peripheral`/`role`列が規則の適用結果で、`signal`は原典表記のまま残す
 2. `extract_remap.py`が拾う内部経路（padを持たない`TIM2ITR1_RM`等）を同じschemaへ入れるか分離するか
 3. CH32H41xのalternate function多重化（pinごとのAFR field）を`route_selectors`でどう表現するか。共有fieldを前提とした現在の構造では表せない
 4. datasheetの誤植とテキスト層欠落を、reviewのどの段階で検出する仕組みにするか
 5. 資料矛盾の裁定を保持する構造をschemaへ追加するか
 6. family repositoryのREADME手製表を禁止対象として明記するか
-7. RMのdefault経路（value=0）をrecordへ明示するか
+7. ~~RMのdefault経路（value=0）をrecordへ明示するか~~
+   → **決着**。明示する。pin表の`default`列をvalue 0として`selection`に持たせ、`remap_routes.csv`へ
+   value=0の行として出す。既定経路とremap後の経路が同じ表に並ぶので、consumerが2表を突き合わせる
+   規則を持たずに済む
 8. CH32V303/V305/V208の省略された接尾辞を、ordering information側と突き合わせて完全な注文型番にする
+9. `valid_values`をどこまで「完全」と言えるか。現在は「RM remap格子 ∪ datasheet pin表が
+   実証した値 ∪ EVTヘッダが名前を付けている値」の和で、**下限としては正しい**が完全とは限らない。
+   3資料は互いに補い合っていて、どれも単独では足りない:
+   RMは`1x1`のような don't-care 表記を使う（CH32X035のUSART4は値5と7が同じ経路）、
+   pin表はそのpackageがbond-outした経路しか出さない、
+   EVTのgpioヘッダは`GPIO_FullRemap_USART4`のように**代表値を1つだけ**定義する（USART4は
+   1,2,3,4,7の5定数だが、4と6・5と7はそれぞれ同じ経路なので「6が無効」という意味ではない）。
+   さらにEVT定数の符号化はfamilyごとに異なるため、ヘッダの読み取りだけでは復号できない。
+   EVTの`GPIO_PinRemapConfig`をhostでコンパイルして実行すればfieldの定義そのものは観測できる
+   （`ArduinoCore-CH32`で実証済み）ので、gccを抽出時の依存に加えるかどうかが論点
+
+## registerをまたぐremap field（2026-08-20追記）
+
+`AFIO_PCFR1`しか読んでいなかったため、selectorの上位bitが`AFIO_PCFR2`にあるfamilyで
+fieldが途中で切れていました。切れても`valid_values`だけは格子から広い値が入るので、
+**bit幅に収まらない値**という形で表に残っていました（16 selector）。
+
+WCHは同じ「上位半分」を3通りに書きます。いずれも`tools/signal_vocabulary.py`の
+`canonical_field()`が同じ名前へ畳みます。
+
+| 書き方 | 例 | family |
+|---|---|---|
+| `_H`接尾辞 | `AFIO_PCFR2_USART1_RM_H` | L103 / M103ヘッダ |
+| 同名をもう一方のregisterに | `AFIO_PCFR2_USART1_REMAP` | V30x / V4x7ヘッダ |
+| field名＋bit番号 | `AFIO_PCFR2_USART1_RM1` | V20x / V30x のRM |
+
+CH32V20xのヘッダは`AFIO_PCFR2_`定義を1つも持たないため、ここだけはRM側からしか取れません。
+`build_candidate.py`はヘッダとRMの和を取り、片方にしかないregisterを補完します。
+
+結果は`ArduinoCore-CH32`が持つ独立実装（EVTの`GPIO_PinRemapConfig`をhostでコンパイルして
+実行し、fieldを観測するもの）と突き合わせて検証しました。ヘッダを読むだけで、
+分割fieldを含めて同じ答えになります。
+
+## 資料の大文字小文字が経路を1本落としていた（2026-08-20追記）
+
+CH32X035はremap格子を持たず、経路をregister field説明の本文に書きます。その本文の
+大文字小文字が揃っていません。`AFIO_PCFR1.USART4_RM`は6行のうち1行だけが小文字です。
+
+```
+001: Mapping (RX/PA9, CTS/PA7, TX/PA5, CK/PA6, RTS/PB21)
+010: mapping (rx/pc17, cts/pb15, tx/pc16, ck/pb2, rts/pa8)   <- ここだけ小文字
+011: Mapping (RX/PA10, CTS/PA14, TX/PB9, CK/PB8, RTS/PA13)
+```
+
+`extract_registers.routes_in()`のpad判定が大文字前提だったため、**値2の経路だけが
+丸ごと落ちていました**。落ちた値2は`TX/PC16, RX/PC17`で、残っていた値5（`1x1`）は
+`TX/PC17, RX/PC16`です。**同じ2 padでTXとRXが逆**なので、取り違えるとSerialは
+ボーレートもpinも正しいまま文字化けします。現在は本文を大文字化してから読みます。
+
+同じ説明文から、値4と6（`1x0`）、値5と7（`1x1`）が**同じ経路の別名**であることも分かります。
+EVTのgpioヘッダが`GPIO_FullRemap_USART4`に7しか与えていないのは5が無効だからではありません。
+
+## 経路の持ち主はpadでは決まらない（2026-08-20追記）
+
+datasheetのpin表は`T1C1_3`と書きます。「このpadは**TIM1自身の**remap fieldが3のとき
+TIM1のchannel 1を出す」という意味で、**signal名がペリフェラルを名指ししています**。
+padは名指ししません。1つのpadは複数のペリフェラルを載せるからです。
+
+`build_candidate.py`の突き合わせは以前、RMが同じ(signal, 値, pad)を書いている場合の次に
+**pad+値**を見ていました。これが誤ります。CH32X035の`AFIO_PCFR1.TIM1_RM`の説明文は
+PDFのテキスト層で**値1の途中で切れており**、値2以降がRMから取れません。
+
+```
+000: Mapping (CH1/PB9, ..., C3N/PB8) 001: Mapping (CH1/PB9, ..., BKIN/PA6, C1N/PA7,
+                                                                          ^ ここで終わり
+```
+
+そのためTIM1の値3の経路（PC0〜PC7・PC18）がpad+値へ落ち、同じpadを説明文に持つ
+I2C1・SPI1・USART2のselectorへ付いていました。**TIM1の経路が3つの別selectorに分散し、
+`afio-tim1-remap`のvalid_valuesからは値3が消えます。**
+
+現在の優先順位は次のとおりで、名前の証拠がpadより先に来ます。
+
+1. RMが同じ(signal, 値, pad)を書いている
+2. **signal名が名指しするペリフェラルにselectorが1つある**（語彙規則で読む）
+3. pad+値が1つのselectorだけを指す
+4. signalのペリフェラルがselector名の前半と一致し、候補が1つ
 
 ## 電気的特性章の調査（2026-08-19追記）
 

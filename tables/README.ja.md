@@ -16,11 +16,11 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
 
 付属表
   product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
-  remap_fields.csv        154行  route selector定義（series×field: register/bit/reset/valid値）
-  remap_routes.csv       2228行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  remap_fields.csv        262行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       4380行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 76行  クロック（系統主頻F_MAIN・上限F_*）と動作電圧V_DD
-  evt_examples.csv       1685行  EVT同梱の例題一覧（周辺グループ→例題→説明）
+  evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -74,6 +74,18 @@ pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、operating_
 ### `remap_fields.csv` / `remap_routes.csv`
 
 AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）ですが、**根拠ごとの一致記録がファイルに残っていないため全行reference**です。EVTとRMの突き合わせを記録付きで再実行して確定へ昇格するのが次の課題です。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
+
+読み方に注意が要る列が3つあります。
+
+**`bits`はbitごとにregister名を持ちます**——`PCFR1:2;PCFR2:19;PCFR2:20`のように、値のLSBから順に`<register>:<bit>`を`;`で並べます。ほとんどのselectorは1つのregisterに収まりますが、CH32L103 / CH32M103 / CH32V20x / CH32V30x / CH32V4x7では**selectorがPCFR1とPCFR2にまたがります**。PCFR1だけを書くとエラーにならずに別の経路が選ばれるので、上位半分を落とさないための修飾です。`register`列は同じことを`PCFR1|PCFR2`と要約します。
+
+**`peripheral`/`role`は`signal`を正規化した読みです**。`signal`は原典の表記のまま残してあり、同じ役割が資料により`USART1_TX` / `UART_TX` / `TX1` / `UTX`と書かれます。`tools/signal_vocabulary.py`の語彙規則がこれを1組へ読み、規則が当たらない行は**両方とも空**にします（推測で埋めるより、埋まっていないことが分かるほうが使えるため）。現在空なのは4380行中14行で、`AETR2`（ADCトリガでペリフェラル役割ではない）、`TIETR`（`T1ETR`の誤植に見えるがdatasheet原文未確認）、`ISINK1`/`ISINK2`（ペリフェラル_役割の形をしていない実在の信号）、`X`・`V`・`SW`・`PD0`・`DVP_`（pin表のテキスト層が壊れた断片）です。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧と当たり具合を出せます。
+
+**`value=0`の行は既定経路です**。datasheet pin表の`default`列を値0として展開したもので、`basis`が`candidates(datasheet-pin-table-default:en)`になります。remap後の経路と同じ表に並ぶので、既定位置を知るためにpin_functions.csvを引き直す必要はありません。
+
+**`valid_values`は下限です**。3つの資料の和を採っています——RMのremap格子が挙げる値、datasheet pin表が実際に経路を持つと示した値、EVTヘッダが定数として列挙している値。格子は「どちらでもよい」桁を`x`で書くので過大に出ることがあり（CH32X035の`USART4_RM=1xx`が4通りに展開される）、逆にどの資料も触れていない値は落ちます。**列挙されていない値が使えないとは限りません**が、列挙されている値はいずれかの資料が実証しています。`remap_routes.csv`に出る経路はすべてここに含まれます。
+
+`tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**、`peripheral`と`role`が揃って埋まるか揃って空であること。
 
 ### `errata.csv`
 
@@ -152,7 +164,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
 - **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
-## 現況（2026-08-19生成）
+## 現況（2026-08-20生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
@@ -161,10 +173,10 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
 | product_attributes.csv | 995 | 926 | 68 | 1 |
-| remap_fields.csv | 154 | 0 | 154 | 0 |
-| remap_routes.csv | 2228 | 0 | 2228 | 0 |
+| remap_fields.csv | 262 | 0 | 262 | 0 |
+| remap_routes.csv | 4380 | 0 | 4380 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
-| operating_conditions.csv | 62 | 61 | 1 | 0 |
+| operating_conditions.csv | 76 | 75 | 1 | 0 |
 | pins.csv | 4312 | 4022 | 290 | 0 |
 | pin_functions.csv | 29493 | 24718 | 4775 | 0 |
 
