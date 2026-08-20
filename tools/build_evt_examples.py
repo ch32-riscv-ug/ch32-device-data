@@ -22,10 +22,14 @@ REPO = Path(__file__).resolve().parent.parent
 ENTRY = re.compile(r"^(?P<indent>[ |]*)\|--\s*(?P<name>[^:：]+?)\s*(?:[:：]\s*(?P<desc>.*))?$")
 # 例題ではないディレクトリ（ドライバ・起動ファイル等）
 NOT_EXAMPLE = {"SRC", "PUB", "Core", "Debug", "Ld", "Peripheral", "Startup"}
-# 目録のグループ名に付く注記（`BLE ----only for CH32V20x_D8W`）
-GROUP_NOTE = re.compile(r"\s*-{2,}.*$")
+# 目録のグループ名に付く注記。英語版は`BLE ----only for CH32V20x_D8W`、
+# 中国語版は全角ダッシュ（`DVP ——仅适用于CH32V30x_D8C`）を使う。
+GROUP_NOTE = re.compile(r"\s*(?:[-–]{2,}|—+).*$")
 # 目録には説明書PDFなどファイルの行も混ざる。例題はディレクトリだけ。
 FILE_LIKE = re.compile(r"\.[A-Za-z0-9]{1,4}(?:-[A-Za-z]{2})?$")
+# 中国語版だけが中国語名で書いている項目（英語版は別名、実体も無い）。
+# 表示値に中国語は載せられないので落とし、件数だけ報告する。
+CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 
 COLUMNS = ["family", "group", "example", "description",
            "#", "confidence", "basis", "source"]
@@ -118,6 +122,11 @@ def main():
         if not keys:
             print(f"{repo.name}: EVT目録が読めない", file=sys.stderr)
             continue
+        chinese = {k for k in keys if CJK.search(k[0]) or CJK.search(k[1])}
+        if chinese:
+            keys -= chinese
+            print(f"{repo.name}: 中国語名のみの項目を除外 "
+                  f"{sorted(e for _, e in chinese)}", file=sys.stderr)
         disk, unlisted = disk_coverage(evt, keys)
         if unlisted:
             print(f"{repo.name}: 目録に無いグループ {unlisted}", file=sys.stderr)

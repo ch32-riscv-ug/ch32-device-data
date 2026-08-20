@@ -878,148 +878,78 @@ CH32V20x,APPLICATION,WUI,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_
 CH32V20x,APPLICATION,WUI/WUI,WCHGUI routine,#,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BKP,BKP,BKP routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,BLE Certification,Product: WCH CH32V208 QDID: 179771,#,reference,evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,BLE_UART,"BLE and UART transparent transmission routine, for detailed instructions, please refer to the <description.txt> document in the root directory",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,BLE_USB,"BLE with USB routine, USB emulation 340 device forwards BLE data",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,BackupUpgrade_IAP,"backup wireless upgrade IAP routine. Detect the current code flag, determine whether to move the code from the backup area to the user area, and run the code in the user area",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,BackupUpgrade_OTA,"backup wireless upgrade user routine. Add OTA function to peripheral slave routines, save the upgrade firmware to the backup area and jump to the IAP program to upgrade",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,Broadcaster,"broadcaster routine, always broadcast when in broadcast status",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,CentPeri,"central-peripheral routine, integrate the function of central routine and peripheral routine and run simultaneously",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,Central,"central routine, actively scan surrounding devices, conect to the specified peripheral address, search custom service and characteristic, execute read/write commands, peripheral routine is needed, and modify the peripheral address to the routine target address, (84:C2:E4:03:02:02) by default",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,CyclingSensor,"cycling sensor routine, upload speed and cadence regularly after connected to the host",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,DirectTest,"direct test routine, test data packets sent by specified communication channel",#,reference,evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HAL,Hardware-related files shared by routines,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HID_Consumer,"BLE consumer routine, simulate user control device, upload volume key down key regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HID_Keyboard,"BLE keyboard routine, simulate a keyboard device, upload key value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HID_Mouse,"BLE mouse routine, simulate a mouse device, upload key value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HID_Touch,"BLE touch routine, simulate a touch pencil device,  upload touch value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,HeartRate,"heart rate routine, upload heart rate regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,LIB,BLE protocol stack library file and header file,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,LWNS,"LWNS wireless networking routine,including broadcast/unicast/netflood/mesh.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH,,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/MESH_LIB,MESH protocol stack library file and header file,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_ali_light,"Tmall Genie light routine, devices can be found and provisioned network via Tmall Genie, to control the switch state. By default, only switch attribute can be controlled. If other attributes (brightness, power, temperature, etc.) are needed, add the corresponding processing function and status report function according to the attribute description of the Alibaba Cloud product configuration.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_ali_light_add_lightness,"MESH general attribute adding routine. On the basis of the Tmall Genie light routine, the brightness attribute is added, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding other MESH general attributes.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_ali_light_add_windspeed,"Tmall definition attribute adding routine. On the basis of the Tmall Genie light routine, the wind speed attribute is added, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding other Tmall definition attributes.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_ali_light_multi_element,"Multi-element fan lamp, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding multi-element Tmall definition attributes.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_ali_light_with_peripheral,"Based on the Tmall Genie light routine, add brightness and color temperature controls, it supports the connection control of BLE debugging tool on the mobile phone.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_proxy,"proxy node routine, which can be used to provision network through the PV_GATT layer (BLE connection).",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor,"vendor-defined model routine, used with provisioner_vendor, supports two communication attributes of response transmission and non-response transparent transmission, and develops the communication protocol by yourself.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor_friend,"based on vendor-defined model routine, support friend node function",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor_low_power,"On the basis of the vendor custom model routine, support low-power node functions and should be used with friend nodes",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor_self_provision,"On the basis of the vendor custom model routine, support local provision",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor_self_provision_IAP,"MESH backup wireless upgrade IAP routine, detect the current code flag, judge whether to move the backup area code to the user area and run the user area code",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/adv_vendor_self_provision_with_peripheral,"MESH backup wireless upgrade user routine, On the basis of the vendor custom model routine, supports the connection control of the mobile phone BLE debugging assistant, receives the distribution network information through BLE and distributes the network itself. It is suitable for terminal control networking applications. It can formulate the communication protocol by itself to realize the mobile phone control all devices in the mesh network.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/provisioner_vendor,"vendor-defined model self-provisioning network initiator routine, used with adv_vendor, automatically provision network to the surrounding devices without network, and add it to its own mesh network, support provision network to six devices by default . The default configuration device is bound with single APPKEY, which is used for response transmission and non-response transparent transmission, and the configuration device is bound with single subscription address, which is used for mass sending of unanswered messages",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MESH/provisioner_vendor_with_peripheral,"Based on the vendor-defined model self-provisioning network initiator routine, can be connected and controlled by BLE debugging tool on the mobile phone, transfer the communication between the mobile phone and the mesh network, and can draw up the communication protocol to implement that all devices in mesh network can be controlled the mobile phone.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MultiCentPeri,"Multi-central and multi-peripheral routines, support connecting three masters and three slaves at the same time",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,MultiCentral,"multicentral routine, actively scan surrounding devices, conect to the specified three peripheral addresses, search custom services and characteristics, execute read/write commands, peripheral routine is needed, and modify the peripheral address to this routine target address, the addresses of these peripherals are (84:C2:E4:03:02:02), (84:C2:E4:03:02:03) and (84:C2:E4:03:02:04) by default",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,Observer,"observer routine, scan regularly, print the scanned broadcast address if the scanning result is not empty",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,OnlyUpdateApp_IAP,"the only library wireless upgrade IAP routine, with OTA function, upgrade the user area code after receiving the upgraded firmware",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,OnlyUpdateApp_Peripheral,"the only library wireless upgrade user routine, on the basis of peripheral routine, the jumping to IAP program is added for subsequent upgrades",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,PAwR_ADV,periodic advertising with responses routine in advertising,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,PAwR_RSP,periodic advertising with responses routine in responses,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,Peripheral,"peripheral role routine, custom including five services with different  attributes, including read attribute, write attribute, notify attribute, read/write attribute, and safe and readable attribute",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,RF_PHY,non-standard wireless transceiver routines,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,RF_PHY_Auto,non-standard wireless auto transceiver routines,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,RF_PHY_Hop,non-standard wireless frequency hopping transceiver routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,RunningSensor,"running sensor routine,upload rate regularly after connected to the central",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,SYNC_ADV,cycle synchronization advertising routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,SYNC_SCAN,cycle synchronization scanning routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,SpeedTest_Central,Bluetooth speed test central routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,SpeedTest_Peripheral,Bluetooth speed test peripheral routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,peripheral_ETH,Bluetooth ETH routines,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE,peripheral_ancs_client,"peripheral slave role routine, including Apple Notification Center service",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,BLE_UART,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,BLE_USB,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,BLE认证证书,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,BackupUpgrade_IAP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,BackupUpgrade_OTA,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,Broadcaster,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,CentPeri,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,Central,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,CyclingSensor,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,DirectTest,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HAL,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HID_Consumer,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HID_Keyboard,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HID_Mouse,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HID_Touch,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,HeartRate,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,LIB,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,LWNS,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/MESH_LIB,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_ali_light,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_ali_light_add_lightness,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_ali_light_add_windspeed,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_ali_light_multi_element,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_ali_light_with_peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_proxy,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor_friend,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor_low_power,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor_self_provision,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor_self_provision_IAP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/adv_vendor_self_provision_with_peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/provisioner_vendor,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MESH/provisioner_vendor_with_peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MultiCentPeri,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,MultiCentral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,Observer,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,OnlyUpdateApp_IAP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,OnlyUpdateApp_Peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,PAwR_ADV,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,PAwR_RSP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,Peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,RF_PHY,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,RF_PHY_Auto,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,RF_PHY_Hop,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,RunningSensor,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,SYNC_ADV,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,SYNC_SCAN,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,SpeedTest_Central,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,SpeedTest_Peripheral,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,peripheral_ETH,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE ——仅适用于CH32V20x_D8W,peripheral_ancs_client,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,CAN,Time-triggered,time triggered communication mode,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,CAN  ——仅适用于CH32V20x_D6-CH32V20x_D8W,Networking,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,CAN  ——仅适用于CH32V20x_D6-CH32V20x_D8W,TestMode,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,CAN  ——仅适用于CH32V20x_D6-CH32V20x_D8W,Time-triggered,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,BLE_UART,"BLE and UART transparent transmission routine, for detailed instructions, please refer to the <description.txt> document in the root directory",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,BLE_USB,"BLE with USB routine, USB emulation 340 device forwards BLE data",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,BackupUpgrade_IAP,"backup wireless upgrade IAP routine. Detect the current code flag, determine whether to move the code from the backup area to the user area, and run the code in the user area",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,BackupUpgrade_OTA,"backup wireless upgrade user routine. Add OTA function to peripheral slave routines, save the upgrade firmware to the backup area and jump to the IAP program to upgrade",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,Broadcaster,"broadcaster routine, always broadcast when in broadcast status",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,CentPeri,"central-peripheral routine, integrate the function of central routine and peripheral routine and run simultaneously",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,Central,"central routine, actively scan surrounding devices, conect to the specified peripheral address, search custom service and characteristic, execute read/write commands, peripheral routine is needed, and modify the peripheral address to the routine target address, (84:C2:E4:03:02:02) by default",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,CyclingSensor,"cycling sensor routine, upload speed and cadence regularly after connected to the host",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,DirectTest,"direct test routine, test data packets sent by specified communication channel",#,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HAL,Hardware-related files shared by routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HID_Consumer,"BLE consumer routine, simulate user control device, upload volume key down key regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HID_Keyboard,"BLE keyboard routine, simulate a keyboard device, upload key value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HID_Mouse,"BLE mouse routine, simulate a mouse device, upload key value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HID_Touch,"BLE touch routine, simulate a touch pencil device,  upload touch value regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,HeartRate,"heart rate routine, upload heart rate regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,LIB,BLE protocol stack library file and header file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,LWNS,"LWNS wireless networking routine,including broadcast/unicast/netflood/mesh.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/MESH_LIB,MESH protocol stack library file and header file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_ali_light,"Tmall Genie light routine, devices can be found and provisioned network via Tmall Genie, to control the switch state. By default, only switch attribute can be controlled. If other attributes (brightness, power, temperature, etc.) are needed, add the corresponding processing function and status report function according to the attribute description of the Alibaba Cloud product configuration.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_ali_light_add_lightness,"MESH general attribute adding routine. On the basis of the Tmall Genie light routine, the brightness attribute is added, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding other MESH general attributes.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_ali_light_add_windspeed,"Tmall definition attribute adding routine. On the basis of the Tmall Genie light routine, the wind speed attribute is added, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding other Tmall definition attributes.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_ali_light_multi_element,"Multi-element fan lamp, which is used to compare the original Tmall Genie light routine to quickly become familiar with the method of adding multi-element Tmall definition attributes.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_ali_light_with_peripheral,"Based on the Tmall Genie light routine, add brightness and color temperature controls, it supports the connection control of BLE debugging tool on the mobile phone.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_proxy,"proxy node routine, which can be used to provision network through the PV_GATT layer (BLE connection).",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor,"vendor-defined model routine, used with provisioner_vendor, supports two communication attributes of response transmission and non-response transparent transmission, and develops the communication protocol by yourself.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor_friend,"based on vendor-defined model routine, support friend node function",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor_low_power,"On the basis of the vendor custom model routine, support low-power node functions and should be used with friend nodes",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor_self_provision,"On the basis of the vendor custom model routine, support local provision",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor_self_provision_IAP,"MESH backup wireless upgrade IAP routine, detect the current code flag, judge whether to move the backup area code to the user area and run the user area code",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/adv_vendor_self_provision_with_peripheral,"MESH backup wireless upgrade user routine, On the basis of the vendor custom model routine, supports the connection control of the mobile phone BLE debugging assistant, receives the distribution network information through BLE and distributes the network itself. It is suitable for terminal control networking applications. It can formulate the communication protocol by itself to realize the mobile phone control all devices in the mesh network.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/provisioner_vendor,"vendor-defined model self-provisioning network initiator routine, used with adv_vendor, automatically provision network to the surrounding devices without network, and add it to its own mesh network, support provision network to six devices by default . The default configuration device is bound with single APPKEY, which is used for response transmission and non-response transparent transmission, and the configuration device is bound with single subscription address, which is used for mass sending of unanswered messages",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MESH/provisioner_vendor_with_peripheral,"Based on the vendor-defined model self-provisioning network initiator routine, can be connected and controlled by BLE debugging tool on the mobile phone, transfer the communication between the mobile phone and the mesh network, and can draw up the communication protocol to implement that all devices in mesh network can be controlled the mobile phone.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MultiCentPeri,"Multi-central and multi-peripheral routines, support connecting three masters and three slaves at the same time",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,MultiCentral,"multicentral routine, actively scan surrounding devices, conect to the specified three peripheral addresses, search custom services and characteristics, execute read/write commands, peripheral routine is needed, and modify the peripheral address to this routine target address, the addresses of these peripherals are (84:C2:E4:03:02:02), (84:C2:E4:03:02:03) and (84:C2:E4:03:02:04) by default",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,Observer,"observer routine, scan regularly, print the scanned broadcast address if the scanning result is not empty",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,OnlyUpdateApp_IAP,"the only library wireless upgrade IAP routine, with OTA function, upgrade the user area code after receiving the upgraded firmware",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,OnlyUpdateApp_Peripheral,"the only library wireless upgrade user routine, on the basis of peripheral routine, the jumping to IAP program is added for subsequent upgrades",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,PAwR_ADV,periodic advertising with responses routine in advertising,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,PAwR_RSP,periodic advertising with responses routine in responses,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,Peripheral,"peripheral role routine, custom including five services with different  attributes, including read attribute, write attribute, notify attribute, read/write attribute, and safe and readable attribute",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,RF_PHY,non-standard wireless transceiver routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,RF_PHY_Auto,non-standard wireless auto transceiver routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,RF_PHY_Hop,non-standard wireless frequency hopping transceiver routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,RunningSensor,"running sensor routine,upload rate regularly after connected to the central",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,SYNC_ADV,cycle synchronization advertising routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,SYNC_SCAN,cycle synchronization scanning routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,SpeedTest_Central,Bluetooth speed test central routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,SpeedTest_Peripheral,Bluetooth speed test peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,peripheral_ETH,Bluetooth ETH routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,peripheral_ancs_client,"peripheral slave role routine, including Apple Notification Center service",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,CAN,Time-triggered,time triggered communication mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,CRC,CRC_Calculation,CRC routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,DMA,DMA_MEM2MEM,Memory to memory mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,DMA,DMA_MEM2PERIP,"Memory to peripheral mode, and peripheral to memory mode routine, see peripheral sub-routines",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH,1_Tool_Doc,routine-related documents and configuration software,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,DHCP,"DHCP demonstration routine to obtain IP automatically, and establish TCP connection for data return",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART. By default, the 1000000 baud rate (can be modified in bsp_uart.h) is selected for serial port data transmission",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,IPRaw_PING,PING function demonstration routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,Mail,to demonstrate reception and transmission of SMTP and POP3 mails,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,NetLib,Network protocol stack library file,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,TcpClient,demonstration routine that TCP client receives data after connected to the server and then returns data,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,TcpServer,demonstration routine that TCP server receives data after connected to the client and then returns data,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,UdpClient,demonstration routine that Udp Client receives data and returns data,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,UdpServer,demonstration routine that Udp Server receives data and returns data,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH,WebServer,"Web Server routine, to demonstrate the configuration of WCHNET device functions through Web browser. As the WCHNET devices have built-in web server, the network parameter configuration and password management of WCHNET can be implemented on the web page.",#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,1_Tool_Doc,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,DHCP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,DNS,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,ETH_CFG,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,ETH_IAP,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,ETH_UART,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,IPRaw_PING,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,MQTT,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,Mail,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,NetLib,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,TcpClient,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,TcpServer,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,UdpClient,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,UdpServer,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ETH ——仅适用于CH32V20x_D8-CH32V20x_D8W,WebServer,,#,reference,evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,1_Tool_Doc,routine-related documents and configuration software,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,DHCP,"DHCP demonstration routine to obtain IP automatically, and establish TCP connection for data return",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART. By default, the 1000000 baud rate (can be modified in bsp_uart.h) is selected for serial port data transmission",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,IPRaw_PING,PING function demonstration routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,Mail,to demonstrate reception and transmission of SMTP and POP3 mails,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,NetLib,Network protocol stack library file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,TcpClient,demonstration routine that TCP client receives data after connected to the server and then returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,TcpServer,demonstration routine that TCP server receives data after connected to the client and then returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,UdpClient,demonstration routine that Udp Client receives data and returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,UdpServer,demonstration routine that Udp Server receives data and returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,WebServer,"Web Server routine, to demonstrate the configuration of WCHNET device functions through Web browser. As the WCHNET devices have built-in web server, the network parameter configuration and password management of WCHNET can be implemented on the web page.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,EXTI,EXTI0,External Interrupt Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,FreeRTOS,FreeRTOS_Core,FreeRTOS migration routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1147,50 +1077,28 @@ CH32V307,DAC,DualDAC_SineWave,dual DAC output sine wave routine,#,confirmed,evt:
 CH32V307,DAC,DualDAC_Triangle,dual DAC output triangular wave routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,DMA,DMA_MEM2MEM,memory to memory mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,DVP,DVP_TFTLCD,DVP routine to operate OV2640 camera video mode to display image on LCD,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,DVP,DVP_UART,DVP routine to operate OV2640 camera JPEG mode,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,DVP ——仅适用于CH32V30x_D8C,DVP_TFTLCD,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,DVP ——仅适用于CH32V30x_D8C,DVP_UART,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH,1_Tool_Doc,ETH routine related documents and tools,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,8_UART_Server,demonstration routine of 8 UART network server,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,DHCP,DHCP demonstration routine to obtain IP automatically,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,ETH_Filter_Multicast,demonstrate filtering and multicast sending functions,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,IPRaw_PING,"IP_RAW routine, to demonstrate that the TCP client receives data after connecting to the server and then sends it back",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,IoCHub,,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,IoCHub/IoCHub_Demo,"IoCHub basic routines, using AT commands to implement IoCHub's basic function demonstration on MCU",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,IoCHub/Lib,IoCHub library file,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,Mail,"mail routine, to demonstrate reception and transmission of SMTP and POP3 mails",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,NetLib,Network protocol stack library file,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,TcpClient,demonstration routine that TCP client receives data after connecting to the server and then returns data,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,TcpServer,demonstration routine that TCP server receives data after connecting to the client and then returns data,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,UdpClient,demonstration routine that Udp Client receives data and returns data,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,UdpServer,demonstration routine that Udp Server receives data and returns data,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH,WebServer,"Web Server routine, to demonstrate the configuration of WCHNET device functions through Web browser. As the WCHNET devices have built-in web server, the network parameter configuration and password management of WCHNET can be implemented on the web page.",#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,1_Tool_Doc,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,8_UART_Server,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,DHCP,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,DNS,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,ETH_CFG,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,ETH_Filter_Multicast,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,ETH_IAP,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,ETH_UART,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,IPRaw_PING,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,IoCHub,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,IoCHub/IoCHub_Demo,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,IoCHub/Lib,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,MQTT,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,Mail,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,NetLib,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,TcpClient,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,TcpServer,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,UdpClient,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,UdpServer,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ETH ——仅适用于CH32V30x_D8C,WebServer,,#,reference,evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,DVP,DVP_TFTLCD,DVP routine to operate OV2640 camera video mode to display image on LCD,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,DVP,DVP_UART,DVP routine to operate OV2640 camera JPEG mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,1_Tool_Doc,ETH routine related documents and tools,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,8_UART_Server,demonstration routine of 8 UART network server,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,DHCP,DHCP demonstration routine to obtain IP automatically,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,ETH_Filter_Multicast,demonstrate filtering and multicast sending functions,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,IPRaw_PING,"IP_RAW routine, to demonstrate that the TCP client receives data after connecting to the server and then sends it back",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,IoCHub,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,IoCHub/IoCHub_Demo,"IoCHub basic routines, using AT commands to implement IoCHub's basic function demonstration on MCU",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,IoCHub/Lib,IoCHub library file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,Mail,"mail routine, to demonstrate reception and transmission of SMTP and POP3 mails",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,NetLib,Network protocol stack library file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,TcpClient,demonstration routine that TCP client receives data after connecting to the server and then returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,TcpServer,demonstration routine that TCP server receives data after connecting to the client and then returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,UdpClient,demonstration routine that Udp Client receives data and returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,UdpServer,demonstration routine that Udp Server receives data and returns data,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,WebServer,"Web Server routine, to demonstrate the configuration of WCHNET device functions through Web browser. As the WCHNET devices have built-in web server, the network parameter configuration and password management of WCHNET can be implemented on the web page.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,EXTI,EXTI0,External Interrupt Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,FPU,FPU,FPU hardware floating point operation routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
