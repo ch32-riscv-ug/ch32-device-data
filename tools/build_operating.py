@@ -46,6 +46,21 @@ TEXT_REPAIRS = [
 COLUMNS = ["series", "symbol", "parameter", "condition",
            "min", "max", "unit", "#", "confidence", "basis", "datasheet"]
 
+# データシート1ページ目の特徴リストが宣言する「系統主頻」。電気的特性表の
+# F_HCLK（AHBの上限値）とは別の事実で、こちらが製品として謳われる周波数
+# （例: CH32V003は本文48MHz、電気的特性の上限は50MHz）。表ではなく散文
+# なので、表抽出とは別に拾う。
+HEADLINE = {
+    "en": [re.compile(r"(?:system|main)\s+(?:main\s+)?frequency[^.\n]{0,24}?(\d{2,3})\s*MHz",
+                      re.IGNORECASE),
+           re.compile(r"(\d{2,3})\s*MHz\s+system\s+(?:main\s+)?frequency",
+                      re.IGNORECASE)],
+    "zh": [re.compile(r"系统主频[^。\n]{0,8}?(\d{2,3})\s*MHz"),
+           re.compile(r"(\d{2,3})\s*MHz\s*系统主频"),
+           re.compile(r"(\d{2,3})\s*MHz\s*主频"),
+           re.compile(r"主频[^。\n]{0,12}?(\d{2,3})\s*MHz")],
+}
+
 
 def norm_header(cell):
     text = FOOTNOTE.sub("", (cell or "")).replace(" ", "").replace(".", "")
@@ -121,6 +136,19 @@ def read_edition(pdf_path, lang):
     return None, []
 
 
+def read_headline_clock(pdf_path, lang):
+    """(page_no, MHz) — 1ページ目付近の特徴リストが謳う系統主頻。無ければ(None, None)。"""
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages[:3]:
+            text = page.extract_text() or ""
+            values = {m.group(1) for pattern in HEADLINE[lang]
+                      for m in pattern.finditer(text)}
+            if values:
+                # 同一ページに複数表記があるときは高い方（「最高NNMHz」表記）
+                return page.page_number, max(values, key=int)
+    return None, None
+
+
 def main():
     with (REPO / "tables/products.csv").open(encoding="utf-8") as f:
         products = list(csv.DictReader(f))
@@ -174,6 +202,33 @@ def main():
                 confidence = "reference"
                 basis = f"{datasheet}:en(p.{en_page})"
             out.append({**row, "series": series, "#": "#",
+                        "confidence": confidence, "basis": basis,
+                        "datasheet": datasheet})
+
+        heads = {}
+        for lang in ("zh", "en"):
+            path = MIRRORS / family / f"datasheet_{lang}" / datasheet
+            if path.exists():
+                page_no, value = read_headline_clock(path, lang)
+                if value:
+                    heads[lang] = (page_no, value)
+        if heads:
+            value = heads.get("en", heads.get("zh"))[1]
+            if len(heads) == 2 and heads["zh"][1] == heads["en"][1]:
+                confidence = "confirmed"
+                basis = "+".join(f"{datasheet}:{lang}(p.{heads[lang][0]})"
+                                 for lang in ("zh", "en"))
+            elif len(heads) == 2:
+                confidence = "conflict"
+                basis = (f"{datasheet}:en(p.{heads['en'][0]})"
+                         f"+!{datasheet}:zh(max={heads['zh'][1]})")
+            else:
+                lang, (page_no, _) = next(iter(heads.items()))
+                confidence = "reference"
+                basis = f"{datasheet}:{lang}(p.{page_no})"
+            out.append({"series": series, "symbol": "F_MAIN",
+                        "parameter": "System main frequency", "condition": "",
+                        "min": "", "max": value, "unit": "MHz", "#": "#",
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
 

@@ -19,7 +19,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   remap_fields.csv        154行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       2228行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
-  operating_conditions.csv 62行  一般動作条件（クロック上限F_*とV_DD範囲）
+  operating_conditions.csv 76行  クロック（系統主頻F_MAIN・上限F_*）と動作電圧V_DD
+  evt_examples.csv       1685行  EVT同梱の例題一覧（周辺グループ→例題→説明）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -34,6 +35,7 @@ product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
 errata.series / operating_conditions.series             → series.series
+evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
@@ -81,7 +83,19 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 ### `operating_conditions.csv`
 
-datasheetの「一般動作条件（General operating conditions）」表からクロック上限（`F_HCLK`等のF_系）と動作電圧（`V_DD`、条件別の行あり）を抽出したものです。表示テキストは英語版、最小/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。電気特性章の残り（絶対最大定格・消費電流等）は未収集です（docs/extraction-survey.ja.md参照）。
+シリーズごとのクロックと動作電圧です。生成は`tools/build_operating.py`。
+
+- **`F_MAIN`**: datasheet 1ページ目の特徴リストが謳う**系統主頻**。製品として語られる周波数がこれです
+- `F_HCLK`/`F_PCLK*`/`F_CORE*`: 電気的特性章「一般動作条件」表の**上限値**。F_MAINとは別の事実で、値も食い違います（CH32V003は本文48MHz・電気的特性の上限50MHz）。README の Clock 列は F_MAIN を優先し、無いシリーズ（CH32X035・CH32H41x）だけ F_HCLK / F_CORE に落とします
+- `V_DD`: 動作電圧。ADC使用時・USB使用時などの条件行があります
+
+表示テキストは英語版、最小/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。電気特性章の残り（絶対最大定格・消費電流・flash耐久等）は未収集です（docs/extraction-survey.ja.md参照）。
+
+### `evt_examples.csv`
+
+EVTに同梱される例題の一覧です。生成は`tools/build_evt_examples.py`。EVTの目録（`EVT/<name>_List_EN.txt`と中国語版。中国語版はGBK）を索引の権威とし、**展開済みEVTツリーに実在するか**を突き合わせます。目録2版＋実体の3根拠のうち2つ以上でconfirmed。
+
+referenceは目録と実体の食い違いで、文書側の事実です（目録が触れていないグループ、実体に無い例題名、目録内の綴りゆれ）。目録に無いグループは生成時にstderrへ報告します（現在: CH32V407のUSBHS、CH32X035のSYSTICK、CH32X315のUSBHS/USBSS）。説明は英語版のみを採用し、中国語版にしか説明が無い行は空にします。
 
 ### `cores.csv`
 
@@ -167,6 +181,7 @@ uv run tools/build_tables.py --out tables                     # families/series/
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
+uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
 uv run tools/scan_errata.py                                   # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ

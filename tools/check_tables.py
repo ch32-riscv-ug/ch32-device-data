@@ -31,7 +31,7 @@ def main() -> int:
          for name in ("families", "series", "products", "packages",
                       "cores", "documents", "pins", "pin_functions",
                       "product_attributes", "remap_fields", "remap_routes",
-                      "errata", "operating_conditions")}
+                      "errata", "operating_conditions", "evt_examples")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -70,6 +70,8 @@ def main() -> int:
         check("cores", r["core"], r["manual"], documents, "documents")
     for r in t["errata"]:
         check("errata", r["id"], r["series"], series, "series", ";")
+    for r in t["evt_examples"]:
+        check("evt_examples", r["example"], r["family"], families, "families")
     for r in t["operating_conditions"]:
         check("operating_conditions", r["symbol"], r["series"], series,
               "series", ";")
