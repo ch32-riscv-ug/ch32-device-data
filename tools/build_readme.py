@@ -27,6 +27,8 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 REPO = Path(__file__).resolve().parent.parent
 TABLES = REPO / "tables"
 MIRRORS = Path("/home/mt/dev_wch")
@@ -401,20 +403,37 @@ def extras_section(family: str) -> list[str]:
     return [path.read_text(encoding="utf-8").rstrip(), ""]
 
 
-def images_section(family: str) -> list[str]:
-    image_dir = MIRRORS / family / "image"
-    if not image_dir.is_dir():
-        return []
-    files = sorted(p.name for p in image_dir.iterdir()
-                   if p.suffix.lower() in (".png", ".jpg", ".jpeg", ".svg"))
-    if not files:
-        return []
-    order = {"system": 0, "product": 1, "architecture": 2}
-    files.sort(key=lambda n: (order.get(n.split("_")[0], 9), n))
-    out = ["## Diagrams", ""]
-    for name in files:
-        title = name.rsplit(".", 1)[0].replace("_", " ")
-        out += [f"### {title}", f'<img src="image/{name}" />', ""]
+PACKAGE_IMAGES = ("https://raw.githubusercontent.com/ch32-riscv-ug/"
+                  "WCH-common/main/image")
+
+
+def pinout_images(data: Data, series: dict) -> list[str]:
+    """ピン配置図。名前は tools/check_images.py が決める規則そのままで、
+    存在確認はしない（未作成なら壊れた画像として見えるのが正しい）。
+    同じ配置の型番は1枚を共有するので、見出しに対象型番を並べる。"""
+    import check_images
+    products = data.series_products(series["series"])
+    mine = {p["part_number"] for p in products}
+    out = []
+    for (family, name), parts in sorted(check_images.pinout_groups().items()):
+        if not mine & set(parts):
+            continue
+        package = next(p["package"] for p in products
+                       if p["part_number"] == parts[0])
+        out += [f"**{', '.join(parts)}** ({package})", "",
+                f'<img src="image/{name}" alt="{parts[0]} pinout" />', "",
+                f"Package outline: "
+                f"[{package}]({PACKAGE_IMAGES}/package_{package}.png)", ""]
+    return out
+
+
+def images_section(data: Data, family: str) -> list[str]:
+    """ブロック図。シリーズごとに固定の名前で参照する。"""
+    out = ["## Block diagrams", ""]
+    for s in data.family_series(family):
+        out += [f"### {s['series']}",
+                f'<img src="image/architecture_{s["series"]}.png" '
+                f'alt="{s["series"]} block diagram" />', ""]
     return out
 
 
@@ -446,13 +465,14 @@ def render(data: Data, family: str) -> str:
             lines += comparison_section(data, s)
         lines += ["## Pin definitions", ""]
     for s in data.family_series(family):
+        lines += pinout_images(data, s)
         lines += pin_map_section(data, s)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
     lines += errata_section(data, family)
     lines += evt_examples_section(data, family)
     lines += extras_section(family)
-    lines += images_section(family)
+    lines += images_section(data, family)
     lines += ["---",
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"
               "ch32-device-data) (tables/ -- each value carries its evidence "

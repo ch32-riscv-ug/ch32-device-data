@@ -68,6 +68,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--missing", action="store_true",
                     help="未作成のファイルだけを出す")
+    ap.add_argument("--prune", action="store_true",
+                    help="READMEから参照されない画像を削除する")
     args = ap.parse_args()
 
     need = required()
@@ -87,6 +89,10 @@ def main():
             print(f"  {mark} {name:44} {description}")
         if extra:
             print(f"    参照されない既存ファイル: {', '.join(extra)}")
+            if args.prune:
+                for name in extra:
+                    (image_dir / name).unlink()
+                print(f"    → {len(extra)} 件を削除しました")
     print(f"\n合計: 必要 {total} / 未作成 {missing_total}")
 
 
