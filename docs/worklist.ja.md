@@ -94,6 +94,8 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張。下記 |
 | R-24追補 | クロック表の追補（A-1〜A-4）とremapの要確認（B） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`・`evt_variants.csv`新設、`operating_conditions.csv`に`typ`列、remapの誤帰属を修正。下記 |
 
+この過程で見つけて手を付けなかった穴は [F. 既知の穴](#f-既知の穴埋める順) に一覧にした。
+
 ### R-24追補（2026-08-21受領・実装済み）
 
 依頼は「PLLを実際に書くのに足りない4件（A-1〜A-4）」と「selectorとperipheralの番号
@@ -311,6 +313,107 @@ R-19で`extract_remap_fields.py`が果たしたのと同じ「独立検証」の
 - ch32-dataは`rcc_*.yaml`を9種持っている（`rcc_v003` `rcc_v00x` `rcc_v1` `rcc_v3`
   `rcc_v3_d8c` `rcc_x0` `rcc_l1` `rcc_h4` `rcc_ch641`）。C-3/C-5/C-6のfield符号化は
   ここと突き合わせられる。ただしV205/V407/V467/X305/X315/M030/M103は向こうに無い
+
+## F. 既知の穴（埋める順）
+
+R-19・R-24とその追補を実装する過程で見つかったが、依頼の範囲外として手を付けなかったもの。
+**資料側の穴**（上流にデータが無い）と**ツール側の穴**（資料にはあるが取れていない）を
+分けている。前者は直せないので記録が成果物、後者は直せる。
+
+| # | 穴 | 規模 | 側 | 判断 |
+|---|---|---:|---|---|
+| F-1 | pin表の電源pin名が添字で分断される | 約850行 | ツール | 直す。最大かつ最小リスク |
+| F-2 | CH32V20xのEVT headerに`AFIO_PCFR2_`が無い | 7 function | 資料 | **方針決定が必要**（下記） |
+| F-3 | 中国語版の文章中のpadを拾えない | 未計測 | ツール | 直す。影響範囲を測ってから |
+| F-4 | pin表のsignal名が縦書きセルで切れる | 約100行 | ツール | 直す。個別性が高い |
+| F-5 | `extract_registers`の見出しrun-on | 未計測 | ツール | R-20のD-2と同時 |
+| F-6 | CH32V30xのRM格子がI2S3のremap経路を書いていない | 12 function | 資料 | 記録のみ |
+| F-7 | CH32V30xのheaderに`DVP_REMAP`が無い | 2 function | 資料 | 記録のみ |
+| F-8 | CH32V003の`AETR`がADC 2 fieldのどちらか決まらない | 1 function | 資料 | 記録のみ |
+| F-9 | USBが48MHzを要求する根拠が散文 | — | ツール | R-24のC-7残り |
+
+### F-1 pin表の電源pin名が添字で分断される
+
+datasheetは電源ピンを`V`＋添字`DD33`のように組んでいて、PDFのテキスト層では
+**2つのセルに割れます**。`pad`列は正しいのに`signal`列が壊れます。
+
+```
+CH32H415REU6  pad=VDD33   functions = ['DD33', 'DD33', 'DD33', 'Main V', 'V']
+CH32H415REU6  pad=VSS     functions = ['SS', 'V']
+CH32H416RDU6  pad=VDD12A  functions = ['DD12A', 'V']
+```
+
+規模は`signal='V'`が**569行**、断片（`DD`/`SS`/`DDA`/`SSA`/`DDK`/`BAT`/`DD8`…）が
+**283行**で、`pin_functions.csv` 29493行の約2.9%。271 padで`V`と断片が同居し、
+298 padでは`V`だけが残っている（断片側が別の壊れ方をしている）。
+
+remap経路には影響しません（電源ピンにroute selectorは無い）。**consumerが
+「このpadは電源か」を判定するときに効きます。**
+
+直し方は既に repository 内に前例があります——`tools/build_operating.py`の
+`norm_symbol`が`V (6)\nDD` → `V_DD`を組み直しています。同じことをpin表側でやる。
+
+### F-2 CH32V20xのEVT headerに`AFIO_PCFR2_`が無い（**方針決定が必要**）
+
+datasheetのpin表は両言語でCH32V203/V208のUSART4を載せており、reference manualも
+`AFIO_PCFR2`を記述しています。ところが**`ch32v20x.h`に`AFIO_PCFR2_`の定義が1つも
+ありません**（`grep -c` = 0）。route selectorはEVT headerから作る方針なので、
+USART4のselectorが生成されず、7 functionが未解決のまま残ります。
+
+- `CH32V203` `USART4_TX`(PA5) `USART4_CK`(PA6) `USART4_CTS`(PA7) `USART4_RTS`(PA15) `USART4_RX`(PB5)
+- `CH32V203`/`CH32V208` `UART4_TX`(PB0) `UART4_RX`(PB1)
+
+**PCFR1だけ書いても何も起きない**ので、R-19のF-18と同型の穴です。埋めるには
+「selectorはEVT headerから作る」という方針を変える必要があります:
+
+| 選択肢 | 得るもの | 失うもの |
+|---|---|---|
+| headerのみ（現状） | selectorの存在がSDKのAPIと一致する | datasheetがpinを載せている経路が落ちる |
+| header ∪ RM | V203のUSART4が埋まる | RMのfield表の読み取り誤りがselectorを生む（F-5と相互作用） |
+| header ∪ RM（`basis`で区別） | 同上＋consumerが選べる | 表の意味が2種類になる |
+
+**これは決めていません。** 3番目が repository の慣行（`confidence`/`basis`で
+判断材料を渡す）に最も沿いますが、F-5を先に直さないとRM側の誤りが混入します。
+
+### F-3 中国語版の文章中のpadを拾えない
+
+文章からpadを拾う正規表現が`\bP[A-H]\d{1,2}\b`で、Pythonの`\w`はCJKを含むため
+`与PD1相连`の`PD1`の前に語境界が立ちません。中国語版のADC触发表
+（`ADC外部触发注入转换与PD1相连`）が0件になります。
+
+いまは英語版が同じ表を"connected to PD1"と書いているので和で埋まっていますが、
+**英語版RMが無いCH32V407/V467では埋まりません**（あちらの格子はpadを裸で書くので
+現状は影響なし）。前後をASCIIだけで見る形
+（`(?<![A-Za-z0-9])P[A-H]\d{1,2}(?![0-9])`）にすれば直りますが、
+中国語版の文章由来経路が全familyで増えるので、**増えた分を数えてから**入れる。
+
+### F-4 pin表のsignal名が縦書きセルで切れる
+
+F-1と同じ機構だが電源ピン以外。確認できているもの:
+
+| signal | pad | 本来 | series |
+|---|---|---|---|
+| `ART10_RTS_3LED0` | PD14 | `USART10_RTS` と `LED0` の混線 | V407/V467 |
+| `LTD`（44行） | 各所 | `LTDC_*` | V407/V467 |
+| `UHSIF_PORT42_` | — | `UHSIF_PORT42` | H417 |
+| `DVP_`, `DV` | — | `DVP_*` | V407/V467 |
+| `I2S3_W`, `I2S3_C`, `TIM3_C` | — | `I2S3_WS`, `I2S3_CK`, `TIM3_CH3` | V30x/V407 |
+| `MC`+`O`, `T`+`L`, `UT`, `N`, `K`, `S` | — | `MCO`, `TL?`, `UTX`? | V00x/V30x |
+
+`tools/signal_vocabulary.py --tables tables`が語彙規則の当たらないsignalを
+series別に出すので、そこが検出器になります（いま最大でV407/V467の7種）。
+**短い名前が全部壊れているわけではありません**——`MCO`・`SCL`・`SDA`・`SCK`・`NSS`・
+`CS`・`TX1`・`UTX`・`A0`〜`A13`・`HO0`〜`HO3`・`XI`/`XO`・`CC1`/`CC2`は原典どおりです。
+
+### F-6〜F-8 資料側で決まらないもの（記録のみ）
+
+- **CH32V30xの`I2S3_*` remap-1**（`I2S3_WS`/PA4、`I2S3_CK`/PC10、`I2S3_SD`/PC12、
+  4 series）。`SPI3_REMAP`が経路を決めるが、V30xのRM格子がその経路を書いていない。
+  **CH32V407/V467は書いているので決まる**——同じ周辺が資料の書き方次第で決まったり
+  決まらなかったりする
+- **CH32V30xの`DVP_*`**。CH32V407にはある`DVP_REMAP`がV30xのheaderに無い
+- **CH32V003の`AETR`**（PC2, remap-1）。datasheet独自の略記で、
+  `ADC_ETRGINJ`と`ADC_ETRGREG`のどちらか決められない（`AETR2`はpadで決まる）
 
 ## 利用状況（優先順位の根拠）
 
