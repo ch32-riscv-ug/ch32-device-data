@@ -50,9 +50,27 @@ def find_header(family: Path) -> Path | None:
     return plain[0] if plain else (candidates[0] if candidates else None)
 
 
-def find_manual(family: Path) -> Path | None:
-    manuals = sorted(p for p in (family / "datasheet_en").iterdir() if MANUAL.search(p.name))
-    return manuals[0] if manuals else None
+def find_manuals(family: Path) -> list[Path]:
+    """Every edition of the reference manual, oldest first.
+
+    English then Chinese, because the Chinese edition is the newer of the two and
+    the later one wins where they state a scalar differently. CH32V407's manual is
+    mirrored only in Chinese, so looking in datasheet_en alone left that family
+    with no manual at all.
+    """
+    found = []
+    for directory in ("datasheet_en", "datasheet_zh"):
+        if not (family / directory).is_dir():
+            continue
+        found += sorted(p for p in (family / directory).iterdir()
+                        if MANUAL.search(p.name))
+    return found
+
+
+def find_gpio(family: Path) -> Path | None:
+    """The EVT GPIO driver, whose GPIO_PinRemapConfig() names the legal routes."""
+    sources = sorted(family.glob("EVT/**/Peripheral/src/*_gpio.c"))
+    return sources[0] if sources else None
 
 
 def curated_columns() -> dict:
@@ -187,7 +205,8 @@ def merge_sku_lists(products: list[dict], ordering: dict[str, dict]) -> list[dic
 
 def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
     report: list[dict] = []
-    header, manual = find_header(family), find_manual(family)
+    header, manuals = find_header(family), find_manuals(family)
+    gpio = find_gpio(family)
     datasheets = sorted(p for p in (family / "datasheet_en").glob("*DS0.PDF"))
     if not datasheets:
         return report
@@ -195,7 +214,7 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
     silicon = None
     if header:
         try:
-            silicon = build_candidate.read_silicon(header, manual)
+            silicon = build_candidate.read_silicon(header, manuals, gpio)
         except Exception as exc:  # noqa: BLE001
             report.append({"family": family.name, "error": f"silicon: {exc}"})
 
@@ -234,9 +253,10 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
             pins, pin_notes = extract_pins.pins_for(rows, variants, layout, column)
             candidate = None
             if silicon:
-                selectors, reg_fields, routes, notes = silicon
+                selectors, reg_fields, routes, evt_values, notes = silicon
                 candidate, notes = build_candidate.join(
-                    selectors, reg_fields, routes, pins, list(notes) + pin_notes
+                    selectors, reg_fields, routes, pins, evt_values,
+                    list(notes) + pin_notes
                 )
             entry.update(
                 {
@@ -265,7 +285,7 @@ def _write(out_dir, part, product, candidate, datasheet, family, table, column, 
         "part_number": part,
         "_provenance": {
             "datasheet": str(datasheet.relative_to(MIRRORS)),
-            "manual": str(m.relative_to(MIRRORS)) if (m := find_manual(family)) else None,
+            "manuals": [str(m.relative_to(MIRRORS)) for m in find_manuals(family)],
             "header": str(h.relative_to(MIRRORS)) if (h := find_header(family)) else None,
             "pin_table": table,
             "pin_column": column,

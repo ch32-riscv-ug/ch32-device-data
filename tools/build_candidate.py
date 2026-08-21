@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Combine the four extractors into one candidate record fragment.
+"""Combine the extractors into one candidate record fragment.
 
-No single document holds a complete route selector. The EVT header states the bit
-positions, the manual's register table the reset value, the manual's remap grid the
-legal values and which pad each value reaches, and the datasheet which of those
-pads the package bonds out. This joins them and reports where they disagree.
+No single document holds a complete route selector. The EVT device header states
+the bit positions, the manual's register table the reset value, the manual's
+remap grid which pad each value reaches, the datasheet which of those pads the
+package bonds out, and EVT's own GPIO_PinRemapConfig() -- compiled for the host
+and run -- which encodings are real routes at all. This joins them and reports
+where they disagree.
 
 Selectors are kept only when a pin actually references them, which removes the bulk
 of the register fields that are not pin routes at all.
@@ -30,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import extract_pins  # noqa: E402
 import extract_registers  # noqa: E402
 import extract_remap  # noqa: E402
+import extract_remap_fields  # noqa: E402
 import extract_selectors  # noqa: E402
 import signal_vocabulary  # noqa: E402
 from extract_remap import canonical_field, canonical_signal  # noqa: E402
@@ -56,47 +59,83 @@ def show_bits(bits: list[tuple[str, int]]) -> str:
 
 
 def read_silicon(
-    header: Path, manual: Path | None
-) -> tuple[list[dict], list[dict], list[dict], list[str]]:
+    header: Path, manuals: Path | list[Path] | None, gpio: Path | None = None
+) -> tuple[list[dict], list[dict], list[dict], dict[str, set[int]], list[str]]:
     """Parse everything that is the same for every package of one silicon.
 
     Reading a reference manual is the slow part, so a bulk run does this once per
     family and reuses it for each of its SKUs.
 
-    The manual is optional. CH32V407 and CH32V467 have no mirrored manual, and
-    refusing to build without one left them with no selectors at all even though
-    their EVT header defines every field and their datasheet pin table names every
-    route. What is lost without a manual is the reset value and the grid's reading
-    of which values are legal, so those stay unstated rather than guessed.
+    `manuals` is every edition of the manual, oldest first. Both editions are
+    read and their routes unioned, because neither is complete: the English
+    CH32X035 manual truncates TIM1_RM's route list after value 0 where the
+    Chinese one reaches 2, and the Chinese edition has 895 register fields to the
+    English one's 876. Where they state the same scalar differently the later
+    edition wins, which is the Chinese one -- it is the newer of the two.
+
+    Passing none of them is allowed. Refusing to build without a manual once left
+    CH32V407/V467 with no selectors at all even though their EVT header defines
+    every field and their datasheet pin table names every route. What is lost is
+    the reset value and the grid's reading of which values are legal, and those
+    stay unstated rather than guessed.
     """
     notes: list[str] = []
 
     selectors, sel_notes = extract_selectors.build(header)
     notes += [f"[header] {n}" for n in sel_notes]
 
-    if manual is None:
+    # The gpio header names one constant per real route and the gpio source
+    # decodes it, so running that decoder is the only mechanical source for
+    # *which encodings exist*. The device header enumerates bits, and often
+    # only bit-index helpers for values; the manual's grid writes don't-care
+    # digits. This needs a host compiler, and families that ship no
+    # GPIO_Remap constant simply contribute nothing.
+    evt_values: dict[str, set[int]] = {}
+    if gpio is not None:
+        observed, evt_notes = extract_remap_fields.extract_family(gpio)
+        notes += [f"[evt] {n}" for n in evt_notes]
+        for name, field in observed.items():
+            if field.get("values"):
+                evt_values.setdefault(canonical_field(name), set()).update(
+                    field["values"].values()
+                )
+
+    editions = ([manuals] if isinstance(manuals, Path)
+                else [m for m in (manuals or []) if m is not None])
+    if not editions:
         notes.append("[register] reference manual が無いので reset値と remap格子は未取得")
-        return selectors, [], [], notes
+        return selectors, [], [], evt_values, notes
 
-    reg_fields, reg_notes = extract_registers.extract(manual, None)
-    notes += [f"[register] {n}" for n in reg_notes[:5]]
+    reg_fields: list[dict] = []
+    routes: list[dict] = []
+    for manual in editions:
+        edition = manual.parent.name.rpartition("_")[2] or manual.parent.name
+        fields, reg_notes = extract_registers.extract(manual, None)
+        for f in fields:
+            f["_edition"] = edition
+        reg_fields += fields
+        notes += [f"[register:{edition}] {n}" for n in reg_notes[:5]]
 
-    routes, remap_notes = extract_remap.extract(manual)
-    notes += [f"[remap] {n}" for n in dict.fromkeys(remap_notes)]
+        grid, remap_notes = extract_remap.extract(manual)
+        notes += [f"[remap:{edition}] {n}" for n in dict.fromkeys(remap_notes)]
 
-    # Not every family tabulates its routes. CH32X035 states them only inside the
-    # register field descriptions, so those are folded into the same pool.
-    described = [r for f in reg_fields for r in extract_registers.routes_in(f)]
-    if described:
-        notes.append(f"[register] 説明文から読めた経路 {len(described)} 件を併用")
-    return selectors, reg_fields, routes + described, notes
+        # Not every family tabulates its routes. CH32X035 states them only inside
+        # the register field descriptions, so those are folded into the same pool.
+        described = [r for f in fields for r in extract_registers.routes_in(f)]
+        notes.append(
+            f"[register:{edition}] field {len(fields)} 件 / 格子経路 {len(grid)} 件 / "
+            f"説明文経路 {len(described)} 件"
+        )
+        routes += grid + described
+    return selectors, reg_fields, routes, evt_values, notes
 
 
-def build(header: Path, manual: Path | None, datasheet: Path, package: str) -> tuple[dict, list[str]]:
-    selectors, reg_fields, routes, notes = read_silicon(header, manual)
+def build(header: Path, manuals: Path | list[Path] | None, datasheet: Path,
+          package: str, gpio: Path | None = None) -> tuple[dict, list[str]]:
+    selectors, reg_fields, routes, evt_values, notes = read_silicon(header, manuals, gpio)
     pins, pin_notes, _ = extract_pins.build(datasheet, package, "", "")
     notes += [f"[pins] {n}" for n in pin_notes[:5]]
-    return join(selectors, reg_fields, routes, pins, notes)
+    return join(selectors, reg_fields, routes, pins, evt_values, notes)
 
 
 def join(
@@ -104,6 +143,7 @@ def join(
     reg_fields: list[dict],
     routes: list[dict],
     pins: list[dict],
+    evt_values: dict[str, set[int]],
     notes: list[str],
 ) -> tuple[dict, list[str]]:
 
@@ -117,7 +157,13 @@ def join(
         key = canonical_field(f["field"])
         controller, _, register = f["register"].rpartition("_")
         if f["reset_value"] is not None:
-            reset_of.setdefault(key, f["reset_value"])
+            known = reset_of.get(key)
+            if known is not None and known != f["reset_value"]:
+                notes.append(
+                    f"[register] {key}: reset値が版で異なる {known} -> "
+                    f"{f['reset_value']} ({f.get('_edition', '?')} を採用)"
+                )
+            reset_of[key] = f["reset_value"]
         # One field can take two rows in the same register's table, where the
         # manual gives its upper bits their own name: CH32V003 lists USART1_RM at
         # bit 2 and USART1_RM1 at bit 21. Both rows describe one field.
@@ -314,14 +360,15 @@ def join(
         # subset of valid_values, which check_tables.py enforces.
         grid = set(values_of.get(key, []))
         pins_say = set(attested.get(key, ()))
+        evt = set(evt_values.get(key, ()))
         # Only where the header actually enumerated values. Its fallback is every
-        # value the field can hold, which would swallow the other two sources.
+        # value the field can hold, which would swallow the other sources.
         header_says = (
             set(s["valid_values"])
             if s.get("_valid_values_enumerated") and not completed
             else set()
         )
-        found = grid | pins_say | header_says
+        found = grid | pins_say | header_says | evt
         limit = 1 << len(bits)
         over = sorted(v for v in found if v >= limit)
         if over:
@@ -333,10 +380,13 @@ def join(
         out["_valid_values_source"] = "+".join(
             name
             for name, source in (
-                ("RM remap格子", grid), ("datasheet pin表", pins_say), ("ヘッダ", header_says)
+                ("RM remap格子", grid), ("datasheet pin表", pins_say),
+                ("ヘッダ", header_says), ("EVTデコーダ", evt),
             )
             if source
         ) or "既定値のみ"
+        if evt - (grid | pins_say | header_says):
+            out["_values_only_from_evt"] = sorted(evt - (grid | pins_say | header_says))
         if grid and pins_say - grid:
             out["_values_not_in_grid"] = sorted(pins_say - grid)
         if key in reset_of:
@@ -410,14 +460,18 @@ def score(candidate: dict, record: Path) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--header", type=Path, required=True)
-    ap.add_argument("--manual", type=Path, help="無い family は省略できる")
+    ap.add_argument("--manual", type=Path, action="append",
+                    help="reference manual。両言語版を古い順に繰り返し指定できる")
+    ap.add_argument("--gpio", type=Path,
+                    help="EVT の <fam>_gpio.c。経路の列挙値をベンダのデコーダから観測する")
     ap.add_argument("--datasheet", type=Path, required=True)
     ap.add_argument("--package", required=True)
     ap.add_argument("--compare", type=Path)
     ap.add_argument("--emit", action="store_true")
     args = ap.parse_args()
 
-    candidate, notes = build(args.header, args.manual, args.datasheet, args.package)
+    candidate, notes = build(args.header, args.manual, args.datasheet, args.package,
+                             args.gpio)
     out = sys.stderr
     print(
         f"候補: route_selectors {len(candidate['route_selectors'])} / "

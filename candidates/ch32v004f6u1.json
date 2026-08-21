@@ -2,7 +2,10 @@
   "part_number": "CH32V004F6U1",
   "_provenance": {
     "datasheet": "CH32V006/datasheet_en/CH32V004DS0.PDF",
-    "manual": "CH32V006/datasheet_en/CH32V00XRM.PDF",
+    "manuals": [
+      "CH32V006/datasheet_en/CH32V00XRM.PDF",
+      "CH32V006/datasheet_zh/CH32V00XRM.PDF"
+    ],
     "header": "CH32V006/EVT/EXAM/SRC/Peripheral/inc/ch32v00X.h",
     "pin_table": "Table 2-1",
     "pin_column": "QFN20L"
@@ -58,7 +61,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -89,7 +92,7 @@
         5,
         6
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -127,7 +130,7 @@
         8,
         9
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -159,7 +162,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -197,7 +200,7 @@
         8,
         9
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     }
   ],

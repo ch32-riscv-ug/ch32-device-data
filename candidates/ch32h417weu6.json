@@ -2,7 +2,10 @@
   "part_number": "CH32H417WEU6",
   "_provenance": {
     "datasheet": "CH32H417/datasheet_en/CH32H417DS0.PDF",
-    "manual": "CH32H417/datasheet_en/CH32H417RM.PDF",
+    "manuals": [
+      "CH32H417/datasheet_en/CH32H417RM.PDF",
+      "CH32H417/datasheet_zh/CH32H417RM.PDF"
+    ],
     "header": "CH32H417/EVT/EXAM/SRC/Peripheral/inc/ch32h417.h",
     "pin_table": "Table 2-1-1",
     "pin_column": "H417WEU6"
@@ -72,7 +75,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -96,7 +99,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -120,7 +123,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_reset_value_missing": true
     }
   ],
@@ -1301,8 +1304,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -1389,8 +1391,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -3140,8 +3141,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_STS",
@@ -3152,8 +3152,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_CMD",
@@ -3164,8 +3163,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -3261,8 +3259,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_STR",
@@ -3273,8 +3270,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT33",
@@ -3400,8 +3396,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_SDCK",
@@ -3412,8 +3407,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_SLVCK",
@@ -3424,8 +3418,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_SLVCK",
@@ -3436,8 +3429,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT34",
@@ -3523,8 +3515,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D0",
@@ -3535,8 +3526,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT35",
@@ -3617,8 +3607,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D1",
@@ -3629,8 +3618,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT36",
@@ -3741,8 +3729,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D2",
@@ -3753,8 +3740,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT37",
@@ -3875,8 +3861,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D3",
@@ -3887,8 +3872,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT38",
@@ -3979,8 +3963,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D4",
@@ -3991,8 +3974,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT39",
@@ -4212,8 +4194,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D6",
@@ -4224,8 +4205,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT41",
@@ -4301,8 +4281,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDMMC_D7",
@@ -4313,8 +4292,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "UHSIF_PORT42_",

@@ -29,7 +29,9 @@ from pathlib import Path
 import pdfplumber
 
 # "6.3.2.1 Remap Register 1 (AFIO_PCFR1)" -- the register name is parenthesised.
-HEADING = re.compile(r"^\d+(?:\.\d+)+\s+.*\(([A-Z][A-Z0-9_]*)\)\s*$")
+# The Chinese edition writes the same heading with full-width brackets,
+# "8.3.2.1 重映射寄存器1（AFIO_PCFR1）", and is generally the newer of the two.
+HEADING = re.compile(r"^\d+(?:\.\d+)+\s+.*[(\uff08]([A-Z][A-Z0-9_]*)[)\uff09]\s*$")
 BIT_RANGE = re.compile(r"^\[(\d+):(\d+)\]$")
 BIT_SINGLE = re.compile(r"^(\d+)$")
 FIELD_NAME = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)(?:\[\d+:\d+\])?$")
@@ -47,8 +49,14 @@ DESCRIBED_ROUTE = re.compile(r"(?P<value>[01xX]{1,4})\s*:\s*[^()]{0,40}?\(([^()]
 # TX and RX sit on the same pads as value 5 but the other way round.
 PAD_TOKEN = re.compile(r"^P[A-Ha-h]\d{1,2}$")
 
+# A field table's header row, in either edition. The Chinese one is
+# "位 名称 访问 描述 复位值"; squash() strips it to nothing, so the two
+# vocabularies are matched separately.
 HEADER_CELLS = ("bit", "name", "access")
 RESET_CELL = "resetvalue"
+HEADER_CELLS_ZH = {"bit": "位", "name": "名称", "access": "访问"}
+RESET_CELL_ZH = "复位值"
+DESCRIPTION_ZH = "描述"
 
 
 def flatten(cell: str | None) -> str:
@@ -64,14 +72,26 @@ def field_header(row: list[str]) -> dict[str, int] | None:
     squashed = [squash(c) for c in row]
     layout = {}
     for key in HEADER_CELLS:
-        if key not in squashed:
+        if key in squashed:
+            layout[key] = squashed.index(key)
+    if len(layout) == len(HEADER_CELLS) and RESET_CELL in squashed:
+        layout["reset"] = squashed.index(RESET_CELL)
+        if "description" in squashed:
+            layout["description"] = squashed.index("description")
+        return layout
+
+    # The Chinese edition, whose cells squash() cannot see.
+    stripped = [(c or "").strip() for c in row]
+    layout = {}
+    for key, cell in HEADER_CELLS_ZH.items():
+        if cell not in stripped:
             return None
-        layout[key] = squashed.index(key)
-    if RESET_CELL not in squashed:
+        layout[key] = stripped.index(cell)
+    if RESET_CELL_ZH not in stripped:
         return None
-    layout["reset"] = squashed.index(RESET_CELL)
-    if "description" in squashed:
-        layout["description"] = squashed.index("description")
+    layout["reset"] = stripped.index(RESET_CELL_ZH)
+    if DESCRIPTION_ZH in stripped:
+        layout["description"] = stripped.index(DESCRIPTION_ZH)
     return layout
 
 
@@ -144,6 +164,15 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
     return fields, notes
 
 
+# The Chinese edition writes the same route lists with full-width punctuation:
+# "010：映射（RX/PC17，CTS/PB15，TX/PC16）". Folding these onto ASCII lets one
+# regex read both editions -- and the Chinese one is worth reading, because it
+# is uniform where the English one is not: CH32X035's USART4_RM has one row in
+# lower case in English and none in Chinese.
+FULLWIDTH = str.maketrans({"：": ":", "（": "(", "）": ")", "，": ",",
+                           "／": "/", "、": ",", "　": " "})
+
+
 def routes_in(field: dict) -> list[dict]:
     """Routes stated inside a field's description, as (value, signal, pad).
 
@@ -152,7 +181,8 @@ def routes_in(field: dict) -> list[dict]:
     """
     peripheral = re.sub(r"_(?:RM|REMAP)$", "", field["field"])
     out: list[dict] = []
-    upper = field["description"].upper() if field.get("description") else ""
+    upper = (field["description"].translate(FULLWIDTH).upper()
+             if field.get("description") else "")
     for m in DESCRIBED_ROUTE.finditer(upper):
         pattern = m.group("value")
         values = [pattern] if "x" not in pattern.lower() else None

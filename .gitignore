@@ -11,3 +11,15 @@ build/
 *.tmp
 *.log
 .nojekyll
+
+# Host C compiler output. tools/extract_remap_fields.py compiles EVT's
+# GPIO_PinRemapConfig() for the host to observe what it writes; it builds in a
+# temporary directory, but guard against a run whose cwd is the repository.
+*.o
+*.out
+a.out
+
+# Locally fetched tools, the way ArduinoCore-CH32/.tools works. Not source:
+# nothing here is fetched today (the extractors use the environment's cc), but
+# a vendored toolchain belongs here rather than in the tree.
+.tools/

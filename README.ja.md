@@ -15,8 +15,12 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `devices/*.json`: schemaを評価するための代表SKUデータ
 - `tools/validate.py`: JSON Schemaと追加の整合性規則を検査するvalidator
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するreview支援tool。recordは書き換えない
+- `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
 - `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧とremap_routes.csvに対する当たり具合を出す
+- `tools/crosscheck_ch32data.py`: [ch32-rs/ch32-data](https://github.com/ch32-rs/ch32-data)と
+  AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
+  CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
 - `candidates/*.json`: 全SKUの機械抽出結果。未reviewで、schemaにも準拠しない
 - `docs/schema-notes.ja.md`: schema調査、確認済みの構造差、未決定事項
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
@@ -50,6 +54,18 @@ python3 tools/validate.py
 `jsonschema` packageが利用可能ならJSON Schema全体を検査します。なくても標準libraryだけで、ID、出典参照、pin coverageなどの追加規則を検査します。
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。
+
+抽出toolのうち`extract_remap_fields.py`だけはhost Cコンパイラを使います（EVTの関数を動かすため）。
+`cc`が環境にあれば追加の用意は不要です。ローカルへtoolchainを置く場合は`.tools/`（gitignore済み）へ。
+
+```sh
+uv run tools/extract_remap_fields.py --mirrors <EVT cloneの親> --compare tables
+uv run tools/crosscheck_ch32data.py --ch32-data <ch32-dataのclone>
+```
+
+reference manualは**両言語版を読んで和を取ります**。中国語版のほうが新しく、
+内容も多いためです（CH32X035はregister field 876→895件、CH32V407のRMは中国語版にしか無い）。
+scalarが食い違ったときは後に読んだ中国語版を採り、noteに残します。
 
 生成した表そのものの整合は、資料もEVTも要らずに検査できます。
 
