@@ -65,6 +65,7 @@
         {
           "signal": "PD0",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-pd0-1-remap",
             "values": [

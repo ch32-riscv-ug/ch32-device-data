@@ -85,6 +85,40 @@ M030 38件 / V407 94件 / V307 129件。
 D-7（DMA channel）はbase addressだけがEVTにあり（14〜48件）、
 peripheral→channelの対応はRM側です。
 
+**registerの絶対アドレスは解けます**（2026-08-21）。R-24追補のA-2で
+`EXTEN->EXTEN_CTR`の番地が必要になったので、`tools/extract_addresses.py`を
+書きました。base定数の連鎖（`PERIPH_BASE`→`HBPERIPH_BASE`→`EXTEN_BASE`）と
+`#define EXTEN ((EXTEN_TypeDef *)EXTEN_BASE)`と`typedef struct`のメンバー
+オフセット（reserved配列も数える）を突き合わせて、`BLOCK->REGISTER`を
+番地へ落とします。12 familyで**241〜2049 register**ぶん解けました。
+
+| family | 解けたregister |
+|---|---:|
+| CH32H417 | 2049 |
+| CH32V307 | 1492 |
+| CH32V407 | 1416 |
+| CH32V103 | 1163 |
+| CH32V205 | 918 |
+| CH32V20x | 819 |
+| CH32X315 | 780 |
+| CH32L103 | 647 |
+| CH32X035 | 503 |
+| CH32M030 | 474 |
+| CH32V006 | 360 |
+| CH32V003 | 241 |
+
+既知の番地で検算しました: `GPIOA->CFGLR`=`0x40010800`、`GPIOD->OUTDR`=`0x4001140C`、
+`USART1->STATR`=`0x40013800`、`AFIO->PCFR1`=`0x40010004`、`AFIO->PCFR2`=`0x4001001C`、
+`FLASH->ACTLR`=`0x40022000`、`GPIOE->INDR`=`0x40011808`。**すべて一致**。
+
+名前からの推測が効かない例も確認済みです——`AHBPERIPH_BASE`と`HBPERIPH_BASE`の
+綴りが揺れ、**CH32X315はEXTENを`0x400220C0`に置き**（他は`BASE+0x3800`）、
+**CH32V205はEXTENのregisterを`CTLR0`と呼びます**（他は`EXTEN_CTR`）。
+
+つまりD-1（base address）とD-3（register offset）は**EVT headerから機械的に取れる**
+ことが実測できました。残るのはD-2（bit field）で、そこが上の「registerを言っているのは
+コメントだけ」という問題です。
+
 ### ch32fun（`~/dev_wch/ch32fun`、29MB、MIT）
 
 LICENSEに CNLohr らと並んで **Nanjing Qinheng Microelectronics（WCH）の著作権表示**があります。

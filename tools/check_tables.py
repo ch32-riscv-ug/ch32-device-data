@@ -18,6 +18,10 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+
+import signal_vocabulary  # noqa: E402
+
 
 def load(tables: Path, name: str) -> list[dict]:
     with (tables / f"{name}.csv").open(encoding="utf-8") as f:
@@ -33,7 +37,8 @@ def main() -> int:
                       "cores", "documents", "pins", "pin_functions",
                       "product_attributes", "remap_fields", "remap_routes",
                       "errata", "operating_conditions", "evt_examples",
-                      "clock_configs", "clock_prescalers", "clock_sources")}
+                      "clock_configs", "clock_prescalers", "clock_sources",
+                      "clock_symbols", "evt_variants")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -143,6 +148,42 @@ def main() -> int:
         if bool(r.get("peripheral")) != bool(r.get("role")):
             bad.append(f"remap_routes: {where} の peripheral と role が片方だけ埋まっている")
 
+    # A route must sit on the selector its own peripheral owns. The ways it can
+    # end up elsewhere are silent: a manual's grid split across two pages reads
+    # as one table and puts TIM4's routes under TIM3_RM, and matching a route on
+    # (pad, value) picks whichever peripheral sharing the pad the manual happened
+    # to describe. Both produce a row a consumer would write the wrong register
+    # for. Only refutable cases are reported -- either the peripheral has a
+    # selector of its own in this series, or it differs from the selector's
+    # peripheral in the instance number alone -- which is what leaves the
+    # genuinely shared fields alone: CH32V407's I2S3_WS really is routed by
+    # SPI3_REMAP, and nothing on that silicon is named I2S3.
+    owners: dict[str, set[str]] = {}
+    for r in t["remap_fields"]:
+        key = signal_vocabulary.canonical_field(r["field"])
+        owners.setdefault(r["series"], set()).add(key.split("_")[0])
+    def same_name_other_instance(a: str, b: str) -> bool:
+        # The same rule build_candidate refutes an answer with, read from the
+        # one module that owns how a peripheral name is spelled.
+        ma, mb = (signal_vocabulary.INSTANCE.match(a),
+                  signal_vocabulary.INSTANCE.match(b))
+        return bool(ma and mb and ma.group(1) == mb.group(1)
+                    and ma.group(2) != mb.group(2))
+
+    for r in t["remap_routes"]:
+        peripheral = r.get("peripheral")
+        field = field_by_key.get((r["series"], r["selector"]))
+        if not peripheral or field is None:
+            continue
+        key = signal_vocabulary.canonical_field(field["field"])
+        if key == peripheral or key.split("_")[0] == peripheral:
+            continue
+        if (peripheral in owners.get(r["series"], set())
+                or same_name_other_instance(key, peripheral)):
+            bad.append(f"remap_routes: {r['series']} {r['selector']} 値{r['value']} の "
+                       f"{r['signal']} ({r['pad']}) は {peripheral} の信号なので "
+                       f"{key} の selector には載らない")
+
     # The clock tables come from EVT's system_ch32*.c, one row per configuration
     # and #if branch. What can be checked without EVT is that they join, that a
     # divider a configuration selects is one the family actually encodes, and
@@ -172,6 +213,43 @@ def main() -> int:
                            "名前=Hz の形でない")
         if r["flash_latency"] and not r["flash_latency"].isdigit():
             bad.append(f"clock_configs: {where} の flash_latency が数でない")
+
+    # A `pll` or `outside_rcc` cell names symbols. Without clock_symbols the
+    # name is all there is, and the name does not give the number away:
+    # CH32V307's RCC_PLLMULL18 is 0x003C0000 and RCC_PLLMULL18_EXTEN is 0.
+    address = re.compile(r"^0x[0-9a-f]{8}$")
+    symbols = {(r["family"], r["symbol"]) for r in t["clock_symbols"]}
+    for r in t["clock_symbols"]:
+        check("clock_symbols", r["symbol"], r["family"], families, "families")
+        if not r["value"].isdigit():
+            bad.append(f"clock_symbols: {r['family']} {r['symbol']} の value が数でない")
+        if r["address"] and not address.match(r["address"]):
+            bad.append(f"clock_symbols: {r['family']} {r['symbol']} の address "
+                       f"{r['address']!r} が 0x のあと8桁でない")
+        if "->" not in r["register"]:
+            bad.append(f"clock_symbols: {r['family']} {r['symbol']} の register "
+                       f"{r['register']!r} が BLOCK->REGISTER の形でない")
+    for r in t["clock_configs"]:
+        for cell in (r["pll"], r["outside_rcc"]):
+            for entry in (e for e in cell.split(";") if e):
+                symbol = entry.split(" ")[-1]
+                if (r["family"], symbol) not in symbols:
+                    bad.append(f"clock_configs: {r['family']} {r['config']} が呼ぶ "
+                               f"{symbol} が clock_symbols にない")
+
+    # A `condition` naming a compile-time variant macro is unresolvable for a
+    # part unless evt_variants says which parts set it.
+    macros = {(r["family"], r["macro"]) for r in t["evt_variants"]}
+    for r in t["evt_variants"]:
+        check("evt_variants", r["macro"], r["family"], families, "families")
+        check("evt_variants", r["macro"], r["part_number"], products, "products")
+    named = re.compile(r"\bCH32[A-Za-z0-9_]+\b")
+    for table in ("clock_configs", "clock_sources"):
+        for r in t[table]:
+            for macro in named.findall(r["condition"]):
+                if (r["family"], macro) not in macros:
+                    bad.append(f"{table}: {r['family']} の condition が呼ぶ "
+                               f"{macro} が evt_variants にない")
 
     # Data columns carry no CJK: Chinese readings are evidence (kept in the
     # *_basis and label_zh columns), never the displayed value. A leak here

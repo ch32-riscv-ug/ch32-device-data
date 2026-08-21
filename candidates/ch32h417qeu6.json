@@ -1179,7 +1179,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT0",
@@ -1191,7 +1191,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT3",
@@ -1203,7 +1203,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -1304,7 +1304,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT1",
@@ -1316,7 +1316,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT4",
@@ -1328,7 +1328,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -1379,7 +1379,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT2",
@@ -1391,7 +1391,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2181,7 +2181,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT3",
@@ -2193,7 +2193,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT6",
@@ -2205,7 +2205,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2290,7 +2290,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT4",
@@ -2302,7 +2302,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT7",
@@ -2314,7 +2314,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2431,7 +2431,14 @@
         },
         {
           "signal": "UHSIF_PORT0",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "I2C4_SCL",
@@ -2467,7 +2474,14 @@
         },
         {
           "signal": "UHSIF_PORT1",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "I2C4_SDA",
@@ -2523,7 +2537,14 @@
         },
         {
           "signal": "UHSIF_PORT2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_ETR",
@@ -2547,7 +2568,14 @@
         },
         {
           "signal": "SD",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "RAM_D4",
@@ -2572,7 +2600,14 @@
         },
         {
           "signal": "UHSIF_PORT3",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1N",
@@ -2622,7 +2657,14 @@
         },
         {
           "signal": "UHSIF_PORT4",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1",
@@ -2668,7 +2710,14 @@
         },
         {
           "signal": "UHSIF_PORT5",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2N",
@@ -2702,7 +2751,14 @@
         },
         {
           "signal": "SD",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "RAM_D7",
@@ -2724,7 +2780,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT5",
@@ -2736,7 +2792,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2752,7 +2808,14 @@
         },
         {
           "signal": "UHSIF_PORT6",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2",
@@ -2809,7 +2872,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT6",
@@ -2821,7 +2884,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2837,7 +2900,14 @@
         },
         {
           "signal": "UHSIF_PORT7",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3N",
@@ -2899,7 +2969,7 @@
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         },
         {
           "signal": "UHSIF_PORT7",
@@ -2911,7 +2981,7 @@
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -2927,7 +2997,14 @@
         },
         {
           "signal": "UHSIF_PORT8",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3",
@@ -2988,7 +3065,14 @@
         },
         {
           "signal": "UHSIF_PORT9",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH4",
@@ -3054,7 +3138,14 @@
         },
         {
           "signal": "UHSIF_PORT10",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_BKIN",
@@ -3125,7 +3216,14 @@
         },
         {
           "signal": "UHSIF_PORT11",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A5",
@@ -3227,7 +3325,14 @@
         },
         {
           "signal": "UHSIF_PORT12",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A6",
@@ -3362,7 +3467,14 @@
         },
         {
           "signal": "UHSIF_PORT13",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A7",
@@ -3468,7 +3580,14 @@
         },
         {
           "signal": "UHSIF_PORT14",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A8",
@@ -3580,7 +3699,14 @@
         },
         {
           "signal": "UHSIF_PORT15",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "FSMC_A23",
@@ -3629,7 +3755,14 @@
         },
         {
           "signal": "S",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "DIO_D0",
@@ -3673,7 +3806,14 @@
         },
         {
           "signal": "D",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "VP_VSYNC",
@@ -3836,7 +3976,14 @@
         },
         {
           "signal": "UHSIF_PORT16",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A10",
@@ -3908,7 +4055,14 @@
         },
         {
           "signal": "UHSIF_PORT17",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A11",
@@ -3927,7 +4081,14 @@
         },
         {
           "signal": "I2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "C4_SMBA",
@@ -4005,7 +4166,14 @@
         },
         {
           "signal": "UHSIF_PORT18",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_A12",
@@ -4113,7 +4281,14 @@
         },
         {
           "signal": "UHSIF_PORT19",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D0",
@@ -4167,7 +4342,14 @@
         },
         {
           "signal": "D",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "VP_D5",
@@ -4193,7 +4375,14 @@
         },
         {
           "signal": "UHSIF_PORT20",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D1",
@@ -4254,7 +4443,14 @@
         },
         {
           "signal": "UHSIF_PORT21",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D2",
@@ -4315,7 +4511,14 @@
         },
         {
           "signal": "UHSIF_PORT22",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D3",
@@ -4371,7 +4574,14 @@
         },
         {
           "signal": "UHSIF_PORT23",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D4",
@@ -4427,7 +4637,14 @@
         },
         {
           "signal": "UHSIF_PORT24",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D5",
@@ -4536,7 +4753,14 @@
         },
         {
           "signal": "UHSIF_PORT25",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D6",
@@ -4585,7 +4809,14 @@
         },
         {
           "signal": "D",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "VP_D0",
@@ -4632,7 +4863,14 @@
         },
         {
           "signal": "UHSIF_PORT26",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D7",
@@ -4724,7 +4962,14 @@
         },
         {
           "signal": "UHSIF_PORT27",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D8",
@@ -4805,7 +5050,14 @@
         },
         {
           "signal": "UHSIF_PORT28",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D9",
@@ -5223,7 +5475,14 @@
         },
         {
           "signal": "UHSIF_PORT29",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D14",
@@ -5320,7 +5579,14 @@
         },
         {
           "signal": "UHSIF_PORT30",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D15",
@@ -5417,7 +5683,14 @@
         },
         {
           "signal": "UHSIF_PORT31",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "FSMC_NBL3",
@@ -5539,7 +5812,14 @@
         },
         {
           "signal": "UHSIF_PORT32",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "FSMC_NBL2",
@@ -5618,7 +5898,14 @@
         },
         {
           "signal": "UHSIF_PORT33",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "FSMC_NBL1",
@@ -5662,7 +5949,14 @@
         },
         {
           "signal": "D",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "VP_D4",
@@ -5706,24 +6000,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT33",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -5759,7 +6053,14 @@
         },
         {
           "signal": "UHSIF_PORT34",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "FSMC_NBL0",
@@ -5865,24 +6166,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT34",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -5898,7 +6199,14 @@
         },
         {
           "signal": "UHSIF_PORT35",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D10",
@@ -5962,24 +6270,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT35",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -5995,7 +6303,14 @@
         },
         {
           "signal": "UHSIF_PORT36",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D11",
@@ -6054,24 +6369,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT36",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6107,7 +6422,14 @@
         },
         {
           "signal": "UHSIF_PORT37",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D12",
@@ -6176,24 +6498,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT37",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6219,7 +6541,14 @@
         },
         {
           "signal": "UHSIF_PORT38",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D13",
@@ -6308,24 +6637,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT38",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6341,7 +6670,14 @@
         },
         {
           "signal": "UHSIF_PORT39",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D14",
@@ -6410,24 +6746,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT39",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6443,7 +6779,14 @@
         },
         {
           "signal": "UHSIF_PORT40",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_D15",
@@ -6514,24 +6857,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT40",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6563,7 +6906,14 @@
         },
         {
           "signal": "UHSIF_PORT41",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM11_CH4",
@@ -6657,24 +7007,24 @@
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               2
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT41",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
-            "selector": "afio-sdmmc-remap",
+            "selector": "afio-uhsif-port-remap",
             "values": [
               3
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6690,7 +7040,14 @@
         },
         {
           "signal": "UHSIF_PORT42",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDRAM_CS_N1",
@@ -6758,7 +7115,14 @@
         },
         {
           "signal": "UHSIF_PORT43",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "CAN3_TX",
@@ -6824,13 +7188,25 @@
           "signal": "UHSIF_PORT43",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT43",
           "route": "remap-3",
           "_selector_value": 3,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6846,7 +7222,14 @@
         },
         {
           "signal": "UHSIF_PORT44",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "LPTIM1_ETR",
@@ -6907,13 +7290,25 @@
           "signal": "UHSIF_PORT44",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT44",
           "route": "remap-3",
           "_selector_value": 3,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6929,7 +7324,14 @@
         },
         {
           "signal": "UHSIF_PORT45",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "LPTIM1_CH2",
@@ -6985,13 +7387,25 @@
           "signal": "UHSIF_PORT45",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT45",
           "route": "remap-3",
           "_selector_value": 3,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -7007,7 +7421,14 @@
         },
         {
           "signal": "UHSIF_PORT46",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "LPTIM1_CH1",
@@ -7068,13 +7489,25 @@
           "signal": "UHSIF_PORT46",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT46",
           "route": "remap-3",
           "_selector_value": 3,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -7090,7 +7523,14 @@
         },
         {
           "signal": "UHSIF_PORT47",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "LPTIM1_OC",
@@ -7146,13 +7586,25 @@
           "signal": "UHSIF_PORT47",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         },
         {
           "signal": "UHSIF_PORT47",
           "route": "remap-3",
           "_selector_value": 3,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },

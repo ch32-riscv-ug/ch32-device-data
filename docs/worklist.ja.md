@@ -92,6 +92,95 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
 | R-20 | レジスタマップ（D-1〜D-8） | 🔜 **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md) |
 | R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張。下記 |
+| R-24追補 | クロック表の追補（A-1〜A-4）とremapの要確認（B） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`・`evt_variants.csv`新設、`operating_conditions.csv`に`typ`列、remapの誤帰属を修正。下記 |
+
+### R-24追補（2026-08-21受領・実装済み）
+
+依頼は「PLLを実際に書くのに足りない4件（A-1〜A-4）」と「selectorとperipheralの番号
+不一致4組（B）」。
+
+| # | 依頼 | 実装 |
+|---|---|---|
+| A-1 | PLL定数の数値符号化（32記号） | `clock_symbols.csv`（77行）。値・書き込み先register・**絶対アドレス**まで |
+| A-2 | `outside_rcc`のアドレスとビット値 | 同表。`EXTEN_PLL_HSI_PRE=16`（bit 4）、V205だけregister名が`CTLR0` |
+| A-3 | HSIの公称周波数 | `operating_conditions.csv`に**`typ`列**を追加。指摘のとおり列が無くて落ちていた |
+| A-4 | 型番→`CH32V20x_D8`等の対応 | `evt_variants.csv`（56行）。型番×macroで直に結合できる |
+| B | selectorとperipheralの番号不一致 | 原因3つ。下記。`check_tables.py`に不変条件を追加 |
+
+**A-1で分かったこと**: 記号名から値は導けないという指摘は、想像より強く成立している。
+`RCC_PLLMULL18`=`0x003C0000`と`RCC_PLLMULL18_EXTEN`=`0`だけでなく、
+**`RCC_PLLMULL15`=`0x00340000`に対し`_EXTEN`版は`0x00380000`**で、`_EXTEN`の付き方に
+一貫した規則がない（×3/×6/×7/×9/×12は同値、×15は別値、×18は0）。
+
+**A-2で分かったこと**: アドレスもfamilyごとに読むしかない。base定数の綴りが
+`AHBPERIPH_BASE`と`HBPERIPH_BASE`で揺れ、**CH32X315はEXTENを`0x400220C0`に置く**
+（他は`BASE+0x3800`）。`tools/extract_addresses.py`がbase連鎖とstructのメンバー
+オフセットを解く。これはR-20（レジスタマップ）の下地にもなる。
+
+**A-3で分かったこと**: 指摘（「typ値＋確度で規定されていて、typ列が無いために基準値が
+落ちている」）はそのとおりだった。`HEADER_MAP`は`典型值`/`typ`を既に認識していて、
+CSVの列に無いので捨てていた。拾ってみると**HSIは8MHzではなく5通りある**:
+8MHz（L103/M103・V103・V20x・V30x）、20MHz（V407/V467・X305/X315）、
+24MHz（V00x）、25MHz（H41x）、48MHz（X033/X035）。8MHz決め打ちは5群のうち4群で外す。
+低消費モードのHSIも別行（L103/M103とV203/V205は1MHz、V00xは`HSI_LP=1`で30〜58kHz）。
+副産物として`F_LSI`もmin/typ/maxが揃い、**CH32V203は`applied for V203RBT6`だけ
+25/32/45kHz**（他は25/39/60kHz）——A-4で`CH32V20x_D8`に割り当てた唯一の型番と一致する。
+確度の典型値は`±500`のように符号が`±`で書かれるので、数値判定に`±`を足した。
+
+**A-4で分かったこと**: 依頼書の想定（V20xにD8/D8C/D8W）と実際が違う。
+**`_D8C`はCH32V30xのmacroで、CH32V20xは`_D6`/`_D8`/`_D8W`**。しかも
+`_D8`に該当するのは**CH32V203RBT6の1型番だけ**。`_D6`が既定なので、RBT6に
+macroを設定せず組むとHSE_VALUEが24MHzのまま（正しくは32MHz）通ってしまう。
+CH32V00x（CH32V002/V004/V005/V006/V007_M007）にも同じ仕組みがあり、こちらは
+`condition`列には出てこないが周辺の集合を動かすので同じ表に入れた。
+
+**Bの原因は4つに分かれた**（依頼書は4組を挙げていたが、実際には5クラス24行）:
+
+1. **reference manualのグリッドがページを跨いだところで別の表と合体していた。**
+   CH32V407のp108にTIM3の表、p109にTIM4の表がある。TIM4の表はヘッダが2行に
+   割れていて空セルを1つ含む（`["復用功能","TIM4_RM=0默認映射","","TIM4_RM=1重映射"]`）。
+   `read_header`がその空セルでヘッダ行を却下し、列数が一致したので「前ページの表の続き」
+   と判定した。結果TIM4の経路が`TIM3_RM`に、しかも**値1が値3として**入った。
+   V103のTIM3、V30xのFSMC_NADV/DVPも同型。空セルを列位置を保ったまま許し、
+   ヘッダらしい行は続きと見なさないようにして解決
+2. **(pad,値)一致が信号名を上書きしていた。** padは「誰の経路か」を言えないので、
+   名前が読めるときは名前に反せない、という制約を入れた。CH32V002の`ADC_IETR`は
+   PA2をTIM1と共有しており、V002にADCのselectorが無いためTIM1に付いていた
+   （いまは未解決として記録される — 正直な状態）
+3. **経路の出所を区別していなかった。** RMのregister説明文は散文を正規表現で読むので、
+   field表の行が次のfieldへ流れ込むと関係ないpadを吸い込む。CH32V00xの
+   `ADC_ETRGREG_RM`は説明文から**値1で35 pad**（PA0〜PD7のほぼ全部）として出てくるが、
+   格子（表7-15）は`PC2`1つだけ。この汚染で`(PA2, 1)`が2候補になり`ADC_IETR`が
+   決まらなかった。段3は**格子由来の経路だけで先に引く**ようにした
+4. **語彙の穴。** CH32L103のpin表は`LPT_OUT`と書き、AFIOのフィールドは`LPTIM_RM`。
+   `LPT`→`LPTIM`を`SAME_PERIPHERAL`に追加。ついでにCH32H417の`UHSIF_PORT33`が
+   `UHSIF_CLK_RM`と`UHSIF_PORT_RM`のどちらかを決められず`SDMMC_RM`に落ちていたのを、
+   「selector名＋数字」で選べるようにした
+
+**#2の直し方を2回やり直した**（記録として）。最初は「名前が読めるときはpadは名前に
+反せない」だけを入れたが、既定経路でも格子の値0を使えるようにしたところ、
+**pad一致が名前ベースの段4より先に来て CH32M030の`ISINK1`が`afio-tim2-remap`に
+なった**（PA6をTIM2と共有している）。次に条件を「反証されないこと」に緩めたら、
+今度は**自分のfieldを持たない周辺で破れた**——CH32V30xの`I2S3_MCK`が
+`afio-tim8-remap`になった（`I2S3`という名前のselectorが無いので反証できない）。
+結論は「フィルタは積極的一致、順序は名前が読めるかで入れ替える」で、
+条件と順序は別の問題だった。
+
+**依頼書が挙げていなかった分**: `UHSIF_PORT33`〜`PORT41`（H417、18行）と
+`FSMC_NADV`（V303/V307/V317）。依頼書の検出（selector末尾の番号とperipheral列の番号の
+比較）では名前が違うだけの組を拾えない。`check_tables.py`の検査は
+「その周辺が自分のselectorを持っているか」または「名前が同じで番号だけ違うか」で
+判定するので、両方拾う。**SPI/I2Sの共有は例外指定なしで通る**（CH32V407の`I2S3_WS`は
+本当に`SPI3_REMAP`が経路を決めており、`I2S3`という名前のselectorは存在しない）。
+
+**未解決として残るもの**（誤った帰属をやめた結果、正直に穴になった分）:
+
+- **CH32V203の`USART4_*`**。datasheetのpin表は両言語でUSART4のdefaultとremap-1を
+  載せているが、**CH32V20xのEVT headerには`AFIO_PCFR2_`の定義が1つも無い**。
+  RMがPCFR2を記述しているのでbitは補完できるが、selector自体がheaderに無いので
+  生成されない。R-19のF-18と同型の穴で、**PCFR1だけ書いても何も起きない**
+- **CH32V30xの`DVP_*`**。V407にはある`DVP_REMAP`がV30xのheaderに無い
+
 
 ### R-24 クロック関連データ（2026-08-21受領・一部実装）
 

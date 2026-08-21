@@ -122,6 +122,15 @@ def read_silicon(
         # Not every family tabulates its routes. CH32X035 states them only inside
         # the register field descriptions, so those are folded into the same pool.
         described = [r for f in fields for r in extract_registers.routes_in(f)]
+        # Where the routes came from, because the two are not equally reliable.
+        # The grid is a table; a description is prose read with a regex, and a
+        # register-field table whose rows run on sweeps up pads that belong to
+        # the next field. CH32V00x's ADC_ETRGREG_RM comes out of its description
+        # with 35 pads at value 1 where its grid says one (PC2).
+        for r in grid:
+            r.setdefault("_source", "grid")
+        for r in described:
+            r.setdefault("_source", "description")
         notes.append(
             f"[register:{edition}] field {len(fields)} 件 / 格子経路 {len(grid)} 件 / "
             f"説明文経路 {len(described)} 件"
@@ -176,12 +185,21 @@ def join(
     # Which selectors reach a pad at a given value. This is the last resort in
     # resolve(): it works without the signal name, but a shared pad means it
     # cannot say which peripheral's route it found.
+    #
+    # Kept twice, because a run-on register description can put a pad under a
+    # field that the grid does not, and that turns a pad the grid identifies
+    # into an ambiguous one. The grid is consulted first and the union only when
+    # it says nothing -- which is the whole of CH32X035, whose manual has no
+    # grid at all.
     by_pad_value: dict[tuple[str, int], set[tuple[str, str]]] = collections.defaultdict(set)
+    grid_pad_value: dict[tuple[str, int], set[tuple[str, str]]] = collections.defaultdict(set)
     for r in routes:
         key = canonical_field(r["field"])
         values_of[key].add(r["value"])
         field_of_route.setdefault((canonical_signal(r["signal"]), r["value"], r["pad"]), key)
         by_pad_value[(r["pad"], r["value"])].add((key, r["signal"]))
+        if r.get("_source") == "grid":
+            grid_pad_value[(r["pad"], r["value"])].add((key, r["signal"]))
 
     by_canonical = {canonical_field(s["field"]): s for s in selectors}
 
@@ -192,7 +210,44 @@ def join(
         if fn.get("_selector_value") is not None
     ]
 
-    def resolve(pin, fn) -> tuple[str | None, str]:
+    def owns(key: str, head: str) -> bool:
+        """Whether selector `key` is the one a signal from peripheral `head` uses."""
+        return key == head or key.split("_")[0] == head
+
+    def other_instance(key: str, head: str) -> bool:
+        """Whether the two are the same peripheral with a different instance number."""
+        a, b = (signal_vocabulary.INSTANCE.match(key),
+                signal_vocabulary.INSTANCE.match(head))
+        return bool(a and b and a.group(1) == b.group(1)
+                    and a.group(2) != b.group(2))
+
+    def contradicted(key: str, head: str) -> bool:
+        """Whether `key` cannot own this signal, judged by the names alone.
+
+        Two ways to refute an answer. The peripheral the signal names has a
+        selector of its own, so a different one cannot be it: CH32V407's
+        TIM4_CH1 came back as TIM3's route -- the manual puts TIM4's grid on the
+        page after TIM3's, and it read as one table -- and TIM4 has a selector.
+        Or the two differ only in the instance number, which refutes it even
+        where the signal's own selector is missing: CH32V203's pin table lists
+        USART4 pins but its EVT header exposes no PCFR2 field at all, and
+        USART1's selector is still not the one that routes USART4.
+
+        Everything else is a gap rather than a contradiction, and stays
+        unrefuted. CH32V303's DVP_D5 came back as ETH's route the same way as
+        the TIM4 case, but the header exposes no DVP field, so there is no
+        selector to prefer. And a peripheral that shares another's field must
+        stay unrefuted or it loses its routes: CH32V30x's I2S3_WS really is
+        routed by SPI3_REMAP, and nothing on that silicon is named I2S3.
+        """
+        if owns(key, head):
+            return False
+        return (any(owns(k, head) for k in by_canonical)
+                or other_instance(key, head))
+
+    PAD_EVIDENCE = {"grid": grid_pad_value, "any": by_pad_value}
+
+    def resolve(pin, fn, value, pad_evidence=("grid", "any")) -> tuple[str | None, str]:
         """Which selector field drives this function, and how that was decided.
 
         The pin table writes "T1C1_3" to mean "this pad carries TIM1's channel 1
@@ -208,37 +263,78 @@ def join(
         way round. Every step reads the name through the shared vocabulary rather
         than matching it literally: the pin table writes TX1 where the manual
         writes USART1_TX.
+
+        `pad_evidence` says which readings of the pad may be used. The default
+        route gets the grid only. The pin table's "default" column cannot be
+        crossed with a pad, because at reset every peripheral sharing the pad
+        sits at value 0 -- but the manual's own value-0 column is a statement
+        about one field, and the name filter below keeps the other peripherals
+        out of it, so the two objections do not apply to it.
         """
-        value = fn["_selector_value"]
         signal = canonical_signal(fn["signal"])
+        pair = signal_vocabulary.split(fn["signal"])
+        head = pair[0] if pair else signal.partition("_")[0]
         key = field_of_route.get((signal, value, pin["pad"]))
         # The manual names this exact route. It may route a field the header does
         # not expose as a selector, hence the membership test.
-        if key in by_canonical:
+        if key in by_canonical and not (pair and contradicted(key, head)):
             return key, "signal"
         # The signal names its peripheral and that peripheral has a selector.
-        pair = signal_vocabulary.split(fn["signal"])
         if pair and pair[0] in by_canonical:
             return pair[0], "peripheral"
-        # Nothing usable in the name: align on the pad and the value, which
-        # identifies a route without the name but cannot tell whose route it is.
-        candidates = {
-            k
-            for k, _ in by_pad_value.get((pin["pad"], value), set())
-            if k in by_canonical
-        }
-        if len(candidates) == 1:
-            return candidates.pop(), "pad+value"
-        # A peripheral whose selector is named for a part of it: ADC_ETR under
-        # ADC1_ETRGIN.
-        head = signal.partition("_")[0]
-        matches = [k for k in by_canonical if k.split("_")[0] == head]
-        return (matches[0], "prefix") if len(matches) == 1 else (None, "")
+        # Align on the pad and the value. This identifies a route without reading
+        # the name, so it cannot say whose route it is -- which means it may not
+        # answer against the name either. CH32V002's ADC_IETR shares PA2 with
+        # TIM1's complementary channel, and the pad alone made it TIM1's; keeping
+        # only the candidates the name allows leaves the ADC field it belongs to.
+        def by_pad() -> tuple[str, str] | None:
+            # The pad may only answer with a selector the name allows, not merely
+            # one it fails to refute. CH32V30x's I2S3 has no selector of its own
+            # -- SPI3_REMAP routes it -- so nothing about I2S3 is refutable, and
+            # refutation alone let PC7 at value 0 answer TIM8, whose channel 2
+            # shares the pad. Requiring agreement leaves it undecided instead,
+            # which is what the manual leaves it as.
+            for source in pad_evidence:
+                candidates = {
+                    k
+                    for k, _ in PAD_EVIDENCE[source].get((pin["pad"], value), set())
+                    if k in by_canonical and (not pair or owns(k, head))
+                }
+                if len(candidates) == 1:
+                    return candidates.pop(), ("pad+value" if source == "any"
+                                              else "pad+value(grid)")
+            return None
+
+        def by_prefix() -> tuple[str, str] | None:
+            # A peripheral whose selector is named for a part of it: ADC_ETR
+            # under ADC1_ETRGINJ, ISINK1 under ISINK1_ADJ.
+            matches = [k for k in by_canonical if k.split("_")[0] == head]
+            if len(matches) == 1:
+                return matches[0], "prefix"
+            # More than one, and the signal says which: CH32H417 has
+            # UHSIF_CLK_RM and UHSIF_PORT_RM, and UHSIF_PORT33 is port 33 of
+            # the second.
+            numbered = [k for k in matches
+                        if re.fullmatch(re.escape(k) + r"\d*", signal)]
+            return (numbered[0], "prefix") if len(numbered) == 1 else None
+
+        # Which of the two goes first depends on whether the name can police the
+        # pad. With a readable name the pad is checked against it and beats the
+        # prefix, which is what decides between CH32V00x's two ADC trigger
+        # fields. Without one the pad answers unchecked and may name the wrong
+        # owner, so a structural match on the selector's own name is better:
+        # CH32M030's ISINK1 shares PA6 with TIM2 and belongs to ISINK1_ADJ.
+        order = (by_pad, by_prefix) if pair else (by_prefix, by_pad)
+        for step in order:
+            found = step()
+            if found:
+                return found
+        return None, ""
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
     for pin, fn in routed:
-        key, how = resolve(pin, fn)
+        key, how = resolve(pin, fn, fn["_selector_value"])
         if key is None:
             fn["_unresolved_selector"] = True
             notes.append(
@@ -268,29 +364,19 @@ def join(
     # selector in one place, so a consumer does not have to join the remap tables
     # against the pin table to learn where a peripheral starts out.
     #
-    # Only two of resolve()'s three answers are safe at value 0. Matching the
-    # grid's own value-0 column is exact, and reading the peripheral out of the
-    # signal name is what "default" means. Matching on pad+value is not: at reset
-    # every peripheral sharing a pad is at value 0, so the pad picks no winner.
+    # The same resolution, with only the manual's own value-0 column allowed as
+    # pad evidence. A pad whose default function belongs to no selector at all is
+    # the common case -- ADC inputs, power, oscillators -- and not something to
+    # report.
     for pin in pins:
         for fn in pin["functions"]:
             if fn.get("route") != "default" or fn.get("selection"):
                 continue
-            signal = canonical_signal(fn["signal"])
-            key = field_of_route.get((signal, 0, pin["pad"]))
-            if key not in by_canonical:
-                pair = signal_vocabulary.split(fn["signal"])
-                head = signal.partition("_")[0]
-                matches = [k for k in by_canonical if k.split("_")[0] == head]
-                if pair and pair[0] in by_canonical:
-                    key = pair[0]
-                elif len(matches) == 1:
-                    key = matches[0]
-                else:
-                    # A pad whose default function belongs to no selector at all
-                    # is the common case -- ADC inputs, power, oscillators -- and
-                    # not something to report.
-                    continue
+            key, how = resolve(pin, fn, 0, pad_evidence=("grid",))
+            if key is None:
+                continue
+            if how != "signal":
+                fn["_selector_resolved_by"] = how
             selector = by_canonical[key]
             fn["selection"] = {
                 "selector": selector_id(selector["controller"], selector["field"]),

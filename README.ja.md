@@ -20,7 +20,14 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧とremap_routes.csvに対する当たり具合を出す
 - `tools/extract_clock_tree.py` / `tools/build_clock.py`: EVTの`system_ch32*.c`から
   クロック設定（発振器・各ドメイン周波数・分周・PLL・flash latency・RCC外のレジスタ）を
-  静的に読み、`tables/clock_configs.csv`と`tables/clock_prescalers.csv`へ落とす
+  静的に読み、`tables/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・
+  `clock_symbols.csv`へ落とす
+- `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
+  オフセットから`BLOCK->REGISTER`の絶対アドレスを解く。レジスタ名から場所は決まらない
+  （CH32V205だけEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを別の番地に置く）
+- `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
+  （`CH32V20x_D8W`等）を取り`tables/evt_variants.csv`にする。macroを設定しないと
+  既定のvariantで黙って通るので、どの型番がどれかを表にしておく
 - `tools/crosscheck_ch32data.py`: [ch32-rs/ch32-data](https://github.com/ch32-rs/ch32-data)と
   AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
   CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため

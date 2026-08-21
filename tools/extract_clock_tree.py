@@ -44,6 +44,10 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+
+import extract_addresses  # noqa: E402
+
 # "static void SetSysClockTo144_HSI(void)" opening a body that ends at column 0.
 FUNCTION = re.compile(
     r"^(?:static\s+)?void\s+(?P<name>Set(?:SysClockTo|SYSCLK)\w*)\s*\(\s*void\s*\)\s*$"
@@ -165,7 +169,17 @@ def domains_of(name: str) -> tuple[dict[str, int], str | None]:
 
 
 def read_variant(text: str, symbols: dict[str, int], family_name: str,
-                 notes: list[str]) -> dict[str, dict]:
+                 notes: list[str],
+                 sites: dict[str, set[str]] | None = None) -> dict[str, dict]:
+    """The configurations one copy of system_ch32*.c states.
+
+    `sites` collects, for every symbol that ends up in a clock_configs cell by
+    name alone, the `BLOCK->REGISTER` it was written to. The cell cannot carry
+    the number: RCC_PLLMULL18 is 0x003C0000 and RCC_PLLMULL18_EXTEN is 0, so the
+    same "x18" reads two ways and the name is not decodable. Recording the write
+    site rather than guessing from the name is what lets the value be resolved
+    against the right register.
+    """
     configs: dict[str, dict] = {}
     for found in FUNCTION.finditer(text):
         name, body = found.group("name"), found.group("body")
@@ -226,9 +240,13 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                     continue
                 if PLL.match(symbol):
                     entry["pll"].append(f"{symbol} [{where}]" if where else symbol)
+                    if sites is not None:
+                        sites.setdefault(symbol, set()).add(f"{block}->{register}")
                     continue
                 if block not in NON_RCC_BLOCKS:
                     entry["outside_rcc"].append(f"{block}->{register} {symbol}")
+                    if sites is not None:
+                        sites.setdefault(symbol, set()).add(f"{block}->{register}")
         entry["unresolved_symbols"] = sorted(set(entry["unresolved_symbols"]))
         entry["outside_rcc"] = sorted(set(entry["outside_rcc"]))
         entry["pll"] = list(dict.fromkeys(entry["pll"]))
@@ -246,18 +264,31 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
     configs: dict[str, dict] = {}
     copies: collections.Counter = collections.Counter()
     disagree: list[str] = []
+    sites: dict[str, set[str]] = {}
     total = sum(len(paths) for _, paths in variants.values())
     for digest, (text, paths) in variants.items():
-        for name, entry in read_variant(text, symbols, family.name, notes).items():
+        for name, entry in read_variant(text, symbols, family.name, notes,
+                                        sites).items():
             copies[name] += len(paths)
             known = configs.get(name)
             if known is None:
                 configs[name] = entry
             elif known != entry:
-                disagree.append(name)
+                # Say what differs, not just that something does. CH32V407's
+                # 400MHz setting multiplies by 16 in one copy and by 8 in
+                # another, which is the kind of difference worth naming.
+                only = (set(entry["pll"]) ^ set(known["pll"])) | \
+                       (set(entry["outside_rcc"]) ^ set(known["outside_rcc"]))
+                # A short difference is the interesting one (x16 against x8);
+                # a long one means one copy configures the PLL and another does
+                # not, which the count says better than the list.
+                disagree.append((name, " ".join(sorted(only)) if len(only) <= 6
+                                 else f"{len(only)} 項目"))
     notes[:] = list(dict.fromkeys(notes))
-    for name in sorted(set(disagree)):
-        notes.append(f"{family.name}: {name} の中身が例題によって違う（先に読んだ版を採用）")
+    for name, differing in sorted(set(disagree)):
+        detail = f"（{differing} の有無。先に読んだ版を採用）" if differing \
+            else "（先に読んだ版を採用）"
+        notes.append(f"{family.name}: {name} の中身が例題によって違う{detail}")
     for name, entry in configs.items():
         entry["copies"] = f"{copies[name]}/{total}"
 
@@ -271,9 +302,39 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
         m = PRESCALER.match(symbol)
         if m:
             encodings[m.group("field")][m.group("divider").upper()] = value
+    # A-1 and A-2 of R-24's follow-up: the number behind every symbol a config
+    # cell names, and where it is written. The address comes from the header's
+    # own base-and-struct chain, because the name does not give it away --
+    # CH32V205 calls EXTEN's register CTLR0 where everyone else calls it
+    # EXTEN_CTR, and CH32X315 puts the block somewhere else entirely.
+    header = find_device_header(family)
+    where = extract_addresses.addresses(header) if header else {}
+    # Only the symbols the configs that survived the union actually name. A copy
+    # this family disagrees about can mention a symbol the retained version does
+    # not, and a row nothing refers to would claim it is in use.
+    # A pll entry is "SYMBOL" or "SYMBOL [condition]"; an outside_rcc entry is
+    # "BLOCK->REGISTER SYMBOL". The symbol is at opposite ends of the two.
+    named = {entry.split(" ")[0] for config in configs.values()
+             for entry in config["pll"]}
+    named |= {entry.split(" ")[-1] for config in configs.values()
+              for entry in config["outside_rcc"]}
+    resolved: list[dict] = []
+    for symbol in sorted(sites):
+        if symbol not in symbols or symbol not in named:
+            continue
+        for site in sorted(sites[symbol]):
+            block, _, register = site.partition("->")
+            address = where.get((block, register))
+            resolved.append({"symbol": symbol, "register": site,
+                             "address": "" if address is None else f"{address:#010x}",
+                             "value": symbols[symbol]})
+        if len(sites[symbol]) > 1:
+            notes.append(f"{family.name}: {symbol} が複数のレジスタに書かれる "
+                         f"({', '.join(sorted(sites[symbol]))})")
     return {"copies": total,
             "variants": len(variants),
             "configs": configs,
+            "symbols": resolved,
             "prescaler_encodings": {k: dict(sorted(v.items(), key=lambda kv: kv[1]))
                                     for k, v in sorted(encodings.items())}}, notes
 
