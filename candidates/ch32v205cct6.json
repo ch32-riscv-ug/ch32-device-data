@@ -2,7 +2,10 @@
   "part_number": "CH32V205CCT6",
   "_provenance": {
     "datasheet": "CH32V205/datasheet_en/CH32V205DS0.PDF",
-    "manual": "CH32V205/datasheet_en/CH32V205RM.PDF",
+    "manuals": [
+      "CH32V205/datasheet_en/CH32V205RM.PDF",
+      "CH32V205/datasheet_zh/CH32V205RM.PDF"
+    ],
     "header": "CH32V205/EVT/EXAM/SRC/Peripheral/inc/ch32v205.h",
     "pin_table": "Table 2-1-1",
     "pin_column": "V205CCT6"
