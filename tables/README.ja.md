@@ -86,6 +86,8 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 **`peripheral`/`role`は`signal`を正規化した読みです**。`signal`は原典の表記のまま残してあり、同じ役割が資料により`USART1_TX` / `UART_TX` / `TX1` / `UTX`と書かれます。`tools/signal_vocabulary.py`の語彙規則がこれを1組へ読み、規則が当たらない行は**両方とも空**にします（推測で埋めるより、埋まっていないことが分かるほうが使えるため）。現在空なのは4380行中14行で、`AETR2`（ADCトリガでペリフェラル役割ではない）、`TIETR`（`T1ETR`の誤植に見えるがdatasheet原文未確認）、`ISINK1`/`ISINK2`（ペリフェラル_役割の形をしていない実在の信号）、`X`・`V`・`SW`・`PD0`・`DVP_`（pin表のテキスト層が壊れた断片）です。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧と当たり具合を出せます。
 
+**`UART`と`USART`は同じものへ畳みます。** WCHは同じseriesの中でも呼び分けが揺れていて、CH32V307はpin表が`UART5_TX`なのにAFIOのfieldは`USART5_REMAP`、CH32M030はpin表が`UART_TX`でfieldは`UART1_REMAP`です。畳まないとsignalが自分のselectorを見つけられません（実際にCH32V303/V307/V317のUSART5〜8が丸ごと落ちました）。12 familyのEVTヘッダを確認して**UARTnとUSARTnのAFIO fieldを両方持つfamilyは無い**ので、同じsiliconで別のペリフェラルを指すことはありません。`peripheral`列は正規化後の`USART5`になりますが、`remap_fields.csv`の`field`列と`selector`のidは原典の綴り（`UART1_REMAP` / `afio-uart1-remap`）を保ちます。
+
 **`value=0`の行は既定経路です**。datasheet pin表の`default`列を値0として展開したもので、`basis`が`candidates(datasheet-pin-table-default:en)`になります。remap後の経路と同じ表に並ぶので、既定位置を知るためにpin_functions.csvを引き直す必要はありません。
 
 **`valid_values`は下限です**。3つの資料の和を採っています——RMのremap格子が挙げる値、datasheet pin表が実際に経路を持つと示した値、EVTヘッダが定数として列挙している値。格子は「どちらでもよい」桁を`x`で書くので過大に出ることがあり（CH32X035の`USART4_RM=1xx`が4通りに展開される）、逆にどの資料も触れていない値は落ちます。**列挙されていない値が使えないとは限りません**が、列挙されている値はいずれかの資料が実証しています。`remap_routes.csv`に出る経路はすべてここに含まれます。

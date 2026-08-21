@@ -33,16 +33,12 @@
     {
       "id": "afio-i2c1-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "I2C1_REMAP",
       "bits": [
         {
           "register": "PCFR1",
           "bit": 1
-        },
-        {
-          "register": "PCFR",
-          "bit": 1
         }
       ],
       "valid_values": [
@@ -50,25 +46,17 @@
         1
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "reset_value": 0
     },
     {
       "id": "afio-spi1-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "SPI1_REMAP",
       "bits": [
         {
           "register": "PCFR1",
           "bit": 0
-        },
-        {
-          "register": "PCFR",
-          "bit": 0
         }
       ],
       "valid_values": [
@@ -76,16 +64,12 @@
         1
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "reset_value": 0
     },
     {
       "id": "afio-tim1-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "TIM1_REMAP",
       "bits": [
         {
@@ -95,14 +79,6 @@
         {
           "register": "PCFR1",
           "bit": 7
-        },
-        {
-          "register": "PCFR",
-          "bit": 6
-        },
-        {
-          "register": "PCFR",
-          "bit": 7
         }
       ],
       "valid_values": [
@@ -110,20 +86,13 @@
         1,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_values_only_from_evt": [
-        3
-      ],
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim2-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "TIM2_REMAP",
       "bits": [
         {
@@ -133,14 +102,6 @@
         {
           "register": "PCFR1",
           "bit": 9
-        },
-        {
-          "register": "PCFR",
-          "bit": 8
-        },
-        {
-          "register": "PCFR",
-          "bit": 9
         }
       ],
       "valid_values": [
@@ -149,17 +110,13 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim3-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "TIM3_REMAP",
       "bits": [
         {
@@ -169,14 +126,6 @@
         {
           "register": "PCFR1",
           "bit": 11
-        },
-        {
-          "register": "PCFR",
-          "bit": 10
-        },
-        {
-          "register": "PCFR",
-          "bit": 11
         }
       ],
       "valid_values": [
@@ -184,12 +133,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim4-remap",
@@ -215,15 +160,11 @@
     {
       "id": "afio-usart1-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "USART1_REMAP",
       "bits": [
         {
           "register": "PCFR1",
-          "bit": 2
-        },
-        {
-          "register": "PCFR",
           "bit": 2
         }
       ],
@@ -232,11 +173,7 @@
         1
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "reset_value": 0
     },
     {
       "id": "afio-usart2-remap",
@@ -262,7 +199,7 @@
     {
       "id": "afio-usart3-remap",
       "controller": "afio",
-      "register": "PCFR1|PCFR",
+      "register": "PCFR1",
       "field": "USART3_REMAP",
       "bits": [
         {
@@ -272,14 +209,6 @@
         {
           "register": "PCFR1",
           "bit": 5
-        },
-        {
-          "register": "PCFR",
-          "bit": 4
-        },
-        {
-          "register": "PCFR",
-          "bit": 5
         }
       ],
       "valid_values": [
@@ -288,15 +217,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_values_only_from_evt": [
-        3
-      ],
-      "reset_value": 0,
-      "_split_registers": [
-        "PCFR1",
-        "PCFR"
-      ]
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     }
   ],
   "pins": [

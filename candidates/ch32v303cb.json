@@ -2,7 +2,10 @@
   "part_number": "CH32V303CB",
   "_provenance": {
     "datasheet": "CH32V307/datasheet_en/CH32V20x_30xDS0.PDF",
-    "manual": "CH32V307/datasheet_en/CH32FV2x_V3xRM.PDF",
+    "manuals": [
+      "CH32V307/datasheet_en/CH32FV2x_V3xRM.PDF",
+      "CH32V307/datasheet_zh/CH32FV2x_V3xRM.PDF"
+    ],
     "header": "CH32V307/EVT/EXAM/SRC/Peripheral/inc/ch32v30x.h",
     "pin_table": "Table 3-1",
     "pin_column": "LQFP48(V303CBT6)(17)"
@@ -65,7 +68,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -83,7 +86,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -101,7 +104,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -119,7 +122,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -137,7 +140,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -158,9 +161,10 @@
       "valid_values": [
         0,
         1,
+        2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -184,7 +188,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -208,7 +212,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -232,7 +236,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -250,7 +254,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -268,7 +272,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -292,7 +296,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -316,7 +320,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -338,7 +342,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -362,7 +366,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     }
   ],

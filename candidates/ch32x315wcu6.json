@@ -2,7 +2,10 @@
   "part_number": "CH32X315WCU6",
   "_provenance": {
     "datasheet": "CH32X315/datasheet_en/CH32X315DS0.PDF",
-    "manual": "CH32X315/datasheet_en/CH32X315RM.PDF",
+    "manuals": [
+      "CH32X315/datasheet_en/CH32X315RM.PDF",
+      "CH32X315/datasheet_zh/CH32X315RM.PDF"
+    ],
     "header": "CH32X315/EVT/EXAM/SRC/Peripheral/inc/ch32x3x5.h",
     "pin_table": "Table 2-1",
     "pin_column": "CH32X315WCU6"
