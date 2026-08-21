@@ -19,9 +19,21 @@ import pdfplumber
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
 
+# 対象の表。「一般動作条件」に加えて発振器の表も読む。後者はクロック源の
+# 許容範囲と確度で、R-24のC-2（HSIの確度・HSEの許容範囲）がここにある。
+# 表題は表のキャプションなので、そのページの表を読む形は同じ。
 MARKER = {
-    "en": re.compile(r"General\s+operating\s+conditions", re.IGNORECASE),
-    "zh": re.compile(r"[通一]\s*[用般]\s*工\s*作\s*条\s*件"),
+    "en": re.compile(
+        r"General\s+operating\s+conditions"
+        r"|(?:Internal|External)\s+(?:high|low)[-\s]speed"
+        r"|From\s+external\s+(?:high|low)[-\s]speed\s+clock"
+        r"|(?:High|Low)[-\s]speed\s+external\s+clocks?\s+generated",
+        re.IGNORECASE),
+    "zh": re.compile(
+        r"[通一]\s*[用般]\s*工\s*作\s*条\s*件"
+        r"|内\s*部\s*(?:高|低)\s*速"
+        r"|来\s*自\s*外\s*部\s*(?:高|低)\s*速\s*时\s*钟"
+        r"|谐\s*振\s*器\s*产\s*生\s*的\s*(?:高|低)\s*速\s*外\s*部\s*时\s*钟"),
 }
 # ヘッダー名 → 正規列。抽出時のCJK間スペースと脚注を吸収する。
 HEADER_MAP = {
@@ -34,7 +46,22 @@ HEADER_MAP = {
     "unit": "unit", "单位": "unit",
 }
 FOOTNOTE = re.compile(r"[（(]\d+[）)]")
-KEEP = re.compile(r"^F_|^V_?DD$")  # クロック上限と主電源電圧のみ
+# クロック上限と主電源電圧、そして発振器の周波数・確度・デューティ。
+# 起動時間や消費電流（t_SU、I_DD）は同じ表にあるが、クロックの事実ではない
+# ので採らない。
+KEEP = re.compile(r"^F_|^V_?DD$|^ACC_(?:HSI|LSI|HSE|LSE)|^DuCy_(?:HSI|LSI|HSE|LSE)")
+# 継承した記号が行の中身と合わないことがある。発振器の表はデューティ比の行が
+# 記号セル空で続くため、F_* の行に単位 % が付く。単位で弾ける。
+UNIT_FOR = [(re.compile(r"^F_"), re.compile(r"^(?:[MmKk]?Hz)$")),
+            (re.compile(r"^V_"), re.compile(r"^m?V$")),
+            (re.compile(r"^ACC_"), re.compile(r"^(?:%|ppm)$")),
+            (re.compile(r"^DuCy_"), re.compile(r"^%$"))]
+# 値の欄に条件文が流れ込むことがある（CH32M007の ACC_HSI は min に
+# "HSI_LP = 0 TA = -10℃~70℃" が入る）。一方で上限が別の記号で書かれることは
+# 正当で、"F_PCLK1 の max は F_HCLK" はC-5が求めているバス上限そのもの。
+# 数値か、空白を含まない短い記号なら採る。
+NUMERIC = re.compile(r"^[-+]?(?:\d+(?:\.\d+)?|\.\d+)$")
+SYMBOLIC = re.compile(r"^[0-9.]*[A-Za-z][A-Za-z0-9_.+]{0,15}$")
 # 抽出時に潰れた表記の修繕（サブスクリプト割り込み・原文の詰まり）
 SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK"}
 VALUE_FIX = {"FHCLK": "F_HCLK"}
@@ -69,7 +96,12 @@ def norm_header(cell):
 
 def norm_symbol(cell):
     parts = [p.strip() for p in (cell or "").split("\n") if p.strip()]
-    sym = FOOTNOTE.sub("", "_".join(parts)).replace(" ", "")
+    sym = FOOTNOTE.sub("", "_".join(parts))
+    # 添字はセル内で改行にも空白にもなる。"F HSE_ext" は F_HSE_ext、
+    # "ACC HSI" は ACC_HSI。空白を消してしまうと FHSE_ext になり引けない。
+    # 脚注を落とした跡が空白として残るので（"V (6)\nDD" → "V _DD"）、
+    # 連続したアンダースコアは1つに畳む。
+    sym = re.sub(r"[\s_]+", "_", sym).strip("_")
     sym = SYMBOL_FIX.get(sym, sym)
     # 「F_HCLK or F_SYS」のような複合表記（orは英語版、或は中国語版）は、
     # サブスクリプトの折返しで語順が壊れるため HCLK を含めば F_HCLK に畳む。
@@ -90,9 +122,40 @@ def norm_value(cell):
     return VALUE_FIX.get(value, value)
 
 
+DROPPED: list[str] = []
+
+
+def keep_row(row, lang, page_no):
+    """その行を採るか。記号・単位・値がそれぞれ噛み合っていることを確かめる。
+
+    表の継承（記号セルが空の続き行）は多条件の行には正しいが、別のパラメータが
+    続いている場合は記号を取り違える。単位と値で弾けるので弾く。
+    """
+    symbol = row["symbol"]
+    if not KEEP.match(symbol):
+        return False
+    unit = row.get("unit") or ""
+    for name, want in UNIT_FOR:
+        if name.match(symbol) and unit and not want.match(unit):
+            DROPPED.append(f"{lang} p.{page_no} {symbol}: 単位が {unit!r} なので別の行の続き")
+            return False
+    for key in ("min", "max"):
+        value = row.get(key) or ""
+        if value and not (NUMERIC.match(value) or SYMBOLIC.match(value)):
+            DROPPED.append(f"{lang} p.{page_no} {symbol}: {key} が {value[:28]!r}")
+            return False
+    return True
+
+
 def read_edition(pdf_path, lang):
-    """(page_no, [row dict]) — マーカーページの直後にある対象表の行を返す。"""
+    """対象表の行。行ごとに読み取ったページ番号を `_page` で持つ。
+
+    対象表は1ページに収まらない。一般動作条件のほかに発振器の表が5つあり
+    （HSI/LSI/外部高速/外部低速/水晶）、それぞれ別ページにある。最初に見つけた
+    ページで打ち切ると一般動作条件しか取れない。
+    """
     marker = MARKER[lang]
+    found = []
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
             text = page.extract_text() or ""
@@ -130,10 +193,10 @@ def read_edition(pdf_path, lang):
                         "max": norm_value(cells.get("max")),
                         "unit": unit,
                     })
-                kept = [r for r in rows if KEEP.match(r["symbol"])]
+                kept = [r for r in rows if keep_row(r, lang, page.page_number)]
                 if kept:
-                    return page.page_number, kept
-    return None, []
+                    found += [{**r, "_page": page.page_number} for r in kept]
+    return found
 
 
 def read_headline_clock(pdf_path, lang):
@@ -166,14 +229,14 @@ def main():
             path = MIRRORS / family / f"datasheet_{lang}" / datasheet
             if not path.exists():
                 continue
-            page_no, rows = read_edition(path, lang)
+            rows = read_edition(path, lang)
             if rows:
-                editions[lang] = (page_no, rows)
+                editions[lang] = rows
         if "en" not in editions:
             print(f"{datasheet}: 英語版で対象表が見つからない", file=sys.stderr)
             continue
-        en_page, en_rows = editions["en"]
-        zh_page, zh_rows = editions.get("zh", (None, []))
+        en_rows = editions["en"]
+        zh_rows = editions.get("zh", [])
         series = ";".join(sorted(ds_series[datasheet]))
 
         # 行対応は記号ごとの値照合。中国語版は行の増減（極限行の同居等）や
@@ -187,10 +250,12 @@ def main():
         for row in en_rows:
             cands = [z for z in remaining if z["symbol"] == row["symbol"]]
             exact = next((z for z in cands if agrees(z, row)), None)
+            en_page = row.pop("_page")
             if exact:
                 remaining.remove(exact)
                 confidence = "confirmed"
-                basis = f"{datasheet}:zh(p.{zh_page})+{datasheet}:en(p.{en_page})"
+                basis = (f"{datasheet}:zh(p.{exact['_page']})"
+                         f"+{datasheet}:en(p.{en_page})")
             elif cands:
                 remaining.remove(cands[0])
                 confidence = "conflict"
@@ -241,6 +306,10 @@ def main():
     from collections import Counter
     print(f"{dest.relative_to(REPO)}: {len(out)} 行",
           dict(Counter(r["confidence"] for r in out)))
+    if DROPPED:
+        print(f"  噛み合わないので採らなかった行 {len(DROPPED)}:", file=sys.stderr)
+        for line in dict.fromkeys(DROPPED):
+            print(f"    - {line}", file=sys.stderr)
 
 
 if __name__ == "__main__":

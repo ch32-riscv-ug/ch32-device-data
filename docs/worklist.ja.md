@@ -12,7 +12,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | README生成 | 3 | 3 |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 4 | 1 |
-| consumerからの依頼 | 1 | 2（うち1件は部分実装） |
+| consumerからの依頼 | 2 | 1 |
 
 ## 着手順の方針
 
@@ -91,7 +91,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 |---|---|---|
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
 | R-20 | レジスタマップ（D-1〜D-8） | 🔜 **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md) |
-| R-24 | クロック関連データ（C-1〜C-8） | 🔜 **C-1/C-3/C-4/C-5/C-6/C-7を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`。残りはC-2（datasheet側）と各周辺の数値上限。下記 |
+| R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張。下記 |
 
 ### R-24 クロック関連データ（2026-08-21受領・一部実装）
 
@@ -113,9 +113,20 @@ EVTのcloneが1 silicon分だから。seriesで引くとV203がCH32V20xとCH32V2
 別のツリーを拾う。`tools/check_tables.py`がfamilyの結合・分周比の存在・`domains`の書式・
 value/shiftが数であることを検査する。
 
-**未実装**: C-2（HSI確度・HSE許容範囲。datasheetの電気的特性章側なのでPDF解析が要る）と、
-C-7のうち**数値上限**（ADCの14MHz上限、USBが48MHzを要求すること）。
-経路と符号化は取れたが「その経路で何Hzにしないといけないか」は電気的特性側にある。
+**C-2も実装**（2026-08-21）。`tools/build_operating.py`を発振器の表まで読むよう広げた。
+`operating_conditions.csv`は76行→**241行**になり、`ACC_HSI`（確度・温度範囲ごと）、
+`F_HSE_ext`/`F_LSE_ext`（外部クロックの許容範囲）、`F_HSI`/`F_LSI`、`DuCy_*` が入った。
+**C-3の上下限も同時に取れた**——`F_PLL_IN`/`F_PLL_OUT`/`F_VCO`（例: L103は入力3〜25MHz・
+出力18〜96MHz、H41xは出力100〜600MHz）。C-5のバス上限も`F_PCLK1`の`max`が`F_HCLK`という
+記号のまま入っている。
+
+抽出上の注意（吸収済み）: 発振器の表は本体と別ページにあり5表に分かれるので、
+**1つ見つけて打ち切ってはいけない**。記号セルの添字は改行にも空白にもなる
+（`F HSE_ext`→`F_HSE_ext`）。脚注を落とした跡が空白として残る（`V (6)\nDD`→`V_DD`）。
+記号セルが空の続き行は別パラメータのことがあり、単位で弾ける（`F_*`に`%`が付く行）。
+
+**未実装**: ADCの14MHz上限のような**周辺固有の上限**。一般動作条件表にも発振器の表にも
+無く、各周辺の章の散文にある。
 
 **依頼書との差**（実測して分かった分）:
 
