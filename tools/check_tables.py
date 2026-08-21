@@ -287,6 +287,13 @@ def main() -> int:
             bad.append(f"clock_init: {r['family']} {r['function']} の "
                        f"{r['action']} が source を持っている")
         init_steps.setdefault((r["family"], r["function"]), []).append(int(r["step"]))
+        # A poll condition or a trim source that names a symbol is a reference
+        # to clock_symbols, and a reference to a row that does not exist leaves
+        # the consumer to guess the bit. CH32X315's RCC_HSIRDY was exactly that.
+        for symbol in re.findall(r"\b(?:RCC|FLASH|EXTEN)_[A-Za-z0-9_]+", r["condition"]):
+            if (r["family"], symbol) not in symbols:
+                bad.append(f"clock_init: {r['family']} {r['function']} の condition が呼ぶ "
+                           f"{symbol} が clock_symbols にない")
     for (family, function), steps in init_steps.items():
         if sorted(steps) != list(range(min(steps), min(steps) + len(steps))):
             bad.append(f"clock_init: {family} {function} の step が連番でない: "

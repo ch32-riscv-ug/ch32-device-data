@@ -570,11 +570,50 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
     header = find_device_header(family)
     where = extract_addresses.addresses(header) if header else {}
     remark = comments(header)
+    banners = banner_registers(header)
     declared: set[str] = set()
+
+    init: list[dict] = []
+    for _, (text, _) in sorted(variants.items(), key=lambda kv: -len(kv[1][1])):
+        init = read_init(text, symbols)
+        if init:
+            break
+    # A trim step's address is where the byte lives, not a register. CH32V003
+    # writes CFG0_PLL_TRIM as (VENDOR_CFG0_BASE), so it has to be followed
+    # through the same base chain the register addresses use.
+    chain = extract_addresses.bases(
+        header.read_text(errors="ignore").splitlines()) if header else {}
+    trim_field = banners.get("RCC_HSITRIM", "")
+    for step in init:
+        if step["action"] == "trim":
+            found = chain.get(step["source"])
+            step["address"] = "" if found is None else f"{found:#010x}"
+            # Where the value ends up. The setter is a driver function, but the
+            # field it writes is named in the header like any other.
+            step["register"] = trim_field
+        else:
+            block, _, register = step["register"].partition("->")
+            found = where.get((block, register))
+            step["address"] = "" if found is None else f"{found:#010x}"
+    if not init:
+        notes.append(f"{family.name}: SystemInit が無い（初期化の場所が別）")
+
     sites: dict[str, set[tuple[str, str]]] = collections.defaultdict(set)
     for config in configs.values():
         for symbol, seen in config["symbols"].items():
             sites[symbol].update(tuple(entry) for entry in seen)
+    # SystemInit's own symbols. Collecting them only from the configurations left
+    # the bit CH32X315 waits on out of the table while clock_init named it in a
+    # poll condition -- a reference to a row that does not exist. And where a
+    # trim ends up is a field like any other, but the setter is a driver
+    # function, so nothing in the sources read here writes its mask.
+    for step in init:
+        for symbol in SYMBOL.findall(step["condition"]):
+            if symbol in symbols and CLOCK_SYMBOL.match(symbol) and step["register"]:
+                sites[symbol].add((step["register"], "poll"))
+        if step["action"] == "trim" and step["register"]:
+            sites["RCC_HSITRIM"].add((step["register"], "mask"))
+            declared.add("RCC_HSITRIM")
     # The masks the code never clears. Their register is the one the field's own
     # values are written to, which the observed rows already say; a mask whose
     # field this family never touches has no register to name and is left out.
@@ -582,7 +621,6 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
     for symbol, seen in sites.items():
         for site, _ in seen:
             register_of.setdefault(symbol, site)
-    banners = banner_registers(header)
     for mask in sorted(field_masks(symbols)):
         if mask in sites:
             continue
@@ -612,31 +650,6 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
         if len(registers) > 1:
             notes.append(f"{family.name}: {symbol} が複数のレジスタに書かれる "
                          f"({', '.join(sorted(registers))})")
-    init: list[dict] = []
-    for _, (text, _) in sorted(variants.items(), key=lambda kv: -len(kv[1][1])):
-        init = read_init(text, symbols)
-        if init:
-            break
-    # A trim step's address is where the byte lives, not a register. CH32V003
-    # writes CFG0_PLL_TRIM as (VENDOR_CFG0_BASE), so it has to be followed
-    # through the same base chain the register addresses use.
-    chain = extract_addresses.bases(
-        header.read_text(errors="ignore").splitlines()) if header else {}
-    trim_field = banners.get("RCC_HSITRIM", "")
-    for step in init:
-        if step["action"] == "trim":
-            found = chain.get(step["source"])
-            step["address"] = "" if found is None else f"{found:#010x}"
-            # Where the value ends up. The setter is a driver function, but the
-            # field it writes is named in the header like any other.
-            step["register"] = trim_field
-        else:
-            block, _, register = step["register"].partition("->")
-            found = where.get((block, register))
-            step["address"] = "" if found is None else f"{found:#010x}"
-    if not init:
-        notes.append(f"{family.name}: SystemInit が無い（初期化の場所が別）")
-
     return {"copies": total,
             "variants": len(variants),
             "configs": configs,
