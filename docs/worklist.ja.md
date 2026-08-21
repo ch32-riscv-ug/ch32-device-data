@@ -12,6 +12,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | README生成 | 3 | 3 |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 4 | 1 |
+| consumerからの依頼 | 1 | 2 |
 
 ## 着手順の方針
 
@@ -80,6 +81,71 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 - [x] ✅ **D3 エラッタ増分検査** — `tools/scan_errata.py`（ミラーPDFが要るのでCIではなく手動運用）
 - [x] ✅ **D5 画像の検査** — 寸法異常と同一切り出しの共有を機械検出（目視の前段。実際に4件の欠損を捕捉）
 - [ ] ⬜ **D4 同期日時の表示** — 各READMEに「いつ原典と同期したか」。U5（原典に到達できない人）が最初に確認する情報
+
+## E. consumerからの依頼
+
+`ArduinoCore-CH32`が`docs/research/`で出している依頼。上流はこのrepositoryなので、
+受けるかどうかもここで決める。
+
+| # | 依頼 | 状態 |
+|---|---|---|
+| R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
+| R-20 | レジスタマップ（D-1〜D-8） | 🔜 **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md) |
+| R-24 | クロック関連データ（C-1〜C-8） | ⬜ **未着手**。下記 |
+
+### R-24 クロック関連データ（2026-08-21受領）
+
+`ArduinoCore-CH32/docs/research/clock-data-request.ja.md`。`SystemInit`をPLL込みに
+一般化するために要る事実が全部familyごとに違い、いまはEVTを手で読んで写している、という依頼。
+`products.csv`にはflash/sram/GPIO数まであるが、**クロックの表は1つも無い**。
+
+欲しいものはC-1〜C-8: クロックツリーの段構成 / 発振器 / PLL / PLL周辺の非RCCレジスタ /
+プリスケーラと各バス上限 / flash latency閾値 / 正確な周波数を要求する周辺の経路 / 出典と確信度。
+粒度はfamily。
+
+**材料の下見（実測）**: 依頼が挙げる検証手段——EVTの`system_*.c`の`SetSysClockTo*`は
+レジスタ書き込みの列そのもの——は成立する。ただし**関数名の書式が3通り**あり、
+段構成は名前そのものが持っている。
+
+| 書式 | family | 例 |
+|---|---|---|
+| `SetSysClockTo<N>_HSI/HSE` | L103(20) M030(14) V003(6) V006(6) V103(14) V205(24) V20x(26) V307(26) X035(10) | `SetSysClockTo144_HSI` |
+| `SetSYSCLK_<sys>MHz_HCLK_<hclk>MHz_HSI/HSE` | V407(10) | `SetSYSCLK_400MHz_HCLK_200MHz_HSE` |
+| `SetSYSCLK_<sys>M_CoreCLK_<core>M_HCLK_<hclk>M_HSI/HSE` | X315(8) | `SetSYSCLK_480M_CoreCLK_480M_HCLK_240M_HSI` |
+| setter無し | H417 | `SystemAndCoreClockUpdate`だけ。dual-coreで設定箇所が別 |
+
+関数の本体は記号名のまま読める。V20xの144MHz HSIは依頼のC-4/C-5をそのまま裏付ける:
+
+```c
+static void SetSysClockTo144_HSI(void) {
+    EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE;   /* C-4: RCC外のPLL制御 */
+    RCC->CFGR0 |= (uint32_t)RCC_HPRE_DIV1;   /* C-5: HCLK = SYSCLK */
+    RCC->CFGR0 |= (uint32_t)RCC_PPRE2_DIV1;  /* PCLK2 = HCLK */
+    RCC->CFGR0 |= (uint32_t)RCC_PPRE1_DIV2;  /* PCLK1 = HCLK/2 -- F_CPUとは違う */
+```
+
+つまり**gccは要らず、静的に読むだけ**でC-1/C-3/C-5/C-6の裏取りができる（合計146関数）。
+R-19で`extract_remap_fields.py`が果たしたのと同じ「独立検証」の役回りになる。
+
+**未確認**:
+- C-2のHSE許容範囲・HSIの確度はEVTには無く、datasheetの電気的特性章側。
+  `tables/operating_conditions.csv`が既にクロック上限と動作電圧を持っているので、
+  同じ抽出器（`tools/build_operating.py`）の隣に置ける可能性
+- ArduinoCore側が「成果物ごと渡せる」と言っているAHBプリスケーラの符号化は、
+  EVTヘッダの`RCC_HPRE_DIV*` defineから**機械的に再導出できる（確認済み）**。
+  ただし2通りではなく**3通り**だった:
+
+  | 符号化 | 値 | family |
+  |---|---|---|
+  | linear（全部） | DIV1..8 = 0x00,0x10..0x70 / DIV16,32,64,128,256 = 0xB0..0xF0 | V003 X035 |
+  | linear（DIV7止まり） | DIV1..7 = 0x00,0x10..0x60 のみ | **M030** |
+  | pow2（DIV32が無い） | DIV1=0x00 / DIV2,4,8,16 = 0x80..0xB0 / DIV64..512 = 0xC0..0xF0 | V103 V20x V307 V407 L103 V205 X315 |
+
+  「`/32`が無い」という依頼側の指摘はpow2群で正しい。M030がDIV8以上を1つも持たないのは
+  依頼書に無い差なので、渡す側・受ける側どちらでも要確認
+- ch32-dataは`rcc_*.yaml`を9種持っている（`rcc_v003` `rcc_v00x` `rcc_v1` `rcc_v3`
+  `rcc_v3_d8c` `rcc_x0` `rcc_l1` `rcc_h4` `rcc_ch641`）。C-3/C-5/C-6のfield符号化は
+  ここと突き合わせられる。ただしV205/V407/V467/X305/X315/M030/M103は向こうに無い
 
 ## 利用状況（優先順位の根拠）
 
