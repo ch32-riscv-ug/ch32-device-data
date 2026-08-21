@@ -39,25 +39,7 @@
     "package": "LQFP48",
     "page": 75
   },
-  "route_selectors": [
-    {
-      "id": "afio-tim1-cap-rm",
-      "controller": "afio",
-      "register": "PCFR1",
-      "field": "TIM1_CAP_RM",
-      "bits": [
-        {
-          "register": "PCFR1",
-          "bit": 31
-        }
-      ],
-      "valid_values": [
-        0
-      ],
-      "_valid_values_source": "datasheet pin表",
-      "reset_value": 0
-    }
-  ],
+  "route_selectors": [],
   "pins": [
     {
       "number": 1,
@@ -66,11 +48,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BAT",
+          "signal": "VBAT",
           "route": "main"
         }
       ]
@@ -128,11 +106,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SSA",
+          "signal": "VSSA",
           "route": "main"
         }
       ]
@@ -144,11 +118,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDA",
+          "signal": "VDDA",
           "route": "main"
         }
       ]
@@ -512,18 +482,7 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH3",
-          "route": "default",
-          "_selector_resolved_by": "prefix",
-          "selection": {
-            "selector": "afio-tim1-cap-rm",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "N",
+          "signal": "TIM1_CH3N",
           "route": "af-0",
           "_alternate_function": 0
         },
@@ -542,11 +501,7 @@
           "route": "default"
         },
         {
-          "signal": "QSPI_SCS",
-          "route": "default"
-        },
-        {
-          "signal": "XN",
+          "signal": "QSPI_SCSXN",
           "route": "af-5",
           "_alternate_function": 5
         }
@@ -567,11 +522,7 @@
           "route": "default"
         },
         {
-          "signal": "USART5_T",
-          "route": "default"
-        },
-        {
-          "signal": "X",
+          "signal": "USART5_TX",
           "route": "af-3",
           "_alternate_function": 3
         },
@@ -665,11 +616,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_1",
+          "signal": "VSS_1",
           "route": "main"
         }
       ]
@@ -747,18 +694,8 @@
         },
         {
           "signal": "TIM1_CH2N",
-          "route": "default",
-          "_selector_resolved_by": "prefix",
-          "selection": {
-            "selector": "afio-tim1-cap-rm",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "(AF0)",
-          "route": "default"
+          "route": "af-0",
+          "_alternate_function": 0
         },
         {
           "signal": "USART3_RTS",
@@ -1017,11 +954,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_2",
+          "signal": "VSS_2",
           "route": "main"
         }
       ]
@@ -1419,11 +1352,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_3",
+          "signal": "VSS_3",
           "route": "main"
         }
       ]

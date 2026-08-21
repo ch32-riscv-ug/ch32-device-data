@@ -486,11 +486,7 @@
       "_pin_type": "O/A",
       "functions": [
         {
-          "signal": "OSC_OU",
-          "route": "main"
-        },
-        {
-          "signal": "T",
+          "signal": "OSC_OUT",
           "route": "main"
         },
         {
@@ -613,7 +609,7 @@
           "route": "default"
         },
         {
-          "signal": "ETH_MII_TX_CL",
+          "signal": "ETH_MII_TX_CLK",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -622,10 +618,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "K",
-          "route": "default"
         },
         {
           "signal": "ETH_RGMII_RXD1",
@@ -647,11 +639,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO",
+          "signal": "VIO",
           "route": "main"
         }
       ]
@@ -699,7 +687,7 @@
           "route": "default"
         },
         {
-          "signal": "ETH_MII_RX_CL",
+          "signal": "ETH_MII_RX_CLK",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -708,10 +696,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "K",
-          "route": "default"
         },
         {
           "signal": "ETH_RMII_REF_CLK",
@@ -1180,22 +1164,11 @@
           }
         },
         {
-          "signal": "ETH_RMII_TX_E",
+          "signal": "ETH_RMII_TX_EN",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-eth-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "N",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart3-remap",
             "values": [
               0
             ]
@@ -1391,7 +1364,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_MDI",
+          "signal": "ETH_RGMII_MDIO",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1400,10 +1373,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "O",
-          "route": "default"
         },
         {
           "signal": "USART3_CTS",
@@ -1630,11 +1599,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]

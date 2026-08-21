@@ -135,11 +135,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD12A",
+          "signal": "VDD12A",
           "route": "main"
         }
       ]
@@ -151,11 +147,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD33",
+          "signal": "VDD33",
           "route": "main"
         }
       ]
@@ -167,20 +159,8 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
+          "signal": "VDDK",
           "route": "main"
-        },
-        {
-          "signal": "DDK",
-          "route": "main"
-        },
-        {
-          "signal": "Main V",
-          "route": "default"
-        },
-        {
-          "signal": "DDK",
-          "route": "default"
         }
       ]
     },
@@ -239,20 +219,8 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
+          "signal": "VDD33",
           "route": "main"
-        },
-        {
-          "signal": "DD33",
-          "route": "main"
-        },
-        {
-          "signal": "Main V",
-          "route": "default"
-        },
-        {
-          "signal": "DD33",
-          "route": "default"
         }
       ]
     },
@@ -450,11 +418,7 @@
           "_alternate_function": 11
         },
         {
-          "signal": "LT",
-          "route": "default"
-        },
-        {
-          "signal": "DC_G5",
+          "signal": "LTDC_G5",
           "route": "af-14",
           "_alternate_function": 14
         },
@@ -696,11 +660,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD33A",
+          "signal": "VDD33A",
           "route": "main"
         }
       ]
@@ -1437,20 +1397,8 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
+          "signal": "VIO18",
           "route": "main"
-        },
-        {
-          "signal": "IO18",
-          "route": "main"
-        },
-        {
-          "signal": "Main V",
-          "route": "default"
-        },
-        {
-          "signal": "IO18",
-          "route": "default"
         }
       ]
     },
@@ -1461,20 +1409,8 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
+          "signal": "VDDIO",
           "route": "main"
-        },
-        {
-          "signal": "DDIO",
-          "route": "main"
-        },
-        {
-          "signal": "Main V",
-          "route": "default"
-        },
-        {
-          "signal": "DDIO",
-          "route": "default"
         }
       ]
     },
@@ -1777,18 +1713,7 @@
           "_alternate_function": 8
         },
         {
-          "signal": "S",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-uhsif-port-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "DIO_D0",
+          "signal": "SDIO_D0",
           "route": "af-9",
           "_alternate_function": 9
         },
@@ -1828,18 +1753,7 @@
           "_alternate_function": 14
         },
         {
-          "signal": "D",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-uhsif-port-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "VP_VSYNC",
+          "signal": "DVP_VSYNC",
           "route": "af-15",
           "_alternate_function": 15
         }
@@ -1961,18 +1875,7 @@
           "_alternate_function": 3
         },
         {
-          "signal": "I2",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-uhsif-port-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "C4_SMBA",
+          "signal": "I2C4_SMBA",
           "route": "af-4",
           "_alternate_function": 4
         },
@@ -2222,18 +2125,7 @@
           "_alternate_function": 12
         },
         {
-          "signal": "D",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-uhsif-port-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "VP_D5",
+          "signal": "DVP_D5",
           "route": "af-13",
           "_alternate_function": 13
         },
@@ -2641,18 +2533,7 @@
           "_alternate_function": 12
         },
         {
-          "signal": "D",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-sdmmc-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "VP_D0",
+          "signal": "DVP_D0",
           "route": "af-13",
           "_alternate_function": 13
         },
@@ -3449,18 +3330,7 @@
           "_alternate_function": 9
         },
         {
-          "signal": "D",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-sdmmc-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "VP_D4",
+          "signal": "DVP_D4",
           "route": "af-13",
           "_alternate_function": 13
         },
@@ -5148,11 +5018,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO18",
+          "signal": "VIO18",
           "route": "main"
         }
       ]
@@ -5328,11 +5194,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

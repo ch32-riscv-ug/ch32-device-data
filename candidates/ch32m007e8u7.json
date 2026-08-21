@@ -542,11 +542,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]
@@ -1121,20 +1117,8 @@
           "route": "default"
         },
         {
-          "signal": "USART1_R",
+          "signal": "USART1_RX",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "X",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -1305,19 +1289,8 @@
           }
         },
         {
-          "signal": "OPA_O",
+          "signal": "OPA_OUT1",
           "route": "default"
-        },
-        {
-          "signal": "UT1",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart2-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "USART1_RTS",
@@ -1372,11 +1345,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]
@@ -1388,11 +1357,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "HREG",
+          "signal": "VHREG",
           "route": "main"
         }
       ]
@@ -1404,11 +1369,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "HV",
+          "signal": "VHV",
           "route": "main"
         }
       ]
@@ -1582,19 +1543,8 @@
           }
         },
         {
-          "signal": "CMP1_OU",
+          "signal": "CMP1_OUT0",
           "route": "default"
-        },
-        {
-          "signal": "T0",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "TIM1_CH3",
@@ -2042,11 +1992,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

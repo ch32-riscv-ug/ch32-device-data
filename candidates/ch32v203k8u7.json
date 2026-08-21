@@ -235,11 +235,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]
@@ -268,11 +264,7 @@
       "_pin_type": "O/A",
       "functions": [
         {
-          "signal": "OSC_O",
-          "route": "main"
-        },
-        {
-          "signal": "UT",
+          "signal": "OSC_OUT",
           "route": "main"
         },
         {
@@ -821,7 +813,7 @@
           "route": "main"
         },
         {
-          "signal": "BOOT1(5)",
+          "signal": "BOOT1",
           "route": "main"
         },
         {
@@ -1586,11 +1578,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

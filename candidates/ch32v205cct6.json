@@ -68,11 +68,7 @@
       "_pin_type": "O/A",
       "functions": [
         {
-          "signal": "OSC_O",
-          "route": "main"
-        },
-        {
-          "signal": "UT",
+          "signal": "OSC_OUT",
           "route": "main"
         },
         {
@@ -200,11 +196,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SSA",
+          "signal": "VSSA",
           "route": "main"
         }
       ]
@@ -216,11 +208,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "REF+",
+          "signal": "VREF+",
           "route": "main"
         }
       ]
@@ -800,11 +788,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_1",
+          "signal": "VSS_1",
           "route": "main"
         }
       ]
@@ -1561,11 +1545,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_3",
+          "signal": "VSS_3",
           "route": "main"
         }
       ]

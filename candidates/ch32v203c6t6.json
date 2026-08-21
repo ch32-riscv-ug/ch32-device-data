@@ -258,11 +258,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BAT",
+          "signal": "VBAT",
           "route": "main"
         }
       ]
@@ -291,11 +287,7 @@
       "_pin_type": "O/A",
       "functions": [
         {
-          "signal": "OSC_O",
-          "route": "main"
-        },
-        {
-          "signal": "UT",
+          "signal": "OSC_OUT",
           "route": "main"
         },
         {
@@ -324,11 +316,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SSA",
+          "signal": "VSSA",
           "route": "main"
         }
       ]
@@ -340,11 +328,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDA",
+          "signal": "VDDA",
           "route": "main"
         }
       ]
@@ -888,7 +872,7 @@
           "route": "main"
         },
         {
-          "signal": "BOOT1(5)",
+          "signal": "BOOT1",
           "route": "main"
         },
         {
@@ -1008,11 +992,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_1",
+          "signal": "VSS_1",
           "route": "main"
         }
       ]
@@ -1024,11 +1004,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_IO_1",
+          "signal": "VDD_IO_1",
           "route": "main"
         }
       ]
@@ -1483,11 +1459,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_2",
+          "signal": "VSS_2",
           "route": "main"
         }
       ]
@@ -1499,11 +1471,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_2",
+          "signal": "VDD_2",
           "route": "main"
         }
       ]
@@ -1937,11 +1905,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_3",
+          "signal": "VSS_3",
           "route": "main"
         }
       ]
@@ -1953,11 +1917,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_IO_3",
+          "signal": "VDD_IO_3",
           "route": "main"
         }
       ]
@@ -1969,11 +1929,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

@@ -276,11 +276,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BAT",
+          "signal": "VBAT",
           "route": "main"
         }
       ]
@@ -292,11 +288,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SSA",
+          "signal": "VSSA",
           "route": "main"
         }
       ]
@@ -408,11 +400,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDA",
+          "signal": "VDDA",
           "route": "main"
         }
       ]
@@ -432,7 +420,7 @@
           "route": "default"
         },
         {
-          "signal": "USART2_CTS",
+          "signal": "USART2_CTSADC_IN0",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -443,22 +431,7 @@
           }
         },
         {
-          "signal": "ADC_IN0",
-          "route": "default"
-        },
-        {
-          "signal": "TIM2_CH1",
-          "route": "default",
-          "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "TIM2_ETR",
+          "signal": "TIM2_CH1TIM2_ETR",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -519,11 +492,7 @@
           }
         },
         {
-          "signal": "ADC_IN1",
-          "route": "default"
-        },
-        {
-          "signal": "TIM5_CH2",
+          "signal": "ADC_IN1TIM5_CH2",
           "route": "default"
         },
         {
@@ -570,26 +539,19 @@
           }
         },
         {
-          "signal": "TIM5_CH3",
+          "signal": "TIM5_CH3ADC_IN2",
           "route": "default"
         },
         {
-          "signal": "ADC_IN2",
-          "route": "default"
-        },
-        {
-          "signal": "TIM2_CH3",
+          "signal": "TIM2_CH3OPA2_OUT0",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA2_OUT0",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH3",
@@ -611,11 +573,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO_4",
+          "signal": "VIO_4",
           "route": "main"
         }
       ]
@@ -653,26 +611,19 @@
           }
         },
         {
-          "signal": "TIM5_CH4",
+          "signal": "TIM5_CH4ADC_IN3",
           "route": "default"
         },
         {
-          "signal": "ADC_IN3",
-          "route": "default"
-        },
-        {
-          "signal": "TIM2_CH4",
+          "signal": "TIM2_CH4OPA1_OUT0",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA1_OUT0",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH4",
@@ -740,11 +691,7 @@
           }
         },
         {
-          "signal": "ADC_IN5",
-          "route": "default"
-        },
-        {
-          "signal": "OPA2_CH1N",
+          "signal": "ADC_IN5OPA2_CH1N",
           "route": "default"
         }
       ]
@@ -770,18 +717,8 @@
           }
         },
         {
-          "signal": "ADC_IN6",
+          "signal": "ADC_IN6TIM3_CH1",
           "route": "default"
-        },
-        {
-          "signal": "TIM3_CH1",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim3-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "OPA1_CH1N",
@@ -821,18 +758,8 @@
           }
         },
         {
-          "signal": "ADC_IN7",
+          "signal": "ADC_IN7TIM3_CH2",
           "route": "default"
-        },
-        {
-          "signal": "TIM3_CH2",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim3-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "OPA2_CH1P",
@@ -898,18 +825,15 @@
           "route": "default"
         },
         {
-          "signal": "TIM3_CH3",
+          "signal": "TIM3_CH3OPA1_CH1P",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA1_CH1P",
-          "route": "default"
         },
         {
           "signal": "TIM1_CH2N",
@@ -1030,18 +954,15 @@
           "route": "default"
         },
         {
-          "signal": "USART3_TX",
+          "signal": "USART3_TXOPA2_CH0N",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart3-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA2_CH0N",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH3",
@@ -1082,18 +1003,15 @@
           "route": "default"
         },
         {
-          "signal": "USART3_RX",
+          "signal": "USART3_RXOPA1_CH0N",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart3-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA1_CH0N",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH4",
@@ -1126,11 +1044,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO_1",
+          "signal": "VIO_1",
           "route": "main"
         }
       ]
@@ -1142,11 +1056,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_1",
+          "signal": "VDD_1",
           "route": "main"
         }
       ]
@@ -1190,18 +1100,8 @@
           "route": "default"
         },
         {
-          "signal": "I2C2_SMBA",
+          "signal": "I2C2_SMBAUSART3_CK",
           "route": "default"
-        },
-        {
-          "signal": "USART3_CK",
-          "route": "default",
-          "selection": {
-            "selector": "afio-usart3-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "TIM1_BKIN",
@@ -1230,20 +1130,11 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH1N",
+          "signal": "TIM1_CH1NUSART3_CTS",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "USART3_CTS",
-          "route": "default",
-          "selection": {
-            "selector": "afio-usart3-remap",
             "values": [
               0
             ]
@@ -1277,20 +1168,11 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH2N",
+          "signal": "TIM1_CH2NUSART3_RTS",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "USART3_RTS",
-          "route": "default",
-          "selection": {
-            "selector": "afio-usart3-remap",
             "values": [
               0
             ]
@@ -1328,18 +1210,15 @@
           "route": "default"
         },
         {
-          "signal": "TIM1_CH3N",
+          "signal": "TIM1_CH3NOPA1_CH0P",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "OPA1_CH0P",
-          "route": "default"
         }
       ]
     },
@@ -1490,20 +1369,11 @@
           "route": "main"
         },
         {
-          "signal": "USART1_CK",
+          "signal": "USART1_CKTIM1_CH1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "TIM1_CH1",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim1-remap",
             "values": [
               0
             ]
@@ -1644,18 +1514,8 @@
           }
         },
         {
-          "signal": "USBDM",
+          "signal": "USBDMCAN1_RX",
           "route": "default"
-        },
-        {
-          "signal": "CAN1_RX",
-          "route": "default",
-          "selection": {
-            "selector": "afio-can-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "TIM1_CH4",
@@ -1712,18 +1572,8 @@
           }
         },
         {
-          "signal": "USBDP",
+          "signal": "USBDPCAN1_TX",
           "route": "default"
-        },
-        {
-          "signal": "CAN1_TX",
-          "route": "default",
-          "selection": {
-            "selector": "afio-can-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "TIM1_ETR",
@@ -1783,11 +1633,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_2",
+          "signal": "VSS_2",
           "route": "main"
         }
       ]
@@ -1799,11 +1645,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "INTA",
+          "signal": "VINTA",
           "route": "main"
         }
       ]
@@ -2163,20 +2005,11 @@
           "route": "main"
         },
         {
-          "signal": "I2C1_SCL",
+          "signal": "I2C1_SCLTIM4_CH1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-i2c1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "TIM4_CH1",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim4-remap",
             "values": [
               0
             ]
@@ -2210,20 +2043,11 @@
           "route": "main"
         },
         {
-          "signal": "I2C1_SDA",
+          "signal": "I2C1_SDATIM4_CH2",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-i2c1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "TIM4_CH2",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim4-remap",
             "values": [
               0
             ]
@@ -2365,11 +2189,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO_3",
+          "signal": "VIO_3",
           "route": "main"
         }
       ]
@@ -2381,11 +2201,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_3",
+          "signal": "VDD_3",
           "route": "main"
         }
       ]
@@ -2397,11 +2213,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]
