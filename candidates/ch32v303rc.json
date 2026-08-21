@@ -363,6 +363,126 @@
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
+    },
+    {
+      "id": "afio-usart4-remap",
+      "controller": "afio",
+      "register": "PCFR2",
+      "field": "USART4_REMAP",
+      "bits": [
+        {
+          "register": "PCFR2",
+          "bit": 16
+        },
+        {
+          "register": "PCFR2",
+          "bit": 17
+        }
+      ],
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_reset_value_missing": true
+    },
+    {
+      "id": "afio-usart5-remap",
+      "controller": "afio",
+      "register": "PCFR2",
+      "field": "USART5_REMAP",
+      "bits": [
+        {
+          "register": "PCFR2",
+          "bit": 18
+        },
+        {
+          "register": "PCFR2",
+          "bit": 19
+        }
+      ],
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_reset_value_missing": true
+    },
+    {
+      "id": "afio-usart6-remap",
+      "controller": "afio",
+      "register": "PCFR2",
+      "field": "USART6_REMAP",
+      "bits": [
+        {
+          "register": "PCFR2",
+          "bit": 20
+        },
+        {
+          "register": "PCFR2",
+          "bit": 21
+        }
+      ],
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_reset_value_missing": true
+    },
+    {
+      "id": "afio-usart7-remap",
+      "controller": "afio",
+      "register": "PCFR2",
+      "field": "USART7_REMAP",
+      "bits": [
+        {
+          "register": "PCFR2",
+          "bit": 22
+        },
+        {
+          "register": "PCFR2",
+          "bit": 23
+        }
+      ],
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_reset_value_missing": true
+    },
+    {
+      "id": "afio-usart8-remap",
+      "controller": "afio",
+      "register": "PCFR2",
+      "field": "USART8_REMAP",
+      "bits": [
+        {
+          "register": "PCFR2",
+          "bit": 24
+        },
+        {
+          "register": "PCFR2",
+          "bit": 25
+        }
+      ],
+      "valid_values": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_reset_value_missing": true
     }
   ],
   "pins": [
@@ -458,7 +578,13 @@
         },
         {
           "signal": "UART6_TX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart6-remap",
+            "values": [
+              0
+            ]
+          }
         }
       ]
     },
@@ -488,7 +614,13 @@
         },
         {
           "signal": "UART6_RX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart6-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "ETH_MII_MDC",
@@ -552,7 +684,13 @@
         },
         {
           "signal": "UART7_TX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart7-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "OPA3_CH1N",
@@ -606,7 +744,13 @@
         },
         {
           "signal": "UART7_RX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart7-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "OPA4_CH1N",
@@ -1307,7 +1451,12 @@
           "signal": "UART7_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart7-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "TIM10_CH2N",
@@ -1426,7 +1575,12 @@
           "signal": "UART7_RX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart7-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "TIM10_CH3N",
@@ -1467,7 +1621,13 @@
         },
         {
           "signal": "UART8_TX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart8-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "OPA4_CH1P",
@@ -1638,7 +1798,12 @@
           "signal": "UART4_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart4-remap",
+            "values": [
+              1
+            ]
+          }
         }
       ]
     },
@@ -1741,7 +1906,12 @@
           "signal": "UART4_RX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart4-remap",
+            "values": [
+              1
+            ]
+          }
         }
       ]
     },
@@ -2841,7 +3011,12 @@
           "signal": "UART8_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart8-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "USART3_RX",
@@ -2960,7 +3135,12 @@
           "signal": "UART8_RX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart8-remap",
+            "values": [
+              1
+            ]
+          }
         }
       ]
     },
@@ -2976,7 +3156,13 @@
         },
         {
           "signal": "UART4_TX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart4-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDIO_D2",
@@ -3038,7 +3224,13 @@
         },
         {
           "signal": "UART4_RX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart4-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDIO_D3",
@@ -3094,7 +3286,13 @@
         },
         {
           "signal": "UART5_TX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart5-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDIO_CK",
@@ -3166,7 +3364,13 @@
         },
         {
           "signal": "UART5_RX",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart5-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDIO_CMD",
@@ -3322,7 +3526,12 @@
           "signal": "UART5_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart5-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "TIM10_CH2",
@@ -3447,7 +3656,12 @@
           "signal": "UART5_RX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart5-remap",
+            "values": [
+              1
+            ]
+          }
         }
       ]
     },
@@ -3684,7 +3898,12 @@
           "signal": "UART6_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart6-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "TIM8_CH3",
@@ -3763,7 +3982,12 @@
           "signal": "UART6_RX",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-usart6-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "TIM8_BKIN",
