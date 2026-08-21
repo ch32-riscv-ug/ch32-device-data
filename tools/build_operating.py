@@ -27,13 +27,18 @@ MARKER = {
         r"General\s+operating\s+conditions"
         r"|(?:Internal|External)\s+(?:high|low)[-\s]speed"
         r"|From\s+external\s+(?:high|low)[-\s]speed\s+clock"
-        r"|(?:High|Low)[-\s]speed\s+external\s+clocks?\s+generated",
+        r"|(?:High|Low)[-\s]speed\s+external\s+clocks?\s+generated"
+        # 周辺固有のクロック上限。ADCは ADCCLK に独自の上限を持ち、しかも
+        # familyで違う（CH32V103は14MHz、CH32V003は12MHz）。表題は
+        # "ADC characteristics" と "10-bit ADC characteristics" が混在する。
+        r"|(?:\d+[-\s]?bit\s+)?ADC\s+characteristic",
         re.IGNORECASE),
     "zh": re.compile(
         r"[通一]\s*[用般]\s*工\s*作\s*条\s*件"
         r"|内\s*部\s*(?:高|低)\s*速"
         r"|来\s*自\s*外\s*部\s*(?:高|低)\s*速\s*时\s*钟"
-        r"|谐\s*振\s*器\s*产\s*生\s*的\s*(?:高|低)\s*速\s*外\s*部\s*时\s*钟"),
+        r"|谐\s*振\s*器\s*产\s*生\s*的\s*(?:高|低)\s*速\s*外\s*部\s*时\s*钟"
+        r"|(?:\d+\s*位\s*)?ADC\s*特\s*性"),
 }
 # ヘッダー名 → 正規列。抽出時のCJK間スペースと脚注を吸収する。
 HEADER_MAP = {
@@ -49,10 +54,12 @@ FOOTNOTE = re.compile(r"[（(]\d+[）)]")
 # クロック上限と主電源電圧、そして発振器の周波数・確度・デューティ。
 # 起動時間や消費電流（t_SU、I_DD）は同じ表にあるが、クロックの事実ではない
 # ので採らない。
-KEEP = re.compile(r"^F_|^V_?DD$|^ACC_(?:HSI|LSI|HSE|LSE)|^DuCy_(?:HSI|LSI|HSE|LSE)")
+# ADCのクロック上限だけは記号が小文字 f で始まる（"f ADC"）。
+KEEP = re.compile(r"^F_|^f_ADC$|^V_?DD$"
+                  r"|^ACC_(?:HSI|LSI|HSE|LSE)|^DuCy_(?:HSI|LSI|HSE|LSE)")
 # 継承した記号が行の中身と合わないことがある。発振器の表はデューティ比の行が
 # 記号セル空で続くため、F_* の行に単位 % が付く。単位で弾ける。
-UNIT_FOR = [(re.compile(r"^F_"), re.compile(r"^(?:[MmKk]?Hz)$")),
+UNIT_FOR = [(re.compile(r"^[Ff]_"), re.compile(r"^(?:[MmKk]?Hz)$")),
             (re.compile(r"^V_"), re.compile(r"^m?V$")),
             (re.compile(r"^ACC_"), re.compile(r"^(?:%|ppm)$")),
             (re.compile(r"^DuCy_"), re.compile(r"^%$"))]
@@ -156,18 +163,35 @@ def read_edition(pdf_path, lang):
     """
     marker = MARKER[lang]
     found = []
+    carry = False
+    last_cols = None
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
             text = page.extract_text() or ""
-            if not marker.search(text):
+            hit = bool(marker.search(text))
+            if not hit and not carry:
                 continue
+            # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
+            # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
+            # 無い続きページも1ページだけ見る。列の並びが同じ表しか読まないので、
+            # 無関係な表を拾っても記号の絞り込みで落ちる。
+            carry_from, carry = carry and not hit, hit
             for tbl in page.extract_tables():
                 cols = [norm_header(c) for c in tbl[0]]
+                body = tbl[1:]
                 # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
-                if not {"symbol", "min", "condition"} <= set(cols):
+                if {"symbol", "min", "condition"} <= set(cols):
+                    last_cols = cols
+                elif (carry_from and last_cols
+                      and len(tbl[0]) == len(last_cols)):
+                    # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
+                    # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
+                    # このページにしかない。
+                    cols, body = last_cols, tbl
+                else:
                     continue
                 rows, sym, unit, param = [], "", "", ""
-                for raw in tbl[1:]:
+                for raw in body:
                     cells = dict()
                     extra = []
                     for i, cell in enumerate(raw):
