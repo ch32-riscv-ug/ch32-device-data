@@ -1,0 +1,335 @@
+#!/usr/bin/env python3
+"""Read each family's clock configurations out of EVT's system_*.c.
+
+EVT ships one function per clock configuration the vendor supports, and the body
+is a plain sequence of register writes by symbol name:
+
+    static void SetSysClockTo144_HSI(void) {
+        EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE;   /* not an RCC register */
+        RCC->CFGR0 |= (uint32_t)RCC_HPRE_DIV1;   /* HCLK  = SYSCLK   */
+        RCC->CFGR0 |= (uint32_t)RCC_PPRE1_DIV2;  /* PCLK1 = HCLK / 2 */
+        RCC->CFGR0 |= (uint32_t)(RCC_PLLSRC_HSI_Div2 | RCC_PLLMULL18);
+        ...
+    }
+
+So the facts a generalised SystemInit needs -- which domains exist, what divides
+what, which PLL multiplier reaches a frequency, what flash latency goes with it,
+and which registers outside RCC take part -- are all here, statically. No
+compiler is needed, unlike tools/extract_remap_fields.py.
+
+The function *name* carries the clock tree's shape, in four spellings:
+
+    SetSysClockTo144_HSI                              SYSCLK only
+    SetSysClockTo_48MHZ_HSI                           SYSCLK only, other spelling
+    SetSYSCLK_400MHz_HCLK_200MHz_HSE                  SYSCLK and HCLK differ
+    SetSYSCLK_312_5M_CoreCLK_312_5M_HCLK_312_5M_HSI   three domains, 312.5 MHz
+
+CH32H417 has no setter at all -- it is dual-core and configures its clocks
+elsewhere -- so it yields nothing and says so.
+
+This emits candidates for review and never writes device records.
+
+Usage:
+    uv run tools/extract_clock_tree.py --mirrors <dir holding the CH32* clones>
+        [--family CH32V20x] [--json out.json]
+"""
+
+from __future__ import annotations
+
+import argparse
+import collections
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+# "static void SetSysClockTo144_HSI(void)" opening a body that ends at column 0.
+FUNCTION = re.compile(
+    r"^(?:static\s+)?void\s+(?P<name>Set(?:SysClockTo|SYSCLK)\w*)\s*\(\s*void\s*\)\s*$"
+    r"(?P<body>.*?)^\}", re.M | re.S)
+
+# "RCC->CFGR0 |= (uint32_t)(A | B);"  ->  register, operator, the symbols in it.
+WRITE = re.compile(r"(?P<block>\w+)\s*->\s*(?P<register>\w+)\s*"
+                   r"(?P<op>\|=|&=|=)\s*(?P<value>[^;]*);")
+SYMBOL = re.compile(r"\b([A-Z][A-Za-z0-9_]{2,})\b")
+# A body can configure the PLL two ways behind a compile-time switch: CH32V307's
+# SetSysClockTo24 multiplies by 3 under one #if and by 6 under the other, because
+# the D8 and D8C variants divide HSI differently. Which branch applies is part of
+# the fact, so the condition is carried with each write.
+CPP = re.compile(r"^\s*#\s*(?P<directive>if|ifdef|ifndef|elif|else|endif)\b"
+                 r"\s*(?P<condition>.*?)\s*$")
+CAST = re.compile(r"\(\s*u?int(?:8|16|32)_t\s*\)")
+DEFINE = re.compile(r"^#define\s+(\w+)\s+\(\(u?int(?:8|16|32)_t\)(0x[0-9A-Fa-f]+|\d+)\)")
+
+# The domains a configuration names. A run is an optional domain label, an
+# optional core name, and a frequency: CH32H417 is dual-core and gives each core
+# its own CoreCLK, as "CoreCLK_V5F_400M_V3F_100M".
+DOMAIN_RUN = re.compile(r"(?:(?P<domain>SYSCLK|CoreCLK|HCLK)_)?"
+                        r"(?:(?P<core>V5F|V3F)_)?"
+                        r"(?P<mhz>\d+(?:_\d+)?)M(?:Hz|HZ)?(?=_|$)", re.I)
+# "SetSysClockTo144_HSI", "SetSysClockTo_48MHZ_HSE", "SetSysClockTo24" (no
+# oscillator named), "SetSysClockToHSE" (run straight off the oscillator, no
+# frequency in the name), "SetSysClockToHSI_LP" (the low-power variant).
+PLAIN = re.compile(r"^SetSysClockTo_?(?P<mhz>\d+)?(?:MHz|MHZ)?_?"
+                   r"(?P<source>HSI|HSE)?(?P<mode>_LP)?$")
+STAGED = re.compile(r"^SetSYSCLK_(?P<stages>.*?)_?(?P<source>HSI|HSE)$")
+
+# What each symbol tells us. A prescaler and a PLL multiplier are both just
+# defines; only the name says which.
+PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBPRE)_"
+                       r"(?P<divider>DIV[0-9_]+|Div[0-9_]+)$")
+PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL|PLLXTPRE|PLL_\w+|CFGR2_\w*PLL\w*)\w*$")
+LATENCY = re.compile(r"^FLASH_ACTLR_LATENCY(?:_(?P<wait>\d+))?$")
+SOURCE_SELECT = re.compile(r"^RCC_SW_(?P<source>\w+)$")
+# Anything the configuration writes that is not RCC or FLASH. This is the fact
+# R-24 calls C-4: CH32V20x cannot run its PLL from HSI without EXTEN_CTR.
+NON_RCC_BLOCKS = ("RCC", "FLASH")
+
+
+def system_sources(family: Path) -> dict[str, tuple[str, list[Path]]]:
+    """The distinct system_ch32*.c under a family, and which copies hold each.
+
+    EVT ships this file once per example and **the copies are not identical**:
+    CH32H417 has 390 of them in 5 distinct versions. Reading only the first one
+    silently picks whichever example sorted first, the same trap the linker
+    scripts have. So every copy is read and its configurations unioned, with a
+    count of how many copies attest each -- a configuration in 185 of 390 files
+    is the mainstream one, and one in a single file is example-specific.
+    """
+    variants: dict[str, tuple[str, list[Path]]] = {}
+    for path in sorted(family.glob("EVT/**/system_ch32*.c")):
+        text = path.read_text(errors="ignore")
+        digest = hashlib.sha1(text.encode("utf-8", "replace")).hexdigest()[:12]
+        if digest in variants:
+            variants[digest][1].append(path)
+        else:
+            variants[digest] = (text, [path])
+    return variants
+
+
+def find_device_header(family: Path) -> Path | None:
+    candidates = sorted(family.glob("EVT/**/Peripheral/inc/ch32*.h"))
+    plain = [p for p in candidates
+             if re.fullmatch(r"ch32[a-z0-9]+\.h", p.name, re.IGNORECASE)]
+    return plain[0] if plain else None
+
+
+def defines(header: Path | None) -> dict[str, int]:
+    if header is None:
+        return {}
+    out: dict[str, int] = {}
+    for line in header.read_text(errors="ignore").splitlines():
+        m = DEFINE.match(line.strip())
+        if m:
+            # Some defines are decimal with leading zeros, which int(x, 0) rejects.
+            raw = m.group(2)
+            out.setdefault(m.group(1),
+                           int(raw, 16) if raw.lower().startswith("0x") else int(raw, 10))
+    return out
+
+
+def hz(mhz: str) -> int:
+    """"312_5" is 312.5 MHz; the vendor writes the decimal point as an underscore."""
+    whole, _, fraction = mhz.partition("_")
+    return round(float(f"{whole}.{fraction}" if fraction else whole) * 1_000_000)
+
+
+def domains_of(name: str) -> tuple[dict[str, int], str | None]:
+    """The clock domains a configuration's name states, and its oscillator.
+
+    A name need not state a frequency. "SetSysClockToHSE" runs the system
+    straight off the oscillator, so the frequency is the board's crystal and not
+    a property of the chip; the domains come back empty rather than guessed.
+    """
+    m = PLAIN.match(name)
+    if m:
+        mhz = m.group("mhz")
+        return ({"SYSCLK": hz(mhz)} if mhz else {}), m.group("source")
+    m = STAGED.match(name)
+    if m:
+        found: dict[str, int] = {}
+        # "SetSYSCLK_" has already eaten the first label, so the first frequency
+        # in what is left belongs to SYSCLK.
+        domain = "SYSCLK"
+        for run in DOMAIN_RUN.finditer(m.group("stages")):
+            if run.group("domain"):
+                domain = {"sysclk": "SYSCLK", "coreclk": "CoreCLK",
+                          "hclk": "HCLK"}[run.group("domain").lower()]
+            if domain is None:
+                continue
+            core = run.group("core")
+            found[f"{domain}[{core}]" if core else domain] = hz(run.group("mhz"))
+        return found, m.group("source")
+    return {}, None
+
+
+def read_variant(text: str, symbols: dict[str, int], family_name: str,
+                 notes: list[str]) -> dict[str, dict]:
+    configs: dict[str, dict] = {}
+    for found in FUNCTION.finditer(text):
+        name, body = found.group("name"), found.group("body")
+        if not body.strip():
+            continue  # a forward declaration, not the definition
+        domains, oscillator = domains_of(name)
+        if not domains:
+            notes.append(f"{family_name}: 関数名から周波数を読めない {name}")
+
+        entry = {
+            "source": oscillator,
+            "domains": domains,
+            "prescalers": {},
+            "pll": [],
+            "flash_latency": None,
+            "system_clock_source": None,
+            "outside_rcc": [],
+            "unresolved_symbols": [],
+        }
+        conditions: list[str] = []
+        for line in body.splitlines():
+            directive = CPP.match(line)
+            if directive:
+                kind = directive.group("directive")
+                condition = directive.group("condition")
+                if kind in ("if", "ifdef", "ifndef"):
+                    conditions.append(f"{kind} {condition}".strip())
+                elif kind in ("elif", "else"):
+                    if conditions:
+                        conditions[-1] = f"{kind} {condition}".strip()
+                elif kind == "endif" and conditions:
+                    conditions.pop()
+                continue
+            write = WRITE.search(line)
+            if not write:
+                continue
+            where = " && ".join(conditions)
+            block, register = write.group("block"), write.group("register")
+            value = CAST.sub("", write.group("value"))
+            if "~" in value:
+                continue  # clearing the field before setting it
+            for symbol in SYMBOL.findall(value):
+                if symbol not in symbols:
+                    if symbol not in ("uint32_t", "uint8_t", "uint16_t"):
+                        entry["unresolved_symbols"].append(symbol)
+                    continue
+                m = PRESCALER.match(symbol)
+                if m:
+                    entry["prescalers"][m.group("field")] = m.group("divider").upper()
+                    continue
+                m = LATENCY.match(symbol)
+                if m and m.group("wait") is not None:
+                    entry["flash_latency"] = int(m.group("wait"))
+                    continue
+                m = SOURCE_SELECT.match(symbol)
+                if m:
+                    entry["system_clock_source"] = m.group("source")
+                    continue
+                if PLL.match(symbol):
+                    entry["pll"].append(f"{symbol} [{where}]" if where else symbol)
+                    continue
+                if block not in NON_RCC_BLOCKS:
+                    entry["outside_rcc"].append(f"{block}->{register} {symbol}")
+        entry["unresolved_symbols"] = sorted(set(entry["unresolved_symbols"]))
+        entry["outside_rcc"] = sorted(set(entry["outside_rcc"]))
+        entry["pll"] = list(dict.fromkeys(entry["pll"]))
+        configs[name] = entry
+    return configs
+
+
+def read_family(family: Path) -> tuple[dict, list[str]]:
+    notes: list[str] = []
+    variants = system_sources(family)
+    if not variants:
+        return {}, [f"{family.name}: system_ch32*.c が無い"]
+    symbols = defines(find_device_header(family))
+
+    configs: dict[str, dict] = {}
+    copies: collections.Counter = collections.Counter()
+    disagree: list[str] = []
+    total = sum(len(paths) for _, paths in variants.values())
+    for digest, (text, paths) in variants.items():
+        for name, entry in read_variant(text, symbols, family.name, notes).items():
+            copies[name] += len(paths)
+            known = configs.get(name)
+            if known is None:
+                configs[name] = entry
+            elif known != entry:
+                disagree.append(name)
+    notes[:] = list(dict.fromkeys(notes))
+    for name in sorted(set(disagree)):
+        notes.append(f"{family.name}: {name} の中身が例題によって違う（先に読んだ版を採用）")
+    for name, entry in configs.items():
+        entry["copies"] = f"{copies[name]}/{total}"
+
+    if not configs:
+        notes.append(f"{family.name}: SetSysClockTo*/SetSYSCLK* が無い")
+
+    # C-5's other half: the divider encodings, from the device header. These are
+    # a property of the family, not of one configuration.
+    encodings: dict[str, dict[str, int]] = collections.defaultdict(dict)
+    for symbol, value in symbols.items():
+        m = PRESCALER.match(symbol)
+        if m:
+            encodings[m.group("field")][m.group("divider").upper()] = value
+    return {"copies": total,
+            "variants": len(variants),
+            "configs": configs,
+            "prescaler_encodings": {k: dict(sorted(v.items(), key=lambda kv: kv[1]))
+                                    for k, v in sorted(encodings.items())}}, notes
+
+
+def summarise(result: dict, out=sys.stderr) -> None:
+    for family, data in result.items():
+        configs = data["configs"]
+        oscillators = collections.Counter(c["source"] or "?" for c in configs.values())
+        multi = {name: c["domains"] for name, c in configs.items()
+                 if len(c["domains"]) > 1}
+        outside = sorted({w for c in configs.values() for w in c["outside_rcc"]})
+        latencies = sorted({c["flash_latency"] for c in configs.values()
+                            if c["flash_latency"] is not None})
+        print(f"{family:10} 設定 {len(configs):3}  "
+              f"copy {data['copies']:3}/{data['variants']}種  "
+              f"{'/'.join(f'{k}{v}' for k, v in sorted(oscillators.items()))}"
+              f"  多段 {len(multi):2}  latency {latencies or '触らない'}", file=out)
+        if outside:
+            print(f"{'':10}   RCC外: {', '.join(outside)}", file=out)
+        for field, table in data["prescaler_encodings"].items():
+            shown = " ".join(f"{d}={v:#x}" for d, v in table.items())
+            print(f"{'':10}   {field}: {shown}", file=out)
+
+
+def extract_all(mirrors: Path, only: str | None = None) -> tuple[dict, list[str]]:
+    """Every family's clock configurations, keyed by EVT family directory name."""
+    result: dict = {}
+    notes: list[str] = []
+    for family in sorted(p for p in mirrors.glob("CH32*") if p.is_dir()):
+        if only and family.name != only:
+            continue
+        data, family_notes = read_family(family)
+        notes += family_notes
+        if data:
+            result[family.name] = data
+    return result, notes
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--mirrors", type=Path, required=True,
+                    help="CH32* の EVT clone を並べたディレクトリ")
+    ap.add_argument("--family", help="この family だけ処理する")
+    ap.add_argument("--json", type=Path)
+    args = ap.parse_args()
+
+    result, notes = extract_all(args.mirrors, args.family)
+    summarise(result)
+    for note in notes:
+        print(f"  - {note}", file=sys.stderr)
+    if args.json:
+        args.json.write_text(json.dumps(result, indent=1, ensure_ascii=False) + "\n",
+                             encoding="utf-8")
+        print(f"wrote {args.json}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -12,7 +12,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | README生成 | 3 | 3 |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 4 | 1 |
-| consumerからの依頼 | 1 | 2 |
+| consumerからの依頼 | 1 | 2（うち1件は部分実装） |
 
 ## 着手順の方針
 
@@ -91,9 +91,41 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 |---|---|---|
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
 | R-20 | レジスタマップ（D-1〜D-8） | 🔜 **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md) |
-| R-24 | クロック関連データ（C-1〜C-8） | ⬜ **未着手**。下記 |
+| R-24 | クロック関連データ（C-1〜C-8） | 🔜 **C-1/C-3/C-4/C-5/C-6を実装**（2026-08-21）。`tables/clock_configs.csv`・`tables/clock_prescalers.csv`。C-2/C-7は未着手。下記 |
 
-### R-24 クロック関連データ（2026-08-21受領）
+### R-24 クロック関連データ（2026-08-21受領・一部実装）
+
+**実装した分**: `tools/extract_clock_tree.py`がEVTの`system_ch32*.c`を静的に読み、
+`tools/build_clock.py`が2表へ落とす。PDFもコンパイラも要らない。
+
+| 列 | 対応するC-n | 中身 |
+|---|---|---|
+| `domains` | C-1 | `SYSCLK=400000000;CoreCLK[V5F]=400000000;...`。多段・双核も表せる |
+| `pll` + `condition` | C-3 | PLL関連の記号列と、それがどの`#if`分岐か |
+| `outside_rcc` | C-4 | `EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE` など |
+| `hpre`/`ppre1`/`ppre2` + `clock_prescalers.csv` | C-5 | 選ばれる分周比と、分周比→field値の符号化 |
+| `flash_latency` | C-6 | その設定が書くlatency。空欄は「書かない」 |
+| `confidence`/`basis` | C-8 | 既存の慣行どおり。単一資料なので全行reference |
+
+391行（設定126種×series、`#if`分岐は別行）と662行。`tools/check_tables.py`が
+seriesの結合・分周比の存在・`domains`の書式・latencyが数であることを検査する。
+
+**未実装**: C-2（HSI確度・HSE許容範囲。datasheetの電気的特性章側）、
+C-7（USB/ADC/RTCの経路。`RCC_USBCLKSource_*`等は`system_*.c`の外にある）。
+
+**依頼書との差**（実測して分かった分）:
+
+- **flash latencyを一度も書かないfamilyは V20x/V30x だけではない。**
+  V407・X315・H417 も書かない。依頼書の指摘#6より範囲が広い
+- **EXTENのregister名がfamilyで違う。** L103/V103/V20x/V30xは`EXTEN_CTR`だが
+  **V205は`CTLR0`**。C-4を「EXTEN_CTRのbit」と決め打つと V205 で外す
+- **1つの設定が2つの事実になる。** V307の144MHzは`#ifdef CH32V30x_D8`で`RCC_PLLMULL18`、
+  `#else`で`RCC_PLLMULL18_EXTEN`。同じ×18でも符号化が違う
+- **`system_ch32*.c`のコピーは同一でない。** 例題ごとに配られており、H417は390個中12種類、
+  V307は168個中26種類。「最初の1個を読む」と例題固有の設定を主流と誤認する。
+  `evt_copies`列（`162/168`など）で区別できるようにした
+
+### R-24 の材料の下見（受領時）
 
 `ArduinoCore-CH32/docs/research/clock-data-request.ja.md`。`SystemInit`をPLL込みに
 一般化するために要る事実が全部familyごとに違い、いまはEVTを手で読んで写している、という依頼。

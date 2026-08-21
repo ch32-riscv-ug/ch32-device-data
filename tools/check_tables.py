@@ -32,7 +32,8 @@ def main() -> int:
          for name in ("families", "series", "products", "packages",
                       "cores", "documents", "pins", "pin_functions",
                       "product_attributes", "remap_fields", "remap_routes",
-                      "errata", "operating_conditions", "evt_examples")}
+                      "errata", "operating_conditions", "evt_examples",
+                      "clock_configs", "clock_prescalers")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -141,6 +142,32 @@ def main() -> int:
         # is a recorded gap. One half filled is a bug in the rule.
         if bool(r.get("peripheral")) != bool(r.get("role")):
             bad.append(f"remap_routes: {where} の peripheral と role が片方だけ埋まっている")
+
+    # The clock tables come from EVT's system_ch32*.c, one row per configuration
+    # and #if branch. What can be checked without EVT is that they join, that a
+    # divider a configuration selects is one the family actually encodes, and
+    # that the frequencies parse.
+    prescalers = {(r["series"], r["field"], r["divider"]) for r in t["clock_prescalers"]}
+    for r in t["clock_prescalers"]:
+        check("clock_prescalers", r["field"], r["series"], series, "series")
+        if not r["divider"].isdigit() or int(r["divider"]) < 1:
+            bad.append(f"clock_prescalers: {r['series']} {r['field']} の divider "
+                       f"{r['divider']!r} が分周比でない")
+    for r in t["clock_configs"]:
+        where = f"{r['series']} {r['config']}"
+        check("clock_configs", r["config"], r["series"], series, "series")
+        for column, field in (("hpre", "HPRE"), ("ppre1", "PPRE1"), ("ppre2", "PPRE2")):
+            divider = r[column]
+            if divider and (r["series"], field, divider) not in prescalers:
+                bad.append(f"clock_configs: {where} の {column}={divider} が "
+                           f"clock_prescalers に無い")
+        for domain in (d for d in r["domains"].split(";") if d):
+            name, _, hz = domain.partition("=")
+            if not name or not hz.isdigit():
+                bad.append(f"clock_configs: {where} の domains {domain!r} が "
+                           "名前=Hz の形でない")
+        if r["flash_latency"] and not r["flash_latency"].isdigit():
+            bad.append(f"clock_configs: {where} の flash_latency が数でない")
 
     # Data columns carry no CJK: Chinese readings are evidence (kept in the
     # *_basis and label_zh columns), never the displayed value. A leak here
