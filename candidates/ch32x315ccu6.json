@@ -293,11 +293,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "REF+",
+          "signal": "VREF+",
           "route": "main"
         }
       ]
@@ -309,11 +305,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDA",
+          "signal": "VDDA",
           "route": "main"
         }
       ]
@@ -1361,11 +1353,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDK",
+          "signal": "VDDK",
           "route": "main"
         }
       ]
@@ -1401,20 +1389,8 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
+          "signal": "VDD",
           "route": "main"
-        },
-        {
-          "signal": "DD",
-          "route": "main"
-        },
-        {
-          "signal": "Main V",
-          "route": "default"
-        },
-        {
-          "signal": "DD",
-          "route": "default"
         }
       ]
     },
@@ -1425,11 +1401,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

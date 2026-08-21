@@ -445,19 +445,14 @@
           }
         },
         {
-          "signal": "TIM1_BK",
+          "signal": "TIM1_BKIN",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "IN",
-          "route": "default"
         },
         {
           "signal": "UART_RTS",
@@ -556,19 +551,14 @@
           }
         },
         {
-          "signal": "TIM3_CH1",
+          "signal": "TIM3_CH1N",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "N",
-          "route": "default"
         },
         {
           "signal": "I2C_SDA",
@@ -709,19 +699,14 @@
           }
         },
         {
-          "signal": "TIM3_CH2",
+          "signal": "TIM3_CH2N",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "N",
-          "route": "default"
         },
         {
           "signal": "I2C_SCL",
@@ -816,11 +801,7 @@
           }
         },
         {
-          "signal": "CMP3_O",
-          "route": "default"
-        },
-        {
-          "signal": "UT1",
+          "signal": "CMP3_OUT1",
           "route": "default"
         },
         {
@@ -1110,11 +1091,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SO",
+          "signal": "VSO",
           "route": "main"
         }
       ]
@@ -1126,11 +1103,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BO",
+          "signal": "VBO",
           "route": "main"
         }
       ]
@@ -1274,11 +1247,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S1",
+          "signal": "VS1",
           "route": "main"
         }
       ]
@@ -1290,11 +1259,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B1",
+          "signal": "VB1",
           "route": "main"
         }
       ]
@@ -1460,11 +1425,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S2",
+          "signal": "VS2",
           "route": "main"
         }
       ]
@@ -1476,11 +1437,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B2",
+          "signal": "VB2",
           "route": "main"
         }
       ]
@@ -1633,11 +1590,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S3",
+          "signal": "VS3",
           "route": "main"
         }
       ]
@@ -1649,11 +1602,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B3",
+          "signal": "VB3",
           "route": "main"
         }
       ]
@@ -1725,11 +1674,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD8",
+          "signal": "VDD8",
           "route": "main"
         }
       ]
@@ -1755,19 +1700,8 @@
           }
         },
         {
-          "signal": "RST",
+          "signal": "RSTTIM3_CH1_ETR",
           "route": "default"
-        },
-        {
-          "signal": "TIM3_CH1_ETR",
-          "route": "default",
-          "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-tim3-remap",
-            "values": [
-              0
-            ]
-          }
         },
         {
           "signal": "UART_RX",
@@ -2110,11 +2044,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD33",
+          "signal": "VDD33",
           "route": "main"
         }
       ]
@@ -2126,11 +2056,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "HV",
+          "signal": "VHV",
           "route": "main"
         }
       ]
@@ -2676,18 +2602,7 @@
           }
         },
         {
-          "signal": "ISOUR",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "CE1",
+          "signal": "ISOURCE1",
           "route": "default",
           "_selector_resolved_by": "pad+value(grid)",
           "selection": {

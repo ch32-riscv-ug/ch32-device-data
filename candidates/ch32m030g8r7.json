@@ -529,11 +529,7 @@
           }
         },
         {
-          "signal": "CMP3_O",
-          "route": "default"
-        },
-        {
-          "signal": "UT1",
+          "signal": "CMP3_OUT1",
           "route": "default"
         },
         {
@@ -861,11 +857,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SO",
+          "signal": "VSO",
           "route": "main"
         }
       ]
@@ -877,11 +869,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BO",
+          "signal": "VBO",
           "route": "main"
         }
       ]
@@ -1025,11 +1013,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S1",
+          "signal": "VS1",
           "route": "main"
         }
       ]
@@ -1041,11 +1025,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B1",
+          "signal": "VB1",
           "route": "main"
         }
       ]
@@ -1211,11 +1191,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S2",
+          "signal": "VS2",
           "route": "main"
         }
       ]
@@ -1227,11 +1203,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B2",
+          "signal": "VB2",
           "route": "main"
         }
       ]
@@ -1324,11 +1296,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD8",
+          "signal": "VDD8",
           "route": "main"
         }
       ]
@@ -1340,11 +1308,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD33",
+          "signal": "VDD33",
           "route": "main"
         }
       ]
@@ -1356,11 +1320,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "HV",
+          "signal": "VHV",
           "route": "main"
         }
       ]

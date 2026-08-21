@@ -516,11 +516,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "BAT",
+          "signal": "VBAT",
           "route": "main"
         }
       ]
@@ -549,11 +545,7 @@
       "_pin_type": "O/A",
       "functions": [
         {
-          "signal": "OSC_OU",
-          "route": "main"
-        },
-        {
-          "signal": "T",
+          "signal": "OSC_OUT",
           "route": "main"
         },
         {
@@ -668,7 +660,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_RXC",
+          "signal": "ETH_RGMII_RXCTL",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -677,10 +669,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "TL",
-          "route": "default"
         }
       ]
     },
@@ -785,7 +773,7 @@
           "route": "default"
         },
         {
-          "signal": "ETH_MII_TX_CL",
+          "signal": "ETH_MII_TX_CLK",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -794,10 +782,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "K",
-          "route": "default"
         },
         {
           "signal": "ETH_RGMII_RXD1",
@@ -819,11 +803,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SSA",
+          "signal": "VSSA",
           "route": "main"
         }
       ]
@@ -835,11 +815,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DDA",
+          "signal": "VDDA",
           "route": "main"
         }
       ]
@@ -1006,7 +982,7 @@
           "route": "default"
         },
         {
-          "signal": "ETH_MII_RX_CL",
+          "signal": "ETH_MII_RX_CLK",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1015,10 +991,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "K",
-          "route": "default"
         },
         {
           "signal": "ETH_RMII_REF_CLK",
@@ -1151,7 +1123,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_GTX",
+          "signal": "ETH_RGMII_GTXC",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1160,10 +1132,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "C",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH3",
@@ -1264,7 +1232,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_TXE",
+          "signal": "ETH_RGMII_TXEN",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1273,10 +1241,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "N",
-          "route": "default"
         },
         {
           "signal": "TIM2_CH4",
@@ -1309,11 +1273,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_4",
+          "signal": "VSS_4",
           "route": "main"
         }
       ]
@@ -1325,11 +1285,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_4",
+          "signal": "VDD_4",
           "route": "main"
         }
       ]
@@ -1908,7 +1864,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_125I",
+          "signal": "ETH_RGMII_125IN",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1917,10 +1873,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "N",
-          "route": "default"
         },
         {
           "signal": "TIM1_CH3N",
@@ -2113,22 +2065,11 @@
           }
         },
         {
-          "signal": "ETH_RMII_TX_E",
+          "signal": "ETH_RMII_TX_EN",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-eth-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "N",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart3-remap",
             "values": [
               0
             ]
@@ -2176,11 +2117,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_1",
+          "signal": "VSS_1",
           "route": "main"
         }
       ]
@@ -2192,11 +2129,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO_1",
+          "signal": "VIO_1",
           "route": "main"
         }
       ]
@@ -2356,7 +2289,7 @@
           }
         },
         {
-          "signal": "ETH_RGMII_MDI",
+          "signal": "ETH_RGMII_MDIO",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -2365,10 +2298,6 @@
               0
             ]
           }
-        },
-        {
-          "signal": "O",
-          "route": "default"
         },
         {
           "signal": "USART3_CTS",
@@ -3021,11 +2950,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_2",
+          "signal": "VSS_2",
           "route": "main"
         }
       ]
@@ -3037,11 +2962,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD_2",
+          "signal": "VDD_2",
           "route": "main"
         }
       ]
@@ -3654,7 +3575,7 @@
           "route": "default"
         },
         {
-          "signal": "ETH_MII_PPS_OU",
+          "signal": "ETH_MII_PPS_OUT",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -3665,33 +3586,11 @@
           }
         },
         {
-          "signal": "T",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-spi3-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "ETH_RMII_PPS_O",
+          "signal": "ETH_RMII_PPS_OUT",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-eth-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "UT",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-spi3-remap",
             "values": [
               0
             ]
@@ -4094,11 +3993,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS_3",
+          "signal": "VSS_3",
           "route": "main"
         }
       ]
@@ -4110,11 +4005,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "IO_3",
+          "signal": "VIO_3",
           "route": "main"
         }
       ]

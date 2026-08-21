@@ -557,11 +557,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]
@@ -791,18 +787,7 @@
           }
         },
         {
-          "signal": "MC",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "O",
+          "signal": "MCO",
           "route": "default",
           "_selector_resolved_by": "pad+value(grid)",
           "selection": {
@@ -1202,11 +1187,7 @@
           "route": "default"
         },
         {
-          "signal": "SWDI",
-          "route": "default"
-        },
-        {
-          "signal": "O",
+          "signal": "SWDIO",
           "route": "default"
         },
         {
@@ -1351,20 +1332,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM2_CH1_ET",
+          "signal": "TIM2_CH1_ETR",
           "route": "default",
           "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "R",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -1543,11 +1513,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

@@ -636,12 +636,7 @@
           "_selector_resolved_by": "peripheral"
         },
         {
-          "signal": "USART1_T",
-          "route": null,
-          "_needs_review": true
-        },
-        {
-          "signal": "X",
+          "signal": "USART1_TX",
           "route": "remap-8",
           "_selector_value": 8,
           "selection": {
@@ -649,8 +644,7 @@
             "values": [
               8
             ]
-          },
-          "_selector_resolved_by": "pad+value(grid)"
+          }
         },
         {
           "signal": "USART1_TX",
@@ -1700,19 +1694,14 @@
           }
         },
         {
-          "signal": "USART1_RT",
+          "signal": "USART1_RTS",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
               0
             ]
           }
-        },
-        {
-          "signal": "S",
-          "route": "default"
         },
         {
           "signal": "I2C_SCL",
@@ -1917,18 +1906,7 @@
           }
         },
         {
-          "signal": "MC",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "O",
+          "signal": "MCO",
           "route": "default",
           "_selector_resolved_by": "pad+value(grid)",
           "selection": {
@@ -1950,18 +1928,7 @@
           }
         },
         {
-          "signal": "TIM1_CH1",
-          "route": "remap-7",
-          "_selector_value": 7,
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              7
-            ]
-          }
-        },
-        {
-          "signal": "TIM1_CH1",
+          "signal": "TIM1_CH1_7TIM1_CH1",
           "route": "remap-8",
           "_selector_value": 8,
           "selection": {
@@ -1969,21 +1936,11 @@
             "values": [
               8
             ]
-          }
+          },
+          "_selector_resolved_by": "peripheral"
         },
         {
-          "signal": "TIM1_CH4",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              1
-            ]
-          }
-        },
-        {
-          "signal": "TIM1_CH2N",
+          "signal": "TIM1_CH4_1TIM1_CH2N",
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
@@ -1991,32 +1948,23 @@
             "values": [
               2
             ]
-          }
+          },
+          "_selector_resolved_by": "peripheral"
         },
         {
-          "signal": "USART1_RX",
-          "route": "remap-9",
-          "_selector_value": 9,
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              9
-            ]
-          }
-        },
-        {
-          "signal": "USART2_TX",
+          "signal": "USART1_RX_9USART2_TX",
           "route": "remap-5",
           "_selector_value": 5,
           "selection": {
-            "selector": "afio-usart2-remap",
+            "selector": "afio-usart1-remap",
             "values": [
               5
             ]
-          }
+          },
+          "_selector_resolved_by": "peripheral"
         },
         {
-          "signal": "I2C_SDA",
+          "signal": "I2C_SDA_2SPI_NSS",
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
@@ -2024,18 +1972,8 @@
             "values": [
               2
             ]
-          }
-        },
-        {
-          "signal": "SPI_NSS",
-          "route": "remap-2",
-          "_selector_value": 2,
-          "selection": {
-            "selector": "afio-spi1-remap",
-            "values": [
-              2
-            ]
-          }
+          },
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "SPI_NSS",
@@ -2146,12 +2084,7 @@
           "_selector_resolved_by": "peripheral"
         },
         {
-          "signal": "USART1_T",
-          "route": null,
-          "_needs_review": true
-        },
-        {
-          "signal": "X",
+          "signal": "USART1_TX",
           "route": "remap-6",
           "_selector_value": 6,
           "selection": {
@@ -2159,8 +2092,7 @@
             "values": [
               6
             ]
-          },
-          "_selector_resolved_by": "pad+value(grid)"
+          }
         },
         {
           "signal": "I2C_SCL",
@@ -2898,20 +2830,9 @@
           "route": "default"
         },
         {
-          "signal": "TIM2_CH1_ET",
+          "signal": "TIM2_CH1_ETR",
           "route": "default",
           "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "R",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -3350,11 +3271,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

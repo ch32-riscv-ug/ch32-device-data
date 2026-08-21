@@ -282,28 +282,58 @@ def find_pin_tables(
     return rows, variants, layout
 
 
+# A subscript sits on its own line, so the letter it hangs off is left alone:
+# CH32H417 writes VDD33 as "V" / "DD33" and "Main VDDK" as "Main V" / "DDK".
+# No signal in any of the pin tables is a single letter, so a lone trailing
+# capital is always the head of one of these.
+SUBSCRIPT = re.compile(r"(?:^|\s)[A-Z]$")
+
+
 def unwrap(cell: str) -> str:
     """Join a wrapped table cell, restoring the separator the line break swallowed.
 
-    A wrap can fall between two signals, where the "/" is implied, or inside one
-    signal, where it is not. CH32X035 splits T2C1N_6 as "T2C1N_" / "6", C1P0 as
-    "C1P" / "0" and the footnote of A3(3) as "A3(" / "3)". No signal name begins
-    with a digit, so a continuation is recognisable: a trailing "_" or "(" on the
-    previous line, or a leading digit or ")" on the next one. CH32H417 wraps in
-    the middle of a parenthesis -- "USART5_CK(A" / "F8)" -- so an unclosed "("
-    also marks a continuation.
+    A line break falls either inside one signal or between two, and **which one
+    is the datasheet's convention, not a property of the break**. Two conventions
+    are in use, and a cell says which it follows:
+
+    Most families separate signals with "/", so a break with no "/" beside it is
+    inside a name. The renderer wraps wherever the column runs out, which is not
+    where tokens end: CH32H417 splits SDRAM_D20(AF12) as "SD" / "RAM_D20(AF12)",
+    CH32V407 splits LTDC_R2 as "LTD" / "C_R2" and USART6_TX as "USAR" / "T6_TX".
+    Even here a break can fall between two signals -- "TIM11_CH3(AF13)" /
+    "QSPI1_SIO0(AF10)" -- and a closed AF number is what says so.
+
+    CH32V20x and CH32V30x use no "/" at all: the line break *is* the separator.
+    There a break is inside a name only when the next line is a stub of one, as
+    in "ETH_MII_PPS_OU" / "T".
+
+    Reading the whole cell first is what makes the two separable. Deciding per
+    break, as this did before, gets one convention right and the other wrong:
+    the previous default inserted a separator everywhere and produced ~850 rows
+    where a power pin's name arrived as the two tokens "V" and "DD33".
     """
     parts = [p.strip() for p in cell.split("\n") if p.strip()]
+    slashed = "/" in cell
     out = ""
     for part in parts:
-        joined = (
-            out.endswith(("/", "_", "("))
-            or out.count("(") > out.count(")")
-            or part.startswith(("/", ")", "_"))
-            or part[0].isdigit()
-        )
-        if out and not joined:
-            out += "/"
+        if out:
+            previous = out.split("/")[-1]
+            inside = (
+                out.endswith(("/", "_", "("))
+                or out.count("(") > out.count(")")
+                or part.startswith(("/", ")", "_"))
+                or part[0].isdigit()
+                or SUBSCRIPT.search(previous)
+                # This cell separates with "/", so a bare break is not one --
+                # unless the previous line finished a signal off with its AF
+                # number, which nothing continues.
+                or (slashed and not (previous.endswith(")") and part[0].isupper()))
+                # This cell separates with the break itself, so only a stub of a
+                # name continues the line above.
+                or (not slashed and len(part) <= 2)
+            )
+            if not inside:
+                out += "/"
         out += part
     return out
 
@@ -314,9 +344,19 @@ CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 def signals(cell: str) -> list[str]:
     """Split a cell into signal tokens. '-' is the table's empty marker, not a
     signal, and no signal name contains CJK -- such tokens are fragments of the
-    Chinese edition's prose bleeding into the cell, so they are dropped."""
-    return [s for s in unwrap(FOOTNOTE.sub("", cell)).split("/")
-            if s and s != "-" and not CJK.search(s)]
+    Chinese edition's prose bleeding into the cell, so they are dropped.
+
+    Nor does one contain a space. The power pins' description column reads "Main
+    VDD33", which is prose about the pin rather than a name for it; the pin's own
+    column says VDD33 next to it. A stray leading space is a different thing and
+    is trimmed.
+    """
+    # Twice, because a footnote can be split across the break it marks: CH32X035
+    # wraps the "(3)" of A3(3) as "A3(" / "3)", which no pass over the raw cell
+    # can see.
+    joined = FOOTNOTE.sub("", unwrap(FOOTNOTE.sub("", cell)))
+    return [s for s in (t.strip() for t in joined.split("/"))
+            if s and s != "-" and " " not in s and not CJK.search(s)]
 
 
 def build(

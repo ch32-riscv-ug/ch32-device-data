@@ -736,20 +736,8 @@
           "route": "default"
         },
         {
-          "signal": "USART1_R",
+          "signal": "USART1_RX",
           "route": "default",
-          "_selector_resolved_by": "peripheral",
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "X",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -799,11 +787,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]
@@ -815,11 +799,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "HV",
+          "signal": "VHV",
           "route": "main"
         }
       ]
@@ -831,11 +811,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "CC12V",
+          "signal": "VCC12V",
           "route": "main"
         }
       ]
@@ -847,11 +823,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S1",
+          "signal": "VS1",
           "route": "main"
         }
       ]
@@ -863,11 +835,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B1",
+          "signal": "VB1",
           "route": "main"
         }
       ]
@@ -879,11 +847,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S2",
+          "signal": "VS2",
           "route": "main"
         }
       ]
@@ -895,11 +859,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B2",
+          "signal": "VB2",
           "route": "main"
         }
       ]
@@ -911,11 +871,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "S3",
+          "signal": "VS3",
           "route": "main"
         }
       ]
@@ -927,11 +883,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "B3",
+          "signal": "VB3",
           "route": "main"
         }
       ]
@@ -1349,11 +1301,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "SS",
+          "signal": "VSS",
           "route": "main"
         }
       ]

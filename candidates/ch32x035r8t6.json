@@ -1202,7 +1202,7 @@
           "route": "default"
         },
         {
-          "signal": "A3(3)",
+          "signal": "A3",
           "route": "default"
         },
         {
@@ -3883,11 +3883,7 @@
       "_pin_type": "P",
       "functions": [
         {
-          "signal": "V",
-          "route": "main"
-        },
-        {
-          "signal": "DD",
+          "signal": "VDD",
           "route": "main"
         }
       ]
