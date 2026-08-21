@@ -38,7 +38,7 @@ def main() -> int:
                       "product_attributes", "remap_fields", "remap_routes",
                       "errata", "operating_conditions", "evt_examples",
                       "clock_configs", "clock_prescalers", "clock_sources",
-                      "clock_symbols", "evt_variants")}
+                      "clock_symbols", "clock_init", "evt_variants")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -263,6 +263,34 @@ def main() -> int:
                 if (r["family"], symbol) not in symbols:
                     bad.append(f"clock_configs: {r['family']} {r['config']} が呼ぶ "
                                f"{symbol} が clock_symbols にない")
+
+    # SystemInit's steps. The order is the fact here, so it has to be a dense
+    # run per (family, function) -- a gap means a line the reader dropped.
+    init_steps: dict[tuple[str, str], list[int]] = {}
+    for r in t["clock_init"]:
+        check("clock_init", r["function"], r["family"], families, "families")
+        if r["action"] not in ("set", "clear", "write", "poll", "trim"):
+            bad.append(f"clock_init: {r['family']} {r['function']} の action "
+                       f"{r['action']!r} が set/clear/write/poll/trim でない")
+        if not r["value"].isdigit() or not r["step"].isdigit():
+            bad.append(f"clock_init: {r['family']} {r['function']} の value/step が数でない")
+            continue
+        if r["register"] and "->" not in r["register"]:
+            bad.append(f"clock_init: {r['family']} {r['function']} の register "
+                       f"{r['register']!r} が BLOCK->REGISTER の形でない")
+        if r["address"] and not address.match(r["address"]):
+            bad.append(f"clock_init: {r['family']} {r['function']} の address "
+                       f"{r['address']!r} が 0x のあと8桁でない")
+        # Only a trim reads from somewhere; a register step's address is the
+        # register itself and naming a source as well would be two answers.
+        if bool(r["source"]) and r["action"] != "trim":
+            bad.append(f"clock_init: {r['family']} {r['function']} の "
+                       f"{r['action']} が source を持っている")
+        init_steps.setdefault((r["family"], r["function"]), []).append(int(r["step"]))
+    for (family, function), steps in init_steps.items():
+        if sorted(steps) != list(range(min(steps), min(steps) + len(steps))):
+            bad.append(f"clock_init: {family} {function} の step が連番でない: "
+                       f"{sorted(steps)}")
 
     # A `condition` naming a compile-time variant macro is unresolvable for a
     # part unless evt_variants says which parts set it.

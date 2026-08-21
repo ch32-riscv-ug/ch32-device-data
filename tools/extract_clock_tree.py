@@ -170,6 +170,29 @@ def comments(header: Path | None) -> dict[str, str]:
     return out
 
 
+# SystemInit puts the chip into a known state before any configuration runs, and
+# it does so with **literal hex** rather than the symbols the rest of the file
+# uses -- `RCC->CFGR0 &= 0xF8FF0000`. Nothing symbol-based can see those, so they
+# are read as an ordered list of steps instead.
+INIT_FUNCTION = re.compile(
+    r"^(?:static\s+)?void\s+SystemInit\s*\(\s*void\s*\)\s*$(?P<body>.*?)^\}",
+    re.M | re.S)
+ANY_FUNCTION = re.compile(r"^(?:static\s+)?\w[\w\s*]*?\b(?P<name>\w+)\s*\(")
+NUMBER = re.compile(r"^(?:0[xX][0-9A-Fa-f]+|\d+)$")
+# `while ((RCC->CTLR & RCC_HSIRDY) != RCC_HSIRDY)` -- the mask and the comparison
+# the body waits for. Both are needed; the comparison is kept verbatim rather
+# than interpreted, because what counts as "ready" is the vendor's statement.
+POLL_TEST = re.compile(r"&\s*(?P<mask>[\w]+)\s*\)?\s*(?P<compare>[!=]=\s*[\w]+)")
+# The HSI factory trim. CH32V003 reads a byte at CFG0_PLL_TRIM (0x1FFFF7D4) and
+# feeds the low 5 bits to the calibration setter; CH32L103 and CH32V205 do the
+# same from HSI_LP_TRIM_BASE (0x1FFFF72A). Skipping it leaves HSI out of spec.
+TRIM_CALL = re.compile(r"RCC_AdjustHSICalibrationValue\s*\((?P<arg>.*)\)\s*;")
+DEREF = re.compile(r"\*\s*\(\s*u?int8_t\s*\*\s*\)\s*(?P<symbol>\w+)")
+BYTE_COPY = re.compile(r"^\s*(?:u?int8_t\s+)?(?P<name>\w+)\s*=\s*"
+                       r"\*\s*\(\s*u?int8_t\s*\*\s*\)\s*(?P<symbol>\w+)\s*;")
+AND_MASK = re.compile(r"&\s*(?P<mask>0[xX][0-9A-Fa-f]+|\d+)")
+GUARD = re.compile(r"^\s*if\s*\(\s*(?P<name>\w+)\s*(?P<compare>[!=]=\s*\S+?)\s*\)")
+
 # The banner that opens each register's block of bit defines. It is the only
 # thing in the header that says which register a bit define belongs to -- the
 # name does not (RCC_ADCPRE says nothing about CFGR0) -- and it covers all but
@@ -397,6 +420,98 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
     return configs
 
 
+def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
+    """The ordered steps of SystemInit, plus every HSI trim load in the file.
+
+    This is the one place order is recorded, and it is a transcription rather
+    than a decision: SystemInit is a straight line with no #if branches, and
+    `RCC->CTLR |= 1` has to precede clearing SW or the chip has no clock to run
+    on. The switching sequence proper is not here, because when to raise the
+    flash latency relative to the switch is a policy and this file is not one.
+
+    A `clear` step's value is the AND mask exactly as the source writes it --
+    the bits to keep, not the bits to drop -- because that is what the vendor
+    states and inverting it would be an interpretation.
+    """
+    steps: list[dict] = []
+
+    def number(token: str) -> int | None:
+        if NUMBER.match(token):
+            return int(token, 16) if token.lower().startswith("0x") else int(token)
+        return symbols.get(token)
+
+    found = INIT_FUNCTION.search(text)
+    if found:
+        for line in found.group("body").splitlines():
+            bare = CAST.sub("", line)
+            write = WRITE.search(bare)
+            if write:
+                operand = write.group("value").strip().strip("()~ ").strip()
+                value = number(operand)
+                if value is None:
+                    continue
+                steps.append({
+                    "function": "SystemInit",
+                    "action": {"|=": "set", "&=": "clear", "=": "write"}[write.group("op")],
+                    "register": f"{write.group('block')}->{write.group('register')}",
+                    "value": value, "condition": "", "source": "",
+                })
+                continue
+            poll = POLL.search(bare)
+            test = POLL_TEST.search(bare) if poll else None
+            if poll and test:
+                value = number(test.group("mask"))
+                if value is None:
+                    continue
+                steps.append({
+                    "function": "SystemInit",
+                    "action": "poll",
+                    "register": f"{poll.group('block')}->{poll.group('register')}",
+                    "value": value,
+                    "condition": " ".join(test.group("compare").split()),
+                    "source": "",
+                })
+
+    # The trim loads, wherever they sit. CH32V003 calls the setter twice -- once
+    # in SystemInit with a literal default and once from the factory byte, the
+    # second guarded by the byte not being 0xFF (an unprogrammed part).
+    where, aliases, guards = "", {}, {}
+    for line in text.splitlines():
+        head = ANY_FUNCTION.match(line)
+        if head and "=" not in line:
+            where, aliases, guards = head.group("name"), {}, {}
+        copy = BYTE_COPY.match(line)
+        if copy:
+            aliases[copy.group("name")] = copy.group("symbol")
+            continue
+        guard = GUARD.match(line)
+        if guard:
+            guards[guard.group("name")] = " ".join(guard.group("compare").split())
+        call = TRIM_CALL.search(line)
+        if not call:
+            continue
+        arg = call.group("arg")
+        deref = DEREF.search(arg)
+        source = deref.group("symbol") if deref else next(
+            (aliases[n] for n in aliases if re.search(rf"\b{n}\b", arg)), "")
+        mask = AND_MASK.search(arg)
+        condition = next((c for n, c in guards.items()
+                          if re.search(rf"\b{n}\b", arg)), "")
+        if mask:
+            value = int(mask.group("mask"), 0)
+        else:
+            operand = arg.strip().strip("()")
+            value = number(operand)
+        if value is None:
+            continue
+        steps.append({
+            "function": where, "action": "trim", "register": "",
+            "value": value, "condition": condition,
+            "source": source if source in symbols else source,
+        })
+    return steps
+
+
 def read_family(family: Path) -> tuple[dict, list[str]]:
     notes: list[str] = []
     variants = system_sources(family)
@@ -497,10 +612,36 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
         if len(registers) > 1:
             notes.append(f"{family.name}: {symbol} が複数のレジスタに書かれる "
                          f"({', '.join(sorted(registers))})")
+    init: list[dict] = []
+    for _, (text, _) in sorted(variants.items(), key=lambda kv: -len(kv[1][1])):
+        init = read_init(text, symbols)
+        if init:
+            break
+    # A trim step's address is where the byte lives, not a register. CH32V003
+    # writes CFG0_PLL_TRIM as (VENDOR_CFG0_BASE), so it has to be followed
+    # through the same base chain the register addresses use.
+    chain = extract_addresses.bases(
+        header.read_text(errors="ignore").splitlines()) if header else {}
+    trim_field = banners.get("RCC_HSITRIM", "")
+    for step in init:
+        if step["action"] == "trim":
+            found = chain.get(step["source"])
+            step["address"] = "" if found is None else f"{found:#010x}"
+            # Where the value ends up. The setter is a driver function, but the
+            # field it writes is named in the header like any other.
+            step["register"] = trim_field
+        else:
+            block, _, register = step["register"].partition("->")
+            found = where.get((block, register))
+            step["address"] = "" if found is None else f"{found:#010x}"
+    if not init:
+        notes.append(f"{family.name}: SystemInit が無い（初期化の場所が別）")
+
     return {"copies": total,
             "variants": len(variants),
             "configs": configs,
             "symbols": resolved,
+            "init": init,
             "prescaler_encodings": {k: dict(sorted(v.items(), key=lambda kv: kv[1]))
                                     for k, v in sorted(encodings.items())}}, notes
 

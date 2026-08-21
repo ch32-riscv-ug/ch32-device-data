@@ -21,7 +21,8 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/extract_clock_tree.py` / `tools/build_clock.py`: EVTの`system_ch32*.c`から
   クロック設定（発振器・各ドメイン周波数・分周・PLL・flash latency・RCC外のレジスタ）を
   静的に読み、`tables/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・
-  `clock_symbols.csv`へ落とす
+  `clock_symbols.csv`・`clock_init.csv`へ落とす。`clock_init.csv`だけは順序を持つ——
+  `SystemInit`はベタのhexで書かれた分岐の無い一直線で、順序が方針ではなく転記だから
 - `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
   オフセットから`BLOCK->REGISTER`の絶対アドレスを解く。レジスタ名から場所は決まらない
   （CH32V205だけEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを別の番地に置く）

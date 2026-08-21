@@ -14,6 +14,9 @@
                           stands for, the register it goes to, that register's
                           address, and whether it is a value, a field mask or a
                           bit the code polls
+    clock_init.csv        the ordered steps of SystemInit, which puts the chip
+                          into a known state with literal hex rather than
+                          symbols, plus every HSI factory-trim load
 
 Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
@@ -81,12 +84,20 @@ SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
                   "condition", "#", "confidence", "basis"]
 SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value",
                   "#", "confidence", "basis"]
+# The only table with an order column, because SystemInit is a straight line and
+# the order is transcribed rather than decided: `RCC->CTLR |= 1` has to precede
+# clearing SW or the chip has no clock left to run on. The switching sequence
+# proper stays out -- when to raise the flash latency relative to the switch is a
+# policy, and a policy is not a device fact.
+INIT_COLUMNS = ["family", "function", "step", "action", "register", "address",
+                "value", "source", "condition", "#", "confidence", "basis"]
 
 BASIS = "evt(system_ch32*.c)"
 PRESCALER_BASIS = "evt(device-header)"
 SOURCE_BASIS = "evt(rcc-header+rcc-driver)"
 SYMBOL_BASIS = "evt(device-header+system_ch32*.c)"
 DECLARED_BASIS = "evt(device-header)"
+INIT_BASIS = "evt(system_ch32*.c+device-header)"
 # One source only, so nothing here is confirmed by agreement between documents.
 # The reference manual states the same fields and is the obvious second reading.
 CONFIDENCE = "reference"
@@ -128,6 +139,7 @@ def main() -> int:
     prescaler_rows: list[dict] = []
     source_rows: list[dict] = []
     symbol_rows: list[dict] = []
+    init_rows: list[dict] = []
     unmapped: list[str] = []
     for family, data in sorted(observed.items()):
         if families and family not in families:
@@ -140,6 +152,14 @@ def main() -> int:
                     "divider": divider.replace("DIV", ""), "value": value,
                     "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
                 })
+        for step, entry in enumerate(data.get("init", [])):
+            init_rows.append({
+                "family": family, "function": entry["function"], "step": step,
+                "action": entry["action"], "register": entry["register"],
+                "address": entry["address"], "value": entry["value"],
+                "source": entry["source"], "condition": entry["condition"],
+                "confidence": CONFIDENCE, "basis": INIT_BASIS,
+            })
         for entry in data.get("symbols", []):
             basis = SYMBOL_BASIS if entry["observed"] else DECLARED_BASIS
             confidence = CONFIDENCE
@@ -192,8 +212,12 @@ def main() -> int:
         ("clock_prescalers.csv", prescaler_rows, PRESCALER_COLUMNS),
         ("clock_sources.csv", source_rows, SOURCE_COLUMNS),
         ("clock_symbols.csv", symbol_rows, SYMBOL_COLUMNS),
+        ("clock_init.csv", init_rows, INIT_COLUMNS),
     ):
-        rows.sort(key=lambda r: tuple(str(r.get(c, "")) for c in columns[:4]))
+        if name == "clock_init.csv":
+            rows.sort(key=lambda r: (r["family"], r["function"], r["step"]))
+        else:
+            rows.sort(key=lambda r: tuple(str(r.get(c, "")) for c in columns[:4]))
         with (args.out / name).open("w", encoding="utf-8", newline="") as out:
             writer = csv.DictWriter(out, fieldnames=columns)
             writer.writeheader()
@@ -243,6 +267,17 @@ def main() -> int:
         for r in conflicts:
             print(f"    {r['family']} {r['symbol']} = {int(r['value']):#x} / "
                   f"{r['basis'].partition('+!')[2]}", file=sys.stderr)
+    actions = collections.Counter(r["action"] for r in init_rows)
+    print(f"  SystemInit の手順: {dict(actions)}", file=sys.stderr)
+    trims = [r for r in init_rows if r["action"] == "trim" and r["source"]]
+    for r in trims:
+        print(f"    HSI工場トリム: {r['family']} {r['source']}={r['address']} "
+              f"& {int(r['value']):#x} -> {r['register']}"
+              f"{'  条件 ' + r['condition'] if r['condition'] else ''}",
+              file=sys.stderr)
+    no_init = sorted(families - {r["family"] for r in init_rows}) if families else []
+    if no_init:
+        print(f"  SystemInit が読めない family: {' '.join(no_init)}", file=sys.stderr)
     no_latency = sorted({r["family"] for r in config_rows} -
                         {r["family"] for r in config_rows if r["flash_latency"]})
     print(f"  flash latencyを一度も書かない family: {' '.join(no_latency)}", file=sys.stderr)
