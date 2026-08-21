@@ -433,6 +433,7 @@
         {
           "signal": "USART2_CTS",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart2-remap",
             "values": [
@@ -447,6 +448,7 @@
         {
           "signal": "TIM2_CH1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -457,6 +459,7 @@
         {
           "signal": "TIM2_ETR",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -1336,6 +1339,7 @@
         {
           "signal": "ETH_RXP",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "extend-eth-10m-en",
             "values": [
@@ -1369,6 +1373,7 @@
         {
           "signal": "ETH_RXN",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "extend-eth-10m-en",
             "values": [
@@ -1402,6 +1407,7 @@
         {
           "signal": "ETH_TXP",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "extend-eth-10m-en",
             "values": [
@@ -1435,6 +1441,7 @@
         {
           "signal": "ETH_TXN",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "extend-eth-10m-en",
             "values": [
@@ -1926,6 +1933,7 @@
         {
           "signal": "TIM3_ETR",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
@@ -2051,6 +2059,7 @@
         {
           "signal": "I2C1_SMBA",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-i2c1-remap",
             "values": [

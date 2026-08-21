@@ -3,8 +3,13 @@
 
 各データシートの「General operating conditions / 一般工作条件」表から
 クロック上限(F_*)と動作電圧(V_DD)の行だけを抽出する。表示テキストは
-英語版から取り、最小値/最大値/単位は中英で照合して一致すれば confirmed。
+英語版から取り、最小値/典型値/最大値/単位は中英で照合して一致すれば confirmed。
 シリーズはproducts.csvの(datasheet→series)結合で展開する。
+
+典型値の列が必要な理由。発振器は「公称値 + 確度」で規定されていて、
+上下限を持たない。HSIは F_HSI の typ が 8MHz や 24MHz で、ばらつきは
+ACC_HSI の ±% 側にある。min/max だけを載せると、公称周波数そのものが
+落ちる — つまりPLL入力が決まらず、逓倍後のSYSCLKが計算できない。
 
 実行: uv run python tools/build_operating.py
 """
@@ -67,7 +72,8 @@ UNIT_FOR = [(re.compile(r"^[Ff]_"), re.compile(r"^(?:[MmKk]?Hz)$")),
 # "HSI_LP = 0 TA = -10℃~70℃" が入る）。一方で上限が別の記号で書かれることは
 # 正当で、"F_PCLK1 の max は F_HCLK" はC-5が求めているバス上限そのもの。
 # 数値か、空白を含まない短い記号なら採る。
-NUMERIC = re.compile(r"^[-+]?(?:\d+(?:\.\d+)?|\.\d+)$")
+# 確度の典型値は符号が ± で書かれる（CH32M030の ACC_LSI は typ が "±500"）。
+NUMERIC = re.compile(r"^[-+±]?(?:\d+(?:\.\d+)?|\.\d+)$")
 SYMBOLIC = re.compile(r"^[0-9.]*[A-Za-z][A-Za-z0-9_.+]{0,15}$")
 # 抽出時に潰れた表記の修繕（サブスクリプト割り込み・原文の詰まり）
 SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK"}
@@ -78,7 +84,7 @@ TEXT_REPAIRS = [
 ]
 
 COLUMNS = ["series", "symbol", "parameter", "condition",
-           "min", "max", "unit", "#", "confidence", "basis", "datasheet"]
+           "min", "typ", "max", "unit", "#", "confidence", "basis", "datasheet"]
 
 # データシート1ページ目の特徴リストが宣言する「系統主頻」。電気的特性表の
 # F_HCLK（AHBの上限値）とは別の事実で、こちらが製品として謳われる周波数
@@ -146,7 +152,7 @@ def keep_row(row, lang, page_no):
         if name.match(symbol) and unit and not want.match(unit):
             DROPPED.append(f"{lang} p.{page_no} {symbol}: 単位が {unit!r} なので別の行の続き")
             return False
-    for key in ("min", "max"):
+    for key in ("min", "typ", "max"):
         value = row.get(key) or ""
         if value and not (NUMERIC.match(value) or SYMBOLIC.match(value)):
             DROPPED.append(f"{lang} p.{page_no} {symbol}: {key} が {value[:28]!r}")
@@ -214,6 +220,7 @@ def read_edition(pdf_path, lang):
                         "parameter": param,
                         "condition": condition,
                         "min": norm_value(cells.get("min")),
+                        "typ": norm_value(cells.get("typ")),
                         "max": norm_value(cells.get("max")),
                         "unit": unit,
                     })
@@ -268,7 +275,13 @@ def main():
         def agrees(zh, en):
             if zh["min"] != en["min"] or zh["max"] != en["max"]:
                 return False
-            return not (zh["unit"] and en["unit"] and zh["unit"] != en["unit"])
+            # 単位と典型値は、片方の版だけが列を持つことがある（rowspanの空セル、
+            # 版によって典型値の列を落とす表）。空は不一致ではないので、
+            # 両方が値を持つときだけ突き合わせる。
+            for key in ("unit", "typ"):
+                if zh[key] and en[key] and zh[key] != en[key]:
+                    return False
+            return True
 
         remaining = list(zh_rows)
         for row in en_rows:
@@ -277,6 +290,10 @@ def main():
             en_page = row.pop("_page")
             if exact:
                 remaining.remove(exact)
+                # 表示テキストは英語版から取るが、典型値は数値なので言語に
+                # 依らない。英語版が列を落としていれば中国語版で埋める。
+                if not row["typ"] and exact["typ"]:
+                    row["typ"] = exact["typ"]
                 confidence = "confirmed"
                 basis = (f"{datasheet}:zh(p.{exact['_page']})"
                          f"+{datasheet}:en(p.{en_page})")
@@ -284,7 +301,7 @@ def main():
                 remaining.remove(cands[0])
                 confidence = "conflict"
                 diff = ",".join(f"{k}={cands[0][k]}"
-                                for k in ("min", "max", "unit")
+                                for k in ("min", "typ", "max", "unit")
                                 if cands[0][k] != row[k])
                 basis = f"{datasheet}:en(p.{en_page})+!{datasheet}:zh({diff})"
             else:
@@ -317,7 +334,7 @@ def main():
                 basis = f"{datasheet}:{lang}(p.{page_no})"
             out.append({"series": series, "symbol": "F_MAIN",
                         "parameter": "System main frequency", "condition": "",
-                        "min": "", "max": value, "unit": "MHz", "#": "#",
+                        "min": "", "typ": "", "max": value, "unit": "MHz", "#": "#",
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
 

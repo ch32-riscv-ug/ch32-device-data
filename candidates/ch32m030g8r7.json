@@ -264,6 +264,7 @@
         {
           "signal": "ADC_IN12",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -349,6 +350,7 @@
         {
           "signal": "ADC_IN2",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -383,6 +385,7 @@
         {
           "signal": "ISINK2",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "extend-isink2-adj",
             "values": [
@@ -405,6 +408,7 @@
         {
           "signal": "ADC_IN7",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -478,6 +482,7 @@
         {
           "signal": "ADC_IN8",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -515,6 +520,7 @@
         {
           "signal": "ADC_IN17",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -560,6 +566,7 @@
         {
           "signal": "ADC_IN18",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -597,6 +604,7 @@
         {
           "signal": "ADC_IN3",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -688,6 +696,7 @@
         {
           "signal": "ADC_IN4",
           "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -697,7 +706,14 @@
         },
         {
           "signal": "XO",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrgin-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "CMP2_N0",
@@ -784,7 +800,14 @@
         },
         {
           "signal": "LO0",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1N",
@@ -875,7 +898,14 @@
         },
         {
           "signal": "HO0",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH1",
@@ -934,7 +964,14 @@
         },
         {
           "signal": "LO1",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2N",
@@ -1025,7 +1062,14 @@
         },
         {
           "signal": "HO1",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH2",
@@ -1084,7 +1128,14 @@
         },
         {
           "signal": "LO2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3N",
@@ -1197,7 +1248,14 @@
         },
         {
           "signal": "HO2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3",
@@ -1332,6 +1390,7 @@
         {
           "signal": "ADC_IN15",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -1452,6 +1511,7 @@
         {
           "signal": "ADC_IN16",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [
@@ -1536,6 +1596,7 @@
         {
           "signal": "ADC_IN11",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-adc-etrgin-remap",
             "values": [

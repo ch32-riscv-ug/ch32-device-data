@@ -331,6 +331,7 @@
         {
           "signal": "PIOC_IO1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-pioc-remap",
             "values": [
@@ -448,6 +449,7 @@
         {
           "signal": "CTS1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -541,6 +543,7 @@
         {
           "signal": "RTS1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -1348,6 +1351,7 @@
         {
           "signal": "SCK",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-spi1-remap",
             "values": [
@@ -1755,6 +1759,7 @@
         {
           "signal": "T1C1N",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
             "values": [
@@ -1814,6 +1819,7 @@
         {
           "signal": "T1C2N",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
             "values": [
@@ -1873,6 +1879,7 @@
         {
           "signal": "T1C3N",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim1-remap",
             "values": [
@@ -1933,6 +1940,7 @@
         {
           "signal": "CK1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -2014,6 +2022,7 @@
         {
           "signal": "TX1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -2090,6 +2099,7 @@
         {
           "signal": "RX1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -2221,6 +2231,7 @@
         {
           "signal": "PIOC_IO0",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-pioc-remap",
             "values": [

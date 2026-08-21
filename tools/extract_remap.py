@@ -36,6 +36,19 @@ import signal_vocabulary  # noqa: E402
 # over several lines: "TIM1_R\nM=000\nDefault\nmapping". A digit may be "x" where
 # the manual does not care about that bit (CH32H417 writes SDMMC_RM=1x).
 COLUMN_HEADER = re.compile(r"(?P<field>[A-Z0-9]+(?:_[A-Z0-9]+)*_RM)=(?P<value>[01xX]+)")
+# What the grid calls its first column. A continuation page does not repeat it.
+ROW_LABEL_HEADING = frozenset({"复用功能", "复用功能（1）", "复用功能(1)",
+                               "Alternatefunction", "AlternateFunction", "AF"})
+# What a register-field table calls its columns. Such a table follows the grids
+# closely and its Description cells are full of pad names, so reading one as a
+# continuation of the last grid attributes every pad it mentions to that grid's
+# field. Its own reader is extract_registers.
+FIELD_TABLE_HEADING = frozenset({"位", "名称", "访问", "描述", "复位值", "访问地址",
+                                 "Bits", "Bit", "Name", "Access", "Description",
+                                 "Resetvalue", "Reset"})
+# A grid row is labelled by a signal, never by bits. "[22:20]", "19" and "18"
+# are what the register-field table puts there.
+BIT_LABEL = re.compile(r"^\[?\d+(?::\d+)?\]?$")
 PAD = re.compile(r"^P[A-H]\d{1,2}$")
 PAD_IN_PROSE = re.compile(r"\bP[A-H]\d{1,2}\b")
 SIGNAL = re.compile(r"^[A-Z][A-Z0-9_]*$")
@@ -57,15 +70,45 @@ def expand(pattern: str) -> list[int]:
     return sorted(values)
 
 
-def read_header(row: list[str]) -> list[tuple[str, list[int]]] | None:
-    """Parse a header row into (field, values) per column, or None if it is not one."""
-    columns: list[tuple[str, list[int]]] = []
+def read_header(row: list[str]) -> list[tuple[str, list[int]] | None] | None:
+    """Parse a header row into (field, values) per column, or None if it is not one.
+
+    A column can come back empty. The header is two lines -- the field and value
+    on one, "default mapping" on the next -- and where the second line is wider
+    than the first the extractor puts in a column boundary the body does not use,
+    so CH32V407's TIM4 grid reads as
+    ["Alternate function", "TIM4_RM=0 default", "", "TIM4_RM=1 remap"].
+    Rejecting the row over that empty cell is what made the grid look like the
+    previous page's table continued, which put TIM4's routes under TIM3_RM. The
+    empty column is kept as None so the remaining columns stay aligned with the
+    body cells, and skipped when the body is read.
+    """
+    columns: list[tuple[str, list[int]] | None] = []
     for cell in row[1:]:
-        m = COLUMN_HEADER.search(flatten(cell))
+        text = flatten(cell)
+        if not text:
+            columns.append(None)
+            continue
+        m = COLUMN_HEADER.search(text)
         if not m:
             return None
         columns.append((m.group("field"), expand(m.group("value"))))
-    return columns if len(columns) >= 2 else None
+    named = [c for c in columns if c]
+    return columns if len(named) >= 2 else None
+
+
+def is_header_row(row: list[str]) -> bool:
+    """Whether this row heads its own grid rather than continuing another.
+
+    The continuation rule below matches on column count alone, which a grid that
+    starts a new field satisfies just as well as the tail of the previous one.
+    A row that names a selector field, or that repeats the row-label heading the
+    grid puts in its first cell, is starting a grid.
+    """
+    if any(COLUMN_HEADER.search(flatten(c)) for c in row):
+        return True
+    label = flatten(row[0]).replace(" ", "")
+    return label in ROW_LABEL_HEADING or label in FIELD_TABLE_HEADING
 
 
 def pads_in(cell: str) -> tuple[list[str], bool]:
@@ -99,7 +142,9 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                 if header:
                     pending, pending_page = header, page.page_number
                     body = rows[1:]
-                elif pending and len(rows[0]) == len(pending) + 1 and page.page_number - pending_page <= 1:
+                elif (pending and not is_header_row(rows[0])
+                      and len(rows[0]) == len(pending) + 1
+                      and page.page_number - pending_page <= 1):
                     # A grid split across pages repeats no header on the later part.
                     body = rows
                 else:
@@ -109,6 +154,16 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                     signal_cell = row[0]
                     if not signal_cell:
                         continue  # stray header fragment inside the grid
+                    if BIT_LABEL.match(signal_cell):
+                        # A register-field table that ran on into the grid. Its
+                        # Description cells name pads, so every one of them would
+                        # be credited to this grid's field: CH32V00x came out
+                        # with ADC_ETRGREG_RM reaching 35 pads at value 1 where
+                        # its own grid says one.
+                        notes.append(
+                            f"bit番号が行見出しの行を読み飛ばした: {signal_cell!r}"
+                        )
+                        continue
                     names = [s.strip() for s in signal_cell.split("/")]
                     prose_signal = not all(SIGNAL.match(s) for s in names)
                     if prose_signal:
@@ -117,9 +172,10 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                         # sees what the manual claims.
                         names = [signal_cell]
                         notes.append(f"signal名が文章の行: {signal_cell!r}")
-                    for col, (field, values) in enumerate(pending, start=1):
-                        if col >= len(row):
+                    for col, column in enumerate(pending, start=1):
+                        if column is None or col >= len(row):
                             continue
+                        field, values = column
                         pads, from_prose = pads_in(row[col])
                         if from_prose and pads:
                             notes.append(

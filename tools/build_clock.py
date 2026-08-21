@@ -10,6 +10,9 @@
     clock_sources.csv     one row per (series, consumer, option): what USB, the
                           RTC, the ADC, I2S and the rest can be clocked from,
                           and the register field that selects it
+    clock_symbols.csv     one row per (family, symbol) named in clock_configs'
+                          `pll` or `outside_rcc`: the number it stands for, the
+                          register it is written to, and that register's address
 
 Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
@@ -27,6 +30,12 @@ otherwise, so one function is two facts. Each branch is its own row and the
 **Not every name states a frequency.** "SetSysClockToHSE" runs the system
 straight off the crystal, whose frequency is a board property, not the chip's.
 Those rows have an empty `domains` rather than a guess.
+
+**A symbol name does not give away its value.** CH32V307 defines
+RCC_PLLMULL18 as 0x003C0000 and RCC_PLLMULL18_EXTEN as 0, so the same "x18"
+encodes two ways, and EXTEN_PLL_HSI_PRE says nothing about being bit 4 of a
+register at 0x40023800. clock_symbols.csv carries the number and the address so
+the `pll` and `outside_rcc` cells can be turned into register writes.
 
 Usage:
     uv run tools/build_clock.py [--mirrors <dir>] [--out tables]
@@ -61,10 +70,13 @@ PRESCALER_COLUMNS = ["family", "field", "divider", "value",
                      "#", "confidence", "basis"]
 SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
                   "condition", "#", "confidence", "basis"]
+SYMBOL_COLUMNS = ["family", "symbol", "register", "address", "value",
+                  "#", "confidence", "basis"]
 
 BASIS = "evt(system_ch32*.c)"
 PRESCALER_BASIS = "evt(device-header)"
 SOURCE_BASIS = "evt(rcc-header+rcc-driver)"
+SYMBOL_BASIS = "evt(device-header+system_ch32*.c)"
 # One source only, so nothing here is confirmed by agreement between documents.
 # The reference manual states the same fields and is the obvious second reading.
 CONFIDENCE = "reference"
@@ -105,6 +117,7 @@ def main() -> int:
     config_rows: list[dict] = []
     prescaler_rows: list[dict] = []
     source_rows: list[dict] = []
+    symbol_rows: list[dict] = []
     unmapped: list[str] = []
     for family, data in sorted(observed.items()):
         if families and family not in families:
@@ -117,6 +130,13 @@ def main() -> int:
                     "divider": divider.replace("DIV", ""), "value": value,
                     "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
                 })
+        for entry in data.get("symbols", []):
+            symbol_rows.append({
+                "family": family, "symbol": entry["symbol"],
+                "register": entry["register"], "address": entry["address"],
+                "value": entry["value"],
+                "confidence": CONFIDENCE, "basis": SYMBOL_BASIS,
+            })
         for consumer, options in sorted(data.get("peripheral_sources", {}).items()):
             for option in options:
                 source_rows.append({
@@ -150,6 +170,7 @@ def main() -> int:
         ("clock_configs.csv", config_rows, CONFIG_COLUMNS),
         ("clock_prescalers.csv", prescaler_rows, PRESCALER_COLUMNS),
         ("clock_sources.csv", source_rows, SOURCE_COLUMNS),
+        ("clock_symbols.csv", symbol_rows, SYMBOL_COLUMNS),
     ):
         rows.sort(key=lambda r: tuple(str(r.get(c, "")) for c in columns[:4]))
         with (args.out / name).open("w", encoding="utf-8", newline="") as out:
@@ -174,6 +195,22 @@ def main() -> int:
                        if (r["family"], r["consumer"], r["value"]) == (family, consumer, value)]
             print(f"    {family} {consumer} {value:#x} = {' / '.join(options)}",
                   file=sys.stderr)
+    named = {(r["family"], s)
+             for r in config_rows
+             for cell in (r["pll"], r["outside_rcc"])
+             for entry in cell.split(";") if entry
+             for s in [entry.split(" ")[-1]]}
+    have = {(r["family"], r["symbol"]) for r in symbol_rows}
+    missing = sorted(named - have)
+    print(f"  clock_configs が名前で呼ぶ記号 {len(named)} / 値の解けたもの {len(have & named)}",
+          file=sys.stderr)
+    for family, symbol in missing:
+        print(f"    - {family} {symbol}: device header に #define が無い", file=sys.stderr)
+    no_address = [r for r in symbol_rows if not r["address"]]
+    if no_address:
+        print(f"  レジスタのアドレスが解けない記号: {len(no_address)}", file=sys.stderr)
+        for r in no_address:
+            print(f"    - {r['family']} {r['symbol']} ({r['register']})", file=sys.stderr)
     no_latency = sorted({r["family"] for r in config_rows} -
                         {r["family"] for r in config_rows if r["flash_latency"]})
     print(f"  flash latencyを一度も書かない family: {' '.join(no_latency)}", file=sys.stderr)

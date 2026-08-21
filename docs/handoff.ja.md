@@ -37,6 +37,10 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_package_dims.py`: PACKAGE.PDF（WCH-common mirror）目次からpackageごとのbody size・pitchを取る。両言語105件
 - `tools/build_pins.py`: pin定義表を`tables/pins.csv`（lead↔pad対応）と`tables/pin_functions.csv`（pad→signal/route）に正規化する。両言語を別々に読んで突き合わせる
 - `tools/build_remap.py`: candidatesから`tables/remap_fields.csv`/`remap_routes.csv`を生成。pin_functionsのremap-Nを解決する
+- `tools/extract_clock_tree.py` / `tools/build_clock.py`: EVTの`system_ch32*.c`を静的に読み、`tables/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・`clock_symbols.csv`を生成する。PDFもコンパイラも要らない
+- `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructメンバーオフセットから`BLOCK->REGISTER`の絶対アドレスを解く。`clock_symbols.csv`の`address`列に使い、R-20（レジスタマップ）の下地でもある
+- `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro（`CH32V20x_D8W`等）を取り`tables/evt_variants.csv`にする。`clock_configs.condition`を型番で評価するのに要る
+- `tools/build_operating.py`: datasheetの一般動作条件表・発振器の表・ADC特性表から`tables/operating_conditions.csv`を生成する
 - `tools/build_documents.py` / `tools/check_tables.py`: 文書カタログのCSV投影（標準ライブラリのみ、日次workflowが実行）と、全テーブルの参照結合検査（push/PRのcheck workflowと日次が実行）
 - `tools/build_readme.py` / `generated/readme/`: **本来の目的である各mirror READMEの生成**。tablesから組み立ててここへcommitし、mirrorのupdate.shが日次で自分の分をfetchしてREADME.mdを置き換える（catalogueと同方式・クロスrepoトークン不要）。CH32V003で旧手製READMEとpin表72セル完全一致を確認済み。ch32_riscv_toolsへのリンクは生成版には無い（撤去方針）。画像はmirror側image/を生成時にスキャンして参照するだけで、手動維持。organizationプロフィール（`.github`リポジトリの`profile/README.md`、family→series対応表つき）も同方式で`generated/readme/_profile.md`から日次fetch
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
@@ -46,7 +50,8 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 
 `tools/build_all.py`で全SKUの候補を`candidates/`へ生成済みです（98ファイル・4.0MB、**全SKUでpin取得**、3989 pin・22186 function・7108経路・585 selector）。**未reviewの機械出力**であり、`devices/`へは反映していません。
 
-残る資料側の欠落は、reference manualがmirrorされていないCH32V407です（経路0件）。
+CH32V407/V467のreference manualは`datasheet_zh`にあります（`CH32V407RM.PDF`。英語版は無い）。
+中国語版のほうがデータが新しいのが通例なので、抽出は両言語を読んで和を取ります。
 
 ## Sample recordの状態
 

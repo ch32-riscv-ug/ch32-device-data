@@ -326,6 +326,7 @@
         {
           "signal": "USART2_CTS",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart2-remap",
             "values": [
@@ -340,6 +341,7 @@
         {
           "signal": "TIM2_CH1",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -350,6 +352,7 @@
         {
           "signal": "TIM2_ETR",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
@@ -604,13 +607,7 @@
           "signal": "USART4_TX",
           "route": "remap-1",
           "_selector_value": 1,
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              1
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         }
       ]
     },
@@ -1359,6 +1356,7 @@
         {
           "signal": "I2C1_SMBA",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-i2c1-remap",
             "values": [

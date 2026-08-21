@@ -514,6 +514,7 @@
         {
           "signal": "TIM1_CH3",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-tim1-cap-rm",
             "values": [
@@ -747,6 +748,7 @@
         {
           "signal": "TIM1_CH2N",
           "route": "default",
+          "_selector_resolved_by": "prefix",
           "selection": {
             "selector": "afio-tim1-cap-rm",
             "values": [

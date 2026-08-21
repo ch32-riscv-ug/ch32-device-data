@@ -423,6 +423,7 @@
         {
           "signal": "I2C1_SMBA",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-i2c1-rm",
             "values": [
@@ -1069,6 +1070,7 @@
         {
           "signal": "TIM2_CH1_ETR",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-rm",
             "values": [
@@ -1079,6 +1081,7 @@
         {
           "signal": "USART2_CTS",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart2-rm",
             "values": [
@@ -2433,6 +2436,7 @@
         {
           "signal": "LPTIM_OUT",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-lptim-rm",
             "values": [
@@ -2631,6 +2635,7 @@
         {
           "signal": "CAN1_RX",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-can-rm",
             "values": [
@@ -2712,6 +2717,7 @@
         {
           "signal": "CAN1_TX",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-can-rm",
             "values": [

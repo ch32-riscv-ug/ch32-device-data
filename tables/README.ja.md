@@ -16,14 +16,16 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
 
 付属表
   product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
-  remap_fields.csv        267行  route selector定義（series×field: register/bit/reset/valid値）
-  remap_routes.csv       4487行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  remap_fields.csv        280行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       4635行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 283行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
   clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
   clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
   clock_sources.csv       116行  USB/RTC/ADC/I2S等をどのクロックから取れるか（選択肢→register field）
+  clock_symbols.csv        77行  上2表が名前で呼ぶ記号の数値・書き込み先register・その絶対アドレス
+  evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -38,13 +40,17 @@ product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
 clock_configs.family / clock_prescalers.family / clock_sources.family → families.family
+clock_symbols.family / evt_variants.family              → families.family
 clock_configs.(family, hpre|ppre1|ppre2)                → clock_prescalers.(family, field, divider)
+clock_configs.(family, pll|outside_rccの各記号)          → clock_symbols.(family, symbol)
+clock_configs.condition / clock_sources.condition の macro → evt_variants.(family, macro)
+evt_variants.part_number                                → products.part_number
 errata.series / operating_conditions.series             → series.series
 evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -94,7 +100,7 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 `tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**、`peripheral`と`role`が揃って埋まるか揃って空であること。
 
-### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv`
+### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `evt_variants.csv`
 
 EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`tools/extract_clock_tree.py`→`tools/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
 
@@ -116,7 +122,24 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 `clock_sources.csv`はUSB・RTC・ADC・I2S・RNG・ETH等を「どのクロックから取れるか」で、`<fam>_rcc.h`の`RCC_*CLKSource_*`定数と、それがどのregister fieldへ行くか（`<fam>_rcc.c`の`RCC_*CLKConfig`）の組です。ここも`condition`が要ります——CH32V20xは`RCC_RTCCLKSource_*`の**値0x300が、D8/D8Wでは`HSE/512`、それ以外では`HSE/128`**です。同じ値が別の意味になるので、分岐を落とすとRTCが4倍ずれます。USBの`PLLCLK_Div5`もD8/D8W限定です。CH32X035は選択肢が1つも無く、USB PHYがクロック選択を必要としないことと整合します。
 
-出典は`evt(system_ch32*.c)`と`evt(rcc-header+rcc-driver)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
+**`clock_symbols.csv`は`pll`と`outside_rcc`の記号を数値に落とします。** この2列だけは値ではなく**記号名**が入っています（`RCC_PLLMULL18`、`EXTEN_PLL_HSI_PRE`）。名前から値は導けません——CH32V307の`RCC_PLLMULL18`は`0x003C0000`、`RCC_PLLMULL18_EXTEN`は`0x00000000`で、**同じ「×18」が別の値**です（`RCC_PLLMULL15`は`0x00340000`、`_EXTEN`版は`0x00380000`で、ずれ方も一定ではありません）。1行が(family, symbol)で、`value`は**シフト済みの10進**（`clock_prescalers.value`と同じ規約）、`register`は書き込み先を`BLOCK->REGISTER`で、`address`はそのregisterの**絶対アドレス**です。
+
+アドレスを載せているのは、レジスタ名から場所が決まらないからです。EVTは`#define EXTEN_BASE (HBPERIPH_BASE + 0x3800)`のように**base定数の連鎖**で書き、綴りもfamilyで違います（`HBPERIPH_BASE`と`AHBPERIPH_BASE`）。**CH32V205だけがEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを`0x400220C0`に置きます**（他は`BASE+0x3800`）。`tools/extract_addresses.py`がbase連鎖とstructのメンバーオフセット（reserved配列も数える）を解いています。
+
+**`evt_variants.csv`は型番→コンパイル時macroです。** `condition`列が`CH32V20x_D8W`や`CH32V30x_D8`といったmacroを参照しますが、どの型番がどれに該当するかはEVTのdevice headerの**コメントにしか書かれていません**。該当するfamilyは3つで、既定値（headerが最初から有効にしているもの）は`default`列が言います:
+
+| family | macro | 該当型番 |
+|---|---|---|
+| CH32V20x | `CH32V20x_D6`（既定） | CH32V203 の F6/F8/G6/G8/K8/C6/C8（11型番） |
+| CH32V20x | `CH32V20x_D8` | CH32V203RBT6 のみ |
+| CH32V20x | `CH32V20x_D8W` | CH32V208 の4型番 |
+| CH32V307 | `CH32V30x_D8` | CH32V303 の5型番 |
+| CH32V307 | `CH32V30x_D8C`（既定） | CH32V305/V307/V317 の9型番 |
+| CH32V006 | `CH32V002` / `CH32V004` / `CH32V005` / `CH32V006`（既定） / `CH32V007_M007` | 型番の先頭一致で26型番 |
+
+**macroを設定しないプロジェクトは既定のvariantで黙って通ります。** CH32V203RBT6にD6のまま組めば、HSE_VALUEが24MHzのまま（正しくは32MHz）、周辺の集合も違う、という形で表に出ません。
+
+出典は`evt(system_ch32*.c)`・`evt(rcc-header+rcc-driver)`・`evt(device-header+system_ch32*.c)`・`evt(device-header-comment)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
 
 ### `errata.csv`
 
@@ -131,6 +154,19 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 - **`F_MAIN`**: datasheet 1ページ目の特徴リストが謳う**系統主頻**。製品として語られる周波数がこれです
 - `F_HCLK`/`F_PCLK*`/`F_CORE*`: 電気的特性章「一般動作条件」表の**上限値**。F_MAINとは別の事実で、値も食い違います（CH32V003は本文48MHz・電気的特性の上限50MHz）。README の Clock 列は F_MAIN を優先し、無いシリーズ（CH32X035・CH32H41x）だけ F_HCLK / F_CORE に落とします
 - `V_DD`: 動作電圧。ADC使用時・USB使用時などの条件行があります
+- **`typ`列**（2026-08-21追加）: 発振器は「**公称値＋確度**」で規定されていて上下限を持ちません。`F_HSI`のばらつきは`ACC_HSI`の±%側にあり、周波数そのものは`typ`にしか出ません。この列が無いあいだ`F_HSI`はmin/maxが空の行で、**PLL入力が決まらないのでSYSCLKが計算できない**状態でした。中英どちらか一方だけが典型値の列を持つ表があるので、両方が値を持つときだけ突き合わせ、英語版が空なら中国語版で埋めます（数値なので言語に依りません）
+
+  **HSIは8MHzではありません。familyで5通りあります。**
+
+  | HSI公称値 | family |
+  |---|---|
+  | **8 MHz** | CH32L103・M103、V103、V203・V205・V208、V303〜V317 |
+  | **20 MHz** | CH32V407・V467、X305・X315 |
+  | **24 MHz** | CH32V002〜V007、M007、V003 |
+  | **25 MHz** | CH32H415・H416・H417 |
+  | **48 MHz** | CH32X033・X035 |
+
+  低消費モードのHSIも別行です（CH32L103/M103とV203/V205は**1MHz**、CH32V00xは`HSI_LP=1`で30〜58kHz）。`F_LSI`もmin/typ/maxが揃い、**CH32V203は`applied for V203RBT6`だけ25/32/45kHz**で他の型番（25/39/60kHz）と違います——`evt_variants.csv`が`CH32V20x_D8`に割り当てる唯一の型番と一致します
 - **発振器**（2026-08-21追加）: `F_HSI`/`F_LSI`と`ACC_HSI`/`ACC_LSI`（**確度**。`condition`列が温度範囲を持ち、範囲ごとに行が分かれます）、`F_HSE_ext`/`F_LSE_ext`（**外部クロックの許容範囲**。例: CH32L103は3〜25MHz、CH32M030は4〜25MHz、CH32V00xは3〜32MHz、CH32H41xは5〜32MHz）、`F_OSC_IN`/`F_XI`（水晶）、`DuCy_*`（デューティ比）
 - **PLL**（同）: `F_PLL_IN`/`F_PLL_OUT`/`F_VCO`の上下限。例: CH32L103は入力3〜25MHz・出力18〜96MHz、CH32H41xは出力100〜600MHz
 - **`f_ADC`**（同）: ADCのクロック上限。**familyで大きく違い、しかも電源電圧に依存します。** 記号だけ小文字始まりなのは原典の表記どおりです
@@ -150,7 +186,7 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 上限が別の記号で書かれる行があります——`F_PCLK1`の`max`が`F_HCLK`のように。数値ではありませんが「PCLK1はHCLKを超えない」という事実そのものなので採っています。
 
-表示テキストは英語版、最小/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。
+表示テキストは英語版、最小/典型/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。
 
 発振器やADCの表は本体と別ページにあり（HSI/LSI/外部高速/外部低速/水晶/ADCで6種）、抽出器は**対象表を1つ見つけて打ち切らず全ページを走ります**。さらに**表はページを跨ぎ、続きページはヘッダ行を持ちません**（CH32V003のADCクロック上限の行はキャプションの次ページにしかない）。列数が同じなら直前の列並びを引き継いで読みます。この副作用で同じページにある他の`F_*`（`F_prog`＝flash書き込みクロック、`F_max(IO)out`＝IOの最大出力周波数）も入りますが、いずれも実在の周波数上限です。表の継承（記号セルが空の続き行）は多条件行には正しいものの、別パラメータが続くと記号を取り違えるので、**記号と単位と値の噛み合い**で弾いています（`F_*`にデューティ比の`%`が付く行など）。弾いた行は実行時に一覧で出ます。
 
@@ -226,8 +262,13 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
 | product_attributes.csv | 995 | 926 | 68 | 1 |
-| remap_fields.csv | 267 | 0 | 267 | 0 |
-| remap_routes.csv | 4487 | 0 | 4487 | 0 |
+| remap_fields.csv | 280 | 0 | 280 | 0 |
+| remap_routes.csv | 4635 | 0 | 4635 | 0 |
+| clock_configs.csv | 152 | 0 | 152 | 0 |
+| clock_prescalers.csv | 263 | 0 | 263 | 0 |
+| clock_sources.csv | 116 | 0 | 116 | 0 |
+| clock_symbols.csv | 77 | 0 | 77 | 0 |
+| evt_variants.csv | 56 | 0 | 56 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
 | operating_conditions.csv | 283 | 257 | 21 | 5 |
 | pins.csv | 4312 | 4022 | 290 | 0 |

@@ -26,6 +26,8 @@ decided", which a consumer can skip, and that is more useful than a wrong guess.
     ('USART5', 'TX')
     >>> split("PIOC_IO0")
     ('PIOC', 'IO0')
+    >>> split("LPT_OUT")
+    ('LPTIM', 'OUT')
     >>> split("AETR2") is None
     True
 """
@@ -47,12 +49,13 @@ INSTANCE = re.compile(r"^([A-Z][A-Z0-9]*?)(\d*)$")
 IMPLIED_INSTANCE = frozenset({"USART", "UART", "SPI", "I2C", "TIM", "CAN", "ADC"})
 
 # WCH calls the same peripheral both things, sometimes within one series. CH32V307
-# writes UART5_TX in its pin table and USART5_REMAP in its AFIO register, and
-# CH32M030 writes UART_TX and UART1_REMAP. Folding one onto the other is what
-# makes a signal find its own selector. It is safe because no family defines both
-# a UARTn and a USARTn AFIO field -- checked across all twelve EVT headers -- so
-# the two spellings never name different peripherals on the same silicon.
-SAME_PERIPHERAL = {"UART": "USART"}
+# writes UART5_TX in its pin table and USART5_REMAP in its AFIO register, CH32M030
+# writes UART_TX and UART1_REMAP, and CH32L103 writes LPT_OUT in its pin table for
+# the field it calls LPTIM_RM. Folding one onto the other is what makes a signal
+# find its own selector. Each pair is safe because no family defines both
+# spellings as AFIO fields -- checked across all twelve EVT headers -- so the two
+# never name different peripherals on the same silicon.
+SAME_PERIPHERAL = {"UART": "USART", "LPT": "LPTIM"}
 
 # Serial roles, in both the long and the shorthand spelling. The shorthand takes
 # the instance as a trailing digit (TX2) or leaves it implied behind a U (UTX).
@@ -86,9 +89,14 @@ def canonical_peripheral(token: str) -> str:
     if not m:
         return token
     name, digits = m.groups()
+    # Fold the alternative spelling before deciding whether an instance number is
+    # implied, because the two spellings need not agree about that: LPT is the
+    # unnumbered LPTIM, and LPTIM is never numbered, while UART is USART, which
+    # always is.
+    name = SAME_PERIPHERAL.get(name, name)
     if not digits and name not in IMPLIED_INSTANCE:
         return name
-    return f"{SAME_PERIPHERAL.get(name, name)}{digits or '1'}"
+    return f"{name}{digits or '1'}"
 
 
 # A selector field's name, minus the suffix that says it is one: USART1_RM,
@@ -173,6 +181,8 @@ def _rules() -> list[tuple[str, str]]:
         ("CS", "SPI1_NSS  (pin表だけがCSと書く)"),
         ("PERIPHERAL_ROLE", "そのまま。instance番号は " + " ".join(sorted(IMPLIED_INSTANCE))
                             + " にだけ補う"),
+        (" / ".join(f"{k}->{v}" for k, v in sorted(SAME_PERIPHERAL.items())),
+         "同じ周辺の別綴り。pin表とAFIOフィールドで綴りが違う"),
     ]
 
 

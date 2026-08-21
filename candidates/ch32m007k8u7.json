@@ -41,6 +41,42 @@
   },
   "route_selectors": [
     {
+      "id": "afio-adc-etrginj-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ADC_ETRGINJ_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 18
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
+    },
+    {
+      "id": "afio-adc-etrgreg-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ADC_ETRGREG_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 19
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
+    },
+    {
       "id": "afio-i2c1-remap",
       "controller": "afio",
       "register": "PCFR1",
@@ -309,6 +345,7 @@
         {
           "signal": "USART1_R",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
@@ -318,7 +355,14 @@
         },
         {
           "signal": "X",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM2_CH3",
@@ -488,7 +532,14 @@
         },
         {
           "signal": "UT1",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "USART1_RTS",
@@ -714,7 +765,14 @@
         },
         {
           "signal": "SWCLK",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "CMP1_P1",
@@ -855,7 +913,14 @@
         },
         {
           "signal": "ADC_IETR",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrginj-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH4",
@@ -995,7 +1060,14 @@
         },
         {
           "signal": "T0",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH3",
@@ -1282,12 +1354,12 @@
           "route": "remap-1",
           "_selector_value": 1,
           "selection": {
-            "selector": "afio-tim1-remap",
+            "selector": "afio-adc-etrgreg-remap",
             "values": [
               1
             ]
           },
-          "_selector_resolved_by": "pad+value"
+          "_selector_resolved_by": "pad+value(grid)"
         }
       ]
     },
@@ -1721,7 +1793,14 @@
         },
         {
           "signal": "MCO",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "ADC_IN2",
@@ -1935,7 +2014,14 @@
         },
         {
           "signal": "ADC_IN4",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrgreg-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM2_CH2",
@@ -1963,7 +2049,14 @@
         },
         {
           "signal": "ADC_RETR",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrgreg-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM1_CH4",
@@ -2063,6 +2156,7 @@
         {
           "signal": "TIM2_CH1_ETR",
           "route": "default",
+          "_selector_resolved_by": "peripheral",
           "selection": {
             "selector": "afio-tim2-remap",
             "values": [
