@@ -298,6 +298,84 @@ def summarise(result: dict, out=sys.stderr) -> None:
             print(f"{'':10}   {field}: {shown}", file=out)
 
 
+# C-7's half of the clock data lives in <fam>_rcc.h, not the device header, and
+# the options are #if-guarded: CH32V20x defines RCC_RTCCLKSource_HSE_Div512 and
+# RCC_RTCCLKSource_HSE_Div128 as the *same* value 0x300 under different branches,
+# because the variants divide HSE differently for the RTC.
+SOURCE_OPTION = re.compile(
+    r"^\s*#define\s+RCC_(?P<consumer>[A-Za-z0-9]+?)CLK(?:Source|48MSource)_"
+    r"(?P<option>\w+)\s+\(\(u?int(?:8|16|32)_t\)(?P<value>0x[0-9A-Fa-f]+|\d+)\)")
+CONFIG_FN = re.compile(r"^void\s+RCC_(?P<consumer>[A-Za-z0-9]+?)CLKConfig\s*\("
+                       r".*?\n\}", re.M | re.S)
+SHIFT = re.compile(r"<<\s*(?:\(\s*uint32_t\s*\))?\s*(\d+)")
+REG_WRITE = re.compile(r"RCC\s*->\s*(\w+)")
+# "#ifndef __CH32V20x_RCC_H" is the include guard, not a silicon variant.
+INCLUDE_GUARD = re.compile(r"^ifn?def\s+_+\w*_H_?\w*$")
+
+
+def find_rcc_pair(family: Path) -> tuple[Path | None, Path | None]:
+    header = sorted(family.glob("EVT/**/Peripheral/inc/ch32*_rcc.h"))
+    source = sorted(family.glob("EVT/**/Peripheral/src/ch32*_rcc.c"))
+    return (header[0] if header else None), (source[0] if source else None)
+
+
+def read_sources(family: Path) -> tuple[dict, list[str]]:
+    """Which clock each peripheral can be fed from, and where that is written.
+
+    This is R-24's C-7: the USB 48 MHz path, the RTC's oscillator, the ADC
+    divider. The options are named in <fam>_rcc.h; which register field they land
+    in is only visible in RCC_<consumer>CLKConfig() in <fam>_rcc.c.
+    """
+    notes: list[str] = []
+    header, source = find_rcc_pair(family)
+    if header is None:
+        return {}, [f"{family.name}: ch32*_rcc.h が無い"]
+
+    # Where each consumer's value is written, from the setter's body.
+    target: dict[str, dict] = {}
+    if source is not None:
+        for found in CONFIG_FN.finditer(source.read_text(errors="ignore")):
+            registers = list(dict.fromkeys(REG_WRITE.findall(found.group(0))))
+            shifts = SHIFT.findall(found.group(0))
+            target[found.group("consumer")] = {
+                "register": "|".join(registers),
+                "shift": int(shifts[0]) if shifts else 0,
+            }
+
+    options: dict[str, list[dict]] = collections.defaultdict(list)
+    conditions: list[str] = []
+    for line in header.read_text(errors="ignore").splitlines():
+        directive = CPP.match(line)
+        if directive:
+            kind, condition = directive.group("directive"), directive.group("condition")
+            if kind in ("if", "ifdef", "ifndef"):
+                conditions.append(f"{kind} {condition}".strip())
+            elif kind in ("elif", "else") and conditions:
+                conditions[-1] = f"{kind} {condition}".strip()
+            elif kind == "endif" and conditions:
+                conditions.pop()
+            continue
+        m = SOURCE_OPTION.match(line)
+        if not m:
+            continue
+        consumer = m.group("consumer")
+        where = target.get(consumer, {})
+        if not where:
+            notes.append(
+                f"{family.name}: RCC_{consumer}CLKConfig が無いので書き込み先が不明"
+            )
+        raw = m.group("value")
+        options[consumer].append({
+            "option": m.group("option"),
+            "value": int(raw, 16) if raw.lower().startswith("0x") else int(raw, 10),
+            "register": where.get("register", ""),
+            "shift": where.get("shift", 0),
+            "condition": " && ".join(c for c in conditions
+                                     if not INCLUDE_GUARD.match(c)),
+        })
+    return dict(options), notes
+
+
 def extract_all(mirrors: Path, only: str | None = None) -> tuple[dict, list[str]]:
     """Every family's clock configurations, keyed by EVT family directory name."""
     result: dict = {}
@@ -307,7 +385,10 @@ def extract_all(mirrors: Path, only: str | None = None) -> tuple[dict, list[str]
             continue
         data, family_notes = read_family(family)
         notes += family_notes
+        sources, source_notes = read_sources(family)
+        notes += source_notes
         if data:
+            data["peripheral_sources"] = sources
             result[family.name] = data
     return result, notes
 

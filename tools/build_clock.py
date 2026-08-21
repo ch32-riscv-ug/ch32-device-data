@@ -7,6 +7,9 @@
                           anything written outside RCC
     clock_prescalers.csv  one row per (series, prescaler field, divider): the
                           value that selects that divider
+    clock_sources.csv     one row per (series, consumer, option): what USB, the
+                          RTC, the ADC, I2S and the rest can be clocked from,
+                          and the register field that selects it
 
 Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
@@ -46,14 +49,22 @@ import extract_clock_tree  # noqa: E402
 REPO = Path(__file__).resolve().parent.parent
 MIRRORS = Path("/home/mt/dev_wch")
 
-CONFIG_COLUMNS = ["series", "config", "source", "condition", "domains",
+# Keyed by family, not series. A clock tree is a property of the silicon, and
+# one EVT clone describes one silicon; families.csv already carries which series
+# each covers. Keying by series would copy CH32V20x's 19 configurations onto both
+# CH32V203 and CH32V208 and, worse, let a series that two family directories both
+# mention pick up the wrong tree.
+CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
                   "hpre", "ppre1", "ppre2", "pll", "flash_latency", "outside_rcc",
                   "#", "confidence", "basis", "evt_copies"]
-PRESCALER_COLUMNS = ["series", "field", "divider", "value",
+PRESCALER_COLUMNS = ["family", "field", "divider", "value",
                      "#", "confidence", "basis"]
+SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
+                  "condition", "#", "confidence", "basis"]
 
 BASIS = "evt(system_ch32*.c)"
 PRESCALER_BASIS = "evt(device-header)"
+SOURCE_BASIS = "evt(rcc-header+rcc-driver)"
 # One source only, so nothing here is confirmed by agreement between documents.
 # The reference manual states the same fields and is the obvious second reading.
 CONFIDENCE = "reference"
@@ -61,16 +72,13 @@ CONFIDENCE = "reference"
 CONDITIONED = re.compile(r"^(?P<symbol>\S+) \[(?P<condition>.*)\]$")
 
 
-def family_series(candidates: Path) -> dict[str, list[str]]:
-    """Which series each EVT family's silicon covers, from candidates/ provenance."""
-    out: dict[str, set[str]] = collections.defaultdict(set)
-    for path in sorted(candidates.glob("ch32*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        header = (data.get("_provenance") or {}).get("header")
-        m = re.match(r"^(CH32[A-Z]\d{2}[0-9A-Za-z])", data.get("part_number", ""))
-        if header and m:
-            out[header.split("/")[0]].add(m.group(1))
-    return {family: sorted(series) for family, series in out.items()}
+def known_families(tables: Path) -> set[str]:
+    """The family names families.csv carries, which are the EVT clone names."""
+    path = tables / "families.csv"
+    if not path.exists():
+        return set()
+    with path.open(newline="", encoding="utf-8") as f:
+        return {r["family"] for r in csv.DictReader(f)}
 
 
 def split_by_condition(pll: list[str]) -> dict[str, list[str]]:
@@ -89,52 +97,59 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
     ap.add_argument("--out", type=Path, default=REPO / "tables")
-    ap.add_argument("--candidates", type=Path, default=REPO / "candidates")
     args = ap.parse_args()
 
     observed, notes = extract_clock_tree.extract_all(args.mirrors)
-    covers = family_series(args.candidates)
+    families = known_families(args.out)
 
     config_rows: list[dict] = []
     prescaler_rows: list[dict] = []
+    source_rows: list[dict] = []
     unmapped: list[str] = []
     for family, data in sorted(observed.items()):
-        series_list = covers.get(family)
-        if not series_list:
+        if families and family not in families:
             unmapped.append(family)
             continue
-        for series in series_list:
-            for field, table in sorted(data["prescaler_encodings"].items()):
-                for divider, value in sorted(table.items(), key=lambda kv: kv[1]):
-                    prescaler_rows.append({
-                        "series": series, "field": field,
-                        "divider": divider.replace("DIV", ""), "value": value,
-                        "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
-                    })
-            for name, entry in sorted(data["configs"].items()):
-                domains = ";".join(f"{k}={v}" for k, v in entry["domains"].items())
-                for condition, symbols in sorted(split_by_condition(entry["pll"]).items()):
-                    config_rows.append({
-                        "series": series,
-                        "config": name,
-                        "source": entry["source"] or "",
-                        "condition": condition,
-                        "domains": domains,
-                        "hpre": entry["prescalers"].get("HPRE", "").replace("DIV", ""),
-                        "ppre1": entry["prescalers"].get("PPRE1", "").replace("DIV", ""),
-                        "ppre2": entry["prescalers"].get("PPRE2", "").replace("DIV", ""),
-                        "pll": ";".join(symbols),
-                        "flash_latency": ("" if entry["flash_latency"] is None
-                                          else str(entry["flash_latency"])),
-                        "outside_rcc": ";".join(entry["outside_rcc"]),
-                        "confidence": CONFIDENCE, "basis": BASIS,
-                        "evt_copies": entry["copies"],
-                    })
-
+        for field, table in sorted(data["prescaler_encodings"].items()):
+            for divider, value in sorted(table.items(), key=lambda kv: kv[1]):
+                prescaler_rows.append({
+                    "family": family, "field": field,
+                    "divider": divider.replace("DIV", ""), "value": value,
+                    "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
+                })
+        for consumer, options in sorted(data.get("peripheral_sources", {}).items()):
+            for option in options:
+                source_rows.append({
+                    "family": family, "consumer": consumer,
+                    "option": option["option"], "value": option["value"],
+                    "register": option["register"], "shift": option["shift"],
+                    "condition": option["condition"],
+                    "confidence": CONFIDENCE, "basis": SOURCE_BASIS,
+                })
+        for name, entry in sorted(data["configs"].items()):
+            domains = ";".join(f"{k}={v}" for k, v in entry["domains"].items())
+            for condition, symbols in sorted(split_by_condition(entry["pll"]).items()):
+                config_rows.append({
+                    "family": family,
+                    "config": name,
+                    "source": entry["source"] or "",
+                    "condition": condition,
+                    "domains": domains,
+                    "hpre": entry["prescalers"].get("HPRE", "").replace("DIV", ""),
+                    "ppre1": entry["prescalers"].get("PPRE1", "").replace("DIV", ""),
+                    "ppre2": entry["prescalers"].get("PPRE2", "").replace("DIV", ""),
+                    "pll": ";".join(symbols),
+                    "flash_latency": ("" if entry["flash_latency"] is None
+                                      else str(entry["flash_latency"])),
+                    "outside_rcc": ";".join(entry["outside_rcc"]),
+                    "confidence": CONFIDENCE, "basis": BASIS,
+                    "evt_copies": entry["copies"],
+                })
     args.out.mkdir(parents=True, exist_ok=True)
     for name, rows, columns in (
         ("clock_configs.csv", config_rows, CONFIG_COLUMNS),
         ("clock_prescalers.csv", prescaler_rows, PRESCALER_COLUMNS),
+        ("clock_sources.csv", source_rows, SOURCE_COLUMNS),
     ):
         rows.sort(key=lambda r: tuple(str(r.get(c, "")) for c in columns[:4]))
         with (args.out / name).open("w", encoding="utf-8", newline="") as out:
@@ -148,14 +163,24 @@ def main() -> int:
     outside = collections.Counter(r["outside_rcc"] for r in config_rows if r["outside_rcc"])
     for what, n in outside.most_common():
         print(f"  RCC外のレジスタ: {what} ({n} 行)", file=sys.stderr)
-    no_latency = sorted({r["series"] for r in config_rows} -
-                        {r["series"] for r in config_rows if r["flash_latency"]})
-    print(f"  flash latencyを一度も書かない series: {' '.join(no_latency)}", file=sys.stderr)
+    same_value = collections.Counter(
+        (r["family"], r["consumer"], r["value"]) for r in source_rows)
+    aliased = [k for k, n in same_value.items() if n > 1]
+    if aliased:
+        print(f"  同じ値が別のsourceを指す（分岐で意味が変わる）: {len(aliased)} 件",
+              file=sys.stderr)
+        for family, consumer, value in aliased:
+            options = [f"{r['option']}[{r['condition'] or '既定'}]" for r in source_rows
+                       if (r["family"], r["consumer"], r["value"]) == (family, consumer, value)]
+            print(f"    {family} {consumer} {value:#x} = {' / '.join(options)}",
+                  file=sys.stderr)
+    no_latency = sorted({r["family"] for r in config_rows} -
+                        {r["family"] for r in config_rows if r["flash_latency"]})
+    print(f"  flash latencyを一度も書かない family: {' '.join(no_latency)}", file=sys.stderr)
     for note in dict.fromkeys(notes):
         print(f"  - {note}", file=sys.stderr)
     for family in unmapped:
-        print(f"  - {family}: candidates/ に無いので series へ対応付けられない",
-              file=sys.stderr)
+        print(f"  - {family}: families.csv に無いので載せない", file=sys.stderr)
     return 0
 
 

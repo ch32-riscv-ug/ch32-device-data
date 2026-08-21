@@ -91,7 +91,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 |---|---|---|
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
 | R-20 | レジスタマップ（D-1〜D-8） | 🔜 **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md) |
-| R-24 | クロック関連データ（C-1〜C-8） | 🔜 **C-1/C-3/C-4/C-5/C-6を実装**（2026-08-21）。`tables/clock_configs.csv`・`tables/clock_prescalers.csv`。C-2/C-7は未着手。下記 |
+| R-24 | クロック関連データ（C-1〜C-8） | 🔜 **C-1/C-3/C-4/C-5/C-6/C-7を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`。残りはC-2（datasheet側）と各周辺の数値上限。下記 |
 
 ### R-24 クロック関連データ（2026-08-21受領・一部実装）
 
@@ -105,13 +105,17 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | `outside_rcc` | C-4 | `EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE` など |
 | `hpre`/`ppre1`/`ppre2` + `clock_prescalers.csv` | C-5 | 選ばれる分周比と、分周比→field値の符号化 |
 | `flash_latency` | C-6 | その設定が書くlatency。空欄は「書かない」 |
+| `clock_sources.csv` | C-7 | USB/RTC/ADC/I2S/RNG/ETH等の源の選択肢と、選ぶregister field |
 | `confidence`/`basis` | C-8 | 既存の慣行どおり。単一資料なので全行reference |
 
-391行（設定126種×series、`#if`分岐は別行）と662行。`tools/check_tables.py`が
-seriesの結合・分周比の存在・`domains`の書式・latencyが数であることを検査する。
+152行 / 263行 / 116行。**seriesではなくfamilyで引く**——クロックツリーはsiliconの性質で
+EVTのcloneが1 silicon分だから。seriesで引くとV203がCH32V20xとCH32V205の両方から
+別のツリーを拾う。`tools/check_tables.py`がfamilyの結合・分周比の存在・`domains`の書式・
+value/shiftが数であることを検査する。
 
-**未実装**: C-2（HSI確度・HSE許容範囲。datasheetの電気的特性章側）、
-C-7（USB/ADC/RTCの経路。`RCC_USBCLKSource_*`等は`system_*.c`の外にある）。
+**未実装**: C-2（HSI確度・HSE許容範囲。datasheetの電気的特性章側なのでPDF解析が要る）と、
+C-7のうち**数値上限**（ADCの14MHz上限、USBが48MHzを要求すること）。
+経路と符号化は取れたが「その経路で何Hzにしないといけないか」は電気的特性側にある。
 
 **依頼書との差**（実測して分かった分）:
 
@@ -121,6 +125,11 @@ C-7（USB/ADC/RTCの経路。`RCC_USBCLKSource_*`等は`system_*.c`の外にあ�
   **V205は`CTLR0`**。C-4を「EXTEN_CTRのbit」と決め打つと V205 で外す
 - **1つの設定が2つの事実になる。** V307の144MHzは`#ifdef CH32V30x_D8`で`RCC_PLLMULL18`、
   `#else`で`RCC_PLLMULL18_EXTEN`。同じ×18でも符号化が違う
+- **同じ値が分岐で別の意味になる。** CH32V20xの`RCC_RTCCLKSource_*`は
+  **値0x300が D8/D8Wでは`HSE/512`、それ以外では`HSE/128`**。分岐を落とすとRTCが4倍ずれる。
+  USBの`PLLCLK_Div5`もD8/D8W限定。依頼書のC-7の例（`RCC_USBCLKSource_PLLCLK_Div1/1.5/2/3`）は
+  実測では`Div1/Div2/Div3`＋条件付き`Div5`で、`1.5`は定数として存在しない
+- **CH32X035はクロック源の選択肢を1つも持たない。** 依頼書の「X035は不要」と整合
 - **`system_ch32*.c`のコピーは同一でない。** 例題ごとに配られており、H417は390個中12種類、
   V307は168個中26種類。「最初の1個を読む」と例題固有の設定を主流と誤認する。
   `evt_copies`列（`162/168`など）で区別できるようにした
