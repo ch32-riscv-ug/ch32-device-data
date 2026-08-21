@@ -94,7 +94,51 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張。下記 |
 | R-24追補 | クロック表の追補（A-1〜A-4）とremapの要確認（B） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`・`evt_variants.csv`新設、`operating_conditions.csv`に`typ`列、remapの誤帰属を修正。下記 |
 
+| R-24追補2 | クロック切替に要るレジスタ/ビットとflash latencyの取りこぼし（D-1〜D-4） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`を77→429行に拡張、`clock_init.csv`新設、`clock_configs`に`flash_sck_div`列。下記 |
+
 この過程で見つけて手を付けなかった穴は [F. 既知の穴](#f-既知の穴埋める順) に一覧にした。
+
+### R-24追補2（2026-08-21受領・実装済み）
+
+依頼は「PLLの設定値は揃ったので、その設定を**適用する**ために触るレジスタが要る」。
+順序は方針なので表に入れない、という境界も依頼書側から示されていた。
+
+| # | 依頼 | 実装 |
+|---|---|---|
+| D-1 | enable/ready/切替ビットとfieldマスク | `clock_symbols.csv` 77→**429行**（value 222 / mask 173 / poll 34） |
+| D-2 | flash latencyの場所（マスク） | 同表に`role=mask`で。**矛盾は4 family**で`confidence=conflict` |
+| D-3 | CH32X315のlatencyが落ちている | `flash_sck_div`列を新設。**CH32H417も同じ**だった |
+| D-4 | 記号にならないもの（SystemInitのhex、工場トリム） | `clock_init.csv`（101行）新設 |
+
+**D-3で分かったこと**: 原因は正規表現だけではなかった。CH32X315とCH32H417は
+**レジスタを直接書かず、ローカル変数へ写して直してから書き戻す**
+（`FLASH_Temp = FLASH->ACTLR; FLASH_Temp &= ~FLASH_ACTLR_SCK_CFG; ...`）。
+`BLOCK->REGISTER op= value`しか見ていなかったので**中の2行が丸ごと見えていなかった**。
+別名を追跡するようにした。そして意味も違う——`SCK_CFG[1:0]`は待ちサイクルではなく
+**HCLKの分周比**なので、`flash_latency`に0〜3を入れると「0〜3待ち」と読まれる。
+列を分け、`check_tables.py`が両方を持つ行を弾くようにした。
+**CH32H417も書いている**（HCLK/2）ので、`tables/README.ja.md`の
+「H417は一度も書かない」も誤りだった。
+
+**D-2で分かったこと**: 矛盾はCH32V003だけでなく**V003・V006・V103・X035の4 family**。
+いずれも`0x03`（2bit幅）に対しコメントが`LATENCY[2:0]`（3bit幅）。
+最初は位置で比べたら`RCC_SWS[1:0]`対マスク`0xC`が全familyで矛盾判定になったが、
+これは誤検出——コメントは*フィールド内*のbit番号を書く慣行なので、比べるべきは**幅**。
+幅で比べると矛盾はちょうど5件（上の4件＋CH32V407の`RCC_PLLMULL[3:0]`）に落ちた。
+
+**D-1で分かったこと**: 観測だけでは依頼書のリストが埋まらない。`SetSysClockTo*`は
+`RCC->CFGR0 |= RCC_HPRE_DIV1`を**クリアせずにOR**している（リセット値に依存）ので、
+`RCC_HPRE`/`RCC_PPRE1`/`RCC_PPRE2`/`RCC_ADCPRE`のマスクがソースに現れない。
+ヘッダの形から認定する規則（「`_`境界で他の2つ以上の記号の接頭辞、かつ値が連続した
+1本のビット列」）を足し、レジスタの位置はbannerコメントから引いた。
+出所は`basis`で分かれる（コードが書いた303行 / 定義だけの126行）。
+
+**D-4で分かったこと**: 依頼書の`CFG0_PLL_TRIM`は**CH32V003だけの名前**で、
+CH32L103とCH32V205は`HSI_LP_TRIM_BASE`（`0x1FFFF72A`）。3 familyという数は合っている。
+CH32V003は`SystemInit`で`0x10`を無条件に書き、工場値が`0xFF`でなければ上書きする——
+つまり**未書き込み品では既定値のまま**。L103/V205は低消費HSIの設定関数の中だけで、
+常時ではない。`clock_init.csv`は**この repository で唯一 order 列を持つ表**で、
+それは`SystemInit`が分岐の無い一直線で順序が転記だから。切替の順序は入れていない。
 
 ### R-24追補（2026-08-21受領・実装済み）
 

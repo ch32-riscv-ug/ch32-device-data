@@ -24,7 +24,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
   clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
   clock_sources.csv       116行  USB/RTC/ADC/I2S等をどのクロックから取れるか（選択肢→register field）
-  clock_symbols.csv        77行  上2表が名前で呼ぶ記号の数値・書き込み先register・その絶対アドレス
+  clock_symbols.csv       429行  設定に出てくる記号の数値・書き込み先register・絶対アドレス・役割
+  clock_init.csv          101行  SystemInitの手順（ベタhexなので記号では見えない）＋HSI工場トリム
   evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
 ```
 
@@ -40,7 +41,7 @@ product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
 clock_configs.family / clock_prescalers.family / clock_sources.family → families.family
-clock_symbols.family / evt_variants.family              → families.family
+clock_symbols.family / clock_init.family / evt_variants.family → families.family
 clock_configs.(family, hpre|ppre1|ppre2)                → clock_prescalers.(family, field, divider)
 clock_configs.(family, pll|outside_rccの各記号)          → clock_symbols.(family, symbol)
 clock_configs.condition / clock_sources.condition の macro → evt_variants.(family, macro)
@@ -100,7 +101,7 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 `tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**、`peripheral`と`role`が揃って埋まるか揃って空であること。
 
-### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `evt_variants.csv`
+### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 
 EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`tools/extract_clock_tree.py`→`tools/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
 
@@ -116,7 +117,11 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 `ppre1`に注意してください。CH32V20x/V30xはHSI由来のどの周波数でも`ppre1=2`で、**`PCLK1 = HCLK/2`**です。USART(BRR)・I2C(FREQ/CKCFGR)・SPI(BR)を`PCLK1 = F_CPU`前提で書くと、PLLを使った瞬間に壊れます。
 
-`flash_latency`が空の行は**その設定がlatencyを書かない**ことを意味します。**CH32V208/V303/V305/V307/V317/V407/V467/X305/X315/H415/H416/H417は一度も書きません。** 書くfamilyの範囲も違います: V003は0〜1、V006/V103/L103/X035は0〜2、M030は0〜3、V205は0〜4。
+`flash_latency`が空の行は**その設定がlatencyを書かない**ことを意味します。書くfamilyの範囲も違います: V003は0〜1、V006/V103/L103/X035は0〜2、M030は0〜3、V205は0〜4。
+
+**`flash_sck_div`は待ちサイクルではなくフラッシュクロックの分周比です。** CH32X315とCH32H417のFLASH_ACTLRは`LATENCY[n:0]`を持たず、`SCK_CFG[1:0]`で**HCLKを何分周するか**を選びます。記号名が`FLASH_ACTLR_LATENCY_HCLK_DIV4`なので`flash_latency`に入れると「4待ち」と読まれてしまい、単位が違うので列を分けました（`check_tables.py`が両方を持つ行を弾きます）。**CH32X315はHCLK/1・/2・/4・/8、CH32H417はHCLK/2**です。240MHzへ上げるのに既定のままだと落ちるので、落としたままにはできない事実です。
+
+この2 familyは**書き方も違います**——レジスタを直接触らず、ローカル変数へ写して直してから書き戻します（`FLASH_Temp = FLASH->ACTLR; FLASH_Temp &= ~FLASH_ACTLR_SCK_CFG; ...`）。`BLOCK->REGISTER op= value`しか見ていないと中身が丸ごと見えず、これが「X315はlatencyを書かない」という誤りの原因でした。
 
 **この3表だけはseriesではなくfamilyで引きます。** クロックツリーはsiliconの性質で、EVTのcloneは1 silicon分だからです（`families.csv`がどのseriesを覆うかを持っています）。seriesで引くとCH32V20xの19設定がV203とV208へ複製されるうえ、2つのfamily dirが同じseriesに触れている場合（V203はCH32V20xとCH32V205の両方から作られたSKUがある）に**別のsiliconのツリーを拾います**。
 
@@ -139,7 +144,31 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **macroを設定しないプロジェクトは既定のvariantで黙って通ります。** CH32V203RBT6にD6のまま組めば、HSE_VALUEが24MHzのまま（正しくは32MHz）、周辺の集合も違う、という形で表に出ません。
 
-出典は`evt(system_ch32*.c)`・`evt(rcc-header+rcc-driver)`・`evt(device-header+system_ch32*.c)`・`evt(device-header-comment)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
+**`clock_symbols.csv`の`role`列は、その記号が何なのかを言います。** 観測から決めています——`&= ~X`なら`mask`、`|= X`なら`value`、`while(REG & X)`なら`poll`。429行の内訳は value 222 / mask 173 / poll 34 です。
+
+マスクが要るのは**setterが全部read-modify-writeだから**です。値だけでは書けません。ところが**ベンダのコード自身がフィールドをクリアせずにORしている**ことがあり（CH32V20xは`RCC->CFGR0 |= RCC_HPRE_DIV1`をリセット値に依存して書く）、ソースの観測だけではマスクが揃いません。足りない分はヘッダの形から認定しています——「名前が`_`境界で他の2つ以上の記号の接頭辞になっていて、値が連続した1本のビット列である」。これがちょうど`RCC_HPRE`（対`RCC_HPRE_DIV1..DIV512`）・`RCC_SW`（対`RCC_SW_HSI/HSE/PLL`）・`FLASH_ACTLR_LATENCY`に当たり、`RCC_HSEON`のような単一ビットには当たりません。レジスタの位置はヘッダのbannerコメント（`/*** Bit definition for RCC_CFGR0 register ***/`）から引きます——名前は`RCC_ADCPRE`がCFGR0のものだと言わないので。
+
+出所は`basis`で分かれます: **`evt(device-header+system_ch32*.c)`は設定コードが実際に書いたもの（303行）、`evt(device-header)`はヘッダに定義があるだけ（126行）**です。
+
+**`confidence=conflict`はヘッダが1行の中で自分と食い違っている記号です。** 5件あります。代表は`FLASH_ACTLR_LATENCY`で、CH32V003/V006/V103/X035が値`0x03`（2bit幅）に対しコメントは`LATENCY[2:0]`（3bit幅）と書きます。名前を信じるか数を信じるかで書けるマスクが変わり、狭い方ではlatency 4が書けません。`basis`に両方の読みを残しています（`+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])`）。**マスクの幅自体もfamilyで違います**: V003/V006/V103/L103/X035が`0x03`、V20x/V307/M030が`0x07`、V205が`0x0F`。
+
+比較は位置ではなく**幅**でしています。コメントは*フィールド内*のbit番号を書く慣行なので、`RCC_SWS[1:0]`はマスク`0xC`（3:2に置いた2bit）と矛盾しません。位置で比べると全familyが矛盾判定になります。
+
+**`clock_init.csv`は`SystemInit`の手順です。** ここだけ順序（`step`列）を持ちます。順序が方針ではなく**転記**だからです——`SystemInit`は分岐の無い一直線で、`RCC->CTLR |= 1`はSWをクリアする前に来なければ動かすクロックが無くなります。一方**クロック切替の順序（latencyを上げ下げする位置、enable→ready→切替→SWS待ち、タイムアウト方針）は入れていません**。あれは方針で、方針はdevice factではありません。
+
+この表が必要なのは、`SystemInit`が**記号ではなくベタのhexで書かれている**からです（`RCC->CFGR0 &= 0xF8FF0000`）。記号ベースの抽出には何も見えません。`action`は`set`(`|=`)・`clear`(`&=`)・`write`(`=`)・`poll`(`while`)・`trim`の5種で、**`clear`の`value`は原典どおりのANDマスク**（残すビット。落とすビットではない）です。反転すると解釈になるので、そのまま載せています。
+
+**HSIの工場トリム**も`action=trim`の行で入っています。3 familyが工場値を固定アドレスから読んで校正します。飛ばすとHSIが規格外のままです。
+
+| family | 読む場所 | アドレス | マスク | 条件 | 書き込み先 | 出てくる関数 |
+|---|---|---|---|---|---|---|
+| CH32V003 | `CFG0_PLL_TRIM` | `0x1FFFF7D4` | `0x1F` | `!= 0xFF` | `RCC->CTLR` | `SetSysClockTo_48MHZ_HSI` |
+| CH32L103 | `HSI_LP_TRIM_BASE` | `0x1FFFF72A` | `0x1F` | — | `RCC->CTLR` | `SetSysClockToHSI_LP` |
+| CH32V205 | `HSI_LP_TRIM_BASE` | `0x1FFFF72A` | `0x1F` | — | `RCC->CTLR` | `SetSysClockToHSI_LP` |
+
+**記号名がfamilyで違います**（`CFG0_PLL_TRIM`と`HSI_LP_TRIM_BASE`）。CH32V003は`SystemInit`でも`0x10`という既定値を無条件に書き、あとで工場値が`0xFF`でなければ上書きします——つまり**未書き込み品では既定値のまま**です。CH32L103とCH32V205は低消費HSIの設定関数の中だけで、常時ではありません。
+
+出典は`evt(system_ch32*.c)`・`evt(rcc-header+rcc-driver)`・`evt(device-header+system_ch32*.c)`・`evt(device-header)`・`evt(system_ch32*.c+device-header)`・`evt(device-header-comment)`で単一資料のため**conflictを除いて全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
 
 ### `errata.csv`
 
@@ -267,7 +296,8 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | clock_configs.csv | 152 | 0 | 152 | 0 |
 | clock_prescalers.csv | 263 | 0 | 263 | 0 |
 | clock_sources.csv | 116 | 0 | 116 | 0 |
-| clock_symbols.csv | 77 | 0 | 77 | 0 |
+| clock_symbols.csv | 429 | 0 | 424 | 5 |
+| clock_init.csv | 101 | 0 | 101 | 0 |
 | evt_variants.csv | 56 | 0 | 56 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
 | operating_conditions.csv | 283 | 257 | 21 | 5 |
