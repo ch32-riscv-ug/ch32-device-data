@@ -64,7 +64,11 @@ SYMBOL = re.compile(r"\b([A-Z][A-Za-z0-9_]{2,})\b")
 CPP = re.compile(r"^\s*#\s*(?P<directive>if|ifdef|ifndef|elif|else|endif)\b"
                  r"\s*(?P<condition>.*?)\s*$")
 CAST = re.compile(r"\(\s*u?int(?:8|16|32)_t\s*\)")
-DEFINE = re.compile(r"^#define\s+(\w+)\s+\(\(u?int(?:8|16|32)_t\)(0x[0-9A-Fa-f]+|\d+)\)")
+DEFINE = re.compile(r"^#define\s+(?P<name>\w+)\s+\(\(u?int(?:8|16|32)_t\)"
+                    r"(?P<value>0x[0-9A-Fa-f]+|\d+)\)\s*(?:/\*(?P<comment>.*?)\*/)?")
+# ヘッダのコメントが宣言するbit範囲。値と食い違うことがある（CH32V003の
+# FLASH_ACTLR_LATENCY は 0x03 = 2bit なのにコメントは LATENCY[2:0] = 3bit）。
+BIT_RANGE = re.compile(r"\[(?P<high>\d+):(?P<low>\d+)\]")
 
 # The domains a configuration names. A run is an optional domain label, an
 # optional core name, and a frequency: CH32H417 is dual-core and gives each core
@@ -86,9 +90,30 @@ PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBP
 PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL|PLLXTPRE|PLL_\w+|CFGR2_\w*PLL\w*)\w*$")
 LATENCY = re.compile(r"^FLASH_ACTLR_LATENCY(?:_(?P<wait>\d+))?$")
 SOURCE_SELECT = re.compile(r"^RCC_SW_(?P<source>\w+)$")
+# CH32X315とCH32H417のFLASH_ACTLRは待ちサイクル数ではなく**フラッシュクロックの
+# 分周比**を持つ（SCK_CFG[1:0]）。名前が LATENCY_HCLK_DIVn なので LATENCY と
+# 同じ列に入れると「n待ち」と読まれる。単位が違うので列を分ける。
+FLASH_SCK = re.compile(r"^FLASH_ACTLR_LATENCY_HCLK_DIV(?P<divider>\d+)$")
+# 設定を「適用する」ために触るもの。enable/ready ビットと、read-modify-write の
+# ために要る field マスクがここに入る。値だけでは書けないので、名前が出てくる
+# 記号は分類できたものも含めて全部 clock_symbols.csv に落とす。
+CLOCK_SYMBOL = re.compile(r"^(?:RCC_\w+|FLASH_ACTLR\w*|EXTEN_\w+)$")
 # Anything the configuration writes that is not RCC or FLASH. This is the fact
 # R-24 calls C-4: CH32V20x cannot run its PLL from HSI without EXTEN_CTR.
 NON_RCC_BLOCKS = ("RCC", "FLASH")
+
+# CH32X315とCH32H417はレジスタを直接読み書きせず、ローカル変数へ写して直す。
+#   FLASH_Temp = FLASH->ACTLR;
+#   FLASH_Temp &= ~FLASH_ACTLR_SCK_CFG;
+#   FLASH_Temp |= FLASH_ACTLR_LATENCY_HCLK_DIV1;
+#   FLASH->ACTLR = FLASH_Temp;
+# `BLOCK->REGISTER op= value` しか見ていないと、この2行が丸ごと見えない。それが
+# 「CH32X315はflash latencyを一度も書かない」という誤りの原因だった。
+ALIAS = re.compile(r"^\s*(?P<name>\w+)\s*=\s*(?P<block>\w+)\s*->\s*(?P<register>\w+)\s*;")
+LOCAL_WRITE = re.compile(r"^\s*(?P<name>\w+)\s*(?P<op>\|=|&=)\s*(?P<value>[^;]*);")
+# ready待ちの条件。書き込みではないので WRITE では拾えないが、どのビットを見て
+# 待つのかは設定を適用するのに要る事実。
+POLL = re.compile(r"while\s*\(.*?(?P<block>\w+)\s*->\s*(?P<register>\w+)")
 
 
 def system_sources(family: Path) -> dict[str, tuple[str, list[Path]]]:
@@ -127,10 +152,98 @@ def defines(header: Path | None) -> dict[str, int]:
         m = DEFINE.match(line.strip())
         if m:
             # Some defines are decimal with leading zeros, which int(x, 0) rejects.
-            raw = m.group(2)
-            out.setdefault(m.group(1),
+            raw = m.group("value")
+            out.setdefault(m.group("name"),
                            int(raw, 16) if raw.lower().startswith("0x") else int(raw, 10))
     return out
+
+
+def comments(header: Path | None) -> dict[str, str]:
+    """The trailing comment of each define, which sometimes contradicts the value."""
+    if header is None:
+        return {}
+    out: dict[str, str] = {}
+    for line in header.read_text(errors="ignore").splitlines():
+        m = DEFINE.match(line.strip())
+        if m and m.group("comment"):
+            out.setdefault(m.group("name"), " ".join(m.group("comment").split()))
+    return out
+
+
+# The banner that opens each register's block of bit defines. It is the only
+# thing in the header that says which register a bit define belongs to -- the
+# name does not (RCC_ADCPRE says nothing about CFGR0) -- and it covers all but
+# 0.3% of them across the twelve headers.
+BANNER = re.compile(r"^/\*+\s*Bit definition for (?P<register>\w+) register\s*\**/")
+
+
+def banner_registers(header: Path | None) -> dict[str, str]:
+    """{symbol: "BLOCK->REGISTER"} from the banners, for symbols no write places."""
+    if header is None:
+        return {}
+    out: dict[str, str] = {}
+    where: str | None = None
+    for line in header.read_text(errors="ignore").splitlines():
+        line = line.strip()
+        m = BANNER.match(line)
+        if m:
+            block, _, register = m.group("register").partition("_")
+            where = f"{block}->{register}" if register else None
+            continue
+        m = DEFINE.match(line)
+        if m and where:
+            out.setdefault(m.group("name"), where)
+    return out
+
+
+def field_masks(symbols: dict[str, int]) -> set[str]:
+    """The symbols that are a field's mask rather than one of its values.
+
+    Needed because the vendor's own code does not always clear a field before
+    writing it -- CH32V20x's SetSysClockTo* ORs RCC_HPRE_DIV1 in and relies on
+    the reset value -- so observing the source finds only some of the masks. A
+    consumer writing the field needs all of them, since every setter is
+    read-modify-write.
+
+    A mask is recognised by the header's own shape: its name is the prefix, at an
+    underscore boundary, of at least two other symbols, and its value is one run
+    of set bits. That is exactly RCC_HPRE against RCC_HPRE_DIV1..DIV512, RCC_SW
+    against RCC_SW_HSI/HSE/PLL, and FLASH_ACTLR_LATENCY against its numbered
+    values. A single enable bit like RCC_HSEON prefixes nothing and is not one.
+    """
+    contiguous = {}
+    for name, value in symbols.items():
+        if value and (value | (value - 1)) == (value + (value & -value) - 1):
+            contiguous[name] = value
+    out = set()
+    for name in contiguous:
+        if not CLOCK_SYMBOL.match(name):
+            continue
+        members = sum(1 for other in symbols if other.startswith(name + "_"))
+        if members >= 2:
+            out.add(name)
+    return out
+
+
+def mask_disagrees(symbol: str, value: int, comment: str) -> str | None:
+    """The comment's own bit range, when it is a different width. Else None.
+
+    CH32V003 defines FLASH_ACTLR_LATENCY as 0x03 and calls it LATENCY[2:0] in the
+    same line. 0x03 is two bits wide; [2:0] is three. A consumer that reads the
+    name writes a different mask than one that reads the number, and the narrow
+    one cannot write latency 4. Recording which document said what is the whole
+    point of the basis column, so the disagreement is carried, not resolved.
+
+    Only the width is compared. The comment numbers the bits **within the
+    field**, not within the register: every family writes RCC_SWS[1:0] for a
+    mask of 0xC, which is the same two bits placed at 3:2. Comparing positions
+    would call each of those a contradiction.
+    """
+    m = BIT_RANGE.search(comment)
+    if not m or value == 0:
+        return None
+    declared = int(m.group("high")) - int(m.group("low")) + 1
+    return f"{symbol}{m.group(0)}" if declared != bin(value).count("1") else None
 
 
 def hz(mhz: str) -> int:
@@ -169,16 +282,15 @@ def domains_of(name: str) -> tuple[dict[str, int], str | None]:
 
 
 def read_variant(text: str, symbols: dict[str, int], family_name: str,
-                 notes: list[str],
-                 sites: dict[str, set[str]] | None = None) -> dict[str, dict]:
+                 notes: list[str]) -> dict[str, dict]:
     """The configurations one copy of system_ch32*.c states.
 
-    `sites` collects, for every symbol that ends up in a clock_configs cell by
-    name alone, the `BLOCK->REGISTER` it was written to. The cell cannot carry
-    the number: RCC_PLLMULL18 is 0x003C0000 and RCC_PLLMULL18_EXTEN is 0, so the
-    same "x18" reads two ways and the name is not decodable. Recording the write
-    site rather than guessing from the name is what lets the value be resolved
-    against the right register.
+    Each entry's `symbols` records, per symbol the body names, the
+    `BLOCK->REGISTER` it was written to and the role it played there. The
+    clock_configs cells cannot carry any of that: RCC_PLLMULL18 is 0x003C0000
+    and RCC_PLLMULL18_EXTEN is 0, so the same "x18" reads two ways and the name
+    is not decodable; and a field's mask never reaches a cell at all even though
+    every setter is read-modify-write and cannot be written without it.
     """
     configs: dict[str, dict] = {}
     for found in FUNCTION.finditer(text):
@@ -195,11 +307,14 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
             "prescalers": {},
             "pll": [],
             "flash_latency": None,
+            "flash_sck_div": None,
             "system_clock_source": None,
             "outside_rcc": [],
             "unresolved_symbols": [],
+            "symbols": {},
         }
         conditions: list[str] = []
+        alias: dict[str, tuple[str, str]] = {}
         for line in body.splitlines():
             directive = CPP.match(line)
             if directive:
@@ -213,22 +328,53 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                 elif kind == "endif" and conditions:
                     conditions.pop()
                 continue
-            write = WRITE.search(line)
-            if not write:
+            # A register the body copies into a local before editing it.
+            copy = ALIAS.match(line)
+            if copy:
+                alias[copy.group("name")] = (copy.group("block"),
+                                             copy.group("register"))
                 continue
             where = " && ".join(conditions)
-            block, register = write.group("block"), write.group("register")
-            value = CAST.sub("", write.group("value"))
-            if "~" in value:
-                continue  # clearing the field before setting it
+            write = WRITE.search(line)
+            if write:
+                block, register = write.group("block"), write.group("register")
+                value, op = write.group("value"), write.group("op")
+            else:
+                local = LOCAL_WRITE.match(line)
+                poll = POLL.search(line)
+                if local and local.group("name") in alias:
+                    block, register = alias[local.group("name")]
+                    value, op = local.group("value"), local.group("op")
+                elif poll:
+                    # Not a write. Which bit the body waits on is still part of
+                    # applying the configuration, so it is recorded as a poll.
+                    block, register = poll.group("block"), poll.group("register")
+                    value, op = line, "poll"
+                else:
+                    continue
+            value = CAST.sub("", value)
+            # `&= ~FIELD` names the mask, not a value. Setters are all
+            # read-modify-write, so the mask is as necessary as the value and
+            # skipping the line lost half of what is needed.
+            role = ("poll" if op == "poll"
+                    else "mask" if (op == "&=" and "~" in value) else "value")
             for symbol in SYMBOL.findall(value):
                 if symbol not in symbols:
-                    if symbol not in ("uint32_t", "uint8_t", "uint16_t"):
+                    if symbol not in ("uint32_t", "uint8_t", "uint16_t") and role != "poll":
                         entry["unresolved_symbols"].append(symbol)
                     continue
+                if CLOCK_SYMBOL.match(symbol):
+                    entry["symbols"].setdefault(symbol, set()).add(
+                        (f"{block}->{register}", role))
+                if role != "value":
+                    continue  # a mask or a polled bit configures nothing by itself
                 m = PRESCALER.match(symbol)
                 if m:
                     entry["prescalers"][m.group("field")] = m.group("divider").upper()
+                    continue
+                m = FLASH_SCK.match(symbol)
+                if m:
+                    entry["flash_sck_div"] = int(m.group("divider"))
                     continue
                 m = LATENCY.match(symbol)
                 if m and m.group("wait") is not None:
@@ -240,16 +386,13 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                     continue
                 if PLL.match(symbol):
                     entry["pll"].append(f"{symbol} [{where}]" if where else symbol)
-                    if sites is not None:
-                        sites.setdefault(symbol, set()).add(f"{block}->{register}")
                     continue
                 if block not in NON_RCC_BLOCKS:
                     entry["outside_rcc"].append(f"{block}->{register} {symbol}")
-                    if sites is not None:
-                        sites.setdefault(symbol, set()).add(f"{block}->{register}")
         entry["unresolved_symbols"] = sorted(set(entry["unresolved_symbols"]))
         entry["outside_rcc"] = sorted(set(entry["outside_rcc"]))
         entry["pll"] = list(dict.fromkeys(entry["pll"]))
+        entry["symbols"] = {k: sorted(v) for k, v in sorted(entry["symbols"].items())}
         configs[name] = entry
     return configs
 
@@ -264,11 +407,9 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
     configs: dict[str, dict] = {}
     copies: collections.Counter = collections.Counter()
     disagree: list[str] = []
-    sites: dict[str, set[str]] = {}
     total = sum(len(paths) for _, paths in variants.values())
     for digest, (text, paths) in variants.items():
-        for name, entry in read_variant(text, symbols, family.name, notes,
-                                        sites).items():
+        for name, entry in read_variant(text, symbols, family.name, notes).items():
             copies[name] += len(paths)
             known = configs.get(name)
             if known is None:
@@ -302,35 +443,60 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
         m = PRESCALER.match(symbol)
         if m:
             encodings[m.group("field")][m.group("divider").upper()] = value
-    # A-1 and A-2 of R-24's follow-up: the number behind every symbol a config
-    # cell names, and where it is written. The address comes from the header's
-    # own base-and-struct chain, because the name does not give it away --
-    # CH32V205 calls EXTEN's register CTLR0 where everyone else calls it
-    # EXTEN_CTR, and CH32X315 puts the block somewhere else entirely.
+    # Every symbol the retained configurations name, with the register it was
+    # written to, the role it played there, and its number. The address comes
+    # from the header's own base-and-struct chain, because the name does not give
+    # it away -- CH32V205 calls EXTEN's register CTLR0 where everyone else calls
+    # it EXTEN_CTR, and CH32X315 puts the block somewhere else entirely.
+    #
+    # Collected from the configurations rather than across every copy, because a
+    # copy this family disagrees about can name a symbol the retained version
+    # does not, and a row nothing refers to would claim it is in use.
     header = find_device_header(family)
     where = extract_addresses.addresses(header) if header else {}
-    # Only the symbols the configs that survived the union actually name. A copy
-    # this family disagrees about can mention a symbol the retained version does
-    # not, and a row nothing refers to would claim it is in use.
-    # A pll entry is "SYMBOL" or "SYMBOL [condition]"; an outside_rcc entry is
-    # "BLOCK->REGISTER SYMBOL". The symbol is at opposite ends of the two.
-    named = {entry.split(" ")[0] for config in configs.values()
-             for entry in config["pll"]}
-    named |= {entry.split(" ")[-1] for config in configs.values()
-              for entry in config["outside_rcc"]}
+    remark = comments(header)
+    declared: set[str] = set()
+    sites: dict[str, set[tuple[str, str]]] = collections.defaultdict(set)
+    for config in configs.values():
+        for symbol, seen in config["symbols"].items():
+            sites[symbol].update(tuple(entry) for entry in seen)
+    # The masks the code never clears. Their register is the one the field's own
+    # values are written to, which the observed rows already say; a mask whose
+    # field this family never touches has no register to name and is left out.
+    register_of: dict[str, str] = {}
+    for symbol, seen in sites.items():
+        for site, _ in seen:
+            register_of.setdefault(symbol, site)
+    banners = banner_registers(header)
+    for mask in sorted(field_masks(symbols)):
+        if mask in sites:
+            continue
+        register = next((register_of[s] for s in sorted(register_of)
+                         if s.startswith(mask + "_")), banners.get(mask))
+        if register:
+            sites[mask].add((register, "mask"))
+            declared.add(mask)
     resolved: list[dict] = []
     for symbol in sorted(sites):
-        if symbol not in symbols or symbol not in named:
+        if symbol not in symbols:
             continue
-        for site in sorted(sites[symbol]):
+        note = remark.get(symbol, "")
+        disagreement = mask_disagrees(symbol, symbols[symbol], note)
+        for site, role in sorted(sites[symbol]):
             block, _, register = site.partition("->")
             address = where.get((block, register))
-            resolved.append({"symbol": symbol, "register": site,
+            resolved.append({"symbol": symbol, "register": site, "role": role,
                              "address": "" if address is None else f"{address:#010x}",
-                             "value": symbols[symbol]})
-        if len(sites[symbol]) > 1:
+                             "value": symbols[symbol],
+                             "observed": symbol not in declared,
+                             "disagreement": disagreement or ""})
+        if disagreement:
+            notes.append(f"{family.name}: {symbol} = {symbols[symbol]:#x} だが"
+                         f"ヘッダ自身のコメントは {disagreement}")
+        registers = {site for site, _ in sites[symbol]}
+        if len(registers) > 1:
             notes.append(f"{family.name}: {symbol} が複数のレジスタに書かれる "
-                         f"({', '.join(sorted(sites[symbol]))})")
+                         f"({', '.join(sorted(registers))})")
     return {"copies": total,
             "variants": len(variants),
             "configs": configs,
