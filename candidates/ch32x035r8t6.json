@@ -2,7 +2,10 @@
   "part_number": "CH32X035R8T6",
   "_provenance": {
     "datasheet": "CH32X035/datasheet_en/CH32X035DS0.PDF",
-    "manual": "CH32X035/datasheet_en/CH32X035RM.PDF",
+    "manuals": [
+      "CH32X035/datasheet_en/CH32X035RM.PDF",
+      "CH32X035/datasheet_zh/CH32X035RM.PDF"
+    ],
     "header": "CH32X035/EVT/EXAM/SRC/Peripheral/inc/ch32x035.h",
     "pin_table": "Table 2-1",
     "pin_column": "LQFP64M"
@@ -63,7 +66,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -81,7 +84,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -105,8 +108,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim1-remap",
@@ -134,10 +137,8 @@
         3,
         4
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_values_not_in_grid": [
-        1,
-        2,
         3,
         4
       ],
@@ -172,7 +173,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -196,7 +197,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -220,7 +221,7 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表",
+      "_valid_values_source": "datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -252,7 +253,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -276,7 +277,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -308,7 +309,7 @@
         6,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     }
   ],
@@ -434,8 +435,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T2ET",
@@ -1233,8 +1233,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -1367,8 +1366,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T3C2",
@@ -1504,8 +1502,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2057,8 +2054,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1BK",
@@ -2069,8 +2065,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2129,8 +2124,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2177,8 +2171,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1C2N",
@@ -2227,8 +2220,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "CK4",
@@ -2457,8 +2449,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1C1",
@@ -2469,8 +2460,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2513,8 +2503,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1C2",
@@ -2525,8 +2514,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TX1",
@@ -2581,8 +2569,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1C3",
@@ -2593,8 +2580,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "RX1",
@@ -2721,8 +2707,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2825,8 +2810,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2863,8 +2847,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T2C1N",
@@ -2909,8 +2892,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T1ET",
@@ -2968,8 +2950,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T2C2N",
@@ -3101,8 +3082,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "RX4",
@@ -3147,8 +3127,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -3461,8 +3440,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -3485,8 +3463,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "RX4",
@@ -3520,8 +3497,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "T2BK",
@@ -3588,8 +3564,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "RX4",

@@ -22,6 +22,8 @@ decided", which a consumer can skip, and that is more useful than a wrong guess.
     ('USART2', 'TX')
     >>> split("T1C1N")
     ('TIM1', 'CH1N')
+    >>> split("UART5_TX")
+    ('USART5', 'TX')
     >>> split("PIOC_IO0")
     ('PIOC', 'IO0')
     >>> split("AETR2") is None
@@ -43,6 +45,14 @@ INSTANCE = re.compile(r"^([A-Z][A-Z0-9]*?)(\d*)$")
 # the corpus, or always with a number; peripherals that are never numbered
 # (ETH, SDMMC, UHSIF, LPTIM, PIOC, I2S) keep the spelling they are given.
 IMPLIED_INSTANCE = frozenset({"USART", "UART", "SPI", "I2C", "TIM", "CAN", "ADC"})
+
+# WCH calls the same peripheral both things, sometimes within one series. CH32V307
+# writes UART5_TX in its pin table and USART5_REMAP in its AFIO register, and
+# CH32M030 writes UART_TX and UART1_REMAP. Folding one onto the other is what
+# makes a signal find its own selector. It is safe because no family defines both
+# a UARTn and a USARTn AFIO field -- checked across all twelve EVT headers -- so
+# the two spellings never name different peripherals on the same silicon.
+SAME_PERIPHERAL = {"UART": "USART"}
 
 # Serial roles, in both the long and the shorthand spelling. The shorthand takes
 # the instance as a trailing digit (TX2) or leaves it implied behind a U (UTX).
@@ -76,9 +86,9 @@ def canonical_peripheral(token: str) -> str:
     if not m:
         return token
     name, digits = m.groups()
-    if digits:
-        return token
-    return f"{name}1" if name in IMPLIED_INSTANCE else name
+    if not digits and name not in IMPLIED_INSTANCE:
+        return name
+    return f"{SAME_PERIPHERAL.get(name, name)}{digits or '1'}"
 
 
 # A selector field's name, minus the suffix that says it is one: USART1_RM,

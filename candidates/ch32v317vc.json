@@ -2,7 +2,10 @@
   "part_number": "CH32V317VC",
   "_provenance": {
     "datasheet": "CH32V307/datasheet_en/CH32V20x_30xDS0.PDF",
-    "manual": "CH32V307/datasheet_en/CH32FV2x_V3xRM.PDF",
+    "manuals": [
+      "CH32V307/datasheet_en/CH32FV2x_V3xRM.PDF",
+      "CH32V307/datasheet_zh/CH32FV2x_V3xRM.PDF"
+    ],
     "header": "CH32V307/EVT/EXAM/SRC/Peripheral/inc/ch32v30x.h",
     "pin_table": "Table 3-1",
     "pin_column": "LQFP100"
@@ -56,7 +59,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -74,7 +77,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -89,9 +92,13 @@
         }
       ],
       "valid_values": [
-        0
+        0,
+        1
       ],
-      "_valid_values_source": "datasheet pin表",
+      "_valid_values_source": "datasheet pin表+EVTデコーダ",
+      "_values_only_from_evt": [
+        1
+      ],
       "reset_value": 0
     },
     {
@@ -109,7 +116,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -127,7 +134,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -145,7 +152,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -166,9 +173,10 @@
       "valid_values": [
         0,
         1,
+        2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -192,7 +200,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -216,7 +224,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -240,7 +248,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -258,7 +266,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -276,7 +284,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -300,7 +308,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -324,7 +332,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -346,7 +354,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -370,7 +378,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -394,103 +402,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
-    },
-    {
-      "id": "afio-usart5-remap",
-      "controller": "afio",
-      "register": "PCFR2",
-      "field": "USART5_REMAP",
-      "bits": [
-        {
-          "register": "PCFR2",
-          "bit": 18
-        },
-        {
-          "register": "PCFR2",
-          "bit": 19
-        }
-      ],
-      "valid_values": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
-    },
-    {
-      "id": "afio-usart6-remap",
-      "controller": "afio",
-      "register": "PCFR2",
-      "field": "USART6_REMAP",
-      "bits": [
-        {
-          "register": "PCFR2",
-          "bit": 20
-        },
-        {
-          "register": "PCFR2",
-          "bit": 21
-        }
-      ],
-      "valid_values": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
-    },
-    {
-      "id": "afio-usart7-remap",
-      "controller": "afio",
-      "register": "PCFR2",
-      "field": "USART7_REMAP",
-      "bits": [
-        {
-          "register": "PCFR2",
-          "bit": 22
-        },
-        {
-          "register": "PCFR2",
-          "bit": 23
-        }
-      ],
-      "valid_values": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
-    },
-    {
-      "id": "afio-usart8-remap",
-      "controller": "afio",
-      "register": "PCFR2",
-      "field": "USART8_REMAP",
-      "bits": [
-        {
-          "register": "PCFR2",
-          "bit": 24
-        },
-        {
-          "register": "PCFR2",
-          "bit": 25
-        }
-      ],
-      "valid_values": [
-        0,
-        1,
-        2,
-        3
-      ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
       "_reset_value_missing": true
     }
   ],
@@ -2243,13 +2155,7 @@
           "signal": "UART5_TX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart5-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART5_TX",
@@ -2294,13 +2200,7 @@
           "signal": "UART5_RX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart5-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART5_RX",
@@ -2345,13 +2245,7 @@
           "signal": "UART6_TX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart6-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART6_TX",
@@ -2396,13 +2290,7 @@
           "signal": "UART6_RX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart6-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         }
       ]
     },
@@ -2441,13 +2329,7 @@
           "signal": "UART7_TX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart7-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART7_TX",
@@ -2492,13 +2374,7 @@
           "signal": "UART7_RX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart7-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART7_RX",
@@ -2547,13 +2423,7 @@
           "signal": "UART8_TX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart8-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART8_TX",
@@ -2602,13 +2472,7 @@
           "signal": "UART8_RX",
           "route": "remap-2",
           "_selector_value": 2,
-          "selection": {
-            "selector": "afio-usart8-remap",
-            "values": [
-              2
-            ]
-          },
-          "_selector_resolved_by": "pad+value"
+          "_unresolved_selector": true
         },
         {
           "signal": "UART8_RX",

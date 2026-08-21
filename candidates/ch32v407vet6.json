@@ -2,7 +2,9 @@
   "part_number": "CH32V407VET6",
   "_provenance": {
     "datasheet": "CH32V407/datasheet_en/CH32V407DS0.PDF",
-    "manual": null,
+    "manuals": [
+      "CH32V407/datasheet_zh/CH32V407RM.PDF"
+    ],
     "header": "CH32V407/EVT/EXAM/SRC/Peripheral/inc/ch32v4x7.h",
     "pin_table": "Table 2-1",
     "pin_column": "CH32V407VET6"
@@ -64,8 +66,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ",
+      "reset_value": 0
     },
     {
       "id": "afio-dvp-remap",
@@ -82,8 +84,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-fsmc-remap",
@@ -100,8 +102,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-i2c1-remap",
@@ -118,8 +120,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-i3c-remap",
@@ -136,8 +138,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-ltdc-remap",
@@ -154,8 +156,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-sdio-remap",
@@ -172,8 +174,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-spi1-remap",
@@ -190,8 +192,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-spi3-remap",
@@ -208,8 +210,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-sw-cfg",
@@ -235,7 +237,7 @@
         4
       ],
       "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "reset_value": 0
     },
     {
       "id": "afio-tim1-remap",
@@ -255,10 +257,11 @@
       "valid_values": [
         0,
         1,
+        2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim2-remap",
@@ -281,8 +284,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim3-remap",
@@ -305,8 +308,11 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_values_not_in_grid": [
+        1
+      ],
+      "reset_value": 0
     },
     {
       "id": "afio-tim4-remap",
@@ -323,8 +329,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-tim8-remap",
@@ -341,8 +347,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart1-remap",
@@ -365,8 +371,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true,
+      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "reset_value": 0,
       "_split_registers": [
         "PCFR1",
         "PCFR2"
@@ -393,8 +399,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart2-remap",
@@ -411,8 +417,8 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart3-remap",
@@ -435,8 +441,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart4-remap",
@@ -459,8 +465,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart5-remap",
@@ -483,8 +489,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart6-remap",
@@ -507,8 +513,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart7-remap",
@@ -531,8 +537,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart8-remap",
@@ -555,8 +561,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     },
     {
       "id": "afio-usart9-remap",
@@ -579,8 +585,8 @@
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表+ヘッダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "reset_value": 0
     }
   ],
   "pins": [
@@ -613,8 +619,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_CK",
@@ -625,8 +630,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A23",
@@ -671,8 +675,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_TX",
@@ -683,8 +686,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A19",
@@ -729,8 +731,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_RX",
@@ -741,8 +742,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A20",
@@ -787,8 +787,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_CTS",
@@ -799,8 +798,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A21",
@@ -845,8 +843,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_RTS",
@@ -857,8 +854,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A22",
@@ -1013,8 +1009,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R0",
@@ -1081,8 +1076,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R1",
@@ -1149,8 +1143,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R2",
@@ -1215,8 +1208,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R3",
@@ -1453,8 +1445,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R4",
@@ -1529,8 +1520,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R5",
@@ -1591,8 +1581,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R6",
@@ -1697,8 +1686,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI3_NSS",
@@ -1709,14 +1697,18 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2S3_WS",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-spi3-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "LTDC_G5",
@@ -1799,8 +1791,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CTS",
@@ -1811,8 +1802,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_CK",
@@ -1823,8 +1813,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_RX",
@@ -1835,8 +1824,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "DVP_VSYNC",
@@ -1923,8 +1911,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_TX",
@@ -1935,8 +1922,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_TX",
@@ -1947,8 +1933,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "DVP_PCLK",
@@ -2043,8 +2028,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM1_CH1N",
@@ -2055,8 +2039,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_RX",
@@ -2067,8 +2050,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_RX",
@@ -2079,8 +2061,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_R7",
@@ -2147,8 +2128,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_CTS",
@@ -2159,8 +2139,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_CTS",
@@ -2171,8 +2150,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D4",
@@ -2249,8 +2227,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_RTS",
@@ -2261,8 +2238,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_RTS",
@@ -2273,8 +2249,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_G1",
@@ -2327,8 +2302,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM3_CH3",
@@ -2339,8 +2313,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2423,8 +2396,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM3_CH4",
@@ -2435,8 +2407,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_RX",
@@ -2447,8 +2418,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_RTS",
@@ -2459,8 +2429,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_RTS",
@@ -2471,8 +2440,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_G3",
@@ -2535,8 +2503,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_TX",
@@ -2547,8 +2514,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_TX",
@@ -2559,8 +2525,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_CTS",
@@ -2571,8 +2536,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D5",
@@ -2639,8 +2603,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_RX",
@@ -2651,8 +2614,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_RTS",
@@ -2663,8 +2625,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D6",
@@ -2829,8 +2790,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2883,8 +2843,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH3",
@@ -2895,8 +2854,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH3",
@@ -2907,8 +2865,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B3",
@@ -2983,8 +2940,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH4",
@@ -2995,8 +2951,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CK",
@@ -3007,8 +2962,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CK",
@@ -3019,8 +2973,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B2",
@@ -3095,8 +3048,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART9_CK",
@@ -3107,8 +3059,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D13",
@@ -3195,8 +3146,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_RTS",
@@ -3207,8 +3157,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_G6",
@@ -3311,8 +3260,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CTS",
@@ -3323,8 +3271,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CTS",
@@ -3335,8 +3282,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_G7",
@@ -3437,8 +3383,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_RX",
@@ -3449,8 +3394,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_RX",
@@ -3461,8 +3405,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B0",
@@ -3557,8 +3500,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CK",
@@ -3569,8 +3511,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_TX",
@@ -3581,8 +3522,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_TX",
@@ -3593,8 +3533,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B1",
@@ -3651,8 +3590,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D14",
@@ -3697,8 +3635,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -3731,8 +3668,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART3_CTS",
@@ -3743,8 +3679,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_TX",
@@ -3755,8 +3690,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_TX",
@@ -3767,8 +3701,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A16",
@@ -3813,8 +3746,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART3_RTS",
@@ -3825,8 +3757,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART3_RTS",
@@ -3837,8 +3768,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_RX",
@@ -3849,8 +3779,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_RX",
@@ -3861,8 +3790,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A17",
@@ -3907,8 +3835,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_CTS",
@@ -3919,8 +3846,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_CTS",
@@ -3931,8 +3857,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_A18",
@@ -3977,8 +3902,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_RTS_2US",
@@ -4034,8 +3958,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LED1",
@@ -4093,8 +4016,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4120,7 +4042,13 @@
         },
         {
           "signal": "I2S3_MCK",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-spi3-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SDIO_D7",
@@ -4141,8 +4069,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4195,8 +4122,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_CTS",
@@ -4207,8 +4133,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4261,8 +4186,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_RTS",
@@ -4273,8 +4197,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4335,8 +4258,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CK",
@@ -4347,8 +4269,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_RX",
@@ -4359,8 +4280,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_CK",
@@ -4371,8 +4291,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_CK",
@@ -4383,8 +4302,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B4",
@@ -4459,8 +4377,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_RTS",
@@ -4471,8 +4388,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_TX",
@@ -4483,8 +4399,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_TX",
@@ -4495,8 +4410,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_DE",
@@ -4507,8 +4421,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDIO_D6",
@@ -4583,8 +4496,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CK",
@@ -4595,8 +4507,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_RX",
@@ -4607,8 +4518,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_RX",
@@ -4619,8 +4529,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_CLK",
@@ -4631,8 +4540,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDIO_D7",
@@ -4709,8 +4617,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CTS",
@@ -4721,8 +4628,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4777,8 +4683,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_RTS",
@@ -4789,8 +4694,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -4851,8 +4755,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART3_TX",
@@ -4863,8 +4766,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_CK",
@@ -4875,8 +4777,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B5",
@@ -4921,8 +4822,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_TX",
@@ -4933,8 +4833,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_CTS",
@@ -4945,8 +4844,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D7",
@@ -4991,8 +4889,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_RX",
@@ -5003,8 +4900,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_RTS",
@@ -5015,8 +4911,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_D8",
@@ -5081,8 +4976,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART3_RX",
@@ -5093,8 +4987,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_CTS",
@@ -5105,8 +4998,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_TX",
@@ -5117,8 +5009,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B6",
@@ -5185,8 +5076,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH1",
@@ -5197,8 +5087,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_ETR",
@@ -5209,8 +5098,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH1",
@@ -5221,8 +5109,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_ETR",
@@ -5233,8 +5120,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_RTS",
@@ -5245,8 +5131,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART8_RX",
@@ -5257,8 +5142,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_NSS",
@@ -5269,8 +5153,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_B7",
@@ -5333,8 +5216,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI3_SCK",
@@ -5345,14 +5227,18 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2S3_CK",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-spi3-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "SDIO_D2",
@@ -5427,8 +5313,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI3_MISO",
@@ -5439,8 +5324,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDIO_D3",
@@ -5527,8 +5411,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI3_MOSI",
@@ -5539,14 +5422,18 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2S3_SD",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-spi3-remap",
+            "values": [
+              1
+            ]
+          }
         },
         {
           "signal": "SDIO_CK",
@@ -5557,8 +5444,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "DVP_D9",
@@ -5641,8 +5527,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_CLK",
@@ -5687,8 +5572,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NOE",
@@ -5733,8 +5617,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NWE",
@@ -5787,8 +5670,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NWAIT",
@@ -5843,8 +5725,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NE1",
@@ -5929,8 +5810,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH2",
@@ -5941,8 +5821,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_CK",
@@ -5953,8 +5832,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_SCK",
@@ -5965,8 +5843,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_G4",
@@ -6043,8 +5920,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_TX",
@@ -6055,8 +5931,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I3C_SCL",
@@ -6067,8 +5942,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MISO",
@@ -6079,8 +5953,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "DVP_D3",
@@ -6138,7 +6011,13 @@
         },
         {
           "signal": "I2S3_SD",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-spi3-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "LTDC_V",
@@ -6163,8 +6042,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_RX",
@@ -6175,8 +6053,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_CK",
@@ -6187,8 +6064,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I3C_SDA",
@@ -6199,8 +6075,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MOSI",
@@ -6211,8 +6086,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "DVP_D10",
@@ -6242,7 +6116,7 @@
           "signal": "TIM4_CH1",
           "route": "default",
           "selection": {
-            "selector": "afio-tim4-remap",
+            "selector": "afio-tim3-remap",
             "values": [
               0
             ]
@@ -6285,8 +6159,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_TX",
@@ -6297,8 +6170,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART7_CTS",
@@ -6309,8 +6181,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -6328,7 +6199,7 @@
           "signal": "TIM4_CH2",
           "route": "default",
           "selection": {
-            "selector": "afio-tim4-remap",
+            "selector": "afio-tim3-remap",
             "values": [
               0
             ]
@@ -6353,8 +6224,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -6395,8 +6265,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_CK",
@@ -6407,8 +6276,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_CK",
@@ -6419,8 +6287,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -6438,7 +6305,7 @@
           "signal": "TIM4_CH3",
           "route": "default",
           "selection": {
-            "selector": "afio-tim4-remap",
+            "selector": "afio-tim3-remap",
             "values": [
               0
             ]
@@ -6473,8 +6340,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM8_CH3",
@@ -6485,8 +6351,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_CTS",
@@ -6497,8 +6362,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_CTS",
@@ -6509,8 +6373,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_CTS",
@@ -6521,8 +6384,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_TX",
@@ -6533,8 +6395,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_TX",
@@ -6545,8 +6406,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2C_SCL",
@@ -6557,8 +6417,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_HSYNC",
@@ -6569,8 +6428,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "CAN_RX",
@@ -6581,8 +6439,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDIO_D4",
@@ -6624,7 +6481,7 @@
           "signal": "TIM4_CH4",
           "route": "default",
           "selection": {
-            "selector": "afio-tim4-remap",
+            "selector": "afio-tim3-remap",
             "values": [
               0
             ]
@@ -6659,8 +6516,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_RTS",
@@ -6671,8 +6527,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_RTS",
@@ -6683,8 +6538,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART5_RTS",
@@ -6695,8 +6549,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_RX",
@@ -6707,8 +6560,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART10_RX",
@@ -6719,8 +6571,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2C_SDA",
@@ -6731,8 +6582,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "LTDC_VSYNC",
@@ -6743,8 +6593,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "CAN_TX",
@@ -6755,8 +6604,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SDIO_D5",
@@ -6798,7 +6646,7 @@
           "signal": "TIM4_ETR",
           "route": "default",
           "selection": {
-            "selector": "afio-tim4-remap",
+            "selector": "afio-tim3-remap",
             "values": [
               0
             ]
@@ -6841,8 +6689,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_TX",
@@ -6853,8 +6700,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_TX",
@@ -6865,8 +6711,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_CTS",
@@ -6877,8 +6722,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NBL0",
@@ -6941,8 +6785,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART4_RX",
@@ -6953,8 +6796,7 @@
             "values": [
               3
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART6_RTS",
@@ -6965,8 +6807,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "FSMC_NBL1",

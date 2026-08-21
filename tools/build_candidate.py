@@ -334,6 +334,18 @@ def join(
                 # Not a route selector; the register heading ran on and picked up
                 # a wide field from the next register's table.
                 continue
+            if rm == sorted(bit for _, bit in bits):
+                # The same bits under a different register name is one register
+                # spelled two ways, not a field split across two. The Chinese
+                # CH32V103 manual writes AFIO_PCFR where the header writes
+                # AFIO_PCFR1, and taking it at face value invented a second
+                # register and doubled every one of that family's fields.
+                notes.append(
+                    f"[join] {selector_id(controller, s['field'])}: "
+                    f"RMが同じbitを {register} という名前で書いている"
+                    f"（headerは {order[0]}）。同じregisterとして扱う"
+                )
+                continue
             bits += [(register, b) for b in rm]
             order.append(register)
             completed = True
