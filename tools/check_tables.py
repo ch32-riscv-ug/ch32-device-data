@@ -33,7 +33,7 @@ def main() -> int:
                       "cores", "documents", "pins", "pin_functions",
                       "product_attributes", "remap_fields", "remap_routes",
                       "errata", "operating_conditions", "evt_examples",
-                      "clock_configs", "clock_prescalers")}
+                      "clock_configs", "clock_prescalers", "clock_sources")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -147,18 +147,22 @@ def main() -> int:
     # and #if branch. What can be checked without EVT is that they join, that a
     # divider a configuration selects is one the family actually encodes, and
     # that the frequencies parse.
-    prescalers = {(r["series"], r["field"], r["divider"]) for r in t["clock_prescalers"]}
+    prescalers = {(r["family"], r["field"], r["divider"]) for r in t["clock_prescalers"]}
     for r in t["clock_prescalers"]:
-        check("clock_prescalers", r["field"], r["series"], series, "series")
+        check("clock_prescalers", r["field"], r["family"], families, "families")
         if not r["divider"].isdigit() or int(r["divider"]) < 1:
-            bad.append(f"clock_prescalers: {r['series']} {r['field']} の divider "
+            bad.append(f"clock_prescalers: {r['family']} {r['field']} の divider "
                        f"{r['divider']!r} が分周比でない")
+    for r in t["clock_sources"]:
+        check("clock_sources", r["consumer"], r["family"], families, "families")
+        if not r["value"].isdigit() or not r["shift"].isdigit():
+            bad.append(f"clock_sources: {r['family']} {r['consumer']} の value/shift が数でない")
     for r in t["clock_configs"]:
-        where = f"{r['series']} {r['config']}"
-        check("clock_configs", r["config"], r["series"], series, "series")
+        where = f"{r['family']} {r['config']}"
+        check("clock_configs", r["config"], r["family"], families, "families")
         for column, field in (("hpre", "HPRE"), ("ppre1", "PPRE1"), ("ppre2", "PPRE2")):
             divider = r[column]
-            if divider and (r["series"], field, divider) not in prescalers:
+            if divider and (r["family"], field, divider) not in prescalers:
                 bad.append(f"clock_configs: {where} の {column}={divider} が "
                            f"clock_prescalers に無い")
         for domain in (d for d in r["domains"].split(";") if d):

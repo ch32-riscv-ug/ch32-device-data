@@ -21,8 +21,9 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 76行  クロック（系統主頻F_MAIN・上限F_*）と動作電圧V_DD
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
-  clock_configs.csv       391行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
-  clock_prescalers.csv    662行  AHB/APB/ADC分周器の符号化（分周比→field値）
+  clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
+  clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
+  clock_sources.csv       116行  USB/RTC/ADC/I2S等をどのクロックから取れるか（選択肢→register field）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -36,8 +37,8 @@ pins.part_number / pin_functions.part_number           → products.part_number
 product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
-clock_configs.series / clock_prescalers.series          → series.series
-clock_configs.(series, hpre|ppre1|ppre2)                → clock_prescalers.(series, field, divider)
+clock_configs.family / clock_prescalers.family / clock_sources.family → families.family
+clock_configs.(family, hpre|ppre1|ppre2)                → clock_prescalers.(family, field, divider)
 errata.series / operating_conditions.series             → series.series
 evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
@@ -91,7 +92,7 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 
 `tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**、`peripheral`と`role`が揃って埋まるか揃って空であること。
 
-### `clock_configs.csv` / `clock_prescalers.csv`
+### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv`
 
 EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`tools/extract_clock_tree.py`→`tools/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
 
@@ -109,7 +110,11 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 `flash_latency`が空の行は**その設定がlatencyを書かない**ことを意味します。**CH32V208/V303/V305/V307/V317/V407/V467/X305/X315/H415/H416/H417は一度も書きません。** 書くfamilyの範囲も違います: V003は0〜1、V006/V103/L103/X035は0〜2、M030は0〜3、V205は0〜4。
 
-出典は`evt(system_ch32*.c)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
+**この3表だけはseriesではなくfamilyで引きます。** クロックツリーはsiliconの性質で、EVTのcloneは1 silicon分だからです（`families.csv`がどのseriesを覆うかを持っています）。seriesで引くとCH32V20xの19設定がV203とV208へ複製されるうえ、2つのfamily dirが同じseriesに触れている場合（V203はCH32V20xとCH32V205の両方から作られたSKUがある）に**別のsiliconのツリーを拾います**。
+
+`clock_sources.csv`はUSB・RTC・ADC・I2S・RNG・ETH等を「どのクロックから取れるか」で、`<fam>_rcc.h`の`RCC_*CLKSource_*`定数と、それがどのregister fieldへ行くか（`<fam>_rcc.c`の`RCC_*CLKConfig`）の組です。ここも`condition`が要ります——CH32V20xは`RCC_RTCCLKSource_*`の**値0x300が、D8/D8Wでは`HSE/512`、それ以外では`HSE/128`**です。同じ値が別の意味になるので、分岐を落とすとRTCが4倍ずれます。USBの`PLLCLK_Div5`もD8/D8W限定です。CH32X035は選択肢が1つも無く、USB PHYがクロック選択を必要としないことと整合します。
+
+出典は`evt(system_ch32*.c)`と`evt(rcc-header+rcc-driver)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
 
 ### `errata.csv`
 
@@ -234,7 +239,7 @@ uv run tools/build_pins.py --out tables                       # pins/pin_functio
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）
-uv run tools/build_clock.py --out tables                      # clock_configs/clock_prescalers（EVTのsystem_*.cから）
+uv run tools/build_clock.py --out tables                      # clock_configs/clock_prescalers/clock_sources（EVTから）
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
 uv run tools/check_images.py [--missing|--prune]              # 画像の必要一覧と検査
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
