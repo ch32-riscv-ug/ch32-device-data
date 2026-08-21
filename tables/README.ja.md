@@ -21,6 +21,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 76行  クロック（系統主頻F_MAIN・上限F_*）と動作電圧V_DD
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
+  clock_configs.csv       391行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
+  clock_prescalers.csv    662行  AHB/APB/ADC分周器の符号化（分周比→field値）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -34,12 +36,14 @@ pins.part_number / pin_functions.part_number           → products.part_number
 product_attributes.part_number                          → products.part_number
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
+clock_configs.series / clock_prescalers.series          → series.series
+clock_configs.(series, hpre|ppre1|ppre2)                → clock_prescalers.(series, field, divider)
 errata.series / operating_conditions.series             → series.series
 evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、operating_conditions.csvは`tools/build_operating.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -86,6 +90,26 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 **`valid_values`は下限です**。3つの資料の和を採っています——RMのremap格子が挙げる値、datasheet pin表が実際に経路を持つと示した値、EVTヘッダが定数として列挙している値。格子は「どちらでもよい」桁を`x`で書くので過大に出ることがあり（CH32X035の`USART4_RM=1xx`が4通りに展開される）、逆にどの資料も触れていない値は落ちます。**列挙されていない値が使えないとは限りません**が、列挙されている値はいずれかの資料が実証しています。`remap_routes.csv`に出る経路はすべてここに含まれます。
 
 `tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**、`peripheral`と`role`が揃って埋まるか揃って空であること。
+
+### `clock_configs.csv` / `clock_prescalers.csv`
+
+EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`tools/extract_clock_tree.py`→`tools/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
+
+読み方に注意が要る列が4つあります。
+
+**`domains`は`名前=Hz`を`;`で並べます**——`SYSCLK=400000000;CoreCLK[V5F]=400000000;CoreCLK[V3F]=100000000`。ほとんどのfamilyは`SYSCLK`だけですが、**CH32V407はSYSCLKとHCLKが別**、**CH32X315はSYSCLK/CoreCLK/HCLKの3段**、**CH32H417は双核なのでCoreCLKがコアごと**です。`SYSCLK = HCLK`という1段のモデルではこの3 familyを表せません。名前が周波数を言っていない設定（`SetSysClockToHSE`＝水晶に直結）は**空**にしてあります。水晶の周波数は基板の属性でchipの属性ではないためです。
+
+**`condition`はコンパイル時分岐です**。CH32V307の144MHzは`#ifdef CH32V30x_D8`で`RCC_PLLMULL18`、`#else`で`RCC_PLLMULL18_EXTEN`を書きます。**1つの関数が2つの事実**なので、分岐ごとに行を分け、どちらかを`condition`が言います。
+
+**`outside_rcc`はRCC以外に触るレジスタです**。CH32L103/V103/V205/V20x/V30xはHSIからPLLを回すとき`EXTEN`を触ります（`EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE`）。**CH32V205だけはこのregisterを`CTLR0`と呼びます**。「RCCだけ見ればよい」というモデルでは組めません。
+
+**`evt_copies`は「何個のコピーがこの設定を書いているか」です**。EVTは`system_ch32*.c`を例題ごとに配っていて、**コピーは同一ではありません**（CH32H417は390個中に12種類）。`162/168`なら主流、`4/168`なら特定の例題専用です。捨てずに全部載せて、判断はconsumerに委ねています。
+
+`ppre1`に注意してください。CH32V20x/V30xはHSI由来のどの周波数でも`ppre1=2`で、**`PCLK1 = HCLK/2`**です。USART(BRR)・I2C(FREQ/CKCFGR)・SPI(BR)を`PCLK1 = F_CPU`前提で書くと、PLLを使った瞬間に壊れます。
+
+`flash_latency`が空の行は**その設定がlatencyを書かない**ことを意味します。**CH32V208/V303/V305/V307/V317/V407/V467/X305/X315/H415/H416/H417は一度も書きません。** 書くfamilyの範囲も違います: V003は0〜1、V006/V103/L103/X035は0〜2、M030は0〜3、V205は0〜4。
+
+出典は`evt(system_ch32*.c)`で単一資料のため**全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
 
 ### `errata.csv`
 
@@ -164,7 +188,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
 - **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
-## 現況（2026-08-20生成）
+## 現況（2026-08-21生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
@@ -210,6 +234,7 @@ uv run tools/build_pins.py --out tables                       # pins/pin_functio
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）
+uv run tools/build_clock.py --out tables                      # clock_configs/clock_prescalers（EVTのsystem_*.cから）
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
 uv run tools/check_images.py [--missing|--prune]              # 画像の必要一覧と検査
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査

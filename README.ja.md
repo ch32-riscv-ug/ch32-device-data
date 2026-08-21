@@ -18,6 +18,9 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
 - `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧とremap_routes.csvに対する当たり具合を出す
+- `tools/extract_clock_tree.py` / `tools/build_clock.py`: EVTの`system_ch32*.c`から
+  クロック設定（発振器・各ドメイン周波数・分周・PLL・flash latency・RCC外のレジスタ）を
+  静的に読み、`tables/clock_configs.csv`と`tables/clock_prescalers.csv`へ落とす
 - `tools/crosscheck_ch32data.py`: [ch32-rs/ch32-data](https://github.com/ch32-rs/ch32-data)と
   AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
   CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
