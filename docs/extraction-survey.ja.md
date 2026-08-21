@@ -592,16 +592,14 @@ uv run tools/build_candidate.py \
    value=0の行として出す。既定経路とremap後の経路が同じ表に並ぶので、consumerが2表を突き合わせる
    規則を持たずに済む
 8. CH32V303/V305/V208の省略された接尾辞を、ordering information側と突き合わせて完全な注文型番にする
-9. `valid_values`をどこまで「完全」と言えるか。現在は「RM remap格子 ∪ datasheet pin表が
-   実証した値 ∪ EVTヘッダが名前を付けている値」の和で、**下限としては正しい**が完全とは限らない。
-   3資料は互いに補い合っていて、どれも単独では足りない:
-   RMは`1x1`のような don't-care 表記を使う（CH32X035のUSART4は値5と7が同じ経路）、
-   pin表はそのpackageがbond-outした経路しか出さない、
-   EVTのgpioヘッダは`GPIO_FullRemap_USART4`のように**代表値を1つだけ**定義する（USART4は
-   1,2,3,4,7の5定数だが、4と6・5と7はそれぞれ同じ経路なので「6が無効」という意味ではない）。
-   さらにEVT定数の符号化はfamilyごとに異なるため、ヘッダの読み取りだけでは復号できない。
-   EVTの`GPIO_PinRemapConfig`をhostでコンパイルして実行すればfieldの定義そのものは観測できる
-   （`ArduinoCore-CH32`で実証済み）ので、gccを抽出時の依存に加えるかどうかが論点
+9. ~~`valid_values`をどこまで「完全」と言えるか~~
+   → **一部決着**（2026-08-21）。gccを抽出時の依存に含めてよいことになったので、
+   `tools/extract_remap_fields.py`がEVTの`GPIO_PinRemapConfig()`をホスト用にコンパイルして
+   実行し、経路の列挙値を観測する。これで4つ目の情報源が入り、`valid_values`は
+   「RM remap格子 ∪ datasheet pin表 ∪ ヘッダの列挙 ∪ EVTデコーダの観測」の和になった。
+   RM未mirrorのCH32V407/V467がこの恩恵を最も受ける。
+   残る限界は、和なので**下限としては正しいが上限は保証しない**こと。RMの`1x1`表記は
+   don't-careで（CH32X035のUSART4は値5と7が同じ経路）、EVTは代表値を1つだけ定義する
 
 ## registerをまたぐremap field（2026-08-20追記）
 
@@ -621,9 +619,32 @@ WCHは同じ「上位半分」を3通りに書きます。いずれも`tools/sig
 CH32V20xのヘッダは`AFIO_PCFR2_`定義を1つも持たないため、ここだけはRM側からしか取れません。
 `build_candidate.py`はヘッダとRMの和を取り、片方にしかないregisterを補完します。
 
-結果は`ArduinoCore-CH32`が持つ独立実装（EVTの`GPIO_PinRemapConfig`をhostでコンパイルして
-実行し、fieldを観測するもの）と突き合わせて検証しました。ヘッダを読むだけで、
-分割fieldを含めて同じ答えになります。
+結果は`tools/extract_remap_fields.py`（EVTの`GPIO_PinRemapConfig`をhostでコンパイルして
+実行し、fieldを観測するもの）と突き合わせて検証しています。ヘッダを読むだけで、
+分割fieldを含めて同じ答えになります——**242 selector 一致・不一致0**。
+
+```sh
+uv run tools/extract_remap_fields.py --mirrors <EVT cloneの親> --compare tables
+```
+
+### EVTのデコーダは万能ではない: CH32V407のUSART1
+
+同じ突き合わせで、**EVT側のバグ**が1件出ました。`ch32v4x7_gpio.c`の
+`GPIO_PinRemapConfig()`は、USART1の上位半分について
+
+```c
+/* Clear bit */  tmp &= ~(1 << 26);                  /* PCFR2 bit 26 を落とす */
+/* Set bit   */  tmp |= ((GPIO_Remap & 0x2) << 26);  /* 立てるのは bit 27 */
+```
+
+と書いています。`2 << 26` は `0x08000000` すなわちbit 27で、落とすbitと1つずれています。
+device header（`AFIO_PCFR2_USART1_REMAP = 0x04000000`）とRMはどちらもbit 26なので、
+**間違っているのはEVTの関数のほう**です。
+
+この1件があるため、抽出器は「ENABLEで観測した値が0でなく互いに異なる」ことを確認し、
+崩れたfieldの値は採りません（`_unusable`に観測値を残します）。
+そして**fieldのbit位置はEVTデコーダから採らず、device headerから採る**という
+役割分担にしてあります。デコーダは独立した検算相手です。
 
 ## 資料の大文字小文字が経路を1本落としていた（2026-08-20追記）
 

@@ -2,7 +2,10 @@
   "part_number": "CH32L103F8P6",
   "_provenance": {
     "datasheet": "CH32L103/datasheet_en/CH32L103DS0.PDF",
-    "manual": "CH32L103/datasheet_en/CH32L103RM.PDF",
+    "manuals": [
+      "CH32L103/datasheet_en/CH32L103RM.PDF",
+      "CH32L103/datasheet_zh/CH32L103RM.PDF"
+    ],
     "header": "CH32L103/EVT/EXAM/SRC/Peripheral/inc/ch32l103.h",
     "pin_table": "Table 2-1-1",
     "pin_column": "L103F8P6"
@@ -68,7 +71,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -90,7 +93,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -114,7 +117,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -146,9 +149,13 @@
         2,
         3,
         4,
-        5
+        5,
+        7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_values_only_from_evt": [
+        7
+      ],
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -183,12 +190,7 @@
         5,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
-      "_values_not_in_grid": [
-        4,
-        5,
-        7
-      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -210,7 +212,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -228,7 +230,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -258,7 +260,7 @@
         4,
         5
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -286,7 +288,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_values_not_in_grid": [
         2
       ],
@@ -316,7 +318,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "_reset_value_missing": true
     },
     {
@@ -334,10 +336,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
-      "_values_not_in_grid": [
-        1
-      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     }
   ],
@@ -642,8 +641,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM1_CH2N",
@@ -720,8 +718,7 @@
             "values": [
               4
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -808,8 +805,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CK",
@@ -871,8 +867,7 @@
             "values": [
               7
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_TX",
@@ -958,8 +953,7 @@
             "values": [
               7
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_TX",
@@ -992,8 +986,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -1059,8 +1052,7 @@
             "values": [
               4
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH4",
@@ -1071,8 +1063,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CK",
@@ -1105,8 +1096,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -1194,8 +1184,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -1306,8 +1295,7 @@
             "values": [
               1
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },

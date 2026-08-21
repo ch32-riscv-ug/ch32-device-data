@@ -2,7 +2,10 @@
   "part_number": "CH32M030K8U7",
   "_provenance": {
     "datasheet": "CH32M030/datasheet_en/CH32M030DS0.PDF",
-    "manual": "CH32M030/datasheet_en/CH32M030RM.PDF",
+    "manuals": [
+      "CH32M030/datasheet_en/CH32M030RM.PDF",
+      "CH32M030/datasheet_zh/CH32M030RM.PDF"
+    ],
     "header": "CH32M030/EVT/EXAM/SRC/Peripheral/inc/ch32m030.h",
     "pin_table": "Table 2-1",
     "pin_column": "QFN32"
@@ -70,7 +73,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -168,7 +171,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -197,7 +200,7 @@
         3,
         4
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -221,7 +224,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {
@@ -250,7 +253,7 @@
         3,
         4
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
       "reset_value": 0
     },
     {

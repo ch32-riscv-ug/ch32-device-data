@@ -77,10 +77,24 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 
 ## 一次資料の矛盾
 
+- CH32V407の`ch32v4x7_gpio.c`の`GPIO_PinRemapConfig()`は、USART1の上位半分について
+  clearがPCFR2 bit 26、setが`(GPIO_Remap & 0x2) << 26`＝bit 27で1つずれている。
+  device header（`AFIO_PCFR2_USART1_REMAP = 0x04000000`）とRMはどちらもbit 26なので
+  EVTの関数側の誤り。`tools/extract_remap_fields.py`が観測値の一意性検査で自動検出し、
+  この1 fieldの値だけ採らない
+
 - CH32M030 RM Table 6-15の`ADC_ETRGIN_RM`対応は他の3根拠と逆。recordはdatasheet Table 2-1、RM register説明/reset、EVT実装が一致する`0=PA14`、`1=PB6`を採用。`tools/extract_remap.py`はこの矛盾を照合時に自動で提示する
 - CH32V003 RMの`ADC_ETRGINJ_RM` register説明はregular triggerのPD3/PC2を誤って繰り返す。recordはdatasheet Table 2-2とRM Table 7-13が一致する`0=PD1`、`1=PA2`を採用
 
 いずれも実機未確認であり、document error候補としてrecordの`notes`に残しています。
+
+## レジスタマップの調査
+
+ArduinoCore-CH32のR-20（レジスタマップを持つとしたら何が要るか）に対する現状調査を
+[docs/register-map-survey.ja.md](register-map-survey.ja.md)に置いた。方針は未決定。
+要点はEVTだけが12 family全部を覆うこと、ch32-dataとch32funはどちらも
+V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないこと、
+peripheral型のversion keyは構造体とbit define名から機械的に計算できること。
 
 ## Validatorが検査するrelation
 
