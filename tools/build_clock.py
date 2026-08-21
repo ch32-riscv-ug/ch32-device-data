@@ -10,9 +10,10 @@
     clock_sources.csv     one row per (series, consumer, option): what USB, the
                           RTC, the ADC, I2S and the rest can be clocked from,
                           and the register field that selects it
-    clock_symbols.csv     one row per (family, symbol) named in clock_configs'
-                          `pll` or `outside_rcc`: the number it stands for, the
-                          register it is written to, and that register's address
+    clock_symbols.csv     one row per (family, symbol, register): the number it
+                          stands for, the register it goes to, that register's
+                          address, and whether it is a value, a field mask or a
+                          bit the code polls
 
 Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
@@ -36,6 +37,13 @@ RCC_PLLMULL18 as 0x003C0000 and RCC_PLLMULL18_EXTEN as 0, so the same "x18"
 encodes two ways, and EXTEN_PLL_HSI_PRE says nothing about being bit 4 of a
 register at 0x40023800. clock_symbols.csv carries the number and the address so
 the `pll` and `outside_rcc` cells can be turned into register writes.
+
+**Setting a field needs its mask as well as its value.** Every setter is
+read-modify-write, and the vendor's own code does not always clear first --
+CH32V20x ORs RCC_HPRE_DIV1 in and relies on the reset value -- so observing the
+source finds only some of the masks. The rest come from the header's shape, and
+`basis` says which: `evt(device-header+system_ch32*.c)` was written by a
+configuration, `evt(device-header)` is only defined.
 
 Usage:
     uv run tools/build_clock.py [--mirrors <dir>] [--out tables]
@@ -64,19 +72,21 @@ MIRRORS = Path("/home/mt/dev_wch")
 # CH32V203 and CH32V208 and, worse, let a series that two family directories both
 # mention pick up the wrong tree.
 CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
-                  "hpre", "ppre1", "ppre2", "pll", "flash_latency", "outside_rcc",
+                  "hpre", "ppre1", "ppre2", "pll",
+                  "flash_latency", "flash_sck_div", "outside_rcc",
                   "#", "confidence", "basis", "evt_copies"]
 PRESCALER_COLUMNS = ["family", "field", "divider", "value",
                      "#", "confidence", "basis"]
 SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
                   "condition", "#", "confidence", "basis"]
-SYMBOL_COLUMNS = ["family", "symbol", "register", "address", "value",
+SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value",
                   "#", "confidence", "basis"]
 
 BASIS = "evt(system_ch32*.c)"
 PRESCALER_BASIS = "evt(device-header)"
 SOURCE_BASIS = "evt(rcc-header+rcc-driver)"
 SYMBOL_BASIS = "evt(device-header+system_ch32*.c)"
+DECLARED_BASIS = "evt(device-header)"
 # One source only, so nothing here is confirmed by agreement between documents.
 # The reference manual states the same fields and is the obvious second reading.
 CONFIDENCE = "reference"
@@ -131,11 +141,20 @@ def main() -> int:
                     "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
                 })
         for entry in data.get("symbols", []):
+            basis = SYMBOL_BASIS if entry["observed"] else DECLARED_BASIS
+            confidence = CONFIDENCE
+            if entry["disagreement"]:
+                # The header states the field two ways in one line. Which one a
+                # consumer believes decides whether the widest value fits, so
+                # both readings are carried rather than one being chosen.
+                confidence = "conflict"
+                basis = f"{basis}+!evt(device-header-comment:{entry['disagreement']})"
             symbol_rows.append({
                 "family": family, "symbol": entry["symbol"],
+                "role": entry["role"],
                 "register": entry["register"], "address": entry["address"],
                 "value": entry["value"],
-                "confidence": CONFIDENCE, "basis": SYMBOL_BASIS,
+                "confidence": confidence, "basis": basis,
             })
         for consumer, options in sorted(data.get("peripheral_sources", {}).items()):
             for option in options:
@@ -161,6 +180,8 @@ def main() -> int:
                     "pll": ";".join(symbols),
                     "flash_latency": ("" if entry["flash_latency"] is None
                                       else str(entry["flash_latency"])),
+                    "flash_sck_div": ("" if entry["flash_sck_div"] is None
+                                      else str(entry["flash_sck_div"])),
                     "outside_rcc": ";".join(entry["outside_rcc"]),
                     "confidence": CONFIDENCE, "basis": BASIS,
                     "evt_copies": entry["copies"],
@@ -211,9 +232,26 @@ def main() -> int:
         print(f"  レジスタのアドレスが解けない記号: {len(no_address)}", file=sys.stderr)
         for r in no_address:
             print(f"    - {r['family']} {r['symbol']} ({r['register']})", file=sys.stderr)
+    roles = collections.Counter(r["role"] for r in symbol_rows)
+    print(f"  記号の役割: {dict(roles)}", file=sys.stderr)
+    declared = [r for r in symbol_rows if r["basis"].startswith(DECLARED_BASIS)]
+    print(f"  うちコードが書かないマスク（headerの定義のみ）: {len(declared)}",
+          file=sys.stderr)
+    conflicts = [r for r in symbol_rows if r["confidence"] == "conflict"]
+    if conflicts:
+        print(f"  ヘッダ自身のコメントと食い違う記号: {len(conflicts)}", file=sys.stderr)
+        for r in conflicts:
+            print(f"    {r['family']} {r['symbol']} = {int(r['value']):#x} / "
+                  f"{r['basis'].partition('+!')[2]}", file=sys.stderr)
     no_latency = sorted({r["family"] for r in config_rows} -
                         {r["family"] for r in config_rows if r["flash_latency"]})
     print(f"  flash latencyを一度も書かない family: {' '.join(no_latency)}", file=sys.stderr)
+    sck = sorted({(r["family"], r["flash_sck_div"]) for r in config_rows
+                  if r["flash_sck_div"]})
+    if sck:
+        print("  flashクロックを分周する family（待ちサイクルではない）:", file=sys.stderr)
+        for family, div in sck:
+            print(f"    {family} HCLK/{div}", file=sys.stderr)
     for note in dict.fromkeys(notes):
         print(f"  - {note}", file=sys.stderr)
     for family in unmapped:

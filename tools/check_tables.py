@@ -213,14 +213,34 @@ def main() -> int:
                            "名前=Hz の形でない")
         if r["flash_latency"] and not r["flash_latency"].isdigit():
             bad.append(f"clock_configs: {where} の flash_latency が数でない")
+        # A flash clock divider, not a wait count. Keeping it out of
+        # flash_latency is the whole point, so it has to look like a divider.
+        div = r["flash_sck_div"]
+        if div and not (div.isdigit() and int(div) >= 1
+                        and int(div) & (int(div) - 1) == 0):
+            bad.append(f"clock_configs: {where} の flash_sck_div {div!r} が"
+                       "2のべき乗の分周比でない")
+        if div and r["flash_latency"]:
+            bad.append(f"clock_configs: {where} が flash_latency と flash_sck_div の"
+                       "両方を持つ（単位が違うので同時には書けない）")
 
     # A `pll` or `outside_rcc` cell names symbols. Without clock_symbols the
     # name is all there is, and the name does not give the number away:
     # CH32V307's RCC_PLLMULL18 is 0x003C0000 and RCC_PLLMULL18_EXTEN is 0.
     address = re.compile(r"^0x[0-9a-f]{8}$")
     symbols = {(r["family"], r["symbol"]) for r in t["clock_symbols"]}
+    # A prescaler symbol is in two tables, keyed differently: clock_prescalers
+    # enumerates the header's whole divider table, clock_symbols records what a
+    # configuration wrote. Where they overlap they have to say the same number,
+    # which is a real cross-check because the two are built from different reads.
+    prescaler_value = {(r["family"], r["field"], r["divider"]): r["value"]
+                       for r in t["clock_prescalers"]}
+    prescaler_symbol = re.compile(r"^RCC_(?P<field>[A-Za-z0-9]+?)_[Dd]iv(?P<divider>\d+)$")
     for r in t["clock_symbols"]:
         check("clock_symbols", r["symbol"], r["family"], families, "families")
+        if r["role"] not in ("value", "mask", "poll"):
+            bad.append(f"clock_symbols: {r['family']} {r['symbol']} の role "
+                       f"{r['role']!r} が value/mask/poll でない")
         if not r["value"].isdigit():
             bad.append(f"clock_symbols: {r['family']} {r['symbol']} の value が数でない")
         if r["address"] and not address.match(r["address"]):
@@ -229,6 +249,13 @@ def main() -> int:
         if "->" not in r["register"]:
             bad.append(f"clock_symbols: {r['family']} {r['symbol']} の register "
                        f"{r['register']!r} が BLOCK->REGISTER の形でない")
+        m = prescaler_symbol.match(r["symbol"])
+        if m:
+            key = (r["family"], m.group("field").upper(), m.group("divider"))
+            other = prescaler_value.get(key)
+            if other is not None and other != r["value"]:
+                bad.append(f"clock_symbols: {r['family']} {r['symbol']} の value "
+                           f"{r['value']} が clock_prescalers の {other} と違う")
     for r in t["clock_configs"]:
         for cell in (r["pll"], r["outside_rcc"]):
             for entry in (e for e in cell.split(";") if e):
