@@ -19,7 +19,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   remap_fields.csv        267行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       4487行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
-  operating_conditions.csv 241行  クロック上限（F_*）・動作電圧（V_DD）・発振器の周波数と確度（HSI/LSI/HSE/LSE）・PLL入出力の上下限
+  operating_conditions.csv 283行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
   clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
   clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
@@ -133,12 +133,26 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 - `V_DD`: 動作電圧。ADC使用時・USB使用時などの条件行があります
 - **発振器**（2026-08-21追加）: `F_HSI`/`F_LSI`と`ACC_HSI`/`ACC_LSI`（**確度**。`condition`列が温度範囲を持ち、範囲ごとに行が分かれます）、`F_HSE_ext`/`F_LSE_ext`（**外部クロックの許容範囲**。例: CH32L103は3〜25MHz、CH32M030は4〜25MHz、CH32V00xは3〜32MHz、CH32H41xは5〜32MHz）、`F_OSC_IN`/`F_XI`（水晶）、`DuCy_*`（デューティ比）
 - **PLL**（同）: `F_PLL_IN`/`F_PLL_OUT`/`F_VCO`の上下限。例: CH32L103は入力3〜25MHz・出力18〜96MHz、CH32H41xは出力100〜600MHz
+- **`f_ADC`**（同）: ADCのクロック上限。**familyで大きく違い、しかも電源電圧に依存します。** 記号だけ小文字始まりなのは原典の表記どおりです
+
+  | family | ADCクロック上限 |
+  |---|---|
+  | CH32V003 | **6 / 12 / 24 MHz**（V_DD 2.8〜/3.2〜/4.5〜5.5V） |
+  | CH32X033・X035 | **6 / 8 MHz**（V_DD < 3.2V / ≥ 3.2V） |
+  | CH32V103・V203・V208・V303〜V317 | 14 MHz |
+  | CH32M030 | 18 MHz |
+  | CH32V407・V467 | 30 MHz |
+  | CH32L103・M103・M007・V002・V004〜V007 | 48 MHz |
+  | CH32V205 | 64 MHz（中英で食い違い。zh版は96 MHz → conflict） |
+  | CH32H41x・X305・X315 | 80 MHz |
+
+  `SYSCLK`を上げたときADCの分周を選び直す必要があり、その基準がこれです。**X035は6〜8MHzで、他familyより1桁近く厳しい**点に注意してください
 
 上限が別の記号で書かれる行があります——`F_PCLK1`の`max`が`F_HCLK`のように。数値ではありませんが「PCLK1はHCLKを超えない」という事実そのものなので採っています。
 
 表示テキストは英語版、最小/最大/単位は両言語照合で一致すればconfirmedです。シリーズ列はdatasheet→products結合で展開しています（`;`区切り）。
 
-発振器の表は本体と別ページにあり（HSI/LSI/外部高速/外部低速/水晶で5表）、抽出器は**対象表を1つ見つけて打ち切らず全ページを走ります**。表の継承（記号セルが空の続き行）は多条件行には正しいものの、別パラメータが続くと記号を取り違えるので、**記号と単位と値の噛み合い**で弾いています（`F_*`にデューティ比の`%`が付く行など）。弾いた行は実行時に一覧で出ます。
+発振器やADCの表は本体と別ページにあり（HSI/LSI/外部高速/外部低速/水晶/ADCで6種）、抽出器は**対象表を1つ見つけて打ち切らず全ページを走ります**。さらに**表はページを跨ぎ、続きページはヘッダ行を持ちません**（CH32V003のADCクロック上限の行はキャプションの次ページにしかない）。列数が同じなら直前の列並びを引き継いで読みます。この副作用で同じページにある他の`F_*`（`F_prog`＝flash書き込みクロック、`F_max(IO)out`＝IOの最大出力周波数）も入りますが、いずれも実在の周波数上限です。表の継承（記号セルが空の続き行）は多条件行には正しいものの、別パラメータが続くと記号を取り違えるので、**記号と単位と値の噛み合い**で弾いています（`F_*`にデューティ比の`%`が付く行など）。弾いた行は実行時に一覧で出ます。
 
 電気特性章の残り（絶対最大定格・消費電流・flash耐久・ウェイクアップ時間）は未収集です（docs/extraction-survey.ja.md参照）。
 
@@ -215,7 +229,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | remap_fields.csv | 267 | 0 | 267 | 0 |
 | remap_routes.csv | 4487 | 0 | 4487 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
-| operating_conditions.csv | 241 | 210 | 28 | 3 |
+| operating_conditions.csv | 283 | 257 | 21 | 5 |
 | pins.csv | 4312 | 4022 | 290 | 0 |
 | pin_functions.csv | 29493 | 24718 | 4775 | 0 |
 
