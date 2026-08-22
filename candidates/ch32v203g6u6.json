@@ -228,6 +228,18 @@
   ],
   "pins": [
     {
+      "number": 1,
+      "pad": "BOOT0",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": [
+        {
+          "signal": "BOOT0",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 2,
       "pad": "OSC_IN",
       "kind": "other",
@@ -698,6 +710,20 @@
           "route": "default"
         },
         {
+          "signal": "TIM3_CH3",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "OPA1_CH1P",
+          "route": "default"
+        },
+        {
           "signal": "TIM1_CH2N",
           "route": "remap-1",
           "_selector_value": 1,
@@ -705,6 +731,17 @@
             "selector": "afio-tim1-remap",
             "values": [
               1
+            ]
+          }
+        },
+        {
+          "signal": "TIM3_CH3",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              2
             ]
           }
         }
@@ -1316,18 +1353,6 @@
               1
             ]
           }
-        }
-      ]
-    },
-    {
-      "number": "1(6)",
-      "pad": "BOOT0",
-      "kind": "other",
-      "_pin_type": "I",
-      "functions": [
-        {
-          "signal": "BOOT0",
-          "route": "main"
         }
       ]
     },

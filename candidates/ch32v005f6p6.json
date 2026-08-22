@@ -2298,6 +2298,17 @@
           "route": "default"
         },
         {
+          "signal": "ADC_RETR",
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrgreg-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
           "signal": "TIM1_CH4",
           "route": "remap-2",
           "_selector_value": 2,
@@ -2340,6 +2351,39 @@
             "selector": "afio-usart1-remap",
             "values": [
               8
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RX",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "SPI_NSS",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "SPI_MOSI",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              2
             ]
           }
         }

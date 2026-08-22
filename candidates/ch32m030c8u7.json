@@ -1700,8 +1700,19 @@
           }
         },
         {
-          "signal": "RSTTIM3_CH1_ETR",
+          "signal": "RST",
           "route": "default"
+        },
+        {
+          "signal": "TIM3_CH1_ETR",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "UART_RX",

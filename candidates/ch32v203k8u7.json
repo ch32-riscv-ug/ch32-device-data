@@ -1552,6 +1552,62 @@
       ]
     },
     {
+      "number": 31,
+      "pad": "BOOT0",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": [
+        {
+          "signal": "BOOT0",
+          "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "pad": "PB9",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PB9",
+          "route": "main"
+        },
+        {
+          "signal": "TIM4_CH4",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim4-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-i2c1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "CAN1_TX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-can-remap",
+            "values": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
       "number": 32,
       "pad": "PB8",
       "kind": "gpio",
@@ -1584,62 +1640,6 @@
         },
         {
           "signal": "CAN1_RX",
-          "route": "remap-2",
-          "_selector_value": 2,
-          "selection": {
-            "selector": "afio-can-remap",
-            "values": [
-              2
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "number": "31(6)",
-      "pad": "BOOT0",
-      "kind": "other",
-      "_pin_type": "I",
-      "functions": [
-        {
-          "signal": "BOOT0",
-          "route": "main"
-        }
-      ]
-    },
-    {
-      "number": "31(6)",
-      "pad": "PB9",
-      "kind": "gpio",
-      "_pin_type": "I/O/A",
-      "functions": [
-        {
-          "signal": "PB9",
-          "route": "main"
-        },
-        {
-          "signal": "TIM4_CH4",
-          "route": "default",
-          "selection": {
-            "selector": "afio-tim4-remap",
-            "values": [
-              0
-            ]
-          }
-        },
-        {
-          "signal": "I2C1_SDA",
-          "route": "remap-1",
-          "_selector_value": 1,
-          "selection": {
-            "selector": "afio-i2c1-remap",
-            "values": [
-              1
-            ]
-          }
-        },
-        {
-          "signal": "CAN1_TX",
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {

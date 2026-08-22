@@ -117,6 +117,7 @@ CH32V208,afio-tim1-remap,afio,PCFR1,TIM1_REMAP,PCFR1:6;PCFR1:7,0;1;2;3,0,#,refer
 CH32V208,afio-tim2-remap,afio,PCFR1,TIM2_REMAP,PCFR1:8;PCFR1:9,0;1;2;3,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32V208,afio-tim3-remap,afio,PCFR1,TIM3_REMAP,PCFR1:10;PCFR1:11,0;1;2;3,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32V208,afio-tim4-remap,afio,PCFR1,TIM4_REMAP,PCFR1:12,0;1,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
+CH32V208,afio-tim5ch4-rm,afio,PCFR1,TIM5CH4_RM,PCFR1:16,0,0,#,reference,candidates(rm-register-table+rm-remap-grid:en)
 CH32V208,afio-usart1-remap,afio,PCFR1|PCFR2,USART1_REMAP,PCFR1:2;PCFR2:26,0;1;2;3,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32V208,afio-usart2-remap,afio,PCFR1,USART2_REMAP,PCFR1:3,0;1,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32V208,afio-usart3-remap,afio,PCFR1,USART3_REMAP,PCFR1:4;PCFR1:5,0;1;2;3,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)

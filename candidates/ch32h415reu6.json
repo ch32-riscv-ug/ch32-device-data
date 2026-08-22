@@ -442,6 +442,21 @@
           "signal": "I2C2_SDA",
           "route": "af-9",
           "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SCSXN",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SDIO_CK",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "LTDC_G5",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -893,6 +908,11 @@
           "signal": "DVP_HSYNC",
           "route": "af-13",
           "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -1361,6 +1381,21 @@
           "signal": "SPI4_MISO",
           "route": "af-5",
           "_alternate_function": 5
+        },
+        {
+          "signal": "QSPI2_SIO1",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "SDIO_D5",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "LTDC_DE",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -1715,6 +1750,51 @@
           "signal": "USART1_TX",
           "route": "af-4",
           "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_MISO",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "LTDC_G0",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_RTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_RTS",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "SDIO_D0",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI2_SIOX1",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "USART7_CK",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_CLK",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "af-15",
+          "_alternate_function": 15
         }
       ]
     },
@@ -2121,6 +2201,41 @@
           "signal": "TIM1_CH4",
           "route": "af-1",
           "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_WS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "USART6_RX",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_R4",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -2515,6 +2630,26 @@
           "signal": "USART3_CK",
           "route": "af-7",
           "_alternate_function": 7
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "DVP_D9",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_R6",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_DE",
+          "route": "af-15",
+          "_alternate_function": 15
         }
       ]
     },
@@ -2936,6 +3071,41 @@
           "signal": "I2C1_SCL",
           "route": "af-4",
           "_alternate_function": 4
+        },
+        {
+          "signal": "I2S3_MCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C4_SCL",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "CAN2_TX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "QSPI1_SCSN",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "DVP_D5",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },

@@ -693,6 +693,30 @@
           "route": "default"
         },
         {
+          "signal": "OPA_O2",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim2-rm",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "USART2_TX",
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart2-rm",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
           "signal": "TIM1_CH4",
           "route": "remap-4",
           "_selector_value": 4,
@@ -711,6 +735,39 @@
             "selector": "afio-tim2-rm",
             "values": [
               4
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-tim2-rm",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH3",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim2-rm",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-rm",
+            "values": [
+              2
             ]
           }
         }

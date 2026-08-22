@@ -50,7 +50,13 @@ FIELD_TABLE_HEADING = frozenset({"位", "名称", "访问", "描述", "复位值
 # are what the register-field table puts there.
 BIT_LABEL = re.compile(r"^\[?\d+(?::\d+)?\]?$")
 PAD = re.compile(r"^P[A-H]\d{1,2}$")
-PAD_IN_PROSE = re.compile(r"\bP[A-H]\d{1,2}\b")
+# `\b` は使えない。Python の `\w` は CJK を含むので、中国語版の
+# 「ADC外部触发注入转换与PD1相连」では `与` と `P` の間に語境界が立たず
+# PD1 が取れない。英語版が同じ表を "connected to PD1" と書くので和で
+# 埋まっていたが、**英語版 RM が無い CH32V407/V467 では埋まらない**。
+# 前後を ASCII だけで見れば CJK が隣でも取れて、`PA1` が `PA12` の中で
+# 当たらないことは保てる。
+PAD_IN_PROSE = re.compile(r"(?<![0-9A-Za-z_])P[A-H]\d{1,2}(?![0-9A-Za-z_])")
 SIGNAL = re.compile(r"^[A-Z][A-Z0-9_]*$")
 MIN_COLUMNS = 3
 
@@ -199,6 +205,11 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                                             ),
                                         }
                                     )
+            # pdfplumber はページごとの解析結果を貯め込む。**捨てないと1本の
+            # reference manual を読むだけで数百MBまで育つ**ので、family を
+            # 並列に走らせたときに効く。落とすのはキャッシュだけで、読み終えた
+            # 行はすでに素の list になっている。
+            page.flush_cache()
     return routes, notes
 
 

@@ -569,6 +569,20 @@
         },
         {
           "signal": "TIM2_CH4",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "OPA1_OUT0",
+          "route": "default"
+        },
+        {
+          "signal": "TIM2_CH4",
           "route": "remap-1",
           "_selector_value": 1,
           "selection": {

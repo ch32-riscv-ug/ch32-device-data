@@ -1006,7 +1006,18 @@
           }
         },
         {
-          "signal": "TIM1_CH1_7TIM1_CH1",
+          "signal": "TIM1_CH1",
+          "route": "remap-7",
+          "_selector_value": 7,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              7
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH1",
           "route": "remap-8",
           "_selector_value": 8,
           "selection": {
@@ -1014,11 +1025,21 @@
             "values": [
               8
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
-          "signal": "TIM1_CH4_1TIM1_CH2N",
+          "signal": "TIM1_CH4",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH2N",
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
@@ -1026,23 +1047,32 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
-          "signal": "USART1_RX_9USART2_TX",
-          "route": "remap-5",
-          "_selector_value": 5,
+          "signal": "USART1_RX",
+          "route": "remap-9",
+          "_selector_value": 9,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              5
+              9
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
-          "signal": "I2C_SDA_2SPI_NSS",
+          "signal": "USART2_TX",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "I2C_SDA",
           "route": "remap-2",
           "_selector_value": 2,
           "selection": {
@@ -1050,8 +1080,18 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
+        },
+        {
+          "signal": "SPI_NSS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              2
+            ]
+          }
         },
         {
           "signal": "SPI_NSS",

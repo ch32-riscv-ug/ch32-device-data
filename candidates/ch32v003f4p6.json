@@ -749,10 +749,27 @@
           }
         },
         {
-          "signal": "T2CH4_1T2CH1ETR",
+          "signal": "T2CH4",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "T2CH1ETR",
           "route": "remap-2",
           "_selector_value": 2,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
         },
         {
           "signal": "URX",

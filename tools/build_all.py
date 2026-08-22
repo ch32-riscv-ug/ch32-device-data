@@ -8,8 +8,28 @@ either the part number itself or the package the comparison table assigns it.
 Reading a reference manual dominates the runtime, so each family is parsed once and
 reused across its SKUs.
 
+**Families are independent and run in parallel.** Each one reads its own documents
+and writes its own `candidates/<part>.json`, sharing nothing, so the only thing the
+parent does is collect the reports. Sequentially the twelve take about 35 minutes
+and the cost is very uneven -- CH32H417 alone is 6m35s where CH32V003 is 1m28s --
+so the longest are started first and the wall clock ends up close to the longest
+single family.
+
+The worker prints nothing while it runs; its block is printed when it finishes, so
+**families appear in completion order, not in catalogue order**. Interleaving the
+lines live would make them unreadable.
+
+Memory, not cores, is what bounds `--jobs`. A worker walks a whole reference manual,
+and pdfplumber keeps what it has parsed, so the page cache is dropped as each page
+is finished -- without that a single manual grows past half a gigabyte. The default
+is 2 rather than the core count because one worker on the largest family peaks at
+2.2 GB, and because **on WSL the memory a worker can actually have is not what
+`free` reports**: `free` describes the Linux VM, the Windows host underneath may
+have far less, and overcommitting there thrashes instead of failing.
+
 Usage:
     uv run tools/build_all.py --out candidates [--family CH32M030] [--limit 5]
+        [--jobs N]
 
 Output is unreviewed machine extraction, written outside devices/.
 """
@@ -17,9 +37,12 @@ Output is unreviewed machine extraction, written outside devices/.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
+import os
 import re
 import sys
+import time
 import traceback
 from pathlib import Path
 
@@ -222,6 +245,8 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
         try:
             products, _ = extract_products.extract(datasheet)
             tables = pin_tables(datasheet)
+            # 名前の語彙は datasheet 単位。片方の表でしか綴られない名前がある。
+            spelled = extract_pins.datasheet_names([(r, lay) for _, r, _, lay in tables])
             ordering = {e["part_number"]: e for e in extract_ordering.extract(datasheet)[0]}
         except Exception as exc:  # noqa: BLE001
             report.append({"family": family.name, "datasheet": datasheet.name, "error": str(exc)})
@@ -250,7 +275,7 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
                 report.append(entry)
                 _write(out_dir, part, product, None, datasheet, family, table_label, column, ordering.get(part))
                 continue
-            pins, pin_notes = extract_pins.pins_for(rows, variants, layout, column)
+            pins, pin_notes = extract_pins.pins_for(rows, variants, layout, column, spelled)
             candidate = None
             if silicon:
                 selectors, reg_fields, routes, evt_values, notes = silicon
@@ -300,42 +325,105 @@ def _write(out_dir, part, product, candidate, datasheet, family, table, column, 
     )
 
 
+def weight(family: Path) -> int:
+    """How much this family costs, near enough to order the queue by.
+
+    Wall clock tracks the size of the documents that have to be parsed, and the
+    spread is wide (CH32H417 6m35s against CH32V003 1m28s). Starting the heavy
+    ones first is what keeps the tail from being one lone family.
+    """
+    return sum(p.stat().st_size
+               for d in ("datasheet_en", "datasheet_zh")
+               if (family / d).is_dir()
+               for p in (family / d).iterdir() if p.is_file())
+
+
+def _one(family: Path, out_dir: Path, limit: int | None) -> tuple[str, list[dict], float, str]:
+    """One family, in a worker process. Returns its report rather than printing it."""
+    started = time.monotonic()
+    try:
+        rows = run_family(family, out_dir, limit)
+        return family.name, rows, time.monotonic() - started, ""
+    except Exception:  # noqa: BLE001
+        return family.name, [], time.monotonic() - started, traceback.format_exc()
+
+
+def show(name: str, rows: list[dict], seconds: float, error: str) -> None:
+    print(f"### {name}  {seconds / 60:.1f}分", file=sys.stderr, flush=True)
+    if error:
+        print(error, file=sys.stderr)
+    for row in rows:
+        if "error" in row:
+            print(f"    エラー {row['error'][:70]}", file=sys.stderr)
+            continue
+        print(
+            f"    {row['part_number']:<16} pin{row.get('pins', 0):>4}"
+            f" fn{row.get('functions', 0):>5} sel{row.get('selectors', 0):>3}"
+            f" 解決{row.get('resolved', 0):>4} 未解決{row.get('unresolved', 0):>4}"
+            f"  {row.get('note', '')}",
+            file=sys.stderr,
+        )
+
+
+def default_jobs() -> int:
+    """How many families to read at once. Deliberately far below the core count.
+
+    Cores are not the constraint -- memory is, and **on WSL the memory a worker
+    can actually have is not what `free` reports**. `free` describes the Linux
+    VM's own allocation; the Windows host underneath may have much less free, and
+    overcommitting there does not fail loudly, it thrashes. Six workers hung this
+    machine even though `free` showed 8 GB available.
+
+    The measurement that settles it: one CH32H417 worker peaks at **2.2 GB**, and
+    that is after dropping each page's cache as it is finished. Six of those want
+    13 GB and hung this machine. Two is what runs comfortably and is still about
+    twice as fast as reading the families one after another; `--jobs` raises it
+    for anyone who knows their own headroom.
+    """
+    return max(1, min(2, (os.cpu_count() or 2) - 1))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=Path("candidates"))
     ap.add_argument("--family", help="この family dir だけ処理する")
     ap.add_argument("--limit", type=int, help="family あたりの SKU 上限（試験用）")
+    ap.add_argument("--jobs", type=int, default=default_jobs(),
+                    help=f"同時に処理する family 数（既定 {default_jobs()}）。"
+                         "1 で逐次（例外がそのまま上がる）")
     args = ap.parse_args()
 
-    report: list[dict] = []
-    for family in family_dirs():
-        if args.family and family.name != args.family:
-            continue
-        print(f"### {family.name}", file=sys.stderr, flush=True)
-        try:
-            rows = run_family(family, args.out, args.limit)
-        except Exception:  # noqa: BLE001
-            traceback.print_exc()
-            continue
-        for row in rows:
-            if "error" in row:
-                print(f"    エラー {row['error'][:70]}", file=sys.stderr)
-                continue
-            print(
-                f"    {row['part_number']:<16} pin{row.get('pins', 0):>4}"
-                f" fn{row.get('functions', 0):>5} sel{row.get('selectors', 0):>3}"
-                f" 解決{row.get('resolved', 0):>4} 未解決{row.get('unresolved', 0):>4}"
-                f"  {row.get('note', '')}",
-                file=sys.stderr,
-            )
-        report += rows
+    families = [f for f in family_dirs()
+                if not args.family or f.name == args.family]
+    # 重いものから。最後に1 family だけ残るのを避ける。
+    families.sort(key=weight, reverse=True)
+    started = time.monotonic()
 
+    report: list[dict] = []
+    if args.jobs <= 1 or len(families) == 1:
+        for family in families:
+            name, rows, seconds, error = _one(family, args.out, args.limit)
+            show(name, rows, seconds, error)
+            report += rows
+    else:
+        args.out.mkdir(parents=True, exist_ok=True)
+        print(f"family {len(families)} 件を最大 {args.jobs} 並列で処理します"
+              f"（終わった順に出ます）", file=sys.stderr, flush=True)
+        with concurrent.futures.ProcessPoolExecutor(max_workers=args.jobs) as pool:
+            futures = [pool.submit(_one, f, args.out, args.limit) for f in families]
+            for future in concurrent.futures.as_completed(futures):
+                name, rows, seconds, error = future.result()
+                show(name, rows, seconds, error)
+                report += rows
+
+    report.sort(key=lambda r: r.get("part_number", ""))
     ok = [r for r in report if r.get("pins")]
     print(
         f"\nSKU {len(report)} 件中 pin を得たもの {len(ok)}"
         f" / 合計 pin {sum(r.get('pins', 0) for r in ok)}"
         f" / 合計 function {sum(r.get('functions', 0) for r in ok)}"
-        f" / 解決済み経路 {sum(r.get('resolved', 0) for r in ok)}",
+        f" / 解決済み経路 {sum(r.get('resolved', 0) for r in ok)}"
+        f" / 所要 {(time.monotonic() - started) / 60:.1f}分",
         file=sys.stderr,
     )
     (args.out / "_report.json").write_text(
