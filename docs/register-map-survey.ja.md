@@ -265,6 +265,111 @@ operating_conditions / product_attributes。**registerの表は1つもありま�
 - 資料間で名前を揃える語彙規則（`tools/signal_vocabulary.py`）
 - 出典と確信度を`#`の右に持つ表の作法（D-8はこの形にそのまま乗る）
 
+## 先出し1: SysTick（R-24追補3のE-1）
+
+**`millis()`/`micros()`/`delay()`がCH32V103で動かない**という報告を受けて、
+1周辺だけ先に出した。`tables/systick.csv`（53行）が配置を持ち、bit定義は
+reference manualにしか無いのでここに記録する。
+
+### 配置は4種類ある（`core_riscv.h`から機械抽出）
+
+| 形 | family | 配置 |
+|---|---|---|
+| A | M030・V003・V006・V205・V407・X315 | `CTLR@0x00` `SR@0x04` `CNT@0x08`(32bit) `CMP@0x10`(32bit) |
+| B | L103・V20x・V307・X035 | `CTLR@0x00` `SR@0x04` `CNT@0x08`(**64bit**) `CMP@0x10`(64bit) |
+| C | H417 | `CTLR@0x00` `ISR@0x04` `CNT@0x08` `CMP@0x10`。**SysTickが2本**（`SysTick0`@`0xE000F000`、`SysTick1`@`0xE000F080`。双核なのでコアごと）。`ISR`には`only for SysTick0`というコメントが付く |
+| D | **V103** | `CTLR@0x00` `CNTL@0x04` `CNTH@0x08` `CMPLR@0x0C` `CMPHR@0x10`。**全部8bit書き込み、status registerが無い** |
+
+**CMPは他11 familyで`0x10`だが、CH32V103では`0x10`が上位32bit**（`CMPHR`）。
+`0x10`へ比較値を書くと上位に入るので一致しない。
+
+### CH32V103のSTK bit定義（`CH32xRM.PDF` zh p.64-66 / en p.77-79、9.5.3節）
+
+**`STK_CTLR`（`0xE000F000`）は1ビットしか持たない。**
+
+| bit | 名前 | 属性 | 記述 |
+|---|---|---|---|
+| [31:1] | Reserved | **RO** | 保留 |
+| 0 | `STE` | RW | 系統計数器STKを起動（**HCLK/8 時基**）／停止 |
+
+`CTLR = 0x7`を書いてbit1/2が立たないのはこれで説明がつく。**割込み許可ビットは
+存在せず、status registerも無い**（表9-6が挙げるのは`CTLR`/`CNTL`/`CNTH`/`CMPLR`/
+`CMPHR`の5本だけ）。
+
+**compare一致割込みは存在し、許可ビットを要しない。** `STK_CMPLR`と`STK_CMPHR`の
+記述が両言語で「当CNT[63:0]与CMP[63:0]值相等时将触发STK中断服务」/ "When the
+CNT[63:0] and CMP[63:0] values are equal, the STK interrupt service will be
+triggered" と書いている。局所的な許可が無いので、**許可はPFIC側**
+（`SysTick_IRQn = 12`、`startup_ch32v10x.S`にベクタあり）。
+
+**割込みが起きない原因はおそらく2つある。**
+
+1. **CNT/CMPは8bit単位でしか書けない。** 両言語が
+   「此寄存器可按 8/16/32 位读取，但是只能以8位进行修改」/ "can be read in
+   8-bit/16-bit/32-bit mode, but **can only be modified in 8-bit mode**」と明記。
+   WCH自身が16個の`uint8_t`として宣言しているのはこのため。**32bitで書いた比較値は
+   入らない。** `systick.csv`の`write_bits`列がこれを持つ
+2. **時基はHCLK/8で固定。** `STE`の記述が`HCLK/8 time base`と言っており、
+   他familyの`STCLK`のような選択ビットが無い。72MHzで1msなら
+   比較値の差分は`72000/8 = 9000`で、`71999`ではない
+
+### WCH自身の参照実装が同じことをしている
+
+`CH32V103/EVT/EXAM/HarmonyOS/LiteOS_M_V103/.../los_timer.c` の`HalTickStart()`が
+上の読みを全部裏付ける。**この repository が持つ範囲で最も権威のある参照実装**なので
+引用しておく。
+
+```c
+NVIC_EnableIRQ(SysTicK_IRQn);          /* 許可はPFIC側だけ */
+NVIC_SetPriority(SysTicK_IRQn, 0xff);
+SysTick->CTLR = 0;
+SysTick->CNTL0=0; ... SysTick->CNTH3=0;      /* カウンタも8bitずつ */
+SysTick->CMPLR0=(UINT8)(g_cyclesPerTick-1);  /* 比較値も8bitずつ */
+SysTick->CMPLR1=(UINT8)((g_cyclesPerTick-1)>>8);
+SysTick->CMPLR2=(UINT8)((g_cyclesPerTick-1)>>16);
+SysTick->CMPLR3=(UINT8)((g_cyclesPerTick-1)>>24);
+SysTick->CMPHR0=0; ... SysTick->CMPHR3=0;
+SysTick->CTLR = 0x1;                   /* STEだけ。割込み許可ビットは無い */
+```
+
+読み取れることが4つある。
+
+**割込み許可はPFIC側の`NVIC_EnableIRQ(SysTicK_IRQn)`だけ。** STK側に許可ビットは
+無いので、`CTLR`に何を書いても始まらない。
+
+**CNT/CMPは本当に8bitずつ書いている。** WCHの自前コードが4回に分けているのは
+reference manualの「只能以8位进行修改」に従っているため。32bitで書いても入らない。
+
+**時基はHCLK/8で確定。** `target_config.h`が`#define OS_SYS_CLOCK (SystemCoreClock / 8)`
+と定義していて、`g_cyclesPerTick = OS_SYS_CLOCK / TICK_PER_SECOND`。同じ`/8`が
+`Debug/debug.c`の`Delay_Init()`にもある（`p_us = SystemCoreClock / 8000000`）。
+**72MHzで1msなら比較値は`72000/8 = 9000`**。
+
+**割込みのクリアは無い。** `HalSysTickReload()`は`STE`を落とし、CNTとCMPを8bitずつ
+書き直して`STE`を立て直すだけ。status registerが無いのだから消すものも無い。
+
+### 同じ章に別のSysTickがある（引っかかりやすい）
+
+9.5.4節が`STK_CTRL`/`STK_LOAD`/`STK_VAL`/`STK_CALIB`（`0xE000E010`〜）を記述して
+いて、こちらには`COUNTFLAG`/`TICKINT`/`ENABLE`がある。**これはCortex-M3の
+SysTickで、CH32F103用**（節末に「适用于基于ARM Cortex-M3内核设计的通用微控制器」）。
+この manual はCH32F103とCH32V103の両方を覆っているので、「割込み許可ビットを探す」と
+`TICKINT`が見つかるが、**CH32V103のものではない**。
+
+### 結論（E-1はこれでクローズ）
+
+**探されていたレジスタは存在しない。** CH32V103のSTKには割込み許可ビットも
+status registerも無く、compare一致で無条件に割込みが上がる。動かすのに要るのは
+STK側ではなく (1) PFICでの許可、(2) CNT/CMPを8bit単位で書くこと、(3) 時基がHCLK/8
+であること——の3つ。3資料（reference manual 両版・LiteOS移植・`debug.c`）が一致する。
+
+### 残る穴
+
+他11 familyの`STK_CTLR`のbit定義（`STE`/`STIE`/`STCLK`/`STRE`/`MODE`/`INIT`/`SWIE`
+に相当するもの）は未取得。`core_riscv.h`は**どのfamilyでも`STK_*`のbitを1つも
+定義していない**ので、reference manualを読む以外に出所が無い。CH32V103で必要だった
+範囲は上で埋まっているので、これはR-20本体の作業に戻す。
+
 ## 判断に必要な材料（決めていない）
 
 方針は「**まず独自に取得し、既存のものとは突き合わせてチェックする**」で確定

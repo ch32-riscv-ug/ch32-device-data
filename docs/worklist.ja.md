@@ -127,7 +127,7 @@ consumer側でPLL対応が実装され、**CH32V20x/V307が8→96MHz、CH32V103�
 
 | # | 依頼 | 状態 |
 |---|---|---|
-| E-1 | CH32V103のSTKレジスタ定義（**P0・実害あり**） | 🔜 調査中 |
+| E-1 | CH32V103のSTKレジスタ定義（**P0**） | ✅ **クローズ**（2026-08-22）。探されていたレジスタは**存在しない**。`tables/systick.csv`新設＋[register-map-survey](register-map-survey.ja.md#先出し1-systickr-24追補3のe-1)。consumer側は実機で解決済み |
 | E-2 | EVTがAPB1を`/2`にする理由（RMにAPB1固有の上限はあるか） | 🔜 |
 | E-3 | CH32V30xのflash/SRAM構成が可変 | 🔜 |
 | E-4 | CH32V003の`RCC_HSITRIM`フィールド位置 | ✅ **実装済み** |

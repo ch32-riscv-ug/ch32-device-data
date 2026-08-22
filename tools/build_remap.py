@@ -60,6 +60,10 @@ ROUTE_COLUMNS = ["series", "selector", "value", "signal", "pad",
                  "#", "confidence", "basis"]
 
 FIELD_BASIS = "candidates(evt-header+rm-register-table+rm-remap-grid:en)"
+# The EVT header does not define this field at all, so nothing cross-checks the
+# manual's reading of it and the SDK offers no macro to write it. CH32V20x's
+# USART4..USART8 are the only fields in any family that come this way.
+MANUAL_BASIS = "candidates(rm-register-table+rm-remap-grid:en)"
 ROUTE_BASIS = "candidates(datasheet-pin-table+rm-remap-grid:en)"
 # The default route is read off the pin table's own default column, not the
 # remap grid, which usually starts at value 1.
@@ -99,6 +103,7 @@ def main() -> int:
                 "valid_values": ";".join(str(v) for v in sel.get("valid_values") or []),
                 "reset_value": "" if sel.get("reset_value") is None
                                else str(sel["reset_value"]),
+                "_from_manual": bool(sel.get("_from_manual")),
             }
             known = fields.get(key)
             if known is None:
@@ -134,9 +139,10 @@ def main() -> int:
 
     field_rows = sorted(fields.values(),
                         key=lambda r: (r["series"], r["selector"]))
+    manual_only = [r for r in field_rows if r["_from_manual"]]
     for row in field_rows:
         row["confidence"] = "reference"
-        row["basis"] = FIELD_BASIS
+        row["basis"] = MANUAL_BASIS if row.pop("_from_manual") else FIELD_BASIS
     route_rows = []
     undecided: dict[str, int] = {}
     for (s, sel, value, signal, pad) in sorted(routes):
@@ -151,6 +157,12 @@ def main() -> int:
              "confidence": "reference",
              "basis": DEFAULT_BASIS if value == 0 else ROUTE_BASIS}
         )
+
+    if manual_only:
+        print(f"  headerに定義が無くRMだけから作った selector: {len(manual_only)}",
+              file=sys.stderr)
+        for r in manual_only:
+            print(f"    {r['series']} {r['selector']:24} {r['bits']}", file=sys.stderr)
 
     args.out.mkdir(parents=True, exist_ok=True)
     for name, rows, columns in (("remap_fields.csv", field_rows, FIELD_COLUMNS),
