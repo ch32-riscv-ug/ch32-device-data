@@ -27,6 +27,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   clock_symbols.csv       429行  設定に出てくる記号の数値・書き込み先register・絶対アドレス・役割
   clock_init.csv          101行  SystemInitの手順（ベタhexなので記号では見えない）＋HSI工場トリム
   evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
+  systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
+  link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -169,6 +171,33 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 **記号名がfamilyで違います**（`CFG0_PLL_TRIM`と`HSI_LP_TRIM_BASE`）。CH32V003は`SystemInit`でも`0x10`という既定値を無条件に書き、あとで工場値が`0xFF`でなければ上書きします——つまり**未書き込み品では既定値のまま**です。CH32L103とCH32V205は低消費HSIの設定関数の中だけで、常時ではありません。
 
 出典は`evt(system_ch32*.c)`・`evt(rcc-header+rcc-driver)`・`evt(device-header+system_ch32*.c)`・`evt(device-header)`・`evt(system_ch32*.c+device-header)`・`evt(device-header-comment)`で単一資料のため**conflictを除いて全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
+
+### `link_firmware.csv`
+
+WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/build_link_firmware.py`で、
+`WCH-LinkUtility.ZIP`（またはMounRiver Studio同梱の同じディレクトリ）を読む。
+**`.bin`自体はこのrepositoryに置いていない**——再配布になるため、載せるのは
+sha256・サイズ・取得元URLだけ。
+
+**この表はまだ「あなたのLinkは古い」を言えない。** `wcfg_version`列はWCH独自の
+番号（`wchlink.wcfg`の`CH32V307Ver=42`等）で、**実機がUSBで申告する`2.12`のような
+`major.minor`との対応が取れていない**。詳細と再挑戦の手順は
+[docs/link-firmware-survey.ja.md](../docs/link-firmware-survey.ja.md)。
+いま確実に使えるのは**sha256**で、「手元のファイルが今配られているものと同じか」は
+これで判る。
+
+MCUの割り当ては推測ではなく先頭命令から出している（`02`=8051の`LJMP`、
+`6f`=RISC-Vの`jal`）。WindowsのZIPとLinux版MounRiver Studioの10本は
+**sha256まで完全に一致する**ので、更新にWindowsは要らない。
+
+### `systick.csv`
+
+SysTickのregister配置。`core_riscv.h`の`SysTick_Type`から機械抽出する
+（`tools/build_systick.py`）。**配置が4種類あり、CH32V103だけ`CMP`の位置が違う**
+——他11 familyは`CMP@0x10`だが、CH32V103は`0x10`が`CMPHR`（上位32bit）で
+比較値の下位は`0x0C`。`write_bits`列が「8bit単位でしか書けない」を言う。
+CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義はreference manualに
+しか無いので[register-map-survey](../docs/register-map-survey.ja.md#先出し1-systickr-24追補3のe-1)に置いた。
 
 ### `errata.csv`
 

@@ -26,6 +26,12 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
   オフセットから`BLOCK->REGISTER`の絶対アドレスを解く。レジスタ名から場所は決まらない
   （CH32V205だけEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを別の番地に置く）
+- `tools/build_systick.py`: `core_riscv.h`からSysTickのregister配置を取り
+  `tables/systick.csv`にする。**CH32V103だけ配置が違い**、`CMP`の位置を他family
+  と同じだと思うと`millis()`が動かない
+- `tools/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
+  一覧を`tables/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
+  **版番号は未解決**（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`tables/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
