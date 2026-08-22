@@ -1,39 +1,55 @@
 part_number,attribute,value,label_zh,label_en,basis,confidence
-CH32H415REU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32H415REU6,adc_tkey_channels,15+2,ADC/TKey 通道数,ADC/TKey Channels,products:zh+products:en,confirmed
+CH32H415REU6,adc_tkey_units,2,ADC/TKey 单元数,ADC/TKey Units,products:zh+products:en,confirmed
 CH32H415REU6,can,3,CAN（5）,CAN(5),products:zh+products:en,confirmed
 CH32H415REU6,cmp,1,CMP,CMP,products:zh+products:en,confirmed
 CH32H415REU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32H415REU6,dfsdm,1,DFSDM,DFSDM,products:zh+products:en,confirmed
 CH32H415REU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32H415REU6,gpha,1,GPHA（5）,GPHA,products:zh+products:en,confirmed
-CH32H415REU6,hsadc,1,HSADC,HSADC,products:zh+products:en,confirmed
+CH32H415REU6,hsadc_channels,4,HSADC 通道数,HSADC Channels,products:zh+products:en,confirmed
+CH32H415REU6,hsadc_units,1,HSADC 单元数,HSADC Units,products:zh+products:en,confirmed
 CH32H415REU6,i2c,4,I2C,I2C,products:zh+products:en,confirmed
 CH32H415REU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32H415REU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
 CH32H415REU6,opa,2 (OPA1/3),OPA,OPA,products:zh+products:en,confirmed
-CH32H415REU6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32H415REU6,pdusb_usbfs_otg_fs,1,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,products:zh+products:en,confirmed
+CH32H415REU6,pdusb_usbhs_usb,1,PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB,products:zh+products:en,confirmed
 CH32H415REU6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32H415REU6,rng,1,RNG,RNG,products:zh+products:en,confirmed
 CH32H415REU6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
 CH32H415REU6,sai,1,SAI,SAI,products:zh+products:en,confirmed
 CH32H415REU6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32H415REU6,spi_i2s,4/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
+CH32H415REU6,sram_core_1_hs_dtcm,256KB,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,products:zh+products:en,confirmed
+CH32H415REU6,sram_core_1_hs_itcm,128KB,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,products:zh+products:en,confirmed
+CH32H415REU6,sram_shared_code_anddata_area,512KB,SRAM 共享代码和数据区,SRAM Shared code anddata area,products:zh+products:en,confirmed
 CH32H415REU6,swpmi,1,SWPMI,SWPMI,products:zh+products:en,confirmed
-CH32H415REU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32H415REU6,timer_adtm_16_bit,2,定时器 高级（16位）,Timer ADTM (16-bit),products:zh+products:en,confirmed
+CH32H415REU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32H415REU6,timer_gptm_16_bit,4,定时器 通用（16位）,Timer GPTM (16-bit),products:zh+products:en,confirmed
+CH32H415REU6,timer_gptm_32_bit,4,定时器 通用（32位）,Timer GPTM (32-bit),products:zh+products:en,confirmed
+CH32H415REU6,timer_lptim,2,定时器 LPTIM,Timer LPTIM,products:zh+products:en,confirmed
+CH32H415REU6,timer_systick_32_bit,2,定时器 系统时基32位,Timer SysTick 32-bit,products:zh+products:en,confirmed
+CH32H415REU6,timer_watchdog,WWDG+IWDG,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32H415REU6,usart,8,USART,USART,products:zh+products:en,confirmed
-CH32H416RDU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32H415REU6,usbpd_type_c,1,PDUSB USBPD Type-C,USBPD Type-C,products:zh+products:en,confirmed
+CH32H416RDU6,adc_tkey_channels,16+2,ADC/TKey 通道数,ADC/TKey Channels,products:zh+products:en,confirmed
+CH32H416RDU6,adc_tkey_units,2,ADC/TKey 单元数,ADC/TKey Units,products:zh+products:en,confirmed
 CH32H416RDU6,can,3,CAN（5）,CAN(5),products:zh+products:en,confirmed
 CH32H416RDU6,cmp,1,CMP,CMP,products:zh+products:en,confirmed
 CH32H416RDU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32H416RDU6,dfsdm,1,DFSDM,DFSDM,products:zh+products:en,confirmed
 CH32H416RDU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32H416RDU6,gpha,1,GPHA（5）,GPHA,products:zh+products:en,confirmed
-CH32H416RDU6,hsadc,1,HSADC,HSADC,products:zh+products:en,confirmed
+CH32H416RDU6,hsadc_channels,7,HSADC 通道数,HSADC Channels,products:zh+products:en,confirmed
+CH32H416RDU6,hsadc_units,1,HSADC 单元数,HSADC Units,products:zh+products:en,confirmed
 CH32H416RDU6,i2c,4,I2C,I2C,products:zh+products:en,confirmed
 CH32H416RDU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32H416RDU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
 CH32H416RDU6,opa,3,OPA,OPA,products:zh+products:en,confirmed
-CH32H416RDU6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32H416RDU6,pdusb_usbfs_otg_fs,1,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,products:zh+products:en,confirmed
+CH32H416RDU6,pdusb_usbhs_usb,1,PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB,products:zh+products:en,confirmed
 CH32H416RDU6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32H416RDU6,qspi,1 (QSPI2),QSPI,QSPI,products:zh+products:en,confirmed
 CH32H416RDU6,rng,1,RNG,RNG,products:zh+products:en,confirmed
@@ -41,24 +57,42 @@ CH32H416RDU6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
 CH32H416RDU6,sai,1,SAI,SAI,products:zh+products:en,confirmed
 CH32H416RDU6,sdmmc,1,SDMMC,SDMMC,products:zh+products:en,confirmed
 CH32H416RDU6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
+CH32H416RDU6,sram_core_1_fast_dtcm,256KB,SRAM 内核1高速DTCM,,products:zh,reference
+CH32H416RDU6,sram_core_1_fast_itcm,128KB,SRAM 内核1高速ITCM,,products:zh,reference
+CH32H416RDU6,sram_core_1_hs_dtcm,256K,,SRAM Core 1 HS DTCM,products:en,reference
+CH32H416RDU6,sram_core_1_hs_itcm,128K,,SRAM Core 1 HS ITCM,products:en,reference
+CH32H416RDU6,sram_shared_code_and_data_area,512KB,SRAM 共享代码和数据区,,products:zh,reference
+CH32H416RDU6,sram_shared_code_anddata_area,512K,,SRAM Shared code anddata area,products:en,reference
 CH32H416RDU6,swpmi,1,SWPMI,SWPMI,products:zh+products:en,confirmed
-CH32H416RDU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32H416RDU6,timer_adtm_16_bit,2,定时器 高级（16位）,Timer ADTM (16-bit),products:zh+products:en,confirmed
+CH32H416RDU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32H416RDU6,timer_gptm_16_bit,4,定时器 通用（16位）,Timer GPTM (16-bit),products:zh+products:en,confirmed
+CH32H416RDU6,timer_gptm_32_bit,4,定时器 通用（32位）,Timer GPTM (32-bit),products:zh+products:en,confirmed
+CH32H416RDU6,timer_lptim,2,定时器 LPTIM,Timer LPTIM,products:zh+products:en,confirmed
+CH32H416RDU6,timer_systick_32_bit,2,定时器 系统时基32位,Timer SysTick 32-bit,products:zh+products:en,confirmed
+CH32H416RDU6,timer_watchdog,WWDG+IWDG,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32H416RDU6,usart,7,USART,USART,products:zh+products:en,confirmed
-CH32H417MEU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32H416RDU6,usbpd_type_c,1Built-in Rd(4),PDUSB USBPD Type-C,USBPD Type-C,products:en+!products:zh(=1 built-in Rd(4)),conflict
+CH32H416RDU6,usbss_usb_3_0,1,PDUSB USBSS（USB 3.0）,USBSS (USB 3.0),products:zh+products:en,confirmed
+CH32H417MEU6,adc_tkey_channels,9+2,ADC/TKey 通道数,ADC/TKey Channels,products:zh+products:en,confirmed
+CH32H417MEU6,adc_tkey_units,2,ADC/TKey 单元数,ADC/TKey Units,products:zh+products:en,confirmed
 CH32H417MEU6,can,3,CAN（5）,CAN(5),products:zh+products:en,confirmed
 CH32H417MEU6,cmp,1,CMP,CMP,products:zh+products:en,confirmed
 CH32H417MEU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32H417MEU6,dfsdm,1,DFSDM,DFSDM,products:zh+products:en,confirmed
 CH32H417MEU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32H417MEU6,ethernet,MAC+10/100MPHY,Ethernet（5）,Ethernet(5),products:zh+products:en,confirmed
-CH32H417MEU6,fmc,1(2),FMC,FMC,products:zh+products:en,confirmed
+CH32H417MEU6,fmc_fsmc,1(2),FMC FSMC,FMC FSMC,products:zh+products:en,confirmed
+CH32H417MEU6,fmc_sdram,1,FMC SDRAM,FMC SDRAM,products:zh+products:en,confirmed
 CH32H417MEU6,gpha,1,GPHA（5）,GPHA,products:zh+products:en,confirmed
-CH32H417MEU6,hsadc,1,HSADC,HSADC,products:zh+products:en,confirmed
+CH32H417MEU6,hsadc_channels,4,HSADC 通道数,HSADC Channels,products:zh+products:en,confirmed
+CH32H417MEU6,hsadc_units,1,HSADC 单元数,HSADC Units,products:zh+products:en,confirmed
 CH32H417MEU6,i2c,4,I2C,I2C,products:zh+products:en,confirmed
 CH32H417MEU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32H417MEU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
 CH32H417MEU6,opa,2 (OPA1/3),OPA,OPA,products:zh+products:en,confirmed
-CH32H417MEU6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32H417MEU6,pdusb_usbfs_otg_fs,1,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,products:zh+products:en,confirmed
+CH32H417MEU6,pdusb_usbhs_usb,1,PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB,products:zh+products:en,confirmed
 CH32H417MEU6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32H417MEU6,qspi,1 (QSPI2),QSPI,QSPI,products:zh+products:en,confirmed
 CH32H417MEU6,rng,1,RNG,RNG,products:zh+products:en,confirmed
@@ -67,25 +101,39 @@ CH32H417MEU6,sai,1,SAI,SAI,products:zh+products:en,confirmed
 CH32H417MEU6,sdmmc,1,SDMMC,SDMMC,products:zh+products:en,confirmed
 CH32H417MEU6,serdes,1,SerDes（5）,SerDes(4),products:zh+products:en,confirmed
 CH32H417MEU6,spi_i2s,4/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
+CH32H417MEU6,sram_core_1_hs_dtcm,256KB,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,products:zh+products:en,confirmed
+CH32H417MEU6,sram_core_1_hs_itcm,128KB,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,products:zh+products:en,confirmed
+CH32H417MEU6,sram_shared_code_anddata_area,512KB,SRAM 共享代码和数据区,SRAM Shared code anddata area,products:zh+products:en,confirmed
 CH32H417MEU6,swpmi,1,SWPMI,SWPMI,products:zh+products:en,confirmed
-CH32H417MEU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32H417MEU6,timer_adtm_16_bit,2,定时器 高级（16位）,Timer ADTM (16-bit),products:zh+products:en,confirmed
+CH32H417MEU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32H417MEU6,timer_gptm_16_bit,4,定时器 通用（16位）,Timer GPTM (16-bit),products:zh+products:en,confirmed
+CH32H417MEU6,timer_gptm_32_bit,4,定时器 通用（32位）,Timer GPTM (32-bit),products:zh+products:en,confirmed
+CH32H417MEU6,timer_lptim,2,定时器 LPTIM,Timer LPTIM,products:zh+products:en,confirmed
+CH32H417MEU6,timer_systick_32_bit,2,定时器 系统时基32位,Timer SysTick 32-bit,products:zh+products:en,confirmed
 CH32H417MEU6,uhsif,1,UHSIF,UHSIF,products:zh+products:en,confirmed
 CH32H417MEU6,usart,8,USART,USART,products:zh+products:en,confirmed
-CH32H417QEU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32H417MEU6,usbpd_type_c,1,PDUSB USBPD Type-C,USBPD Type-C,products:zh+products:en,confirmed
+CH32H417MEU6,usbss_usb_3_0,1,PDUSB USBSS（USB 3.0）,USBSS (USB 3.0),products:zh+products:en,confirmed
+CH32H417QEU6,adc_tkey_channels,16+2,ADC/TKey 通道数,ADC/TKey Channels,products:zh+products:en,confirmed
+CH32H417QEU6,adc_tkey_units,2,ADC/TKey 单元数,ADC/TKey Units,products:zh+products:en,confirmed
 CH32H417QEU6,can,3,CAN（5）,CAN(5),products:zh+products:en,confirmed
 CH32H417QEU6,cmp,1,CMP,CMP,products:zh+products:en,confirmed
 CH32H417QEU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32H417QEU6,dfsdm,1,DFSDM,DFSDM,products:zh+products:en,confirmed
 CH32H417QEU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32H417QEU6,ethernet,MAC+10/100M PHY,Ethernet（5）,Ethernet(5),products:zh+products:en,confirmed
-CH32H417QEU6,fmc,1,FMC,FMC,products:zh+products:en,confirmed
+CH32H417QEU6,fmc_fsmc,1,FMC FSMC,FMC FSMC,products:zh+products:en,confirmed
+CH32H417QEU6,fmc_sdram,1,FMC SDRAM,FMC SDRAM,products:zh+products:en,confirmed
 CH32H417QEU6,gpha,1,GPHA（5）,GPHA,products:zh+products:en,confirmed
-CH32H417QEU6,hsadc,1,HSADC,HSADC,products:zh+products:en,confirmed
+CH32H417QEU6,hsadc_channels,7,HSADC 通道数,HSADC Channels,products:zh+products:en,confirmed
+CH32H417QEU6,hsadc_units,1,HSADC 单元数,HSADC Units,products:zh+products:en,confirmed
 CH32H417QEU6,i2c,4,I2C,I2C,products:zh+products:en,confirmed
 CH32H417QEU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32H417QEU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
 CH32H417QEU6,opa,3,OPA,OPA,products:zh+products:en,confirmed
-CH32H417QEU6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32H417QEU6,pdusb_usbfs_otg_fs,1,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,products:zh+products:en,confirmed
+CH32H417QEU6,pdusb_usbhs_usb,1,PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB,products:zh+products:en,confirmed
 CH32H417QEU6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32H417QEU6,qspi,2,QSPI,QSPI,products:zh+products:en,confirmed
 CH32H417QEU6,rng,1,RNG,RNG,products:zh+products:en,confirmed
@@ -95,24 +143,39 @@ CH32H417QEU6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32H417QEU6,sdmmc,1,SDMMC,SDMMC,products:zh+products:en,confirmed
 CH32H417QEU6,serdes,1,SerDes（5）,SerDes(4),products:zh+products:en,confirmed
 CH32H417QEU6,spi_i2s,4/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
+CH32H417QEU6,sram_core_1_hs_dtcm,256KB,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,products:zh+products:en,confirmed
+CH32H417QEU6,sram_core_1_hs_itcm,128KB,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,products:zh+products:en,confirmed
+CH32H417QEU6,sram_shared_code_anddata_area,512KB,SRAM 共享代码和数据区,SRAM Shared code anddata area,products:zh+products:en,confirmed
 CH32H417QEU6,swpmi,1,SWPMI,SWPMI,products:zh+products:en,confirmed
-CH32H417QEU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32H417QEU6,timer_adtm_16_bit,2,定时器 高级（16位）,Timer ADTM (16-bit),products:zh+products:en,confirmed
+CH32H417QEU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32H417QEU6,timer_gptm_16_bit,4,定时器 通用（16位）,Timer GPTM (16-bit),products:zh+products:en,confirmed
+CH32H417QEU6,timer_gptm_32_bit,4,定时器 通用（32位）,Timer GPTM (32-bit),products:zh+products:en,confirmed
+CH32H417QEU6,timer_lptim,2,定时器 LPTIM,Timer LPTIM,products:zh+products:en,confirmed
+CH32H417QEU6,timer_systick_32_bit,2,定时器 系统时基32位,Timer SysTick 32-bit,products:zh+products:en,confirmed
+CH32H417QEU6,timer_watchdog,WWDG+IWDG,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32H417QEU6,uhsif,1,UHSIF,UHSIF,products:zh+products:en,confirmed
 CH32H417QEU6,usart,8,USART,USART,products:zh+products:en,confirmed
-CH32H417WEU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32H417QEU6,usbpd_type_c,1,PDUSB USBPD Type-C,USBPD Type-C,products:zh+products:en,confirmed
+CH32H417QEU6,usbss_usb_3_0,1,PDUSB USBSS（USB 3.0）,USBSS (USB 3.0),products:zh+products:en,confirmed
+CH32H417WEU6,adc_tkey_channels,7+2,ADC/TKey 通道数,ADC/TKey Channels,products:zh+products:en,confirmed
+CH32H417WEU6,adc_tkey_units,2,ADC/TKey 单元数,ADC/TKey Units,products:zh+products:en,confirmed
 CH32H417WEU6,can,3,CAN（5）,CAN(5),products:zh+products:en,confirmed
 CH32H417WEU6,cmp,1,CMP,CMP,products:zh+products:en,confirmed
 CH32H417WEU6,dac_unit,1 (DAC2),DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32H417WEU6,dfsdm,1,DFSDM,DFSDM,products:zh+products:en,confirmed
 CH32H417WEU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32H417WEU6,ethernet,MAC+10/100M PHY,Ethernet（5）,Ethernet(5),products:zh+products:en,confirmed
-CH32H417WEU6,fmc,1(2),FMC,FMC,products:zh+products:en,confirmed
+CH32H417WEU6,fmc_fsmc,1(2),FMC FSMC,FMC FSMC,products:zh+products:en,confirmed
+CH32H417WEU6,fmc_sdram,1(3),FMC SDRAM,FMC SDRAM,products:zh+products:en,confirmed
 CH32H417WEU6,gpha,1,GPHA（5）,GPHA,products:zh+products:en,confirmed
-CH32H417WEU6,hsadc,1,HSADC,HSADC,products:zh+products:en,confirmed
+CH32H417WEU6,hsadc_channels,4,HSADC 通道数,HSADC Channels,products:zh+products:en,confirmed
+CH32H417WEU6,hsadc_units,1,HSADC 单元数,HSADC Units,products:zh+products:en,confirmed
 CH32H417WEU6,i2c,4,I2C,I2C,products:zh+products:en,confirmed
 CH32H417WEU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32H417WEU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
 CH32H417WEU6,opa,2 (OPA1/3),OPA,OPA,products:en+!products:zh(=1（OPA1）),conflict
+CH32H417WEU6,pdusb_usbhs_usb,1,PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB,products:zh+products:en,confirmed
 CH32H417WEU6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32H417WEU6,qspi,1 (QSPI2),QSPI,QSPI,products:zh+products:en,confirmed
 CH32H417WEU6,rng,1,RNG,RNG,products:zh+products:en,confirmed
@@ -120,54 +183,115 @@ CH32H417WEU6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
 CH32H417WEU6,sai,1,SAI,SAI,products:zh+products:en,confirmed
 CH32H417WEU6,sdmmc,1,SDMMC,SDMMC,products:zh+products:en,confirmed
 CH32H417WEU6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
+CH32H417WEU6,sram_core_1_hs_dtcm,256KB,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,products:zh+products:en,confirmed
+CH32H417WEU6,sram_core_1_hs_itcm,128KB,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,products:zh+products:en,confirmed
+CH32H417WEU6,sram_shared_code_anddata_area,512KB,SRAM 共享代码和数据区,SRAM Shared code anddata area,products:zh+products:en,confirmed
 CH32H417WEU6,swpmi,1,SWPMI,SWPMI,products:zh+products:en,confirmed
-CH32H417WEU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32H417WEU6,timer_adtm_16_bit,2,定时器 高级（16位）,Timer ADTM (16-bit),products:zh+products:en,confirmed
+CH32H417WEU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32H417WEU6,timer_gptm_16_bit,4,定时器 通用（16位）,Timer GPTM (16-bit),products:zh+products:en,confirmed
+CH32H417WEU6,timer_gptm_32_bit,4,定时器 通用（32位）,Timer GPTM (32-bit),products:zh+products:en,confirmed
+CH32H417WEU6,timer_lptim,2,定时器 LPTIM,Timer LPTIM,products:zh+products:en,confirmed
+CH32H417WEU6,timer_systick_32_bit,2,定时器 系统时基32位,Timer SysTick 32-bit,products:zh+products:en,confirmed
 CH32H417WEU6,uhsif,1(1),UHSIF,UHSIF,products:zh+products:en,confirmed
 CH32H417WEU6,usart,7,USART,USART,products:zh+products:en,confirmed
+CH32H417WEU6,usbss_usb_3_0,1,PDUSB USBSS（USB 3.0）,USBSS (USB 3.0),products:zh+products:en,confirmed
 CH32L103C8T6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103C8T6,cmp,3,CMP,,products:zh,reference
-CH32L103C8T6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103C8T6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103C8T6,communication_interfaces_can_fd,√,通信接口 CAN FD,,products:zh,reference
+CH32L103C8T6,communication_interfaces_i2c,2,通信接口 I2C,,products:zh,reference
+CH32L103C8T6,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103C8T6,communication_interfaces_pdusb_usb_pdtype_c,DRPSourceSink,通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103C8T6,communication_interfaces_spi,2,通信接口 SPI,,products:zh,reference
+CH32L103C8T6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103C8T6,cpu_main_frequency,Max：96MHz,CPU主频,,products:zh,reference
 CH32L103C8T6,main_applications_and_features,"General purpose, pin-compatible",主要应用及特点,,products:zh,reference
 CH32L103C8T6,opa,1,OPA,OPA,products:zh+products:en,confirmed
 CH32L103C8T6,rated_voltage,3.3V,额定电压,,products:zh,reference
 CH32L103C8T6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
-CH32L103C8T6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103C8T6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103C8T6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103C8T6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103C8T6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
+CH32L103C8T6,timer_systick_64_bit,√,定时器 系统时基（64位）,Timer SysTick(64-bit),products:zh+products:en,confirmed
+CH32L103C8T6,timer_watchdog,2 ( WWDG + IWDG ),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32L103C8T6,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32L103F8P6,adc,9+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103F8P6,cmp,CMP1CMP2,CMP,,products:zh,reference
-CH32L103F8P6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103F8P6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103F8P6,communication_interfaces_i2c,I2C1,通信接口 I2C,,products:zh,reference
+CH32L103F8P6,communication_interfaces_pdusb_usb_hostdevice,Device,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103F8P6,communication_interfaces_pdusb_usb_pdtype_c,DRPSourceSink,通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103F8P6,communication_interfaces_spi,SPI1,通信接口 SPI,,products:zh,reference
+CH32L103F8P6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103F8P6,main_applications_and_features,"General purpose, pin-compatible",主要应用及特点,,products:zh,reference
 CH32L103F8P6,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32L103F8P6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103F8P6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103F8P6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103F8P6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103F8P6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32L103F8P6,tkey,9,Tkey,Tkey,products:zh+products:en,confirmed
 CH32L103F8U6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103F8U6,cmp,3,CMP,,products:zh,reference
-CH32L103F8U6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103F8U6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103F8U6,communication_interfaces_i2c,2,通信接口 I2C,,products:zh,reference
+CH32L103F8U6,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103F8U6,communication_interfaces_pdusb_usb_pdtype_c,"DRP/Source/Sink, built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103F8U6,communication_interfaces_spi,2,通信接口 SPI,,products:zh,reference
+CH32L103F8U6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103F8U6,main_applications_and_features,"General purpose, pin-optimized",主要应用及特点,,products:zh,reference
 CH32L103F8U6,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32L103F8U6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103F8U6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103F8U6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103F8U6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103F8U6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32L103F8U6,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32L103G8R6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103G8R6,cmp,3,CMP,,products:zh,reference
-CH32L103G8R6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103G8R6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103G8R6,communication_interfaces_i2c,2,通信接口 I2C,,products:zh,reference
+CH32L103G8R6,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103G8R6,communication_interfaces_pdusb_usb_pdtype_c,DRPSourceSink,通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103G8R6,communication_interfaces_spi,2,通信接口 SPI,,products:zh,reference
+CH32L103G8R6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103G8R6,main_applications_and_features,"General purpose, motor main control",主要应用及特点,,products:zh,reference
 CH32L103G8R6,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32L103G8R6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103G8R6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103G8R6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103G8R6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103G8R6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32L103G8R6,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32L103K8U6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103K8U6,cmp,3,CMP,,products:zh,reference
-CH32L103K8U6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103K8U6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103K8U6,communication_interfaces_can_fd,√,通信接口 CAN FD,,products:zh,reference
+CH32L103K8U6,communication_interfaces_i2c,I2C1,通信接口 I2C,,products:zh,reference
+CH32L103K8U6,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103K8U6,communication_interfaces_pdusb_usb_pdtype_c,"DRP/Source/Sink, built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103K8U6,communication_interfaces_spi,SPI1,通信接口 SPI,,products:zh,reference
+CH32L103K8U6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103K8U6,main_applications_and_features,"General purpose, pin-optimized",主要应用及特点,,products:zh,reference
 CH32L103K8U6,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32L103K8U6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103K8U6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103K8U6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103K8U6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103K8U6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32L103K8U6,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32L103K8U7,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32L103K8U7,cmp,3,CMP,,products:zh,reference
-CH32L103K8U7,communication_interfaces,4,通信接口,,products:zh,reference
+CH32L103K8U7,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32L103K8U7,communication_interfaces_i2c,I2C1,通信接口 I2C,,products:zh,reference
+CH32L103K8U7,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32L103K8U7,communication_interfaces_pdusb_usb_pdtype_c,"DRP/Source/Sink, built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32L103K8U7,communication_interfaces_spi,SPI1,通信接口 SPI,,products:zh,reference
+CH32L103K8U7,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32L103K8U7,main_applications_and_features,"General purpose, pin-optimized",主要应用及特点,,products:zh,reference
 CH32L103K8U7,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32L103K8U7,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32L103K8U7,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32L103K8U7,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32L103K8U7,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32L103K8U7,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32L103K8U7,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32M007E8R6,adc,7+2,ADC,ADC,products:zh+products:en,confirmed
 CH32M007E8R6,adtm,1,高 级 定 时 器,ADTM,products:zh+products:en,confirmed
@@ -229,7 +353,11 @@ CH32M030C8T7,adc,20,ADC,ADC,products:zh+products:en,confirmed
 CH32M030C8T7,cmp1,1,CMP1,,products:zh,reference
 CH32M030C8T7,cmp2,1,CMP2,,products:zh,reference
 CH32M030C8T7,cmp3,1,CMP3,,products:zh,reference
-CH32M030C8T7,communication_interfaces,1,通信接口,,products:zh,reference
+CH32M030C8T7,communication_interfaces_i2c,1,通信接口 I2C,,products:zh,reference
+CH32M030C8T7,communication_interfaces_pdusb_usb_pdtype_c,"(CC1,CC2)(CC3,CC4)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M030C8T7,communication_interfaces_pdusb_usbfs,HostDevice,通信接口 PDUSB USBFS,,products:zh,reference
+CH32M030C8T7,communication_interfaces_spi,1,通信接口 SPI,,products:zh,reference
+CH32M030C8T7,communication_interfaces_uart,1,通信接口 UART,,products:zh,reference
 CH32M030C8T7,current_sampling_isp_isn,2 differential,"电流采样ISP,ISN",,products:zh,reference
 CH32M030C8T7,current_source_module_isource,2,源电流模块ISOURCE,,products:zh,reference
 CH32M030C8T7,half_bridge_gate_driver,4,半桥栅极驱动器,Half-bridge gate driver,products:zh+products:en,confirmed
@@ -240,12 +368,19 @@ CH32M030C8T7,opa4,1,OPA4,OPA4,products:zh+products:en,confirmed
 CH32M030C8T7,pre_drive_i_o_mv_i_0,8,预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),products:zh+products:en,confirmed
 CH32M030C8T7,programmable_current_sink_module_isink,2,可编程灌电流模块ISINK,,products:zh,reference
 CH32M030C8T7,signal_decoding_qii,2,信号解码QII,,products:zh,reference
-CH32M030C8T7,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32M030C8T7,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32M030C8T7,timer_general_purposetim2_16_bit,1,定时器 通用TIM2（16位）,Timer General-purposeTIM2 (16-bit),products:zh+products:en,confirmed
+CH32M030C8T7,timer_streamlined_tim3_16_bit,1,定时器 精简TIM3（16位）,Timer Streamlined TIM3(16-bit),products:zh+products:en,confirmed
+CH32M030C8T7,timer_wwdg,1,定时器 窗口看门狗（WWDG）,Timer WWDG,products:zh+products:en,confirmed
 CH32M030C8U3,adc,20,ADC,ADC,products:zh+products:en,confirmed
 CH32M030C8U3,cmp1,1,CMP1,,products:zh,reference
 CH32M030C8U3,cmp2,1,CMP2,,products:zh,reference
 CH32M030C8U3,cmp3,1,CMP3,,products:zh,reference
-CH32M030C8U3,communication_interfaces,1,通信接口,,products:zh,reference
+CH32M030C8U3,communication_interfaces_i2c,1,通信接口 I2C,,products:zh,reference
+CH32M030C8U3,communication_interfaces_pdusb_usb_pdtype_c,"(CC1R,CC2R)(CC3,CC4), built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M030C8U3,communication_interfaces_pdusb_usbfs,HostDevice,通信接口 PDUSB USBFS,,products:zh,reference
+CH32M030C8U3,communication_interfaces_spi,1,通信接口 SPI,,products:zh,reference
+CH32M030C8U3,communication_interfaces_uart,1,通信接口 UART,,products:zh,reference
 CH32M030C8U3,current_sampling_isp_isn,2 differential,"电流采样ISP,ISN",,products:zh,reference
 CH32M030C8U3,current_source_module_isource,2,源电流模块ISOURCE,,products:zh,reference
 CH32M030C8U3,half_bridge_gate_driver,4,半桥栅极驱动器,Half-bridge gate driver,products:zh+products:en,confirmed
@@ -257,12 +392,20 @@ CH32M030C8U3,opa4,1,OPA4,OPA4,products:zh+products:en,confirmed
 CH32M030C8U3,pre_drive_i_o_mv_i_0,8,预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),products:zh+products:en,confirmed
 CH32M030C8U3,programmable_current_sink_module_isink,2,可编程灌电流模块ISINK,,products:zh,reference
 CH32M030C8U3,signal_decoding_qii,2,信号解码QII,,products:zh,reference
-CH32M030C8U3,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32M030C8U3,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32M030C8U3,timer_general_purposetim2_16_bit,1,定时器 通用TIM2（16位）,Timer General-purposeTIM2 (16-bit),products:zh+products:en,confirmed
+CH32M030C8U3,timer_streamlined_tim3_16_bit,1,定时器 精简TIM3（16位）,Timer Streamlined TIM3(16-bit),products:zh+products:en,confirmed
+CH32M030C8U3,timer_system_time_base_32_bit,√,定时器 系统时基（32位）,Timer System time base(32-bit),products:zh+products:en,confirmed
+CH32M030C8U3,timer_wwdg,1,定时器 窗口看门狗（WWDG）,Timer WWDG,products:zh+products:en,confirmed
 CH32M030C8U7,adc,20,ADC,ADC,products:zh+products:en,confirmed
 CH32M030C8U7,cmp1,1,CMP1,,products:zh,reference
 CH32M030C8U7,cmp2,1,CMP2,,products:zh,reference
 CH32M030C8U7,cmp3,1,CMP3,,products:zh,reference
-CH32M030C8U7,communication_interfaces,1,通信接口,,products:zh,reference
+CH32M030C8U7,communication_interfaces_i2c,1,通信接口 I2C,,products:zh,reference
+CH32M030C8U7,communication_interfaces_pdusb_usb_pdtype_c,"(CC1R,CC2R)(CC3,CC4), built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M030C8U7,communication_interfaces_pdusb_usbfs,HostDevice,通信接口 PDUSB USBFS,,products:zh,reference
+CH32M030C8U7,communication_interfaces_spi,1,通信接口 SPI,,products:zh,reference
+CH32M030C8U7,communication_interfaces_uart,1,通信接口 UART,,products:zh,reference
 CH32M030C8U7,current_sampling_isp_isn,2 differential,"电流采样ISP,ISN",,products:zh,reference
 CH32M030C8U7,current_source_module_isource,2,源电流模块ISOURCE,,products:zh,reference
 CH32M030C8U7,half_bridge_gate_driver,4,半桥栅极驱动器,Half-bridge gate driver,products:zh+products:en,confirmed
@@ -274,11 +417,17 @@ CH32M030C8U7,opa4,1,OPA4,OPA4,products:zh+products:en,confirmed
 CH32M030C8U7,pre_drive_i_o_mv_i_0,8,预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),products:zh+products:en,confirmed
 CH32M030C8U7,programmable_current_sink_module_isink,2,可编程灌电流模块ISINK,,products:zh,reference
 CH32M030C8U7,signal_decoding_qii,2,信号解码QII,,products:zh,reference
-CH32M030C8U7,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32M030C8U7,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32M030C8U7,timer_general_purposetim2_16_bit,1,定时器 通用TIM2（16位）,Timer General-purposeTIM2 (16-bit),products:zh+products:en,confirmed
+CH32M030C8U7,timer_streamlined_tim3_16_bit,1,定时器 精简TIM3（16位）,Timer Streamlined TIM3(16-bit),products:zh+products:en,confirmed
+CH32M030C8U7,timer_wwdg,1,定时器 窗口看门狗（WWDG）,Timer WWDG,products:zh+products:en,confirmed
 CH32M030G8R7,adc,11,ADC,ADC,products:zh+products:en,confirmed
 CH32M030G8R7,cmp2,1,CMP2,,products:zh,reference
 CH32M030G8R7,cmp3,1,CMP3,,products:zh,reference
-CH32M030G8R7,communication_interfaces,1,通信接口,,products:zh,reference
+CH32M030G8R7,communication_interfaces_i2c,1,通信接口 I2C,,products:zh,reference
+CH32M030G8R7,communication_interfaces_pdusb_usb_pdtype_c,"(CC3,CC4)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M030G8R7,communication_interfaces_pdusb_usbfs,HostDevice,通信接口 PDUSB USBFS,,products:zh,reference
+CH32M030G8R7,communication_interfaces_uart,1,通信接口 UART,,products:zh,reference
 CH32M030G8R7,current_sampling_isp_isn,2 differential,"电流采样ISP,ISN",,products:zh,reference
 CH32M030G8R7,half_bridge_gate_driver,3,半桥栅极驱动器,Half-bridge gate driver,products:zh+products:en,confirmed
 CH32M030G8R7,opa2,1,OPA2,OPA2,products:zh+products:en,confirmed
@@ -287,11 +436,18 @@ CH32M030G8R7,opa4,1,OPA4,OPA4,products:zh+products:en,confirmed
 CH32M030G8R7,pre_drive_i_o_mv_i_0,6,预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),products:zh+products:en,confirmed
 CH32M030G8R7,programmable_current_sink_module_isink,1,可编程灌电流模块ISINK,,products:zh,reference
 CH32M030G8R7,signal_decoding_qii,1,信号解码QII,,products:zh,reference
-CH32M030G8R7,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32M030G8R7,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32M030G8R7,timer_general_purposetim2_16_bit,1,定时器 通用TIM2（16位）,Timer General-purposeTIM2 (16-bit),products:zh+products:en,confirmed
+CH32M030G8R7,timer_streamlined_tim3_16_bit,1,定时器 精简TIM3（16位）,Timer Streamlined TIM3(16-bit),products:zh+products:en,confirmed
+CH32M030G8R7,timer_wwdg,1,定时器 窗口看门狗（WWDG）,Timer WWDG,products:zh+products:en,confirmed
 CH32M030K8U7,adc,16,ADC,ADC,products:zh+products:en,confirmed
 CH32M030K8U7,cmp2,1,CMP2,,products:zh,reference
 CH32M030K8U7,cmp3,1,CMP3,,products:zh,reference
-CH32M030K8U7,communication_interfaces,1,通信接口,,products:zh,reference
+CH32M030K8U7,communication_interfaces_i2c,1,通信接口 I2C,,products:zh,reference
+CH32M030K8U7,communication_interfaces_pdusb_usb_pdtype_c,"(CC1R,CC2R)(CC3,CC4), built-in Rd(1)",通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M030K8U7,communication_interfaces_pdusb_usbfs,HostDevice,通信接口 PDUSB USBFS,,products:zh,reference
+CH32M030K8U7,communication_interfaces_spi,1,通信接口 SPI,,products:zh,reference
+CH32M030K8U7,communication_interfaces_uart,1,通信接口 UART,,products:zh,reference
 CH32M030K8U7,current_sampling_isp_isn,1 differential + 1 single-ended,"电流采样ISP,ISN",,products:zh,reference
 CH32M030K8U7,current_source_module_isource,1,源电流模块ISOURCE,,products:zh,reference
 CH32M030K8U7,half_bridge_gate_driver,2,半桥栅极驱动器,Half-bridge gate driver,products:zh+products:en,confirmed
@@ -302,14 +458,26 @@ CH32M030K8U7,opa4,1,OPA4,OPA4,products:zh+products:en,confirmed
 CH32M030K8U7,pre_drive_i_o_mv_i_0,6,预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),products:zh+products:en,confirmed
 CH32M030K8U7,programmable_current_sink_module_isink,2,可编程灌电流模块ISINK,,products:zh,reference
 CH32M030K8U7,signal_decoding_qii,1,信号解码QII,,products:zh,reference
-CH32M030K8U7,timer,1,定时器,Timer,products:zh+products:en,confirmed
-CH32M103G8R6,3_phasegate_drive,24V,三相预驱,3-phasegate drive,products:zh+products:en,confirmed
+CH32M030K8U7,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32M030K8U7,timer_general_purposetim2_16_bit,1,定时器 通用TIM2（16位）,Timer General-purposeTIM2 (16-bit),products:zh+products:en,confirmed
+CH32M030K8U7,timer_streamlined_tim3_16_bit,1,定时器 精简TIM3（16位）,Timer Streamlined TIM3(16-bit),products:zh+products:en,confirmed
+CH32M030K8U7,timer_wwdg,1,定时器 窗口看门狗（WWDG）,Timer WWDG,products:zh+products:en,confirmed
+CH32M103G8R6,3_phasegate_drive_structure,P+N,三相预驱 结构,3-phasegate drive Structure,products:zh+products:en,confirmed
+CH32M103G8R6,3_phasegate_drive_voltage,24V,三相预驱 电压,3-phasegate drive Voltage,products:zh+products:en,confirmed
 CH32M103G8R6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32M103G8R6,cmp,3,CMP,,products:zh,reference
-CH32M103G8R6,communication_interfaces,4,通信接口,,products:zh,reference
+CH32M103G8R6,communication_interfaces_can,1,通信接口 CAN,,products:zh,reference
+CH32M103G8R6,communication_interfaces_i2c,2,通信接口 I2C,,products:zh,reference
+CH32M103G8R6,communication_interfaces_pdusb_usb_hostdevice,HostDevice,通信接口 PDUSB USB HostDevice,,products:zh,reference
+CH32M103G8R6,communication_interfaces_pdusb_usb_pdtype_c,DRPSourceSink,通信接口 PDUSB USB PDType-C,,products:zh,reference
+CH32M103G8R6,communication_interfaces_spi,SPI1,通信接口 SPI,,products:zh,reference
+CH32M103G8R6,communication_interfaces_usart,4,通信接口 USART,,products:zh,reference
 CH32M103G8R6,main_applications_and_features,"With pre-driver, motor-dedicated",主要应用及特点,,products:zh,reference
 CH32M103G8R6,opa,1,OPA,OPA,products:zh+products:en,confirmed
-CH32M103G8R6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32M103G8R6,timer_advanced_control_tim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-control TIM1(16-bit),products:zh+products:en,confirmed
+CH32M103G8R6,timer_general_purpose_tim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3(16-bit),products:zh+products:en,confirmed
+CH32M103G8R6,timer_general_purpose_tim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purpose TIM4(32-bit),products:zh+products:en,confirmed
+CH32M103G8R6,timer_low_powertimer_lptim,√,定时器 低功耗定时器（LPTIM）,Timer Low-powertimer(LPTIM),products:zh+products:en,confirmed
 CH32M103G8R6,tkey,10,Tkey,Tkey,products:zh+products:en,confirmed
 CH32V002A4M6,adc,6+2,ADC,ADC,products:zh+products:en,confirmed
 CH32V002A4M6,adtm,1,高级 定时 器,ADTM,products:zh+products:en,confirmed
@@ -546,97 +714,198 @@ CH32V007K8U7,streamlined_timer,1,精 简 定 时 器,Streamlined timer,products:
 CH32V007K8U7,touch_key_button,8,电容 触摸 按键,Touch-key button,products:zh+products:en,confirmed
 CH32V007K8U7,watchdog,2,看 门 狗,Watchdog,products:zh+products:en,confirmed
 CH32V103C6T6,adc_tkey_number_of_channels,10,ADC/TKey（通道数),ADC/TKey (Number of channels),products:zh+products:en,confirmed
-CH32V103C6T6,communicationinterface,1,通信接口,CommunicationInterface,products:zh+products:en,confirmed
+CH32V103C6T6,communicationinterface_i2c,1,通信接口 I2C,CommunicationInterface I2C,products:zh+products:en,confirmed
+CH32V103C6T6,communicationinterface_spi,1,通信接口 SPI,CommunicationInterface SPI,products:zh+products:en,confirmed
+CH32V103C6T6,communicationinterface_usart,2,通信接口 USART,CommunicationInterface USART,products:zh+products:en,confirmed
+CH32V103C6T6,communicationinterface_usbhd_2_0fs,1,通信接口 USBHD 2.0FS,CommunicationInterface USBHD 2.0FS,products:zh+products:en,confirmed
 CH32V103C6T6,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,products:en,reference
 CH32V103C6T6,cpu_main_frequency,Typ. 72MHz,CPU主频,,products:zh,reference
 CH32V103C6T6,operating_voltage,2.7V～5.5V,工作电压,,products:zh,reference
 CH32V103C6T6,operating_voltage_,2.7V~5.5V,,Operating voltage,products:en,reference
-CH32V103C6T6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V103C6T6,timer_advanced,1,定时器 高级,Timer Advanced,products:zh+products:en,confirmed
+CH32V103C6T6,timer_general_purpose,2,定时器 通用,Timer General-purpose,products:zh+products:en,confirmed
+CH32V103C6T6,timer_systick,1,定时器 系统时钟,Timer SysTick,products:zh+products:en,confirmed
+CH32V103C6T6,timer_watchdog_wdt,2,定时器 看门狗,Timer Watchdog (WDT),products:zh+products:en,confirmed
 CH32V103C8T6,adc_tkey_number_of_channels,10,ADC/TKey（通道数),ADC/TKey (Number of channels),products:zh+products:en,confirmed
-CH32V103C8T6,communicationinterface,2,通信接口,CommunicationInterface,products:zh+products:en,confirmed
-CH32V103C8T6,timer,3,定时器,Timer,products:zh+products:en,confirmed
+CH32V103C8T6,communicationinterface_i2c,2,通信接口 I2C,CommunicationInterface I2C,products:zh+products:en,confirmed
+CH32V103C8T6,communicationinterface_spi,2,通信接口 SPI,CommunicationInterface SPI,products:zh+products:en,confirmed
+CH32V103C8T6,communicationinterface_usart,3,通信接口 USART,CommunicationInterface USART,products:zh+products:en,confirmed
+CH32V103C8T6,communicationinterface_usbhd_2_0fs,1,通信接口 USBHD 2.0FS,CommunicationInterface USBHD 2.0FS,products:zh+products:en,confirmed
+CH32V103C8T6,timer_advanced,1,定时器 高级,Timer Advanced,products:zh+products:en,confirmed
+CH32V103C8T6,timer_general_purpose,3,定时器 通用,Timer General-purpose,products:zh+products:en,confirmed
+CH32V103C8T6,timer_systick,1,定时器 系统时钟,Timer SysTick,products:zh+products:en,confirmed
+CH32V103C8T6,timer_watchdog_wdt,2,定时器 看门狗,Timer Watchdog (WDT),products:zh+products:en,confirmed
 CH32V103C8U6,adc_tkey_number_of_channels,10,ADC/TKey（通道数),ADC/TKey (Number of channels),products:zh+products:en,confirmed
-CH32V103C8U6,communicationinterface,2,通信接口,CommunicationInterface,products:zh+products:en,confirmed
-CH32V103C8U6,timer,3,定时器,Timer,products:zh+products:en,confirmed
+CH32V103C8U6,communicationinterface_i2c,2,通信接口 I2C,CommunicationInterface I2C,products:zh+products:en,confirmed
+CH32V103C8U6,communicationinterface_spi,2,通信接口 SPI,CommunicationInterface SPI,products:zh+products:en,confirmed
+CH32V103C8U6,communicationinterface_usart,3,通信接口 USART,CommunicationInterface USART,products:zh+products:en,confirmed
+CH32V103C8U6,communicationinterface_usbhd_2_0fs,1,通信接口 USBHD 2.0FS,CommunicationInterface USBHD 2.0FS,products:zh+products:en,confirmed
+CH32V103C8U6,timer_advanced,1,定时器 高级,Timer Advanced,products:zh+products:en,confirmed
+CH32V103C8U6,timer_general_purpose,3,定时器 通用,Timer General-purpose,products:zh+products:en,confirmed
+CH32V103C8U6,timer_systick,1,定时器 系统时钟,Timer SysTick,products:zh+products:en,confirmed
+CH32V103C8U6,timer_watchdog_wdt,2,定时器 看门狗,Timer Watchdog (WDT),products:zh+products:en,confirmed
 CH32V103R8T6,adc_tkey_number_of_channels,16,ADC/TKey（通道数),ADC/TKey (Number of channels),products:zh+products:en,confirmed
-CH32V103R8T6,communicationinterface,2,通信接口,CommunicationInterface,products:zh+products:en,confirmed
-CH32V103R8T6,timer,3,定时器,Timer,products:zh+products:en,confirmed
+CH32V103R8T6,communicationinterface_i2c,2,通信接口 I2C,CommunicationInterface I2C,products:zh+products:en,confirmed
+CH32V103R8T6,communicationinterface_spi,2,通信接口 SPI,CommunicationInterface SPI,products:zh+products:en,confirmed
+CH32V103R8T6,communicationinterface_usart,3,通信接口 USART,CommunicationInterface USART,products:zh+products:en,confirmed
+CH32V103R8T6,communicationinterface_usbhd_2_0fs,1,通信接口 USBHD 2.0FS,CommunicationInterface USBHD 2.0FS,products:zh+products:en,confirmed
+CH32V103R8T6,timer_advanced,1,定时器 高级,Timer Advanced,products:zh+products:en,confirmed
+CH32V103R8T6,timer_general_purpose,3,定时器 通用,Timer General-purpose,products:zh+products:en,confirmed
+CH32V103R8T6,timer_systick,1,定时器 系统时钟,Timer SysTick,products:zh+products:en,confirmed
+CH32V103R8T6,timer_watchdog_wdt,2,定时器 看门狗,Timer Watchdog (WDT),products:zh+products:en,confirmed
 CH32V203C6T6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203C6T6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203C6T6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203C6T6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203C6T6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203C6T6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203C6T6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203C6U6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203C6U6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203C6U6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203C6U6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203C6U6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203C6U6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203C6U6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203C8T6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203C8T6,ecafretninoitacinummoc,4,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_i2c,2,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_spi,2,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_usart_uart,4,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203C8T6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203C8T6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203C8T6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203C8T6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203C8T6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203C8U6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203C8U6,ecafretninoitacinummoc,4,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_i2c,2,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_spi,2,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_usart_uart,4,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203C8U6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203C8U6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203C8U6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203C8U6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203C8U6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203CCT6,adc,10+3,ADC,ADC,products:zh+products:en,confirmed
 CH32V203CCT6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V203CCT6,cmp,2,CMP,CMP,products:zh+products:en,confirmed
 CH32V203CCT6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
 CH32V203CCT6,opa,2,OPA,OPA,products:zh+products:en,confirmed
-CH32V203CCT6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32V203CCT6,pdusb_usbfs,1,PDUSB USBFS,PDUSB USBFS,products:zh+products:en,confirmed
 CH32V203CCT6,qspi,1,QSPI,QSPI,products:zh+products:en,confirmed
 CH32V203CCT6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
 CH32V203CCT6,spi,2,SPI,SPI,products:zh+products:en,confirmed
-CH32V203CCT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203CCT6,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32V203CCT6,timer_general_purposetim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purposeTIM2/3 (16-bit),products:zh+products:en,confirmed
+CH32V203CCT6,timer_general_purposetim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purposeTIM4 (32-bit),products:zh+products:en,confirmed
+CH32V203CCT6,timer_systick_32_bit,√,定时器 系统时基（32位）,Timer SysTick (32-bit),products:zh+products:en,confirmed
 CH32V203CCT6,tkey,10,TKEY,TKEY,products:zh+products:en,confirmed
 CH32V203CCT6,usart,8,USART,USART,products:zh+products:en,confirmed
 CH32V203F6P6,adc_tkey_channel_unitcount,9@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
 CH32V203F6P6,cpu_clock_speed,Max: 144MHz,CPU主频,CPU clock speed,products:zh+products:en,confirmed
-CH32V203F6P6,ecafretninoitacinummoc,1,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203F6P6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203F6P6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203F6P6,ecafretninoitacinummoc_usart_uart,1,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203F6P6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
 CH32V203F6P6,opa_cmp,1,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V203F6P6,rated_voltage,3.3V,额定电压,Rated voltage,products:zh+products:en,confirmed
 CH32V203F6P6,rtc,Supported,RTC,RTC,products:zh+products:en,confirmed
-CH32V203F6P6,timer,1(3),定时器,Timer,products:zh+products:en,confirmed
+CH32V203F6P6,timer_advanced_control_16_bit,1(3),定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203F6P6,timer_general_purpose_16_bit,3(3),定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V203F6P6,timer_systick_64_bit,Supported,定时器 系统时基（64位）,Timer SysTick(64-bit),products:zh+products:en,confirmed
+CH32V203F6P6,timer_watchdog,2 ( WWDG + IWDG ),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V203F8P6,adc_tkey_channel_unitcount,9@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203F8P6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203F8P6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203F8P6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203F8P6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203F8P6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203F8P6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203F8P6,timer,1(3),定时器,Timer,products:zh+products:en,confirmed
+CH32V203F8P6,timer_advanced_control_16_bit,1(3),定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203F8P6,timer_general_purpose_16_bit,3(3),定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203F8U6,adc_tkey_channel_unitcount,9@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203F8U6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203F8U6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203F8U6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203F8U6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203F8U6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203F8U6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203F8U6,timer,1(3),定时器,Timer,products:zh+products:en,confirmed
+CH32V203F8U6,timer_advanced_control_16_bit,1(3),定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203F8U6,timer_general_purpose_16_bit,3(3),定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203G6U6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203G6U6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203G6U6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203G6U6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203G6U6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203G6U6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203G6U6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
 CH32V203G6U6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203G6U6,timer,1(3),定时器,Timer,products:zh+products:en,confirmed
+CH32V203G6U6,timer_advanced_control_16_bit,1(3),定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203G6U6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203G8R6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203G8R6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203G8R6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203G8R6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203G8R6,timer,1(3),定时器,Timer,products:zh+products:en,confirmed
+CH32V203G8R6,timer_advanced_control_16_bit,1(3),定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203G8R6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203K8T6,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203K8T6,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203K8T6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203K8T6,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203K8T6,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203K8T6,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203K8T6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
 CH32V203K8T6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203K8T6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203K8T6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203K8T6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203K8U7,adc_tkey_channel_unitcount,10@2,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203K8U7,ecafretninoitacinummoc,2,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_i2c,1,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_spi,1,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_usart_uart,2,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203K8U7,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203K8U7,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203K8U7,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203K8U7,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203K8U7,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
 CH32V203RBT6,adc_tkey_channel_unitcount,16@1,ADC/TKey(通道数@单元),ADC/TKey (channel@unitcount),products:zh+products:en,confirmed
-CH32V203RBT6,ecafretninoitacinummoc,4,通信接口,ecafretninoitacinummoC,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_can,1,通信接口 CAN,ecafretninoitacinummoC CAN,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_ethernet,10M,通信接口 Ethernet,ecafretninoitacinummoC Ethernet,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_i2c,2,通信接口 I2C,ecafretninoitacinummoC I2C,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_spi,2,通信接口 SPI,ecafretninoitacinummoC SPI,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_usart_uart,4,通信接口 USART/UART,ecafretninoitacinummoC USART/UART,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_usb_fs_usbd,1,通信接口 USB(FS) USBD,ecafretninoitacinummoC USB(FS) USBD,products:zh+products:en,confirmed
+CH32V203RBT6,ecafretninoitacinummoc_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,ecafretninoitacinummoC USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V203RBT6,opa_cmp,2,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V203RBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V203RBT6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V203RBT6,timer_general_purpose_16_bit,3,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V203RBT6,timer_general_purpose_32_bit,1,定时器 通用（32位）,Timer General-purpose(32-bit),products:zh+products:en,confirmed
 CH32V205CCT6,adc,16+3,ADC,ADC,products:zh+products:en,confirmed
 CH32V205CCT6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V205CCT6,cmp,2,CMP,CMP,products:zh+products:en,confirmed
 CH32V205CCT6,cpu_main_frequency,40MHz@Zero-wait; Max: 192MHz@Non-zero wait,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V205CCT6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
 CH32V205CCT6,opa,2,OPA,OPA,products:zh+products:en,confirmed
-CH32V205CCT6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32V205CCT6,pdusb_usb_pdtype_c,1,PDUSB USB PDType-C,PDUSB USB PDType-C,products:zh+products:en,confirmed
+CH32V205CCT6,pdusb_usbfs,1,PDUSB USBFS,PDUSB USBFS,products:zh+products:en,confirmed
+CH32V205CCT6,pdusb_usbhs,1,PDUSB USBHS,PDUSB USBHS,products:zh+products:en,confirmed
 CH32V205CCT6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32V205CCT6,qspi,1,QSPI,QSPI,products:zh+products:en,confirmed
 CH32V205CCT6,rated_voltage,3.3V,额定电压,Rated voltage,products:zh+products:en,confirmed
 CH32V205CCT6,rtc,√,RTC,RTC,products:zh+products:en,confirmed
 CH32V205CCT6,spi,2,SPI,SPI,products:zh+products:en,confirmed
-CH32V205CCT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V205CCT6,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32V205CCT6,timer_general_purposetim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purposeTIM2/3 (16-bit),products:zh+products:en,confirmed
+CH32V205CCT6,timer_general_purposetim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purposeTIM4 (32-bit),products:zh+products:en,confirmed
+CH32V205CCT6,timer_systick_32_bit,√,定时器 系统时基（32位）,Timer SysTick (32-bit),products:zh+products:en,confirmed
+CH32V205CCT6,timer_watchdog,2(WWDG+IWDG),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V205CCT6,tkey,16,TKEY,TKEY,products:zh+products:en,confirmed
 CH32V205CCT6,usart,8,USART,USART,products:zh+products:en,confirmed
 CH32V205RCT6,adc,16+3,ADC,ADC,products:zh+products:en,confirmed
@@ -644,11 +913,15 @@ CH32V205RCT6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V205RCT6,cmp,2,CMP,CMP,products:zh+products:en,confirmed
 CH32V205RCT6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
 CH32V205RCT6,opa,2,OPA,OPA,products:zh+products:en,confirmed
-CH32V205RCT6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32V205RCT6,pdusb_usb_pdtype_c,1,PDUSB USB PDType-C,PDUSB USB PDType-C,products:zh+products:en,confirmed
+CH32V205RCT6,pdusb_usbfs,1,PDUSB USBFS,PDUSB USBFS,products:zh+products:en,confirmed
+CH32V205RCT6,pdusb_usbhs,1,PDUSB USBHS,PDUSB USBHS,products:zh+products:en,confirmed
 CH32V205RCT6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32V205RCT6,qspi,1,QSPI,QSPI,products:zh+products:en,confirmed
 CH32V205RCT6,spi,2,SPI,SPI,products:zh+products:en,confirmed
-CH32V205RCT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V205RCT6,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32V205RCT6,timer_general_purposetim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purposeTIM2/3 (16-bit),products:zh+products:en,confirmed
+CH32V205RCT6,timer_general_purposetim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purposeTIM4 (32-bit),products:zh+products:en,confirmed
 CH32V205RCT6,tkey,16,TKEY,TKEY,products:zh+products:en,confirmed
 CH32V205RCT6,usart,8,USART,USART,products:zh+products:en,confirmed
 CH32V205VCT6,adc,16+3,ADC,ADC,products:zh+products:en,confirmed
@@ -657,132 +930,308 @@ CH32V205VCT6,cmp,2,CMP,CMP,products:zh+products:en,confirmed
 CH32V205VCT6,fsmc,1,FSMC,FSMC,products:zh+products:en,confirmed
 CH32V205VCT6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
 CH32V205VCT6,opa,2,OPA,OPA,products:zh+products:en,confirmed
-CH32V205VCT6,pdusb,1,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32V205VCT6,pdusb_usb_pdtype_c,1,PDUSB USB PDType-C,PDUSB USB PDType-C,products:zh+products:en,confirmed
+CH32V205VCT6,pdusb_usbfs,1,PDUSB USBFS,PDUSB USBFS,products:zh+products:en,confirmed
+CH32V205VCT6,pdusb_usbhs,1,PDUSB USBHS,PDUSB USBHS,products:zh+products:en,confirmed
 CH32V205VCT6,pioc,1,PIOC,PIOC,products:zh+products:en,confirmed
 CH32V205VCT6,qspi,1,QSPI,QSPI,products:zh+products:en,confirmed
 CH32V205VCT6,spi,2,SPI,SPI,products:zh+products:en,confirmed
-CH32V205VCT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V205VCT6,timer_advanced_controltim1_16_bit,1,定时器 高级TIM1（16位）,Timer Advanced-controlTIM1 (16-bit),products:zh+products:en,confirmed
+CH32V205VCT6,timer_general_purposetim2_3_16_bit,2,定时器 通用TIM2/3（16位）,Timer General-purposeTIM2/3 (16-bit),products:zh+products:en,confirmed
+CH32V205VCT6,timer_general_purposetim4_32_bit,1,定时器 通用TIM4（32位）,Timer General-purposeTIM4 (32-bit),products:zh+products:en,confirmed
 CH32V205VCT6,tkey,16,TKEY,TKEY,products:zh+products:en,confirmed
 CH32V205VCT6,usart,8,USART,USART,products:zh+products:en,confirmed
 CH32V208CBU6,adc_tkey_channel_unit_count,10@1,ADC/TKey（通道数/单元),ADC/TKey (channel@ unit count),products:zh+products:en,confirmed
-CH32V208CBU6,communicationinterfaces,4,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_spi,2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_usart_uart,4,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_usb_fs_usbd,1,通信接口 USB(FS) USBD,Communicationinterfaces USB(FS) USBD,products:zh+products:en,confirmed
+CH32V208CBU6,communicationinterfaces_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V208CBU6,opa,2,运放、比较器,OPA,products:zh+products:en,confirmed
-CH32V208CBU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V208CBU6,timer_advanced_control_16_bits,1,定时器 高级（16位）,Timer Advanced-control(16 bits),products:zh+products:en,confirmed
+CH32V208CBU6,timer_general_purpose_16_bits,3,定时器 通用（16位）,Timer General-purpose(16 bits),products:zh+products:en,confirmed
+CH32V208CBU6,timer_general_purpose_32_bits,1,定时器 通用（32位）,Timer General-purpose(32 bits),products:zh+products:en,confirmed
+CH32V208CBU6,timer_watchdog,2,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V208GBU6,adc_tkey_channel_unit_count,8@1,ADC/TKey（通道数/单元),ADC/TKey (channel@ unit count),products:zh+products:en,confirmed
-CH32V208GBU6,communicationinterfaces,2,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_ble_5_3,supported,通信接口 BLE 5.3,Communicationinterfaces BLE 5.3,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_ethernet,10M,通信接口 Ethernet,Communicationinterfaces Ethernet,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_i2c,1,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_spi,1,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_usart_uart,2,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_usb_fs_usbd,1,通信接口 USB(FS) USBD,Communicationinterfaces USB(FS) USBD,products:zh+products:en,confirmed
+CH32V208GBU6,communicationinterfaces_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V208GBU6,cpu_clock_speed,Max: 144MHz,CPU主频,CPU clock speed,products:zh+products:en,confirmed
 CH32V208GBU6,opa,OPA2,运放、比较器,OPA,products:zh+products:en,confirmed
 CH32V208GBU6,rated_voltage,3.3V,额定电压,Rated voltage,products:zh+products:en,confirmed
 CH32V208GBU6,rtc,Supported,RTC,RTC,products:zh+products:en,confirmed
-CH32V208GBU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V208GBU6,timer_advanced_control_16_bits,1,定时器 高级（16位）,Timer Advanced-control(16 bits),products:zh+products:en,confirmed
+CH32V208GBU6,timer_general_purpose_16_bits,3,定时器 通用（16位）,Timer General-purpose(16 bits),products:zh+products:en,confirmed
+CH32V208GBU6,timer_general_purpose_32_bits,1,定时器 通用（32位）,Timer General-purpose(32 bits),products:zh+products:en,confirmed
+CH32V208GBU6,timer_systick_64_bits,Supported,定时器 系统时基（64位）,Timer SysTick (64 bits),products:zh+products:en,confirmed
+CH32V208GBU6,timer_watchdog,2,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V208RBT6,adc_tkey_channel_unit_count,16@1,ADC/TKey（通道数/单元),ADC/TKey (channel@ unit count),products:zh+products:en,confirmed
-CH32V208RBT6,communicationinterfaces,4,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_ethernet,10M,通信接口 Ethernet,Communicationinterfaces Ethernet,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_spi,2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_usart_uart,4,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_usb_fs_usbd,1,通信接口 USB(FS) USBD,Communicationinterfaces USB(FS) USBD,products:zh+products:en,confirmed
+CH32V208RBT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V208RBT6,opa,2,运放、比较器,OPA,products:zh+products:en,confirmed
-CH32V208RBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32V208RBT6,timer_advanced_control_16_bits,1,定时器 高级（16位）,Timer Advanced-control(16 bits),products:zh+products:en,confirmed
+CH32V208RBT6,timer_general_purpose_16_bits,3,定时器 通用（16位）,Timer General-purpose(16 bits),products:zh+products:en,confirmed
+CH32V208RBT6,timer_general_purpose_32_bits,1,定时器 通用（32位）,Timer General-purpose(32 bits),products:zh+products:en,confirmed
+CH32V208RBT6,timer_watchdog,2,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V208WBU6,adc_tkey_channel_unit_count,16@1,ADC/TKey（通道数/单元),ADC/TKey (channel@ unit count),products:zh+products:en,confirmed
-CH32V208WBU6,communicationinterfaces,4,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_spi,2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_usart_uart,4,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_usb_fs_usbd,1,通信接口 USB(FS) USBD,Communicationinterfaces USB(FS) USBD,products:zh+products:en,confirmed
+CH32V208WBU6,communicationinterfaces_usb_fs_usbhd,1,通信接口 USB(FS) USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V208WBU6,opa,2,运放、比较器,OPA,products:zh+products:en,confirmed
-CH32V208WBU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
-CH32V303CBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V208WBU6,timer_advanced_control_16_bits,1,定时器 高级（16位）,Timer Advanced-control(16 bits),products:zh+products:en,confirmed
+CH32V208WBU6,timer_general_purpose_16_bits,3,定时器 通用（16位）,Timer General-purpose(16 bits),products:zh+products:en,confirmed
+CH32V208WBU6,timer_general_purpose_32_bits,1,定时器 通用（32位）,Timer General-purpose(32 bits),products:zh+products:en,confirmed
+CH32V208WBU6,timer_watchdog,2,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
+CH32V303CBT6,adc_tkey_channel,10,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V303CBT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V303CBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V303CBT6,communicationinterfaces,3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V303CBT6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V303CBT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V303CBT6,communicationinterfaces_spi,2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V303CBT6,communicationinterfaces_usart_uart,3,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V303CBT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V303CBT6,cpu_main_frequency,Max: 144MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V303CBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303CBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303CBT6,rtc,Supported,RTC,RTC,products:zh+products:en,confirmed
-CH32V303CBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
-CH32V303RBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303CBT6,timer_advanced_control_16_bit,1,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V303CBT6,timer_general_purpose_16_bit,3,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V303CBT6,timer_systick_64_bit,Supported,定时器 系统时基64位,Timer SysTick(64-bit),products:zh+products:en,confirmed
+CH32V303CBT6,timer_watchdog,2 (WWDG + IWDG),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
+CH32V303RBT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V303RBT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V303RBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V303RBT6,communicationinterfaces,3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V303RBT6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V303RBT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V303RBT6,communicationinterfaces_spi,2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V303RBT6,communicationinterfaces_usart_uart,3,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V303RBT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V303RBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
-CH32V303RBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
-CH32V303RCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RBT6,timer_advanced_control_16_bit,1,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V303RBT6,timer_general_purpose_16_bit,3,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V303RCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V303RCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V303RCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V303RCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V303RCT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V303RCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303RCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V303RCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V303RCT7,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V303RCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V303RCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V303RCT7,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V303RCT7,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V303RCT7,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V303RCT7,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V303RCT7,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V303RCT7,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RCT7,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303RCT7,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V303RCT7,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V303VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RCT7,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V303RCT7,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V303RCT7,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V303VCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V303VCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V303VCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V303VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_can,1,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_fsmc,1,FSMC,Communicationinterfaces FSMC,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V303VCT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
 CH32V303VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303VCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V303VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V305CCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303VCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V303VCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V303VCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V305CCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V305CCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V305CCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V305CCT6,communicationinterfaces,5,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_usart_uart,5,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V305CCT6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V305CCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305CCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305CCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V305CCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V305FBP6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305CCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V305CCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V305CCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V305FBP6,adc_tkey_channel,1,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V305FBP6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V305FBP6,code_flash_bytes,224K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V305FBP6,communicationinterfaces,USART1USART3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_can,CAN2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_i2s,I2S2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_spi,SPI2,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_usart_uart,USART1USART3,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V305FBP6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V305FBP6,dac_unit,DAC2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305FBP6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V305FBP6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V305GBU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305FBP6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V305FBP6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V305FBP6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V305GBU6,adc_tkey_channel,6,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V305GBU6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V305GBU6,code_flash_bytes,224K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V305GBU6,communicationinterfaces,USART1USART3UART4UART5UART7,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_can,CAN2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_usart_uart,USART1USART3UART4UART5UART7,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V305GBU6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V305GBU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305GBU6,opa_cmp,OPA3,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305GBU6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V305GBU6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V305RBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305GBU6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V305GBU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V305GBU6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V305RBT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V305RBT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V305RBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V305RBT6,communicationinterfaces,5,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_usart_uart,5,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V305RBT6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V305RBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305RBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305RBT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V305RBT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V307RCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305RBT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V305RBT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V305RBT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V307RCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V307RCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V307RCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V307RCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_ethernet,1G MAC+10M PHY,Ethernet,Communicationinterfaces Ethernet,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V307RCT6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V307RCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307RCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307RCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V307RCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V307VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307RCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V307RCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V307RCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V307VCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V307VCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V307VCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V307VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_dvp,1,DVP,Communicationinterfaces DVP,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_fsmc,1,FSMC,Communicationinterfaces FSMC,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V307VCT6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V307VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307VCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V307VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V307WCU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307VCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V307VCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V307VCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V307WCU6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V307WCU6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V307WCU6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
-CH32V307WCU6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_usb_fs_usbhd,1,通信接口 US（B FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V307WCU6,communicationinterfaces_usbhs_includephy,1,通信接口 USBHS（含PHY）,Communicationinterfaces USBHS(includePHY),products:zh+products:en,confirmed
 CH32V307WCU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307WCU6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307WCU6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V307WCU6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V317VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307WCU6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit),products:zh+products:en,confirmed
+CH32V307WCU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V307WCU6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32V317VCT6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V317VCT6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V317VCT6,code_flash_bytes,480K,Code FLASH（字节）,,products:zh,reference
-CH32V317VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_dvp,1,DVP,Communicationinterfaces DVP,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_usb_fs_usbhd,1,USB（FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V317VCT6,communicationinterfaces_usbhs_include_phy,1,USBHS（含PHY）,Communicationinterfaces USBHS(include PHY),products:zh+products:en,confirmed
 CH32V317VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V317VCT6,opa,4,运放,OPA,products:zh+products:en,confirmed
 CH32V317VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
-CH32V317VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V317WCU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V317VCT6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit)(2),products:zh+products:en,confirmed
+CH32V317VCT6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V317VCT6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General- purpose(16-bit)(2),products:zh+products:en,confirmed
+CH32V317WCU6,adc_tkey_channel,16,ADC/TKey 通道数,ADC/TKey Channel,products:zh+products:en,confirmed
+CH32V317WCU6,adc_tkey_unit,2,ADC/TKey 单元数,ADC/TKey Unit,products:zh+products:en,confirmed
 CH32V317WCU6,code_flash_bytes,480K,Code FLASH（字节）,,products:zh,reference
-CH32V317WCU6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_can,2,通信接口 CAN,Communicationinterfaces CAN,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_ethernet,MAC+10M/100M PHY,Ethernet,Communicationinterfaces Ethernet,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_i2c,2,通信接口 I2C,Communicationinterfaces I2C,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_i2s,2,通信接口 I2S,Communicationinterfaces I2S,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_sdio,1,通信接口 SDIO,Communicationinterfaces SDIO,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_spi,3,通信接口 SPI,Communicationinterfaces SPI,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_usart_uart,8,通信接口 USART/UART,Communicationinterfaces USART/UART,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_usb_fs_usbhd,1,USB（FS） USBHD,Communicationinterfaces USB(FS) USBHD,products:zh+products:en,confirmed
+CH32V317WCU6,communicationinterfaces_usbhs_include_phy,1,USBHS（含PHY）,Communicationinterfaces USBHS(include PHY),products:zh+products:en,confirmed
 CH32V317WCU6,cpu_main_frequency,Max: 144MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V317WCU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V317WCU6,opa,4,运放,OPA,products:zh+products:en,confirmed
 CH32V317WCU6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V317WCU6,rtc,Supported,RTC,RTC,products:zh+products:en,confirmed
-CH32V317WCU6,timer,4,定时器,Timer,products:zh+products:en,confirmed
-CH32V407RET6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V317WCU6,timer_advanced_control_16_bit,4,定时器 高级（16位）（2）,Timer Advanced-control(16-bit)(2),products:zh+products:en,confirmed
+CH32V317WCU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic(16-bit),products:zh+products:en,confirmed
+CH32V317WCU6,timer_general_purpose_16_bit,4,定时器 通用（16位）（2）,Timer General- purpose(16-bit)(2),products:zh+products:en,confirmed
+CH32V317WCU6,timer_systick_64_bit,Supported,定时器 系统时基64位,Timer SysTick (64-bit),products:zh+products:en,confirmed
+CH32V317WCU6,timer_watchdog,2 (WWDG + IWDG),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
+CH32V407RET6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V407RET6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V407RET6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V407RET6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V407RET6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
@@ -794,10 +1243,13 @@ CH32V407RET6,opa,1,OPA,OPA,products:zh+products:en,confirmed
 CH32V407RET6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confirmed
 CH32V407RET6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V407RET6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V407RET6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V407RET6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V407RET6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V407RET6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
 CH32V407RET6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V407RET6,usbhs_include_phy,1(USBHS1),USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
-CH32V407VET6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V407VET6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V407VET6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V407VET6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V407VET6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V407VET6,cpu_main_frequency,Max: 200MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
@@ -813,10 +1265,15 @@ CH32V407VET6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confi
 CH32V407VET6,rtc,Support,RTC,RTC,products:zh+products:en,confirmed
 CH32V407VET6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V407VET6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V407VET6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V407VET6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V407VET6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V407VET6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
+CH32V407VET6,timer_systick_32_bit,Support,定时器 系统时基32位,Timer SysTick (32-bit),products:zh+products:en,confirmed
+CH32V407VET6,timer_watchdog,2 (WWDG + IWDG),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V407VET6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V407VET6,usbhs_include_phy,2,USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
-CH32V407WEU6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V407WEU6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V407WEU6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V407WEU6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V407WEU6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V407WEU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
@@ -828,14 +1285,18 @@ CH32V407WEU6,opa,1,OPA,OPA,products:zh+products:en,confirmed
 CH32V407WEU6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confirmed
 CH32V407WEU6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V407WEU6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V407WEU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V407WEU6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V407WEU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V407WEU6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
 CH32V407WEU6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V407WEU6,usbhs_include_phy,2,USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
-CH32V467RET6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V467RET6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V467RET6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V467RET6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V467RET6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V467RET6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V467RET6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
+CH32V467RET6,extended_psram_bytes,4M,扩展PSRAM（字节）,Extended PSRAM (Bytes),products:zh+products:en,confirmed
 CH32V467RET6,i2c,1,I2C,I2C,products:zh+products:en,confirmed
 CH32V467RET6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32V467RET6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
@@ -843,16 +1304,20 @@ CH32V467RET6,opa,1,OPA,OPA,products:zh+products:en,confirmed
 CH32V467RET6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confirmed
 CH32V467RET6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V467RET6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V467RET6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V467RET6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V467RET6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V467RET6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
 CH32V467RET6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V467RET6,usbhs_include_phy,1(USBHS1),USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
-CH32V467VET6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V467VET6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V467VET6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V467VET6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V467VET6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V467VET6,cpu_main_frequency,Max: 200MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V467VET6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V467VET6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
 CH32V467VET6,ethernet,MAC+10M/100M PHY,Ethernet,Ethernet,products:zh+products:en,confirmed
+CH32V467VET6,extended_psram_bytes,8M,扩展PSRAM（字节）,Extended PSRAM (Bytes),products:zh+products:en,confirmed
 CH32V467VET6,fsmc,1,FSMC,FSMC,products:zh+products:en,confirmed
 CH32V467VET6,i2c,1,I2C,I2C,products:zh+products:en,confirmed
 CH32V467VET6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
@@ -862,14 +1327,20 @@ CH32V467VET6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confi
 CH32V467VET6,rtc,Support,RTC,RTC,products:zh+products:en,confirmed
 CH32V467VET6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V467VET6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V467VET6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V467VET6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V467VET6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V467VET6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
+CH32V467VET6,timer_systick_32_bit,Support,定时器 系统时基32位,Timer SysTick (32-bit),products:zh+products:en,confirmed
+CH32V467VET6,timer_watchdog,2 (WWDG + IWDG),定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32V467VET6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V467VET6,usbhs_include_phy,2,USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
-CH32V467WEU6,adc,2,ADC,ADC,products:zh+products:en,confirmed
+CH32V467WEU6,adc_channel,16+2,ADC 通道数,ADC channel,products:zh+products:en,confirmed
+CH32V467WEU6,adc_unit,2,ADC 单元数,ADC Unit,products:zh+products:en,confirmed
 CH32V467WEU6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32V467WEU6,can,1,CAN,CAN,products:zh+products:en,confirmed
 CH32V467WEU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V467WEU6,dvp,1,DVP,DVP,products:zh+products:en,confirmed
+CH32V467WEU6,extended_psram_bytes,8M,扩展PSRAM（字节）,Extended PSRAM (Bytes),products:zh+products:en,confirmed
 CH32V467WEU6,i2c,1,I2C,I2C,products:zh+products:en,confirmed
 CH32V467WEU6,i3c,1,I3C,I3C,products:zh+products:en,confirmed
 CH32V467WEU6,ltdc,1,LTDC,LTDC,products:zh+products:en,confirmed
@@ -877,7 +1348,9 @@ CH32V467WEU6,opa,1,OPA,OPA,products:zh+products:en,confirmed
 CH32V467WEU6,rng,1,随机数发生器（RNG）,RNG,products:zh+products:en,confirmed
 CH32V467WEU6,sdio,1,SDIO,SDIO,products:zh+products:en,confirmed
 CH32V467WEU6,spi_i2s,3/2,SPI/I2S,SPI/I2S,products:zh+products:en,confirmed
-CH32V467WEU6,timer,2,定时器,Timer,products:zh+products:en,confirmed
+CH32V467WEU6,timer_advanced_control_16_bit,2,定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),products:zh+products:en,confirmed
+CH32V467WEU6,timer_basic_16_bit,2,定时器 基本（16位）,Timer Basic (16-bit),products:zh+products:en,confirmed
+CH32V467WEU6,timer_general_purpose_16_bit,4,定时器 通用（16位）（1）,Timer General-purpose(16-bit) (1),products:zh+products:en,confirmed
 CH32V467WEU6,usart,10,USART,USART,products:zh+products:en,confirmed
 CH32V467WEU6,usbhs_include_phy,2,USBHS（含PHY）,USBHS (Include PHY),products:zh+products:en,confirmed
 CH32X033F8P6,adc,10+1,ADC,ADC,products:zh+products:en,confirmed
@@ -977,34 +1450,65 @@ CH32X035R8T6,spi,√,SPI,SPI,products:zh+products:en,confirmed
 CH32X035R8T6,type_c_source_sink_drp,√,Type-C Source Sink DRP,Type-C Source Sink DRP,products:zh+products:en,confirmed
 CH32X035R8T6,usb_device,√,USB 设 备,USB Device,products:zh+products:en,confirmed
 CH32X035R8T6,watchdog,2,看 门 狗,Watchdog,products:zh+products:en,confirmed
-CH32X305RCT6,adc,9+1,ADC,ADC,products:zh+products:en,confirmed
+CH32X305RCT6,adc_adc1_channel,9+1,ADC ADC1通道数,ADC ADC1 channel,products:zh+products:en,confirmed
+CH32X305RCT6,adc_adc2_channel,10,ADC ADC2通道数,ADC ADC2 channel,products:zh+products:en,confirmed
+CH32X305RCT6,adc_adc3_channel,10,ADC ADC3通道数,ADC ADC3 channel,products:zh+products:en,confirmed
+CH32X305RCT6,adc_adc4_channel,10,ADC ADC4通道数,ADC ADC4 channel,products:zh+products:en,confirmed
 CH32X305RCT6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32X305RCT6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
-CH32X305RCT6,pdusb,Host/Device,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32X305RCT6,pdusb_usbhs_usb2_0,Host/Device,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),products:zh+products:en,confirmed
+CH32X305RCT6,pdusb_usbpd,1,PDUSB USBPD,PDUSB USBPD,products:zh+products:en,confirmed
 CH32X305RCT6,rtc,Support,RTC,RTC,products:zh+products:en,confirmed
 CH32X305RCT6,spi,3,SPI,SPI,products:zh+products:en,confirmed
-CH32X305RCT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32X305RCT6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control (16-bit),products:zh+products:en,confirmed
+CH32X305RCT6,timer_general_purpose_16_bit,2,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32X305RCT6,timer_general_purpose_32_bit,1,定时器 通用（32位）,Timer General-purpose(32-bit),products:zh+products:en,confirmed
+CH32X305RCT6,timer_systick_32_bit,Support,定时器 系统时基32位,Timer SysTick (32-bit),products:zh+products:en,confirmed
+CH32X305RCT6,timer_watchdog,WWDG+IWDG,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32X305RCT6,usart,4,USART,USART,products:zh+products:en,confirmed
-CH32X315CCU6,adc,8+1,ADC,ADC,products:zh+products:en,confirmed
+CH32X315CCU6,adc_adc1_channel,8+1,ADC ADC1通道数,ADC ADC1 channel,products:zh+products:en,confirmed
+CH32X315CCU6,adc_adc2_channel,6,ADC ADC2通道数,ADC ADC2 channel,products:zh+products:en,confirmed
+CH32X315CCU6,adc_adc3_channel,8,ADC ADC3通道数,ADC ADC3 channel,products:zh+products:en,confirmed
+CH32X315CCU6,adc_adc4_channel,6,ADC ADC4通道数,ADC ADC4 channel,products:zh+products:en,confirmed
 CH32X315CCU6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32X315CCU6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
-CH32X315CCU6,pdusb,Host/Device,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32X315CCU6,pdusb_usbhs_usb2_0,Host/Device,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),products:zh+products:en,confirmed
+CH32X315CCU6,pdusb_usbpd,1,PDUSB USBPD,PDUSB USBPD,products:zh+products:en,confirmed
+CH32X315CCU6,pdusb_usbss_usb3_0,Device,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),products:zh+products:en,confirmed
 CH32X315CCU6,spi,3,SPI,SPI,products:zh+products:en,confirmed
-CH32X315CCU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32X315CCU6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control (16-bit),products:zh+products:en,confirmed
+CH32X315CCU6,timer_general_purpose_16_bit,2,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32X315CCU6,timer_general_purpose_32_bit,1,定时器 通用（32位）,Timer General-purpose(32-bit),products:zh+products:en,confirmed
 CH32X315CCU6,usart,4,USART,USART,products:zh+products:en,confirmed
-CH32X315MCU6,adc,12+1,ADC,ADC,products:zh+products:en,confirmed
+CH32X315MCU6,adc_adc1_channel,12+1,ADC ADC1通道数,ADC ADC1 channel,products:zh+products:en,confirmed
+CH32X315MCU6,adc_adc2_channel,12,ADC ADC2通道数,ADC ADC2 channel,products:zh+products:en,confirmed
+CH32X315MCU6,adc_adc3_channel,12,ADC ADC3通道数,ADC ADC3 channel,products:zh+products:en,confirmed
+CH32X315MCU6,adc_adc4_channel,12,ADC ADC4通道数,ADC ADC4 channel,products:zh+products:en,confirmed
 CH32X315MCU6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32X315MCU6,cpu_main_frequency,Max: 480MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32X315MCU6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
-CH32X315MCU6,pdusb,Host/Device,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32X315MCU6,pdusb_usbhs_usb2_0,Host/Device,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),products:zh+products:en,confirmed
+CH32X315MCU6,pdusb_usbpd,1Built-in Rd(2),PDUSB USBPD,PDUSB USBPD,products:en+!products:zh(=1 built-in Rd(2)),conflict
+CH32X315MCU6,pdusb_usbss_usb3_0,Device,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),products:zh+products:en,confirmed
 CH32X315MCU6,rtc,Support,RTC,RTC,products:zh+products:en,confirmed
 CH32X315MCU6,spi,3,SPI,SPI,products:zh+products:en,confirmed
-CH32X315MCU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32X315MCU6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control (16-bit),products:zh+products:en,confirmed
+CH32X315MCU6,timer_general_purpose_16_bit,2,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32X315MCU6,timer_general_purpose_32_bit,1,定时器 通用（32位）,Timer General-purpose(32-bit),products:zh+products:en,confirmed
+CH32X315MCU6,timer_systick_32_bit,Support,定时器 系统时基32位,Timer SysTick (32-bit),products:zh+products:en,confirmed
+CH32X315MCU6,timer_watchdog,WWDG+IWDG,定时器 看门狗,Timer Watchdog,products:zh+products:en,confirmed
 CH32X315MCU6,usart,4,USART,USART,products:zh+products:en,confirmed
-CH32X315WCU6,adc,12+1,ADC,ADC,products:zh+products:en,confirmed
+CH32X315WCU6,adc_adc1_channel,12+1,ADC ADC1通道数,ADC ADC1 channel,products:zh+products:en,confirmed
+CH32X315WCU6,adc_adc2_channel,12,ADC ADC2通道数,ADC ADC2 channel,products:zh+products:en,confirmed
+CH32X315WCU6,adc_adc3_channel,12,ADC ADC3通道数,ADC ADC3 channel,products:zh+products:en,confirmed
+CH32X315WCU6,adc_adc4_channel,12,ADC ADC4通道数,ADC ADC4 channel,products:zh+products:en,confirmed
 CH32X315WCU6,argb,1,ARGB,ARGB,products:zh+products:en,confirmed
 CH32X315WCU6,i2c,2,I2C,I2C,products:zh+products:en,confirmed
-CH32X315WCU6,pdusb,Host/Device,PDUSB,PDUSB,products:zh+products:en,confirmed
+CH32X315WCU6,pdusb_usbhs_usb2_0,Host/Device,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),products:zh+products:en,confirmed
+CH32X315WCU6,pdusb_usbpd,1,PDUSB USBPD,PDUSB USBPD,products:zh+products:en,confirmed
+CH32X315WCU6,pdusb_usbss_usb3_0,Device,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),products:zh+products:en,confirmed
 CH32X315WCU6,spi,3,SPI,SPI,products:zh+products:en,confirmed
-CH32X315WCU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
+CH32X315WCU6,timer_advanced_control_16_bit,1,定时器 高级（16位）,Timer Advanced-control (16-bit),products:zh+products:en,confirmed
+CH32X315WCU6,timer_general_purpose_16_bit,2,定时器 通用（16位）,Timer General-purpose(16-bit),products:zh+products:en,confirmed
+CH32X315WCU6,timer_general_purpose_32_bit,1,定时器 通用（32位）,Timer General-purpose(32-bit),products:zh+products:en,confirmed
 CH32X315WCU6,usart,4,USART,USART,products:zh+products:en,confirmed

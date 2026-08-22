@@ -161,11 +161,59 @@ def squash(text: str) -> str:
     return re.sub(r"[^a-z0-9一-鿿]", "", str(text).lower())
 
 
+KEEP = re.compile(r"[a-z0-9一-鿿]")
+
+
+def squash_marked(text: str) -> tuple[str, frozenset[int]]:
+    """The squashed label, and where in it the original's words began.
+
+    Squashing is what lets a keyword span a space -- `Code FLASH` has to answer
+    to `codeflash` -- so the boundaries have to be carried alongside rather than
+    recovered afterwards. `Non-zero wait Code FLASH` squashes to
+    "nonzerowaitcodeflash", where "codeflash" no longer starts after a space but
+    still starts a word.
+    """
+    flat: list[str] = []
+    starts: set[int] = set()
+    fresh = True
+    for ch in str(text).lower():
+        if not KEEP.match(ch):
+            fresh = True
+            continue
+        # 中文はラベルの中で英字と地続きに書く（`非零等待Code FLASH`）。
+        # 字種が変わるところは、空白が無くても語の切れ目。
+        if flat and ch.isascii() != flat[-1].isascii():
+            fresh = True
+        if fresh:
+            starts.add(len(flat))
+        flat.append(ch)
+        fresh = False
+    return "".join(flat), frozenset(starts)
+
+
+def spelt_in(keyword: str, flat: str, starts: frozenset[int]) -> bool:
+    """Does the label use this keyword, rather than merely contain it?
+
+    Squashing drops the spaces, so a bare substring test reads a word out of the
+    middle of another: `FMC SDRAM` (an SDRAM controller, count 1) becomes
+    "fmcsdram" and answers to `sram`, and `programmable current sink` answers to
+    `ram`. Both would be read as an SRAM size. An ASCII keyword therefore has to
+    begin where a word began. CJK is written without spaces, so the same test
+    cannot apply to it and is not needed: those keywords are whole labels.
+    """
+    at = flat.find(keyword)
+    while at != -1:
+        if not keyword.isascii() or at in starts:
+            return True
+        at = flat.find(keyword, at + 1)
+    return False
+
+
 def canonical_match(label: str) -> tuple[str, int] | None:
     """(field, rank). Rank 0 is the spelling PREFER names, 1 is anything else."""
-    flat = squash(label)
+    flat, starts = squash_marked(label)
     for field, keyword in CANONICAL_ORDER:
-        if keyword in flat:
+        if spelt_in(keyword, flat, starts):
             return field, 0 if keyword in PREFER.get(field, ()) else 1
     return None
 
@@ -173,6 +221,37 @@ def canonical_match(label: str) -> tuple[str, int] | None:
 def canonical_field(label: str) -> str | None:
     found = canonical_match(label)
     return found[0] if found else None
+
+
+def partitioned(attrs: dict, field: str) -> str | None:
+    """A capacity the table states as parts of one group, added back up.
+
+    CH32H41x does not print its SRAM total. The comparison table splits it into
+    the regions it is divided into, under one group heading:
+
+        SRAM   内核1高速ITCM       128KB
+               内核1高速DTCM       256KB
+               共享代码和数据区     512KB
+
+    Reading any one of them as `sram_bytes` understates the part **sevenfold**,
+    and the datasheet's own prose gives the total the three add up to（「内置総
+    容量896K字節のSRAM」）, so the sum is corroborated rather than invented.
+
+    The group heading is what says these are parts of one quantity and not two
+    columns competing for one field: CH32V30x's `Code FLASH` and `Flash` differ
+    from the first word onwards and are never added. Every member has to parse
+    as a size, which is what keeps a count group (`定时器 高级（16位）` … ) out.
+    """
+    if not field.endswith("_bytes"):
+        return None
+    members = [(label, value) for label, value in attrs.items()
+               if canonical_field(label) == field]
+    if len(members) < 2 or len({label.split()[0] for label, _ in members}) != 1:
+        return None
+    sizes = [as_bytes(str(value).translate(WIDE).strip()) for _, value in members]
+    if not all(size and size.isdigit() for size in sizes):
+        return None
+    return str(sum(int(size) for size in sizes))
 
 
 def promoted(label: str, attrs: dict) -> bool:
@@ -186,6 +265,10 @@ def promoted(label: str, attrs: dict) -> bool:
     if not found:
         return False
     field, rank = found
+    # 足し合わせて得た値は、どの1行のものでもない。分割はそれ自体が事実なので
+    # 子行は全部 product_attributes へ残す（F-14 で 480K を残したのと同じ）。
+    if partitioned(attrs, field) is not None:
+        return False
     return not any(other != label
                    and (m := canonical_match(other))
                    and m[0] == field and m[1] < rank
@@ -219,6 +302,10 @@ def read_edition(datasheet: Path) -> tuple[dict, dict]:
 
 def normalise(attributes: dict) -> dict[str, str]:
     out: dict[str, str] = {}
+    for field in {f for label in attributes if (f := canonical_field(label))}:
+        total = partitioned(attributes, field)
+        if total:
+            out[field] = total
     for label, value in sorted(attributes.items(),
                                key=lambda kv: (canonical_match(kv[0]) or ("", 0))[1]):
         field = canonical_field(label)
@@ -759,8 +846,22 @@ def load_translations() -> dict:
 
 
 def translated(text: str, table: dict) -> str:
-    """Look up the hand-made translation, spaces the PDF inserted removed."""
-    return table.get(text.replace(" ", "").replace("　", ""), text)
+    """Look up the hand-made translation, spaces the PDF inserted removed.
+
+    A row-group label is the group heading and the child heading joined by a
+    space（`通信接口 CAN`）, and the dictionary is worth keeping in parts rather
+    than in every combination the table happens to print, so a label that is not
+    there whole is translated a part at a time.
+    """
+    flat = text.replace(" ", "").replace("　", "")
+    if flat in table:
+        return table[flat]
+    parts = text.split()
+    if len(parts) > 1:
+        rendered = [table.get(part, part) for part in parts]
+        if rendered != parts:
+            return " ".join(rendered)
+    return text
 
 
 def display_value(value_en: str, value_zh: str, confidence: str) -> str:
@@ -828,8 +929,10 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
             if zh_i is not None and en_i is not None:
                 agree = canonical_value(value_zh) == canonical_value(value_en)
                 confidence = "confirmed" if agree else "conflict"
+                # basis も `#` より左のデータ列なので中国語は残せない。
                 basis = "products:zh+products:en" if agree \
-                    else f"products:en+!products:zh(={value_zh})"
+                    else ("products:en+!products:zh("
+                          f"={translated(value_zh, translations['values'])})")
             elif zh_i is not None:
                 confidence, basis = "reference", "products:zh"
             else:

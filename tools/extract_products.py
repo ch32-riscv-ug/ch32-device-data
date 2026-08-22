@@ -125,8 +125,29 @@ def read_column_layout(rows: list[list[str]], default_family: str) -> list[dict]
         return None
 
     products = {col: {"part_number": pn, "attributes": {}} for col, pn in columns.items()}
+    # **見出しは1列とは限らない。** 型番の列より左にある列は全部見出しで、
+    # CH32H417 の比較表はそこを2段に使う:
+    #
+    #     SRAM   内核1高速ITCM     128KB
+    #            内核1高速DTCM     256KB   ← row[0] が空。行グループの子
+    #            共享代码和数据区   512KB
+    #
+    # row[0] だけを見て空なら捨てていたので、**グループの最初の子しか残らず**
+    # SRAM が 896KB のうち 128KB になっていた（worklist の F-15）。
+    depth = min(columns)
+    carried = [""] * depth
     for row in rows[header + 1:]:
-        label = flatten(row[0]) if row else ""
+        if not row:
+            continue
+        for level in range(depth):
+            cell = flatten(row[level]) if level < len(row) else ""
+            if cell:
+                carried[level] = cell
+                # 上の段が変わったら下の段は無効。そうしないと見出しが1段だけの
+                # 行（GPIO端口数）に、前のグループの子見出しが付いて回る。
+                for lower in range(level + 1, depth):
+                    carried[lower] = ""
+        label = " ".join(part for part in carried if part).strip()
         if not label:
             continue
         for col, product in products.items():

@@ -5,6 +5,9 @@
     "CodeFLASH（字节）": "Code FLASH (bytes)",
     "主要应用及特点": "Main applications and features",
     "信号解码QII": "Signal decoding QII",
+    "共享代码和数据区": "Shared code and data area",
+    "内核1高速DTCM": "Core 1 fast DTCM",
+    "内核1高速ITCM": "Core 1 fast ITCM",
     "可编程灌电流模块ISINK": "Programmable current-sink module ISINK",
     "工作电压": "Operating voltage",
     "源电流模块ISOURCE": "Current-source module ISOURCE",
@@ -13,6 +16,10 @@
     "额定电压": "Rated voltage"
   },
   "values": {
+    "(CC1R,CC2R)(CC3,CC4)内置Rd(1)": "(CC1R,CC2R)(CC3,CC4), built-in Rd(1)",
+    "1内置Rd(4)": "1 built-in Rd(4)",
+    "1内置Rd（2）": "1 built-in Rd(2)",
+    "DRPSourceSink内置Rd(1)": "DRP/Source/Sink, built-in Rd(1)",
     "典型：72MHz": "Typ. 72MHz",
     "差分*1单端*1": "1 differential + 1 single-ended",
     "差分*2": "2 differential",
