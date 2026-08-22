@@ -78,7 +78,12 @@ def package_dim_evidence(dims: dict, package: str | None, key: str) -> list[tupl
 # words these differently -- "Flash memory", "Code FLASH（字节）", "闪存" -- so the
 # comparison needs a name of its own rather than the document's.
 CANONICAL = {
-    "flash_bytes": ("flash", "闪存", "codeflash"),
+    # 具体的な綴りほど先に来る（CANONICAL_ORDER が長さ順に並べ替える）。
+    # 「非零等待」は「零等待」を内側に持つので、**より長い非零等待側が先に
+    # 当たらないと CH32H41x の列が零等待と読まれる**。
+    "flash_bytes": ("flash", "闪存", "codeflash",
+                    "零等待codeflash", "非零等待codeflash",
+                    "zerowaitcodeflash", "nonzerowaitcodeflash"),
     "sram_bytes": ("sram", "ram", "零等待sram"),
     "pin_count": ("pinno", "pincount", "pinnumber", "chippinnumber", "芯片引脚数", "引脚数"),
     "gpio_count": ("gpio", "gpioportnumber", "gpioportcount", "numberofgpios",
@@ -111,7 +116,11 @@ CANONICAL_ORDER = sorted(
 # taking gpio_count away from "GPIO port count".
 # 中文版は同じ2列を「Code FLASH（字节）480K」と「闪存（字节）256K」と書く。
 # 両方の綴りを入れないと片言語だけ直って zh/en が conflict になる。
-PREFER = {"flash_bytes": frozenset({"flash", "闪存"})}
+# CH32X305/X315 は列が1つ（480K）しかなく、零等待の192Kは脚注の散文にある。
+# `extract_products` がそれを `零等待Code FLASH（字节）` として注ぎ足すので、
+# ここで綴りの勝ち負けを決める（480K は product_attributes へ落ちる）。
+PREFER = {"flash_bytes": frozenset({"flash", "闪存",
+                                    "零等待codeflash", "zerowaitcodeflash"})}
 
 SIZE = re.compile(r"^(\d+)\s*([KMG])?B?$", re.IGNORECASE)
 # A temperature range is worded freely around the same two numbers -- "Industrial

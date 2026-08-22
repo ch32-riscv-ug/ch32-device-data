@@ -15,7 +15,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
 
 付属表
-  product_attributes.csv 1513行  比較表の全属性（縦持ち。列に昇格していない残り全部）
+  product_attributes.csv 1517行  比較表の全属性（縦持ち。列に昇格していない残り全部）
   remap_fields.csv        285行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       4900行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
@@ -81,9 +81,11 @@ CH32V303/305/307のdatasheetは「Code FLASH（字节）480K」と「Flash（字
 負けた側は`product_attributes.csv`へ落とします（480Kも事実なので消しません）。
 振り直せるpartは`memory_configs.csv`を参照してください。
 
-**CH32X305/X315は`flash_bytes`が過大です。** 列が1つしかなく、
-分割が脚注の散文（「480KB闪存包含192KB的零等待程序运行区域」）にあるため
-まだ取れていません（docs/worklist.ja.mdのF-14）。CH32H41xは当てはまりません——
+**CH32X305/X315の`flash_bytes`は192Kです。** 比較表の列は480Kの1つしかなく、
+分割は脚注の散文（「480KB闪存包含192KB的零等待程序运行区域」）にあります。
+文が総量と零等待量の両方を書いているので、そこから零等待側を取ります
+（480Kは`code_flash_bytes`として`product_attributes.csv`に残ります）。
+EVTの`Link.ld`も7本すべて192Kを基準にしています。CH32H41xは当てはまりません——
 比較表の列が「非零等待Code FLASH」と名乗っていて、**零等待で走るFLASHが無い**
 （零等待のコード領域はSRAM側のITCMにあります）。
 
@@ -403,7 +405,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
 - **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
-## 現況（2026-08-22生成）
+## 現況（2026-08-23生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
@@ -415,7 +417,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | documents.csv | 76 | — | — | — |
 | pins.csv | 4342 | 4220 | 122 | 0 |
 | pin_functions.csv | 27926 | 27719 | 207 | 0 |
-| product_attributes.csv | 1513 | 1378 | 132 | 3 |
+| product_attributes.csv | 1517 | 1382 | 132 | 3 |
 | remap_fields.csv | 285 | 0 | 285 | 0 |
 | remap_routes.csv | 4900 | 0 | 4900 | 0 |
 | pin_alternate.csv | 240 | 0 | 240 | 0 |
