@@ -46,6 +46,43 @@ PLAIN_SUFFIX = re.compile(r"^[A-Z]{1,2}\d[A-Zx]\d?[A-Z]?\d?$")
 MAX_PAGES = 16
 
 
+# 零等待領域が**列ではなく脚注の散文**にある family がある。CH32X305/X315 の
+# 比較表は `Code FLASH（字节） 480K(1)` の1列しか持たず、その `(1)` が指す注が
+#
+#     注：1.480KB闪存包含192KB的零等待程序运行区域和288KB非零等待区域。
+#     Note: 1. The 480KB flash memory contains 192KB of zero-wait program
+#           execution area and 288KB of non-zero-wait area.
+#
+# と書く。EVT の Link.ld はどれも `FLASH 192K` を link していて、480K を
+# `flash_bytes` に採ると linker script が 2.5 倍に見積もる（worklist の F-14）。
+# 脚注番号と値の対応を作らなくても、**文が総量と零等待量の両方を書いている**ので
+# 総量が一致することで結び付けられる。
+ZERO_WAIT = {
+    "zh": re.compile(r"(?P<total>\d+)\s*KB?\s*闪存包含\s*(?P<zero>\d+)\s*KB?\s*的?零等待"),
+    "en": re.compile(r"(?P<total>\d+)\s*KB\s+flash\s+memory\s+contains\s+"
+                     r"(?P<zero>\d+)\s*KB\s+of\s+zero[-\s]?wait", re.IGNORECASE),
+}
+# 注入するラベル。既存の `Code FLASH（字节）` より具体的な綴りなので
+# build_tables の「同じフィールドに寄る列は具体的な方を promote」に乗る。
+ZERO_WAIT_LABEL = {"zh": "零等待Code FLASH（字节）", "en": "Zero-wait Code FLASH (bytes)"}
+
+
+def read_zero_wait(pdf, lang: str) -> tuple[int, str] | None:
+    """(page_no, "192K") — 脚注が言う零等待領域。無ければ None。
+
+    折り返しで文が2行に割れるので、隣接2行の窓で読む。
+    """
+    pattern = ZERO_WAIT[lang]
+    for page in pdf.pages[:MAX_PAGES]:
+        lines = (page.extract_text() or "").splitlines()
+        for i, _ in enumerate(lines):
+            found = pattern.search(" ".join(lines[i:i + 2]))
+            if found:
+                return page.page_number, f"{found.group('zero')}K"
+        page.flush_cache()
+    return None
+
+
 def flatten(cell: str | None) -> str:
     return (cell or "").replace("\n", "").strip()
 
@@ -193,6 +230,13 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                     seen.add(key)
                     product["_source"] = {"page": pno, "layout": layout}
                     products.append(product)
+        lang = "zh" if "datasheet_zh" in str(pdf_path) else "en"
+        split = read_zero_wait(pdf, lang)
+    if split:
+        page_no, value = split
+        notes.append(f"零等待領域は脚注にある（p.{page_no}）: {value}")
+        for product in products:
+            product["attributes"][ZERO_WAIT_LABEL[lang]] = value
     return products, notes
 
 
