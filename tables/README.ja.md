@@ -15,7 +15,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
 
 付属表
-  product_attributes.csv 1009行  比較表の全属性（縦持ち。列に昇格していない残り全部）
+  product_attributes.csv 1513行  比較表の全属性（縦持ち。列に昇格していない残り全部）
   remap_fields.csv        285行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       4900行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
@@ -81,9 +81,16 @@ CH32V303/305/307のdatasheetは「Code FLASH（字节）480K」と「Flash（字
 負けた側は`product_attributes.csv`へ落とします（480Kも事実なので消しません）。
 振り直せるpartは`memory_configs.csv`を参照してください。
 
-**CH32X305/X315とCH32H41xは`flash_bytes`が過大です。** 列が1つしかなく、
+**CH32X305/X315は`flash_bytes`が過大です。** 列が1つしかなく、
 分割が脚注の散文（「480KB闪存包含192KB的零等待程序运行区域」）にあるため
-まだ取れていません（docs/worklist.ja.mdのF-14）。
+まだ取れていません（docs/worklist.ja.mdのF-14）。CH32H41xは当てはまりません——
+比較表の列が「非零等待Code FLASH」と名乗っていて、**零等待で走るFLASHが無い**
+（零等待のコード領域はSRAM側のITCMにあります）。
+
+`sram_bytes`は逆に**過小でした**。CH32H41xのdatasheetは合計を表に書かず、
+ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合計896KBは
+本文の「内置総容量896K字節のSRAM」と一致します（F-15）。3行は
+`product_attributes.csv`に残してあります。
 
 ### `packages.csv`
 
@@ -402,7 +409,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | documents.csv | 76 | — | — | — |
 | pins.csv | 4342 | 4220 | 122 | 0 |
 | pin_functions.csv | 27926 | 27719 | 207 | 0 |
-| product_attributes.csv | 1009 | 938 | 70 | 1 |
+| product_attributes.csv | 1513 | 1378 | 132 | 3 |
 | remap_fields.csv | 285 | 0 | 285 | 0 |
 | remap_routes.csv | 4900 | 0 | 4900 | 0 |
 | pin_alternate.csv | 240 | 0 | 240 | 0 |
