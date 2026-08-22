@@ -311,7 +311,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 - **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
 - **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
 
-## 現況（2026-08-21生成）
+## 現況（2026-08-22生成）
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
@@ -327,13 +327,13 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | clock_configs.csv | 152 | 0 | 152 | 0 |
 | clock_prescalers.csv | 263 | 0 | 263 | 0 |
 | clock_sources.csv | 116 | 0 | 116 | 0 |
-| clock_symbols.csv | 433 | 0 | 424 | 5 |
+| clock_symbols.csv | 433 | 0 | 428 | 5 |
 | clock_init.csv | 101 | 0 | 101 | 0 |
 | evt_variants.csv | 56 | 0 | 56 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
 | operating_conditions.csv | 283 | 257 | 21 | 5 |
 | pins.csv | 4312 | 4022 | 290 | 0 |
-| pin_functions.csv | 27850 | 24718 | 4775 | 0 |
+| pin_functions.csv | 27850 | 24444 | 3406 | 0 |
 
 pins系は全103型番がpin行を持ちます（型番→pin表列の解決失敗ゼロ）。
 
