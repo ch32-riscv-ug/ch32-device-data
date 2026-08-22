@@ -684,6 +684,7 @@ CH32V208WBU6,communicationinterfaces,4,通信接口,Communicationinterfaces,prod
 CH32V208WBU6,opa,2,运放、比较器,OPA,products:zh+products:en,confirmed
 CH32V208WBU6,timer,1,定时器,Timer,products:zh+products:en,confirmed
 CH32V303CBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303CBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V303CBT6,communicationinterfaces,3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V303CBT6,cpu_main_frequency,Max: 144MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V303CBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
@@ -691,76 +692,89 @@ CH32V303CBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confir
 CH32V303CBT6,rtc,Supported,RTC,RTC,products:zh+products:en,confirmed
 CH32V303CBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
 CH32V303RBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V303RBT6,communicationinterfaces,3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V303RBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303RBT6,timer,1,定时器,Timer,products:zh+products:en,confirmed
 CH32V303RCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V303RCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V303RCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303RCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V303RCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V303RCT7,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303RCT7,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V303RCT7,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V303RCT7,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303RCT7,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303RCT7,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V303RCT7,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V303VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V303VCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V303VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V303VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V303VCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V303VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V303VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V305CCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305CCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V305CCT6,communicationinterfaces,5,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V305CCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305CCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305CCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V305CCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V305FBP6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305FBP6,code_flash_bytes,224K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V305FBP6,communicationinterfaces,USART1USART3,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V305FBP6,dac_unit,DAC2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305FBP6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V305FBP6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V305GBU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305GBU6,code_flash_bytes,224K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V305GBU6,communicationinterfaces,USART1USART3UART4UART5UART7,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V305GBU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305GBU6,opa_cmp,OPA3,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305GBU6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V305GBU6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V305RBT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V305RBT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V305RBT6,communicationinterfaces,5,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V305RBT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V305RBT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V305RBT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V305RBT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V307RCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307RCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V307RCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V307RCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307RCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307RCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V307RCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V307VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307VCT6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V307VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V307VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307VCT6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V307VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V307WCU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V307WCU6,code_flash_bytes,480K,Code FLASH（字节）,Code FLASH (bytes),products:zh+products:en,confirmed
 CH32V307WCU6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V307WCU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V307WCU6,opa_cmp,4,运放、比较器,OPA/CMP,products:zh+products:en,confirmed
 CH32V307WCU6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V307WCU6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V317VCT6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V317VCT6,code_flash_bytes,480K,Code FLASH（字节）,,products:zh,reference
 CH32V317VCT6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V317VCT6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed
 CH32V317VCT6,opa,4,运放,OPA,products:zh+products:en,confirmed
 CH32V317VCT6,rng,1,随机数发生器,RNG,products:zh+products:en,confirmed
 CH32V317VCT6,timer,4,定时器,Timer,products:zh+products:en,confirmed
 CH32V317WCU6,adc_tkey,2,ADC/TKey,ADC/TKey,products:zh+products:en,confirmed
+CH32V317WCU6,code_flash_bytes,480K,Code FLASH（字节）,,products:zh,reference
 CH32V317WCU6,communicationinterfaces,8,通信接口,Communicationinterfaces,products:zh+products:en,confirmed
 CH32V317WCU6,cpu_main_frequency,Max: 144MHz,CPU主频,CPU main frequency,products:zh+products:en,confirmed
 CH32V317WCU6,dac_unit,2,DAC（单元）,DAC (Unit),products:zh+products:en,confirmed

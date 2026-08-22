@@ -27,7 +27,7 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_products.py`: datasheetの製品比較表から全SKUとその属性を取る。ユニーク型番92件を確認済み
 - `tools/build_candidate.py`: 上記4 toolの出力を結合し、pinから参照されるselectorだけを残した候補を作る
 - `tools/extract_ordering.py`: datasheetのordering表からorder model・package・body size・pin pitchを取る
-- `tools/build_all.py`: 全SKUに対して候補を生成する。出力は`candidates/`（未review）
+- `tools/build_all.py`: 全SKUに対して候補を生成する。出力は`candidates/`（未review）。**familyごとに並列**で走る（`--jobs`、既定2）。逐次35分に対し2並列で16.6分。family間は何も共有しないので、上限を決めるのはコア数ではなくメモリ。1 workerがreference manualを丸ごと開くため**CH32H417で実測2.2GB**（ページ単位に`flush_cache()`しても下がらない）で、6並列は13GBを要求してWSLごと固まった。**WSLの`free`が見せる空きはホストの空きではない**ので、数字を信じて上げないこと。終わった順に出力されるのでカタログ順には並ばない
 - `curated/pin-table-columns.json`: テキスト層が落とす列見出しを、画像確認した値で上書きする
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する
 - `templates/`: 全mirror共通の`update.sh`とworkflow。file IDの直書きを持たない
@@ -41,14 +41,18 @@ ArduinoCore-CH32のQ-011を検討するため、exact orderable SKU単位のJSON
 - `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructメンバーオフセットから`BLOCK->REGISTER`の絶対アドレスを解く。`clock_symbols.csv`の`address`列に使い、R-20（レジスタマップ）の下地でもある
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro（`CH32V20x_D8W`等）を取り`tables/evt_variants.csv`にする。`clock_configs.condition`を型番で評価するのに要る
 - `tools/build_operating.py`: datasheetの一般動作条件表・発振器の表・ADC特性表から`tables/operating_conditions.csv`を生成する
+- `tools/build_systick.py`: `core_riscv.h`の`SysTick_Type`から`tables/systick.csv`を生成する。**CH32V103だけ配置が違い**、`CMP`の位置を他familyと同じだと思うと`millis()`が動かない
+- `tools/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）のAF番号の書き込み先を`tables/pin_alternate.csv`にする。`pin_functions`の`af-N`が4412行あるのに、Nをどこに書くかがどの表にも無かった（worklistのF-10/F-12）
+- `tools/build_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを`tables/memory_configs.csv`にする。reference manualが符号と適用先を、EVTの`Link.ld`が組合せを言い、両者を突き合わせる（X315の`Link.ld`だけ嘘を書いているのがこれで判る）。**「出荷時の組」と言えるものは無い**ので、列は`datasheet_value`（比較表が載せる組）と名乗り、EVTの例題がどの組をlinkしているかは実行時のnotesに出す
+- `tools/build_link_firmware.py`: WCH-Link系デバッガのファームウェア一覧を`tables/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。**版番号は未解決**（[link-firmware-survey](link-firmware-survey.ja.md)）
 - `tools/build_documents.py` / `tools/check_tables.py`: 文書カタログのCSV投影（標準ライブラリのみ、日次workflowが実行）と、全テーブルの参照結合検査（push/PRのcheck workflowと日次が実行）
 - `tools/build_readme.py` / `generated/readme/`: **本来の目的である各mirror READMEの生成**。tablesから組み立ててここへcommitし、mirrorのupdate.shが日次で自分の分をfetchしてREADME.mdを置き換える（catalogueと同方式・クロスrepoトークン不要）。CH32V003で旧手製READMEとpin表72セル完全一致を確認済み。ch32_riscv_toolsへのリンクは生成版には無い（撤去方針）。画像はmirror側image/を生成時にスキャンして参照するだけで、手動維持。organizationプロフィール（`.github`リポジトリの`profile/README.md`、family→series対応表つき）も同方式で`generated/readme/_profile.md`から日次fetch
 - `docs/extraction-survey.ja.md`: 上記5 toolでの実測と、機械抽出できる範囲の調査結果
 - `docs/glossary.ja.md`: 用語集。ファミリー/シリーズの定義、型番の読み方、確度の語彙
 
-全datasheetの掃引では31 pin定義表・102変種列から4035 pin、21853 pin function（要確認252件）を取得できています。対象SKUをどこまで広げるかは未合意です。
+全datasheetの掃引では31 pin定義表・102変種列から4342 pin、27926 pin functionを取得できています（2026-08-22時点）。対象SKUをどこまで広げるかは未合意です。
 
-`tools/build_all.py`で全SKUの候補を`candidates/`へ生成済みです（98ファイル・4.0MB、**全SKUでpin取得**、3989 pin・22186 function・7108経路・585 selector）。**未reviewの機械出力**であり、`devices/`へは反映していません。
+`tools/build_all.py`で全SKUの候補を`candidates/`へ生成済みです（102ファイル、**全SKUでpin取得**、4255 pin・27656 function・15004経路）。**未reviewの機械出力**であり、`devices/`へは反映していません。
 
 CH32V407/V467のreference manualは`datasheet_zh`にあります（`CH32V407RM.PDF`。英語版は無い）。
 中国語版のほうがデータが新しいのが通例なので、抽出は両言語を読んで和を取ります。

@@ -641,6 +641,11 @@
           "signal": "USART1_RX",
           "route": "af-1",
           "_alternate_function": 1
+        },
+        {
+          "signal": "ADCS0",
+          "route": "af-5",
+          "_alternate_function": 5
         }
       ]
     },
@@ -953,6 +958,88 @@
           "signal": "ARGB_TX",
           "route": "af-5",
           "_alternate_function": 5
+        }
+      ]
+    },
+    {
+      "number": 58,
+      "pad": "PD4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PD4",
+          "route": "main"
+        },
+        {
+          "signal": "ADC3_IN10",
+          "route": "default"
+        },
+        {
+          "signal": "CC1",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "I2C1_SCL",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "ARGB_TX",
+          "route": "af-5",
+          "_alternate_function": 5
+        }
+      ]
+    },
+    {
+      "number": 59,
+      "pad": "PD5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PD5",
+          "route": "main"
+        },
+        {
+          "signal": "ADC3_IN11",
+          "route": "default"
+        },
+        {
+          "signal": "CC2",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "TIM3_CH3",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "af-3",
+          "_alternate_function": 3
         }
       ]
     },

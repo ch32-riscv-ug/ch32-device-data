@@ -31,7 +31,18 @@ import pdfplumber
 # "6.3.2.1 Remap Register 1 (AFIO_PCFR1)" -- the register name is parenthesised.
 # The Chinese edition writes the same heading with full-width brackets,
 # "8.3.2.1 重映射寄存器1（AFIO_PCFR1）", and is generally the newer of the two.
-HEADING = re.compile(r"^\d+(?:\.\d+)+\s+.*[(\uff08]([A-Z][A-Z0-9_]*)[)\uff09]\s*$")
+SECTION = re.compile(r"^\d+(?:\.\d+)+\s+\S")
+# The name is not always the end of the line, and not always upper case. A whole
+# family of registers is written once with the index left as a lower-case
+# placeholder, and the range it stands for is appended in a second bracket:
+#
+#     11.3.3 DMAy 通道 x 配置寄存器（DMAy_CFGRx）（x=1/2/3/4/5/6/7/8，y=1/2）
+#     10.3.1.1 GPIO 配置寄存器低位（GPIOx_CFGLR）（x=A/B/C/D/E）
+#
+# Anchoring at the end and demanding upper case missed every one of these -- 161
+# headings in CH32FV2x_V3xRM and 271 in CH32H417RM. The qualifier cannot be
+# mistaken for a name because "x=1/2" does not match the name pattern at all.
+REGISTER_IN_HEADING = re.compile(r"[(\uff08]([A-Z][A-Za-z0-9_]*)[)\uff09]")
 BIT_RANGE = re.compile(r"^\[(\d+):(\d+)\]$")
 BIT_SINGLE = re.compile(r"^(\d+)$")
 FIELD_NAME = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)(?:\[\d+:\d+\])?$")
@@ -117,9 +128,17 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
             items += [("t", table.bbox[1], table) for table in page.find_tables()]
             for kind, _, payload in sorted(items, key=lambda x: x[1]):
                 if kind == "h":
-                    m = HEADING.match(payload)
-                    if m:
-                        register, layout = m.group(1), None
+                    # **A heading always replaces the register, even when no name
+                    # can be read from it.** Keeping the previous one is what
+                    # made CH32H417's whole DMA chapter -- 41 trigger-multiplexer
+                    # rows and the DMAy_CFGRx fields -- come out as AFIO_EXTICR2
+                    # fields named TIM1_CH1..TIM9_CH3, which then looked exactly
+                    # like real remap selectors. Dropping the tables is the
+                    # honest outcome: absence beats a plausible wrong owner.
+                    if SECTION.match(payload):
+                        found = REGISTER_IN_HEADING.search(payload)
+                        register = found.group(1) if found else None
+                        layout = None
                     continue
                 if register is None or (want and register != want):
                     continue
@@ -161,6 +180,8 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
                             "page": page.page_number,
                         }
                     )
+            # 読み終えたページのキャッシュは捨てる。extract_remap と同じ理由。
+            page.flush_cache()
     return fields, notes
 
 

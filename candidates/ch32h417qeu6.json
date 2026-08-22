@@ -466,6 +466,11 @@
           "signal": "DVP_D7",
           "route": "af-13",
           "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_G1",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -835,6 +840,26 @@
           "signal": "USART8_RTS",
           "route": "af-11",
           "_alternate_function": 11
+        },
+        {
+          "signal": "QSPI1_SIO1",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "FSMC_D21",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_D21",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "TIM11_CH4",
+          "route": "af-13",
+          "_alternate_function": 13
         }
       ]
     },
@@ -1322,6 +1347,51 @@
           "_alternate_function": 3
         },
         {
+          "signal": "FSMC_D7",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI2_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2S2_SD",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "SAI_FS_A",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "QSPI2_SIOX1",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SDRAM_D16",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "FSMC_D16",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "SDRAM_CKE0",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_DQM1",
+          "route": "af-15",
+          "_alternate_function": 15
+        },
+        {
           "signal": "UHSIF_PORT2",
           "route": "remap-2",
           "_selector_value": 2,
@@ -1341,6 +1411,18 @@
             "selector": "afio-uhsif-port-remap",
             "values": [
               3
+            ]
+          },
+          "_selector_resolved_by": "pad+value(grid)"
+        },
+        {
+          "signal": "UHSIF_PORT5",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              1
             ]
           },
           "_selector_resolved_by": "pad+value(grid)"
@@ -1734,6 +1816,31 @@
           "signal": "USART2_CK",
           "route": "af-7",
           "_alternate_function": 7
+        },
+        {
+          "signal": "TIM10_CH4",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "FSMC_D27",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_D27",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "DVP_HSYNC",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_VSYNC",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -2211,6 +2318,11 @@
           "signal": "SDRAM_D30",
           "route": "af-12",
           "_alternate_function": 12
+        },
+        {
+          "signal": "LTDC_G0",
+          "route": "af-14",
+          "_alternate_function": 14
         },
         {
           "signal": "UHSIF_PORT4",
@@ -3741,6 +3853,11 @@
           "signal": "SDRAM_BA1",
           "route": "af-12",
           "_alternate_function": 12
+        },
+        {
+          "signal": "LTDC_G7",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -4266,6 +4383,16 @@
           "signal": "SDRAM_D0",
           "route": "af-12",
           "_alternate_function": 12
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -5194,6 +5321,31 @@
           "signal": "USART1_CTS",
           "route": "af-7",
           "_alternate_function": 7
+        },
+        {
+          "signal": "SDRAM_D22",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "FSMC_A7",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SDRAM_A7",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "LTDC_R4",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },
@@ -5653,6 +5805,61 @@
           "_alternate_function": 2
         },
         {
+          "signal": "SDRAM_D24",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI3_SCK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2S3_CK",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "USART3_TX",
+          "route": "af-7",
+          "_alternate_function": 7
+        },
+        {
+          "signal": "USART6_TX",
+          "route": "af-8",
+          "_alternate_function": 8
+        },
+        {
+          "signal": "QSPI1_SIO1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "LTDC_B1",
+          "route": "af-10",
+          "_alternate_function": 10
+        },
+        {
+          "signal": "SWPMI_RX",
+          "route": "af-11",
+          "_alternate_function": 11
+        },
+        {
+          "signal": "DVP_D8",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_R2",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_HSYNC",
+          "route": "af-15",
+          "_alternate_function": 15
+        },
+        {
           "signal": "SDMMC_STS",
           "route": "remap-2",
           "_selector_value": 2,
@@ -5684,6 +5891,41 @@
               2
             ]
           }
+        },
+        {
+          "signal": "SDMMC_CMD",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-sdmmc-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "UHSIF_PORT32",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
+        },
+        {
+          "signal": "UHSIF_PORT32",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -6871,6 +7113,26 @@
           "_alternate_function": 7
         },
         {
+          "signal": "FSMC_NE1",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "TIM11_CH3",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B3",
+          "route": "af-14",
+          "_alternate_function": 14
+        },
+        {
+          "signal": "LTDC_G4",
+          "route": "af-15",
+          "_alternate_function": 15
+        },
+        {
           "signal": "SDMMC_D7",
           "route": "remap-2",
           "_selector_value": 2,
@@ -6893,9 +7155,28 @@
           }
         },
         {
-          "signal": "UHSIF_PORT42_",
-          "route": null,
-          "_needs_review": true
+          "signal": "UHSIF_PORT42",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "prefix"
+        },
+        {
+          "signal": "UHSIF_PORT42",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-uhsif-port-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "prefix"
         }
       ]
     },
@@ -7886,6 +8167,26 @@
           "signal": "SDIO_D4",
           "route": "af-10",
           "_alternate_function": 10
+        },
+        {
+          "signal": "FSMC_A3",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_A3",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "DVP_D6",
+          "route": "af-13",
+          "_alternate_function": 13
+        },
+        {
+          "signal": "LTDC_B6",
+          "route": "af-14",
+          "_alternate_function": 14
         }
       ]
     },

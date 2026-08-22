@@ -695,6 +695,10 @@
           }
         },
         {
+          "signal": "OPA_N0",
+          "route": "default"
+        },
+        {
           "signal": "XI",
           "route": null,
           "_needs_review": true
@@ -707,6 +711,105 @@
             "selector": "afio-tim1-remap",
             "values": [
               1
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "remap-9",
+          "_selector_value": 9,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              9
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-6",
+          "_selector_value": 6,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              6
+            ]
+          }
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-8",
+          "_selector_value": 8,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              8
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RTS",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "SPI_SCK",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              5
             ]
           }
         }
@@ -1179,6 +1282,52 @@
             "selector": "afio-tim1-remap",
             "values": [
               6
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "remap-8",
+          "_selector_value": 8,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              8
+            ]
+          }
+        },
+        {
+          "signal": "TIM2_CH1_ETR",
+          "route": "remap-6",
+          "_selector_value": 6,
+          "_combined_signal": true,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              6
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "USART2_RX",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "SPI_SCK",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              3
             ]
           }
         }
@@ -2308,6 +2457,28 @@
               6
             ]
           }
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-7",
+          "_selector_value": 7,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              7
+            ]
+          }
+        },
+        {
+          "signal": "SPI_MOSI",
+          "route": "remap-6",
+          "_selector_value": 6,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              6
+            ]
+          }
         }
       ]
     },
@@ -3028,6 +3199,28 @@
             "selector": "afio-usart1-remap",
             "values": [
               7
+            ]
+          }
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "I2C_SDA",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-i2c1-remap",
+            "values": [
+              3
             ]
           }
         }

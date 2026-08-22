@@ -88,11 +88,30 @@ CANONICAL = {
                     "maxoperatingambienttemperature", "工作温度", "最大工作环境温度",
                     "工作环境温度"),
 }
-# A longer label wins, so "gpioportnumber" is not swallowed by "gpio".
+# A longer label wins, so "gpioportnumber" is not swallowed by "gpio". Within one
+# field the keywords are listed most-specific-first, and that order decides which
+# column gets promoted when a table has two that mean nearly the same thing.
+# CH32V303/305/307 print both:
+#
+#     Code FLASH（字节） 480K   the whole program flash on the die
+#     Flash（字节）      256K   the zero-wait execution area, R_0WAIT
+#
+# and the second one is what bounds a linker script's FLASH at 0x00000000, so
+# `flash` outranks `codeflash`. The loser is not dropped -- it falls through to
+# product_attributes.csv, because 480K is a fact about the part too.
 CANONICAL_ORDER = sorted(
     ((field, kw) for field, kws in CANONICAL.items() for kw in kws),
     key=lambda x: -len(x[1]),
 )
+# Where two columns of one table canonicalise onto the same field, the keyword
+# listed here wins the field and the other stays an attribute. Length cannot
+# decide it: "codeflash" is the longer spelling but the wider quantity. Nothing
+# outside this map changes -- the first match in column order still wins, which
+# is what keeps CH32V208's "GPIO power supply" (a false match on "gpio") from
+# taking gpio_count away from "GPIO port count".
+# 中文版は同じ2列を「Code FLASH（字节）480K」と「闪存（字节）256K」と書く。
+# 両方の綴りを入れないと片言語だけ直って zh/en が conflict になる。
+PREFER = {"flash_bytes": frozenset({"flash", "闪存"})}
 
 SIZE = re.compile(r"^(\d+)\s*([KMG])?B?$", re.IGNORECASE)
 # A temperature range is worded freely around the same two numbers -- "Industrial
@@ -142,12 +161,35 @@ def squash(text: str) -> str:
     return re.sub(r"[^a-z0-9一-鿿]", "", str(text).lower())
 
 
-def canonical_field(label: str) -> str | None:
+def canonical_match(label: str) -> tuple[str, int] | None:
+    """(field, rank). Rank 0 is the spelling PREFER names, 1 is anything else."""
     flat = squash(label)
     for field, keyword in CANONICAL_ORDER:
         if keyword in flat:
-            return field
+            return field, 0 if keyword in PREFER.get(field, ()) else 1
     return None
+
+
+def canonical_field(label: str) -> str | None:
+    found = canonical_match(label)
+    return found[0] if found else None
+
+
+def promoted(label: str, attrs: dict) -> bool:
+    """Does this label win its field in this table?
+
+    A table can hold two columns that canonicalise onto one field. Only the
+    more specific one becomes the field; the other stays an attribute rather
+    than disappearing.
+    """
+    found = canonical_match(label)
+    if not found:
+        return False
+    field, rank = found
+    return not any(other != label
+                   and (m := canonical_match(other))
+                   and m[0] == field and m[1] < rank
+                   for other in attrs)
 
 
 def as_range(value: str) -> str:
@@ -177,7 +219,8 @@ def read_edition(datasheet: Path) -> tuple[dict, dict]:
 
 def normalise(attributes: dict) -> dict[str, str]:
     out: dict[str, str] = {}
-    for label, value in attributes.items():
+    for label, value in sorted(attributes.items(),
+                               key=lambda kv: (canonical_match(kv[0]) or ("", 0))[1]):
         field = canonical_field(label)
         if not field or not str(value).strip() or str(value).strip() in {"-", "—"}:
             continue
@@ -759,7 +802,7 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
         def keep(attrs: dict) -> list[tuple[str, str]]:
             return [(label, str(value).strip())
                     for label, value in attrs.items()
-                    if canonical_field(label) is None
+                    if not promoted(label, attrs)
                     and str(value).strip() not in ("", "-", "—")]
         zh = keep(zh_attrs)
         en = keep(en_attrs)

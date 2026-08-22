@@ -88,6 +88,9 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
     titles: dict = {}
     overrides = build_all.curated_columns().get(path.name, {})
     ordinal: collections.Counter = collections.Counter()
+    # 表は先に全部読む。**名前の語彙は datasheet 単位**で、番号表でしか綴られない
+    # 名前と説明表でしか綴られない名前があるため（extract_pins.resplit）。
+    parsed: list[tuple[str, str, list, list, dict]] = []
     with pdfplumber.open(path) as pdf:
         caps = extract_pins.captions(pdf)
         seen: set[str] = set()
@@ -103,37 +106,41 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
                 # The curated list is authoritative; the parser only found where
                 # the columns are, not always what they are called.
                 variants = fixed + variants[len(fixed):]
-            m = re.search(r"CH32[A-Z0-9]+", title)
-            token = m.group(0) if m else table_number(label)
-            tkey = (token, ordinal[token])
-            ordinal[token] += 1
-            titles[tkey] = (table_number(label), title)
-            for variant in variants:
-                if not variant or variant == "-":
+            parsed.append((label, title, rows, variants, layout))
+    spelled = extract_pins.datasheet_names([(r, lay) for _, _, r, _, lay in parsed])
+    for label, title, rows, variants, layout in parsed:
+        m = re.search(r"CH32[A-Z0-9]+", title)
+        token = m.group(0) if m else table_number(label)
+        tkey = (token, ordinal[token])
+        ordinal[token] += 1
+        titles[tkey] = (table_number(label), title)
+        for variant in variants:
+            if not variant or variant == "-":
+                continue
+            try:
+                pins, _ = extract_pins.pins_for(rows, variants, layout, variant,
+                                                spelled)
+            except Exception:  # noqa: BLE001
+                continue
+            # A heading may stack the packages that share one numbering
+            # column ("LQFP48/QFN48X7"); the other edition may give each its
+            # own column, so it is registered once per package it names.
+            for component in (v.strip() for v in variant.split("/")):
+                if not component:
                     continue
-                try:
-                    pins, _ = extract_pins.pins_for(rows, variants, layout, variant)
-                except Exception:  # noqa: BLE001
-                    continue
-                # A heading may stack the packages that share one numbering
-                # column ("LQFP48/QFN48X7"); the other edition may give each its
-                # own column, so it is registered once per package it names.
-                for component in (v.strip() for v in variant.split("/")):
-                    if not component:
-                        continue
-                    cell = columns.setdefault((tkey, canon_variant(component)),
-                                              {"table": table_number(label),
-                                               "variant": component, "pins": {}})
-                    for p in pins:
-                        # Both the normalised kind and the datasheet's own type
-                        # notation ("I/O/A", "I/O/FT"), which carries the 5V
-                        # tolerance and analogue capability the kind flattens.
-                        cell["pins"][(p["number"], p["pad"])] = (
-                            p.get("kind") or "", p.get("_pin_type", ""))
+                cell = columns.setdefault((tkey, canon_variant(component)),
+                                          {"table": table_number(label),
+                                           "variant": component, "pins": {}})
                 for p in pins:
-                    for f in p.get("functions", []):
-                        functions[(tkey, p["pad"])].add(
-                            (f.get("signal") or "", f.get("route") or ""))
+                    # Both the normalised kind and the datasheet's own type
+                    # notation ("I/O/A", "I/O/FT"), which carries the 5V
+                    # tolerance and analogue capability the kind flattens.
+                    cell["pins"][(p["number"], p["pad"])] = (
+                        p.get("kind") or "", p.get("_pin_type", ""))
+            for p in pins:
+                for f in p.get("functions", []):
+                    functions[(tkey, p["pad"])].add(
+                        (f.get("signal") or "", f.get("route") or ""))
     return columns, dict(functions), titles
 
 

@@ -694,6 +694,17 @@
           }
         },
         {
+          "signal": "ETH_RGMII_RXD2",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
           "signal": "TIM2_CH1",
           "route": "remap-2",
           "_selector_value": 2,
@@ -1141,6 +1152,77 @@
             "selector": "afio-tim9-remap",
             "values": [
               1
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "pad": "PA5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PA5",
+          "route": "main"
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "default",
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ADC_IN5",
+          "route": "default"
+        },
+        {
+          "signal": "DAC2_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "OPA2_CH1N",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "default"
+        },
+        {
+          "signal": "TIM10_CH1N",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim10-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              3
             ]
           }
         }
@@ -1866,6 +1948,17 @@
         },
         {
           "signal": "ETH_RMII_TXD0",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ETH_RGMII_MDC",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {

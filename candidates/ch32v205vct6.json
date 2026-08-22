@@ -690,6 +690,31 @@
           "signal": "TIM1_CH1N",
           "route": "af-0",
           "_alternate_function": 0
+        },
+        {
+          "signal": "TIM3_CH2",
+          "route": "af-1",
+          "_alternate_function": 1
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "USART7_RX",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "USART7_RTS",
+          "route": "af-4",
+          "_alternate_function": 4
+        },
+        {
+          "signal": "SPI1_MOSI",
+          "route": "af-5",
+          "_alternate_function": 5
         }
       ]
     },
@@ -939,6 +964,16 @@
           "signal": "USART5_RX",
           "route": "af-2",
           "_alternate_function": 2
+        },
+        {
+          "signal": "QSPI_SIOX2",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "FSMC_D6",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },
@@ -1242,6 +1277,26 @@
           "signal": "CMP1_OUT",
           "route": "af-1",
           "_alternate_function": 1
+        },
+        {
+          "signal": "USART3_CK",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "USART4_CTS",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "SPI2_NSS",
+          "route": "af-5",
+          "_alternate_function": 5
+        },
+        {
+          "signal": "I2C2_SMBA",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },
@@ -1563,6 +1618,11 @@
           "signal": "TIM3_CH1",
           "route": "af-1",
           "_alternate_function": 1
+        },
+        {
+          "signal": "USART7_TX",
+          "route": "af-4",
+          "_alternate_function": 4
         }
       ]
     },
@@ -1866,6 +1926,11 @@
           "signal": "USART3_TX",
           "route": "af-2",
           "_alternate_function": 2
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },
@@ -2155,6 +2220,11 @@
           "signal": "USART4_CK",
           "route": "af-4",
           "_alternate_function": 4
+        },
+        {
+          "signal": "FSMC_NADV",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },
@@ -2425,6 +2495,21 @@
           "signal": "TIM4_CH2",
           "route": "af-1",
           "_alternate_function": 1
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "af-2",
+          "_alternate_function": 2
+        },
+        {
+          "signal": "FSMC_NADV",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "I2C1_SDA",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },

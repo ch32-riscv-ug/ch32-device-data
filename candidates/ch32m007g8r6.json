@@ -698,6 +698,10 @@
           }
         },
         {
+          "signal": "CMP1_N1",
+          "route": "default"
+        },
+        {
           "signal": "TIM2_CH4",
           "route": "remap-3",
           "_selector_value": 3,
@@ -716,6 +720,28 @@
             "selector": "afio-usart1-remap",
             "values": [
               1
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-9",
+          "_selector_value": 9,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              9
+            ]
+          }
+        },
+        {
+          "signal": "SPI_MISO",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              4
             ]
           }
         }
@@ -1426,6 +1452,28 @@
             "selector": "afio-i2c1-remap",
             "values": [
               2
+            ]
+          }
+        },
+        {
+          "signal": "SPI_NSS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "SPI_NSS",
+          "route": "remap-6",
+          "_selector_value": 6,
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              6
             ]
           }
         }

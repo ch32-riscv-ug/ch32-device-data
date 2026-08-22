@@ -29,6 +29,16 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/build_systick.py`: `core_riscv.h`からSysTickのregister配置を取り
   `tables/systick.csv`にする。**CH32V103だけ配置が違い**、`CMP`の位置を他family
   と同じだと思うと`millis()`が動かない
+- `tools/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
+  AF番号の書き込み先を`tables/pin_alternate.csv`にする。`pin_functions`の`af-N`が
+  4448行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
+  EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
+- `tools/build_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを
+  `tables/memory_configs.csv`にする。`products.csv`の`flash_bytes`/`sram_bytes`は
+  datasheetの比較表が載せる1組しか言わないので、**振り直せること自体がそこから
+  読めない**。reference manualが符号と適用先を、EVTの`Link.ld`が組合せを言い、
+  両者を突き合わせる。**「出荷時の組」と言えるものは無い**——RMは復位値を`x`と
+  しか書かず、EVTの例題も1組に揃っていない
 - `tools/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
   一覧を`tables/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
   **版番号は未解決**（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）

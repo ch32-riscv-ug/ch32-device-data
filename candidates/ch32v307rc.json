@@ -617,6 +617,17 @@
               0
             ]
           }
+        },
+        {
+          "signal": "ETH_RGMII_RXC",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
         }
       ]
     },
@@ -909,6 +920,17 @@
         },
         {
           "signal": "ETH_MII_CRS",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ETH_RGMII_RXD2",
           "route": "default",
           "_selector_resolved_by": "peripheral",
           "selection": {
@@ -1396,6 +1418,77 @@
       ]
     },
     {
+      "number": 21,
+      "pad": "PA5",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PA5",
+          "route": "main"
+        },
+        {
+          "signal": "SPI1_SCK",
+          "route": "default",
+          "selection": {
+            "selector": "afio-spi1-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ADC_IN5",
+          "route": "default"
+        },
+        {
+          "signal": "DAC2_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "OPA2_CH1N",
+          "route": "default"
+        },
+        {
+          "signal": "DVP_VSYNC",
+          "route": "default"
+        },
+        {
+          "signal": "TIM10_CH1N",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim10-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CTS",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "USART1_CK",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
       "number": 22,
       "pad": "PA6",
       "kind": "gpio",
@@ -1717,6 +1810,63 @@
         {
           "signal": "ADC_IN15",
           "route": "default"
+        },
+        {
+          "signal": "TIM9_BKIN",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim9-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "UART8_RX",
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart8-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "OPA3_CH1P",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_MII_RXD1",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ETH_RMII_RXD1",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "ETH_RGMII_TXD2",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "USART1_RTS",
@@ -2234,6 +2384,17 @@
               0
             ]
           }
+        },
+        {
+          "signal": "ETH_RGMII_MDC",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
         }
       ]
     },
@@ -2506,6 +2667,31 @@
           "route": "default"
         },
         {
+          "signal": "TIM8_CH2",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim8-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "SDIO_D7",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_RXN",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
           "signal": "TIM3_CH2",
           "route": "remap-3",
           "_selector_value": 3,
@@ -2559,6 +2745,58 @@
         },
         {
           "signal": "TIM3_CH3",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim3-remap",
+            "values": [
+              3
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "number": 40,
+      "pad": "PC9",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC9",
+          "route": "main"
+        },
+        {
+          "signal": "TIM8_CH4",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim8-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "SDIO_D1",
+          "route": "default"
+        },
+        {
+          "signal": "ETH_TXN",
+          "route": "default",
+          "_selector_resolved_by": "peripheral",
+          "selection": {
+            "selector": "afio-eth-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "DVP_D3",
+          "route": "default"
+        },
+        {
+          "signal": "TIM3_CH4",
           "route": "remap-3",
           "_selector_value": 3,
           "selection": {
@@ -3395,6 +3633,17 @@
         {
           "signal": "DVP_D11",
           "route": "default"
+        },
+        {
+          "signal": "FSMC_NADV",
+          "route": "default",
+          "_selector_resolved_by": "prefix",
+          "selection": {
+            "selector": "afio-fsmc-nadv-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "TIM3_ETR",

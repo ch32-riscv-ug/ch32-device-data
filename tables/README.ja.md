@@ -15,9 +15,11 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
 
 付属表
-  product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
-  remap_fields.csv        284行  route selector定義（series×field: register/bit/reset/valid値）
-  remap_routes.csv       4643行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  product_attributes.csv 1009行  比較表の全属性（縦持ち。列に昇格していない残り全部）
+  remap_fields.csv        285行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       4900行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
+  memory_configs.csv       67行  option byteで動くFLASH/SRAMの組合せ（19 part）
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 283行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
@@ -28,7 +30,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   clock_init.csv          101行  SystemInitの手順（ベタhexなので記号では見えない）＋HSI工場トリム
   evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
-  link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）
+  link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -48,12 +50,15 @@ clock_configs.(family, hpre|ppre1|ppre2)                → clock_prescalers.(fa
 clock_configs.(family, pll|outside_rccの各記号)          → clock_symbols.(family, symbol)
 clock_configs.condition / clock_sources.condition の macro → evt_variants.(family, macro)
 evt_variants.part_number                                → products.part_number
+memory_configs.part_number                              → products.part_number
+pin_alternate.family                                    → families.family
+pin_functions(route=af-N).part_number+pad               → pin_alternate.family+pad
 errata.series / operating_conditions.series             → series.series
 evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -68,6 +73,17 @@ pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系�
 ### `products.csv`
 
 1行1注文型番。flash・GPIO数・温度など製品固有の値だけを持ち、**寸法系はpackage名でpackages.csvを参照**します。`listed_as`は比較表での略記（`CH32V208CB`→`CH32V208CBU6`、ワイルドカード`C6x6`→C6T6/C6U6）。
+
+`flash_bytes`は**零等待で実行できる領域**（linker scriptの`FLASH`に入る量）です。
+CH32V303/305/307のdatasheetは「Code FLASH（字节）480K」と「Flash（字节）256K」を
+別の列で持っていて、前者はdie上のprogram flash全体、後者が零等待領域です。
+同じフィールドに寄る列が2つあるときは**より具体的な綴りをpromote**し、
+負けた側は`product_attributes.csv`へ落とします（480Kも事実なので消しません）。
+振り直せるpartは`memory_configs.csv`を参照してください。
+
+**CH32X305/X315とCH32H41xは`flash_bytes`が過大です。** 列が1つしかなく、
+分割が脚注の散文（「480KB闪存包含192KB的零等待程序运行区域」）にあるため
+まだ取れていません（docs/worklist.ja.mdのF-14）。
 
 ### `packages.csv`
 
@@ -199,6 +215,69 @@ SysTickのregister配置。`core_riscv.h`の`SysTick_Type`から機械抽出す�
 CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義はreference manualに
 しか無いので[register-map-survey](../docs/register-map-survey.ja.md#先出し1-systickr-24追補3のe-1)に置いた。
 
+### `pin_alternate.csv`
+
+**AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4412行）のNの
+書き込み先で、1行1（family, pad）。`tools/build_pin_alternate.py`。
+
+CH32V205・CH32X315・CH32H417の3 familyは**AFIO remapを持たない世代**で、
+経路をピンごとの4bitのAF番号で選びます。残る9 familyの`remap_fields.csv`と
+対になる表です。
+
+| 世代 | 経路の選び方 | 表 |
+|---|---|---|
+| remap（9 family） | `AFIO->PCFR1`の周辺機器ごとのフィールドに経路番号 | `remap_fields.csv` / `remap_routes.csv` |
+| AF（3 family） | `AFIO->GPIOx_AFLR`/`AFHR`のピンごとの4bitにAF番号 | この表 ＋ `pin_functions.route = af-N` |
+
+`pin 0-7`が`AFLR`、`pin 8-15`が`AFHR`で、下から4bitずつ。この規則は決め打ちでは
+なくEVTの`GPIO_PinAFConfig()`の`~(0xF << (tmp << 2))`と`GPIO_PinSource >= 0x08`を
+読んで確かめています。**番地はfamilyごとに違います**——CH32H417のAFIOは`PCFR1`の
+直後にAF registerが並ぶので`GPIOA_AFLR`が`0x40010004`、CH32V205とCH32X315は
+`ECR`/`EXTICR`/`CR`が前にあるので`0x40010020`から。同じ番地がfamilyによって
+別のregisterを指します（CH32H417の`GPIOD_AFHR`とCH32V205の`GPIOA_AFLR`）。
+
+`check_tables.py`が**`af-N`の行すべてについて書き込み先の存在**を見ます。
+経路の情報が行き止まりになるのを防ぐためで、これが無いままV205のPWMが
+consumer側で全滅していました（docs/worklist.ja.mdのF-10/F-12）。
+
+### `memory_configs.csv`
+
+**FLASH/SRAMの境界が用户选择字（option byte）で動くpart**の組合せ表。
+1行1（型番, 符号）。`products.csv`の`flash_bytes`/`sram_bytes`はdatasheetの比較表が
+載せる1組しか言わないので、振り直せること自体がそこから読めません（`tools/build_memory.py`）。
+
+対象は**19 part / 3 family**——CH32V20xの`_D8`/`_D8W`（V203RB・V208）、
+CH32V30xのC品（V303RC/VC・V307RC/VC/WC・V317VC/WC）、CH32V407/V467。
+CH32X315は`Link.ld`のコメントが可変だと書いていますが**嘘**です
+（V407からのコピー忘れ。headerに`RAM_CODE_MOD`が無く、480K=零等待192K＋
+非零等待288Kで固定）。
+
+**「出荷時の組」と言えるものはありません。** RM 32.4.6は`RAM_CODE_MOD`の復位値を`x`と
+書き、「USERとRDPRTはシステムリセット後に用户选择字領域から読み込む」と注記します——
+決めるのはoption byteで、RMはその出荷値を書きません。EVTも決めません。
+例題ごとに違う組をlinkしています（符号表に載る組だけ数えて）:
+
+```
+CH32V20x   128K+64K ×14  144K+48K ×1
+CH32V307   256K+64K ×17  192K+128K ×8  288K+32K ×2
+CH32V407   576K+136K ×7  512K+200K ×1
+```
+
+そこで列は「既定」と名乗らず、**出所を名前にします**——`datasheet_value`は
+**datasheetの比較表が載せる組**（`products.csv`の`sram_bytes`に当たる行）で、
+それ以上の意味は持ちません。**可変partのlinker scriptを起こす側は、
+どれか1組を決め打つのではなく自分のscriptに合わせてoption byteを書く**必要があります。
+
+`condition`はその符号だけに付く制約（`110`は批号倒数第六位が0でない品のみ）。
+書き込み先と読み出し先を別の列で持ちます——`option_byte_bits`が
+`0x1FFFF800`のUSERバイトの中の位置（書く側）、`obr_bits`が`FLASH_OBR`の中の
+位置（読む側）。
+
+**全行`conflict`です。** 中文版RMは`RAM_CODE_MOD[2:0]`を`[9:7]`、English版は
+`SRAM_CODE_MODE`を`[9:8]`と書き、EVT headerは後者と同じ2bitマスクを持ちます。
+組合せが5通りある以上3bit要る（2bitでは`110`と`111`が同じ値になる）ので
+中文版が正しく、`basis`に両方を残しています。
+
 ### `errata.csv`
 
 1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
@@ -315,13 +394,19 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
+| families.csv | 12 | — | — | — |
+| series.csv | 27 | 99 | 4 | 0 |
 | products.csv | 103 | 643 | 79 | 0 |
 | packages.csv | 25 | 73 | 2 | 0 |
-| series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
-| product_attributes.csv | 995 | 926 | 68 | 1 |
-| remap_fields.csv | 284 | 0 | 284 | 0 |
-| remap_routes.csv | 4643 | 0 | 4643 | 0 |
+| documents.csv | 76 | — | — | — |
+| pins.csv | 4342 | 4220 | 122 | 0 |
+| pin_functions.csv | 27926 | 27719 | 207 | 0 |
+| product_attributes.csv | 1009 | 938 | 70 | 1 |
+| remap_fields.csv | 285 | 0 | 285 | 0 |
+| remap_routes.csv | 4900 | 0 | 4900 | 0 |
+| pin_alternate.csv | 240 | 0 | 240 | 0 |
+| memory_configs.csv | 67 | 0 | 0 | 67 |
 | systick.csv | 53 | 0 | 53 | 0 |
 | link_firmware.csv | 10 | 0 | 10 | 0 |
 | clock_configs.csv | 152 | 0 | 152 | 0 |
@@ -330,16 +415,22 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | clock_symbols.csv | 433 | 0 | 428 | 5 |
 | clock_init.csv | 101 | 0 | 101 | 0 |
 | evt_variants.csv | 56 | 0 | 56 | 0 |
-| errata.csv | 21 | 21 | 0 | 0 |
 | operating_conditions.csv | 283 | 257 | 21 | 5 |
-| pins.csv | 4312 | 4022 | 290 | 0 |
-| pin_functions.csv | 27850 | 24444 | 3406 | 0 |
+| evt_examples.csv | 1593 | 1556 | 37 | 0 |
+| errata.csv | 21 | 21 | 0 | 0 |
 
 pins系は全103型番がpin行を持ちます（型番→pin表列の解決失敗ゼロ）。
 
-series.csvはcore・ISAとも全27シリーズで値が入っています（ISAはdatasheetとQingKe core manual両方で確認。H415/H416のみcore推定に依存するためreference）。temperatureは型番末尾の温度グレード規則で補っており、規則単独の値はreferenceです。
+series.csvはcore・ISAとも全27シリーズで値が入っています（ISAはdatasheetとQingKe core manual両方で確認。H415/H416のみcore推定に依存するためreference）。temperatureは型番末尾の温度グレード規則で補っており、規則単独の値はreferenceです。**CH32V303とCH32V305のflash_bytesは`varies-by-package`になりました**——同じシリーズに128Kと256Kの型番が混ざるためで、以前480Kで揃って見えていたのはF-14の取り違えでした。
 
-part_number・series・packageは全型番で確定（conflict 0件）。残るconflictはproduct_attributesの1件（CH32H417WEU6のOPA数: zh=1/en=2）です。productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
+part_number・series・packageは全型番で確定（conflict 0件）。残るconflictは:
+
+- `product_attributes` 1件（CH32H417WEU6のOPA数: zh=1/en=2）
+- `clock_symbols` 5件（`FLASH_ACTLR_LATENCY[2:0]`のマスクがV003/V006/V103/X035で0x03、V407の`RCC_PLLMULL[3:0]`）
+- `operating_conditions` 5件
+- **`memory_configs` は全67行がconflict**。中文版RMが`RAM_CODE_MOD[2:0]`を`[9:7]`、English版が`[9:8]`と書き、EVT headerが後者と同じ2bitマスクを持つためです。組合せが5通りある以上3bit要るので中文版を採り、`basis`に両方を残しています
+
+productsのreference 79件の大半は温度グレード規則単独のtemperatureです。pins系のreferenceはM030・V20x・V30x・H41xに偏っており、片方の版で表の行が抽出できていない箇所です（文書の矛盾ではなく抽出欠落。今後の改善対象）。
 
 ## 画像（現在は未使用）
 
@@ -360,12 +451,18 @@ part_number・series・packageは全型番で確定（conflict 0件）。残るc
 ## 生成
 
 ```sh
+uv run tools/build_all.py                                     # candidates/（family並列。--jobs で本数、既定2）
 uv run tools/build_tables.py --out tables                     # families/series/products/packages/cores/documents
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）
 uv run tools/build_clock.py --out tables                      # clock_configs/clock_prescalers/clock_sources（EVTから）
+uv run tools/build_systick.py --out tables                    # systick（EVTのcore_riscv.hから）
+uv run tools/build_pin_alternate.py --out tables              # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
+uv run tools/build_memory.py --out tables                     # memory_configs（RMとEVTのLink.ldから・数分かかる）
+uv run tools/build_evt_variants.py --out tables               # evt_variants（EVTのdevice headerから）
+uv run tools/build_link_firmware.py --out tables              # link_firmware（WCHの配布物から）
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
 uv run tools/check_images.py [--missing|--prune]              # 画像の必要一覧と検査
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査

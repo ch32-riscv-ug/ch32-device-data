@@ -38,7 +38,8 @@ def main() -> int:
                       "product_attributes", "remap_fields", "remap_routes",
                       "errata", "operating_conditions", "evt_examples",
                       "clock_configs", "clock_prescalers", "clock_sources",
-                      "clock_symbols", "clock_init", "evt_variants", "systick")}
+                      "clock_symbols", "clock_init", "evt_variants", "systick",
+                      "memory_configs", "pin_alternate")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -326,6 +327,103 @@ def main() -> int:
             bad.append(f"systick: {where} の offset {at:#x} が同じ block の"
                        "他の register と重なる")
         occupied |= span
+
+    # AF番号の書き込み先。**af-N の行があるのに書き込み先が無いと、経路の情報が
+    # そこで行き止まりになる**（F-10/F-12 がまさにそれだった）ので、pin_functions
+    # の af-N と (family, pad) で結合できることを見る。pad は "PA0-WKUP" のように
+    # 役割つきで書かれることがあるので、頭の P?? だけで突き合わせる。
+    pad_head = re.compile(r"^(P[A-H]\d{1,2})")
+    alternate = {(r["family"], r["pad"]) for r in t["pin_alternate"]}
+    family_of = {r["part_number"]: r["family"] for r in t["products"]}
+    seen_bits: dict[tuple[str, str], set[int]] = {}
+    for r in t["pin_alternate"]:
+        check("pin_alternate", r["pad"], r["family"], families, "families")
+        where = f"{r['family']} {r['pad']}"
+        if not pad_head.fullmatch(r["pad"]):
+            bad.append(f"pin_alternate: {where} の pad が P<port><pin> でない")
+        bits = [b for b in r["bits"].split(";") if b]
+        if len(bits) != int(r["width_bits"]):
+            bad.append(f"pin_alternate: {where} の bits が {len(bits)} 個で "
+                       f"width_bits {r['width_bits']} と合わない")
+        indices = set()
+        for bit in bits:
+            register, _, index = bit.partition(":")
+            if register != r["register"] or not index.isdigit() or int(index) > 31:
+                bad.append(f"pin_alternate: {where} の bits {bit!r} が "
+                           f"{r['register']} の 0-31 でない")
+            else:
+                indices.add(int(index))
+        occupied = seen_bits.setdefault((r["family"], r["register"]), set())
+        if indices & occupied:
+            bad.append(f"pin_alternate: {where} の bit が同じ register の"
+                       "他の pad と重なる")
+        occupied |= indices
+        if not address.match(r["address"]) or int(r["address"], 16) % 4:
+            bad.append(f"pin_alternate: {where} の address が 0x8桁の4byte境界でない")
+    for r in t["pin_functions"]:
+        if not r["route"].startswith("af-"):
+            continue
+        head = pad_head.match(r["pad"])
+        family = family_of.get(r["part_number"])
+        if head and family and (family, head.group(1)) not in alternate:
+            bad.append(f"pin_functions: {r['part_number']} {r['pad']} の "
+                       f"{r['route']} を書く先が pin_alternate にない")
+
+    # FLASH/SRAM の可変な分割。**間違えると linker script が黙って壊れる**ので、
+    # ここで見るのは (1) 出荷時の1組が products.csv と一致すること、(2) 符号が
+    # 互いに排他であること、(3) フィールド幅が符号を表せること。
+    sram_of = {r["part_number"]: r["sram_bytes"] for r in t["products"]}
+    flash_of = {r["part_number"]: r["flash_bytes"] for r in t["products"]}
+    by_part: dict[str, list[dict]] = {}
+    for r in t["memory_configs"]:
+        check("memory_configs", r["part_number"], r["part_number"], products, "products")
+        by_part.setdefault(r["part_number"], []).append(r)
+        if not re.fullmatch(r"[01x]+", r["value"]):
+            bad.append(f"memory_configs: {r['part_number']} の value "
+                       f"{r['value']!r} が 0/1/x でない")
+        for column in ("code_bytes", "sram_bytes"):
+            if not r[column].isdigit() or int(r[column]) <= 0:
+                bad.append(f"memory_configs: {r['part_number']} の {column} が正の数でない")
+    span = re.compile(r"^\[(\d+):(\d+)\]$")
+    for part, rows in sorted(by_part.items()):
+        # 「既定」と呼べる1組は資料が決めていない（build_memory.py の説明）。
+        # 列が言うのは「datasheet の比較表が載せる組」だけで、それは1つ。
+        quoted = [r for r in rows if r["datasheet_value"]]
+        if len(quoted) != 1:
+            bad.append(f"memory_configs: {part} の datasheet_value が "
+                       f"{len(quoted)} 行ある（比較表が載せる組は1つ）")
+        if len(quoted) == 1:
+            if quoted[0]["sram_bytes"] != sram_of.get(part):
+                bad.append(f"memory_configs: {part} の datasheet_value の sram_bytes "
+                           f"{quoted[0]['sram_bytes']} が products.csv の "
+                           f"{sram_of.get(part)} と違う")
+            elif quoted[0]["code_bytes"] != flash_of.get(part):
+                # ここが合わないのは products.csv が零等待領域ではなく総容量を
+                # 取っているとき（worklist の F-14）。linker script が壊れる。
+                bad.append(f"memory_configs: {part} の datasheet_value の code_bytes "
+                           f"{quoted[0]['code_bytes']} が products.csv の "
+                           f"flash_bytes {flash_of.get(part)} と違う")
+        # 2つの符号が同じビット並びに当たってはいけない。x は don't care なので
+        # 桁ごとに「どちらかが x」なら重なる。
+        values = [r["value"] for r in rows]
+        for i, one in enumerate(values):
+            for other in values[i + 1:]:
+                if all(a == b or "x" in (a, b) for a, b in zip(one, other)):
+                    bad.append(f"memory_configs: {part} の符号 {one} と {other} が"
+                               "同じ値に当たる")
+        needed = max(len(v.rstrip("x")) for v in values)
+        for column in ("option_byte_bits", "obr_bits"):
+            cell = rows[0][column]
+            if not cell:
+                continue
+            found = span.match(cell)
+            if not found:
+                bad.append(f"memory_configs: {part} の {column} {cell!r} が [hi:lo] でない")
+                continue
+            hi, lo = int(found.group(1)), int(found.group(2))
+            if hi - lo + 1 < needed:
+                bad.append(f"memory_configs: {part} の {column} {cell} は "
+                           f"{hi - lo + 1}bit だが符号は {needed}bit 要る")
 
     # A `condition` naming a compile-time variant macro is unresolvable for a
     # part unless evt_variants says which parts set it.

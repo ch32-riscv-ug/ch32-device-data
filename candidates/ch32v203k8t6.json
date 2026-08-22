@@ -1543,6 +1543,18 @@
       ]
     },
     {
+      "number": 31,
+      "pad": "BOOT0",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": [
+        {
+          "signal": "BOOT0",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 32,
       "pad": "VSS",
       "kind": "power",
@@ -1550,18 +1562,6 @@
       "functions": [
         {
           "signal": "VSS",
-          "route": "main"
-        }
-      ]
-    },
-    {
-      "number": "31(\n6)",
-      "pad": "BOOT0",
-      "kind": "other",
-      "_pin_type": "I",
-      "functions": [
-        {
-          "signal": "BOOT0",
           "route": "main"
         }
       ]
