@@ -21,7 +21,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
   memory_configs.csv       67行  option byteで動くFLASH/SRAMの組合せ（19 part）
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
-  operating_conditions.csv 283行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
+  operating_conditions.csv 305行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
   clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
   clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
@@ -298,6 +298,12 @@ CH32V407   576K+136K ×7  512K+200K ×1
 - **`F_MAIN`**: datasheet 1ページ目の特徴リストが謳う**系統主頻**。製品として語られる周波数がこれです
 - `F_HCLK`/`F_PCLK*`/`F_CORE*`: 電気的特性章「一般動作条件」表の**上限値**。F_MAINとは別の事実で、値も食い違います（CH32V003は本文48MHz・電気的特性の上限50MHz）。README の Clock 列は F_MAIN を優先し、無いシリーズ（CH32X035・CH32H41x）だけ F_HCLK / F_CORE に落とします
 - `V_DD`: 動作電圧。ADC使用時・USB使用時などの条件行があります
+- **`F_USBCLK` / `F_HCLK(USB)`**（2026-08-22追加）: USBのクロック要求。表ではなく本文にあるので散文から取ります。
+  **48MHzは全familyの話ではありません**——USBHS/USBSSを持つCH32V407/V467とCH32X305/X315は専用PLL
+  （`USBHS_PLL` 320/480MHz、`USBSS_PLL` 125/357/625MHz）を持ち、48MHzのUSBCLKを使いません。
+  この2 familyには行が出ません。`F_HCLK(USB)`は**USB使用時に許されるCPU周波数の列挙**で、
+  資料が直接書いています（V103は48/72、L103は48/72/96、V20x・V30xは48/96/144）。
+  **離散集合はmin/maxで表せない**ので、許容値1つにつき1行（`typ`に値）です
 - **`typ`列**（2026-08-21追加）: 発振器は「**公称値＋確度**」で規定されていて上下限を持ちません。`F_HSI`のばらつきは`ACC_HSI`の±%側にあり、周波数そのものは`typ`にしか出ません。この列が無いあいだ`F_HSI`はmin/maxが空の行で、**PLL入力が決まらないのでSYSCLKが計算できない**状態でした。中英どちらか一方だけが典型値の列を持つ表があるので、両方が値を持つときだけ突き合わせ、英語版が空なら中国語版で埋めます（数値なので言語に依りません）
 
   **HSIは8MHzではありません。familyで5通りあります。**
@@ -422,7 +428,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | clock_symbols.csv | 433 | 0 | 428 | 5 |
 | clock_init.csv | 101 | 0 | 101 | 0 |
 | evt_variants.csv | 56 | 0 | 56 | 0 |
-| operating_conditions.csv | 283 | 257 | 21 | 5 |
+| operating_conditions.csv | 305 | 279 | 21 | 5 |
 | evt_examples.csv | 1593 | 1556 | 37 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
 

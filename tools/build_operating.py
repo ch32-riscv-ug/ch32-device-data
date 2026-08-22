@@ -230,6 +230,71 @@ def read_edition(pdf_path, lang):
     return found
 
 
+# USB のクロックは表ではなく散文にある。**48MHz は全 family の話ではない**——
+# USBHS/USBSS を持つ family（CH32V407/V467、CH32X315）は専用 PLL を別に持ち
+# （480MHz・625MHz・357MHz・125MHz・320MHz）、48MHz の USBCLK を一切使わない。
+# 全文書を走査して確かめた（worklist の F-9）。全速側の block 名を必ず伴う形で
+# だけ拾えば、高速側の family には当たらない——あちらの文に 48MHz は出てこない。
+FULL_SPEED = re.compile(r"USBD|USBFS|USBHD|USBCLK|USBClock|OTG_FS", re.IGNORECASE)
+# `\b48` は使えない。中文は「的48MHz时钟」と続けて書き、CJK も語構成文字なので
+# 境界にならず、CH32X035 の中文版だけ取り逃す。数字の続きでないことだけ見る。
+MHZ_48 = re.compile(r"(?<![\d.])48\s*MHz", re.IGNORECASE)
+# 「USB を使うなら CPU はこの周波数のどれか」。**family ごとに違う**
+# （V103 は 48/72、L103 は 48/72/96、V20x・V30x は 48/96/144）ので、
+# 分周器から導かず資料の列挙をそのまま採る。資料が直接書いている。
+# 英語版は "the CPU frequency must be" とも "CPU must be" とも書く（CH32V103 は
+# 「the frequency of using PLL, CPU must be 48MHz or 72MHz」）。文が USB の話で
+# あることは窓の中の USB で確かめるので、CPU 側の言い回しは緩めてよい。
+CPU_WITH_USB = {
+    "zh": re.compile(r"CPU\s*的频率必须是(?P<list>[^。；]*)"),
+    "en": re.compile(r"CPU\s+(?:frequency\s+|clock\s+speed\s+)?must\s+be(?P<list>[^.;]*)",
+                     re.IGNORECASE),
+}
+USB_MENTIONED = re.compile(r"USB", re.IGNORECASE)
+MHZ_VALUE = re.compile(r"(\d+(?:\.\d+)?)\s*MHz", re.IGNORECASE)
+
+
+def scan_prose(pdf_path, hit):
+    """ページ本文を1行と次行の窓で読み、hit が返した値を (page_no, 値) で返す。
+
+    折り返しで文が2行に割れるため、行単体ではなく隣接2行の窓を渡す。最初に
+    当たったページで止める——同じ事実が章ごとに繰り返されるだけなので。
+    """
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            lines = (page.extract_text() or "").splitlines()
+            for i, _ in enumerate(lines):
+                found = hit(" ".join(lines[i:i + 2]))
+                if found:
+                    page_no = page.page_number
+                    page.flush_cache()
+                    return page_no, found
+            page.flush_cache()
+    return None, None
+
+
+def read_usb_clock(pdf_path, lang):
+    """(page_no, "48") — 全速 USB block が 48MHz を要求すると書いてあれば。"""
+    def hit(window):
+        if FULL_SPEED.search(window) and MHZ_48.search(window):
+            return "48"
+        return None
+    return scan_prose(pdf_path, hit)
+
+
+def read_cpu_with_usb(pdf_path, lang):
+    """(page_no, ["48", "96", "144"]) — USB 使用時に許される CPU 周波数の列挙。"""
+    pattern = CPU_WITH_USB[lang]
+
+    def hit(window):
+        found = pattern.search(window)
+        if not found or not USB_MENTIONED.search(window):
+            return None
+        values = MHZ_VALUE.findall(found.group("list"))
+        return values or None
+    return scan_prose(pdf_path, hit)
+
+
 def read_headline_clock(pdf_path, lang):
     """(page_no, MHz) — 1ページ目付近の特徴リストが謳う系統主頻。無ければ(None, None)。"""
     with pdfplumber.open(pdf_path) as pdf:
@@ -251,6 +316,9 @@ def main():
     for p in products:
         ds_series.setdefault(p["datasheet"], set()).add(p["series"])
         ds_family[p["datasheet"]] = p["family"]
+    with (REPO / "tables/families.csv").open(encoding="utf-8") as f:
+        family_manuals = {r["family"]: r["reference_manuals"]
+                          for r in csv.DictReader(f)}
 
     out = []
     for datasheet in sorted(ds_series):
@@ -338,7 +406,53 @@ def main():
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
 
-    out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"]))
+        # USB のクロックは表ではなく散文にあり、しかも **datasheet に無く
+        # reference manual にしか無い family がある**（CH32L103 の CPU 周波数、
+        # CH32H417 の 48MHz）。family の manual も読む。
+        papers = [datasheet] + [d for d in (family_manuals.get(family) or "").split(";") if d]
+        for symbol, reader, parameter in (
+                ("F_USBCLK", read_usb_clock, "USB module clock frequency"),
+                ("F_HCLK(USB)", read_cpu_with_usb,
+                 "CPU frequency permitted while USB is in use")):
+            seen = {}
+            for paper in papers:
+                for lang in ("zh", "en"):
+                    path = MIRRORS / family / f"datasheet_{lang}" / paper
+                    if path.exists() and (paper, lang) not in seen:
+                        page_no, value = reader(path, lang)
+                        if value:
+                            seen[(paper, lang)] = (page_no, value)
+                if seen:
+                    break  # 同じ事実を章ごとに繰り返すだけなので最初の文書で足りる
+            if not seen:
+                continue
+            paper = next(iter(seen))[0]
+            langs = {lang for (_, lang) in seen}
+            readings = {lang: seen[(paper, lang)] for lang in langs}
+            value = readings.get("en", readings.get("zh"))[1]
+            if len(readings) == 2 and readings["zh"][1] == readings["en"][1]:
+                confidence = "confirmed"
+                basis = "+".join(f"{paper}:{lang}(p.{readings[lang][0]})"
+                                 for lang in ("zh", "en"))
+            elif len(readings) == 2:
+                confidence = "conflict"
+                basis = (f"{paper}:en(p.{readings['en'][0]})"
+                         f"+!{paper}:zh(={readings['zh'][1]})")
+            else:
+                lang = next(iter(readings))
+                confidence = "reference"
+                basis = f"{paper}:{lang}(p.{readings[lang][0]})"
+            # 許容値の列挙は min/typ/max では表せないので1値1行にする。
+            for one in (value if isinstance(value, list) else [value]):
+                out.append({"series": series, "symbol": symbol,
+                            "parameter": parameter, "condition": "USB in use",
+                            "min": one if symbol == "F_USBCLK" else "",
+                            "typ": one,
+                            "max": one if symbol == "F_USBCLK" else "",
+                            "unit": "MHz", "#": "#", "confidence": confidence,
+                            "basis": basis, "datasheet": paper})
+
+    out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"], r["typ"]))
     dest = REPO / "tables/operating_conditions.csv"
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)

@@ -13,6 +13,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 4 | 1 |
 | consumerからの依頼 | 2 | 1 |
+| 既知の穴（F系） | 14 | 4（うち3件は資料側で直せない） |
 
 ## 着手順の方針
 
@@ -540,7 +541,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-6 | CH32V30xのRM格子がI2S3のremap経路を書いていない | 12 function | 資料 | 記録のみ |
 | F-7 | CH32V30xのheaderに`DVP_REMAP`が無い | 2 function | 資料 | 記録のみ |
 | F-8 | CH32V003の`AETR`がADC 2 fieldのどちらか決まらない | 1 function | 資料 | 記録のみ |
-| F-9 | USBが48MHzを要求する根拠が散文 | 文は特定済み | ツール | 🔜 **全55文書を走査済み**（2026-08-22）。48MHzは全familyの話ではなかった。下記 |
+| F-9 | USBが48MHzを要求する根拠が散文 | 22行 | ツール | ✅ **実装済み**（2026-08-22）。48MHzは全familyの話ではなかった。下記 |
 | F-10 | CH32V205・CH32X315のRMから経路が0件 | V203CCT6のUSART5-8 | 資料/ツール | ✅ **原因判明**（2026-08-22）。**AFIO remapを持たない世代**だった。下記 |
 | F-11 | WCH-Link系ファームウェアの版番号が確定しない | — | 資料 | 🔜 実機で1回突き合わせる |
 | F-12 | AF番号で多重化するfamilyの選択レジスタが未収録 | 240行 | ツール | ✅ **実装済み**（2026-08-22）。`tables/pin_alternate.csv`新設。下記 |
@@ -1156,13 +1157,15 @@ interfaces CAN`）。行グループの組合せを全部辞書に書くのは�
 
 | family | USBの時钟 |
 |---|---|
-| V103・V20x・V30x・L103・X035・H417 | **USBD/USBFS = 48MHz**（PLLを分周） |
+| V103・V20x・V30x・V205・L103・X035・H41x | **USBD/USBFS = 48MHz**（PLLを分周） |
 | V407/V467 | `USBHS_PLL` **320MHz / 480MHz** |
-| X315 | `USBHS_PLL` **480MHz**、`USBSS_PLL` **125 / 357 / 625MHz** |
-| V205 | 48MHzの記述が1件も無い（USB 2.0全速＋PHY） |
+| X305/X315 | `USBHS_PLL` **480MHz**、`USBSS_PLL` **125 / 357 / 625MHz** |
 
-`F_USBCLK = 48MHz`の行を全familyに入れると**V407/V467・X315で嘘になる**。
+`F_USBCLK = 48MHz`の行を全familyに入れると**V407/V467・X305/X315で嘘になる**。
 入れてよいのは上の表の1行目だけ。
+
+（CH32V205は最初「48MHzの記述が1件も無い」と書いたが、**datasheetだけを見ていた
+誤り**。`CH32V205RM.PDF`のp.19/p.23が48MHzを書いている。RMも読む理由がこれ。）
 
 **もう1つ、consumerが実際に要るのはCPU側の制約のほうで、これはfamilyで違う。**
 しかも**資料が明示的に列挙している**（分周器から導いた値ではない）:
@@ -1178,12 +1181,42 @@ interfaces CAN`）。行グループの組合せを全部辞書に書くのは�
 `min/typ/max`の3列では「48か96か144」という**離散集合を表せない**ので、
 許容値1つにつき1行（`typ`に値、`condition`に「USB使用時」）が形として素直。
 
-残っているのは実装のみ:
+#### 実装（2026-08-22・完了）
 
-1. `F_USBCLK` = 48MHz（min=typ=max）を、**上表1行目のfamilyだけ**に出す
-2. CPU周波数の許容値を1値1行で出す（symbolは`F_HCLK(USB)`など）
-3. V407/V467・X315のUSBHS/USBSS PLLは別の事実。`clock_symbols.csv`側の話で、
-   `operating_conditions`には入れない
+`build_operating.py`に散文を読む2つのreaderを足した。`read_headline_clock`
+（1ページ目の系統主頻）と同じ形で、表ではなく本文を読む。
+
+**48MHzは全速側のblock名を必ず伴う形でしか拾わない**
+（`USBD|USBFS|USBHD|USBCLK|OTG_FS`）。高速側の文書には48MHzが一度も出てこないので、
+これでV407/V467・X305/X315には当たらない。
+
+**reference manualも読む。** CH32L103のCPU周波数とCH32H41xの48MHzは
+**datasheetに無くRMにしかない**。CH32V205の48MHzも同じ。
+
+**離散集合はmin/typ/maxで表せない**ので、CPU周波数は許容値1つにつき1行
+（`typ`に値、`condition`に`USB in use`）。`F_USBCLK`は要求値が1つなので
+min=typ=max=48。
+
+**結果**: `operating_conditions.csv` 283→**305行**。追加22行は**全部`confirmed`**
+（両言語版が一致）。
+
+| symbol | series | 値 |
+|---|---|---|
+| `F_USBCLK` | V103 / V203 / V203;V205 / V208 / V30x / L103;M103 / X033;X035 / H41x | 48 MHz |
+| `F_HCLK(USB)` | V103 | 48 / 72 |
+| | L103;M103 | 48 / 72 / 96 |
+| | V203・V208・V30x | 48 / 96 / 144 |
+
+V407/V467・X305/X315・USBを持たないfamilyには1行も出ない（意図どおり）。
+
+**抽出で1つ踏んだ**: `\b48\s*MHz`が中文版で当たらない。中文は「的48MHz时钟」と
+続けて書き、**CJKも語構成文字なので`\b`が境界にならない**。CH32X035の中文版だけ
+取り逃していた。`(?<![\d.])48`に変えた。F-16（全角括弧）・F-15（squashの語頭）と
+同じ「ASCII前提の書き方が中文版で崩れる」型で、この日3件目
+（[抽出可能性の事前調査](extraction-survey.ja.md)に型としてまとめた）。
+
+**残り**: V407/V467・X305/X315のUSBHS/USBSS PLLは別の事実。`clock_symbols.csv`側の
+話で、`operating_conditions`には入れない。
 
 ### F-5 `extract_registers`の見出しrun-on（修理済み）
 
