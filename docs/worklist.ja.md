@@ -417,7 +417,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | # | 穴 | 規模 | 側 | 判断 |
 |---|---|---:|---|---|
 | F-1 | pin表の電源pin名が添字で分断される | 約850行 | ツール | ✅ **修理済み**（2026-08-21）。F-4も同じ修正で片付いた |
-| F-2 | CH32V20xのEVT headerに`AFIO_PCFR2_`が無い | 7 function | 資料 | **方針決定が必要**（下記） |
+| F-2 | CH32V20xのEVT headerに`AFIO_PCFR2_`が無い | 7 function | 資料 | ✅ **実装済み**（2026-08-22）。3案目（`basis`で区別）。下記 |
 | F-3 | 中国語版の文章中のpadを拾えない | 未計測 | ツール | 直す。影響範囲を測ってから |
 | F-4 | pin表のsignal名が縦書きセルで切れる | 約100行 | ツール | ✅ **ほぼ修理済み**（F-1と同一原因）。残り6行 |
 | F-5 | `extract_registers`の見出しrun-on | 未計測 | ツール | R-20のD-2と同時 |
@@ -510,8 +510,59 @@ USART4のselectorが生成されず、7 functionが未解決のまま残りま�
 | header ∪ RM | V203のUSART4が埋まる | RMのfield表の読み取り誤りがselectorを生む（F-5と相互作用） |
 | header ∪ RM（`basis`で区別） | 同上＋consumerが選べる | 表の意味が2種類になる |
 
-**これは決めていません。** 3番目が repository の慣行（`confidence`/`basis`で
-判断材料を渡す）に最も沿いますが、F-5を先に直さないとRM側の誤りが混入します。
+**3番目で実装しました**（consumerからも「`basis`で区別する案が一番ありがたい」との
+回答）。ただし**単純な「header ∪ RM」は成立しません**。実測でそれが出ました。
+
+### 実測: RMだけが持つAFIO fieldは294種あり、54種が「参照されるが偽物」
+
+12 familyで、headerに無くRMにあるAFIO/EXTEND fieldを全部数え、
+`pin_functions.csv`のsignalと突き合わせた。
+
+| 群 | 件数 | 中身 |
+|---|---:|---|
+| **A** 参照あり・**経路あり** | 6 | CH32V20xの`USART4`〜`USART8`と`ETH` |
+| **B** 参照あり・経路なし | **54** | H417の`TIM1_CH1`〜`TIM9_CH3`（`AFIO_EXTICR2`へ誤帰属したDMAトリガ）41件、`ADC1_SMP_SELx`、X035の`*_FILT_EN`/`UDM_*`、`VDDIO_IO_HSLV`、V003の`TIM1_IREMAP` |
+| **C** 参照なし | 234 | DMAのフィールド（`EN`・`TCIE`・`PINC`…） |
+
+**「pin経路から参照されたselectorだけ残す」という既存の篩では足りない。** B群は
+fieldの名前が`TIM1_CH1`のように本物のsignal名と一致するので、54種が素通りする。
+これはF-5（`extract_registers`の見出しrun-on）が生む誤りで、`AFIO_EXTICR2`は
+外部割込み設定レジスタなのにDMAのトリガmultiplexerのフィールドが載る。
+
+### 採った条件は2段
+
+> RM由来selectorを認めるのは、**(a) RMがそのfieldにpad経路を述べていて、
+> (b) その経路が名乗るsignalのうち少なくとも1つが、その部品のpin表にもある**とき
+
+(a)だけでB群54種が全滅する（DMAトリガにpadは無い）。(b)が要るのは**`ETH`のため**。
+CH32V20xのheaderに`AFIO_PCFR1_ETH_REMAP`は無く、あるのは`EXTEN_ETH_10M_EN`
+（既存の`extend-eth-10m-en`）。V203/V208のETH信号は`ETH_RXP`/`RXN`/`TXP`/`TXN`の
+4本だけ（固定パッドの10M PHY）なのに、共有RM（`CH32FV2x_V3xRM.PDF`）の`ETH_RM`は
+V30xのMII/RMII用で`ETH_MDIO`・`ETH_TXD0`等を名乗る。**共有RMがV3xの記述をV2xへ
+持ち込む**という、まさに懸念していた形が実在した。
+
+### 結果: 7 selector
+
+```
+CH32V203 afio-tim5ch4-rm   PCFR1:16          CH32V303 afio-tim5ch4-rm  PCFR1:16
+CH32V203 afio-usart4-rm    PCFR2:16;PCFR2:17 CH32V305 afio-tim5ch4-rm  PCFR1:16
+CH32V208 afio-usart4-rm    PCFR2:16;PCFR2:17 CH32V307 afio-tim5ch4-rm  PCFR1:16
+                                             CH32V317 afio-tim5ch4-rm  PCFR1:16
+```
+
+狙いの`USART4`に加えて**`TIM5CH4_RM`**（TIM5_CH4をLSIへ切り替えるfield）も出た。
+V30xのheaderがこれを定義していない。`basis`で区別する:
+
+```
+candidates(rm-register-table+rm-remap-grid:en)              ← headerに定義が無い
+candidates(evt-header+rm-register-table+rm-remap-grid:en)   ← 従来
+```
+
+`remap_fields` 277→**284**、`remap_routes` 4620→**4643**。4検査すべて通過。
+
+**`USART5`〜`USART8`は入らなかった。** 該当ピンを持つのは`CH32V203CCT6`だけで、
+その型番は**CH32V205 familyから作られる**ため——そしてCH32V205のRMからは経路が
+1件も取れていない（F-10）。
 
 ### F-3 中国語版の文章中のpadを拾えない
 
