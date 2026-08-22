@@ -16,15 +16,15 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
 
 付属表
   product_attributes.csv  995行  比較表の全属性（縦持ち。列に昇格していない残り全部）
-  remap_fields.csv        280行  route selector定義（series×field: register/bit/reset/valid値）
-  remap_routes.csv       4635行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  remap_fields.csv        284行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       4643行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
   operating_conditions.csv 283行  クロック上限（F_*）・動作電圧（V_DD）・発振器（HSI/LSI/HSE/LSE）・PLL入出力・ADCクロック上限
   evt_examples.csv       1593行  EVT同梱の例題一覧（周辺グループ→例題→説明）
   clock_configs.csv       152行  EVTが用意しているクロック設定（発振器・各ドメイン周波数・分周・PLL・latency）
   clock_prescalers.csv    263行  AHB/APB/ADC分周器の符号化（分周比→field値）
   clock_sources.csv       116行  USB/RTC/ADC/I2S等をどのクロックから取れるか（選択肢→register field）
-  clock_symbols.csv       429行  設定に出てくる記号の数値・書き込み先register・絶対アドレス・役割
+  clock_symbols.csv       433行  設定に出てくる記号の数値・書き込み先register・絶対アドレス・役割
   clock_init.csv          101行  SystemInitの手順（ベタhexなので記号では見えない）＋HSI工場トリム
   evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
@@ -320,18 +320,20 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | series.csv | 27 | 100 | 4 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
 | product_attributes.csv | 995 | 926 | 68 | 1 |
-| remap_fields.csv | 280 | 0 | 280 | 0 |
-| remap_routes.csv | 4635 | 0 | 4635 | 0 |
+| remap_fields.csv | 284 | 0 | 284 | 0 |
+| remap_routes.csv | 4643 | 0 | 4643 | 0 |
+| systick.csv | 53 | 0 | 53 | 0 |
+| link_firmware.csv | 10 | 0 | 10 | 0 |
 | clock_configs.csv | 152 | 0 | 152 | 0 |
 | clock_prescalers.csv | 263 | 0 | 263 | 0 |
 | clock_sources.csv | 116 | 0 | 116 | 0 |
-| clock_symbols.csv | 429 | 0 | 424 | 5 |
+| clock_symbols.csv | 433 | 0 | 424 | 5 |
 | clock_init.csv | 101 | 0 | 101 | 0 |
 | evt_variants.csv | 56 | 0 | 56 | 0 |
 | errata.csv | 21 | 21 | 0 | 0 |
 | operating_conditions.csv | 283 | 257 | 21 | 5 |
 | pins.csv | 4312 | 4022 | 290 | 0 |
-| pin_functions.csv | 29493 | 24718 | 4775 | 0 |
+| pin_functions.csv | 27850 | 24718 | 4775 | 0 |
 
 pins系は全103型番がpin行を持ちます（型番→pin表列の解決失敗ゼロ）。
 

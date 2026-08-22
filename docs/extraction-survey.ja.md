@@ -435,6 +435,37 @@ CH32X035のRMにはremap格子がありません。経路はregister field表の
 | RMのremap格子 | V003, M030, H417 |
 | RMのregister説明文 | X035, M030, V003 |
 
+### selectorはheaderから作るが、RMだけが持つものも条件つきで認める
+
+route selectorの出所はEVT headerです。headerはプログラミングインタフェースそのもので、
+定数が無ければconsumerは書けないからです。ところが**CH32V20xはAFIO_PCFR2のbitを1つも
+定義していないのに、`AFIO_TypeDef`には`PCFR2`があり**、RMは`USART4_RM`を記述し、
+datasheetのpin表はUSART4のピンを載せています。欠けているのはマクロだけで、
+**PCFR1だけ書いても何も起きない**ので、落とすと他に見つけようのない経路が消えます。
+
+とはいえRMのfieldを全部認めるのは、穴より遥かに悪いです。12 familyで
+headerに無くRMにあるAFIO fieldは**294種**あり、そのうち**54種はsignal名が一致して
+参照されるのに本物ではありません**——CH32H417のregister field表がDMAのトリガ
+multiplexerへ走り込んでいて、`TIM1_CH1`〜`TIM9_CH3`が`AFIO_EXTICR2`のfieldとして
+出てきます（F-5）。**「pinから参照されたselectorだけ残す」既存の篩は効きません。**
+
+条件は2段で、両方が要ります。
+
+**(a) RMがそのfieldにpad経路も述べている。** DMAのトリガにpadは無いので、これだけで
+54種が全滅します。
+
+**(b) その経路が名乗るsignalのうち少なくとも1つが、その部品のpin表にもある。**
+これが要るのは`ETH`のためです。CH32V20xのheaderに`ETH_REMAP`は無く、あるのは
+`EXTEN_ETH_10M_EN`。V203/V208のETH信号は`ETH_RXP`/`RXN`/`TXP`/`TXN`の4本だけ
+（固定パッドの10M PHY）なのに、**共有RM（`CH32FV2x_V3xRM.PDF`）の`ETH_RM`は
+V30xのMII/RMII用**で`ETH_MDIO`・`ETH_TXD0`を名乗ります。1つの文書がFV2xとV3xの
+両方を覆っているせいで、V3xの記述がV2xへ持ち込まれる形です。
+
+残るのは7つだけで、`basis`が`candidates(rm-register-table+rm-remap-grid:en)`と
+なって従来の`candidates(evt-header+...)`と区別できます。**EVTデコーダの検算が
+効かない**（headerに定数が無いので`GPIO_PinRemapConfig()`もこのfieldを知らない）点が
+従来行との実質的な差です。
+
 ### 経路の持ち主を決める4段（padは名前に反せない）
 
 signalとpadと値から「どのselectorがこの経路を決めるのか」を決める段は4つあり、**順番が効きます**。
