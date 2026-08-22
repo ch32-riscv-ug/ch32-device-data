@@ -38,7 +38,7 @@ def main() -> int:
                       "product_attributes", "remap_fields", "remap_routes",
                       "errata", "operating_conditions", "evt_examples",
                       "clock_configs", "clock_prescalers", "clock_sources",
-                      "clock_symbols", "clock_init", "evt_variants")}
+                      "clock_symbols", "clock_init", "evt_variants", "systick")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -298,6 +298,34 @@ def main() -> int:
         if sorted(steps) != list(range(min(steps), min(steps) + len(steps))):
             bad.append(f"clock_init: {family} {function} の step が連番でない: "
                        f"{sorted(steps)}")
+
+    # SysTick's layout. The one thing a consumer must not get wrong is where the
+    # compare register is, so the offsets have to be a consistent non-overlapping
+    # map and the write granularity has to divide the width.
+    seen_offsets: dict[tuple[str, str], set[int]] = {}
+    for r in t["systick"]:
+        check("systick", r["register"], r["family"], families, "families")
+        where = f"{r['family']} {r['block']} {r['register']}"
+        try:
+            at, width, writable = (int(r["offset"], 16), int(r["width_bits"]),
+                                   int(r["write_bits"]))
+        except ValueError:
+            bad.append(f"systick: {where} の offset/width_bits/write_bits が数でない")
+            continue
+        if width % writable:
+            bad.append(f"systick: {where} の write_bits {writable} が "
+                       f"width_bits {width} を割り切らない")
+        if r["address"] and not address.match(r["address"]):
+            bad.append(f"systick: {where} の address {r['address']!r} が "
+                       "0x のあと8桁でない")
+        if r["address"] and int(r["address"], 16) % 4:
+            bad.append(f"systick: {where} の address が4byte境界にない")
+        occupied = seen_offsets.setdefault((r["family"], r["block"]), set())
+        span = set(range(at, at + width // 8))
+        if span & occupied:
+            bad.append(f"systick: {where} の offset {at:#x} が同じ block の"
+                       "他の register と重なる")
+        occupied |= span
 
     # A `condition` naming a compile-time variant macro is unresolvable for a
     # part unless evt_variants says which parts set it.

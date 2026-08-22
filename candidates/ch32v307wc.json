@@ -275,6 +275,24 @@
       "reset_value": 0
     },
     {
+      "id": "afio-tim5ch4-rm",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "TIM5CH4_RM",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 16
+        }
+      ],
+      "_from_manual": true,
+      "valid_values": [
+        0
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表",
+      "reset_value": 0
+    },
+    {
       "id": "afio-tim8-remap",
       "controller": "afio",
       "register": "PCFR2",
@@ -1213,7 +1231,13 @@
         },
         {
           "signal": "TIM5_CH4",
-          "route": "default"
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim5ch4-rm",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "ADC_IN3",

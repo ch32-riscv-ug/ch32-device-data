@@ -162,6 +162,7 @@ def join(
     # they mark the upper half (USART1_RM in PCFR1, USART1_RM1 in PCFR2).
     reset_of: dict[str, int] = {}
     reg_bits: dict[tuple[str, str, str], set[int]] = collections.defaultdict(set)
+    field_names: dict[str, str] = {}
     for f in reg_fields:
         key = canonical_field(f["field"])
         controller, _, register = f["register"].rpartition("_")
@@ -179,8 +180,12 @@ def join(
         reg_bits[(controller.lower(), register, key)].update(
             range(f["bit_offset"], f["bit_offset"] + f["bit_width"])
         )
+        field_names.setdefault(key, f["field"])
 
     values_of: dict[str, set[int]] = collections.defaultdict(set)
+    # Which signals the manual's routes name per field, and the manual's own
+    # spelling of the field. Both are needed to admit a manual-only selector.
+    signals_of: dict[str, set[str]] = collections.defaultdict(set)
     field_of_route: dict[tuple[str, int, str], str] = {}
     # Which selectors reach a pad at a given value. This is the last resort in
     # resolve(): it works without the signal name, but a shared pad means it
@@ -198,10 +203,68 @@ def join(
         values_of[key].add(r["value"])
         field_of_route.setdefault((canonical_signal(r["signal"]), r["value"], r["pad"]), key)
         by_pad_value[(r["pad"], r["value"])].add((key, r["signal"]))
+        signals_of[key].add(canonical_signal(r["signal"]))
         if r.get("_source") == "grid":
             grid_pad_value[(r["pad"], r["value"])].add((key, r["signal"]))
 
     by_canonical = {canonical_field(s["field"]): s for s in selectors}
+
+    # A selector the EVT header does not expose at all. The header is the
+    # programming interface, so it is the source of record -- but CH32V20x
+    # defines no AFIO_PCFR2 bit whatsoever while its AFIO_TypeDef *has* PCFR2 and
+    # the manual documents USART4..USART8 in it. The datasheet's pin table lists
+    # those pins. Only the convenience macros are missing, and writing PCFR1
+    # alone does nothing, so leaving the field out loses a route a consumer has
+    # no other way to find.
+    #
+    # Taking every manual-only field would be much worse than the gap. Across the
+    # twelve families the manual yields 294 AFIO fields the headers lack, and 54
+    # of them are referenced by a signal of the right name while being nothing of
+    # the kind: CH32H417's register-field table runs on into the DMA trigger
+    # multiplexer, so TIM1_CH1..TIM9_CH3 arrive as fields of AFIO_EXTICR2.
+    #
+    # Two things separate the six real ones from those 54, and both are needed:
+    #
+    #   the manual states pad routes for the field -- a DMA trigger has no pad,
+    #   which excludes all 54 at once; and
+    #
+    #   at least one signal those routes name is a signal this part's pin table
+    #   names too. That is what excludes ETH on CH32V20x, whose routes come from
+    #   the shared FV2x/V3x manual and name ETH_MDIO and ETH_TXD0 -- CH32V208's
+    #   Ethernet is a fixed-pad 10M PHY and its pin table has only ETH_RXP,
+    #   ETH_RXN, ETH_TXP and ETH_TXN.
+    #
+    # What is left is CH32V20x's USART4..USART8 and nothing else in any family.
+    on_package = {canonical_signal(fn["signal"])
+                  for pin in pins for fn in pin["functions"]}
+    from_manual: set[str] = set()
+    for (rm_controller, register, key), found in sorted(reg_bits.items()):
+        if key in by_canonical or not found:
+            continue
+        if len(found) > extract_selectors.MAX_FIELD_BITS:
+            continue
+        stated = signals_of.get(key, set())
+        if not stated or not (stated & on_package):
+            continue
+        bits = sorted(found)
+        by_canonical[key] = {
+            "_symbol": f"{rm_controller.upper()}_{register}_{key}",
+            "controller": rm_controller,
+            "register": register,
+            "field": field_names.get(key, key),
+            "bits": [{"register": register, "bit": bit} for bit in bits],
+            "_valid_values_enumerated": False,
+            "valid_values": list(range(1 << len(bits))),
+            "_valid_values_source": "幅からの推定",
+            "_reset_value": None,
+            "_from_manual": True,
+        }
+        from_manual.add(key)
+        notes.append(
+            f"[register] {key}: headerに定義が無いのでRMのfield表から selector を作る "
+            f"({rm_controller.upper()}_{register} bits={bits}、"
+            f"経路{len(stated)}種のうち{len(stated & on_package)}種がpin表にある)"
+        )
 
     routed = [
         (pin, fn)
@@ -448,6 +511,11 @@ def join(
             "field": s["field"],
             "bits": [{"register": register, "bit": bit} for register, bit in bits],
         }
+        if s.get("_from_manual"):
+            # Not in the EVT header at all. A consumer that reaches registers
+            # through the SDK's macros has none for this field, so the basis has
+            # to say the field came from the manual alone.
+            out["_from_manual"] = True
         # Three sources, none complete on its own. The manual's remap grid names
         # the columns, but writes a don't-care digit where a column stands for
         # more than one encoding, so it over-reports. The datasheet's pin table
