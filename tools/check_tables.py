@@ -39,7 +39,8 @@ def main() -> int:
                       "errata", "operating_conditions", "evt_examples",
                       "clock_configs", "clock_prescalers", "clock_sources",
                       "clock_symbols", "clock_init", "evt_variants", "systick",
-                      "memory_configs", "pin_alternate")}
+                      "memory_configs", "pin_alternate", "interrupts",
+                      "memory_map", "features")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -425,6 +426,62 @@ def main() -> int:
                 bad.append(f"memory_configs: {part} の {column} {cell} は "
                            f"{hi - lo + 1}bit だが符号は {needed}bit 要る")
 
+    # アドレス空間の地図。番地は 0x 付きの 32bit、同じ (family, kind, region) は1行。
+    span = re.compile(r"^0x[0-9a-f]{8}$")
+    seen_region: set[tuple[str, str, str, str]] = set()
+    for r in t["memory_map"]:
+        check("memory_map", r["region"], r["family"], families, "families")
+        if not span.match(r["base_address"]):
+            bad.append(f"memory_map: {r['family']} {r['region']} の base_address "
+                       f"{r['base_address']!r} が 0x8桁でない")
+        key = (r["family"], r["kind"], r["region"], r["condition"])
+        if key in seen_region:
+            bad.append(f"memory_map: {r['family']} の {r['kind']}/{r['region']} が重複")
+        seen_region.add(key)
+
+    # 機能の一覧は datasheet が覆う series の事実。節番号は1冊の中でだけ一意なので、
+    # (series群, section) で重ならないこと。
+    seen_feature: set[tuple[str, str]] = set()
+    for r in t["features"]:
+        check("features", r["section"], r["family"], families, "families")
+        check("features", r["section"], r["series"], series, "series", ";")
+        check("features", r["section"], r["datasheet"], documents, "documents")
+        if not r["feature"] and not r["feature_zh"]:
+            bad.append(f"features: {r['series']} {r['section']} が両言語とも空")
+        key = (r["series"], r["section"])
+        if key in seen_feature:
+            bad.append(f"features: {r['series']} の節 {r['section']} が重複")
+        seen_feature.add(key)
+
+    # 割り込みは family ごとに1つの列挙で、番号は variant で入れ替わる。
+    # 同じ (family, condition) の中では番号が1つの名前しか指さないこと。
+    seen_irq: dict[tuple[str, int, str], str] = {}
+    for r in t["interrupts"]:
+        check("interrupts", r["name"], r["family"], families, "families")
+        if r["kind"] not in ("exception", "irq"):
+            bad.append(f"interrupts: {r['family']} {r['name']} の kind "
+                       f"{r['kind']!r} が exception/irq でない")
+        if not r["number"].isdigit():
+            bad.append(f"interrupts: {r['family']} {r['name']} の number が数でない")
+            continue
+        key = (r["family"], int(r["number"]), r["condition"])
+        if key in seen_irq and seen_irq[key] != r["name"]:
+            bad.append(f"interrupts: {r['family']} の {r['number']} 番が "
+                       f"{seen_irq[key]} と {r['name']} で重なる"
+                       f"（condition={r['condition'] or 'なし'}）")
+        seen_irq[key] = r["name"]
+    # 例外の番号は全部、周辺割り込みの番号より小さい。境目の番号は family で
+    # 違う（CH32H417 は 32 番から。IPC と HSEM がプロセッサ側の枠にいる）ので、
+    # 番号そのものではなく2群が交ざらないことを見る。
+    for family in {r["family"] for r in t["interrupts"]}:
+        mine = [r for r in t["interrupts"] if r["family"] == family
+                and r["number"].isdigit()]
+        highest = [int(r["number"]) for r in mine if r["kind"] == "exception"]
+        lowest = [int(r["number"]) for r in mine if r["kind"] == "irq"]
+        if highest and lowest and max(highest) >= min(lowest):
+            bad.append(f"interrupts: {family} の例外 {max(highest)} 番が "
+                       f"周辺割り込みの最小 {min(lowest)} 番以上")
+
     # A `condition` naming a compile-time variant macro is unresolvable for a
     # part unless evt_variants says which parts set it.
     macros = {(r["family"], r["macro"]) for r in t["evt_variants"]}
@@ -432,7 +489,7 @@ def main() -> int:
         check("evt_variants", r["macro"], r["family"], families, "families")
         check("evt_variants", r["macro"], r["part_number"], products, "products")
     named = re.compile(r"\bCH32[A-Za-z0-9_]+\b")
-    for table in ("clock_configs", "clock_sources"):
+    for table in ("clock_configs", "clock_sources", "interrupts"):
         for r in t[table]:
             for macro in named.findall(r["condition"]):
                 if (r["family"], macro) not in macros:
@@ -440,9 +497,12 @@ def main() -> int:
                                f"{macro} が evt_variants にない")
 
     # Data columns carry no CJK: Chinese readings are evidence (kept in the
-    # *_basis and label_zh columns), never the displayed value. A leak here
+    # *_basis and *_zh columns), never the displayed value. A leak here
     # means the translation dictionary in curated/translations.json is missing
     # an entry, or an extractor let prose fragments through.
+    #
+    # `_zh` で終わる列は中文の原文を残すためのもの（`label_zh`・`feature_zh`）。
+    # 名前で除くので、同じ役目の列が増えても検査を書き足さずに済む。
     cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
     for name, rows in t.items():
         if not rows:
@@ -451,7 +511,7 @@ def main() -> int:
         for column in rows[0]:
             if column == "#":
                 break
-            if column != "label_zh":
+            if not column.endswith("_zh"):
                 columns.append(column)
         for r in rows:
             for column in columns:
