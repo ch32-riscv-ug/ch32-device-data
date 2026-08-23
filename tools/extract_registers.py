@@ -180,8 +180,10 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
                             "page": page.page_number,
                         }
                     )
-            # 読み終えたページのキャッシュは捨てる。extract_remap と同じ理由。
-            page.flush_cache()
+            # flush_cache() だけでは extract_text_lines() が作った
+            # get_textmap のlru_cacheが残る。close() はページを再利用不能に
+            # する処理ではなく、両方のキャッシュを捨てる。
+            page.close()
     return fields, notes
 
 

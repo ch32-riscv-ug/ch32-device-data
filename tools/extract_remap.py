@@ -209,7 +209,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
             # reference manual を読むだけで数百MBまで育つ**ので、family を
             # 並列に走らせたときに効く。落とすのはキャッシュだけで、読み終えた
             # 行はすでに素の list になっている。
-            page.flush_cache()
+            page.close()
     return routes, notes
 
 

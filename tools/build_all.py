@@ -20,10 +20,10 @@ The worker prints nothing while it runs; its block is printed when it finishes, 
 lines live would make them unreadable.
 
 Memory, not cores, is what bounds `--jobs`. A worker walks a whole reference manual,
-and pdfplumber keeps what it has parsed, so the page cache is dropped as each page
-is finished -- without that a single manual grows past half a gigabyte. The default
-is 2 rather than the core count because one worker on the largest family peaks at
-2.2 GB, and because **on WSL the memory a worker can actually have is not what
+and pdfplumber keeps both parsed page objects and a text-map LRU, so both caches are
+dropped as each page is finished. Without that, one small family peaked at 581 MiB;
+with it, the largest family peaks at about 360 MiB. The default is 4 rather than the
+core count because **on WSL the memory a worker can actually have is not what
 `free` reports**: `free` describes the Linux VM, the Windows host underneath may
 have far less, and overcommitting there thrashes instead of failing.
 
@@ -374,13 +374,12 @@ def default_jobs() -> int:
     overcommitting there does not fail loudly, it thrashes. Six workers hung this
     machine even though `free` showed 8 GB available.
 
-    The measurement that settles it: one CH32H417 worker peaks at **2.2 GB**, and
-    that is after dropping each page's cache as it is finished. Six of those want
-    13 GB and hung this machine. Two is what runs comfortably and is still about
-    twice as fast as reading the families one after another; `--jobs` raises it
-    for anyone who knows their own headroom.
+    After dropping both pdfplumber's page properties and its per-page text-map
+    LRU, one CH32H417 worker peaks at about **360 MiB**. Four workers therefore
+    need roughly 1.5 GiB plus the parent and OS; `--jobs` can raise or lower this
+    for a machine's actual headroom.
     """
-    return max(1, min(2, (os.cpu_count() or 2) - 1))
+    return max(1, min(6, (os.cpu_count() or 2) - 1))
 
 
 def main() -> int:
