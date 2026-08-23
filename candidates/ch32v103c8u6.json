@@ -15,9 +15,15 @@
     "Flash memory (byte)": "64K",
     "SRAM (byte)": "20K",
     "Number of GPIOs": "37",
-    "Timer": "3",
+    "Timer General-purpose": "3",
+    "Timer Advanced": "1",
+    "Timer Watchdog (WDT)": "2",
+    "Timer SysTick": "1",
     "ADC/TKey (Number of channels)": "10",
-    "CommunicationInterface": "2",
+    "CommunicationInterface SPI": "2",
+    "CommunicationInterface I2C": "2",
+    "CommunicationInterface USART": "3",
+    "CommunicationInterface USBHD 2.0FS": "1",
     "Package": "QFN48×7"
   },
   "ordering": {

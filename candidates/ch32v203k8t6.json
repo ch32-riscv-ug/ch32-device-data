@@ -15,10 +15,16 @@
     "Flash (bytes) (1)": "64K",
     "SRAM (bytes)": "20K",
     "GPIO port count": "26",
-    "Timer": "1",
+    "Timer Advanced-control(16-bit)": "1",
+    "Timer General-purpose(16-bit)": "3",
     "ADC/TKey (channel@unitcount)": "10@2",
     "OPA/CMP": "2",
-    "ecafretninoitacinummoC": "2",
+    "ecafretninoitacinummoC USART/UART": "2",
+    "ecafretninoitacinummoC SPI": "1",
+    "ecafretninoitacinummoC I2C": "1",
+    "ecafretninoitacinummoC CAN": "1",
+    "ecafretninoitacinummoC USB(FS) USBD": "1",
+    "ecafretninoitacinummoC USB(FS) USBHD": "-",
     "Package": "LQFP32"
   },
   "ordering": {

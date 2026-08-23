@@ -15,10 +15,16 @@
     "Flash (bytes) (1)": "32K",
     "SRAM (bytes)": "10K",
     "GPIO port count": "24",
-    "Timer": "1(3)",
+    "Timer Advanced-control(16-bit)": "1(3)",
+    "Timer General-purpose(16-bit)": "3",
     "ADC/TKey (channel@unitcount)": "10@2",
     "OPA/CMP": "2",
-    "ecafretninoitacinummoC": "2",
+    "ecafretninoitacinummoC USART/UART": "2",
+    "ecafretninoitacinummoC SPI": "1",
+    "ecafretninoitacinummoC I2C": "1",
+    "ecafretninoitacinummoC CAN": "1",
+    "ecafretninoitacinummoC USB(FS) USBD": "1",
+    "ecafretninoitacinummoC USB(FS) USBHD": "-",
     "Package": "QFN28"
   },
   "ordering": {
