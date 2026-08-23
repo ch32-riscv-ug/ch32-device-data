@@ -206,6 +206,14 @@ def captions(pdf) -> list[tuple[str, str, int]]:
             m = CAPTION.match(line["text"].strip())
             if m:
                 out.append((m.group(1), m.group(2), pno))
+        # This preliminary pass visits the whole document.  Keeping every page's
+        # parsed layout alive until find_pin_tables() starts made a 148-page
+        # datasheet consume about 800 MiB just to collect its captions.  The
+        # captions above are plain strings now, so none of the page cache is
+        # needed by the caller.
+        # close() also clears get_textmap's per-page lru_cache; flush_cache()
+        # alone leaves that large text map reachable.
+        page.close()
     return out
 
 
@@ -334,7 +342,7 @@ def find_pin_tables(
                             rows[-1][i] = f"{rows[-1][i]}\n{cells[i]}".strip()
         # 読み終えたページの解析キャッシュは捨てる。同じ pdf を表ごとに
         # 何度も走査するので、貯め込むと datasheet 1本でも重くなる。
-        page.flush_cache()
+        page.close()
         if cut is not None:
             break
     return rows, variants, layout

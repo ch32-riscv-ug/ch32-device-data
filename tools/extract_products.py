@@ -78,8 +78,10 @@ def read_zero_wait(pdf, lang: str) -> tuple[int, str] | None:
         for i, _ in enumerate(lines):
             found = pattern.search(" ".join(lines[i:i + 2]))
             if found:
-                return page.page_number, f"{found.group('zero')}K"
-        page.flush_cache()
+                result = page.page_number, f"{found.group('zero')}K"
+                page.close()
+                return result
+        page.close()
     return None
 
 
@@ -230,6 +232,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                     seen.add(key)
                     product["_source"] = {"page": pno, "layout": layout}
                     products.append(product)
+            page.close()
         lang = "zh" if "datasheet_zh" in str(pdf_path) else "en"
         split = read_zero_wait(pdf, lang)
     if split:

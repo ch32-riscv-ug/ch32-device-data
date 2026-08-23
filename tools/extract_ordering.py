@@ -107,6 +107,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                                 "page": page.page_number,
                             }
                         )
+            page.close()
     if not entries:
         notes.append("ordering情報の表を認識できませんでした")
     return entries, notes
