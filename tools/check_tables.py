@@ -40,7 +40,7 @@ def main() -> int:
                       "clock_configs", "clock_prescalers", "clock_sources",
                       "clock_symbols", "clock_init", "evt_variants", "systick",
                       "memory_configs", "pin_alternate", "interrupts",
-                      "memory_map", "features")}
+                      "memory_map", "features", "sources")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -425,6 +425,21 @@ def main() -> int:
             if hi - lo + 1 < needed:
                 bad.append(f"memory_configs: {part} の {column} {cell} は "
                            f"{hi - lo + 1}bit だが符号は {needed}bit 要る")
+
+    # 読んだ原典の版。全 family が揃っていないと、生成物の差分の原因を
+    # 「入力が変わった」と「再生成を忘れた」に切り分けられない。
+    recorded = {r["family"] for r in t["sources"]}
+    for family in families - recorded:
+        bad.append(f"sources: {family} の版が記録されていない"
+                   "——差分の原因を切り分けられなくなる")
+    for r in t["sources"]:
+        check("sources", r["family"], r["family"], families, "families")
+        if not re.fullmatch(r"[0-9a-f]{40}", r["commit"]):
+            bad.append(f"sources: {r['family']} の commit "
+                       f"{r['commit']!r} が 40 桁の hash でない")
+        if r["dirty"]:
+            bad.append(f"sources: {r['family']} の mirror に未コミットの変更が"
+                       "あった——commit は読んだ中身を説明しない")
 
     # アドレス空間の地図。番地は 0x 付きの 32bit、同じ (family, kind, region) は1行。
     span = re.compile(r"^0x[0-9a-f]{8}$")

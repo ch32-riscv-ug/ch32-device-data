@@ -141,7 +141,15 @@ def pin_count_of(attributes: dict) -> int | None:
 def choose_column(
     part: str, attributes: dict, variants: list[str], ordering: dict[str, dict] | None = None
 ) -> tuple[str | None, str]:
-    """Which pin-table column belongs to this SKU, and how that was decided."""
+    """Which pin-table column belongs to this SKU, and how that was decided.
+
+    `-` is the pin table's "this package has no such lead" marker, and it heads a
+    column in some tables. **It is never a package.** Without dropping it here the
+    package-attribute rule below matches it against any attribute whose value is
+    `-` (`Ethernet: -`), and the SKU is resolved to a column where every lead is
+    `-` -- three CH32V203 parts lost all 74 of their pins that way.
+    """
+    variants = [v for v in variants if v and v.strip() != "-"]
     # The ordering table states the package outright and is the best evidence there is.
     named = (ordering or {}).get(part, {}).get("package", "")
     if named:
@@ -425,8 +433,22 @@ def main() -> int:
         f" / 所要 {(time.monotonic() - started) / 60:.1f}分",
         file=sys.stderr,
     )
-    (args.out / "_report.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    # **`_report.json` は candidates/ 全体の目録**で、この実行の記録ではない。
+    # `--family` や `--limit` で一部だけ作り直したときに丸ごと書き換えると、
+    # 作り直していない SKU の行が消える——`--family CH32V407` の後に 6 件しか
+    # 残っていない目録がコミットされた。今回触った SKU だけ差し替える。
+    dest = args.out / "_report.json"
+    catalogue = list(report)
+    if (args.family or args.limit) and dest.exists():
+        touched = {r.get("part_number") for r in report}
+        kept = [r for r in json.loads(dest.read_text(encoding="utf-8"))
+                if r.get("part_number") not in touched]
+        catalogue += kept
+        catalogue.sort(key=lambda r: r.get("part_number", ""))
+        print(f"目録は {len(report)} 件を差し替え、{len(kept)} 件を残して "
+              f"{len(catalogue)} 件になりました", file=sys.stderr)
+    dest.write_text(
+        json.dumps(catalogue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     return 0
 
