@@ -33,6 +33,16 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
   AF番号の書き込み先を`tables/pin_alternate.csv`にする。`pin_functions`の`af-N`が
   4448行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
   EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
+- `tools/build_interrupts.py`: 割り込みベクタ表を`tables/interrupts.csv`にする。
+  **出所はreference manualではなくEVTのdevice header**で、`IRQn_Type`列挙が
+  番号・名前・説明を全部持っている。variantで番号が入れ替わる（CH32V20xの61番は
+  `_D6`で`UART4`、`_D8`で`ETH`）ので`#if`の条件を`condition`列に持つ
+- `tools/build_memory_map.py`: アドレス空間の地図を`tables/memory_map.csv`にする。
+  EVTの`*_BASE`定数から。**FLASHの番地は2つある**——ヘッダーの`FLASH_BASE`と
+  linker scriptの`ORIGIN`は別の窓口を指すので両方持つ
+- `tools/build_features.py`: familyが持つ周辺の一覧を`tables/features.csv`にする。
+  比較表は「シリーズ内で差がある列」しか持たないので機能フラグを作れない。
+  **機能説明章の節見出し**を採る。節番号は言語に依らないので中英が厳密に対応する
 - `tools/build_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを
   `tables/memory_configs.csv`にする。`products.csv`の`flash_bytes`/`sram_bytes`は
   datasheetの比較表が載せる1組しか言わないので、**振り直せること自体がそこから

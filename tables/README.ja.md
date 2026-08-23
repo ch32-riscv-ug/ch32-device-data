@@ -29,6 +29,9 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   clock_symbols.csv       433行  設定に出てくる記号の数値・書き込み先register・絶対アドレス・役割
   clock_init.csv          101行  SystemInitの手順（ベタhexなので記号では見えない）＋HSI工場トリム
   evt_variants.csv         56行  型番→EVTのコンパイル時variant macro（CH32V20x_D8W等）
+  interrupts.csv          791行  割り込みベクタ表（family×番号。variantで入れ替わる分はcondition付き）
+  memory_map.csv          797行  アドレス空間の地図（FLASH/SRAM/OB・バス・周辺のベース番地）
+  features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
 ```
@@ -52,13 +55,16 @@ clock_configs.condition / clock_sources.condition の macro → evt_variants.(fa
 evt_variants.part_number                                → products.part_number
 memory_configs.part_number                              → products.part_number
 pin_alternate.family                                    → families.family
+interrupts.family / memory_map.family / features.family → families.family
+features.series                                         → series.series
+interrupts.condition の macro                            → evt_variants.(family, macro)
 pin_functions(route=af-N).part_number+pad               → pin_alternate.family+pad
 errata.series / operating_conditions.series             → series.series
 evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`tools/build_features.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -287,6 +293,74 @@ CH32V407   576K+136K ×7  512K+200K ×1
 組合せが5通りある以上3bit要る（2bitでは`110`と`111`が同じ値になる）ので
 中文版が正しく、`basis`に両方を残しています。
 
+### `interrupts.csv`
+
+割り込みベクタ表。1行1（family, 番号, condition）。**出所はreference manualではなく
+EVTのdevice header**で、`IRQn_Type`列挙が番号・名前・1行説明を全部持っています。
+コンパイルされる側の定義そのものなので、RMの表を読むより確かです。
+
+`kind`が`exception`（RISC-Vのプロセッサ例外）と`irq`（PFICの周辺割り込み）を分けます。
+**境目の番号はfamilyで違います**——ほとんどは16番からですが、CH32H41xは**32番**から
+で、16〜28はIPC（コア間通信）とHSEMです（2コアなのでプロセッサ側の枠が広い）。
+番号で決め打つと5本を取り違えるので、ヘッダー自身の横断幕
+（`RISC-V Processor Exceptions Numbers` / `RISC-V specific Interrupt Numbers`）を
+読んでいます。検査は「例外の番号は全部、割り込みの番号より小さい」という形です。
+
+**同じ番号が別の周辺を指すことがあります。** CH32V20xの61番は`_D6`で`UART4`、
+`_D8`/`_D8W`で`ETH`。`condition`列がその条件で、どの型番がそのmacroを立てるかは
+`evt_variants.csv`が持ちます（`clock_configs.condition`と同じ辿り方）。
+
+### `memory_map.csv`
+
+アドレス空間の地図。1行1（family, kind, region）。**DS 1.2章の図ではなくEVTの
+device headerの`*_BASE`定数から**取ります。相対の連鎖
+（`EXTEN_BASE = HBPERIPH_BASE + 0x3800`）の解決は`tools/extract_addresses.py`が
+持っています。
+
+`kind`は4種類:
+
+```
+memory       FLASH・SRAM・OB（用户选择字）
+bus          PERIPH_BASE / APB1PERIPH_BASE / AHBPERIPH_BASE ── 束ねる側
+peripheral   TIM2_BASE・GPIOA_BASE … 個々の周辺
+link-origin  EVTのlinker scriptが実際に使う先頭番地
+```
+
+**FLASHの番地は2つあります。** ヘッダーの`FLASH_BASE`はCH32V307で`0x08000000`、
+EVTのlinker scriptは`ORIGIN = 0x00000000`を使います。どちらも実在の窓口で、
+**linker scriptを起こす側が要るのは後者**なので両方を別の行で持ちます。
+IAPの例題はbootloaderのぶんだけずらしたORIGINを書くので、`link-origin`は
+**一番多い値**（＝領域の先頭）を採っています。
+
+`FLASH_R`はFLASHの制御レジスタ（`0x40022000`）で記憶域ではないため`peripheral`です。
+
+### `features.csv`
+
+そのdatasheetが覆うシリーズが持つ周辺の一覧。1行1（series群, 節番号）。
+
+**比較表からは作れません。** 比較表は「シリーズ内で差がある列」しか持たないので、
+シリーズ共通の周辺は列ごと存在しません——CH32V307の属性は6種しかなく、USBHSも
+Ethernetも行がありません（実際には両方あります）。**「属性が無い＝機能が無い」は
+誤り**です。機能説明の章は別物で、その製品が持つ周辺を節見出しとして並べます。
+
+**章番号は決め打ちできません。** CH32L103は`1.4`、CH32V103は`1.5`、CH32V20x/V30xは
+`2.5`です。題（`Functional Description` / `功能概述`）で章を探します。
+
+**節番号は言語に依らない**ので中英の対応が推測なしで取れます……が、**保証では
+ありません**。CH32V208は23節中18節が対応する一方、英語版が通信系を`2.5.15.1〜6`と
+入れ子にし、中文版が同じものを`2.5.19〜`と平らに振るため、残りが噛み合いません
+（`reference` 11行）。**その節が片方の版に無いのか、番号の振り方が違うだけなのかは
+この表からは決まりません**——題を突き合わせないと分かれないので、生成時は断定せず
+一致数・片方のみの数を出します。
+
+**granularityは`series`です。** 1つのfamilyがdatasheetを複数持つことがあり
+（CH32V006はV002/V004/V006/V007の4冊）、**節番号は1冊の中でしか一意ではない**ため、
+familyを主キーにすると別々の冊子の`1.4.17`が衝突します。
+
+書き込み方式（worklistのA8）もここに出ます——`1-wire Serial Debug Interface (SDI)`
+（CH32V002/V003/V004/V006/V007）と`2-wire SDI Serial Debug Interface`
+（CH32L103・V103・V203・V30x・X035）が節見出しとして立っています。
+
 ### `errata.csv`
 
 1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
@@ -422,6 +496,9 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | remap_routes.csv | 4900 | 0 | 4900 | 0 |
 | pin_alternate.csv | 240 | 0 | 240 | 0 |
 | memory_configs.csv | 67 | 0 | 0 | 67 |
+| interrupts.csv | 791 | 0 | 791 | 0 |
+| memory_map.csv | 797 | 0 | 797 | 0 |
+| features.csv | 397 | 386 | 11 | 0 |
 | systick.csv | 53 | 0 | 53 | 0 |
 | link_firmware.csv | 10 | 0 | 10 | 0 |
 | clock_configs.csv | 152 | 0 | 152 | 0 |
@@ -476,6 +553,9 @@ uv run tools/build_clock.py --out tables                      # clock_configs/cl
 uv run tools/build_systick.py --out tables                    # systick（EVTのcore_riscv.hから）
 uv run tools/build_pin_alternate.py --out tables              # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
 uv run tools/build_memory.py --out tables                     # memory_configs（RMとEVTのLink.ldから・数分かかる）
+uv run tools/build_interrupts.py --out tables                # interrupts（EVTのIRQn_Type列挙から）
+uv run tools/build_memory_map.py --out tables                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
+uv run tools/build_features.py --out tables                  # features（datasheetの機能説明章から・数分かかる）
 uv run tools/build_evt_variants.py --out tables               # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py --out tables              # link_firmware（WCHの配布物から）
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
