@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import urllib.parse
 import csv
 import re
 import sys
@@ -36,9 +37,12 @@ PAGES = "https://ch32-riscv-ug.github.io"
 
 # Signal spellings per role, as the datasheets write them. Route "default" only:
 # the point is what the pin does before any remap.
+# pad の名前は入れない。**除外条件（`pad not in names`）が pad 自身を弾く**ので、
+# `PA13` を入れると PA13 が SWDIO として出なくなる——2線式SDIのfamily全部で
+# この列が空だった。signal 名（SWDIO/SWCLK/SWIO）はデータに揃っている。
 ROLES = (
-    ("SWDIO", {"SWIO", "SWDIO", "PA13"}),
-    ("SWCLK", {"SWCLK", "SWCK", "PA14"}),
+    ("SWDIO", {"SWIO", "SWDIO"}),
+    ("SWCLK", {"SWCLK", "SWCK"}),
     ("UART TX", {"UTX", "TX", "TX1", "USART1_TX", "U1TX", "TXD1"}),
     ("UART RX", {"URX", "RX", "RX1", "USART1_RX", "U1RX", "RXD1"}),
 )
@@ -101,6 +105,13 @@ class Data:
             self.errata = load("errata")
         except FileNotFoundError:
             self.errata = []
+        # B4 で足した節が読むもの。無くても頁は組めるようにしておく。
+        for name in ("feature_tags", "eval_boards", "memory_map", "sources",
+                     "families"):
+            try:
+                setattr(self, name, load(name))
+            except FileNotFoundError:
+                setattr(self, name, [])
 
     def family_series(self, family: str) -> list[dict]:
         return [s for s in self.series if s["family"] == family]
@@ -203,10 +214,10 @@ def all_signals(data: Data, part: str) -> dict[str, set[str]]:
     return result
 
 
-def roles_section(data: Data, family: str) -> list[str]:
+def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
     if not data.family_series(family):
         return []
-    out = ["## Debug / serial defaults", "",
+    out = [f"{level} Debug / serial defaults", "",
            "| Series | " + " | ".join(name for name, _ in ROLES) + " |",
            "|---|" + "---|" * len(ROLES)]
     for s in data.family_series(family):
@@ -472,16 +483,99 @@ def evt_examples_section(data: Data, family: str) -> list[str]:
             listed, ""]
 
 
+def quick_start_section(data: Data, family: str) -> list[str]:
+    """最初に触る人が要るもの——**どうやって書き込むか**と、debug/serial のpad。
+
+    書き込み方式は `feature_tags.csv` の SDI の行が持つ。CH32V003 系は1線式、
+    CH32V20x 系は2線式で、**線数が違うと配線が違う**ので最初に要る
+    （worklist の A8）。見出しの綴りは版で揺れるので `features` 列の原文から
+    線数を読む。
+    """
+    tags = [r for r in data.feature_tags
+            if r["family"] == family and r["tag"] == "SDI"]
+    if not tags:
+        return []
+    wires = sorted({("1-wire" if "1-wire" in r["features"] else
+                     "2-wire" if "2-wire" in r["features"] else "")
+                    for r in tags} - {""})
+    out = ["## Quick start", ""]
+    if wires:
+        out += [f"Programming and debug: **{' / '.join(wires)} SDI** "
+                "(WCH-Link, `Serial Debug Interface`).", ""]
+    out += roles_section(data, family, "###")
+    return out
+
+
+def reference_section(data: Data, family: str) -> list[str]:
+    """アドレス空間の入口。`memory_map.csv` の記憶域とバスだけを出す。
+
+    周辺の番地は 700 行近くあって頁に置くものではないので、**FLASH と SRAM と
+    バスの先頭**——linker script を書くときに要るぶん——に絞る。
+    `link-origin` は linker script が実際に使う先頭で、ヘッダーの `FLASH_BASE`
+    とは別の窓口を指すことがある（CH32V307 は 0x08000000 と 0x00000000）。
+    """
+    rows = [r for r in data.memory_map
+            if r["family"] == family and r["kind"] in ("memory", "bus", "link-origin")]
+    if not rows:
+        return []
+    out = ["## Reference", "", "### Address map", "",
+           "| Region | Base | Kind |", "|---|---|---|"]
+    for r in sorted(rows, key=lambda r: (r["kind"], r["base_address"])):
+        note = f" ({r['condition']})" if r["condition"] else ""
+        out.append(f"| {r['region']}{note} | `{r['base_address']}` | {r['kind']} |")
+    out += ["",
+            "`link-origin` is what the EVT linker scripts use; the `memory` row "
+            "for FLASH is the address the device header states. Both windows are "
+            "real -- CH32V307 answers at `0x08000000` and at `0x00000000`.", "",
+            "Peripheral base addresses are in "
+            "[memory_map.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
+            "/blob/main/tables/memory_map.csv); interrupt numbers in "
+            "[interrupts.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
+            "/blob/main/tables/interrupts.csv).", ""]
+    return out
+
+
+def eval_board_lines(data: Data, family: str) -> list[str]:
+    """評価ボードの資料。**EVT 同梱**なので Documents 節の中に置く。"""
+    rows = [r for r in data.eval_boards if r["family"] == family]
+    if not rows:
+        return []
+    # `repository` は families.csv の列（series.csv には無い）。
+    repo = next((f.get("repository") for f in data.families
+                 if f["family"] == family and f.get("repository")), None)
+    base = f"https://github.com/{repo}/blob/main" if repo else None
+    papers = [r for r in rows if r["kind"].startswith(("board-manual", "schematic"))]
+    boards = [r for r in rows if r["kind"].startswith("board")
+              and not r["kind"].startswith("board-manual")]
+    out = ["### Evaluation boards", ""]
+    for r in sorted(papers, key=lambda r: r["kind"]):
+        name = r["path"].rsplit("/", 1)[-1]
+        # 資料の名前に空白と中文が入る（`CH32V20x Evaluation Board Reference-EN.pdf`、
+        # `CH32V20x评估板说明书.pdf`）。素で埋めると Markdown のリンクが切れる。
+        link = urllib.parse.quote(r["path"])
+        out.append(f"- {r['kind']}: "
+                   + (f"[{name}]({base}/{link})" if base else f"`{r['path']}`"))
+    if boards:
+        listed = ", ".join(f"`{r['board']}`" for r in sorted(boards,
+                                                            key=lambda r: r["board"]))
+        out += ["", f"{len(boards)} board schematics under `EVT/PUB/SCHPCB/`: "
+                    f"{listed}", ""]
+    return out
+
+
 def render(data: Data, family: str) -> str:
+    # **節の順は U1（初めて触る人）→ U2 → U3。** 以前は U3（開発中の人）向けに
+    # Series・Debug defaults・Documents が先に来ていた。最初に触る人が要るのは
+    # 「どう書き込むか」と「どの型番か」で、資料の一覧はその後（worklist の B4）。
     lines = [f"# {family}", "", NOTICE, ""]
+    lines += quick_start_section(data, family)
     lines += series_section(data, family)
-    lines += roles_section(data, family)
-    lines += documents_section(data, family)
-    lines += pinout_reference(data, family)
     if data.family_series(family):
         lines += ["## Product comparison", ""]
         for s in data.family_series(family):
             lines += comparison_section(data, s)
+    lines += pinout_reference(data, family)
+    if data.family_series(family):
         lines += ["## Pin definitions", ""]
     for s in data.family_series(family):
         lines += pin_map_section(data, s)
@@ -490,6 +584,9 @@ def render(data: Data, family: str) -> str:
     lines += block_diagrams(data, family)
     lines += errata_section(data, family)
     lines += evt_examples_section(data, family)
+    lines += documents_section(data, family)
+    lines += eval_board_lines(data, family)
+    lines += reference_section(data, family)
     lines += extras_section(family)
     lines += ["---",
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"
