@@ -300,13 +300,15 @@ def as_bytes(value: str) -> str:
     return str(int(m.group(1)) * scale)
 
 
-def read_edition(datasheet: Path) -> tuple[dict, dict]:
-    """One edition's products and ordering rows, keyed by part number."""
-    products = {
-        p["part_number"]: p["attributes"] for p in extract_products.extract(datasheet)[0]
-    }
+def read_edition(datasheet: Path) -> tuple[dict, dict, dict]:
+    """One edition's products, ordering rows and footnotes, keyed by part number."""
+    found = extract_products.extract(datasheet)[0]
+    products = {p["part_number"]: p["attributes"] for p in found}
+    # 脚注と、横から流れてきた項目の名前。例外の判定に両方要る。
+    footnotes = {p["part_number"]: (p.get("_footnotes") or {},
+                                   p.get("_filled") or set()) for p in found}
     ordering = {e["part_number"]: e for e in extract_ordering.extract(datasheet)[0]}
-    return products, ordering
+    return products, ordering, footnotes
 
 
 def normalise(attributes: dict) -> dict[str, str]:
@@ -452,18 +454,37 @@ def resolve_full_names(parts: set[str], full: set[str]) -> dict[str, list[str]]:
 def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
     en_path = family / "datasheet_en" / datasheet_name
     zh_path = family / "datasheet_zh" / datasheet_name
-    en_products, en_ordering = read_edition(en_path) if en_path.exists() else ({}, {})
-    zh_products, zh_ordering = read_edition(zh_path) if zh_path.exists() else ({}, {})
+    en_products, en_ordering, en_notes = (
+        read_edition(en_path) if en_path.exists() else ({}, {}, {}))
+    zh_products, zh_ordering, zh_notes = (
+        read_edition(zh_path) if zh_path.exists() else ({}, {}, {}))
 
     full = set(en_ordering) | set(zh_ordering)
     alias = resolve_full_names(set(en_products) | set(zh_products), full)
     listed_as = {long: short for short, longs in alias.items() for long in longs}
     for short, longs in alias.items():
-        for products in (en_products, zh_products):
+        for products, notes in ((en_products, en_notes), (zh_products, zh_notes)):
             if short in products:
                 attributes = products.pop(short)
+                marks = notes.get(short, {})
                 for long in longs:
                     products.setdefault(long, dict(attributes))
+                    notes.setdefault(long, marks)
+    # **脚注が名指しした型番からは、横流しされた値を外す。** 比較表は同じ値が
+    # 続く列を結合し、外れる型番を脚注で断る（`-40℃～85℃（3）` の注 3 が
+    # 「CH32V303RCT7 は -40℃～105℃」）。注文型番が揃ったこの時点で初めて、
+    # 略記 `CH32V303RC` の中の RCT7 だけを外せる。値を消すので、その項目は
+    # 別の出所（型番末尾の温度グレード）が答える。
+    for products, notes in ((en_products, en_notes), (zh_products, zh_notes)):
+        for part, attributes in products.items():
+            marks, filled = notes.get(part, ({}, set()))
+            if not marks:
+                continue
+            for label in list(attributes):
+                # 横から流れてきた項目だけが例外の対象。
+                if label in filled and extract_products.excepted(
+                        str(attributes[label]), part, marks):
+                    del attributes[label]
 
     rows = []
     for part in sorted(set(en_products) | set(zh_products) | full):

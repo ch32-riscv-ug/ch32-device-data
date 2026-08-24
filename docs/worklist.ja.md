@@ -55,7 +55,27 @@ product_attributesからは機能フラグを作れません。datasheetの比�
 
 - [x] ✅ **B1 12リポジトリのTOP生成** — Series/Documents/比較表/ピン表/remap/Errata/Diagrams。日次でミラーが取得
 - [x] ✅ **B2 org TOPの生成** — 現行はリポジトリ一覧＋横断文書＋toolchain
-- [x] ✅ **B3 org TOP「型番から探す」** — **今あるデータだけで作れる**（series.csv: series→family、products.csv: part_number→family）。CH32M007がCH32V006に、CH32M103がCH32L103に、CH32V317がCH32V307に入っている件が検索者に見えるようになる。これができれば`curated/readme-extras/CH32V20x.md`（V205分離の手書きNotes）を削除して**特殊処理ゼロ**にできる
+- [x] ✅ **B3 org TOP「型番から探す」** — **今あるデータだけで作れる**（series.csv: series→family、products.csv: part_number→family）。CH32M007がCH32V006に、CH32M103がCH32L103に、CH32V317がCH32V307に入っている件が検索者に見えるようになる。～~これができれば`curated/readme-extras/CH32V20x.md`（V205分離の手書きNotes）を削除して**特殊処理ゼロ**にできる~～ → **この見通しは誤りだった**（2026-08-24に確認）。詳細は下記
+#### B3の後始末は実施しない（2026-08-24に確認）
+
+B3の項に「`curated/readme-extras/CH32V20x.md`を削除して特殊処理ゼロにできる」と
+書いていたが、**削除できない**。Notesの2項目はどちらもB3では置き換わらない:
+
+| Notes | B3で置き換わるか |
+|---|---|
+| CH32V205が独立リポジトリへ移った | **✗** org TOPの型番検索は**org全体を探す人**を助けるが、**すでにCH32V20xのページにいる読者**には届かない |
+| 生成前の型番別ページへのリンク | **✗** `README_CH32V203.md`/`README_CH32V208.md`はミラーに**現存**していてリンクが生きている。データからは導けない履歴 |
+
+`extras_section`の仕組みも「表が言えないこと（エラッタ・リポジトリの注記）」の
+**正当な逃げ道**で、消すべき欠陥ではない。古いTODOを根拠に手書きの注記を消さない。
+
+**導けるものは1つある。** CH32V20xの`CH32V203CCT6`は`CH32V205DS0.PDF`に載っていて
+（`products.csv`の`datasheet`列）、その文書はfamily CH32V205のもの。つまり
+**2つのリポジトリの間にデータで見えるリンクがある**ので、「関連リポジトリ」節を
+生成することはできる——しかも「なぜ関連するのか」まで言える。ただしこれは
+「移った」という履歴の代わりにはならないので、手書きNotesと**併存**する。
+節構成の話なのでB4で扱う。
+
 - [ ] ⬜ **B4 節構成の組み替え** — 現状はU3（開発中の人）向けの順序。U1→U2→U3順へ:
   `Quick start`(A8) → `Products` → `Pinout`(画像+表) → `Block diagram` → `Errata` → `EVT examples`(A5) → `Documents`(+同期日時・評価ボードPDF) → `Reference`(A7)
 - [ ] ⬜ **B5 org TOP「機能から探す」** — A6待ち

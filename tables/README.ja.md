@@ -15,7 +15,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   documents.csv   76行  文書カタログ。**両言語のページURL・DL URL・mirror URL**
 
 付属表
-  product_attributes.csv 1517行  比較表の全属性（縦持ち。列に昇格していない残り全部）
+  product_attributes.csv 1729行  比較表の全属性（縦持ち。列に昇格していない残り全部）
   remap_fields.csv        285行  route selector定義（series×field: register/bit/reset/valid値）
   remap_routes.csv       4900行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
@@ -34,6 +34,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
+  eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
+  feature_tags.csv        696行  機能から製品を探す索引（比較表を優先し、無ければ節見出し）
   sources.csv              12行  **どの版の原典を読んで生成したか**（mirrorのcommitとその日付）
 ```
 
@@ -57,6 +59,9 @@ evt_variants.part_number                                → products.part_number
 memory_configs.part_number                              → products.part_number
 pin_alternate.family                                    → families.family
 interrupts.family / memory_map.family / features.family / sources.family → families.family
+eval_boards.family / feature_tags.family                → families.family
+eval_boards.parts                                       → products.part_number
+feature_tags.series                                     → series.series
 features.series                                         → series.series
 interrupts.condition の macro                            → evt_variants.(family, macro)
 pin_functions(route=af-N).part_number+pad               → pin_alternate.family+pad
@@ -65,7 +70,7 @@ evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、sources.csvは`tools/build_sources.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`tools/build_features.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、eval_boards.csvは`tools/build_eval_boards.py`、feature_tags.csvは`tools/build_feature_tags.py`、sources.csvは`tools/build_sources.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`tools/build_features.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -362,6 +367,62 @@ familyを主キーにすると別々の冊子の`1.4.17`が衝突します。
 （CH32V002/V003/V004/V006/V007）と`2-wire SDI Serial Debug Interface`
 （CH32L103・V103・V203・V30x・X035）が節見出しとして立っています。
 
+### `eval_boards.csv`
+
+評価ボードの資料と回路図。**WCHの配布物ではなくEVT同梱**なので`documents.csv`
+（ダウンロードURL付きの文書カタログ）には入りません。`kind`で5種類を分けます:
+
+```
+board          型番ごとの板（SCHPCB/<型番>-R<版>/）        78
+board-variant  用途違いの派生板（-UHSIF- / -USB）            3
+board-manual:en / :zh   family単位の説明書              12 / 12
+schematic-pdf  family単位の回路図PDF                      12
+```
+
+**`board`が一番効きます**——「自分の型番に評価ボードはあるか、版はどれか」に答えます。
+
+**板の名前は型番と別の綴りで、80枚のうち27枚が素の一致では外れます**（温度グレードの
+桁落ち`CH32V203CCT`、CH32F系との共用`CH32F&V208C`、区切りが`_`、`x`のワイルドカード
+`CH32V4x7RET`、派生板`-UHSIF-`）。`listed_as`と同型ですが、板は**package単位で作られる**
+ので複数の型番に当たるのが正常で、末尾の補完も3文字まで要ります（`CH32V208C`→`CBU6`）。
+比較表用の`resolve_full_names`（2文字まで・1つに寄せたい）とは要件が違うので別規則です。
+
+決められない3枚は`parts`が空です——`CH32V006K8U6`・`CH32V203K6T6`はcatalogueに無い型番、
+`CH32X035USBPD_CH211`はcompanion chip込みのリファレンス板。近い型番に寄せると嘘になります。
+
+`path`はmirrorの中での位置です。**CJK検査から除外しています**——
+`EVT/PUB/CH32V30x评估板说明书.pdf`は中文名で実在するファイルで、翻訳したら指す先が
+なくなります。「表示する値」ではなく識別子です。
+
+### `feature_tags.csv`
+
+**機能から製品を探すための索引**（org TOPの「機能から探す」用）。1行1（タグ, series）。
+
+`features.csv`は節見出しをそのまま持つので綴りが揺れます
+（`General DMA Controller` / `General-purpose DMA Controller`）。多くの見出しが
+**括弧の中に略語を持つ**ので、それを第一の手がかりにし、括弧が無いものと綴り違い
+（`FPIC`と`PFIC`は同じもの）だけを`curated/feature-tags.json`で決めます。
+
+**`precision`列が読みの精度を言います。**
+
+```
+part       比較表がその機能の行を持つ → 型番単位。値がある series だけ載る
+datasheet  比較表に行が無い          → 節見出しに戻る。datasheet 単位
+```
+
+**節見出しだけでは偽陽性が出ます。** 機能説明の章はdatasheet単位なので、
+`CH32V20x_30xDS0`のEthernetの節はV303/V305/V307/V317の全部に付きます——
+**V303にEthernetはありません**。比較表は型番単位で書き分けているので、
+そちらがある場合は優先し、値が無い（`-`）seriesは索引に出しません。
+この判定で**21件の偽陽性**が消えました（ETHERNET×4・FSMC×3・USBSS×2ほか）。
+
+64タグのうち46が比較表側で決まり、残る18は比較表に行がありません——
+**それはCRC・DMA・EXTI・GPIO・PFIC・TIMのような「全familyが持つ」もの**で、
+比較表が差の無い行を持たないことと整合します。
+
+`parent`は上位のまとめです（`USBHS`は`USB`にも入る）。「USBが使えるか」で探す人と
+「USBHSが要る」人の両方に答えるためです。
+
 ### `sources.csv`
 
 **どの版の原典を読んで生成したか。** 1行1 family。
@@ -511,14 +572,14 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | 表 | 行数 | confirmed | reference | conflict |
 |---|---:|---:|---:|---:|
 | families.csv | 12 | — | — | — |
-| series.csv | 27 | 99 | 4 | 0 |
-| products.csv | 103 | 643 | 79 | 0 |
+| series.csv | 27 | 110 | 4 | 0 |
+| products.csv | 103 | 684 | 38 | 0 |
 | packages.csv | 25 | 73 | 2 | 0 |
 | cores.csv | 13 | 13 | 0 | 0 |
 | documents.csv | 76 | — | — | — |
 | pins.csv | 4342 | 4220 | 122 | 0 |
 | pin_functions.csv | 27926 | 27719 | 207 | 0 |
-| product_attributes.csv | 1517 | 1382 | 132 | 3 |
+| product_attributes.csv | 1729 | 1570 | 156 | 3 |
 | remap_fields.csv | 285 | 0 | 285 | 0 |
 | remap_routes.csv | 4900 | 0 | 4900 | 0 |
 | pin_alternate.csv | 240 | 0 | 240 | 0 |
@@ -583,6 +644,8 @@ uv run tools/build_memory.py --out tables                     # memory_configs�
 uv run tools/build_interrupts.py --out tables                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py --out tables                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run tools/build_features.py --out tables                  # features（datasheetの機能説明章から・数分かかる）
+uv run tools/build_eval_boards.py --out tables                # eval_boards（EVTのPUB/から）
+uv run tools/build_feature_tags.py --out tables               # feature_tags（features + 比較表から。PDF不要）
 uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py --out tables               # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py --out tables              # link_firmware（WCHの配布物から）
