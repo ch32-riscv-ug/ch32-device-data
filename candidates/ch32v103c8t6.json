@@ -20,10 +20,10 @@
     "Timer Watchdog (WDT)": "2",
     "Timer SysTick": "1",
     "ADC/TKey (Number of channels)": "10",
-    "CommunicationInterface SPI": "2",
-    "CommunicationInterface I2C": "2",
-    "CommunicationInterface USART": "3",
-    "CommunicationInterface USBHD 2.0FS": "1",
+    "Communication Interface SPI": "2",
+    "Communication Interface I2C": "2",
+    "Communication Interface USART": "3",
+    "Communication Interface USBHD 2.0FS": "1",
     "CPU clock frequency": "Typical: 72MHz",
     "Operating voltage": "2.7V~5.5V",
     "Operating temperature": "Industrial grade -40℃~85℃",
@@ -244,6 +244,54 @@
         {
           "signal": "VBAT",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "pad": "PC13-TAMPER-RTC",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC13",
+          "route": "main"
+        },
+        {
+          "signal": "TAMPER-RTC",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
         }
       ]
     },
@@ -999,14 +1047,7 @@
         },
         {
           "signal": "MCO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         }
       ]
     },

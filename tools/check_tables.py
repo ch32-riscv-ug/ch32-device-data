@@ -28,6 +28,56 @@ def load(tables: Path, name: str) -> list[dict]:
         return list(csv.DictReader(f))
 
 
+# `pin_roles` が語彙で覆えなかった signal。**目標は 0** で、ここに並んでいるのは
+# まだ埋まっていない穴の実測値。増えたら失敗させ、減らしたらこの表も一緒に減らす。
+#
+#   AETR / AETR2 / TIETR   CH32V003。ADCのトリガがADC2 fieldのどちらか資料が
+#                          決めていない（worklist の F-8）。資料側なので埋まらない
+#   HO* / LO* / IS* / QII  CH32M030 のモータ駆動。比較表が
+#                          `Source current module ISOURCE` のように群を名乗る
+#   ADCS0-2 / RTC / SWIM   資料に対応の記述が見つかっていない
+#   LED0 / LED1            CH32V407。Ethernet の LED と思われるが未確認
+KNOWN_ROLE_GAPS = {
+    "AETR": 6, "AETR2": 8, "TIETR": 4,
+    "LED0": 8, "LED1": 8, "RTC": 5, "SWIM": 5,
+    "ADCS0": 4, "ADCS1": 4, "ADCS2": 4,
+    "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 4,
+    "LO0": 5, "LO1": 5, "LO2": 4, "LO3": 3,
+    "ISINK1": 4, "ISINK2": 5, "ISOURCE1": 4, "ISOURCE2": 3,
+    "ISN1": 5, "ISN2": 4, "ISP2": 5,
+    "QII1": 3, "QII2": 5,
+    "CC1(CC1R)": 4, "CC2(CC2R)": 4,
+}
+
+
+def pin_role_coverage(t: dict) -> list[str]:
+    """`pin_roles` が覆えていない signal を、記録してある実測値と突き合わせる。
+
+    **数の閾値ではなく名前で持つ。** 「95%以上あればよい」にすると、片方が
+    直って別の穴が開いても気付けない。名前で持てば、新しい綴りが増えたことも
+    埋まったことも、どちらも同じ検査が言う。
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import build_pin_roles  # noqa: PLC0415
+
+    catalogue = {r["part_number"]: r for r in t["products"]}
+    _, unresolved = build_pin_roles.roles(t["pin_functions"], catalogue)
+    found: dict[str, int] = {}
+    for (_, signal), count in unresolved.items():
+        found[signal] = found.get(signal, 0) + count
+    out = []
+    for signal in sorted(set(found) | set(KNOWN_ROLE_GAPS)):
+        now, before = found.get(signal, 0), KNOWN_ROLE_GAPS.get(signal, 0)
+        if now > before:
+            out.append(f"pin_roles: 語彙で覆えない {signal!r} が {before} 行から "
+                       f"{now} 行に増えた（tools/signal_vocabulary.py に規則を足すか"
+                       "、抽出を直す）")
+        elif now < before:
+            out.append(f"pin_roles: 語彙で覆えない {signal!r} が {before} 行から "
+                       f"{now} 行に減った——KNOWN_ROLE_GAPS を更新すること")
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--tables", type=Path, default=Path("tables"))
@@ -41,7 +91,7 @@ def main() -> int:
                       "clock_symbols", "clock_init", "evt_variants", "systick",
                       "memory_configs", "pin_alternate", "interrupts",
                       "memory_map", "features", "sources", "eval_boards",
-                      "feature_tags")}
+                      "feature_tags", "pin_roles")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -96,6 +146,23 @@ def main() -> int:
             bad.append(f"pin_functions: {r['part_number']} の pad {r['pad']!r} が pins にない")
     for r in t["product_attributes"]:
         check("product_attributes", r["attribute"], r["part_number"], products, "products")
+
+    # pin_roles は pin_functions を語彙で言い換えた索引で、**新しい事実は足さない**。
+    # 行が pin_functions に戻せることと、覆えなかった数が増えていないことを見る。
+    for r in t["pin_roles"]:
+        check("pin_roles", r["part_number"], r["part_number"], products, "products")
+        check("pin_roles", r["part_number"], r["series"], series, "series")
+        if (r["part_number"], r["pad"]) not in pin_pads:
+            bad.append(f"pin_roles: {r['part_number']} の pad {r['pad']!r} が pins にない")
+    stated = {(r["part_number"], r["pad"], r["routing"], r["signal"])
+              for r in t["pin_roles"]}
+    verbatim = {(r["part_number"], r["pad"], r["route"], r["signal"])
+                for r in t["pin_functions"]}
+    invented = stated - verbatim
+    if invented:
+        bad.append(f"pin_roles: pin_functions にない行が {len(invented)} 件ある"
+                   f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
+    bad += pin_role_coverage(t)
     # The two remap tables have to agree with each other as well as join, because
     # the ways they can disagree are the ways a consumer writes the wrong register
     # and gets a different route with no error at all.

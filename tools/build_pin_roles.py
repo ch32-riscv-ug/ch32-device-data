@@ -45,21 +45,22 @@ COLUMNS = ["part_number", "series", "family", "peripheral", "role", "pad",
            "routing", "signal", "#", "confidence", "basis"]
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
-    args = ap.parse_args()
+def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collections.Counter]:
+    """(索引の行, 語彙で覆えなかった {(datasheet, signal): 行数})。
 
-    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
-        catalogue = {r["part_number"]: r for r in csv.DictReader(f)}
-    with (args.out / "pin_functions.csv").open(newline="", encoding="utf-8") as f:
-        functions = list(csv.DictReader(f))
-
+    `tools/check_tables.py` が同じ計算をして、覆えない数が増えていないかを見る。
+    """
     rows: list[dict] = []
     unresolved: collections.Counter = collections.Counter()
     for fn in functions:
-        # pad が自分の名前を主機能として持つ行は役割ではない（PA9 の main が PA9）。
+        # **pad 自身の名前は役割ではない。** `PA9` の主機能が `PA9`、`VSS` の
+        # 主機能が `VSS` と書かれるのは、その pad が何であるかを言っているだけ。
+        # pad 名と違う綴りでも同じことが起きる——`PC13-RTC` の主機能は `PC13`、
+        # `OSC_IN` の主機能は `PD0` で、どちらもその pad の GPIO としての名前。
+        # 載せると「PC13 という周辺の PC13 という役割」が索引に生まれる。
         if fn["route"] == "main" and fn["signal"] == fn["pad"]:
+            continue
+        if signal_vocabulary.is_pad_name(fn["signal"]):
             continue
         pair = signal_vocabulary.split(fn["signal"])
         if not pair:
@@ -84,6 +85,20 @@ def main() -> int:
 
     rows.sort(key=lambda r: (r["part_number"], r["peripheral"], r["role"],
                              r["pad"], r["routing"]))
+    return rows, unresolved
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    args = ap.parse_args()
+
+    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
+        catalogue = {r["part_number"]: r for r in csv.DictReader(f)}
+    with (args.out / "pin_functions.csv").open(newline="", encoding="utf-8") as f:
+        functions = list(csv.DictReader(f))
+
+    rows, unresolved = roles(functions, catalogue)
     dest = args.out / "pin_roles.csv"
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)

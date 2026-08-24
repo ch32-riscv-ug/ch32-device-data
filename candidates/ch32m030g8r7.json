@@ -18,16 +18,29 @@
     "GPIO": "17",
     "Pre-drive I/O (MV I/0)": "6",
     "High voltage I/O（HV I/0）": "-",
-    "Timer Advanced-controlTIM1 (16-bit)": "1",
-    "Timer General-purposeTIM2 (16-bit)": "1",
-    "Timer Streamlined TIM3(16-bit)": "1",
+    "Timer Advanced-control TIM1 (16-bit)": "1",
+    "Timer General-purpose TIM2 (16-bit)": "1",
+    "Timer Streamlined TIM3 (16-bit)": "1",
     "Timer WWDG": "1",
-    "Timer System time base(32-bit)": "√",
+    "Timer System time base (32-bit)": "√",
     "ADC": "11",
     "OPA1": "-",
     "OPA2": "1",
     "OPA3": "1",
-    "OPA4": "1"
+    "OPA4": "1",
+    "CMP1": "-",
+    "CMP2": "1",
+    "CMP3": "1",
+    "Current sampling ISP, ISN": "Differential *2",
+    "Signal decoding QII": "1",
+    "Programmable current injection module ISINK": "1",
+    "Source current module ISOURCE": "-",
+    "Communication interface UART": "1",
+    "Communication interface SPI": "-",
+    "Communication interface I2C": "1",
+    "Communication interface PDUSB USBFS": "Host Device",
+    "Communication interface PDUSB USB PD Type-C": "(CC3, CC4)",
+    "Package form": "QSOP28"
   },
   "ordering": {
     "part_number": "CH32M030G8R7",
@@ -706,14 +719,7 @@
         },
         {
           "signal": "XO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-adc-etrgin-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "CMP2_N0",

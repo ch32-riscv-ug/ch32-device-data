@@ -61,6 +61,13 @@ POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
 # by a list of pad names. Types read like P, A, O, I/O, I/O/A, I/O/FT.
 PIN_TYPE = re.compile(r"^[A-Z]{1,3}(?:/[A-Z]{1,3}){0,3}$")
 PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,7}$")
+# **GPIO の名前に役割を継ぎ足した pad 名**。datasheet は `PA0-WKUP` のように
+# その pad の特別な役割を pad 名の一部として書く。8文字までの `PAD_TOKEN` では
+# `PC13-TAMPER-RTC`・`PC14-OSC32_IN`・`PC15-OSC32_OUT` が長すぎて外れ、
+# **9 冊の datasheet でこの 3 pad が丸ごと落ちていた**（103 型番のうち 99 が
+# PC13 を持たない状態だった）。長さで測るのをやめて形で見る——GPIO の名前で
+# 始まり `-` で役割が続く、という形は signal 名には無い。
+PAD_COMPOUND = re.compile(r"^P[A-H]\d{1,2}-[A-Z0-9][A-Z0-9_+-]*$")
 # **括弧は半角とは限らない。** 中文版は全角で（7）と打つ。半角だけを剥がすと
 # SDIO_D0（7）や PD0（4）が signal 名としてそのまま表に出る（46種・364行あった）。
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
@@ -269,11 +276,49 @@ def continues(cells: list[str], pad_col: int, type_col: int,
     Nothing identifies it but its shape: **no pad and no pin type, yet signal
     text and no prose**. A row with neither is a rule or a spacer and carries
     nothing; a row with prose is the heading printed again on the new page.
+
+    lead 番号を全部の封装欄に持つ行は続きではない（`variant_row` を参照）。
+    ここへ来るのは番号を持たないか、番号の**尻尾**しか持たない行——CH32V407 の
+    PB7 は `60(12)` が切れて `2)` だけが次ページに残る。
     """
     if cells[pad_col] or cells[type_col]:
         return False
     carried = [cells[i] for i in signal_cols if i < len(cells) and cells[i]]
     return bool(carried) and not any(PROSE.search(c) or CJK.search(c) for c in carried)
+
+
+# 封装欄が書ける値。番号（脚注が付くことがある）か、「この封装には無い」の `-`。
+# **数で始まるだけでは足りない**——縦書きの見出しが繰り返されると
+# `6TER764V23HC`（`CH32V407RET6` の逆順）のような文字列が同じ欄に入る。
+LEAD_CELL = re.compile(r"-|\d+(?:\s*[（(][\d,、\s]*[)）]?)?")
+
+
+def variant_row(cells: list[str], previous: list[str], pad_col: int) -> bool:
+    """pad 欄が空でも lead 番号を持つ、**同じ pad の別の封装の行**か。
+
+    CH32X035 の PC3 は封装によって既定の多重化機能が違うので、pad 欄を縦に
+    結合して2行に組まれる:
+
+        11 -  4 -  -  -  -  PC3  I/O/A  PC3  C1N0/C2N1/C3N1/A13
+        -  -  -  8  -  4  -  （pad欄は空）    RST/C1N0/C2N1/C3N1/A13
+
+    番号の欄は互いに補い合っていて、どちらの行も自分の封装を持っています。
+    ページ境界で切れた尻尾（CH32V407 の PB7 は `60(12)` の `2)` だけが次ページに
+    残る）と見分けが要る——**自分の行なら全部の封装の欄に何か書いてある**
+    （番号か「この封装には無い」の `-`）。尻尾は書けなかった欄が空のまま残る。
+
+    それだけでは足りません。**pad 欄が縦に結合されているなら、封装は2行に
+    分かれている**はず——同じ封装の欄を両方の行が埋めているなら、pad 欄が空なのは
+    結合ではなく**その行の pad 名を読み落とした**ということです。CH32L103 の
+    PC13/PC14/PC15 がそれで、番号は 2/3/4 と続くのに pad 欄が取れておらず、
+    継ぐと直前の VBAT が 3 つに増えていました。
+    """
+    lead = [cells[i].strip() for i in range(pad_col) if i < len(cells)]
+    if not lead or not all(LEAD_CELL.fullmatch(c) for c in lead):
+        return False
+    above = [previous[i].strip() if i < len(previous) else "" for i in range(pad_col)]
+    return not any(a not in ("", "-") and b not in ("", "-")
+                   for a, b in zip(lead, above))
 
 
 def find_pin_tables(
@@ -324,8 +369,15 @@ def find_pin_tables(
                     continue
                 pad = normalise_pad(cells[pad_col])
                 pin_type = normalise_pad(cells[type_col])
-                if PAD.match(pad) or (PAD_TOKEN.match(pad) and PIN_TYPE.match(pin_type)):
+                if PAD.match(pad) or PAD_COMPOUND.match(pad) or (
+                        PAD_TOKEN.match(pad) and PIN_TYPE.match(pin_type)):
                     cells[pad_col] = pad
+                    rows.append(cells)
+                elif rows and variant_row(cells, rows[-1], pad_col):
+                    # 同じ pad の別の封装の行。結合された pad/型の欄を上から継ぐ。
+                    cells[pad_col] = rows[-1][pad_col]
+                    if not cells[type_col]:
+                        cells[type_col] = rows[-1][type_col]
                     rows.append(cells)
                 elif continues(cells, pad_col, type_col, signal_cols) and rows:
                     # A row split by a page break: the pad and type cells are on
@@ -352,7 +404,12 @@ def find_pin_tables(
 # CH32H417 writes VDD33 as "V" / "DD33" and "Main VDDK" as "Main V" / "DDK".
 # No signal in any of the pin tables is a single letter, so a lone trailing
 # capital is always the head of one of these.
-SUBSCRIPT = re.compile(r"(?:^|\s)[A-Z]$")
+#
+# **語の切れ目は空白だけではない。** 中文版は同じ欄を `主V` と書き、漢字と
+# ラテン文字の間に空白を置かない——`\s` だけを見ていたので中文版だけ
+# `主V`／`DD33` に割れ、`DD33`・`DDIO`・`DDK`・`IO18` が signal として残っていた。
+# 漢字からラテン文字への変わり目も語の始まりとして数える。
+SUBSCRIPT = re.compile(r"(?:^|\s|[\u3040-\u30ff\u4e00-\u9fff])[A-Z]$")
 # 改行が区切りの版で「上の行の続き」になれる形。1〜2文字か、それに経路の
 # 添字が付いたもの（"V_1"）。この版の signal 名はどれも長いので取り違えない。
 STUB = re.compile(r"^[A-Z0-9]{1,2}(?:_\d+)?$")
@@ -629,7 +686,18 @@ def pins_for(
             notes.append(f"列数不足の行を無視: {cells[:pad_col + 2]}")
             continue
         number = normalise_number(cells[index])
-        if number in {"-", ""}:
+        if number == "-":
+            # `-` は「この封装にこの pad は無い」と資料が書いたもの。
+            continue
+        if number == "":
+            # **空欄は「無い」ではない。** その pad は在るが lead 番号を持たない
+            # ——チップの中で別の pad に繋がっているため。CH32M103 の
+            # PA13/PA14 がこれで（中文版 p.25 が PA11/PA12 と内部接続だと書く）、
+            # 落としたので SWDIO/SWCLK が1つも無い series になっていた。
+            # **どう持つかは決まっていない**（worklist の F-24）ので今は落とすが、
+            # 黙って落とさない。
+            notes.append(f"{cells[pad_col]}: lead番号が空欄。pad は在るが番号を"
+                         "持たない（内部で別のpadに接続）ため、この表からは落とした")
             continue
         pad = cells[pad_col]
         pin_type = normalise_pad(cells[type_col])

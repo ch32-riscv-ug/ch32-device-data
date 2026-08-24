@@ -300,15 +300,17 @@ def as_bytes(value: str) -> str:
     return str(int(m.group(1)) * scale)
 
 
-def read_edition(datasheet: Path) -> tuple[dict, dict, dict]:
-    """One edition's products, ordering rows and footnotes, keyed by part number."""
+def read_edition(datasheet: Path) -> tuple[dict, dict, dict, dict]:
+    """One edition's products, ordering rows, footnotes and row groups."""
     found = extract_products.extract(datasheet)[0]
     products = {p["part_number"]: p["attributes"] for p in found}
     # 脚注と、横から流れてきた項目の名前。例外の判定に両方要る。
     footnotes = {p["part_number"]: (p.get("_footnotes") or {},
                                    p.get("_filled") or set()) for p in found}
+    # 見出しの上の段（`Communication interface`）。剥がせるように分けて持つ。
+    groups = {p["part_number"]: (p.get("_groups") or {}) for p in found}
     ordering = {e["part_number"]: e for e in extract_ordering.extract(datasheet)[0]}
-    return products, ordering, footnotes
+    return products, ordering, footnotes, groups
 
 
 def normalise(attributes: dict) -> dict[str, str]:
@@ -454,22 +456,25 @@ def resolve_full_names(parts: set[str], full: set[str]) -> dict[str, list[str]]:
 def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
     en_path = family / "datasheet_en" / datasheet_name
     zh_path = family / "datasheet_zh" / datasheet_name
-    en_products, en_ordering, en_notes = (
-        read_edition(en_path) if en_path.exists() else ({}, {}, {}))
-    zh_products, zh_ordering, zh_notes = (
-        read_edition(zh_path) if zh_path.exists() else ({}, {}, {}))
+    en_products, en_ordering, en_notes, en_groups = (
+        read_edition(en_path) if en_path.exists() else ({}, {}, {}, {}))
+    zh_products, zh_ordering, zh_notes, zh_groups = (
+        read_edition(zh_path) if zh_path.exists() else ({}, {}, {}, {}))
 
     full = set(en_ordering) | set(zh_ordering)
     alias = resolve_full_names(set(en_products) | set(zh_products), full)
     listed_as = {long: short for short, longs in alias.items() for long in longs}
     for short, longs in alias.items():
-        for products, notes in ((en_products, en_notes), (zh_products, zh_notes)):
+        for products, notes, groups in ((en_products, en_notes, en_groups),
+                                        (zh_products, zh_notes, zh_groups)):
             if short in products:
                 attributes = products.pop(short)
                 marks = notes.get(short, {})
+                headings = groups.pop(short, {})
                 for long in longs:
                     products.setdefault(long, dict(attributes))
                     notes.setdefault(long, marks)
+                    groups.setdefault(long, dict(headings))
     # **脚注が名指しした型番からは、横流しされた値を外す。** 比較表は同じ値が
     # 続く列を結合し、外れる型番を脚注で断る（`-40℃～85℃（3）` の注 3 が
     # 「CH32V303RCT7 は -40℃～105℃」）。注文型番が揃ったこの時点で初めて、
@@ -572,6 +577,8 @@ def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
         # The full attribute rows, judged later into product_attributes.csv.
         row["_zh_attrs"] = zh_products.get(part, {})
         row["_en_attrs"] = en_products.get(part, {})
+        row["_zh_groups"] = zh_groups.get(part, {})
+        row["_en_groups"] = en_groups.get(part, {})
         table_leads, table_gpio = pin_table_counts(part)
         # Sizes and lead counts are properties of the package, not the product.
         # The statements made here are stashed and judged once per package name.
@@ -671,7 +678,8 @@ FAMILY_COLUMNS = [
 ]
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
 ERRATA_COLUMNS = ["id", "series", "condition", "description"]
-ATTRIBUTE_COLUMNS = ["part_number", "attribute", "value", "label_zh", "label_en"]
+ATTRIBUTE_COLUMNS = ["part_number", "order", "attribute", "value",
+                     "group_zh", "group_en", "label_zh", "label_en"]
 
 
 def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
@@ -930,6 +938,8 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
     for row in rows:
         zh_attrs = row.pop("_zh_attrs", {}) or {}
         en_attrs = row.pop("_en_attrs", {}) or {}
+        zh_groups = row.pop("_zh_groups", {}) or {}
+        en_groups = row.pop("_en_groups", {}) or {}
         def keep(attrs: dict) -> list[tuple[str, str]]:
             return [(label, str(value).strip())
                     for label, value in attrs.items()
@@ -953,7 +963,7 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
             pairs += [(block.a + k, block.b + k) for k in range(block.size)]
             zi, ei = block.a + block.size, block.b + block.size
         used: set[str] = set()
-        for zh_i, en_i in pairs:
+        for position, (zh_i, en_i) in enumerate(pairs):
             label_zh, value_zh = zh[zh_i] if zh_i is not None else ("", "")
             label_en, value_en = en[en_i] if en_i is not None else ("", "")
             if zh_i is not None and en_i is not None:
@@ -976,14 +986,22 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
             used.add(name)
             out.append({
                 "part_number": row["part_number"],
+                # **資料の行の並び。** 比較表は関連する行を固めて組んでいるので、
+                # 属性名のアルファベット順に並べ替えると読みにくくなる
+                # （worklist の F-23）。
+                "order": position,
                 "attribute": name,
                 "value": translated(
                     display_value(value_en, value_zh, confidence),
                     translations["values"]),
+                # 見出しの上の段。`Communication interface CAN` の
+                # `Communication interface` で、表示側で剥がせるように分けて持つ。
+                "group_zh": zh_groups.get(label_zh, ""),
+                "group_en": en_groups.get(label_en, ""),
                 "label_zh": label_zh, "label_en": label_en,
                 "confidence": confidence, "basis": basis,
             })
-    out.sort(key=lambda r: (r["part_number"], r["attribute"]))
+    out.sort(key=lambda r: (r["part_number"], r["order"]))
     return out
 
 

@@ -39,24 +39,14 @@ TABLES = REPO / "tables"
 MIRRORS = Path("/home/mt/dev_wch")
 PAGES = "https://ch32-riscv-ug.github.io"
 
-# Signal spellings per role, as the datasheets write them. Route "default" only:
-# the point is what the pin does before any remap.
 # **綴りの集合を持たない。** 同じ役割を資料ごとに違う名前で書く
 # （`USART1_TX` / `TX1` / `UTX` / `UART_TX`、`SWDIO` / `DIO`）ので、集合で書くと
 # 必ず取りこぼす——実際 CH32M030 の `UART_TX` が漏れ、pad 名を入れたせいで
-# 2線式SDIの family 全部で SWDIO の列が空だった。綴りを揃える規則は
-# `tools/signal_vocabulary.py` が持っているので、そこへ渡して
-# (peripheral, role) の対で突き合わせる。
+# 2線式SDIの family 全部で SWDIO の列が空だった。綴りを揃えた索引が
+# `tables/pin_roles.csv` にあるので、そこから (peripheral, role) で引く。
 # **UART は instance を決め打たない。** CH32X033 の 20 ピン品は USART1 を既定の
 # route に持たず、既定で出ているのは USART2 と USART4。`USART1` で引くと
-# 「UART が無い」という誤った空欄になるので、**既定に出ている USART を全部**
-# 拾って、どの instance かを添える。
-ROLES = (
-    ("SWDIO", ("SDI", "SWDIO")),
-    ("SWCLK", ("SDI", "SWCLK")),
-    ("UART TX", ("USART*", "TX")),
-    ("UART RX", ("USART*", "RX")),
-)
+# 「UART が無い」という誤った空欄になる。
 USART = re.compile(r"^USART\d+$")
 OSC = {"OSCI", "OSCO", "OSC_IN", "OSC_OUT", "XTAL1", "XTAL2", "OSC32_IN", "OSC32_OUT"}
 
@@ -119,11 +109,15 @@ class Data:
             self.errata = []
         # B4 で足した節が読むもの。無くても頁は組めるようにしておく。
         for name in ("feature_tags", "eval_boards", "memory_map", "sources",
-                     "families"):
+                     "families", "pin_roles"):
             try:
                 setattr(self, name, load(name))
             except FileNotFoundError:
                 setattr(self, name, [])
+
+        self.roles_by_part = collections.defaultdict(list)
+        for r in self.pin_roles:
+            self.roles_by_part[r["part_number"]].append(r)
 
     def family_series(self, family: str) -> list[dict]:
         return [s for s in self.series if s["family"] == family]
@@ -227,11 +221,24 @@ def all_signals(data: Data, part: str) -> dict[str, set[str]]:
 
 
 def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
+    """Quick start の「とりあえずどこに繋ぐか」の表。
+
+    **`tables/pin_roles.csv` から素直に引く。** 綴りを揃えるのはあちらの仕事で、
+    ここで `USART1_TX` / `TX1` / `UTX` / `UART_TX` の4通りを知っている必要は無い
+    ——以前はここが綴りを抱え込み、`UART_TX` を取りこぼして CH32M030 の欄が
+    空になっていた。
+
+    **USART は2つまで。** 資料には8つ持つ series があるが、この表は「基本は
+    SWD と USART1 が分かればよく、USART1 が無いときに他をどこへ繋ぐか」を見る
+    ためのもの。全部並べると読む表ではなくなるので、USART1 を先に、無ければ
+    番号の小さいほうから2つに絞り、残りは Pin definitions に譲る。
+    """
     if not data.family_series(family):
         return []
     out = [f"{level} Debug / serial defaults", "",
-           "| Series | " + " | ".join(name for name, _ in ROLES) + " |",
-           "|---|" + "---|" * len(ROLES)]
+           "| Series | SWDIO | SWCLK | UART TX | UART RX |",
+           "|---|---|---|---|---|"]
+    marked = False
     for s in data.family_series(family):
         products = data.series_products(s["series"])
         if not products:
@@ -239,66 +246,83 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
         # **1型番だけ見ない。** 小さい package にその pad が無いことがあり、
         # CH32V006 の先頭品では USART1 が remap にしか出ない。series の全品を
         # 合わせて「この series のどこに出るか」を答える。
-        fixed: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
-        chosen: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+        default: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+        alternate: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
         for product in products:
-            for fn in data.fns_by_part[product["part_number"]]:
-                pair = signal_vocabulary.split(fn["signal"])
-                if not pair:
-                    continue
-                if USART.match(pair[0]):
-                    # instance を畳んだ鍵にも入れる。どの USART かは pad に添える。
-                    pair = ("USART*", pair[1], pair[0])
-                if fn["route"] in ("default", "main"):
-                    fixed[pair[:2]].add((fn["pad"],) + pair[2:])
-                elif fn["route"].startswith("af-"):
+            for r in data.roles_by_part[product["part_number"]]:
+                key = (r["peripheral"], r["role"])
+                if r["routing"] in ("default", "main"):
+                    default[key].add(r["pad"])
+                elif r["routing"].startswith("af-"):
                     # **AF 方式の family（V205・X315・H41x）に「既定」は無い。**
                     # どの機能もレジスタで選ぶので、`af-7` に出る USART1 は
                     # 「そこへ出せる」であって「そこに出ている」ではない。
-                    # 見せないと UART の欄が空になるが、既定と同じ顔で並べると
-                    # 嘘になるので `AF:` を付けて区別する。
-                    chosen[pair[:2]].add((fn["pad"],) + pair[2:])
-        def render(pads: set[tuple]) -> str:
-            # ("PA2", "USART2") → "PA2 (USART2)"。instance が1つなら添えない。
-            names = {p[1] for p in pads if len(p) > 1}
-            if len(names) <= 1:
-                return ",".join(sorted(p[0] for p in pads))
-            return ", ".join(f"{p[0]} ({p[1]})" for p in sorted(pads))
-        cells = []
-        for _, pair in ROLES:
-            if fixed.get(pair):
-                cells.append(render(fixed[pair]))
-            elif chosen.get(pair):
-                # **AF 方式は数え上げない。** 既定が無いので「どこへでも出せる」
-                # が答で、CH32H417 は 26 pad 並ぶ。Quick start に置くものでは
-                # ないので、答が載っている場所を指す。
-                cells.append(f"AF ({len(chosen[pair])} pads, see Pin definitions)")
+                    alternate[key].add(r["pad"])
+        cells = [",".join(sorted(default.get(("SDI", role), set()), key=pad_key)) or "-"
+                 for role in ("SWDIO", "SWCLK")]
+        for role in ("TX", "RX"):
+            chosen = usart_choice(default, role)
+            if chosen:
+                cells.append("; ".join(
+                    f"{','.join(sorted(pads, key=pad_key))} ({name})"
+                    for name, pads in chosen))
+            elif any(USART.match(p) and r == role for p, r in alternate):
+                # **既定が無いことは空欄ではない。** AF 方式は電源投入時に
+                # どの USART も出ていないので、「無い」ではなく「既定が無い」。
+                cells.append("none by default[^af]")
+                marked = True
             else:
                 cells.append("-")
         out.append(f"| {s['series']} | " + " | ".join(cells) + " |")
-    if any("AF:" in line for line in out):
+    if marked:
         out += ["",
-                "`AF` marks a series with no default routing (CH32V205, "
-                "CH32X3x5, CH32H41x): every function is selected through "
-                "`AFIO->GPIOx_AFLR/AFHR`, so the pads listed are the ones it "
-                "**can** be put on, not where it already is. The reset value of "
-                "`GPIOx_AFLR/AFHR` is 0, which selects AF0 -- a real function, "
-                "not \"none\" -- but a pad only drives it once its GPIO mode is "
-                "set to alternate function."]
+                "[^af]: This series selects every pin function through "
+                "`AFIO->GPIOx_AFLR/AFHR` rather than through AFIO remap, so no "
+                "USART is routed out until software picks one -- the pads it "
+                "**can** go on are listed under Pin definitions. The reset "
+                "value of `GPIOx_AFLR/AFHR` is 0, which selects AF0 (a real "
+                "function, not \"none\"), and a pad only drives its alternate "
+                "function once its GPIO mode is set to alternate."]
     out.append("")
     return out
+
+
+# この表に並べる USART の数。全部は要らない——SWD と USART1 が分かれば足り、
+# USART1 が無いときの逃げ場が1つ見えればよい。
+USART_LIMIT = 2
+
+
+def usart_choice(default: dict[tuple[str, str], set[str]],
+                 role: str) -> list[tuple[str, set[str]]]:
+    """既定経路に出ている USART を、USART1 を先頭に番号順で最大2つ。"""
+    found = {peripheral: pads for (peripheral, r), pads in default.items()
+             if r == role and USART.match(peripheral) and pads}
+
+    def rank(name: str) -> tuple[int, int]:
+        number = int(name[len("USART"):])
+        # USART1 が既定にあるならそれが答。無いときだけ番号の小さい順。
+        return (0 if number == 1 else 1, number)
+
+    return [(name, found[name]) for name in sorted(found, key=rank)[:USART_LIMIT]]
 
 
 def notes_for(pad: str, defaults: dict[str, set[str]],
               everything: dict[str, set[str]]) -> str:
     """pin 表の Notes 欄。debug と UART の pad に印を付ける。
 
-    ROLES と同じく綴りではなく (peripheral, role) で見る——`DIO` と `SWDIO`、
-    `UART_TX` と `TX1` と `USART1_TX` は同じもの。
+    綴りではなく (peripheral, role) で見る——`DIO` と `SWDIO`、`UART_TX` と
+    `TX1` と `USART1_TX` は同じもの。**USART は instance を添える**
+    （`UART TX (USART2)`）——どこに繋ぐかを決めるとき、TX であることと同じだけ
+    どの USART かが要る。
     """
     pairs = {signal_vocabulary.split(name)
              for name in defaults.get(pad, set())} - {None}
-    notes = [role for role, pair in ROLES if pair in pairs]
+    notes = []
+    for peripheral, role in sorted(pairs):
+        if (peripheral, role) in (("SDI", "SWDIO"), ("SDI", "SWCLK")):
+            notes.append(role)
+        elif USART.match(peripheral) and role in ("TX", "RX"):
+            notes.append(f"UART {role} ({peripheral})")
     if everything.get(pad, set()) & OSC:
         notes.append("OSC")
     return ", ".join(notes)
@@ -318,14 +342,38 @@ def comparison_section(data: Data, series: dict) -> list[str]:
     parts = [p["part_number"] for p in products]
     by_part = {p: {} for p in parts}
     labels: dict[str, str] = {}
-    order: list[str] = []
+    leaves: dict[str, str] = {}
+    # **資料が並べた順に出す。** 比較表は関連する行を固めて組んでいるので、
+    # 属性名の順に並べ替えると読みにくい。型番ごとに持つ行が違うので、
+    # 「その属性がいちばん早く出てくる位置」で並べる——後の型番にしか無い行を
+    # 末尾に足していくと、そこだけ資料の並びから外れる（worklist の F-23）。
+    rank: dict[str, int] = {}
+    seen: list[str] = []
     for r in data.attributes:
         if r["part_number"] not in by_part:
             continue
-        by_part[r["part_number"]][r["attribute"]] = r["value"]
-        labels.setdefault(r["attribute"], r["label_en"] or r["label_zh"])
-        if r["attribute"] not in order:
-            order.append(r["attribute"])
+        attribute = r["attribute"]
+        by_part[r["part_number"]][attribute] = r["value"]
+        english = bool(r["label_en"])
+        label = r["label_en"] or r["label_zh"]
+        group = (r.get("group_en") if english else r.get("group_zh")) or ""
+        labels.setdefault(attribute, label)
+        # 群の名前は剥がす。`Communication interface CAN` は表の中では CAN で足りる
+        # ——同じ群の行が並ぶので、全行に同じ接頭辞が付くだけになる（F-20）。
+        leaves.setdefault(attribute,
+                          label[len(group):].strip() if group and
+                          label.startswith(group) else label)
+        # `order` を持たない古い表でも組めるようにする。無ければ出現順が残る。
+        position = int(r.get("order") or 0)
+        rank[attribute] = min(rank.get(attribute, position), position)
+        if attribute not in seen:
+            seen.append(attribute)
+    order = sorted(seen, key=lambda a: (rank[a], seen.index(a)))
+    # 群を剥がすと別の行と同じ名前になることがある（`ADC/ TKey Units` と
+    # `HSADC Units`）。**そのときは剥がさない。**
+    collisions = {leaf for leaf in leaves.values()
+                  if list(leaves.values()).count(leaf) > 1}
+    display = {a: labels[a] if leaves[a] in collisions else leaves[a] for a in leaves}
 
     def head(part: str) -> str:
         pkg = next(p["package"] for p in products if p["part_number"] == part)
@@ -344,7 +392,7 @@ def comparison_section(data: Data, series: dict) -> list[str]:
             out.append(f"| **{title}** | " + " | ".join(values) + " |")
     for attr in order:
         values = [md_escape(by_part[p].get(attr, "-") or "-") for p in parts]
-        label = md_escape(labels.get(attr, attr))
+        label = md_escape(display.get(attr, labels.get(attr, attr)))
         out.append(f"| {label} | " + " | ".join(values) + " |")
     out.append("")
     return out

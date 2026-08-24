@@ -15,9 +15,9 @@
     "Flash (Bytes)": "256K",
     "SRAM (Bytes)": "32K",
     "GPIO port number": "80",
-    "Timer Advanced-controlTIM1 (16-bit)": "1",
-    "Timer General-purposeTIM2/3 (16-bit)": "2",
-    "Timer General-purposeTIM4 (32-bit)": "1",
+    "Timer Advanced-control TIM1 (16-bit)": "1",
+    "Timer General-purpose TIM2/3 (16-bit)": "2",
+    "Timer General-purpose TIM4 (32-bit)": "1",
     "Timer Watchdog": "2(WWDG+IWDG)",
     "Timer SysTick (32-bit)": "√",
     "RTC": "√",
@@ -34,7 +34,7 @@
     "PIOC": "1",
     "PDUSB USBFS": "1",
     "PDUSB USBHS": "1",
-    "PDUSB USB PDType-C": "1",
+    "PDUSB USB PD Type-C": "1",
     "CPU main frequency": "40MHz@Zero-wait; Max: 192MHz@Non-zero wait",
     "Rated voltage": "3.3V",
     "Operating temperature": "Industrial-grade: -40℃~85℃",
@@ -159,6 +159,78 @@
         {
           "signal": "VBAT",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "pad": "PC13-TAMPER-RTC",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC13",
+          "route": "main"
+        },
+        {
+          "signal": "TAMPER",
+          "route": "default"
+        },
+        {
+          "signal": "RTC",
+          "route": "default"
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "af-0",
+          "_alternate_function": 0
+        },
+        {
+          "signal": "I2C2_SCL",
+          "route": "af-7",
+          "_alternate_function": 7
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        },
+        {
+          "signal": "I2C2_SDA",
+          "route": "af-7",
+          "_alternate_function": 7
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "I2C2_SMBA",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },

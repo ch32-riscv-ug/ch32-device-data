@@ -8,6 +8,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
       └ products.csv    103行   注文型番
           └ pins.csv          注文型番ごとのlead↔pad対応（キー: part_number）
           └ pin_functions.csv 注文型番ごとのpad→signal/route（キー: part_number）
+          └ pin_roles.csv     **機能→padの逆引き索引**（pin_functionsを語彙で言い換えたもの）
 
 マスタ表（各表から名前で参照される）
   packages.csv    25行  package。寸法・pitch・lead数
@@ -48,6 +49,8 @@ products.package                                       → packages.package
 series.core / families.cores                           → cores.core
 pins.part_number / pin_functions.part_number           → products.part_number
 product_attributes.part_number                          → products.part_number
+pin_roles.(part_number, pad)                            → pins.(part_number, pad)
+pin_roles.(part_number, pad, routing, signal)           → pin_functions.（同じ4つ組。新しい行は作らない）
 remap_fields.series                                     → series.series
 remap_routes.(series, selector)                         → remap_fields
 clock_configs.family / clock_prescalers.family / clock_sources.family → families.family
@@ -121,6 +124,20 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 ### `product_attributes.csv`
 
 比較表の**全属性を縦持ち**で保持します（列に昇格済みのflash/sram/pin数/GPIO/温度/packageは除く）。両言語はラベルの語が違う（`定时器`↔`Timer`）ため、**正規化した値の並びのLCSで行を対応付け**ます——翻訳は表の行順を保つので、同値同順は同じ行です。対応付いて値が違う行はconflictになります（例: CH32H417WEU6のOPA数はzh=1/en=2で本物の食い違い）。`label_zh`/`label_en`に原文ラベルを残しています。
+
+**`order`は資料の行の並び**です。比較表は関連する行を固めて組んでいるので、属性名のアルファベット順に並べ替えると読みにくくなります。ファイルもこの順で並びます。
+
+**`group_zh`/`group_en`は見出しの上の段**です。比較表の見出し列は2段組みで、`label_*`はそれを繋いだ全体（`Communication interface CAN`）を持ちます。下の段だけが要るとき（表示するとき）に上の段を剥がせるよう、分けて持ちます。剥がすと別の行と同じ名前になることがある（`ADC/TKey Units`と`HSADC Units`）ので、剥がすかどうかは読む側が決めます。`attribute`列（結合キー）は**繋いだ全体から作る**ので、剥がしても衝突しません。
+
+### `pin_roles.csv`
+
+**「USART1のTXはどのpadか」を素直に引くための索引**です。`pin_functions.csv`は資料が綴ったままの`signal`を持ちます——綴りは証拠なのでそれでよいのですが、同じ役割が`USART1_TX` / `TX1` / `UTX` / `UART_TX`と4通りに出るため、読む側が全部を知っていないと引けませんでした。実際にREADMEの生成側がそれを抱え込み、`UART_TX`を取りこぼしてCH32M030の欄が空になり、pad名を条件に混ぜたせいで2線式SDIのfamily全部でSWDIOの欄が空になっていました。
+
+この表は`tools/signal_vocabulary.py`の語彙規則を通した`(peripheral, role)`を持ちます。**新しい事実は足しません**——`pin_functions.csv`の行を言い換えるだけで、語彙で覆えない行は載せません。載せるとしたら語彙か抽出を直すのが筋で、ここで補うと資料に無いものが表に生まれます。`tools/check_tables.py`が「pin_functionsに無い行が入っていないか」と「覆えない綴りが増えていないか」を毎回見ます。
+
+`routing`は`pin_functions.csv`の`route`と同じ（`default` / `main` / `remap-N` / `af-N`）、`signal`は原典の綴りで、そこから層1へ戻れます。
+
+**pad自身の名前は載りません。** `PA9`の主機能が`PA9`、`PC13-RTC`の主機能が`PC13`、`VSS`の主機能が`VSS`と書かれるのは、そのpadが何であるかを言っているだけで役割ではないためです。逆引きに出てこないpadは4269中584で、内訳は電源400・その他136・GPIO 39・アナログ9です。
 
 ### `remap_fields.csv` / `remap_routes.csv`
 
@@ -634,6 +651,7 @@ productsのreference 79件の大半は温度グレード規則単独のtemperatu
 uv run tools/build_all.py                                     # candidates/（family並列。--jobs で本数、既定2）
 uv run tools/build_tables.py --out tables                     # families/series/products/packages/cores/documents
 uv run tools/build_pins.py --out tables                       # pins/pin_functions（数分かかる）
+uv run tools/build_pin_roles.py --out tables                   # pin_roles（pin_functionsを語彙で言い換える）
 uv run tools/build_remap.py --out tables                      # remap_fields/remap_routes（candidates/から）
 uv run tools/build_operating.py                               # operating_conditions（数分かかる）
 uv run tools/build_evt_examples.py                            # evt_examples（EVTツリーと目録から）

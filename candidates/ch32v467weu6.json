@@ -16,7 +16,7 @@
     "Extended PSRAM (Bytes)": "8M",
     "GPIO port number": "54",
     "Timer Advanced-control (16-bit)(1)": "2",
-    "Timer General-purpose(16-bit) (1)": "4",
+    "Timer General-purpose (16-bit) (1)": "4",
     "Timer Basic (16-bit)": "2",
     "Timer Watchdog": "2 (WWDG + IWDG)",
     "Timer SysTick (32-bit)": "Support",
@@ -3983,14 +3983,7 @@
         },
         {
           "signal": "SWCLK",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-ltdc-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "LTDC_B6",
@@ -5165,14 +5158,7 @@
         },
         {
           "signal": "BOOT0",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart10-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "USART10_CK",

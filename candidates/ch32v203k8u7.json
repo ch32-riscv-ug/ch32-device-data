@@ -15,11 +15,11 @@
     "Flash (bytes) (1)": "64K",
     "SRAM (bytes)": "20K",
     "GPIO port count": "31",
-    "Timer Advanced-control(16-bit)": "1",
-    "Timer General-purpose(16-bit)": "3",
-    "Timer General-purpose(32-bit)": "-",
+    "Timer Advanced-control (16-bit)": "1",
+    "Timer General-purpose (16-bit)": "3",
+    "Timer General-purpose (32-bit)": "-",
     "Timer Watchdog": "2 ( WWDG + IWDG )",
-    "Timer SysTick(64-bit)": "Supported",
+    "Timer SysTick (64-bit)": "Supported",
     "RTC": "Supported",
     "ADC/TKey (channel@unitcount)": "10@2",
     "OPA/CMP": "2",
@@ -27,12 +27,12 @@
     "Communication interface SPI": "1",
     "Communication interface I2C": "1",
     "Communication interface CAN": "1",
-    "Communication interface USB(FS) USBD": "1",
-    "Communication interface USB(FS) USBHD": "1",
+    "Communication interface USB (FS) USBD": "1",
+    "Communication interface USB (FS) USBHD": "1",
     "Communication interface Ethernet": "-",
     "CPU clock speed": "Max: 144MHz",
     "Rated voltage": "3.3V",
-    "Operating temperature": "-40℃~105℃",
+    "Operating temperature": "-40℃ ~105℃",
     "Package": "QFN32"
   },
   "ordering": {
@@ -275,6 +275,38 @@
         {
           "signal": "VDD",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
         }
       ]
     },
