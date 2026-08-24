@@ -34,6 +34,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
+  sources.csv              12行  **どの版の原典を読んで生成したか**（mirrorのcommitとその日付）
 ```
 
 結合キーの対応（`tools/check_tables.py` が全参照の結合可能性を機械検査します）:
@@ -55,7 +56,7 @@ clock_configs.condition / clock_sources.condition の macro → evt_variants.(fa
 evt_variants.part_number                                → products.part_number
 memory_configs.part_number                              → products.part_number
 pin_alternate.family                                    → families.family
-interrupts.family / memory_map.family / features.family → families.family
+interrupts.family / memory_map.family / features.family / sources.family → families.family
 features.series                                         → series.series
 interrupts.condition の macro                            → evt_variants.(family, macro)
 pin_functions(route=af-N).part_number+pad               → pin_alternate.family+pad
@@ -64,7 +65,7 @@ evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`tools/build_features.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`tools/build_pins.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`tools/build_operating.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、sources.csvは`tools/build_sources.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`tools/build_features.py`、memory_configs.csvは`tools/build_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
 
 ## 各ファイル
 
@@ -361,6 +362,32 @@ familyを主キーにすると別々の冊子の`1.4.17`が衝突します。
 （CH32V002/V003/V004/V006/V007）と`2-wire SDI Serial Debug Interface`
 （CH32L103・V103・V203・V30x・X035）が節見出しとして立っています。
 
+### `sources.csv`
+
+**どの版の原典を読んで生成したか。** 1行1 family。
+
+このリポジトリは原典を自分の中に持たず、`/home/mt/dev_wch/<FAMILY>/`にある
+**別々のgitリポジトリ（mirror）**のPDFとEVTを読みます。mirrorはGitHub Actionsが
+毎日15:07 UTCにWCHから取り直してcommit/pushするので、**入力が勝手に動きます**。
+版を控えておかないと、生成物の差分の原因が
+
+1. 抽出のコードを変えた
+2. mirrorが更新された
+3. 誰かが再生成を忘れた
+
+のどれなのか区別できません。`tools/build_all.py`は入力とコードが同じなら何度
+回しても差分が出ない（実測済み）ので、**版さえ控えれば差分は1か3に絞れます**。
+
+**生成時刻は入れていません。** 入れると回すたびに行が変わり、「差分が出たら異常」
+という判定そのものが使えなくなります。控えるのはcommit hashと、そのcommit自身が
+持つ日付だけ——どちらも再実行で動きません。
+
+`dirty`はmirrorに未コミットの変更があったという印で、立っている行は
+**commit hashが読んだ中身を説明しません**。`tools/check_tables.py`が落とします。
+
+この表は`tables/`を作り直す一連の実行の中で回します。mirrorを同期した後・生成の
+前後どちらでもよいですが、**生成の途中で同期しないこと**。
+
 ### `errata.csv`
 
 1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
@@ -556,6 +583,7 @@ uv run tools/build_memory.py --out tables                     # memory_configs�
 uv run tools/build_interrupts.py --out tables                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py --out tables                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run tools/build_features.py --out tables                  # features（datasheetの機能説明章から・数分かかる）
+uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py --out tables               # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py --out tables              # link_firmware（WCHの配布物から）
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）

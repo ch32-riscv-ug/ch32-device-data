@@ -85,6 +85,37 @@ def read_zero_wait(pdf, lang: str) -> tuple[int, str] | None:
     return None
 
 
+def unrotate(page, table, rows: list[list[str]]) -> list[list[str]]:
+    """縦書きのセルを読み直す。
+
+    比較表の見出し列は狭いので、長い題は **90度回して**組まれる
+    （CH32V203 の `Communication interface`）。`table.extract()` はその文字を
+    逆順に返すので、そのままだと `ecafretninoitacinummoC` が属性名になる。
+    文字は `upright: False` で確実に見分けられ、しかも `page.chars` を文書順に
+    読めば正しい向きで出る（空白も戻る）ので、そのセルだけ読み直す。
+
+    回った文字が 1 つも無いページでは何もしない——ほとんどのページがそうで、
+    セルごとに文字を走査する費用を払わずに済む。
+    """
+    turned = [c for c in page.chars if not c.get("upright", True)]
+    if not turned:
+        return rows
+    for i, row in enumerate(rows):
+        for j, text in enumerate(row):
+            if not text or i >= len(table.rows) or j >= len(table.rows[i].cells):
+                continue
+            box = table.rows[i].cells[j]
+            if not box:
+                continue
+            x0, top, x1, bottom = box
+            inside = [c for c in turned
+                      if x0 <= (c["x0"] + c["x1"]) / 2 <= x1
+                      and top <= (c["top"] + c["bottom"]) / 2 <= bottom]
+            if inside:
+                rows[i][j] = flatten("".join(c["text"] for c in inside))
+    return rows
+
+
 def flatten(cell: str | None) -> str:
     return (cell or "").replace("\n", "").strip()
 
@@ -214,7 +245,8 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
             notes.append("先頭ページから family 名を読めず、転置表の型番を補完できません")
         for pno, page in enumerate(pdf.pages[:MAX_PAGES], start=1):
             for table in page.find_tables():
-                rows = [[flatten(c) for c in r] for r in table.extract()]
+                rows = unrotate(page, table,
+                                [[flatten(c) for c in r] for r in table.extract()])
                 if not rows or len(rows[0]) < 4:
                     continue
                 found = read_row_layout(rows) or read_column_layout(rows, title)
