@@ -20,6 +20,8 @@
     "Timer General-purpose(16 bits)": "3",
     "Timer General-purpose(32 bits)": "1",
     "Timer Watchdog": "2",
+    "Timer SysTick (64 bits)": "Supported",
+    "RTC": "Supported",
     "ADC/TKey (channel@ unit count)": "16@1",
     "OPA": "2",
     "Communicationinterfaces USART/UART": "4",
@@ -28,6 +30,11 @@
     "Communicationinterfaces CAN": "1",
     "Communicationinterfaces USB(FS) USBD": "1",
     "Communicationinterfaces USB(FS) USBHD": "1",
+    "Communicationinterfaces Ethernet": "10M",
+    "Communicationinterfaces BLE 5.3": "supported",
+    "CPU clock speed": "Max: 144MHz",
+    "Rated voltage": "3.3V",
+    "Operating temperature": "Industrial-grade: -40℃~85℃",
     "Package": "QFN68"
   },
   "ordering": {

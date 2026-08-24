@@ -40,7 +40,8 @@ def main() -> int:
                       "clock_configs", "clock_prescalers", "clock_sources",
                       "clock_symbols", "clock_init", "evt_variants", "systick",
                       "memory_configs", "pin_alternate", "interrupts",
-                      "memory_map", "features", "sources")}
+                      "memory_map", "features", "sources", "eval_boards",
+                      "feature_tags")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -426,6 +427,39 @@ def main() -> int:
                 bad.append(f"memory_configs: {part} の {column} {cell} は "
                            f"{hi - lo + 1}bit だが符号は {needed}bit 要る")
 
+    # 機能の索引。1 series 1 タグで、precision がどちらの読みかを言う。
+    seen_tag: set[tuple[str, str]] = set()
+    for r in t["feature_tags"]:
+        check("feature_tags", r["tag"], r["family"], families, "families")
+        check("feature_tags", r["tag"], r["series"], series, "series")
+        if r["precision"] not in ("part", "datasheet"):
+            bad.append(f"feature_tags: {r['tag']} の precision "
+                       f"{r['precision']!r} が part/datasheet でない")
+        if r["parent"] and r["parent"] not in {x["tag"] for x in t["feature_tags"]}:
+            bad.append(f"feature_tags: {r['tag']} の parent {r['parent']} が"
+                       "タグとして存在しない")
+        key = (r["tag"], r["series"])
+        if key in seen_tag:
+            bad.append(f"feature_tags: {r['tag']} / {r['series']} が重複")
+        seen_tag.add(key)
+
+    # 評価ボード。`parts` は空でもよい（catalogue に無い型番の板が3枚ある）が、
+    # 書いてあるなら products.csv に居ること。同じ板が2行あってはいけない。
+    seen_board: set[tuple[str, str, str]] = set()
+    for r in t["eval_boards"]:
+        check("eval_boards", r["path"], r["family"], families, "families")
+        check("eval_boards", r["path"], r["parts"], products, "products", ";")
+        if r["kind"] not in ("board", "board-variant", "board-manual:en",
+                             "board-manual:zh", "schematic-pdf"):
+            bad.append(f"eval_boards: {r['path']} の kind {r['kind']!r} が想定外")
+        if r["revision"] and not r["revision"].isdigit():
+            bad.append(f"eval_boards: {r['board']} の revision "
+                       f"{r['revision']!r} が数でない")
+        key = (r["family"], r["kind"], r["path"])
+        if key in seen_board:
+            bad.append(f"eval_boards: {r['family']} の {r['path']} が重複")
+        seen_board.add(key)
+
     # 読んだ原典の版。全 family が揃っていないと、生成物の差分の原因を
     # 「入力が変わった」と「再生成を忘れた」に切り分けられない。
     recorded = {r["family"] for r in t["sources"]}
@@ -518,7 +552,12 @@ def main() -> int:
     #
     # `_zh` で終わる列は中文の原文を残すためのもの（`label_zh`・`feature_zh`）。
     # 名前で除くので、同じ役目の列が増えても検査を書き足さずに済む。
+    #
+    # `path` は別の理由で除く。**ファイル名そのもの**で、
+    # `EVT/PUB/CH32V30x评估板说明书.pdf` は中文名で実在する。翻訳したら指す先が
+    # 無くなるので、これは「表示する値」ではなく識別子。
     cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
+    LITERAL = ("path",)
     for name, rows in t.items():
         if not rows:
             continue
@@ -526,7 +565,7 @@ def main() -> int:
         for column in rows[0]:
             if column == "#":
                 break
-            if not column.endswith("_zh"):
+            if not column.endswith("_zh") and column not in LITERAL:
                 columns.append(column)
         for r in rows:
             for column in columns:

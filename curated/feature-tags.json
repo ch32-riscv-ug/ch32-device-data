@@ -1,0 +1,86 @@
+{
+  "_comment": "features.csv の節見出しを『機能から探す』の検索語に揃える規則。見出しの綴りは版とfamilyで揺れるので（General DMA Controller / General-purpose DMA Controller）、括弧内の略語を第一の手がかりにし、括弧が無いものと綴り違いだけをここで決める。**「役に立つ機能か」は判断しない**——機能でないもの（群見出し・CPU）だけexcluded にして、あとは全部タグを付ける。全familyが持つ機能はorg TOP 側で件数を見れば分かる。未登録の見出しが出たら tools/build_feature_tags.py が報告するので、語彙は意図的にだけ増える。",
+  "aliases": {
+    "FPIC": "PFIC",
+    "Tkey": "TKey",
+    "Touchkey": "TKey",
+    "OPA/PGA": "OPA",
+    "USBFS/OTG_FS": "USBFS",
+    "TIM1": "TIM",
+    "TIM2/3/4": "TIM",
+    "MAC+PHY": "ETHERNET",
+    "SerDes": "SERDES",
+    "USB PD": "USB-PD",
+    "SysTick": "SYSTICK",
+    "_comment": "同じものの綴り違い。FPIC/PFIC は資料側の綴り揺れ"
+  },
+  "titles": {
+    "2wiresdiserialdebuginterface": "SDI",
+    "cmp": "CMP",
+    "crccyclicredundancycheckcalculationunit": "CRC",
+    "crccalculationunit": "CRC",
+    "clockandboot": "CLOCK",
+    "clockandstartup": "CLOCK",
+    "dacdigitalanalogconverter": "DAC",
+    "flexiblestaticmemorycontroller": "FSMC",
+    "gatedriver": "GATE-DRIVER",
+    "generaldmacontroller": "DMA",
+    "generalpurposedmacontroller": "DMA",
+    "hsadchighspeedanalogdigitalconverter": "HSADC",
+    "i2cbus": "I2C",
+    "i2saudiointerface": "I2S",
+    "i3cbus": "I3C",
+    "lowpowermode": "LOW-POWER",
+    "opa": "OPA",
+    "opaandcmpcharacteristics": [
+      "OPA",
+      "CMP"
+    ],
+    "onchipextendedpsrammemory": "PSRAM",
+    "onchipmemory": "MEMORY",
+    "onchipmemoryandbootmode": "MEMORY",
+    "powersupplydetector": "PVD",
+    "powersupplymonitor": "PVD",
+    "powersupplysupervisor": "PVD",
+    "powersupplyscheme": "POWER",
+    "programmablecurrentsinkmoduleisinksourcecurrentmoduleisource": [
+      "ISINK",
+      "ISOURCE"
+    ],
+    "protectionandresetcircuit": "RESET",
+    "resetcircuit": "RESET",
+    "qspiinterface": "QSPI",
+    "rtc": "RTC",
+    "rtcandbackupregister": "RTC",
+    "sdiohostcontroller": "SDIO",
+    "sidocontroller": "SIDO",
+    "sidohostdevicecontroller": "SIDO",
+    "systemvoltageregulatorldo": "LDO",
+    "voltageregulator": "LDO",
+    "timer": "TIM",
+    "timerandwatchdog": [
+      "TIM",
+      "WDG"
+    ],
+    "typecandusbpdcontroller": "USB-PD",
+    "usbpdandtypeccontroller": "USB-PD",
+    "_comment": "括弧に略語が無い見出し。キーは小文字化して英数字以外を落としたもの。値が配列なら1つの見出しが2つの機能を指す"
+  },
+  "excluded": {
+    "RISC": "CPU そのもの。core と ISA は cores.csv / series.csv が持つ",
+    "communicationinterface": "群見出し。子の節が個々の周辺を並べる",
+    "_comment": "機能ではないもの。**「役に立たない機能」は入れない**——全familyが持つ機能かどうかは件数で見える"
+  },
+  "parents": {
+    "USBD": "USB",
+    "USBFS": "USB",
+    "USBHS": "USB",
+    "USBSS": "USB",
+    "USB-PD": "USB",
+    "USB": "USB",
+    "IWDG": "WDG",
+    "WWDG": "WDG",
+    "TKey": "ADC",
+    "_comment": "上位のまとめ。『USB が使えるか』で探す人と 『USBHS が要る』人の両方に答える"
+  }
+}

@@ -18,6 +18,9 @@
     "Timer Advanced-controlTIM1 (16-bit)": "1",
     "Timer General-purposeTIM2/3 (16-bit)": "2",
     "Timer General-purposeTIM4 (32-bit)": "1",
+    "Timer Watchdog": "2(WWDG+IWDG)",
+    "Timer SysTick (32-bit)": "√",
+    "RTC": "√",
     "ADC": "16+3",
     "TKEY": "16-channel",
     "OPA": "2",
@@ -32,6 +35,9 @@
     "PDUSB USBFS": "1",
     "PDUSB USBHS": "1",
     "PDUSB USB PDType-C": "1",
+    "CPU main frequency": "40MHz@Zero-wait; Max: 192MHz@Non-zero wait",
+    "Rated voltage": "3.3V",
+    "Operating temperature": "Industrial-grade: -40℃~85℃",
     "Package form": "LQFP100"
   },
   "ordering": {

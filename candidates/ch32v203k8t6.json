@@ -17,6 +17,10 @@
     "GPIO port count": "26",
     "Timer Advanced-control(16-bit)": "1",
     "Timer General-purpose(16-bit)": "3",
+    "Timer General-purpose(32-bit)": "-",
+    "Timer Watchdog": "2 ( WWDG + IWDG )",
+    "Timer SysTick(64-bit)": "Supported",
+    "RTC": "Supported",
     "ADC/TKey (channel@unitcount)": "10@2",
     "OPA/CMP": "2",
     "Communication interface USART/UART": "2",
@@ -25,6 +29,10 @@
     "Communication interface CAN": "1",
     "Communication interface USB(FS) USBD": "1",
     "Communication interface USB(FS) USBHD": "-",
+    "Communication interface Ethernet": "-",
+    "CPU clock speed": "Max: 144MHz",
+    "Rated voltage": "3.3V",
+    "Operating temperature": "-40℃~85℃",
     "Package": "LQFP32"
   },
   "ordering": {

@@ -85,6 +85,23 @@ def read_zero_wait(pdf, lang: str) -> tuple[int, str] | None:
     return None
 
 
+# 比較表の下に並ぶ脚注。`3.CH32V303RCT7芯片支持的工作温度范围为：-40℃～105℃。`
+# 全角ピリオドもある。番号だけ拾えばよく、本文の型番は PART_NUMBER で見る。
+FOOTNOTE_LINE = re.compile(r"^\s*(?P<number>\d{1,2})\s*[.．、]\s*(?P<text>\S.*)$")
+# 値に付く脚注の印。`-40℃～85℃（3）`
+FOOTNOTE_MARK = re.compile(r"[（(](\d{1,2})[)）]")
+
+
+def read_footnotes(page) -> dict[str, str]:
+    """{脚注番号: 本文}。表の下に並ぶ注記。"""
+    out: dict[str, str] = {}
+    for line in (page.extract_text() or "").splitlines():
+        found = FOOTNOTE_LINE.match(line.strip())
+        if found:
+            out.setdefault(found.group("number"), found.group("text"))
+    return out
+
+
 def unrotate(page, table, rows: list[list[str]]) -> list[list[str]]:
     """縦書きのセルを読み直す。
 
@@ -155,7 +172,26 @@ def read_row_layout(rows: list[list[str]]) -> list[dict] | None:
     return products
 
 
-def read_column_layout(rows: list[list[str]], default_family: str) -> list[dict] | None:
+def excepted(value: str, part: str, footnotes: dict[str, str]) -> bool:
+    """この値に付く脚注が、この型番を名指しで別扱いしているか。
+
+    比較表は同じ値が続く列を結合し、そこから外れる型番を脚注で断る。値を
+    そのまま横へ及ぼすと、名指しされた型番だけ嘘になる（CH32V303RCT7 は
+    表の -40〜85℃ ではなく脚注の -40〜105℃）。
+
+    **注文型番が揃ってからでないと判定できない。** 比較表の列見出しは
+    `CH32V303RC` のような略記で、RCT6 と RCT7 の両方を兼ねる。脚注が名指しする
+    のは RCT7 だけなので、略記のまま突き合わせると RCT6 まで落ちる。呼ぶのは
+    略記を展開したあと（`build_tables` の alias 展開の後）。
+    """
+    if not part:
+        return False
+    return any(part in footnotes.get(number, "").replace(" ", "")
+               for number in FOOTNOTE_MARK.findall(value))
+
+
+def read_column_layout(rows: list[list[str]], default_family: str,
+                       footnotes: dict[str, str] | None = None) -> list[dict] | None:
     """One column per model, attributes down the rows."""
     def sku_cells(row: list[str], pattern: re.Pattern) -> int:
         # A bare family name spans a group of columns; it names the group, not a model.
@@ -220,11 +256,33 @@ def read_column_layout(rows: list[list[str]], default_family: str) -> list[dict]
         label = " ".join(part for part in carried if part).strip()
         if not label:
             continue
-        for col, product in products.items():
-            if col < len(row):
-                value = flatten(row[col])
-                if value:
-                    product["attributes"][label] = value
+        # **値の空欄は「左と同じ」。** 比較表は同じ値が続く列を横に結合するので、
+        # 空いたセルは隣の型番と同じことを言っている。CH32V30x の Ethernet 行は
+        #
+        #     Ethernet | - | | | | | | | | 1G MAC+10M PHY | | |
+        #                V303CB ────────→   V307RC ─────────────→
+        #
+        # で、`-`（無い）が V303/V305 の 8 型番に、`1G MAC+10M PHY` が V307 の
+        # 3 型番に及ぶ。埋めないと **値を持つ 1 型番にしか属性が付かない**——
+        # CH32V307RCT6 は Ethernet を持ち VCT6 は持たない、という形になっていた。
+        #
+        # 「空欄＝無い」ではない。**無いことは `-` と書かれる**ので取り違えない。
+        # この読み方は独立した出所で検算できる——同じ表の封装形式の行は
+        # V303RC が空欄で、左から埋めると LQFP64M になり、注文型番表から作った
+        # `products.csv` の CH32V303RCT6 = LQFP64M と一致する。
+        carry = ""
+        for col in sorted(products):
+            value = flatten(row[col]) if col < len(row) else ""
+            if value:
+                carry = value
+            if not carry:
+                continue
+            products[col]["attributes"][label] = carry
+            if not value:
+                # **自分の欄が空で、左から流れてきた値**という印。脚注の例外は
+                # これにだけ効かせる——その型番の欄に書いてある値なら、脚注が
+                # 名指ししていても資料がそう書いたということなので落とせない。
+                products[col].setdefault("_filled", set()).add(label)
     return list(products.values())
 
 
@@ -249,7 +307,13 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                                 [[flatten(c) for c in r] for r in table.extract()])
                 if not rows or len(rows[0]) < 4:
                     continue
-                found = read_row_layout(rows) or read_column_layout(rows, title)
+                notes_here = read_footnotes(page)
+                found = (read_row_layout(rows)
+                         or read_column_layout(rows, title, notes_here))
+                for product in found or ():
+                    # 脚注は値の横流しの例外を決めるが、判定は注文型番が
+                    # 揃ってからでないとできない（excepted の説明）。持ち回す。
+                    product["_footnotes"] = dict(notes_here)
                 if not found:
                     continue
                 layout = "row" if read_row_layout(rows) else "column"
@@ -257,9 +321,16 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                     key = product["part_number"]
                     if key in seen:
                         # Continuation page: merge the further attributes in.
+                        # **脚注も足す。** 比較表は複数ページに渡り、注記は
+                        # 最後のページの下にある。最初のページのぶんだけ持って
+                        # いると、`（3）` が指す注が手元に無いことになる。
                         for existing in products:
                             if existing["part_number"] == key:
                                 existing["attributes"].update(product["attributes"])
+                                existing.setdefault("_footnotes", {}).update(
+                                    product.get("_footnotes") or {})
+                                existing.setdefault("_filled", set()).update(
+                                    product.get("_filled") or set())
                         continue
                     seen.add(key)
                     product["_source"] = {"page": pno, "layout": layout}
