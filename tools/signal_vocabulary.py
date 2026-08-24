@@ -161,7 +161,22 @@ SYSTEM = {
     # `ETH_LED_EN` で有効になると書いていて、持ち主が ETH だと分かる。
     "LED0": ("ETH", "LED0"),
     "LED1": ("ETH", "LED1"),
+    # PC13 が持つ RTC の2つの端子。改竄検知の入力と RTC の出力。
+    "TAMPER": ("RTC", "TAMPER"),
+    "RTC": ("RTC", "OUT"),
 }
+
+# **1つの綴りが2つの役割を名指しすることがある。** PC13 は改竄検知の入力と
+# RTC の出力を兼ねていて、CH32L103 の pin 表は `TAMPER` と `RTC` を改行で分けて
+# 書くのに、CH32V103/V20x/V30x/V4x7 は `TAMPER-RTC` と1語で書く。同じ silicon の
+# 同じ pad なので、綴りが違うだけで指しているものは同じ。
+COMPOUND = {
+    "TAMPER-RTC": (("RTC", "TAMPER"), ("RTC", "OUT")),
+}
+
+# 役割ではない綴り。`NC` は「どこにも繋がっていない」という pad についての
+# 断り書きで、周辺の機能ではない。
+NOT_A_ROLE = frozenset({"NC"})
 # Type-C の構成チャネル。比較表が `PDUSB USBPD Type-C` の行で数える周辺。
 # CH32M030 は同じ端子を `CC1(CC1R)` と書く——括弧の中は「Rd を内蔵した側の
 # 呼び名」で（datasheet p.16「PA0/CC1R and PA1/CC2R pins have built-in
@@ -274,6 +289,21 @@ def split(signal: str) -> tuple[str, str] | None:
     if m:
         return canonical_peripheral("ADC"), f"S{m.group('n')}"
     return None
+
+
+def roles(signal: str) -> list[tuple[str, str]]:
+    """この綴りが名指す (peripheral, role) の全部。規則が当たらなければ空。
+
+    ほとんどは1つだが、`TAMPER-RTC` のように資料が2つを1語で書くことがある
+    （`COMPOUND`）。索引はそのどちらでも引けるべきなので、両方返す。
+    """
+    if signal in NOT_A_ROLE or is_pad_name(signal):
+        return []
+    compound = COMPOUND.get(signal)
+    if compound:
+        return list(compound)
+    pair = split(signal)
+    return [pair] if pair else []
 
 
 def canonical(signal: str) -> str | None:

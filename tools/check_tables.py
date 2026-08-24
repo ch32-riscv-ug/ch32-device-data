@@ -35,18 +35,15 @@ def load(tables: Path, name: str) -> list[dict]:
 #                          決めていない（worklist の F-8）。資料側なので埋まらない
 #   HO* / LO* / IS* / QII  CH32M030 のモータ駆動。比較表が
 #                          `Source current module ISOURCE` のように群を名乗る
-#   ADCS0-2 / RTC / SWIM   資料に対応の記述が見つかっていない
-#   LED0 / LED1            CH32V407。Ethernet の LED と思われるが未確認
+#   SWIM                   CH32M030 PA3。資料に対応の記述が見つかっていない
 KNOWN_ROLE_GAPS = {
     "AETR": 6, "AETR2": 8, "TIETR": 4,
-    "LED0": 8, "LED1": 8, "RTC": 5, "SWIM": 5,
-    "ADCS0": 4, "ADCS1": 4, "ADCS2": 4,
     "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 4,
     "LO0": 5, "LO1": 5, "LO2": 4, "LO3": 3,
     "ISINK1": 4, "ISINK2": 5, "ISOURCE1": 4, "ISOURCE2": 3,
     "ISN1": 5, "ISN2": 4, "ISP2": 5,
     "QII1": 3, "QII2": 5,
-    "CC1(CC1R)": 4, "CC2(CC2R)": 4,
+    "SWIM": 5,
 }
 
 

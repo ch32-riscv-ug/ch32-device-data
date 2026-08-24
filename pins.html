@@ -229,6 +229,16 @@ function matrixHTML(partNames, withPins) {
 }
 
 // ---- Series view: the in-repository selector. -------------------------------
+// A heading still names something once the row-group prefix is gone if it holds
+// an acronym or a number ("CAN", "Basic (16-bit)"). A plain English word does
+// not -- "Unit" needs its "ADC/TKey", "Voltage" its "3-phase gate drive".
+const NAMES_ITSELF = /[A-Z]{2,}|\d/;
+const leafOf = (label, group) => {
+  if (!group || !label.startsWith(group)) return label;
+  const leaf = label.slice(group.length).trim();
+  return leaf && NAMES_ITSELF.test(leaf) ? leaf : label;
+};
+
 function comparisonHTML(parts) {
   const names = parts.map(p => p.part_number);
   const byPart = Object.fromEntries(names.map(n => [n, {}]));
@@ -242,12 +252,10 @@ function comparisonHTML(parts) {
   for (const r of state.attrs) {
     if (!(r.part_number in byPart)) continue;
     byPart[r.part_number][r.attribute] = r.value;
-    const english = !!r.label_en;
-    const label = r.label_en || r.label_zh || r.attribute;
-    const group = (english ? r.group_en : r.group_zh) || "";
+    const label = r.label || r.label_en || r.label_zh || r.attribute;
+    const group = r.group || "";
     labels[r.attribute] ??= label;
-    leaves[r.attribute] ??=
-      group && label.startsWith(group) ? label.slice(group.length).trim() : label;
+    leaves[r.attribute] ??= leafOf(label, group);
     const position = parseInt(r.order || "0", 10) || 0;
     rank[r.attribute] = Math.min(rank[r.attribute] ?? position, position);
     if (!seen.includes(r.attribute)) seen.push(r.attribute);
