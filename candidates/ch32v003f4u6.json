@@ -53,6 +53,24 @@
       "reset_value": 0
     },
     {
+      "id": "afio-adc1-etrgreg-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ADC1_ETRGREG_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 18
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
+    },
+    {
       "id": "afio-i2c1-remap",
       "controller": "afio",
       "register": "PCFR1",
@@ -180,14 +198,7 @@
         },
         {
           "signal": "NRST",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "T2CH4",
@@ -201,14 +212,7 @@
         },
         {
           "signal": "OPP1",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "UCK",
@@ -267,25 +271,11 @@
         },
         {
           "signal": "A1",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "OPN0",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "OSCI",
@@ -327,25 +317,11 @@
         },
         {
           "signal": "A0",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "OPP0",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "OSCO",
@@ -411,14 +387,7 @@
         },
         {
           "signal": "OPN1",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "SDA",
@@ -813,25 +782,11 @@
         },
         {
           "signal": "MCO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "A2",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "T1CH2N",
@@ -1261,14 +1216,7 @@
         },
         {
           "signal": "A3",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "T2CH3",
@@ -1317,7 +1265,14 @@
         },
         {
           "signal": "A4",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc1-etrgreg-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "T2CH2",
@@ -1453,14 +1408,7 @@
         },
         {
           "signal": "A5",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "T2CH4",
@@ -1508,14 +1456,7 @@
         },
         {
           "signal": "A6",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "T2CH3",

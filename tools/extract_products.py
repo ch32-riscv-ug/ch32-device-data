@@ -137,6 +137,149 @@ def flatten(cell: str | None) -> str:
     return (cell or "").replace("\n", "").strip()
 
 
+# 行を分ける縦の隙間。上付きの脚注番号（`Built-in Rd(1)` の `(1)`）は
+# 2〜3pt 持ち上がるだけなので、これより小さい差は同じ行とみなす。
+LINE_GAP = 4.0
+# 行末がこれなら折り返しは語の途中。空白が残っていても切れ目ではない。
+CONNECTORS = "-+/(_&"
+
+
+def spaced(previous: str, piece: str) -> bool:
+    """折り返しの前後を空白で継ぐか。
+
+    行末に空白が残っていれば語の切れ目。ただし**漢字どうしの境目には入れない**
+    ——中文は語を空白で区切らないので、`通用，`と`引脚兼容`の間の空白は
+    版面の詰めであって語の切れ目ではない。
+    """
+    if previous == previous.rstrip():
+        return False
+    head, tail = previous.rstrip()[-1:], piece.strip()[:1]
+    # 語を繋ぐ記号で終わっているなら、そこは語の切れ目ではない。
+    # `General-`＋`purpose`・`MAC+`＋`10/100M PHY` は詰めて継ぐのが資料の綴り。
+    if head in CONNECTORS:
+        return False
+    return head.isascii() or tail.isascii()
+
+
+def dewrap(page, table, raw: list[list]) -> list[list[str]]:
+    """セル内の折り返しを継ぐ。**空白が落ちたのか元から無いのかは版面が知っている。**
+
+    `table.extract()` は行末の空白を落として改行だけを残すので、そこから先は
+    文字列を見ても決まらない——`Low-power`＋`timer` は空白で折り返した所、
+    `General-purp`＋`ose` は語の途中。改行を空文字で繋いでいたため
+    `Communicationinterfaces`・`MAC+10/100MPHY`・`Low-powertimer` のように
+    語が癒着していた（worklist の F-22）。
+
+    **文字の層には行末の空白が残っている。** 折り返しが空白の位置で起きたなら
+    その行の最後の文字は空白そのもので、語の途中で折れたなら空白は無い。
+    推測ではなく資料が書いたとおりに継げる。
+
+    行の切り分けだけ注意が要る。上付きの脚注番号は `top` が 2〜3pt ずれるので、
+    厳密に揃えて分けると `Built-in Rd(1)` が3行に割れる。隙間で分ける。
+    """
+    wrapped = [(i, j) for i, row in enumerate(raw)
+               for j, cell in enumerate(row) if cell and "\n" in cell]
+    rows = [[flatten(c) for c in r] for r in raw]
+    if not wrapped:
+        return rows
+    chars = page.chars
+    for i, j in wrapped:
+        if i >= len(table.rows) or j >= len(table.rows[i].cells):
+            continue
+        box = table.rows[i].cells[j]
+        if not box:
+            continue
+        x0, top, x1, bottom = box
+        inside = [c for c in chars
+                  if x0 <= (c["x0"] + c["x1"]) / 2 <= x1
+                  and top <= (c["top"] + c["bottom"]) / 2 <= bottom]
+        if not inside:
+            continue
+        lines: list[list] = []
+        for char in sorted(inside, key=lambda c: (c["top"], c["x0"])):
+            if lines and char["top"] - lines[-1][0]["top"] <= LINE_GAP:
+                lines[-1].append(char)
+            else:
+                lines.append([char])
+        pieces = ["".join(c["text"] for c in sorted(line, key=lambda c: c["x0"]))
+                  for line in lines]
+        pieces = [p for p in pieces if p.strip()]
+        if len(pieces) < 2:
+            continue
+        # 行末の空白が「ここは語の切れ目」と言っている。**継いだ後では消えて
+        # しまう**ので、継ぐ前の行そのものを見る。
+        text = pieces[0].strip()
+        for previous, piece in zip(pieces, pieces[1:]):
+            text += (" " if spaced(previous, piece) else "") + piece.strip()
+        rows[i][j] = text.strip()
+    return rows
+
+
+# 継続ページの列を前の表に結び付けるときの許容差（pt）。同じ表の続きなら
+# 罫線そのものなので 1pt も動かないが、PDF の丸めぶんだけ見る。
+COLUMN_TOLERANCE = 3.0
+
+
+def column_spans(table) -> list[tuple[float, float] | None]:
+    """列ごとの x 範囲。結合セルは広いので、その列で**最も狭い**セルを採る。"""
+    width = max(len(row.cells) for row in table.rows)
+    spans: list[tuple[float, float] | None] = []
+    for col in range(width):
+        boxes = [row.cells[col] for row in table.rows
+                 if col < len(row.cells) and row.cells[col]]
+        spans.append(min(((b[0], b[2]) for b in boxes), key=lambda s: s[1] - s[0])
+                     if boxes else None)
+    return spans
+
+
+def continued_columns(spans, carry: dict) -> dict[int, str] | None:
+    """見出しの無い継続ページで、列と型番の対応を前の表から引き継ぐ。
+
+    **列番号では合わない。** CH32L103 の英語版は継続ページで見出し列が2段に
+    割れ、9列の表が10列になる。罫線の x 範囲は同じ表の続きである限り動かない
+    ので、そちらで結ぶ。全部の列が1つずつに当たらなければ**別の表**とみなす
+    ——たまたま隣り合っただけの表を比較表の続きとして読むほうが害が大きい。
+    """
+    previous = carry.get("columns")
+    if not previous or not spans:
+        return None
+    found: dict[int, str] = {}
+    for (x0, x1), part in previous:
+        hits = [j for j, span in enumerate(spans)
+                if span and abs(span[0] - x0) <= COLUMN_TOLERANCE
+                and abs(span[1] - x1) <= COLUMN_TOLERANCE]
+        if len(hits) != 1 or hits[0] in found:
+            return None
+        found[hits[0]] = part
+    # 見出し列が1つも残らない表は比較表ではない。
+    return found if len(found) == len(previous) and min(found) >= 1 else None
+
+
+def join_wrap(head: str, tail: str) -> str:
+    """ページ境界で切れた文字列を継ぐ。
+
+    折り返しの起きた場所が空白かどうかは版面が決めるので復元できないが、
+    **欧文は空白でしか折り返せない**（CH32H417 の `USBHS (USB` ＋ `2.0)`）。
+    漢字は任意の位置で折り返すので詰めて継ぐ。
+    """
+    if not head:
+        return tail
+    if head[-1].isascii() and tail[:1].isascii():
+        return f"{head} {tail}"
+    return head + tail
+
+
+def identifier(cell: str | None) -> str:
+    """型番・family 名として読むときの綴り。**空白は落とす。**
+
+    `dewrap` は折り返しを資料の書いたとおりに継ぐので、版面の都合で
+    `CH32V103`＋`C6T6` の間に空白が残っていれば `CH32V103 C6T6` になる。
+    ラベルや値としてはそれが正しいが、**型番に空白は入らない**ので、
+    識別子として突き合わせるときだけ詰める。
+    """
+    return re.sub(r"\s+", "", flatten(cell))
+
+
 def fill_across(row: list[str]) -> list[str]:
     """Carry a value rightwards over the blank cells it spans."""
     out, last = [], ""
@@ -148,26 +291,32 @@ def fill_across(row: list[str]) -> list[str]:
 
 def read_row_layout(rows: list[list[str]]) -> list[dict] | None:
     """One row per model, labels merged from the header rows above."""
-    first = next((i for i, r in enumerate(rows) if r and MODEL.match(r[0])), None)
-    if first is None or sum(1 for r in rows[first:] if r and MODEL.match(r[0])) < 2:
+    first = next((i for i, r in enumerate(rows)
+                  if r and MODEL.match(identifier(r[0]))), None)
+    if first is None or sum(1 for r in rows[first:]
+                            if r and MODEL.match(identifier(r[0]))) < 2:
         return None
     width = max(len(r) for r in rows)
-    labels = [
-        " ".join(rows[j][c] for j in range(first) if c < len(rows[j]) and rows[j][c]).strip()
-        or f"col{c}"
-        for c in range(width)
-    ]
+    # 見出しは縦に何段か重なる。**最後の段が見出しそのもので、その上は群の名前。**
+    # 繋いだ文字列だけを持つと `Communication interface CAN` の
+    # `Communication interface` を後から剥がせない（worklist の F-20）。
+    stacks = [[rows[j][c] for j in range(first) if c < len(rows[j]) and rows[j][c]]
+              for c in range(width)]
+    labels = [" ".join(stack).strip() or f"col{c}" for c, stack in enumerate(stacks)]
+    groups = [" ".join(stack[:-1]).strip() for stack in stacks]
     products: list[dict] = []
     carried: list[str] = [""] * width
     for row in rows[first:]:
-        if not row or not MODEL.match(row[0]):
+        if not row or not MODEL.match(identifier(row[0])):
             continue
         padded = list(row) + [""] * (width - len(row))
         # A blank cell repeats the model above it, which is how merged cells read.
         values = [cell or carried[i] for i, cell in enumerate(padded)]
         carried = values
         products.append(
-            {"part_number": values[0], "attributes": dict(zip(labels[1:], values[1:]))}
+            {"part_number": identifier(values[0]),
+             "attributes": dict(zip(labels[1:], values[1:])),
+             "_groups": dict(zip(labels[1:], groups[1:]))}
         )
     return products
 
@@ -191,23 +340,33 @@ def excepted(value: str, part: str, footnotes: dict[str, str]) -> bool:
 
 
 def read_column_layout(rows: list[list[str]], default_family: str,
-                       footnotes: dict[str, str] | None = None) -> list[dict] | None:
-    """One column per model, attributes down the rows."""
+                       footnotes: dict[str, str] | None = None,
+                       spans: list | None = None,
+                       carry: dict | None = None) -> list[dict] | None:
+    """One column per model, attributes down the rows.
+
+    `carry` は**同じ比較表の前のページ**から持ち越す状態。ページを跨いだ表を
+    `pdfplumber` は別々の表として返すので、これが無いと継続ページは
+    (a) 見出し行が無ければ列と型番の対応が付かず丸ごと落ち、
+    (b) 折り返しの尻尾が親を失い、
+    (c) 行グループの見出しが引き継がれない（F-19）。
+    """
     def sku_cells(row: list[str], pattern: re.Pattern) -> int:
         # A bare family name spans a group of columns; it names the group, not a model.
         return sum(
             1
-            for n in (flatten(c) for c in row[1:])
+            for n in (identifier(c) for c in row[1:])
             if pattern.match(n) or (MODEL.match(n) and not FAMILY.match(n))
         )
 
     def family_row(upto: int) -> list[str] | None:
         for row in rows[:upto]:
-            if sum(1 for c in row if FAMILY.match(flatten(c))) >= 1:
-                filled = fill_across([flatten(c) for c in row])
+            if sum(1 for c in row if FAMILY.match(identifier(c))) >= 1:
+                filled = fill_across([identifier(c) for c in row])
                 return [f if FAMILY.match(f) else default_family for f in filled]
         return None
 
+    carry = {} if carry is None else carry
     header = None
     for i, row in enumerate(rows[:3]):
         # The loose shape is only trustworthy when a family name heads the group.
@@ -215,20 +374,25 @@ def read_column_layout(rows: list[list[str]], default_family: str,
         if loose_ok or sku_cells(row, PLAIN_SUFFIX) >= 2:
             header = i
             break
+
     if header is None:
-        return None
-
-    families = (family_row(header) or []) + [default_family] * len(rows[header])
-
-    columns: dict[int, str] = {}
-    for col, name in enumerate(rows[header]):
-        name = flatten(name)
-        if MODEL.match(name):
-            columns[col] = name
-        elif SUFFIX.match(name):
-            columns[col] = families[col] + name if col < len(families) else name
-    if len(columns) < 2:
-        return None
+        # 見出しを繰り返さない継続ページ。列は罫線の x 範囲で引き継ぐ。
+        columns = continued_columns(spans, carry)
+        if not columns:
+            return None
+        start = 0
+    else:
+        families = (family_row(header) or []) + [default_family] * len(rows[header])
+        columns = {}
+        for col, name in enumerate(rows[header]):
+            name = identifier(name)
+            if MODEL.match(name):
+                columns[col] = name
+            elif SUFFIX.match(name):
+                columns[col] = families[col] + name if col < len(families) else name
+        if len(columns) < 2:
+            return None
+        start = header + 1
 
     products = {col: {"part_number": pn, "attributes": {}} for col, pn in columns.items()}
     # **見出しは1列とは限らない。** 型番の列より左にある列は全部見出しで、
@@ -242,20 +406,54 @@ def read_column_layout(rows: list[list[str]], default_family: str,
     # SRAM が 896KB のうち 128KB になっていた（worklist の F-15）。
     depth = min(columns)
     carried = [""] * depth
-    for row in rows[header + 1:]:
+    # **同じ比較表の続きなら、見出しの段は前のページから続いている。**
+    # 型番の並びが前の表と同じであることを条件にする（見出しを繰り返す
+    # 継続ページはここを通る——CH32H417 の英語版がそれで、繰り返すのは
+    # 型番の行だけ、行グループの `PDUSB` は繰り返さない）。
+    continuation = list(columns.values()) == carry.get("parts")
+    last_label = ""
+    if continuation:
+        for level, text in enumerate(carry.get("labels") or []):
+            if level < depth:
+                carried[level] = text
+        last_label = carry.get("last_label", "")
+
+    for row in rows[start:]:
         if not row:
             continue
-        for level in range(depth):
-            cell = flatten(row[level]) if level < len(row) else ""
+        cells = [flatten(row[level]) if level < len(row) else ""
+                 for level in range(depth)]
+        values = [flatten(row[col]) if col < len(row) else ""
+                  for col in sorted(products)]
+        # **値を1つも持たない行は属性行ではない。** 転置レイアウトでは属性は
+        # 必ずどれかの型番の欄に値を持つ。値が空で見出しだけある行は、
+        # ページ境界で切れたセルの尻尾（F-19b）——CH32H417 の
+        # `USBHS (USB` に続く `2.0)` がこれで、前のラベルに継ぐのが正しい。
+        if any(cells) and not any(values):
+            if not last_label:
+                continue
+            for level, cell in enumerate(cells):
+                if cell:
+                    carried[level] = join_wrap(carried[level], cell)
+            joined = " ".join(part for part in carried if part).strip()
+            if joined != last_label:
+                carry.setdefault("renames", []).append((last_label, joined))
+                last_label = joined
+            continue
+        for level, cell in enumerate(cells):
             if cell:
                 carried[level] = cell
                 # 上の段が変わったら下の段は無効。そうしないと見出しが1段だけの
                 # 行（GPIO端口数）に、前のグループの子見出しが付いて回る。
                 for lower in range(level + 1, depth):
                     carried[lower] = ""
-        label = " ".join(part for part in carried if part).strip()
+        stack = [part for part in carried if part]
+        label = " ".join(stack).strip()
         if not label:
             continue
+        # 最後の段が見出しそのもの。その上は群の名前で、剥がせるように分けて持つ。
+        group = " ".join(stack[:-1]).strip()
+        last_label = label
         # **値の空欄は「左と同じ」。** 比較表は同じ値が続く列を横に結合するので、
         # 空いたセルは隣の型番と同じことを言っている。CH32V30x の Ethernet 行は
         #
@@ -270,19 +468,27 @@ def read_column_layout(rows: list[list[str]], default_family: str,
         # この読み方は独立した出所で検算できる——同じ表の封装形式の行は
         # V303RC が空欄で、左から埋めると LQFP64M になり、注文型番表から作った
         # `products.csv` の CH32V303RCT6 = LQFP64M と一致する。
-        carry = ""
-        for col in sorted(products):
-            value = flatten(row[col]) if col < len(row) else ""
+        spread = ""
+        for col, value in zip(sorted(products), values):
             if value:
-                carry = value
-            if not carry:
+                spread = value
+            if not spread:
                 continue
-            products[col]["attributes"][label] = carry
+            products[col]["attributes"][label] = spread
+            products[col].setdefault("_groups", {})[label] = group
             if not value:
                 # **自分の欄が空で、左から流れてきた値**という印。脚注の例外は
                 # これにだけ効かせる——その型番の欄に書いてある値なら、脚注が
                 # 名指ししていても資料がそう書いたということなので落とせない。
                 products[col].setdefault("_filled", set()).add(label)
+
+    # 次の表が続きだったときに渡す状態。
+    carry["parts"] = list(columns.values())
+    carry["labels"] = list(carried)
+    carry["last_label"] = last_label
+    if spans:
+        carry["columns"] = [(spans[col], part) for col, part in sorted(columns.items())
+                            if col < len(spans) and spans[col]]
     return list(products.values())
 
 
@@ -301,22 +507,43 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                 break
         if not title:
             notes.append("先頭ページから family 名を読めず、転置表の型番を補完できません")
+        # 比較表はページを跨ぐ。`pdfplumber` はページごとに別の表として返すので、
+        # 前の表の状態をここで持ち回る（F-19）。**隣り合うページの間だけ**——
+        # 間に別の内容が挟まったらもう続きではない。
+        carry: dict = {}
         for pno, page in enumerate(pdf.pages[:MAX_PAGES], start=1):
+            if carry and pno > carry.get("page", 0) + 1:
+                carry = {}
             for table in page.find_tables():
-                rows = unrotate(page, table,
-                                [[flatten(c) for c in r] for r in table.extract()])
+                rows = unrotate(page, table, dewrap(page, table, table.extract()))
                 if not rows or len(rows[0]) < 4:
                     continue
                 notes_here = read_footnotes(page)
-                found = (read_row_layout(rows)
-                         or read_column_layout(rows, title, notes_here))
+                found = read_row_layout(rows)
+                layout = "row"
+                if not found:
+                    layout = "column"
+                    found = read_column_layout(rows, title, notes_here,
+                                               column_spans(table), carry)
+                    if found:
+                        carry["page"] = pno
                 for product in found or ():
                     # 脚注は値の横流しの例外を決めるが、判定は注文型番が
                     # 揃ってからでないとできない（excepted の説明）。持ち回す。
                     product["_footnotes"] = dict(notes_here)
                 if not found:
                     continue
-                layout = "row" if read_row_layout(rows) else "column"
+                # ページ境界で切れたラベルは、前のページに書いたものを直す。
+                for old_label, new_label in carry.pop("renames", []):
+                    for target in products + found:
+                        for key in ("attributes", "_groups"):
+                            holder = target.get(key)
+                            if holder and old_label in holder:
+                                holder[new_label] = holder.pop(old_label)
+                        filled = target.get("_filled")
+                        if filled and old_label in filled:
+                            filled.discard(old_label)
+                            filled.add(new_label)
                 for product in found:
                     key = product["part_number"]
                     if key in seen:
@@ -327,6 +554,8 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                         for existing in products:
                             if existing["part_number"] == key:
                                 existing["attributes"].update(product["attributes"])
+                                existing.setdefault("_groups", {}).update(
+                                    product.get("_groups") or {})
                                 existing.setdefault("_footnotes", {}).update(
                                     product.get("_footnotes") or {})
                                 existing.setdefault("_filled", set()).update(

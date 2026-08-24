@@ -18,16 +18,29 @@
     "GPIO": "36",
     "Pre-drive I/O (MV I/0)": "8",
     "High voltage I/O（HV I/0）": "1",
-    "Timer Advanced-controlTIM1 (16-bit)": "1",
-    "Timer General-purposeTIM2 (16-bit)": "1",
-    "Timer Streamlined TIM3(16-bit)": "1",
+    "Timer Advanced-control TIM1 (16-bit)": "1",
+    "Timer General-purpose TIM2 (16-bit)": "1",
+    "Timer Streamlined TIM3 (16-bit)": "1",
     "Timer WWDG": "1",
-    "Timer System time base(32-bit)": "√",
+    "Timer System time base (32-bit)": "√",
     "ADC": "20",
     "OPA1": "1",
     "OPA2": "1",
     "OPA3": "1",
-    "OPA4": "1"
+    "OPA4": "1",
+    "CMP1": "1",
+    "CMP2": "1",
+    "CMP3": "1",
+    "Current sampling ISP, ISN": "Differential *2",
+    "Signal decoding QII": "2",
+    "Programmable current injection module ISINK": "2",
+    "Source current module ISOURCE": "2",
+    "Communication interface UART": "1",
+    "Communication interface SPI": "1",
+    "Communication interface I2C": "1",
+    "Communication interface PDUSB USBFS": "Host Device",
+    "Communication interface PDUSB USB PD Type-C": "(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",
+    "Package form": "QFN48"
   },
   "ordering": {
     "part_number": "CH32M030C8U7",
@@ -940,14 +953,7 @@
         },
         {
           "signal": "XO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-adc-etrgin-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "CMP2_N0",
@@ -2099,14 +2105,7 @@
         },
         {
           "signal": "CC1(CC1R)",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-spi1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "SPI_NSS",
@@ -2176,14 +2175,7 @@
         },
         {
           "signal": "CC2(CC2R)",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-spi1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "SPI_SCK",

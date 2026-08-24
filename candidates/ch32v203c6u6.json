@@ -15,11 +15,11 @@
     "Flash (bytes) (1)": "32K",
     "SRAM (bytes)": "10K",
     "GPIO port count": "37",
-    "Timer Advanced-control(16-bit)": "1",
-    "Timer General-purpose(16-bit)": "3",
-    "Timer General-purpose(32-bit)": "-",
+    "Timer Advanced-control (16-bit)": "1",
+    "Timer General-purpose (16-bit)": "3",
+    "Timer General-purpose (32-bit)": "-",
     "Timer Watchdog": "2 ( WWDG + IWDG )",
-    "Timer SysTick(64-bit)": "Supported",
+    "Timer SysTick (64-bit)": "Supported",
     "RTC": "Supported",
     "ADC/TKey (channel@unitcount)": "10@2",
     "OPA/CMP": "2",
@@ -27,13 +27,13 @@
     "Communication interface SPI": "1",
     "Communication interface I2C": "1",
     "Communication interface CAN": "1",
-    "Communication interface USB(FS) USBD": "1",
-    "Communication interface USB(FS) USBHD": "1",
+    "Communication interface USB (FS) USBD": "1",
+    "Communication interface USB (FS) USBHD": "1",
     "Communication interface Ethernet": "-",
     "CPU clock speed": "Max: 144MHz",
     "Rated voltage": "3.3V",
     "Operating temperature": "-40℃~85℃",
-    "Package": "LQFP48,QFN48X7"
+    "Package": "LQFP48, QFN48X7"
   },
   "ordering": {
     "part_number": "CH32V203C6U6",
@@ -299,6 +299,54 @@
         {
           "signal": "VBAT",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "pad": "PC13-TAMPER-RTC",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC13",
+          "route": "main"
+        },
+        {
+          "signal": "TAMPER-RTC",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
         }
       ]
     },

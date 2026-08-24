@@ -880,6 +880,34 @@
       ]
     },
     {
+      "number": 8,
+      "pad": "PC3",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "RST",
+          "route": "default"
+        },
+        {
+          "signal": "C1N0",
+          "route": "default"
+        },
+        {
+          "signal": "C2N1",
+          "route": "default"
+        },
+        {
+          "signal": "C3N1",
+          "route": "default"
+        },
+        {
+          "signal": "A13",
+          "route": "default"
+        }
+      ]
+    },
+    {
       "number": 9,
       "pad": "PA0",
       "kind": "gpio",

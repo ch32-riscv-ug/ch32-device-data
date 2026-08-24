@@ -948,14 +948,7 @@
         },
         {
           "signal": "SWCLK",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-usart2-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "CMP1_P1",
@@ -1344,14 +1337,7 @@
         },
         {
           "signal": "MCO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "ADC_IN2",

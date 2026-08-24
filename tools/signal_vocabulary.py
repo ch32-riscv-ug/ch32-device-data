@@ -30,6 +30,20 @@ decided", which a consumer can skip, and that is more useful than a wrong guess.
     ('LPTIM', 'OUT')
     >>> split("AETR2") is None
     True
+    >>> split("A10")
+    ('ADC1', 'IN10')
+    >>> split("C3N0")
+    ('CMP3', 'N0')
+    >>> split("O2O0")
+    ('OPA2', 'OUT0')
+    >>> split("OPO")
+    ('OPA1', 'OUT')
+    >>> split("MCO")
+    ('RCC', 'MCO')
+    >>> split("XO")
+    ('OSC', 'OUT')
+    >>> is_pad_name("PC13")
+    True
 """
 
 from __future__ import annotations
@@ -98,6 +112,77 @@ FIXED = {
 }
 
 
+# **CH32X033/X035 のピン図の凡例がそのまま規則を書いている**（datasheet p.16）:
+#
+#     A:ADC_   (A10:ADC_IN10)
+#     C:CMP_   (C3N0:CMP3_N0)
+#     T:TIME_  (T2C4:TIM2_CH4、T2C2N:TIM2_CH2N)
+#     O:OPA_   (O1N2:OPA1_N2、O2O0:OPA2_OUT0)
+#
+# 番号の付き方が3通りある——ADC は instance を持たず channel だけ、CMP と OPA は
+# 「instance＋端子の種類＋その番号」。`O` の綴りだけ役割名が伸びる（OUT）のは
+# 凡例が `O2O0:OPA2_OUT0` と書いているとおり。EVT header の
+# `CMP_STATR_CMP1_OUT` も CMP 側の出力が OUT であることを裏付ける。
+ADC_CHANNEL = re.compile(r"^A(?P<ch>\d{1,2})$")
+ANALOG_UNIT = re.compile(r"^(?P<kind>[CO])(?P<unit>\d)(?P<role>[NPO])(?P<n>\d?)$")
+ANALOG_PERIPHERAL = {"C": "CMP", "O": "OPA"}
+# CH32V003 は OPA を1つしか持たないので instance を書かない。
+V003_OPA = re.compile(r"^OP(?P<role>[NPO])(?P<n>\d?)$")
+
+# 周辺が持つのではなく**チップが持つ**端子。周辺名が無いので `SYS` でまとめる
+# ——`OSC_IN` が `(OSC, IN)` に割れるのと同じで、`_` の左に相当するものを置く。
+SYSTEM = {
+    # リセット。`RST` と綴る family と `NRST` と綴る family がある。
+    "RST": ("SYS", "NRST"),
+    "NRST": ("SYS", "NRST"),
+    "BOOT0": ("SYS", "BOOT0"),
+    "BOOT1": ("SYS", "BOOT1"),
+    # 高速外部発振子。`OSC_IN`/`OSC_OUT` と綴る family は `_` があるので既に
+    # `(OSC, IN)` に割れている。同じ端子を CH32H417 は pad 名ごと `XI`/`XO`、
+    # CH32V003 は `OSCI`/`OSCO` と綴るので、そちらへ寄せる。
+    "XI": ("OSC", "IN"),
+    "XO": ("OSC", "OUT"),
+    # **`X0` は `XO` の綴り違い。** CH32V002/V004/V006 の PA2 に両方の綴りで
+    # 現れる（同じ pad なので O と 0 の取り違え）。
+    "X0": ("OSC", "OUT"),
+    "OSCI": ("OSC", "IN"),
+    "OSCO": ("OSC", "OUT"),
+    # クロック出力。EVT header の `RCC_MCO_SYSCLK` が RCC のものだと言っている。
+    "MCO": ("RCC", "MCO"),
+    # 起床端子。EVT header の `PWR_WakeUpPinCmd` が PWR のものだと言っている。
+    "WKUP": ("PWR", "WKUP"),
+    # USB の差動対。`UDP`/`UDM` の綴り切った側（FIXED にある）と同じ対。
+    "USBDP": ("USB", "DP"),
+    "USBDM": ("USB", "DM"),
+    # CH32V103 は USB を USBHD と呼ぶ（比較表の `通信接口 USB(FS) USBHD`）。
+    "USBHDP": ("USBHD", "DP"),
+    "USBHDM": ("USBHD", "DM"),
+    # Ethernet の LED。CH32V407 の注記が `register FEATURE_SIGN` の
+    # `ETH_LED_EN` で有効になると書いていて、持ち主が ETH だと分かる。
+    "LED0": ("ETH", "LED0"),
+    "LED1": ("ETH", "LED1"),
+}
+# Type-C の構成チャネル。比較表が `PDUSB USBPD Type-C` の行で数える周辺。
+# CH32M030 は同じ端子を `CC1(CC1R)` と書く——括弧の中は「Rd を内蔵した側の
+# 呼び名」で（datasheet p.16「PA0/CC1R and PA1/CC2R pins have built-in
+# controllable Rd」）、指しているのは同じ CC1。
+TYPE_C = re.compile(r"^CC(?P<n>[1-4])(?:\([A-Z0-9]+\))?$")
+# CH32X315 の ADC スキャン回数出力。datasheet p.12 が
+# 「the round count can be output through GPIO (ADCS0/PA10, ...)」と書く。
+ADC_SCAN = re.compile(r"^ADCS(?P<n>\d)$")
+
+# **pad 自身の GPIO 名は役割ではない。** ピン表の「リセット後の主機能」欄は
+# `PC13-RTC` のような pad に `PC13` と書く——その pad が GPIO であること自体を
+# 言っているだけで、周辺の役割ではない。`pin_roles` に載せると
+# 「PC13 という周辺の PC13 という役割」が生まれてしまう。
+GPIO_NAME = re.compile(r"^P[A-Z]\d{1,2}$")
+
+
+def is_pad_name(signal: str) -> bool:
+    """pad 自身の GPIO 名か。役割ではないので索引に載せない。"""
+    return bool(GPIO_NAME.match(signal))
+
+
 def canonical_peripheral(token: str) -> str:
     """Spell a peripheral with its instance number present where one is implied."""
     m = INSTANCE.match(token)
@@ -161,9 +246,33 @@ def split(signal: str) -> tuple[str, str] | None:
     if m:
         return f"TIM{m.group('n')}", TIMER_ROLE[m.group("role")]
 
-    fixed = FIXED.get(signal)
+    fixed = FIXED.get(signal) or SYSTEM.get(signal)
     if fixed:
         return canonical_peripheral(fixed[0]), fixed[1]
+
+    m = ADC_CHANNEL.match(signal)
+    if m:
+        # 凡例の `A10:ADC_IN10`。ADC は instance を書かないので 1 に補う。
+        return canonical_peripheral("ADC"), f"IN{m.group('ch')}"
+
+    m = ANALOG_UNIT.match(signal)
+    if m:
+        role = "OUT" if m.group("role") == "O" else m.group("role")
+        name = ANALOG_PERIPHERAL[m.group("kind")] + m.group("unit")
+        return name, f"{role}{m.group('n')}"
+
+    m = V003_OPA.match(signal)
+    if m:
+        role = "OUT" if m.group("role") == "O" else m.group("role")
+        return "OPA1", f"{role}{m.group('n')}"
+
+    m = TYPE_C.match(signal)
+    if m:
+        return "USBPD", f"CC{m.group('n')}"
+
+    m = ADC_SCAN.match(signal)
+    if m:
+        return canonical_peripheral("ADC"), f"S{m.group('n')}"
     return None
 
 

@@ -54,7 +54,11 @@ EQUIVALENTS = (("非零等待", "nonzerowait"), ("non-zero-wait", "nonzerowait")
                ("supported", "support"), ("支持", "support"))
 # Full-width punctuation in the Chinese edition against ASCII in the English one.
 PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "、": ",",
-                             "：": ":", "；": ";", "℃": "C", "　": ""})
+                             "：": ":", "；": ";", "℃": "C", "　": "",
+                             # 範囲の記号は中文が全角、英語版が半角。`2.7V～5.5V`
+                             # と `2.7V~5.5V` が別物に見えると、揃っている行が
+                             # 対応付けに使えず前後の行まで道連れに外れる。
+                             "～": "~", "－": "-", "＋": "+", "／": "/"})
 
 
 def canonical_value(value) -> str:

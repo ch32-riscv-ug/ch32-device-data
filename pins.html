@@ -86,11 +86,18 @@ const FEATURE_ALIAS = { ART: "USART", UART: "USART", ADC: "ADC/DAC",
                         FSMC: "FSMC/SDIO", SDIO: "FSMC/SDIO", DAC: "ADC/DAC" };
 const ROUTES = [["default", "default"], ["remap", "remap"], ["af", "AF"],
                 ["unstated", "unstated"]];
-// Where the debug and console pins sit by default, as the READMEs also state.
+// Where the debug and console pins sit by default.
+// **Matched on tables/pin_roles.csv, not on spellings.** The same role is
+// written four ways across the datasheets (USART1_TX / TX1 / UTX / UART_TX,
+// SWDIO / DIO), so a list of spellings here always misses some: this page
+// showed no SWD pins at all for CH32X033/X035, which write DIO and DCK.
+// pin_roles.csv is pin_functions.csv read through tools/signal_vocabulary.py,
+// so the spellings are already folded onto one (peripheral, role) pair.
 const DEFAULT_ROLES = [
-  ["SWDIO", /^(SWIO|SWDIO)$/], ["SWCLK", /^(SWCLK|SWCK)$/],
-  ["UART TX", /^(UTX|TX\d?|TXD\d?|USART1_TX|U1TX)$/],
-  ["UART RX", /^(URX|RX\d?|RXD\d?|USART1_RX|U1RX)$/],
+  ["SWDIO", p => p === "SDI", r => r === "SWDIO"],
+  ["SWCLK", p => p === "SDI", r => r === "SWCLK"],
+  ["UART TX", p => /^USART\d+$/.test(p), r => r === "TX"],
+  ["UART RX", p => /^USART\d+$/.test(p), r => r === "RX"],
 ];
 
 function groupOf(signal) {
@@ -225,13 +232,31 @@ function matrixHTML(partNames, withPins) {
 function comparisonHTML(parts) {
   const names = parts.map(p => p.part_number);
   const byPart = Object.fromEntries(names.map(n => [n, {}]));
-  const labels = {}; const order = [];
+  // Labels drop the row-group heading ("Communication interface CAN" -> "CAN"):
+  // in a table where a whole run of rows shares it, the prefix is noise. It
+  // stays when dropping it would make two rows read the same ("ADC/TKey Units"
+  // and "HSADC Units"). Rows keep the datasheet's own order, which groups
+  // related rows together; `order` says what that order was, and a product that
+  // only some rows mention must not push those rows to the end.
+  const labels = {}; const leaves = {}; const rank = {}; const seen = [];
   for (const r of state.attrs) {
     if (!(r.part_number in byPart)) continue;
     byPart[r.part_number][r.attribute] = r.value;
-    labels[r.attribute] ??= r.label_en || r.label_zh || r.attribute;
-    if (!order.includes(r.attribute)) order.push(r.attribute);
+    const english = !!r.label_en;
+    const label = r.label_en || r.label_zh || r.attribute;
+    const group = (english ? r.group_en : r.group_zh) || "";
+    labels[r.attribute] ??= label;
+    leaves[r.attribute] ??=
+      group && label.startsWith(group) ? label.slice(group.length).trim() : label;
+    const position = parseInt(r.order || "0", 10) || 0;
+    rank[r.attribute] = Math.min(rank[r.attribute] ?? position, position);
+    if (!seen.includes(r.attribute)) seen.push(r.attribute);
   }
+  const clashes = new Set(Object.values(leaves).filter(
+    (leaf, i, all) => all.indexOf(leaf) !== i));
+  const shown = a => (clashes.has(leaves[a]) ? labels[a] : leaves[a]);
+  const order = [...seen].sort(
+    (a, b) => rank[a] - rank[b] || seen.indexOf(a) - seen.indexOf(b));
   const head = "<tr><th class=\"pad\"></th>" + parts.map(p =>
     `<th class="part"><a href="${chipLink(p.part_number)}">`
     + breakable(p.part_number, p.package) + "</a></th>").join("") + "</tr>";
@@ -245,7 +270,7 @@ function comparisonHTML(parts) {
         + values.map(v => `<td>${v}</td>`).join("") + "</tr>");
   }
   for (const attr of order) {
-    rows.push(`<tr><td class="label">${labels[attr]}</td>`
+    rows.push(`<tr><td class="label">${shown(attr)}</td>`
       + names.map(n => `<td>${byPart[n][attr] || "-"}</td>`).join("") + "</tr>");
   }
   return `<div class="wrap"><table><thead>${head}</thead>`
@@ -293,16 +318,33 @@ function rebuildFeatureBoxes(partNames) {
 }
 
 function defaultsLine(partNames) {
-  const pads = DEFAULT_ROLES.map(() => new Set());
-  for (const r of state.fns) {
+  // USART instance -> pads, per role, so the line can say which USART it is.
+  const found = DEFAULT_ROLES.map(() => new Map());
+  for (const r of state.roles) {
     if (r.part_number !== partNames[0]) continue;
-    if (r.route !== "default" && r.route !== "main") continue;
-    DEFAULT_ROLES.forEach(([_, rx], i) => {
-      if (rx.test(r.signal) && r.signal !== r.pad) pads[i].add(r.pad);
+    if (r.routing !== "default" && r.routing !== "main") continue;
+    DEFAULT_ROLES.forEach(([_, wantPeripheral, wantRole], i) => {
+      if (!wantPeripheral(r.peripheral) || !wantRole(r.role)) return;
+      if (!found[i].has(r.peripheral)) found[i].set(r.peripheral, new Set());
+      found[i].get(r.peripheral).add(r.pad);
     });
   }
+  // USART1 first, then the lowest-numbered, and at most two -- the point of
+  // this line is "where do I plug in", not a catalogue of all eight.
+  const rank = name => {
+    const n = parseInt(name.replace(/\D+/g, ""), 10);
+    return (n === 1 ? 0 : 1) * 1000 + (isNaN(n) ? 0 : n);
+  };
+  const cell = i => {
+    const names = [...found[i].keys()].sort((a, b) => rank(a) - rank(b));
+    if (!names.length) return "-";
+    if (names.length === 1 && !/^USART/.test(names[0]))
+      return [...found[i].get(names[0])].sort().join(",");
+    return names.slice(0, 2).map(n =>
+      `${[...found[i].get(n)].sort().join(",")} (${n})`).join("; ");
+  };
   return "<div class=\"count\"><b>Defaults:</b> " + DEFAULT_ROLES.map(([name], i) =>
-    `${name} = ${[...pads[i]].sort().join(",") || "-"}`).join(" &middot; ") + "</div>";
+    `${name} = ${cell(i)}`).join(" &middot; ") + "</div>";
 }
 
 function render() {
@@ -342,9 +384,10 @@ function render() {
 }
 
 Promise.all([load("products"), load("pins"), load("pin_functions"),
-             load("product_attributes"), load("remap_fields")])
-.then(([products, pins, fns, attrs, remap]) => {
-  Object.assign(state, { products, pins, fns, attrs, remap });
+             load("product_attributes"), load("remap_fields"),
+             load("pin_roles")])
+.then(([products, pins, fns, attrs, remap, roles]) => {
+  Object.assign(state, { products, pins, fns, attrs, remap, roles });
   const series = [...new Set(products.map(p => p.series))].sort();
   const chipSel = $("chip");
   const gs = document.createElement("optgroup"); gs.label = "Series";

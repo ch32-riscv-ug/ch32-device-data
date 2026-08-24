@@ -891,14 +891,7 @@
         },
         {
           "signal": "MCO",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim1-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "TIM1_CH1",
@@ -1561,14 +1554,7 @@
         },
         {
           "signal": "RST",
-          "route": "default",
-          "_selector_resolved_by": "pad+value(grid)",
-          "selection": {
-            "selector": "afio-tim2-remap",
-            "values": [
-              0
-            ]
-          }
+          "route": "default"
         },
         {
           "signal": "OPA_P1",
