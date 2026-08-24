@@ -80,6 +80,21 @@ FIXED = {
     # The pin tables call SPI's slave select CS; the register descriptions and
     # every other series call it NSS.
     "CS": ("SPI", "NSS"),
+    # **CH32X033/X035 の凡例がそのまま書いている。** ピン表は略記で書き、同じ
+    # ページに対応を並べる:
+    #
+    #     CS:SPI_NSS   UDP:USBDP   UDM:USBDM   DIO:SWDIO   DCK:SWCLK
+    #
+    # 略記のままだと、他の family が `SWDIO` と綴る同じ pad が結合できない
+    # ——CH32X035 の SWD pad が pins.html に出ていなかったのがこれ。
+    "DIO": ("SDI", "SWDIO"),
+    "DCK": ("SDI", "SWCLK"),
+    "UDP": ("USB", "DP"),
+    "UDM": ("USB", "DM"),
+    # 綴り切った側も同じ対に寄せる。1線式（CH32V003 系）は SWIO だけを持つ。
+    "SWDIO": ("SDI", "SWDIO"),
+    "SWCLK": ("SDI", "SWCLK"),
+    "SWIO": ("SDI", "SWDIO"),
 }
 
 
