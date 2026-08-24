@@ -376,6 +376,38 @@
       ]
     },
     {
+      "number": 2,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
+        }
+      ]
+    },
+    {
       "number": 4,
       "pad": "OSC_IN",
       "kind": "gpio",

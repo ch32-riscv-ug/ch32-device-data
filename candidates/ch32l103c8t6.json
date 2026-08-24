@@ -376,6 +376,58 @@
       ]
     },
     {
+      "number": 2,
+      "pad": "PC13-TAMPER-RTC",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC13",
+          "route": "main"
+        },
+        {
+          "signal": "TAMPER",
+          "route": "default"
+        },
+        {
+          "signal": "RTC",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
+        }
+      ]
+    },
+    {
       "number": 5,
       "pad": "OSC_IN",
       "kind": "gpio",

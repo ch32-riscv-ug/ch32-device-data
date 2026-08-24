@@ -279,6 +279,22 @@
   ],
   "pins": [
     {
+      "number": 1,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
+        }
+      ]
+    },
+    {
       "number": 2,
       "pad": "OSC_IN",
       "kind": "other",
@@ -1191,6 +1207,22 @@
         {
           "signal": "VDD_IO_3",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
         }
       ]
     },

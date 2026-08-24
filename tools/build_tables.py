@@ -329,6 +329,11 @@ def normalise(attributes: dict) -> dict[str, str]:
             text = as_bytes(text)
         elif field == "temperature":
             text = as_range(text)
+        elif field == "package":
+            # **封装名は識別子で、空白は入らない。** 比較表のセルは狭く
+            # `LQFP`／`48` と折り返すことがあり、資料の綴りどおりに継ぐと
+            # `LQFP 48` になって `LQFP48` と別の package として数えられる。
+            text = re.sub(r"\s+", "", text)
         out.setdefault(field, text)
     return out
 
@@ -679,7 +684,7 @@ FAMILY_COLUMNS = [
 CORE_COLUMNS = ["core", "isa", "manual", "note"]
 ERRATA_COLUMNS = ["id", "series", "condition", "description"]
 ATTRIBUTE_COLUMNS = ["part_number", "order", "attribute", "value",
-                     "group_zh", "group_en", "label_zh", "label_en"]
+                     "group", "label", "label_zh", "label_en"]
 
 
 def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
@@ -994,10 +999,19 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
                 "value": translated(
                     display_value(value_en, value_zh, confidence),
                     translations["values"]),
-                # 見出しの上の段。`Communication interface CAN` の
-                # `Communication interface` で、表示側で剥がせるように分けて持つ。
-                "group_zh": zh_groups.get(label_zh, ""),
-                "group_en": en_groups.get(label_en, ""),
+                # **表示用の見出し。** 値と同じで、英語版が言っていればそれを、
+                # 無ければ中文を訳したものを出す（`display_value` と同じ作法）。
+                # 原文は `label_zh`/`label_en` に残る。
+                "label": translated(label_en or label_zh, translations["labels"]),
+                # 見出しの上の段。`Communication interfaces CAN` の
+                # `Communication interfaces` で、表示側で剥がせるように分けて持つ。
+                # **`label` の接頭辞**なので、こちらも表示用の綴りで置く。
+                # **`label` を出した側の群を採る。** 英語版が見出しを1段で書き、
+                # 中文版が2段で書くことがある（`ADTM` と `高级定时器`）ので、
+                # 混ぜると英語の見出しに中文の群が付く。
+                "group": translated(
+                    en_groups.get(label_en, "") if label_en
+                    else zh_groups.get(label_zh, ""), translations["labels"]),
                 "label_zh": label_zh, "label_en": label_en,
                 "confidence": confidence, "basis": basis,
             })

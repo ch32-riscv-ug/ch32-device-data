@@ -60,16 +60,18 @@ def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collectio
         # 載せると「PC13 という周辺の PC13 という役割」が索引に生まれる。
         if fn["route"] == "main" and fn["signal"] == fn["pad"]:
             continue
-        if signal_vocabulary.is_pad_name(fn["signal"]):
+        found = signal_vocabulary.roles(fn["signal"])
+        if signal_vocabulary.is_pad_name(fn["signal"]) \
+                or fn["signal"] in signal_vocabulary.NOT_A_ROLE:
             continue
-        pair = signal_vocabulary.split(fn["signal"])
-        if not pair:
+        if not found:
             unresolved[(fn["datasheet"], fn["signal"])] += 1
             continue
         product = catalogue.get(fn["part_number"])
         if not product:
             continue
-        rows.append({
+        for pair in found:
+          rows.append({
             "part_number": fn["part_number"],
             "series": product["series"],
             "family": product["family"],
@@ -81,7 +83,7 @@ def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collectio
             "signal": fn["signal"],
             "confidence": fn["confidence"],
             "basis": fn["basis"],
-        })
+          })
 
     rows.sort(key=lambda r: (r["part_number"], r["peripheral"], r["role"],
                              r["pad"], r["routing"]))

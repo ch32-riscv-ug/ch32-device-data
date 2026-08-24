@@ -540,6 +540,68 @@
       ]
     },
     {
+      "number": 9,
+      "pad": "PC14-OSC32_IN",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC14",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_IN",
+          "route": "default"
+        },
+        {
+          "signal": "SDRAM_CKE1",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "FSMC_D16",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_D16",
+          "route": "af-12",
+          "_alternate_function": 12
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "pad": "PC15-OSC32_OUT",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PC15",
+          "route": "main"
+        },
+        {
+          "signal": "OSC32_OUT",
+          "route": "default"
+        },
+        {
+          "signal": "SDRAM_RAS_N",
+          "route": "af-9",
+          "_alternate_function": 9
+        },
+        {
+          "signal": "FSMC_D17",
+          "route": "af-12",
+          "_alternate_function": 12
+        },
+        {
+          "signal": "SDRAM_D17",
+          "route": "af-12",
+          "_alternate_function": 12
+        }
+      ]
+    },
+    {
       "number": 11,
       "pad": "VDDK",
       "kind": "power",

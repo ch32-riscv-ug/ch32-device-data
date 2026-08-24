@@ -287,6 +287,25 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
     return out
 
 
+# 群の名前を剥がしても意味が残る見出し。略語か数を含んでいれば、それ自身が
+# 何かを名指している（`CAN`・`Basic (16-bit)`・`Core 1 HS ITCM`）。
+# 含まないものは普通の英単語で、群が無いと何のことか分からなくなる
+# （`ADC/TKey Unit` の `Unit`、`3-phase gate drive Voltage` の `Voltage`）。
+NAMES_ITSELF = re.compile(r"[A-Z]{2,}|\d")
+
+
+def leaf_of(label: str, group: str) -> str:
+    """群の名前を剥がした見出し。剥がすと分からなくなるものは剥がさない。
+
+    比較表の見出し列は2段組みで、同じ群の行が固まって並ぶ。`Communication
+    interface` が全行に付くのは読みにくいだけなので落とす（worklist の F-20）。
+    """
+    if not group or not label.startswith(group):
+        return label
+    leaf = label[len(group):].strip()
+    return leaf if leaf and NAMES_ITSELF.search(leaf) else label
+
+
 # この表に並べる USART の数。全部は要らない——SWD と USART1 が分かれば足り、
 # USART1 が無いときの逃げ場が1つ見えればよい。
 USART_LIMIT = 2
@@ -354,22 +373,17 @@ def comparison_section(data: Data, series: dict) -> list[str]:
             continue
         attribute = r["attribute"]
         by_part[r["part_number"]][attribute] = r["value"]
-        english = bool(r["label_en"])
-        label = r["label_en"] or r["label_zh"]
-        group = (r.get("group_en") if english else r.get("group_zh")) or ""
+        label = r.get("label") or r["label_en"] or r["label_zh"]
+        group = r.get("group") or ""
         labels.setdefault(attribute, label)
-        # 群の名前は剥がす。`Communication interface CAN` は表の中では CAN で足りる
-        # ——同じ群の行が並ぶので、全行に同じ接頭辞が付くだけになる（F-20）。
-        leaves.setdefault(attribute,
-                          label[len(group):].strip() if group and
-                          label.startswith(group) else label)
+        leaves.setdefault(attribute, leaf_of(label, group))
         # `order` を持たない古い表でも組めるようにする。無ければ出現順が残る。
         position = int(r.get("order") or 0)
         rank[attribute] = min(rank.get(attribute, position), position)
         if attribute not in seen:
             seen.append(attribute)
     order = sorted(seen, key=lambda a: (rank[a], seen.index(a)))
-    # 群を剥がすと別の行と同じ名前になることがある（`ADC/ TKey Units` と
+    # 群を剥がすと別の行と同じ名前になることがある（`ADC/TKey Units` と
     # `HSADC Units`）。**そのときは剥がさない。**
     collisions = {leaf for leaf in leaves.values()
                   if list(leaves.values()).count(leaf) > 1}
