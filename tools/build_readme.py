@@ -30,6 +30,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import signal_vocabulary  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 REPO = Path(__file__).resolve().parent.parent
 TABLES = REPO / "tables"
 MIRRORS = Path("/home/mt/dev_wch")
@@ -37,15 +41,23 @@ PAGES = "https://ch32-riscv-ug.github.io"
 
 # Signal spellings per role, as the datasheets write them. Route "default" only:
 # the point is what the pin does before any remap.
-# pad の名前は入れない。**除外条件（`pad not in names`）が pad 自身を弾く**ので、
-# `PA13` を入れると PA13 が SWDIO として出なくなる——2線式SDIのfamily全部で
-# この列が空だった。signal 名（SWDIO/SWCLK/SWIO）はデータに揃っている。
+# **綴りの集合を持たない。** 同じ役割を資料ごとに違う名前で書く
+# （`USART1_TX` / `TX1` / `UTX` / `UART_TX`、`SWDIO` / `DIO`）ので、集合で書くと
+# 必ず取りこぼす——実際 CH32M030 の `UART_TX` が漏れ、pad 名を入れたせいで
+# 2線式SDIの family 全部で SWDIO の列が空だった。綴りを揃える規則は
+# `tools/signal_vocabulary.py` が持っているので、そこへ渡して
+# (peripheral, role) の対で突き合わせる。
+# **UART は instance を決め打たない。** CH32X033 の 20 ピン品は USART1 を既定の
+# route に持たず、既定で出ているのは USART2 と USART4。`USART1` で引くと
+# 「UART が無い」という誤った空欄になるので、**既定に出ている USART を全部**
+# 拾って、どの instance かを添える。
 ROLES = (
-    ("SWDIO", {"SWIO", "SWDIO"}),
-    ("SWCLK", {"SWCLK", "SWCK"}),
-    ("UART TX", {"UTX", "TX", "TX1", "USART1_TX", "U1TX", "TXD1"}),
-    ("UART RX", {"URX", "RX", "RX1", "USART1_RX", "U1RX", "RXD1"}),
+    ("SWDIO", ("SDI", "SWDIO")),
+    ("SWCLK", ("SDI", "SWCLK")),
+    ("UART TX", ("USART*", "TX")),
+    ("UART RX", ("USART*", "RX")),
 )
+USART = re.compile(r"^USART\d+$")
 OSC = {"OSCI", "OSCO", "OSC_IN", "OSC_OUT", "XTAL1", "XTAL2", "OSC32_IN", "OSC32_OUT"}
 
 NOTICE = ("<!-- This file is generated from ch32-riscv-ug/ch32-device-data "
@@ -224,23 +236,69 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
         products = data.series_products(s["series"])
         if not products:
             continue
-        defaults = default_signals(data, products[0]["part_number"])
+        # **1型番だけ見ない。** 小さい package にその pad が無いことがあり、
+        # CH32V006 の先頭品では USART1 が remap にしか出ない。series の全品を
+        # 合わせて「この series のどこに出るか」を答える。
+        fixed: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+        chosen: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+        for product in products:
+            for fn in data.fns_by_part[product["part_number"]]:
+                pair = signal_vocabulary.split(fn["signal"])
+                if not pair:
+                    continue
+                if USART.match(pair[0]):
+                    # instance を畳んだ鍵にも入れる。どの USART かは pad に添える。
+                    pair = ("USART*", pair[1], pair[0])
+                if fn["route"] in ("default", "main"):
+                    fixed[pair[:2]].add((fn["pad"],) + pair[2:])
+                elif fn["route"].startswith("af-"):
+                    # **AF 方式の family（V205・X315・H41x）に「既定」は無い。**
+                    # どの機能もレジスタで選ぶので、`af-7` に出る USART1 は
+                    # 「そこへ出せる」であって「そこに出ている」ではない。
+                    # 見せないと UART の欄が空になるが、既定と同じ顔で並べると
+                    # 嘘になるので `AF:` を付けて区別する。
+                    chosen[pair[:2]].add((fn["pad"],) + pair[2:])
+        def render(pads: set[tuple]) -> str:
+            # ("PA2", "USART2") → "PA2 (USART2)"。instance が1つなら添えない。
+            names = {p[1] for p in pads if len(p) > 1}
+            if len(names) <= 1:
+                return ",".join(sorted(p[0] for p in pads))
+            return ", ".join(f"{p[0]} ({p[1]})" for p in sorted(pads))
         cells = []
-        for _, names in ROLES:
-            pads = sorted({pad for pad, signals in defaults.items()
-                           if signals & names and pad not in names})
-            cells.append(",".join(pads) or "-")
+        for _, pair in ROLES:
+            if fixed.get(pair):
+                cells.append(render(fixed[pair]))
+            elif chosen.get(pair):
+                # **AF 方式は数え上げない。** 既定が無いので「どこへでも出せる」
+                # が答で、CH32H417 は 26 pad 並ぶ。Quick start に置くものでは
+                # ないので、答が載っている場所を指す。
+                cells.append(f"AF ({len(chosen[pair])} pads, see Pin definitions)")
+            else:
+                cells.append("-")
         out.append(f"| {s['series']} | " + " | ".join(cells) + " |")
+    if any("AF:" in line for line in out):
+        out += ["",
+                "`AF` marks a series with no default routing (CH32V205, "
+                "CH32X3x5, CH32H41x): every function is selected through "
+                "`AFIO->GPIOx_AFLR/AFHR`, so the pads listed are the ones it "
+                "**can** be put on, not where it already is. The reset value of "
+                "`GPIOx_AFLR/AFHR` is 0, which selects AF0 -- a real function, "
+                "not \"none\" -- but a pad only drives it once its GPIO mode is "
+                "set to alternate function."]
     out.append("")
     return out
 
 
 def notes_for(pad: str, defaults: dict[str, set[str]],
               everything: dict[str, set[str]]) -> str:
-    notes = []
-    for role, names in ROLES:
-        if defaults.get(pad, set()) & names and pad not in names:
-            notes.append(role)
+    """pin 表の Notes 欄。debug と UART の pad に印を付ける。
+
+    ROLES と同じく綴りではなく (peripheral, role) で見る——`DIO` と `SWDIO`、
+    `UART_TX` と `TX1` と `USART1_TX` は同じもの。
+    """
+    pairs = {signal_vocabulary.split(name)
+             for name in defaults.get(pad, set())} - {None}
+    notes = [role for role, pair in ROLES if pair in pairs]
     if everything.get(pad, set()) & OSC:
         notes.append("OSC")
     return ", ".join(notes)
