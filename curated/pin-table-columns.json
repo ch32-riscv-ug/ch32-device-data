@@ -1,44 +1,56 @@
 {
-  "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, position by position. A '-' marks a column the table grid contains but the printed table does not, which pdfplumber picks up from a stray rule.",
-  "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually, then confirming the data columns line up with the parsed grid.",
-  "CH32V208DS0.PDF": {
-    "Table 3-1": {
-      "columns": [
-        "QFN28",
-        "QFN48",
-        "LQFP64",
-        "-",
-        "QFN68"
-      ],
-      "note": "紙面は QFN28/QFN48/LQFP64/QFN68 の4列。テキスト層は QFN68 を落とし、3列目に空の誤検出列が入るため4列目が QFN68 のデータになる",
-      "verified_by": "page-image",
-      "page": 19
-    }
-  },
-  "CH32V20x_30xDS0.PDF": {
-    "Table 3-2": {
-      "columns": [
-        "QFN68",
-        "LQFP100",
-        "-"
-      ],
-      "note": "紙面は QFN68/LQFP100 の2列。LQFP100 の末尾 0 が段落ちしてテキスト層では LQFP10 になり、3列目に空の誤検出列が入る",
-      "verified_by": "page-image",
-      "page": 42
-    }
-  },
-  "CH32V203DS0.PDF": {
-    "Table 3-1-1": {
-      "columns": [
-        "QFN20",
-        "LQFP32",
-        "QFN32",
-        "LQFP48/QFN48X7",
-        "-"
-      ],
-      "note": "紙面は4列。4列目は LQFP48 と QFN48X7 を1セルに積んだ見出しで両packageが同じpin番号を共有する。テキスト層では2列に割れ、5列目が空になる",
-      "verified_by": "page-image",
-      "page": 24
-    }
+ "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, position by position. A '-' marks a column the table grid contains but the printed table does not, which pdfplumber picks up from a stray rule.",
+ "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually, then confirming the data columns line up with the parsed grid.",
+ "CH32V208DS0.PDF": {
+  "Table 3-1": {
+   "columns": [
+    "QFN28",
+    "QFN48",
+    "LQFP64",
+    "-",
+    "QFN68"
+   ],
+   "note": "紙面は QFN28/QFN48/LQFP64/QFN68 の4列。テキスト層は QFN68 を落とし、3列目に空の誤検出列が入るため4列目が QFN68 のデータになる",
+   "verified_by": "page-image",
+   "page": 19
   }
+ },
+ "CH32V20x_30xDS0.PDF": {
+  "Table 3-2": {
+   "columns": [
+    "QFN68",
+    "LQFP100",
+    "-"
+   ],
+   "note": "紙面は QFN68/LQFP100 の2列。LQFP100 の末尾 0 が段落ちしてテキスト層では LQFP10 になり、3列目に空の誤検出列が入る",
+   "verified_by": "page-image",
+   "page": 42
+  }
+ },
+ "CH32V203DS0.PDF": {
+  "Table 3-1-1": {
+   "columns": [
+    "QFN20",
+    "LQFP32",
+    "QFN32",
+    "LQFP48/QFN48X7",
+    "-"
+   ],
+   "note": "紙面は4列。4列目は LQFP48 と QFN48X7 を1セルに積んだ見出しで両packageが同じpin番号を共有する。テキスト層では2列に割れ、5列目が空になる",
+   "verified_by": "page-image",
+   "page": 24
+  },
+  "表3-1-1": {
+   "columns": [
+    "QFN20",
+    "LQFP32",
+    "QFN32",
+    "LQFP48/QFN48X7",
+    "-"
+   ],
+   "note": "中文版も同じ組版。紙面は4列で、4列目は LQFP48 と QFN48X7 を1セルに積んだ見出し（両packageが同じpin番号を共有）。テキスト層では2列に割れ、QFN48X7 側が空列になる。英語版（Table 3-1-1）にだけ直しを当てていたため、中文側の QFN48X7 が0 pinになり、その封装の機能行が全部 en 片翼（reference）に落ちていた",
+   "verified_by": "page-image",
+   "page": 24
+  }
+ }
 }

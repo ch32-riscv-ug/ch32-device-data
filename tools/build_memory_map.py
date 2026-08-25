@@ -56,8 +56,26 @@ BUS = re.compile(r"^(?:A?HB|APB\d|)PERIPH$|^PERIPH$")
 # `FLASH_R` は FLASH の**制御レジスタ**（0x40022000）で、記憶域ではない。
 MEMORY = {"FLASH", "SRAM", "OB"}
 
+# `ORIGIN = 0x20000000+1024` や `ORIGIN = (0x20110000+256)` のような**算術式**が
+# 書かれる。数だけ取ると +1024 が落ちて、CH32V407 の RAM が 0x20000000 に
+# 見えていた（worklist の F-38。原典検証で発覚した誤値）。式ごと取って評価する。
 LD_ORIGIN = re.compile(
-    r"^\s*(?P<what>FLASH|RAM)\s*\([rwx]+\)\s*:\s*ORIGIN\s*=\s*(?P<origin>0x[0-9A-Fa-f]+)")
+    r"^\s*(?P<what>FLASH|RAM)\s*\([rwx]+\)\s*:\s*ORIGIN\s*=\s*(?P<expr>[^,]+),")
+# linker script の式に出るもの以外を拒む（16進・10進・K/M 接尾辞・+-*・括弧）。
+LD_EXPR = re.compile(r"^[0-9a-fA-FxX+\-*()\s]*$")
+LD_SUFFIX = re.compile(r"\b(\d+)([KM])\b")
+
+
+def evaluate_origin(expr: str) -> int | None:
+    """linker script の ORIGIN 式の値。読めない形なら None。"""
+    text = LD_SUFFIX.sub(lambda m: f"({m.group(1)}*{'1024' if m.group(2) == 'K' else '1048576'})",
+                         expr.strip())
+    if not text or not LD_EXPR.match(text):
+        return None
+    try:
+        return int(eval(text, {"__builtins__": {}}, {}))  # noqa: S307 — 字種を絞った上
+    except Exception:
+        return None
 COMMENT = re.compile(r"/\*.*?\*/", re.S)
 
 
@@ -100,19 +118,38 @@ def kind_of(region: str) -> str:
     return "peripheral"
 
 
-def read_link_origins(family_dir: Path) -> dict[str, int]:
-    """{FLASH|RAM: 領域の先頭番地}。
+# 2コア品はコアごとに別のリンカを持つ（CH32H417 の V3F/ と V5F/）。ディレクトリ
+# 名がコアを名乗る。
+CORE_DIR = re.compile(r"^V\d[A-Z]$")
 
-    IAP の例題は bootloader のぶんだけ後ろにずらした ORIGIN を書くので、
-    **一番多い値**を領域の先頭と読む（ずらした側は少数派）。
+
+def read_link_origins(family_dir: Path) -> dict[tuple[str, str], int]:
+    """{(FLASH|RAM, コア名または空): 領域の先頭番地}。
+
+    **family の基準リンカ（`EVT/EXAM/SRC/Ld`）だけを読む。** 以前は EVT 全体の
+    多数決を採っていたが、例題は用途ごとに ORIGIN を動かす（IAP は bootloader の
+    ぶん後ろへ、CoreMark は RAM 実行用に別番地へ）ので、**多数決は基準ではなく
+    例題の流行を答えていた**——CH32H417 の RAM が 0x20120000（一部例題の値）に
+    なっていたのがそれ（worklist の F-38）。基準リンカは全12 family にある。
+
+    2コア品はコアごとの値を分けて返す。CH32H417 は V3F が FLASH 0x00000000、
+    V5F が 0x00010000 で、**1行に畳むとどちらかが嘘になる**。
     """
-    counted: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
-    for path in sorted(family_dir.glob("EVT/**/*.ld")):
+    reference = family_dir / "EVT" / "EXAM" / "SRC" / "Ld"
+    paths = sorted(reference.glob("**/*.ld"))
+    if not paths:  # 基準が無い family は無い（実測）が、無ければ従来の多数決
+        paths = sorted(family_dir.glob("EVT/**/*.ld"))
+    counted: dict[tuple[str, str], collections.Counter] = collections.defaultdict(collections.Counter)
+    for path in paths:
+        core = path.parent.name if CORE_DIR.match(path.parent.name) else ""
         for line in COMMENT.sub("", path.read_text(errors="ignore")).splitlines():
             found = LD_ORIGIN.match(line)
-            if found:
-                counted[found.group("what")][int(found.group("origin"), 16)] += 1
-    return {what: tally.most_common(1)[0][0] for what, tally in counted.items()}
+            if not found:
+                continue
+            value = evaluate_origin(found.group("expr"))
+            if value is not None:
+                counted[(found.group("what"), core)][value] += 1
+    return {key: tally.most_common(1)[0][0] for key, tally in counted.items()}
 
 
 def main() -> int:
@@ -151,7 +188,7 @@ def main() -> int:
                 "basis": f"evt({header.name})",
             })
         origins = read_link_origins(args.mirrors / family)
-        for what, origin in sorted(origins.items()):
+        for (what, core), origin in sorted(origins.items()):
             rows.append({
                 "family": family,
                 "region": what,
@@ -159,7 +196,9 @@ def main() -> int:
                 # linker script が実際に使う先頭。ヘッダーの FLASH_BASE とは
                 # 別の窓口を指すことがある（CH32V307 は 0x08000000 と 0x00000000）。
                 "kind": "link-origin",
-                "condition": "",
+                # 2コア品はコアごとに別番地。condition がどちらのコアの
+                # リンカかを言う（他の行の condition は variant macro）。
+                "condition": core,
                 "confidence": CONFIDENCE,
                 "basis": "evt(Link.ld)",
             })

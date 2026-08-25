@@ -106,13 +106,19 @@ def read_enum(header: Path, notes: list[str]) -> list[dict]:
             opener, rest = directive.group("kind"), directive.group("rest")
             if opener in ("ifdef", "ifndef", "if"):
                 macros = MACRO.findall(rest)
-                stack.append(macros[0] if macros else None)
-                branches.append(list(macros[:1]))
+                # **OR 条件は全部持つ。** CH32V006 の header は
+                # `#if defined(CH32V005) || defined(CH32V006) ||
+                # defined(CH32V007_M007)` と書き、先頭だけ採ると **default
+                # variant の CH32V006 でも有効なベクタが CH32V005 専用に
+                # 見える**（worklist の F-37。原典検証で発覚）。区切りは
+                # memory_map.csv の condition と同じ `|`（いずれかが定義済み）。
+                stack.append("|".join(macros) if macros else None)
+                branches.append(list(macros))
             elif opener in ("elif", "else") and stack:
                 macros = MACRO.findall(rest)
                 if opener == "elif" and macros:
-                    stack[-1] = macros[0]
-                    branches[-1].append(macros[0])
+                    stack[-1] = "|".join(macros)
+                    branches[-1].extend(macros)
                 else:
                     seen = branches[-1] if branches else []
                     stack[-1] = "+".join(f"!{m}" for m in seen) or None
