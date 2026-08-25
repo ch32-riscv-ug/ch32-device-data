@@ -236,6 +236,9 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
     if not data.family_series(family):
         return []
     out = [f"{level} Debug / serial defaults", "",
+           "Where these land **without writing a remap register**. SWD is live at "
+           "reset; the UART pads are not -- the pin must still be put into "
+           "alternate-function mode. See `route` in tables/README.ja.md.", "",
            "| Series | SWDIO | SWCLK | UART TX | UART RX |",
            "|---|---|---|---|---|"]
     marked = False
@@ -246,6 +249,10 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
         # **1型番だけ見ない。** 小さい package にその pad が無いことがあり、
         # CH32V006 の先頭品では USART1 が remap にしか出ない。series の全品を
         # 合わせて「この series のどこに出るか」を答える。
+        # **`main` と `default` の両方を見る。** どちらの列に書くかは datasheet が
+        # family ごとに違い（SWD は 4 family が主功能列、7 family が既定代替功能列）、
+        # `main` だけで引くと 7 family の SWD を落とす。意味の違いは
+        # tables/README.ja.md の「`route` の値の意味」にある。
         default: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
         alternate: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
         for product in products:

@@ -253,6 +253,8 @@ CH32H415REU6,CH32H415,CH32H417,OPA3,P0,PC2,C,2,,OPA3_P0,#,reference,pin-table:en
 CH32H415REU6,CH32H415,CH32H417,OPA3,P0,PC2,C,2,default,OPA3_P0,#,reference,pin-table:zh
 CH32H415REU6,CH32H415,CH32H417,OPA3,P1,PA2,A,2,,OPA3_P1,#,reference,pin-table:en
 CH32H415REU6,CH32H415,CH32H417,OPA3,P1,PA2,A,2,default,OPA3_P1,#,reference,pin-table:zh
+CH32H415REU6,CH32H415,CH32H417,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32H415REU6,CH32H415,CH32H417,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32H415REU6,CH32H415,CH32H417,OTG,DM,PA11,A,11,,OTG_DM,#,reference,pin-table:en
 CH32H415REU6,CH32H415,CH32H417,OTG,DM,PA11,A,11,default,OTG_DM,#,reference,pin-table:zh
 CH32H415REU6,CH32H415,CH32H417,OTG,DP,PA12,A,12,,OTG_DP,#,reference,pin-table:en
@@ -754,6 +756,8 @@ CH32H416RDU6,CH32H416,CH32H417,OPA3,OUT0,PA0,A,0,default,OPA3_OUT0,#,confirmed,p
 CH32H416RDU6,CH32H416,CH32H417,OPA3,OUT1,PA4,A,4,default,OPA3_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,OPA3,P0,PC2,C,2,default,OPA3_P0,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,OPA3,P1,PA2,A,2,default,OPA3_P1,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,OTG,DM,PA11,A,11,default,OTG_DM,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,OTG,DP,PA12,A,12,default,OTG_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,PIOC,IO0,PA0,A,0,af-5,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
@@ -1034,6 +1038,10 @@ CH32H416RDU6,CH32H416,CH32H417,USBHS,DM,PB9,B,9,default,USBHS_DM,#,confirmed,pin
 CH32H416RDU6,CH32H416,CH32H417,USBHS,DP,PB8,B,8,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,USBPD,CC1,PB3,B,3,af-4,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32H416RDU6,CH32H416,CH32H417,USBPD,CC2,PB4,B,4,af-4,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H416RDU6,CH32H416,CH32H417,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ADC1,IN0,PA0,A,0,default,ADC_IN0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ADC1,IN10,PC0,C,0,default,ADC_IN10,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ADC1,IN11,PC1,C,1,default,ADC_IN11,#,confirmed,pin-table:zh+pin-table:en
@@ -1118,6 +1126,10 @@ CH32H417MEU6,CH32H417,CH32H417,DVP,VSYNC,PB14,B,14,af-15,DVP_VSYNC,#,confirmed,p
 CH32H417MEU6,CH32H417,CH32H417,DVP,VSYNC,PF3,F,3,af-13,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ETH,MDC,PC0,C,0,af-1,ETH_MDC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ETH,MDIO,PC1,C,1,af-1,ETH_MDIO,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ETH,PHY_LED0,PF0,F,0,af-10,ETH_PHY_LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ETH,PHY_LED1,PF1,F,1,af-10,ETH_PHY_LED1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,ETH,PHY_LED2,PF2,F,2,af-10,ETH_PHY_LED2,#,confirmed,pin-table:zh+pin-table:en
@@ -1350,6 +1362,8 @@ CH32H417MEU6,CH32H417,CH32H417,OPA3,N0,PC3,C,3,default,OPA3_N0,#,confirmed,pin-t
 CH32H417MEU6,CH32H417,CH32H417,OPA3,OUT0,PA0,A,0,default,OPA3_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,OPA3,OUT1,PA4,A,4,default,OPA3_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,OPA3,P0,PC2,C,2,default,OPA3_P0,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,OTG,DM,PA11,A,11,default,OTG_DM,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,OTG,DP,PA12,A,12,default,OTG_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,OTG,ID,PA10,A,10,default,OTG_ID,#,confirmed,pin-table:zh+pin-table:en
@@ -1657,6 +1671,7 @@ CH32H417MEU6,CH32H417,CH32H417,SWPMI,RX,PC10,C,10,af-11,SWPMI_RX,#,confirmed,pin
 CH32H417MEU6,CH32H417,CH32H417,SWPMI,RX,PC8,C,8,af-11,SWPMI_RX,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,SWPMI,SUP,PC9,C,9,af-11,SWPMI_SUP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,SWPMI,TX,PC7,C,7,af-11,SWPMI_TX,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,TIM1,BKIN,PB12,B,12,af-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,TIM1,BKIN,PE15,E,15,af-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,TIM1,BKIN2,PA12,A,12,af-12,TIM1_BKIN2,#,confirmed,pin-table:zh+pin-table:en
@@ -1952,6 +1967,10 @@ CH32H417MEU6,CH32H417,CH32H417,USBHS,DM,PB9,B,9,default,USBHS_DM,#,confirmed,pin
 CH32H417MEU6,CH32H417,CH32H417,USBHS,DP,PB8,B,8,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,USBPD,CC1,PB3,B,3,af-4,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417MEU6,CH32H417,CH32H417,USBPD,CC2,PB4,B,4,af-4,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417MEU6,CH32H417,CH32H417,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ADC1,IN0,PA0,A,0,default,ADC_IN0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ADC1,IN1,PA1,A,1,default,ADC_IN1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ADC1,IN10,PC0,C,0,default,ADC_IN10,#,confirmed,pin-table:zh+pin-table:en
@@ -2065,6 +2084,10 @@ CH32H417QEU6,CH32H417,CH32H417,DVP,VSYNC,PB7,B,7,af-13,DVP_VSYNC,#,confirmed,pin
 CH32H417QEU6,CH32H417,CH32H417,DVP,VSYNC,PF3,F,3,af-13,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ETH,MDC,PC0,C,0,af-1,ETH_MDC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ETH,MDIO,PC1,C,1,af-1,ETH_MDIO,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ETH,PHY_LED0,PF0,F,0,af-10,ETH_PHY_LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ETH,PHY_LED1,PF1,F,1,af-10,ETH_PHY_LED1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,ETH,PHY_LED2,PF2,F,2,af-10,ETH_PHY_LED2,#,confirmed,pin-table:zh+pin-table:en
@@ -2368,6 +2391,8 @@ CH32H417QEU6,CH32H417,CH32H417,OPA3,OUT0,PA0,A,0,default,OPA3_OUT0,#,confirmed,p
 CH32H417QEU6,CH32H417,CH32H417,OPA3,OUT1,PA4,A,4,default,OPA3_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,OPA3,P0,PC2,C,2,default,OPA3_P0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,OPA3,P1,PA2,A,2,default,OPA3_P1,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,OTG,DM,PA11,A,11,default,OTG_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -2750,6 +2775,7 @@ CH32H417QEU6,CH32H417,CH32H417,SWPMI,RX,PC10,C,10,af-11,SWPMI_RX,#,confirmed,pin
 CH32H417QEU6,CH32H417,CH32H417,SWPMI,RX,PC8,C,8,af-11,SWPMI_RX,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,SWPMI,SUP,PC9,C,9,af-11,SWPMI_SUP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,SWPMI,TX,PC7,C,7,af-11,SWPMI_TX,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,TIM1,BKIN,PA6,A,6,af-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,TIM1,BKIN,PB12,B,12,af-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,TIM1,BKIN,PE15,E,15,af-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -3127,6 +3153,10 @@ CH32H417QEU6,CH32H417,CH32H417,USBHS,DM,PB9,B,9,default,USBHS_DM,#,confirmed,pin
 CH32H417QEU6,CH32H417,CH32H417,USBHS,DP,PB8,B,8,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,USBPD,CC1,PB3,B,3,af-4,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417QEU6,CH32H417,CH32H417,USBPD,CC2,PB4,B,4,af-4,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417QEU6,CH32H417,CH32H417,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ADC1,IN10,PC0,C,0,default,ADC_IN10,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ADC1,IN11,PC1,C,1,default,ADC_IN11,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ADC1,IN12,PC2,C,2,default,ADC_IN12,#,confirmed,pin-table:zh+pin-table:en
@@ -3196,6 +3226,10 @@ CH32H417WEU6,CH32H417,CH32H417,DVP,VSYNC,PB14,B,14,af-15,DVP_VSYNC,#,confirmed,p
 CH32H417WEU6,CH32H417,CH32H417,DVP,VSYNC,PF3,F,3,af-13,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ETH,MDC,PC0,C,0,af-1,ETH_MDC,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ETH,MDIO,PC1,C,1,af-1,ETH_MDIO,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ETH,PHY_LED0,PF0,F,0,af-10,ETH_PHY_LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ETH,PHY_LED1,PF1,F,1,af-10,ETH_PHY_LED1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,ETH,PHY_LED2,PF2,F,2,af-10,ETH_PHY_LED2,#,confirmed,pin-table:zh+pin-table:en
@@ -3393,6 +3427,8 @@ CH32H417WEU6,CH32H417,CH32H417,OPA1,P0,PB0,B,0,default,OPA1_P0,#,confirmed,pin-t
 CH32H417WEU6,CH32H417,CH32H417,OPA2,OUT1,PB1,B,1,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,OPA3,N0,PC3,C,3,default,OPA3_N0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,OPA3,P0,PC2,C,2,default,OPA3_P0,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,PIOC,IO0,PB8,B,8,af-5,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,PIOC,IO0,PC1,C,1,af-7,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,PIOC,IO1,PB9,B,9,af-7,PIOC_IO1,#,confirmed,pin-table:zh+pin-table:en
@@ -3859,6 +3895,10 @@ CH32H417WEU6,CH32H417,CH32H417,USART8,CK,PA14,A,14,af-11,USART8_CK,#,confirmed,p
 CH32H417WEU6,CH32H417,CH32H417,USART8,TX,PA15,A,15,af-11,USART8_TX,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,USBHS,DM,PB9,B,9,default,USBHS_DM,#,confirmed,pin-table:zh+pin-table:en
 CH32H417WEU6,CH32H417,CH32H417,USBHS,DP,PB8,B,8,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32H417WEU6,CH32H417,CH32H417,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,ADC1,IN0,PA0-WKUP,A,0,default,ADC_IN0,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,ADC1,IN1,PA1,A,1,default,ADC_IN1,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,ADC1,IN2,PA2,A,2,default,ADC_IN2,#,confirmed,pin-table:zh+pin-table:en
@@ -3931,6 +3971,8 @@ CH32L103C8T6,CH32L103,CH32L103,OPA,P2,PB14,B,14,default,OPA_P2,#,confirmed,pin-t
 CH32L103C8T6,CH32L103,CH32L103,OPA,P3,PA7,A,7,default,OPA_P3,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,OPA,P4,PA0-WKUP,A,0,default,OPA_P4,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,OPA,P5,PA6,A,6,default,OPA_P5,#,confirmed,pin-table:zh+pin-table:en
+CH32L103C8T6,CH32L103,CH32L103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32L103C8T6,CH32L103,CH32L103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -3959,7 +4001,9 @@ CH32L103C8T6,CH32L103,CH32L103,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32L103C8T6,CH32L103,CH32L103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32L103C8T6,CH32L103,CH32L103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32L103C8T6,CH32L103,CH32L103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-4,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-5,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103C8T6,CH32L103,CH32L103,TIM1,BKIN,PA13,A,13,remap-2,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -4168,6 +4212,8 @@ CH32L103F8P6,CH32L103,CH32L103,OPA,O3,PA4,A,4,default,OPA_O3,#,confirmed,pin-tab
 CH32L103F8P6,CH32L103,CH32L103,OPA,P3,PA7,A,7,default,OPA_P3,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,OPA,P4,PA0-WKUP,A,0,default,OPA_P4,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,OPA,P5,PA6,A,6,default,OPA_P5,#,confirmed,pin-table:zh+pin-table:en
+CH32L103F8P6,CH32L103,CH32L103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32L103F8P6,CH32L103,CH32L103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,SDI,SWDIO,PA13,A,13,main,SWDIO,#,confirmed,pin-table:zh+pin-table:en
@@ -4182,6 +4228,8 @@ CH32L103F8P6,CH32L103,CH32L103,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin
 CH32L103F8P6,CH32L103,CH32L103,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-2,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-3,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32L103F8P6,CH32L103,CH32L103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32L103F8P6,CH32L103,CH32L103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-4,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-5,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103F8P6,CH32L103,CH32L103,TIM1,BKIN,PA13,A,13,remap-2,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -4562,6 +4610,7 @@ CH32L103G8R6,CH32L103,CH32L103,OPA,P2,PB14,B,14,default,OPA_P2,#,confirmed,pin-t
 CH32L103G8R6,CH32L103,CH32L103,OPA,P3,PA7,A,7,default,OPA_P3,#,confirmed,pin-table:zh+pin-table:en
 CH32L103G8R6,CH32L103,CH32L103,OPA,P4,PA0-WKUP,A,0,default,OPA_P4,#,confirmed,pin-table:zh+pin-table:en
 CH32L103G8R6,CH32L103,CH32L103,OPA,P5,PA6,A,6,default,OPA_P5,#,confirmed,pin-table:zh+pin-table:en
+CH32L103G8R6,CH32L103,CH32L103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103G8R6,CH32L103,CH32L103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32L103G8R6,CH32L103,CH32L103,RCC,MCO,PA8,A,8,default,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32L103G8R6,CH32L103,CH32L103,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -4798,6 +4847,8 @@ CH32L103K8U6,CH32L103,CH32L103,OPA,P1,PB0,B,0,default,OPA_P1,#,confirmed,pin-tab
 CH32L103K8U6,CH32L103,CH32L103,OPA,P3,PA7,A,7,default,OPA_P3,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,OPA,P4,PA0-WKUP,A,0,default,OPA_P4,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,OPA,P5,PA6,A,6,default,OPA_P5,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U6,CH32L103,CH32L103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U6,CH32L103,CH32L103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -4820,6 +4871,7 @@ CH32L103K8U6,CH32L103,CH32L103,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin
 CH32L103K8U6,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-2,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-3,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U6,CH32L103,CH32L103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-4,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U6,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-5,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -5022,6 +5074,8 @@ CH32L103K8U7,CH32L103,CH32L103,OPA,P1,PB0,B,0,default,OPA_P1,#,confirmed,pin-tab
 CH32L103K8U7,CH32L103,CH32L103,OPA,P3,PA7,A,7,default,OPA_P3,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,OPA,P4,PA0-WKUP,A,0,default,OPA_P4,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,OPA,P5,PA6,A,6,default,OPA_P5,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U7,CH32L103,CH32L103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U7,CH32L103,CH32L103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -5044,6 +5098,7 @@ CH32L103K8U7,CH32L103,CH32L103,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin
 CH32L103K8U7,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-2,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,SPI1,SCK,PB6,B,6,remap-3,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
+CH32L103K8U7,CH32L103,CH32L103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-4,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32L103K8U7,CH32L103,CH32L103,TIM1,BKIN,PA12,A,12,remap-5,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -11121,6 +11176,7 @@ CH32V103C6T6,CH32V103,CH32V103,I2C1,SDA,PB9,B,9,remap-1,I2C1_SDA,#,confirmed,pin
 CH32V103C6T6,CH32V103,CH32V103,I2C1,SMBAI,PB5,B,5,default,I2C1_SMBAI,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C6T6,CH32V103,CH32V103,OSC8M,IN,OSC8M_IN,,,main,OSC8M_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,RCC,MCO,PA8,A,8,default,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,RTC,OUT,PC13-TAMPER-RTC,C,13,default,TAMPER-RTC,#,confirmed,pin-table:zh+pin-table:en
@@ -11135,7 +11191,9 @@ CH32V103C6T6,CH32V103,CH32V103,SPI1,NSS,PA15,A,15,remap-1,SPI1_NSS,#,confirmed,p
 CH32V103C6T6,CH32V103,CH32V103,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C6T6,CH32V103,CH32V103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C6T6,CH32V103,CH32V103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C6T6,CH32V103,CH32V103,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11197,6 +11255,8 @@ CH32V103C8T6,CH32V103,CH32V103,I2C1,SMBAI,PB5,B,5,default,I2C1_SMBAI,#,confirmed
 CH32V103C8T6,CH32V103,CH32V103,I2C2,SCL,PB10,B,10,default,I2C2_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,I2C2,SDA,PB11,B,11,default,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,I2C2,SMBAI,PB12,B,12,default,I2C2_SMBAI,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8T6,CH32V103,CH32V103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8T6,CH32V103,CH32V103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11217,7 +11277,9 @@ CH32V103C8T6,CH32V103,CH32V103,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V103C8T6,CH32V103,CH32V103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8T6,CH32V103,CH32V103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8T6,CH32V103,CH32V103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8T6,CH32V103,CH32V103,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11288,6 +11350,8 @@ CH32V103C8U6,CH32V103,CH32V103,I2C1,SMBAI,PB5,B,5,default,I2C1_SMBAI,#,confirmed
 CH32V103C8U6,CH32V103,CH32V103,I2C2,SCL,PB10,B,10,default,I2C2_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,I2C2,SDA,PB11,B,11,default,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,I2C2,SMBAI,PB12,B,12,default,I2C2_SMBAI,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8U6,CH32V103,CH32V103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8U6,CH32V103,CH32V103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11308,7 +11372,9 @@ CH32V103C8U6,CH32V103,CH32V103,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V103C8U6,CH32V103,CH32V103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8U6,CH32V103,CH32V103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V103C8U6,CH32V103,CH32V103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103C8U6,CH32V103,CH32V103,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11385,6 +11451,8 @@ CH32V103R8T6,CH32V103,CH32V103,I2C1,SMBAI,PB5,B,5,default,I2C1_SMBAI,#,confirmed
 CH32V103R8T6,CH32V103,CH32V103,I2C2,SCL,PB10,B,10,default,I2C2_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,I2C2,SDA,PB11,B,11,default,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,I2C2,SMBAI,PB12,B,12,default,I2C2_SMBAI,#,confirmed,pin-table:zh+pin-table:en
+CH32V103R8T6,CH32V103,CH32V103,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V103R8T6,CH32V103,CH32V103,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11405,7 +11473,9 @@ CH32V103R8T6,CH32V103,CH32V103,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V103R8T6,CH32V103,CH32V103,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V103R8T6,CH32V103,CH32V103,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V103R8T6,CH32V103,CH32V103,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V103R8T6,CH32V103,CH32V103,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11500,6 +11570,8 @@ CH32V203C6T6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203C6T6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6T6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6T6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11520,7 +11592,9 @@ CH32V203C6T6,CH32V203,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V203C6T6,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6T6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6T6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6T6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11639,6 +11713,8 @@ CH32V203C6U6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203C6U6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6U6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6U6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11659,7 +11735,9 @@ CH32V203C6U6,CH32V203,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V203C6U6,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6U6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C6U6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C6U6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11778,6 +11856,8 @@ CH32V203C8T6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203C8T6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8T6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8T6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11798,7 +11878,9 @@ CH32V203C8T6,CH32V203,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V203C8T6,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8T6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8T6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8T6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -11917,6 +11999,8 @@ CH32V203C8U6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203C8U6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8U6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8U6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -11937,7 +12021,9 @@ CH32V203C8U6,CH32V203,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V203C8U6,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8U6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203C8U6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203C8U6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -12076,6 +12162,8 @@ CH32V203CCT6,CH32V203,CH32V205,OPA2,CHP0,PB14,B,14,default,OPA2_CHP0,#,confirmed
 CH32V203CCT6,CH32V203,CH32V205,OPA2,CHP1,PA7,A,7,default,OPA2_CHP1,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,OPA2,OUT2,PA2,A,2,default,OPA2_OUT2,#,confirmed,pin-table:zh+pin-table:en
+CH32V203CCT6,CH32V203,CH32V205,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203CCT6,CH32V203,CH32V205,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -12109,6 +12197,9 @@ CH32V203CCT6,CH32V203,CH32V205,SPI2,MISO,PB14,B,14,af-5,SPI2_MISO,#,confirmed,pi
 CH32V203CCT6,CH32V203,CH32V205,SPI2,MOSI,PB15,B,15,af-5,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,SPI2,NSS,PB12,B,12,af-5,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,SPI2,SCK,PB13,B,13,af-5,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203CCT6,CH32V203,CH32V205,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V203CCT6,CH32V203,CH32V205,SYS,BOOT1,BOOT1,,,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203CCT6,CH32V203,CH32V205,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,TIM1,BK,PA6,A,6,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,TIM1,BK,PB12,B,12,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203CCT6,CH32V203,CH32V205,TIM1,BK,PB9,B,9,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
@@ -12235,6 +12326,8 @@ CH32V203F6P6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203F6P6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203F6P6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203F6P6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,SDI,SWDIO,PA13,A,13,main,SWDIO,#,confirmed,pin-table:zh+pin-table:en
@@ -12242,6 +12335,8 @@ CH32V203F6P6,CH32V203,CH32V20x,SPI1,MISO,PA6,A,6,default,SPI1_MISO,#,confirmed,p
 CH32V203F6P6,CH32V203,CH32V20x,SPI1,MOSI,PA7,A,7,default,SPI1_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203F6P6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V203F6P6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,TIM1,CH1N,PA7,A,7,remap-1,TIM1_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F6P6,CH32V203,CH32V20x,TIM1,CH3N,PB1,B,1,remap-1,TIM1_CH3N,#,confirmed,pin-table:zh+pin-table:en
@@ -12302,6 +12397,7 @@ CH32V203F8P6,CH32V203,CH32V20x,SPI1,MISO,PA6,A,6,default,SPI1_MISO,#,confirmed,p
 CH32V203F8P6,CH32V203,CH32V20x,SPI1,MOSI,PA7,A,7,default,SPI1_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F8P6,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F8P6,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203F8P6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F8P6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F8P6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
 CH32V203F8P6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,remap-1,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -12463,6 +12559,8 @@ CH32V203G6U6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203G6U6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G6U6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G6U6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,SDI,SWDIO,PA13,A,13,main,SWDIO,#,confirmed,pin-table:zh+pin-table:en
@@ -12474,6 +12572,8 @@ CH32V203G6U6,CH32V203,CH32V20x,SPI1,NSS,PA15,A,15,remap-1,SPI1_NSS,#,confirmed,p
 CH32V203G6U6,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G6U6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G6U6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,TIM1,CH1N,PA7,A,7,remap-1,TIM1_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G6U6,CH32V203,CH32V20x,TIM1,CH2,PA9,A,9,default,TIM1_CH2,#,confirmed,pin-table:zh+pin-table:en
@@ -12564,6 +12664,8 @@ CH32V203G8R6,CH32V203,CH32V20x,SPI1,MISO,PA6,A,6,default,SPI1_MISO,#,confirmed,p
 CH32V203G8R6,CH32V203,CH32V20x,SPI1,MOSI,PA7,A,7,default,SPI1_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G8R6,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G8R6,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G8R6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V203G8R6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G8R6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G8R6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203G8R6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -12650,6 +12752,8 @@ CH32V203K8T6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203K8T6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8T6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8T6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,RCC,MCO,PA8,A,8,default,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -12662,6 +12766,8 @@ CH32V203K8T6,CH32V203,CH32V20x,SPI1,NSS,PA15,A,15,remap-1,SPI1_NSS,#,confirmed,p
 CH32V203K8T6,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8T6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8T6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8T6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,remap-1,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -12759,6 +12865,8 @@ CH32V203K8U7,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203K8U7,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8U7,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8U7,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -12774,6 +12882,7 @@ CH32V203K8U7,CH32V203,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin
 CH32V203K8U7,CH32V203,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,SPI1,SCK,PB3,B,3,remap-1,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
+CH32V203K8U7,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203K8U7,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -12891,6 +13000,8 @@ CH32V203RBT6,CH32V203,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V203RBT6,CH32V203,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203RBT6,CH32V203,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V203RBT6,CH32V203,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,OSC32,IN,PC14-,C,14,default,OSC32_IN,#,reference,pin-table:zh
 CH32V203RBT6,CH32V203,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -12911,7 +13022,9 @@ CH32V203RBT6,CH32V203,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V203RBT6,CH32V203,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V203RBT6,CH32V203,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V203RBT6,CH32V203,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V203RBT6,CH32V203,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -13066,6 +13179,8 @@ CH32V205CCT6,CH32V205,CH32V205,OPA2,CHP0,PB14,B,14,default,OPA2_CHP0,#,confirmed
 CH32V205CCT6,CH32V205,CH32V205,OPA2,CHP1,PA7,A,7,default,OPA2_CHP1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,OPA2,OUT2,PA2,A,2,default,OPA2_OUT2,#,confirmed,pin-table:zh+pin-table:en
+CH32V205CCT6,CH32V205,CH32V205,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V205CCT6,CH32V205,CH32V205,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,PIOC,IO0,PA11,A,11,af-4,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,PIOC,IO0,PB10,B,10,af-4,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,PIOC,IO1,PA12,A,12,af-4,PIOC_IO1,#,confirmed,pin-table:zh+pin-table:en
@@ -13099,6 +13214,7 @@ CH32V205CCT6,CH32V205,CH32V205,SPI2,MISO,PB14,B,14,af-5,SPI2_MISO,#,confirmed,pi
 CH32V205CCT6,CH32V205,CH32V205,SPI2,MOSI,PB15,B,15,af-5,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,SPI2,NSS,PB12,B,12,af-5,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,SPI2,SCK,PB13,B,13,af-5,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V205CCT6,CH32V205,CH32V205,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,TIM1,BK,PA6,A,6,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,TIM1,BK,PB12,B,12,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205CCT6,CH32V205,CH32V205,TIM1,BK,PB9,B,9,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
@@ -13289,6 +13405,8 @@ CH32V205RCT6,CH32V205,CH32V205,OPA2,CHP0,PB14,B,14,default,OPA2_CHP0,#,confirmed
 CH32V205RCT6,CH32V205,CH32V205,OPA2,CHP1,PA7,A,7,default,OPA2_CHP1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,OPA2,OUT2,PA2,A,2,default,OPA2_OUT2,#,confirmed,pin-table:zh+pin-table:en
+CH32V205RCT6,CH32V205,CH32V205,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V205RCT6,CH32V205,CH32V205,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,PIOC,IO0,PA11,A,11,af-4,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
@@ -13329,6 +13447,8 @@ CH32V205RCT6,CH32V205,CH32V205,SPI2,MISO,PB14,B,14,af-5,SPI2_MISO,#,confirmed,pi
 CH32V205RCT6,CH32V205,CH32V205,SPI2,MOSI,PB15,B,15,af-5,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,SPI2,NSS,PB12,B,12,af-5,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,SPI2,SCK,PB13,B,13,af-5,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V205RCT6,CH32V205,CH32V205,SYS,BOOT1,BOOT1,,,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V205RCT6,CH32V205,CH32V205,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,TIM1,BK,PA6,A,6,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,TIM1,BK,PB12,B,12,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205RCT6,CH32V205,CH32V205,TIM1,BK,PB9,B,9,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
@@ -13573,6 +13693,8 @@ CH32V205VCT6,CH32V205,CH32V205,OPA2,CHP0,PB14,B,14,default,OPA2_CHP0,#,confirmed
 CH32V205VCT6,CH32V205,CH32V205,OPA2,CHP1,PA7,A,7,default,OPA2_CHP1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,OPA2,OUT2,PA2,A,2,default,OPA2_OUT2,#,confirmed,pin-table:zh+pin-table:en
+CH32V205VCT6,CH32V205,CH32V205,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V205VCT6,CH32V205,CH32V205,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,PIOC,IO0,PA11,A,11,af-4,PIOC_IO0,#,confirmed,pin-table:zh+pin-table:en
@@ -13625,6 +13747,9 @@ CH32V205VCT6,CH32V205,CH32V205,SPI2,MISO,PB14,B,14,af-5,SPI2_MISO,#,confirmed,pi
 CH32V205VCT6,CH32V205,CH32V205,SPI2,MOSI,PB15,B,15,af-5,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,SPI2,NSS,PB12,B,12,af-5,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,SPI2,SCK,PB13,B,13,af-5,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V205VCT6,CH32V205,CH32V205,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V205VCT6,CH32V205,CH32V205,SYS,BOOT1,BOOT1,,,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V205VCT6,CH32V205,CH32V205,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,TIM1,BK,PA6,A,6,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,TIM1,BK,PB12,B,12,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
 CH32V205VCT6,CH32V205,CH32V205,TIM1,BK,PB9,B,9,af-0,TIM1_BK,#,confirmed,pin-table:zh+pin-table:en
@@ -13844,6 +13969,8 @@ CH32V208CBU6,CH32V208,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V208CBU6,CH32V208,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208CBU6,CH32V208,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V208CBU6,CH32V208,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -13864,7 +13991,9 @@ CH32V208CBU6,CH32V208,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V208CBU6,CH32V208,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V208CBU6,CH32V208,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208CBU6,CH32V208,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208CBU6,CH32V208,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -13971,6 +14100,8 @@ CH32V208GBU6,CH32V208,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V208GBU6,CH32V208,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208GBU6,CH32V208,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V208GBU6,CH32V208,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -13980,6 +14111,7 @@ CH32V208GBU6,CH32V208,CH32V20x,SPI1,MISO,PA6,A,6,default,SPI1_MISO,#,confirmed,p
 CH32V208GBU6,CH32V208,CH32V20x,SPI1,MOSI,PA7,A,7,default,SPI1_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,SPI1,NSS,PA4,A,4,default,SPI1_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,SPI1,SCK,PA5,A,5,default,SPI1_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V208GBU6,CH32V208,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,TIM1,CH1N,PA7,A,7,remap-1,TIM1_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V208GBU6,CH32V208,CH32V20x,TIM1,CH4,PA11,A,11,default,TIM1_CH4,#,confirmed,pin-table:zh+pin-table:en
@@ -14068,6 +14200,8 @@ CH32V208RBT6,CH32V208,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V208RBT6,CH32V208,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208RBT6,CH32V208,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V208RBT6,CH32V208,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -14088,7 +14222,9 @@ CH32V208RBT6,CH32V208,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V208RBT6,CH32V208,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V208RBT6,CH32V208,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208RBT6,CH32V208,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208RBT6,CH32V208,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -14227,6 +14363,8 @@ CH32V208WBU6,CH32V208,CH32V20x,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V208WBU6,CH32V208,CH32V20x,OPA2,CH1P,PA7,A,7,default,OPA2_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,OPA2,OUT0,PA2,A,2,default,OPA2_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,OPA2,OUT1,PA4,A,4,default,OPA2_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208WBU6,CH32V208,CH32V20x,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V208WBU6,CH32V208,CH32V20x,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -14247,7 +14385,9 @@ CH32V208WBU6,CH32V208,CH32V20x,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V208WBU6,CH32V208,CH32V20x,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V208WBU6,CH32V208,CH32V20x,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V208WBU6,CH32V208,CH32V20x,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V208WBU6,CH32V208,CH32V20x,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -14434,6 +14574,8 @@ CH32V303CBT6,CH32V303,CH32V307,OPA3,OUT0,PA1,A,1,default,OPA3_OUT0,#,confirmed,p
 CH32V303CBT6,CH32V303,CH32V307,OPA4,CH0N,PB1,B,1,default,OPA4_CH0N,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V303CBT6,CH32V303,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V303CBT6,CH32V303,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -14468,7 +14610,9 @@ CH32V303CBT6,CH32V303,CH32V307,SPI3,MOSI,PB5,B,5,default,SPI3_MOSI,#,confirmed,p
 CH32V303CBT6,CH32V303,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V303CBT6,CH32V303,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303CBT6,CH32V303,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303CBT6,CH32V303,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -14739,6 +14883,8 @@ CH32V303RBT6,CH32V303,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V303RBT6,CH32V303,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RBT6,CH32V303,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RBT6,CH32V303,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -14784,7 +14930,9 @@ CH32V303RBT6,CH32V303,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V303RBT6,CH32V303,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RBT6,CH32V303,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RBT6,CH32V303,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RBT6,CH32V303,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -15090,6 +15238,8 @@ CH32V303RCT6,CH32V303,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V303RCT6,CH32V303,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT6,CH32V303,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT6,CH32V303,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -15135,7 +15285,9 @@ CH32V303RCT6,CH32V303,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V303RCT6,CH32V303,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT6,CH32V303,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT6,CH32V303,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT6,CH32V303,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -15441,6 +15593,8 @@ CH32V303RCT7,CH32V303,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V303RCT7,CH32V303,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT7,CH32V303,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT7,CH32V303,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -15486,7 +15640,9 @@ CH32V303RCT7,CH32V303,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V303RCT7,CH32V303,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT7,CH32V303,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303RCT7,CH32V303,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303RCT7,CH32V303,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -15839,6 +15995,8 @@ CH32V303VCT6,CH32V303,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,p
 CH32V303VCT6,CH32V303,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,OPA4,OUT1,PE8,E,8,default,OPA4_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303VCT6,CH32V303,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V303VCT6,CH32V303,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -15884,7 +16042,9 @@ CH32V303VCT6,CH32V303,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V303VCT6,CH32V303,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V303VCT6,CH32V303,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V303VCT6,CH32V303,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V303VCT6,CH32V303,CH32V307,TIM1,BKIN,PE15,E,15,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -16261,6 +16421,8 @@ CH32V305CCT6,CH32V305,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V305CCT6,CH32V305,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V305CCT6,CH32V305,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V305CCT6,CH32V305,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,OTG,FS_DP,PA12,A,12,default,OTG_FS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,OTG,FS_ID,PA10,A,10,default,OTG_FS_ID,#,confirmed,pin-table:zh+pin-table:en
@@ -16293,6 +16455,7 @@ CH32V305CCT6,CH32V305,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V305CCT6,CH32V305,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V305CCT6,CH32V305,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305CCT6,CH32V305,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -16492,6 +16655,8 @@ CH32V305FBP6,CH32V305,CH32V307,OPA2,CH1N,PA5,A,5,default,OPA2_CH1N,#,confirmed,p
 CH32V305FBP6,CH32V305,CH32V307,OPA3,CH0P,PB13,B,13,default,OPA3_CH0P,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,OPA3,OUT0,PA1,A,1,default,OPA3_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed,pin-table:zh+pin-table:en
+CH32V305FBP6,CH32V305,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V305FBP6,CH32V305,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,OTG,FS_VBUS,PA9,A,9,default,OTG_FS_VBUS,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,SDI,SWDIO,PA13,A,13,main,SWDIO,#,confirmed,pin-table:zh+pin-table:en
@@ -16506,6 +16671,7 @@ CH32V305FBP6,CH32V305,CH32V307,SPI2,MISO,PB14,B,14,default,SPI2_MISO,#,confirmed
 CH32V305FBP6,CH32V305,CH32V307,SPI2,MOSI,PB15,B,15,default,SPI2_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,SPI2,NSS,PB12,B,12,default,SPI2_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,SPI2,SCK,PB13,B,13,default,SPI2_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V305FBP6,CH32V305,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,TIM1,CH1N,PB13,B,13,default,TIM1_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V305FBP6,CH32V305,CH32V307,TIM1,CH2,PA9,A,9,default,TIM1_CH2,#,confirmed,pin-table:zh+pin-table:en
@@ -16627,6 +16793,8 @@ CH32V305GBU6,CH32V305,CH32V307,OPA3,CH1N,PC2,C,2,default,OPA3_CH1N,#,confirmed,p
 CH32V305GBU6,CH32V305,CH32V307,OPA3,OUT0,PA1,A,1,default,OPA3_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
+CH32V305GBU6,CH32V305,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V305GBU6,CH32V305,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,SDI,SWCLK,PA14,A,14,main,SWCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,SDI,SWDIO,PA13,A,13,main,SWDIO,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,SDIO,CK,PC12,C,12,default,SDIO_CK,#,confirmed,pin-table:zh+pin-table:en
@@ -16649,6 +16817,7 @@ CH32V305GBU6,CH32V305,CH32V307,SPI3,MISO,PC11,C,11,remap-1,SPI3_MISO,#,confirmed
 CH32V305GBU6,CH32V305,CH32V307,SPI3,MOSI,PC12,C,12,remap-1,SPI3_MOSI,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V305GBU6,CH32V305,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305GBU6,CH32V305,CH32V307,TIM1,CH1N,PA7,A,7,remap-1,TIM1_CH1N,#,confirmed,pin-table:zh+pin-table:en
@@ -16857,6 +17026,8 @@ CH32V305RBT6,CH32V305,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V305RBT6,CH32V305,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V305RBT6,CH32V305,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V305RBT6,CH32V305,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -16902,7 +17073,9 @@ CH32V305RBT6,CH32V305,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V305RBT6,CH32V305,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V305RBT6,CH32V305,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V305RBT6,CH32V305,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V305RBT6,CH32V305,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -17208,6 +17381,8 @@ CH32V307RCT6,CH32V307,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V307RCT6,CH32V307,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V307RCT6,CH32V307,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V307RCT6,CH32V307,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -17253,7 +17428,9 @@ CH32V307RCT6,CH32V307,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V307RCT6,CH32V307,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V307RCT6,CH32V307,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V307RCT6,CH32V307,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307RCT6,CH32V307,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -17606,6 +17783,8 @@ CH32V307VCT6,CH32V307,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,p
 CH32V307VCT6,CH32V307,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,OPA4,OUT1,PE8,E,8,default,OPA4_OUT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V307VCT6,CH32V307,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V307VCT6,CH32V307,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -17651,7 +17830,9 @@ CH32V307VCT6,CH32V307,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V307VCT6,CH32V307,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V307VCT6,CH32V307,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V307VCT6,CH32V307,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307VCT6,CH32V307,CH32V307,TIM1,BKIN,PE15,E,15,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -18048,6 +18229,8 @@ CH32V307WCU6,CH32V307,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V307WCU6,CH32V307,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V307WCU6,CH32V307,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V307WCU6,CH32V307,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -18093,7 +18276,9 @@ CH32V307WCU6,CH32V307,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V307WCU6,CH32V307,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V307WCU6,CH32V307,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V307WCU6,CH32V307,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V307WCU6,CH32V307,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -18324,6 +18509,12 @@ CH32V317VCT6,CH32V317,CH32V307,DVP,D9,PC12,C,12,default,DVP_D9,#,confirmed,pin-t
 CH32V317VCT6,CH32V317,CH32V307,DVP,HSYNC,PA4,A,4,default,DVP_HSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,DVP,PCLK,PA6,A,6,default,DVP_PCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,LED0,LED0,,,main,LED0,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,LED1,LED1,,,main,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,I2C1,SCL,PB6,B,6,default,I2C1_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,I2C1,SCL,PB8,B,8,remap-1,I2C1_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,I2C1,SDA,PB7,B,7,default,I2C1_SDA,#,confirmed,pin-table:zh+pin-table:en
@@ -18363,6 +18554,8 @@ CH32V317VCT6,CH32V317,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V317VCT6,CH32V317,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -18407,7 +18600,9 @@ CH32V317VCT6,CH32V317,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V317VCT6,CH32V317,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V317VCT6,CH32V317,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317VCT6,CH32V317,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -18677,6 +18872,12 @@ CH32V317WCU6,CH32V317,CH32V307,DVP,D9,PC12,C,12,default,DVP_D9,#,confirmed,pin-t
 CH32V317WCU6,CH32V317,CH32V307,DVP,HSYNC,PA4,A,4,default,DVP_HSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,DVP,PCLK,PA6,A,6,default,DVP_PCLK,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,LED0,LED0,,,main,LED0,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,LED1,LED1,,,main,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,I2C1,SCL,PB6,B,6,default,I2C1_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,I2C1,SCL,PB8,B,8,remap-1,I2C1_SCL,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,I2C1,SDA,PB7,B,7,default,I2C1_SDA,#,confirmed,pin-table:zh+pin-table:en
@@ -18714,6 +18915,8 @@ CH32V317WCU6,CH32V317,CH32V307,OPA4,CH0P,PB12,B,12,default,OPA4_CH0P,#,confirmed
 CH32V317WCU6,CH32V317,CH32V307,OPA4,CH1N,PC3,C,3,default,OPA4_CH1N,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,OPA4,CH1P,PC4,C,4,default,OPA4_CH1P,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,OPA4,OUT0,PA0-WKUP,A,0,default,OPA4_OUT0,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,OTG,FS_DM,PA11,A,11,default,OTG_FS_DM,#,confirmed,pin-table:zh+pin-table:en
@@ -18754,7 +18957,9 @@ CH32V317WCU6,CH32V317,CH32V307,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V317WCU6,CH32V317,CH32V307,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,SYS,BOOT0,BOOT0,,,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V317WCU6,CH32V317,CH32V307,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V317WCU6,CH32V317,CH32V307,TIM1,CH1,PA8,A,8,default,TIM1_CH1,#,confirmed,pin-table:zh+pin-table:en
@@ -18984,6 +19189,10 @@ CH32V407RET6,CH32V407,CH32V407,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,p
 CH32V407RET6,CH32V407,CH32V407,DVP,VSYNC,PA5,A,5,remap-1,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,ETH,LED0,PD14,D,14,remap-1,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,ETH,LED1,PD15,D,15,remap-1,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,FSMC,D0,PD14,D,14,default,FSMC_D0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,FSMC,D0,PD14,D,14,remap-1,FSMC_D0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,FSMC,D1,PD15,D,15,,FSMC_D1,#,confirmed,pin-table:zh+pin-table:en
@@ -19080,6 +19289,8 @@ CH32V407RET6,CH32V407,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V407RET6,CH32V407,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -19129,6 +19340,7 @@ CH32V407RET6,CH32V407,CH32V407,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V407RET6,CH32V407,CH32V407,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -19399,6 +19611,10 @@ CH32V407VET6,CH32V407,CH32V407,ETH,LED0,PD14,D,14,remap-1,LED0,#,confirmed,pin-t
 CH32V407VET6,CH32V407,CH32V407,ETH,LED0,PE8,E,8,default,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,ETH,LED1,PD15,D,15,remap-1,LED1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,ETH,LED1,PE9,E,9,default,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,FSMC,A16,PD11,D,11,default,FSMC_A16,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,FSMC,A16,PD11,D,11,remap-1,FSMC_A16,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,FSMC,A17,PD12,D,12,default,FSMC_A17,#,confirmed,pin-table:zh+pin-table:en
@@ -19549,6 +19765,8 @@ CH32V407VET6,CH32V407,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V407VET6,CH32V407,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -19606,6 +19824,7 @@ CH32V407VET6,CH32V407,CH32V407,SYS,BOOT0,PE12,E,12,default,BOOT0,#,confirmed,pin
 CH32V407VET6,CH32V407,CH32V407,SYS,BOOT0,PE12,E,12,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,SYS,BOOT1,PB2,B,2,default,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -19946,6 +20165,10 @@ CH32V407WEU6,CH32V407,CH32V407,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,p
 CH32V407WEU6,CH32V407,CH32V407,DVP,VSYNC,PA5,A,5,remap-1,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,ETH,LED0,PE8,E,8,default,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,ETH,LED1,PE9,E,9,default,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,FSMC,D10,PB12,B,12,default,FSMC_D10,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,FSMC,D10,PB12,B,12,remap-1,FSMC_D10,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,FSMC,D11,PB13,B,13,default,FSMC_D11,#,confirmed,pin-table:zh+pin-table:en
@@ -20053,6 +20276,8 @@ CH32V407WEU6,CH32V407,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V407WEU6,CH32V407,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -20106,6 +20331,7 @@ CH32V407WEU6,CH32V407,CH32V407,SYS,BOOT0,PE12,E,12,default,BOOT0,#,confirmed,pin
 CH32V407WEU6,CH32V407,CH32V407,SYS,BOOT0,PE12,E,12,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,SYS,BOOT1,PB2,B,2,default,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -20399,6 +20625,10 @@ CH32V467RET6,CH32V467,CH32V407,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,p
 CH32V467RET6,CH32V467,CH32V407,DVP,VSYNC,PA5,A,5,remap-1,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,ETH,LED0,PD14,D,14,remap-1,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,ETH,LED1,PD15,D,15,remap-1,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,FSMC,D0,PD14,D,14,default,FSMC_D0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,FSMC,D0,PD14,D,14,remap-1,FSMC_D0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,FSMC,D1,PD15,D,15,,FSMC_D1,#,confirmed,pin-table:zh+pin-table:en
@@ -20492,6 +20722,8 @@ CH32V467RET6,CH32V467,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V467RET6,CH32V467,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -20541,6 +20773,7 @@ CH32V467RET6,CH32V467,CH32V407,SPI3,NSS,PA15,A,15,default,SPI3_NSS,#,confirmed,p
 CH32V467RET6,CH32V467,CH32V407,SPI3,NSS,PA4,A,4,remap-1,SPI3_NSS,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,SPI3,SCK,PB3,B,3,default,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,SPI3,SCK,PC10,C,10,remap-1,SPI3_SCK,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -20808,6 +21041,10 @@ CH32V467VET6,CH32V467,CH32V407,ETH,LED0,PD14,D,14,remap-1,LED0,#,confirmed,pin-t
 CH32V467VET6,CH32V467,CH32V407,ETH,LED0,PE8,E,8,default,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,ETH,LED1,PD15,D,15,remap-1,LED1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,ETH,LED1,PE9,E,9,default,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,FSMC,A16,PD11,D,11,default,FSMC_A16,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,FSMC,A16,PD11,D,11,remap-1,FSMC_A16,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,FSMC,A17,PD12,D,12,default,FSMC_A17,#,confirmed,pin-table:zh+pin-table:en
@@ -20957,6 +21194,8 @@ CH32V467VET6,CH32V467,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V467VET6,CH32V467,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -21014,6 +21253,7 @@ CH32V467VET6,CH32V467,CH32V407,SYS,BOOT0,PE12,E,12,default,BOOT0,#,confirmed,pin
 CH32V467VET6,CH32V467,CH32V407,SYS,BOOT0,PE12,E,12,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,SYS,BOOT1,PB2,B,2,default,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -21353,6 +21593,10 @@ CH32V467WEU6,CH32V467,CH32V407,DVP,VSYNC,PA5,A,5,default,DVP_VSYNC,#,confirmed,p
 CH32V467WEU6,CH32V467,CH32V407,DVP,VSYNC,PA5,A,5,remap-1,DVP_VSYNC,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,ETH,LED0,PE8,E,8,default,LED0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,ETH,LED1,PE9,E,9,default,LED1,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,ETH,MDIRN,MDIRN,,,main,MDIRN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,ETH,MDIRP,MDIRP,,,main,MDIRP,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,ETH,MDITN,MDITN,,,main,MDITN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,ETH,MDITP,MDITP,,,main,MDITP,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,FSMC,D10,PB12,B,12,default,FSMC_D10,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,FSMC,D10,PB12,B,12,remap-1,FSMC_D10,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,FSMC,D11,PB13,B,13,default,FSMC_D11,#,confirmed,pin-table:zh+pin-table:en
@@ -21457,6 +21701,8 @@ CH32V467WEU6,CH32V467,CH32V407,OPA,OUT1,PA7,A,7,default,OPA_OUT1,#,confirmed,pin
 CH32V467WEU6,CH32V467,CH32V407,OPA,OUT2,PB1,B,1,default,OPA_OUT2,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,OPA,P1,PB12,B,12,default,OPA_P1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,OPA,P2,PA6,A,6,default,OPA_P2,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,OSC,IN,OSC_IN,,,main,OSC_IN,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,OSC,OUT,OSC_OUT,,,main,OSC_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,OSC32,IN,PC14-OSC32_IN,C,14,default,OSC32_IN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,OSC32,OUT,PC15-OSC32_OUT,C,15,default,OSC32_OUT,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,PWR,WKUP,PA0-WKUP,A,0,default,WKUP,#,confirmed,pin-table:zh+pin-table:en
@@ -21510,6 +21756,7 @@ CH32V467WEU6,CH32V467,CH32V407,SYS,BOOT0,PE12,E,12,default,BOOT0,#,confirmed,pin
 CH32V467WEU6,CH32V467,CH32V407,SYS,BOOT0,PE12,E,12,main,BOOT0,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,SYS,BOOT1,PB2,B,2,default,BOOT1,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,SYS,BOOT1,PB2,B,2,main,BOOT1,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,SYS,NRST,NRST,,,main,NRST,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,TIM1,BKIN,PA6,A,6,remap-1,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,TIM1,BKIN,PB10,B,10,remap-3,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,TIM1,BKIN,PB12,B,12,default,TIM1_BKIN,#,confirmed,pin-table:zh+pin-table:en
@@ -23153,6 +23400,8 @@ CH32X305RCT6,CH32X305,CH32X315,I2C2,SDA,PB10,B,10,af-3,I2C2_SDA,#,confirmed,pin-
 CH32X305RCT6,CH32X305,CH32X315,I2C2,SDA,PC11,C,11,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X305RCT6,CH32X305,CH32X315,I2C2,SDA,PD7,D,7,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X305RCT6,CH32X305,CH32X315,I2C2,SDA,XO,,,af-3,I2C2_SDA,#,reference,pin-table:zh
+CH32X305RCT6,CH32X305,CH32X315,OSC,IN,XI,,,main,XI,#,reference,pin-table:zh
+CH32X305RCT6,CH32X305,CH32X315,OSC,OUT,XO,,,main,XO,#,reference,pin-table:zh
 CH32X305RCT6,CH32X305,CH32X315,RCC,MCO,PA15,A,15,af-0,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32X305RCT6,CH32X305,CH32X315,RTC,OUT,PC8,C,8,af-0,RTC,#,confirmed,pin-table:zh+pin-table:en
 CH32X305RCT6,CH32X305,CH32X315,SDI,SWCLK,PA14,A,14,default,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -23332,6 +23581,8 @@ CH32X315CCU6,CH32X315,CH32X315,I2C2,SDA,PA12,A,12,af-3,I2C2_SDA,#,confirmed,pin-
 CH32X315CCU6,CH32X315,CH32X315,I2C2,SDA,PB10,B,10,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,I2C2,SDA,PD7,D,7,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,I2C2,SDA,XO,,,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,RCC,MCO,PA15,A,15,af-0,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,RTC,OUT,PC8,C,8,af-0,RTC,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,SDI,SWCLK,PA14,A,14,default,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -23439,6 +23690,10 @@ CH32X315CCU6,CH32X315,CH32X315,USBHS,DM,PD6,D,6,default,USBHS_DM,#,confirmed,pin
 CH32X315CCU6,CH32X315,CH32X315,USBHS,DP,PD7,D,7,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,USBPD,CC1,PD4,D,4,af-2,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32X315CCU6,CH32X315,CH32X315,USBPD,CC2,PD5,D,5,af-2,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315CCU6,CH32X315,CH32X315,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,ADC1,IN0,PA2,A,2,default,ADC1_IN0,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,ADC1,IN1,PA3,A,3,default,ADC1_IN1,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,ADC1,IN10,PB4,B,4,default,ADC1_IN10,#,confirmed,pin-table:zh+pin-table:en
@@ -23515,6 +23770,8 @@ CH32X315MCU6,CH32X315,CH32X315,I2C2,SDA,PB10,B,10,af-3,I2C2_SDA,#,confirmed,pin-
 CH32X315MCU6,CH32X315,CH32X315,I2C2,SDA,PC11,C,11,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,I2C2,SDA,PD7,D,7,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,I2C2,SDA,XO,,,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,RCC,MCO,PA15,A,15,af-0,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,RTC,OUT,PC8,C,8,af-0,RTC,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,SDI,SWCLK,PA14,A,14,default,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -23650,6 +23907,10 @@ CH32X315MCU6,CH32X315,CH32X315,USBHS,DM,PD6,D,6,default,USBHS_DM,#,confirmed,pin
 CH32X315MCU6,CH32X315,CH32X315,USBHS,DP,PD7,D,7,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,USBPD,CC1,PD4,D,4,af-2,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32X315MCU6,CH32X315,CH32X315,USBPD,CC2,PD5,D,5,af-2,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315MCU6,CH32X315,CH32X315,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,ADC1,IN0,PA2,A,2,default,ADC1_IN0,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,ADC1,IN1,PA3,A,3,default,ADC1_IN1,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,ADC1,IN10,PB4,B,4,default,ADC1_IN10,#,confirmed,pin-table:zh+pin-table:en
@@ -23724,6 +23985,8 @@ CH32X315WCU6,CH32X315,CH32X315,I2C2,SDA,PB10,B,10,af-3,I2C2_SDA,#,confirmed,pin-
 CH32X315WCU6,CH32X315,CH32X315,I2C2,SDA,PC11,C,11,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,I2C2,SDA,PD7,D,7,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,I2C2,SDA,XO,,,af-3,I2C2_SDA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,OSC,IN,XI,,,main,XI,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,OSC,OUT,XO,,,main,XO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,RCC,MCO,PA15,A,15,af-0,MCO,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,RTC,OUT,PC8,C,8,af-0,RTC,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,SDI,SWCLK,PA14,A,14,default,SWCLK,#,confirmed,pin-table:zh+pin-table:en
@@ -23851,3 +24114,7 @@ CH32X315WCU6,CH32X315,CH32X315,USBHS,DM,PD6,D,6,default,USBHS_DM,#,confirmed,pin
 CH32X315WCU6,CH32X315,CH32X315,USBHS,DP,PD7,D,7,default,USBHS_DP,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,USBPD,CC1,PD4,D,4,af-2,CC1,#,confirmed,pin-table:zh+pin-table:en
 CH32X315WCU6,CH32X315,CH32X315,USBPD,CC2,PD5,D,5,af-2,CC2,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,USBSS,RXA,SSRXA,,,main,SSRXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,USBSS,RXB,SSRXB,,,main,SSRXB,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,USBSS,TXA,SSTXA,,,main,SSTXA,#,confirmed,pin-table:zh+pin-table:en
+CH32X315WCU6,CH32X315,CH32X315,USBSS,TXB,SSTXB,,,main,SSTXB,#,confirmed,pin-table:zh+pin-table:en

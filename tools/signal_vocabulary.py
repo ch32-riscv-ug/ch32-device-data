@@ -44,6 +44,10 @@ decided", which a consumer can skip, and that is more useful than a wrong guess.
     ('OSC', 'OUT')
     >>> is_pad_name("PC13")
     True
+    >>> split("MDITP")
+    ('ETH', 'MDITP')
+    >>> split("SSTXA")
+    ('USBSS', 'TXA')
 """
 
 from __future__ import annotations
@@ -177,6 +181,13 @@ COMPOUND = {
 # 役割ではない綴り。`NC` は「どこにも繋がっていない」という pad についての
 # 断り書きで、周辺の機能ではない。
 NOT_A_ROLE = frozenset({"NC"})
+# Ethernet の MDI 差動対。`MDI` ＋ R/T（受信/送信）＋ P/N（正/負）。pin 表は
+# これを主機能（复位后）として書く——専用 pad で GPIO と兼用しないため。
+ETH_MDI = re.compile(r"^MDI(?P<pair>[RT])(?P<side>[PN])$")
+# USB 3.0 の SuperSpeed 差動対。pin 表の型欄が `USB3.0` と書く専用 pad で、
+# 比較表はこの周辺を `USBSS（USB 3.0）` と数える。
+USB_SS = re.compile(r"^SS(?P<pair>RX|TX)(?P<lane>[AB])$")
+
 # Type-C の構成チャネル。比較表が `PDUSB USBPD Type-C` の行で数える周辺。
 # CH32M030 は同じ端子を `CC1(CC1R)` と書く——括弧の中は「Rd を内蔵した側の
 # 呼び名」で（datasheet p.16「PA0/CC1R and PA1/CC2R pins have built-in
@@ -292,6 +303,14 @@ def split(signal: str) -> tuple[str, str] | None:
     m = ADC_SCAN.match(signal)
     if m:
         return canonical_peripheral("ADC"), f"S{m.group('n')}"
+
+    m = ETH_MDI.match(signal)
+    if m:
+        return "ETH", f"MDI{m.group('pair')}{m.group('side')}"
+
+    m = USB_SS.match(signal)
+    if m:
+        return "USBSS", f"{m.group('pair')}{m.group('lane')}"
     return None
 
 

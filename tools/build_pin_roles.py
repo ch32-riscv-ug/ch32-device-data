@@ -56,7 +56,8 @@ COLUMNS = ["part_number", "series", "family", "peripheral", "role",
 GPIO_PAD = re.compile(r"^P(?P<port>[A-H])(?P<pin>\d{1,2})(?:[-_]|$)")
 
 
-def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collections.Counter]:
+def roles(functions: list[dict], catalogue: dict,
+          kinds: dict | None = None) -> tuple[list[dict], collections.Counter]:
     """(索引の行, 語彙で覆えなかった {(datasheet, signal): 行数})。
 
     `tools/check_tables.py` が同じ計算をして、覆えない数が増えていないかを見る。
@@ -70,10 +71,22 @@ def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collectio
         # `OSC_IN` の主機能は `PD0` で、どちらもその pad の GPIO としての名前。
         # 載せると「PC13 という周辺の PC13 という役割」が索引に生まれる。
         if fn["route"] == "main" and fn["signal"] == fn["pad"]:
+            # **自分の名前を主機能に持つ pad は2種類ある。**
+            #
+            #   VSS の主機能が VSS       電源。役割ではない
+            #   NRST の主機能が NRST     **リセット直後に生きている機能そのもの**
+            #
+            # 後者は「設定しなくても動く」の代表（`NRST`・`OSC_IN`/`OSC_OUT`・
+            # `BOOT0`・Ethernet の `MDI*`・USB3.0 の `SS*`）で、逆引きに要ります。
+            # 分けるのは pad の kind——power なら電源、そうでなければ機能。
+            if (kinds or {}).get((fn["part_number"], fn["pad"])) == "power":
+                continue
+            if signal_vocabulary.is_pad_name(fn["signal"]):
+                continue
+        elif signal_vocabulary.is_pad_name(fn["signal"]):
             continue
         found = signal_vocabulary.roles(fn["signal"])
-        if signal_vocabulary.is_pad_name(fn["signal"]) \
-                or fn["signal"] in signal_vocabulary.NOT_A_ROLE:
+        if fn["signal"] in signal_vocabulary.NOT_A_ROLE:
             continue
         if not found:
             unresolved[(fn["datasheet"], fn["signal"])] += 1
@@ -114,8 +127,10 @@ def main() -> int:
         catalogue = {r["part_number"]: r for r in csv.DictReader(f)}
     with (args.out / "pin_functions.csv").open(newline="", encoding="utf-8") as f:
         functions = list(csv.DictReader(f))
+    with (args.out / "pins.csv").open(newline="", encoding="utf-8") as f:
+        kinds = {(r["part_number"], r["pad"]): r["kind"] for r in csv.DictReader(f)}
 
-    rows, unresolved = roles(functions, catalogue)
+    rows, unresolved = roles(functions, catalogue, kinds)
     dest = args.out / "pin_roles.csv"
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)

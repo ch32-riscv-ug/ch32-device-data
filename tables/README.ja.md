@@ -118,7 +118,37 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 **注文型番単位**です。pins.csvは1行1(part_number, pin, pad)で「この型番のlead Nにどのpadが載るか」、pin_functions.csvは1行1(part_number, pad, signal, route)で「この型番のpadが持つ機能」。datasheetのpin表は1つのpinoutを複数型番で共有します（表題が適用範囲を宣言: `CH32V103x8x6`、`CH32V006（除F4U6以外）`、`TSSOP20(F8)`）が、その解決は生成時に済ませてあり、**行はpart_numberでそのままproducts.csvと結合できます**。共有していた事実はメタ側のdatasheet/table列（出典）に残ります。
 
-`route`の値: `main`（リセット後の主機能）/ `default`（既定の代替機能）/ `remap-N`（remap値N）/ `af-N`（H41x・X315系のalternate function番号）/ 空（経路番号が資料になく要確認）。
+#### `route`の値の意味（**「デフォルト」が2つの別々のことを指します**）
+
+`route`は**datasheetのpin表の列そのもの**です。全12 familyが同じ4列を持ちます（列見出しを実測して確認）。
+
+| `route` | 出所の列 | 意味 | **電源投入直後に動くか** | 行数 |
+|---|---|---|---|---|
+| `main` | 主功能（复位后）/ Main function (after reset) | リセット直後にそのpadがやっていること | **動く** | 130 |
+| `default` | 默认复用功能 / Default alternate function / 引脚功能 | remapレジスタを触らず（値0のまま）**AFモードにしたら**出る機能 | **動かない** | 9,261 |
+| `remap-N` | 重映射功能 | AFIOのremapフィールドに N を書く | 動かない | 約10,000 |
+| `af-N` | 同じ列にAF番号が併記される（`SDA(AF7)`） | そのpadのAF番号に N を書く | 動かない | 約4,100 |
+| 空 | — | 経路番号が資料になく要確認 | — | 107 |
+
+**`default`は「設定しなくても動く」ではありません。** 「remapを書かなくても届く」です。リセット直後のGPIOはフローティング入力で、**GPIOモードを代替機能にするまで代替機能は出ません**。AF方式のfamilyでも同じで、`GPIOx_AFLR`のリセット値0がAF0を選ぶことと、GPIOモードを代替機能にすることは別の設定です。
+
+具体的には、**UARTは`main`が1行もありません**（TX/RXは全部`default`/`remap-N`/`af-N`）。電源を入れただけではUARTは出ません。`main`に出るのは`SWDIO`/`SWCLK`/`BOOT0`/`BOOT1`と、専用padのリセット機能（`NRST`・`OSC_IN`/`OSC_OUT`・`XI`/`XO`・Ethernetの`MDI*`・USB3.0の`SS*`）だけです。
+
+#### **どちらの列に書くかはfamilyで揃っていません**
+
+同じSWDが、datasheetによって主功能列だったり既定代替功能列だったりします。
+
+```
+主功能列に書く:       CH32L103 / CH32V103 / CH32V20x / CH32V307
+既定代替功能列に書く:  CH32H417 / CH32M030 / CH32V003 / CH32V006 / CH32V205 / CH32X035 / CH32X315
+両方に出る:           CH32V407
+```
+
+CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`PC18`（GPIO）、既定代替功能を`DIO`（＝SWDIO）と書きます。**物理的にはどのfamilyもリセット時にSWDが生きています**（それでデバッガが素で繋がる）。列の違いは資料の書き方の違いです。
+
+**なので「リセット時に生きているか」を引くときは`main`だけを見ないでください。** `main`で引くと7 familyのSWDを落とします。`tools/build_readme.py`が`main`と`default`の両方を見ているのはこのためです。
+
+`route`は資料の列を保つ（綴りと出所が証拠なので変えない）方針なので、この揺れの吸収は読む側の仕事です。
 
 両言語照合で吸収している表記ずれ: 表番号のずれ（X315はzh`表2-1-1`=en`Table 2-1`。表題中のシリーズ名で照合）、列見出しの綴り（`QFN48×7`、`QFN28(6)`、zh`LQFP64M`=en画像`LQFP64`は表内の消去法でペアリング）、1列が複数packageを兼ねる見出し（`LQFP48/QFN48X7`は成分ごとに登録）。
 
@@ -198,11 +228,20 @@ consumerが型番ごとの機能一覧を作るなら、**この2つを掛け合
 
 この表は`tools/signal_vocabulary.py`の語彙規則を通した`(peripheral, role)`を持ちます。**新しい事実は足しません**——`pin_functions.csv`の行を言い換えるだけで、語彙で覆えない行は載せません。載せるとしたら語彙か抽出を直すのが筋で、ここで補うと資料に無いものが表に生まれます。`tools/check_tables.py`が「pin_functionsに無い行が入っていないか」と「覆えない綴りが増えていないか」を毎回見ます。
 
-`routing`は`pin_functions.csv`の`route`と同じ（`default` / `main` / `remap-N` / `af-N`）、`signal`は原典の綴りで、そこから層1へ戻れます。
+`routing`は`pin_functions.csv`の`route`と同じ（`default` / `main` / `remap-N` / `af-N`）で、**意味は上の「`route`の値の意味」を参照**してください——`default`は「電源を入れただけで動く」ではなく「remapを書かずに届く」です。`signal`は原典の綴りで、そこから層1へ戻れます。
 
 **`port`/`pin`は装飾を落としたGPIOとしての読み**です。datasheetは`PA0-WKUP`（432行）や`PC13-TAMPER-RTC`（89行）のように、そのpadの特別な役割を名前の一部として書きます。`pad`はその綴りをそのまま持つので（綴りは証拠）、`PA0`で探すと`PA0-WKUP`を取りこぼします。`pin_alternate.csv`が既に`pad, port, pin`を持っているので同じ形に揃えました。GPIOでないpad（`OSC_IN`・`XI`、51行）は両方とも空です。
 
-**pad自身の名前は載りません。** `PA9`の主機能が`PA9`、`PC13-RTC`の主機能が`PC13`、`VSS`の主機能が`VSS`と書かれるのは、そのpadが何であるかを言っているだけで役割ではないためです。逆引きに出てこないpadは4269中584で、内訳は電源400・その他136・GPIO 39・アナログ9です。
+**pad自身のGPIO名と電源は載りません。** `PA9`の主機能が`PA9`、`PC13-RTC`の主機能が`PC13`、`VSS`の主機能が`VSS`と書かれるのは、そのpadが何であるかを言っているだけで役割ではないためです。
+
+**ただし専用padのリセット機能は載せます。** 名前が機能そのものである pad が2種類あり、`kind`が分けます:
+
+```
+VSS の主機能が VSS      kind=power   電源。役割ではない → 載せない
+NRST の主機能が NRST    kind=other   リセット時に生きている機能 → 載せる
+```
+
+`NRST`・`OSC_IN`/`OSC_OUT`・`XI`/`XO`・`BOOT0`・Ethernetの`MDIRP`等・USB3.0の`SSTXA`等がこれで、**まさに「設定しなくても動く」ものなので逆引きに要ります**（280行）。
 
 ### `remap_fields.csv` / `remap_routes.csv`
 
