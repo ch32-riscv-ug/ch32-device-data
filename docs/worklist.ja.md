@@ -18,7 +18,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | README生成 | 3 | 3（B4〜B6。新規） |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 5 | 2（D4・D7。新規） |
-| consumerからの依頼 | 7 | 1（R-20。方針が要る） |
+| consumerからの依頼 | 8 | 0（R-20は機械収集ぶんまで。残りはconsumerの要否次第） |
 | 既知の穴（F系） | 42 | 5 = 資料が決めない 2（F-24残り8行・F-4残り6行）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-33・F-43〜46） |
 
 （2026-08-25 棚卸し時点。次にやる順は [次の作業](#次の作業優先順) にある）
@@ -149,7 +149,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | # | 依頼 | 状態 |
 |---|---|---|
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
-| R-20 | レジスタマップ（D-1〜D-8） | ❓ **調査済み・方針未決**。[register-map-survey.ja.md](register-map-survey.ja.md)。consumer側の要否確認から |
+| R-20 | レジスタマップ（D-1〜D-8） | 🔧 **機械的に集められる部分を実装**（2026-08-25、`tools/build_registers.py`）。`register_blocks` 676行（D-1）・`registers` 4,995行（D-3）・`register_fields` 33,365行（D-4。field 24,792のうちRM一致6,829・conflict 38）・`register_layouts` 353行（D-5。型数は調査どおりI2C 4/GPIO 6/USART 8…）。D-6は`interrupts.csv`。**未着手**: D-7（DMA channel→周辺。RMの表）、RM zh版の絶対アドレス表（D-1/D-3の裏取り）、構造体を持たないdefine群（M030 `UART_*`等1,591行）のmember対応。見方は`tables/README`。[register-map-survey.ja.md](register-map-survey.ja.md) |
 | R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張 |
 | R-24追補 | クロック表の追補（A-1〜A-4）とremapの要確認（B） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`・`evt_variants.csv`新設、`operating_conditions.csv`に`typ`列、remapの誤帰属を修正 |
 | R-24追補2 | クロック切替に要るレジスタ/ビットとflash latencyの取りこぼし（D-1〜D-4） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`を77→429行に拡張、`clock_init.csv`新設、`clock_configs`に`flash_sck_div`列 |
@@ -269,7 +269,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 - **JSON schema草案（`schemas/`・`devices/`8 sample・`tools/validate.py`・`docs/schema-notes.ja.md`・
   `.github/workflows/validate.yml`）は2026-08-25に削除した。** `tables/`が正本。記録はgitの履歴
-- **R-20（レジスタマップ）**を受けるかは未決。consumer側の要否から
+- **R-20（レジスタマップ）**は機械収集ぶんを実装した（2026-08-25。E表参照）。残りの手作業ぶん（D-7・RMの絶対アドレス表）は consumer側の要否を見て
 
 ### 3. 新規（穴が尽きてから）
 
@@ -311,6 +311,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-31 | CH32M103 datasheet en | pin説明でHO*を「N型」（p31）と「P型」（p32）の両方で書く | 表には影響なし（記録のみ） |
 | F-21 | CH32M030 EVT header | `ISP_CTLR_ISP2_QDET1_*`と綴る（RMは`QDET2`） | 語彙には使わない（記録のみ） |
 | F-21 | CH32V003 datasheet | pin表2-1のPD4が`TIETR_2`（同じ行が表2-3では`T1ETR_2`。`I`と`1`） | 語彙で`T1ETR`へ寄せる。層1の綴りは残す |
+| R-20 | EVT header vs RM（`register_fields`の conflict 38） | bit位置がEVTとRMで**入れ替わっている**もの: M030 `ADC_STATR` `MULT_CMP1`(EVT bit9/RM bit7)⇄`MULT_CMP3`(bit7/bit9)、V407 `RCC_CFGR2` `UTMI1ON`(bit31/bit30)⇄`UTMI2ON`(bit30/bit31)。**幅が違う**: V003/V006 `GPIO_LCKR.LCKK` EVT bit8/RM bit16、L103 `CAN_BTIMR.TS2` 3bit/4bit・`SJW` 2bit/4bit、V103 `FLASH_ACTLR.LATENCY` 2bit/3bit・`ADC_CTLR1.DUALMOD` 4bit/6bit、V20x/V307 `RCC_CFGR0.USBPRE` 1bit/2bit、X035 `ADC_CTLR3.CLK_DIV` 4bit/9bit・TIM `CCR3/4` 16/32bit、V003 `ADC_RDATAR.DATA` 32/16bit。`FLASH_OBR.USER`（8 family）はRM側が行を別の切り方で書くため | 全部 conflict＋両論。**実機未確認**。どちらが正しいかは決めていない |
 
 いずれも**実機では未確認**。「正しい側」はもう一方の資料が複数一致することで決めている。
 

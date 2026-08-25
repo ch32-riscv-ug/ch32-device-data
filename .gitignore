@@ -23,3 +23,6 @@ a.out
 # nothing here is fetched today (the extractors use the environment's cc), but
 # a vendored toolchain belongs here rather than in the tree.
 .tools/
+
+# build_registers.py --rm-cache の置き場（RM のレジスタ表の読み結果。再生成できる）
+.cache/

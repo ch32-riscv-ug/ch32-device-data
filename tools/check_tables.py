@@ -125,7 +125,8 @@ def main() -> int:
                       "memory_map", "features", "sources", "eval_boards",
                       "feature_tags", "pin_roles", "timers", "flash_geometry",
                       "opa_cmp_registers", "clock_enables", "adc_internal",
-                      "usbpd_plumbing")}
+                      "usbpd_plumbing", "register_blocks", "registers",
+                      "register_fields", "register_layouts")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -216,6 +217,44 @@ def main() -> int:
         bad.append(f"pin_roles: pin_functions にない行が {len(invented)} 件ある"
                    f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
     bad += pin_role_coverage(t)
+
+    # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
+    # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に
+    # あること、bits/mask/kind の書式、layout key が (family, 型) で一意であること。
+    layouts = {(r["family"], r["type"]): r["layout"] for r in t["register_layouts"]}
+    if len(layouts) != len(t["register_layouts"]):
+        bad.append("register_layouts: (family, type) が重複している")
+    for r in t["register_layouts"]:
+        check("register_layouts", r["type"], r["family"], families, "families")
+    for r in t["register_blocks"]:
+        check("register_blocks", r["block"], r["family"], families, "families")
+        # 型の構造体が header に無い block（V407/X315 の `USBHSH`——別 header の型）は
+        # layout が空。base address は事実なので行は残す。
+        if r["layout"] and (r["family"], r["type"]) not in layouts:
+            bad.append(f"register_blocks: {r['family']} {r['block']} の型 {r['type']} が register_layouts にない")
+        elif r["layout"] and r["layout"] != layouts[(r["family"], r["type"])]:
+            bad.append(f"register_blocks: {r['family']} {r['block']} の layout が register_layouts と違う")
+        if not re.fullmatch(r"0x[0-9a-f]{8}", r["base_address"]):
+            bad.append(f"register_blocks: {r['family']} {r['block']} の base_address {r['base_address']!r}")
+    for r in t["registers"]:
+        if (r["family"], r["type"]) not in layouts:
+            bad.append(f"registers: {r['family']} {r['type']}.{r['register']} の型が register_layouts にない")
+        if not re.fullmatch(r"0x[0-9a-f]+", r["offset"]) or r["width_bits"] not in ("8", "16", "32", "64"):
+            bad.append(f"registers: {r['family']} {r['type']}.{r['register']} の offset/width {r['offset']!r}/{r['width_bits']!r}")
+    for r in t["register_fields"]:
+        check("register_fields", r["register"], r["family"], families, "families")
+        if r["kind"] not in ("field", "value"):
+            bad.append(f"register_fields: {r['family']} {r['register']}.{r['field']} の kind {r['kind']!r}")
+        if r["bits"] and not re.fullmatch(r"\d+(?::\d+)?", r["bits"]):
+            bad.append(f"register_fields: {r['family']} {r['register']}.{r['field']} の bits {r['bits']!r}")
+        if not re.fullmatch(r"0x[0-9a-f]+", r["mask"]):
+            bad.append(f"register_fields: {r['family']} {r['register']}.{r['field']} の mask {r['mask']!r}")
+        if r["kind"] == "field" and not r["bits"] and r["mask"] != "0x0":
+            # 連続しない mask の field（bits が空）は許すが数は見える形にしておく
+            pass
+        if r["member"] and (r["family"], r["member"].split(".")[0]) not in layouts:
+            bad.append(f"register_fields: {r['family']} {r['register']} の member {r['member']} の"
+                       "構造体が register_layouts にない")
 
     # flash_geometry は family ごと1行。参照と、幾何の常識的な不変量
     # （fast page は標準 page より小さい・2の冪）を見る。

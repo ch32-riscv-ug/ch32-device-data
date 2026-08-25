@@ -39,6 +39,10 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   clock_enables.csv       429行  周辺クロックのenable bit（family×peripheral→PCENRレジスタとbit。EVT rcc.h×RM照合）
   adc_internal.csv         19行  ADC内部チャネル（温度センサ・VREFINT・VDD/2のチャネル番号・換算定数・サンプル時間）
   usbpd_plumbing.csv       13行  USBPDの配管（RCC enable bit＋PHY設定bitの所在。family で置き場所が違う）
+  register_blocks.csv     676行  block（USART1）→型・base address・layout key（EVTヘッダ。R-20）
+  registers.csv          4995行  型×register→構造体内offset・幅・配列数。RMのレジスタ表と名前が一致すればconfirmed
+  register_fields.csv   33365行  register×bit define→bit位置・mask・field/値・EVTの説明・RMのaccess/reset。RMとbit位置一致で confirmed
+  register_layouts.csv    353行  型×layout key。同じkeyのfamilyはレジスタ定義を共有できる（D-5）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
   eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
@@ -308,6 +312,46 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 | M030 | `EXTEN->EXTEN_CTLR0` の `USBPD0/1_CC_REF` / `CC_HVT` / `LVE_T`（PDが2つ） |
 
 **PDのfieldだけ**を載せます。X035の`AFIO_CTLR`やM030の`EXTEN_CTLR1`にある`UDP_*`/`UDM_*`（USBのD+/D-パッド制御）はUSBの配管でPDではないので入れていません。1行が1つのPHY fieldで、RCC側の列は行ごとに繰り返します。出所はEVTヘッダ（define名がレジスタを名乗るか、名乗らないものは直前のbanner「Bit definition for EXTEN_CTLR0 register」）で、RMのレジスタ表とbit位置を突き合わせています。
+
+### `register_blocks.csv` / `registers.csv` / `register_fields.csv` / `register_layouts.csv`
+
+**レジスタマップの、機械的に集められる部分**です（consumerのR-20。2026-08-25）。出所は12 family
+すべてを覆う唯一の機械可読ソースであるEVTのdevice header（`ch32*.h`）で、reference manual（zh）の
+レジスタ表でbit位置を突き合わせています。**EVTは参照するだけで複製しない**という作法どおり、
+headerの定義をそのまま写すのではなく、構造（block→型→register→field）に分解した事実だけを持ちます。
+
+| 表 | 1行 | 何が分かるか |
+|---|---|---|
+| `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
+| `registers` | family × 型 × register 4,995行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行 |
+| `register_fields` | family × register × bit define 33,365行（field 24,792・value 8,573） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。fieldの27.5%（6,829）がRMとbit位置一致、38がconflict |
+| `register_layouts` | family × 型 353行（70型） | **layout key**（構造体の並びとdefine名の集合のハッシュ）。同じkeyのfamilyは同じレジスタ定義を共有できる。実測: I2C 4型・GPIO 6型・USART/SPI 8型・TIM/ADC 11型・RCC/AFIO 12型（family全部違う） |
+
+**見方**:
+- **絶対アドレス** = `register_blocks.base_address` + `registers.offset`（同じfamilyの`type`で結合）。
+  `USART1->STATR`なら blocks(USART1)=0x40013800 + registers(USART, STATR)=0x000
+- **`register_fields.register`はheaderのbanner（`Bit definition for RCC_APB2PCENR register`）の綴り**で、
+  RMのレジスタ表と同じ形（`RCC_APB2PCENR`）。構造体のメンバーへの対応は`member`列
+  （`RCC.APB2PCENR`）に**付くものだけ付けます**。bannerがinstance番号を含むもの（`DMA_CNTR7`→
+  `DMA_Channel.CNTR`）は付きますが、CANのメールボックス/フィルタ（`CAN_TXMI0R`・`CAN_F30R2`）や
+  構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（1,591行＝4.8%）。**空でも行は消していません**
+  ——bit位置とmaskはheaderが言っているとおりです
+- **`kind=value`はfieldの中の値**。`RCC_PLLMULL_3`は`PLLMULL`の値。`of_field`が親、`value`がその値
+  （`mask >> lo`）。`kind=field`だけを数えればfieldの数になります
+- **`bits`が空の`field`**はmaskが連続していないもの（少数）。maskを見てください
+- **D-5（型のversion）は`register_layouts.layout`**。「I2Cは4型」のような分け方は、`type`ごとに
+  `layout`でgroup byすれば出ます。keyはハッシュなので**意味は持たず、同じか違うかだけ**を言います。
+  header側の定義が1つでも変われば変わる（版が上がると同じsiliconでも変わり得る）
+- **RMとの突き合わせは綴りが一致したものだけ**。RMの`GPIOx_CFGLR`・`IDRy`の`x`/`y`は数字を落として
+  比べます。一致してbit位置が同じ→`confirmed`、違う→`conflict`（`basis`に`!rm(...)(=hi:lo)`）、
+  RMに同名が無い→`reference`。**`reference`は誤りではなく裏取り待ち**で、`value`行は照合対象外
+  なので常に`reference`です
+- `conflict`は本物の食い違いです（例: CH32V003の`GPIO_LCKR.LCKK`はEVT bit8 / RM bit16、
+  `ADC_RDATAR.DATA`はEVT 32bit / RM 16bit）。どちらかに寄せていません
+
+**持っていないもの**: D-7（DMA channel→周辺の対応。RMの表にしかない）、RM zh版の絶対アドレス表
+（`R32_AFIO_PCFR1 / 0x40010004`。D-1/D-3の裏取りに使えるが未抽出）、RMのfield説明文
+（中国語。行が多いので入れていない。`extract_registers.py`で取れる）。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
@@ -890,6 +934,7 @@ uv run tools/build_opa_cmp_registers.py --out tables         # opa_cmp_registers
 uv run tools/build_clock_enables.py --out tables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
 uv run tools/build_adc_internal.py --out tables              # adc_internal（datasheet両言語の散文と電気的特性表）
 uv run tools/build_usbpd_plumbing.py --out tables            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
+uv run tools/build_registers.py --out tables --rm-cache .cache/rm   # register_blocks/registers/register_fields/register_layouts（EVTヘッダ＋RM全読み。10分以上）
 uv run tools/build_eval_boards.py --out tables                # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py --out tables               # feature_tags（features + 比較表から。PDF不要）
 uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）
