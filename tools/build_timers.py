@@ -54,13 +54,25 @@ HEAD_GROUP = re.compile(
 HEAD_ONE = re.compile(
     r"^\d+(?:\.\d+)+\s*(?P<kind>\S*?定时器).*?TIM(?P<n>\d+)_CNT\s*[)）]")
 # 直後の field 表の CNT 行。`[31:0] CNT[31:0]` / `[15:0] CNT[15:0]`。
-WIDTH = re.compile(r"\[(?P<hi>\d+):0\]\s*CNT")
+# 幅を言う書き方が2つあります。**両方を見て最上位ビットの最大を採ります。**
+#
+#   field 表の行      `[31:0] CNT[31:0] RW …`
+#   レジスタ配置図    `CNT[31:16]` と `CNT[15:0]` の2行に割れる
+#
+# field 表は見出しから**次のページに送られる**ことがあり（CH32H417 の TIM6/7、
+# CH32L103 の TIM2/3）、そのときは配置図しか手元に残りません。
+WIDTH = re.compile(r"\[(?P<hi>\d+):\d+\]\s*CNT|CNT\[(?P<hi2>\d+):\d+\]")
 # 幅が variant で変わるという注。`32位的TIM5_CNT仅适用于型号为…系列的产品`
 VARIES = re.compile(r"(?P<bits>\d+)位的TIM(?P<n>\d+)_CNT")
 MACRO = re.compile(r"CH32[A-Za-z0-9_]+")
 # 見出しの種類。資料の言い方をそのまま英語の呼び名へ。
+# 見出しの種類。資料の言い方をそのまま英語の呼び名へ。比較表も
+# `Streamlined timer` と呼ぶので `精简定时器` はそれに合わせる。
+# **修飾の無い `定时器` は空のままにします**——CH32V00X の RM は TIM3 を
+# ただ「定时器」と書き、種類を言っていないので、こちらで決めない。
 KINDS = {"高级定时器": "advanced", "通用定时器": "general-purpose",
-         "基本定时器": "basic", "低功耗定时器": "low-power"}
+         "基本定时器": "basic", "低功耗定时器": "low-power",
+         "精简定时器": "streamlined"}
 # 見出しから幅の行までの距離。表は見出しのすぐ下にある。
 LOOKAHEAD = 25
 
@@ -69,51 +81,61 @@ def read_timers(path: Path) -> tuple[list[dict], list[str]]:
     """RM から (timer, kind, width, condition の素材) を読む。"""
     found: dict[int, dict] = {}
     notes: list[str] = []
+    # **見出しとその表がページを跨ぐ**ことがあるので（CH32H417 の TIM6/7、
+    # CH32L103 の TIM2/3 は field 表が次ページに送られる）、ページごとに切らず
+    # 1本に繋いでから走査します。行がどのページのものかは `basis` に要るので
+    # 持ち回ります。
+    stream: list[tuple[int, str]] = []
     with pdfplumber.open(path) as pdf:
         for page in pdf.pages:
-            lines = (page.extract_text() or "").splitlines()
-            for i, line in enumerate(lines):
-                text = line.strip()
-                group = HEAD_GROUP.match(text)
-                single = None if group else HEAD_ONE.match(text)
-                if not group and not single:
-                    continue
-                width = None
-                for step, after in enumerate(lines[i:i + LOOKAHEAD]):
-                    # **次の見出しを跨がない。** 同じページに2つ並ぶことがあり
-                    # （CH32H417 の 15.4.10 は 16bit、15.4.11 は 32bit）、跨ぐと
-                    # 隣の幅を静かに拾う。
-                    if step and (HEAD_GROUP.match(after.strip())
-                                 or HEAD_ONE.match(after.strip())):
-                        break
-                    hit = WIDTH.search(after)
-                    if hit:
-                        width = int(hit.group("hi")) + 1
-                        break
-                if width is None:
-                    notes.append(f"{text[:40]}: 見出しはあるが CNT の幅が読めない")
-                    continue
-                kind = KINDS.get((group or single).group("kind"), "")
-                numbers = ([int(n) for n in re.findall(r"\d+", group.group("list"))]
-                           if group else [int(single.group("n"))])
-                for n in numbers:
-                    # **同じタイマが2度出たら広いほうを採らない。** 章が分かれて
-                    # いる以上どちらも本文で、どちらが効くかは注が決める。
-                    if n in found and found[n]["counter_width_bits"] != width:
-                        notes.append(f"TIM{n}: 幅が2通り出た "
-                                     f"({found[n]['counter_width_bits']} と {width})")
-                    found.setdefault(n, {"timer": f"TIM{n}", "kind": kind,
-                                         "counter_width_bits": width,
-                                         "page": page.page_number})
-            # variant で幅が変わる注。
-            for line in lines:
-                varies = VARIES.search(line)
-                if varies:
-                    n = int(varies.group("n"))
-                    if n in found:
-                        found[n]["_varies"] = (int(varies.group("bits")),
-                                               MACRO.findall(line))
+            stream += [(page.page_number, text)
+                       for text in (page.extract_text() or "").splitlines()]
             page.close()
+    lines = [text for _, text in stream]
+
+    for i, line in enumerate(lines):
+        text = line.strip()
+        group = HEAD_GROUP.match(text)
+        single = None if group else HEAD_ONE.match(text)
+        if not group and not single:
+            continue
+        tops: list[int] = []
+        for step, after in enumerate(lines[i:i + LOOKAHEAD]):
+            # **次の見出しを跨がない。** 同じページに2つ並ぶことがあり
+            # （CH32H417 の 15.4.10 は 16bit、15.4.11 は 32bit）、跨ぐと隣の幅を
+            # 静かに拾う。
+            if step and (HEAD_GROUP.match(after.strip())
+                         or HEAD_ONE.match(after.strip())):
+                break
+            for hit in WIDTH.finditer(after):
+                tops.append(int(hit.group("hi") or hit.group("hi2")))
+        # **最上位ビットの最大を採る。** レジスタ配置図は32bitを `CNT[31:16]` と
+        # `CNT[15:0]` の2行に描くので、最初に当たった行だけ見ると16bitと読む。
+        width = max(tops) + 1 if tops else None
+        if width is None:
+            notes.append(f"{text[:40]}: 見出しはあるが CNT の幅が読めない")
+            continue
+        kind = KINDS.get((group or single).group("kind"), "")
+        numbers = ([int(n) for n in re.findall(r"\d+", group.group("list"))]
+                   if group else [int(single.group("n"))])
+        for n in numbers:
+            # **同じタイマが2度出たら広いほうを採らない。** 章が分かれている以上
+            # どちらも本文で、どちらが効くかは注が決める。
+            if n in found and found[n]["counter_width_bits"] != width:
+                notes.append(f"TIM{n}: 幅が2通り出た "
+                             f"({found[n]['counter_width_bits']} と {width})")
+            found.setdefault(n, {"timer": f"TIM{n}", "kind": kind,
+                                 "counter_width_bits": width,
+                                 "page": stream[i][0]})
+
+    # variant で幅が変わる注。
+    for line in lines:
+        varies = VARIES.search(line)
+        if varies:
+            n = int(varies.group("n"))
+            if n in found:
+                found[n]["_varies"] = (int(varies.group("bits")),
+                                       MACRO.findall(line))
     return [found[n] for n in sorted(found)], notes
 
 

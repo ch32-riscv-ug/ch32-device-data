@@ -12662,6 +12662,8 @@ CH32V103C6T6,BOOT0,BOOT0,main,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103
 CH32V103C6T6,NRST,NRST,main,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
 CH32V103C6T6,OSC8M_IN,OSC8M_IN,main,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
 CH32V103C6T6,OSC8M_IN,PD0,,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
+CH32V103C6T6,OSC8M_OUT,OSC8M_OUT,main,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
+CH32V103C6T6,OSC8M_OUT,PD1,,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
 CH32V103C6T6,PA0-WKUP,ADC_IN0,default,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
 CH32V103C6T6,PA0-WKUP,PA0,main,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
 CH32V103C6T6,PA0-WKUP,TIM2_CH1,default,#,confirmed,pin-table:zh+pin-table:en,2-2,CH32V103DS0.PDF
@@ -15545,8 +15547,6 @@ CH32V205CCT6,PD1,CAN_TX,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V20
 CH32V205CCT6,PD1,FSMC_D3,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205CCT6,PD1,PD1,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205CCT6,PD1,USART8_CK,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
-CH32V205CCT6,VIO_1,VIO_1,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
-CH32V205CCT6,VIO_3,VIO_3,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205CCT6,VREF+,VREF+,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205CCT6,VSSA,VSSA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205CCT6,VSS_1,VSS_1,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
