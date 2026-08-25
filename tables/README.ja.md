@@ -1,6 +1,6 @@
 # 正規化テーブル
 
-`tools/build_tables.py` が生成します。用語（ファミリー/シリーズ/確度…）の定義は [docs/glossary.ja.md](../docs/glossary.ja.md) にあります。**上から下に降りる階層**で、すべての値が「何を根拠にしているか」（`*_basis`列）を持ちます。
+`tools/build_tables.py` が生成します。**テーブルごとの信頼度（どこまで固いか・既知の穴）は [docs/table-reliability.ja.md](../docs/table-reliability.ja.md)** にあります。用語（ファミリー/シリーズ/確度…）の定義は [docs/glossary.ja.md](../docs/glossary.ja.md) にあります。**上から下に降りる階層**で、すべての値が「何を根拠にしているか」（`*_basis`列）を持ちます。
 
 ```
 families.csv        12行   ファミリー一覧（mirror repository = 文書の単位）
