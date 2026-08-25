@@ -168,7 +168,73 @@ SYSTEM = {
     # PC13 が持つ RTC の2つの端子。改竄検知の入力と RTC の出力。
     "TAMPER": ("RTC", "TAMPER"),
     "RTC": ("RTC", "OUT"),
+    # ---- CH32M030 / CH32M007 のモータ・アナログ専用機能（worklist F-21）----
+    # 所属は datasheet zh/en・RM・`ch32m030.h` で確認した（2026-08-25）。周辺名は
+    # WCH 自身の呼び方に揃える。
+    #
+    # ゲートドライバ出力。DS 表2-2「内部高侧/低侧栅极驱动器的输出」。RM は独立章を
+    # 持たず §6.2.10「MV の GPIO 構造」で説明し、header も `AFIO_PCFR1_HO_DIO_EN*`
+    # しか無い。M030 と M007 の両 datasheet と比較表が共通に使う語が
+    # 「预驱 / pre-drive」（M007 は「三相预驱 / three-phase pre-driver」）なので
+    # PREDRV。`HB` は RM で「HB时钟」（AHB）を指すので避けた。
+    "HO0": ("PREDRV", "HO0"), "HO1": ("PREDRV", "HO1"),
+    "HO2": ("PREDRV", "HO2"), "HO3": ("PREDRV", "HO3"),
+    "LO0": ("PREDRV", "LO0"), "LO1": ("PREDRV", "LO1"),
+    "LO2": ("PREDRV", "LO2"), "LO3": ("PREDRV", "LO3"),
+    # 差分入力電流サンプリング（DS §1.4.18.2、RM §17.2.6、header `OPA_TypeDef.ISP_CTLR`）。
+    # ISP1 と ISN1/PA8 が1対、ISP2/PA10 と ISN2/PA11 がもう1対。役割は差動の正負
+    # （CMP の `C3N0`→(CMP3, N0) と同じ流儀）。
+    "ISP1": ("ISP1", "P"), "ISN1": ("ISP1", "N"),
+    "ISP2": ("ISP2", "P"), "ISN2": ("ISP2", "N"),
+    # 交流小信号増幅デコーダ（DS §1.4.18.1、RM §17.2.5、header `OPA_TypeDef.QII_CFGR`）。
+    # PA12 が QII1 の入力、PA13 が QII2 の入力（RM 図）。役割語は資料に無い。
+    "QII1": ("QII1", "IN"), "QII2": ("QII2", "IN"),
+    # Q 値検出。RM `ISP_CTLR` の `QDET1_EN`「ISP1模块Q值检测使能」——ISP モジュール
+    # の検出経路。ADC 章「ADC_IN9/IN10 を使うには QDET1_EN/QDET2_EN を1に」。
+    # header は `ISP_CTLR_ISP2_QDET1_*` と綴る（RM は QDET2。header の誤記）。
+    "Q_DET1": ("ISP1", "QDET"), "Q_DET2": ("ISP2", "QDET"),
+    # VHV の分圧監視／過電圧リセット。RM 電源制御（PWR）§2.2.2/§2.2.3、
+    # `PWR_CTLR[13:12] SEL_IO_VHV`「PB4端口功能选择位」。
+    "V_DET": ("PWR", "V_DET"),
+    # 可編程シンク電流／ソース電流モジュール（DS §1.4.19、RM EXTEN 章 §20.1、
+    # header `EXTEN_TypeDef.ISINK1_CFGR`・`EXTEN_CTLR0` の `ISRC1_EN`）。
+    "ISINK1": ("ISINK1", "OUT"), "ISINK2": ("ISINK2", "OUT"),
+    "ISOURCE1": ("ISOURCE1", "OUT"), "ISOURCE2": ("ISOURCE2", "OUT"),
+    # CH32M030 の PA3 は `SWDIO/SWIM/CC4/…`。RM にも EVT にも SWIM は無く、
+    # DS §1.4.22 が「单线调试…对应 SWIO 引脚」と書く——STM8 の SWIM ではなく
+    # **1-wire SDI のデータ線 SWIO の綴り違い**。既存の `SWIO` と同じ対に寄せる
+    # （PA3 は `SWDIO` からも同じ対を得るので、索引では同じ行が2つの綴りから出る）。
+    "SWIM": ("SDI", "SWDIO"),
+    # ---- CH32V003 の略記（worklist F-21 / F-8）----
+    # DS 凡例「AETR(ADC_ETR)」。RM zh 表7-14 は ADC_ETRGREG_RM 0=PD3 / 1=PC2、
+    # 表7-13 は ADC_ETRGINJ_RM 0=PD1 / 1=PA2 で、AETR（PD3→PC2）が規則転換、
+    # AETR2（PD1→PA2）が注入転換の pad と一致する。V00x の他 series が綴る
+    # `ADC_RETR`/`ADC_IETR` と同じ役割名にする。
+    "AETR": ("ADC", "RETR"), "AETR2": ("ADC", "IETR"),
+    # DS 表2-1 の PD4 `TIETR_2` は `T1ETR_2` の誤植（`I` と `1`）。同じ行が
+    # 表2-3 では `T1ETR_2`、RM 表7-8 で TIM1_RM=10 の ETR が PD4。
+    "TIETR": ("TIM1", "ETR"),
+    # ---- CH32V208 ----
+    # 専用 pad `ANT`。DS 凡例「射频信号输入输出（天线）」。die 上の RF ブロックは
+    # BLE5.3 だけ（header の `BB_IRQn`「BLE BB」）。
+    "ANT": ("BLE", "ANT"),
 }
+
+# **役割の綴りが selector の field 名と別系統のもの。** datasheet は ADC の外部
+# トリガを `RETR`（规则/regular）・`IETR`（注入/injected）と書き、EVT header と
+# RM は field を `ETRGREG`・`ETRGINJ` と名付ける。対応は RM の表7-13/7-14
+# （pad が一致）で確かめられる。`build_candidate` が signal から selector を
+# 引くときに使う——pad の一致だけに頼ると、CH32V003 RM 英語版の bit17 説明の
+# 誤植（注入転換の説明に規則転換の文を繰り返し PC2 と書く）で両 field が同じ
+# pad を名乗り、決められなくなる（worklist F-8）。
+ROLE_FIELD = {"RETR": "ETRGREG", "IETR": "ETRGINJ"}
+
+# **signal の周辺名と field の周辺名が別のもの。** CH32V407/V467 の Ethernet LED
+# （pin 表 `LED0`/`LED1`、remap-1）を選ぶ field を header は PHY の名で
+# `AFIO_PCFR1_ETHPHY_LED_REMAP` と綴る（`ETH_REMAP` は MII/RMII 側の別 field）。
+# 語彙は LED0 を (ETH, LED0) と読むので prefix でも pad でも当たらず、8 function が
+# 未解決のままだった（worklist F-47）。canonical_field 後の綴りで書く。
+FIELD_OF_SIGNAL = {"LED0": "ETHPHY_LED", "LED1": "ETHPHY_LED"}
 
 # **1つの綴りが2つの役割を名指しすることがある。** PC13 は改竄検知の入力と
 # RTC の出力を兼ねていて、CH32L103 の pin 表は `TAMPER` と `RTC` を改行で分けて

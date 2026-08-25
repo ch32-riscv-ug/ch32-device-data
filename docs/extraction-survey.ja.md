@@ -675,7 +675,7 @@ package判定は3つの独立な根拠で検証できます。
 以上から、次を提案します。決定ではありません。
 
 - 抽出器は`tools/`に置き、必要時に人が実行する。CIには入れない
-- 出力は候補として提示し、人のreviewを経て`devices/`へ人が反映する
+- 出力は候補（`candidates/`）として提示し、正規化した表は`tables/`に生成する（JSON recordの`devices/`は2026-08-25に廃止）
 - 抽出結果を格納する中間層（`extracted/`等）とmergerは設けない。継続同期しないため不要
 - **抽出結果は全件reviewを前提とする。** 抽出器がflagを立てた項目だけを見るのでは足りない
 - 資料矛盾の裁定だけは機械可読で残す。抽出器を再実行したとき同じ矛盾が再提起されるのを防ぐため
@@ -691,12 +691,12 @@ package判定は3つの独立な根拠で検証できます。
 ## Toolの使い方
 
 ```sh
-uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
-uv run tools/extract_remap.py <manual>.PDF --compare devices/<id>.json
-uv run tools/extract_registers.py <manual>.PDF --compare devices/<id>.json
+uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <record>.json
+uv run tools/extract_remap.py <manual>.PDF --compare <record>.json
+uv run tools/extract_registers.py <manual>.PDF --compare <record>.json
 
 uv run tools/extract_pins.py <datasheet>.PDF --list
-uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare devices/<id>.json
+uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare <record>.json
 uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --emit > candidate.json
 ```
 
@@ -714,10 +714,10 @@ uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --emit > candida
 uv run tools/build_candidate.py \
   --header <EVT>/Peripheral/inc/ch32xxx.h \
   --manual <manual>.PDF --datasheet <datasheet>.PDF --package LQFP48 \
-  --compare devices/<id>.json
+  --compare <record>.json
 ```
 
-`tools/validate.py`は標準libraryだけで動く状態を維持しており、`python3 -S tools/validate.py`のfallback検査も従来どおりです。
+（`tools/validate.py`とJSON recordは2026-08-25に廃止。表の検査は`tools/check_tables.py`）
 
 ## 未決定事項
 

@@ -20,7 +20,7 @@ family 全部で SWDIO の欄が空になっていた。
 資料に無いものが表に生まれる。覆えなかった数は毎回出すので、穴は数で見える
 （`tools/check_tables.py` が現在値と突き合わせる）。
 
-    routing   default / main / remap-N / af-N   どの経路で出るか
+    routing   default / main / remap-N / af-N   どの経路で出るか（alias 行は載せない）
     signal    資料が綴ったままの名前            層1 へ戻る手がかり
 
 実行:
@@ -64,6 +64,11 @@ def roles(functions: list[dict], catalogue: dict,
     """
     rows: list[dict] = []
     unresolved: collections.Counter = collections.Counter()
+    # **GPIO 名を括弧で添えられた pad の、GPIO としての読み。** CH32M007/M103 の
+    # ゲートドライバ出力は pad 名が `LO1` で、資料が `(PA0)` と別名を添える
+    # （`pin_functions` では `route=alias` の行）。`port`/`pin` はそこから採る。
+    alias_of = {(fn["part_number"], fn["pad"]): fn["signal"]
+                for fn in functions if fn["route"] == "alias"}
     for fn in functions:
         # **pad 自身の名前は役割ではない。** `PA9` の主機能が `PA9`、`VSS` の
         # 主機能が `VSS` と書かれるのは、その pad が何であるかを言っているだけ。
@@ -94,7 +99,8 @@ def roles(functions: list[dict], catalogue: dict,
         product = catalogue.get(fn["part_number"])
         if not product:
             continue
-        gpio = GPIO_PAD.match(fn["pad"])
+        gpio = (GPIO_PAD.match(fn["pad"])
+                or GPIO_PAD.match(alias_of.get((fn["part_number"], fn["pad"]), "")))
         for pair in found:
           rows.append({
             "part_number": fn["part_number"],

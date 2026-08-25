@@ -15,7 +15,7 @@ and never writes device records.
 
 Usage:
     uv run tools/extract_registers.py <manual.pdf> [--register AFIO_PCFR1]
-        [--compare devices/<id>.json] [--emit]
+        [--compare <record>.json] [--emit]
 """
 
 from __future__ import annotations

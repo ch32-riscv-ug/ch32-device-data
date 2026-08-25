@@ -13,7 +13,7 @@ of the register fields that are not pin routes at all.
 
 Usage:
     uv run tools/build_candidate.py --header <evt>/ch32xxx.h --manual <rm>.pdf \
-        --datasheet <ds>.pdf --package LQFP48 [--compare devices/<id>.json] [--emit]
+        --datasheet <ds>.pdf --package LQFP48 [--compare <record>.json] [--emit]
 
 It prints a candidate fragment for review and never writes device records.
 """
@@ -349,6 +349,24 @@ def join(
         # The signal names its peripheral and that peripheral has a selector.
         if pair and pair[0] in by_canonical:
             return pair[0], "peripheral"
+        # The role is spelled one way in the pin table and another in the field
+        # name: CH32V00x write ADC_RETR / AETR for the regular-conversion trigger
+        # and ADC_IETR / AETR2 for the injected one, while the header and the
+        # manual call the fields ADC1_ETRGREG and ADC1_ETRGINJ. The pairing is
+        # the manual's own (tables 7-13/7-14 give the pads), so it lives in the
+        # vocabulary. Decided by name here, before the pad gets a say -- the
+        # English CH32V003 manual repeats the regular trigger's sentence under
+        # bit 17, so by pad both fields claim PC2 (worklist F-8).
+        if pair:
+            spelled = signal_vocabulary.ROLE_FIELD.get(pair[1])
+            if spelled and f"{pair[0]}_{spelled}" in by_canonical:
+                return f"{pair[0]}_{spelled}", "role"
+        # The field is named for something other than the signal's peripheral:
+        # CH32V407's ETHPHY_LED_REMAP routes the LED0/LED1 the pin table files
+        # under ETH (worklist F-47).
+        named = signal_vocabulary.FIELD_OF_SIGNAL.get(fn["signal"])
+        if named in by_canonical:
+            return named, "role"
         # Align on the pad and the value. This identifies a route without reading
         # the name, so it cannot say whose route it is -- which means it may not
         # answer against the name either. CH32V002's ADC_IETR shares PA2 with

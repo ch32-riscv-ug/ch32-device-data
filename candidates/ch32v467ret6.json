@@ -94,6 +94,24 @@
       "reset_value": 0
     },
     {
+      "id": "afio-ethphy-led-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ETHPHY_LED_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 31
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
+    },
+    {
       "id": "afio-fsmc-remap",
       "controller": "afio",
       "register": "PCFR2",
@@ -3168,7 +3186,13 @@
           "signal": "LED0",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-ethphy-led-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "FSMC_D0",
@@ -3220,7 +3244,13 @@
           "signal": "LED1",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-ethphy-led-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "FSMC_D1",

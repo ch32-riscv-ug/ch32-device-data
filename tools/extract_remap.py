@@ -15,7 +15,7 @@ given a record reports where the two disagree. It emits candidates only and neve
 writes device records.
 
 Usage:
-    uv run tools/extract_remap.py <manual.pdf> [--compare devices/<id>.json] [--emit]
+    uv run tools/extract_remap.py <manual.pdf> [--compare <record>.json] [--emit]
 """
 
 from __future__ import annotations

@@ -8,7 +8,7 @@ candidates agree with it. It never writes device records.
 
 Usage:
     uv run tools/extract_pins.py <datasheet.pdf> --package TSSOP20 \
-        [--compare devices/<id>.json] [--emit]
+        [--compare <record>.json] [--emit]
 """
 
 from __future__ import annotations
@@ -75,6 +75,13 @@ PIN_TYPE = re.compile(r"^[A-Z]{1,4}\d?(?:\.\d)?(?:/[A-Z]{1,4}\d?)*$")
 # `VIO_1` が残っていた）。**欠けた lead より見える誤記のほうがまし**なので広げ、
 # 綴りの問題は worklist の F-32 に記録します。
 PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,11}$")
+# **pad 名に GPIO の別名が括弧で付く。** CH32M007/M103 のゲートドライバ出力は
+# `LO1\n(PA0)`——pad の名前は `LO1` で、括弧はその足が素の CH32V007 では PA0 で
+# ある、という別名。数字の脚注 `(7)` は FOOTNOTE が剥がすが GPIO 名は残るので、
+# `PAD_TOKEN` が括弧を通さず **26 lead が黙って落ちていた**（worklist F-31。
+# M007 ×4 の LO1〜LO3/HO1〜HO2、M103 の HO1〜HO3/LO1〜LO3）。pad 名は括弧の前、
+# 別名は `route=alias` の function として持つ。
+ALIASED = re.compile(r"^(?P<pad>[A-Z][A-Z0-9_+-]{1,11})[（(](?P<alias>P[A-H]\d{1,2})[)）]$")
 # **GPIO の名前に役割を継ぎ足した pad 名**。datasheet は `PA0-WKUP` のように
 # その pad の特別な役割を pad 名の一部として書く。8文字までの `PAD_TOKEN` では
 # `PC13-TAMPER-RTC`・`PC14-OSC32_IN`・`PC15-OSC32_OUT` が長すぎて外れ、
@@ -104,6 +111,31 @@ def kind_for(pin_type: str) -> str | None:
     return {"P": "power", "A": "analog", "O": "gpio"}.get(pin_type)
 
 
+def interleave(cell: str) -> str:
+    """添字の行を基準文字の行へ**列ごとに**戻す。
+
+    pad 名の添字は別の行に描かれる（`V\\nDD` → `VDD`）。名前が添字を2組持つと、
+    基準文字も添字も**同じ行に横に並ぶ**ので、行を単に繋ぐと基準文字が先に全部
+    出てしまう:
+
+        V V          → 行を繋ぐと VV + DD_IO_1 = VVDD_IO_1   （存在しない名前）
+        DD_ IO_1     → 列ごとに戻すと V+DD_ V+IO_1 = VDD_VIO_1（資料の綴り）
+
+    CH32V205DS0 の `VDD_VIO_1`〜`_3`（worklist F-32）。上の行と下の行の語数が
+    同じ（2つ以上）ときだけ列として組む——それ以外の折り返し（`LO1\\n(PA0)`・
+    `PA13(7\\n)`）は語数が合わないので従来どおり繋ぐ。3行目以降は最後の添字の
+    続き（英語版は `DD_ IO` / `_1` と3行に割る）。
+    """
+    lines = [line for line in cell.split("\n") if line.strip()]
+    if len(lines) < 2:
+        return cell
+    base, sub = lines[0].split(), lines[1].split()
+    if len(base) < 2 or len(base) != len(sub):
+        return cell
+    sub[-1] += "".join(lines[2:]).replace(" ", "")
+    return "".join(b + s for b, s in zip(base, sub))
+
+
 def normalise_pad(cell: str) -> str:
     """Strip the line wrap the pad column picks up, then its footnote markers.
 
@@ -111,7 +143,7 @@ def normalise_pad(cell: str) -> str:
     fall inside the marker, as CH32M030 does with "PA13(7\\n)", so whitespace has to
     go first for the marker to be recognisable at all.
     """
-    return FOOTNOTE.sub("", cell.replace("\n", "").replace(" ", ""))
+    return FOOTNOTE.sub("", interleave(cell).replace("\n", "").replace(" ", ""))
 
 
 # 番号のセルの頭にある数。脚注を剥がした残り。
@@ -448,7 +480,8 @@ def find_pin_tables(
                 pad = normalise_pad(cells[pad_col])
                 pin_type = normalise_pad(cells[type_col])
                 if PAD.match(pad) or PAD_COMPOUND.match(pad) or (
-                        PAD_TOKEN.match(pad) and PIN_TYPE.match(pin_type)):
+                        (PAD_TOKEN.match(pad) or ALIASED.match(pad))
+                        and PIN_TYPE.match(pin_type)):
                     cells[pad_col] = pad
                     rows.append(cells)
                 elif rows and variant_row(cells, rows[-1], pad_col):
@@ -778,17 +811,31 @@ def pins_for(
                          "この封装にあるのかどうか決まらず、落とした")
             continue
         pad = cells[pad_col]
+        alias = None
+        aliased = ALIASED.match(pad)
+        if aliased:
+            # `LO1(PA0)`: pad は LO1、PA0 は資料が括弧で添えた GPIO の別名。
+            pad, alias = aliased.group("pad"), aliased.group("alias")
         pin_type = normalise_pad(cells[type_col])
         kind = kind_for(pin_type)
         if kind is None:
             kind = "other"
             notes.append(f"{pad}: pin type {pin_type!r} を分類できず other とした")
         functions = []
+        if alias:
+            functions.append({"signal": alias, "route": "alias"})
         if main_col is not None:
             # The reset-state main function: usually the pad itself, but NRST
             # and the oscillator pads state their special role here.
-            for token in signals(cells[main_col], known, names):
-                functions.append({"signal": token, "route": "main"})
+            #
+            # 主機能の欄が pad 名そのもの（電源 pad はそう書く）なら pad と同じ
+            # 読みを使う——添字が2組ある `VDD_VIO_1` は signals() の折り返し処理
+            # では `VVDD_IO_1` になる（interleave を参照）。
+            if normalise_pad(cells[main_col]) == pad:
+                functions.append({"signal": pad, "route": "main"})
+            else:
+                for token in signals(cells[main_col], known, names):
+                    functions.append({"signal": token, "route": "main"})
         if default_col is not None:
             for token in signals(cells[default_col], known, names):
                 # CH32H41x puts its alternate-function numbers in this column too.

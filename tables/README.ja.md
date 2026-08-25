@@ -17,8 +17,8 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
 
 付属表
   product_attributes.csv 1729行  比較表の全属性（縦持ち。列に昇格していない残り全部）
-  remap_fields.csv        285行  route selector定義（series×field: register/bit/reset/valid値）
-  remap_routes.csv       4900行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
+  remap_fields.csv        288行  route selector定義（series×field: register/bit/reset/valid値）
+  remap_routes.csv       4919行  selector値→(signal, pad)。pin_functionsのremap-Nを解決する
   pin_alternate.csv       240行  AF番号の書き込み先（AFIO remapを持たない3 family。pin_functionsのaf-Nを解決する）
   memory_configs.csv       67行  option byteで動くFLASH/SRAMの組合せ（19 part）
   errata.csv               21行  ロット依存の挙動・ハードウェア注意事項（curated/errata.csvから）
@@ -133,7 +133,30 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 | `default` | 默认复用功能 / Default alternate function / 引脚功能 | remapレジスタを触らず（値0のまま）**AFモードにしたら**出る機能 | **動かない** | 9,261 |
 | `remap-N` | 重映射功能 | AFIOのremapフィールドに N を書く | 動かない | 約10,000 |
 | `af-N` | 同じ列にAF番号が併記される（`SDA(AF7)`） | そのpadのAF番号に N を書く | 動かない | 約4,100 |
+| `alias` | pad名の欄の括弧（`LO1\n(PA0)`） | **機能ではない**。そのpadの**GPIOとしての名前**を資料が別名として添えたもの | — | 30 |
 | 空 | — | 経路番号が資料になく要確認 | — | 107 |
+
+#### `alias`——pad名にGPIO名が括弧で付くとき（CH32M007 / CH32M103）
+
+CH32M007とCH32M103のゲートドライバ出力は、pin表のpad欄が **`LO1` と `(PA0)` の2行**です。
+pad の名前は`LO1`で、括弧はその足が素のCH32V007ではPA0であること（GPIOとしての名前）を
+言っています。逆にCH32M030は同じ種類のpadを`PB9`と書いて`HO0`を`default`機能の側に置きます
+——**同じ物理を資料が反対向きに書いている**ので、どちらにも寄せずに資料の向きのまま持ちます。
+
+| 資料の書き方 | `pins.pad` | `pin_functions` の行 |
+|---|---|---|
+| CH32M030: pad `PB9`、既定代替機能 `HO0/TIM1_CH1` | `PB9` | `(PB9, HO0, default)` `(PB9, TIM1_CH1, default)` |
+| CH32M007: pad `LO1 (PA0)`、主機能 `LO1` | `LO1` | `(LO1, LO1, main)` **`(LO1, PA0, alias)`** |
+
+**見方**:
+- 「M007のPA0はどの足か」→ `pin_functions`で`signal=PA0, route=alias`を引く。または`pin_roles`の
+  `port=A, pin=0`（`port`/`pin`はaliasからも埋める）
+- 「M007のLO1はどの足か」→ `pins`で`pad=LO1`
+- `alias`の行は**機能の一覧に混ぜないでください**（`pin_roles`には載せず、生成READMEでは
+  pad名の隣に`LO1 (PA0)`と出す）。PA0としてGPIO出力に使えるかは資料が言っていないので、
+  この表も言いません
+- `tools/check_tables.py`が、alias行のsignalがGPIO名であること・padがGPIO名でないこと・
+  padごとに1つであることを見ます
 
 **`default`は「設定しなくても動く」ではありません。** 「remapを書かなくても届く」です。リセット直後のGPIOはフローティング入力で、**GPIOモードを代替機能にするまで代替機能は出ません**。AF方式のfamilyでも同じで、`GPIOx_AFLR`のリセット値0がAF0を選ぶことと、GPIOモードを代替機能にすることは別の設定です。
 
@@ -311,7 +334,21 @@ consumerが型番ごとの機能一覧を作るなら、**この2つを掛け合
 
 `routing`は`pin_functions.csv`の`route`と同じ（`default` / `main` / `remap-N` / `af-N`）で、**意味は上の「`route`の値の意味」を参照**してください——`default`は「電源を入れただけで動く」ではなく「remapを書かずに届く」です。`signal`は原典の綴りで、そこから層1へ戻れます。
 
-**`port`/`pin`は装飾を落としたGPIOとしての読み**です。datasheetは`PA0-WKUP`（432行）や`PC13-TAMPER-RTC`（89行）のように、そのpadの特別な役割を名前の一部として書きます。`pad`はその綴りをそのまま持つので（綴りは証拠）、`PA0`で探すと`PA0-WKUP`を取りこぼします。`pin_alternate.csv`が既に`pad, port, pin`を持っているので同じ形に揃えました。GPIOでないpad（`OSC_IN`・`XI`、51行）は両方とも空です。
+**`port`/`pin`は装飾を落としたGPIOとしての読み**です。datasheetは`PA0-WKUP`（432行）や`PC13-TAMPER-RTC`（89行）のように、そのpadの特別な役割を名前の一部として書きます。`pad`はその綴りをそのまま持つので（綴りは証拠）、`PA0`で探すと`PA0-WKUP`を取りこぼします。`pin_alternate.csv`が既に`pad, port, pin`を持っているので同じ形に揃えました。**pad名がGPIO名でなくても、資料が括弧で別名を添えていれば（`LO1 (PA0)`、`pin_functions`の`route=alias`）そこから埋めます**——CH32M007の`LO1`は`port=A, pin=0`。GPIOでないpad（`OSC_IN`・`XI`）は両方とも空です。
+
+**語彙の周辺名のうち、資料の見出しと同じ綴りでないもの**（`tools/signal_vocabulary.py`の`SYSTEM`に根拠を書いてあります）:
+
+| `peripheral` | 何か | 資料の呼び方 |
+|---|---|---|
+| `PREDRV` | CH32M030/M007のゲートドライバ出力 `HO0`〜`HO3`／`LO0`〜`LO3` | 「预驱 / pre-drive」（両datasheetと比較表の語）。RMは独立章を持たない |
+| `ISP1`/`ISP2` | 差分入力電流サンプリング。役割`P`/`N`（`ISP1`/`ISN1`）と`QDET`（`Q_DET1`。Q値検出） | RM §17.2.6、header `OPA_TypeDef.ISP_CTLR` |
+| `QII1`/`QII2` | 交流小信号増幅デコーダ。役割`IN` | RM §17.2.5、header `QII_CFGR` |
+| `ISINK1`/`ISINK2`・`ISOURCE1`/`ISOURCE2` | 可編程シンク/ソース電流モジュール。役割`OUT` | RM EXTEN章 §20.1 |
+| `PWR` の `V_DET` | PB4のVHV分圧監視／過電圧リセット | RM 電源制御 §2.2.2/2.2.3 |
+| `SDI` の `SWDIO` ← `SWIM` | CH32M030 PA3の`SWIM`は1-wire SDIの`SWIO`の綴り違い（STM8のSWIMではない） | DS §1.4.22 |
+| `ADC1` の `RETR`/`IETR` ← `AETR`/`AETR2` | CH32V003の略記。規則/注入転換の外部トリガ | RM 表7-13/7-14 |
+| `TIM1` の `ETR` ← `TIETR` | CH32V003 pin表の誤植（`I`と`1`） | 同じ行が表2-3では`T1ETR` |
+| `BLE` の `ANT` | CH32V208の専用pad | 凡例「射频信号输入输出（天线）」 |
 
 **pad自身のGPIO名と電源は載りません。** `PA9`の主機能が`PA9`、`PC13-RTC`の主機能が`PC13`、`VSS`の主機能が`VSS`と書かれるのは、そのpadが何であるかを言っているだけで役割ではないためです。
 

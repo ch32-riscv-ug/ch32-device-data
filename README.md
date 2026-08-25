@@ -2,36 +2,36 @@
 
 [日本語](README.ja.md)
 
-Machine-readable CH32 device records with source provenance and validation state.
+Normalised, machine-extracted data about WCH's CH32 microcontrollers (12 families,
+27 series, 103 part numbers): `tables/*.csv` (36 tables) built from the primary
+sources -- datasheets in both languages, reference manuals and the EVT packages --
+plus the tools that generate the README of each family repository from them.
+Every value carries its provenance (`basis`) and confidence (`confidence`).
 
-The repository is the canonical home of the device database. The current schema version, `0.1-draft`, is still under design, and the sample records do not declare Arduino support.
+This repository does not declare Arduino core support for any part.
+
+Start with [tables/README.ja.md](tables/README.ja.md) (what each table and column
+means), [docs/table-reliability.ja.md](docs/table-reliability.ja.md) (how far each
+table can be trusted) and [docs/worklist.ja.md](docs/worklist.ja.md) (work in progress).
 
 ## Layout
 
-- `schemas/device.schema.json`: JSON Schema for exact orderable SKUs
-- `devices/*.json`: representative device records
-- `tools/validate.py`: schema and cross-reference validator
-- `tools/extract_selectors.py`, `tools/extract_pins.py`, `tools/extract_remap.py`, `tools/extract_registers.py`: review aids that propose candidates from EVT headers, datasheets and reference manuals; they never modify records
-- `tools/build_candidate.py`: joins those four into a single candidate fragment
-- `candidates/*.json`: unreviewed machine extraction, one file per SKU
-- `docs/`: Japanese notes — work list (`worklist.ja.md`), per-table reliability (`table-reliability.ja.md`), handoff, extraction survey, and the archive of resolved items
+- `tables/*.csv`: the normalised tables (canonical). Data columns left of `#`, provenance to the right
+- `candidates/*.json`: unreviewed machine extraction, one file per SKU; the raw material of `tables/`
+- `curated/`: the few hand-verified overrides (pin-table column headers, errata, series facts)
+- `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it
+- `tools/check_tables.py`, `tools/check_counts.py`: joins, formats and count invariants across the tables
+- `tools/extract_*.py`, `tools/build_*.py`: extraction from EVT headers, datasheets and reference manuals, and table generation (run order in `tables/README.ja.md`)
+- `docs/`: Japanese notes -- work list (`worklist.ja.md`), per-table reliability (`table-reliability.ja.md`), handoff, extraction survey, and the archive of resolved items
 
 ## Validation
 
 ```sh
-python3 tools/validate.py
-python3 -S tools/validate.py
+uv run tools/check_tables.py
+uv run tools/check_counts.py
 ```
 
-The second command exercises the standard-library fallback without the optional `jsonschema` package.
-
-The extraction aids need third-party packages and run through uv, which resolves them from `pyproject.toml` and `uv.lock`:
-
-```sh
-uv run tools/extract_selectors.py <evt>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
-uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20 --compare devices/<id>.json
-uv run tools/extract_remap.py <manual>.PDF --compare devices/<id>.json
-uv run tools/extract_registers.py <manual>.PDF --compare devices/<id>.json
-```
+The tools need third-party packages (pdfplumber) and run through uv, which resolves
+them from `pyproject.toml` and `uv.lock`.
 
 Official PDFs, EVT trees, legacy Arduino core sources, and hand-written legacy pin tables are not copied into this repository. Records retain URLs, hashes, revisions, and document locators instead.

@@ -28,7 +28,7 @@
 
 ## 一覧
 
-行数・confidence 分布は 2026-08-25 時点。検証結果の詳細は下の各節。
+行数・confidence 分布は 2026-08-25（穴埋め後）時点。検証結果の詳細は下の各節（検証時の行数は当時のもの）。
 
 ### 中核（datasheet 両言語照合）
 
@@ -37,8 +37,8 @@
 | products | 103 | 列ごと（confirmed大半・packing missing 102） | 結合・比較表と突き合わせ | flash/sram が空の series あり（比較表が書かない） | ✅ |
 | product_attributes | 1,721 | confirmed 1,684 / conflict 25 / ref 12 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2） | ✅ |
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
-| pins | 4,532 | confirmed 4,396 / ref 135 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）・F-31（lead欠け10型番。うちM007×4/M103の26 leadは**ゲートドライバpad `LO1(PA0)` の括弧が原因と判明**、残り5型番は資料が`未使用`）・F-32（V205DS0の綴り `VVDD_IO_1`→資料は`VDD_VIO_1`。詰め順の誤り） | 🟡 |
-| pin_functions | 28,423 | confirmed 28,174 / ref 237 / conflict 12 | 結合・pins と結合 | F-6/7/8（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
+| pins | 4,558 | confirmed 4,524 / ref 33 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）。F-31/F-32は**修正済み**（M007/M103のゲートドライバpad 26 leadが入った。lead欠けは資料が`未使用`と書く5型番のみ。`VDD_VIO_1`の綴りも直った） | 🟡 |
+| pin_functions | 28,484 | confirmed 28,235 / ref 237 / conflict 12 | 結合・pins と結合・**alias行の形** | F-6/7（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。`route=alias`（30行）はpad名の括弧のGPIO別名で機能ではない（`tables/README`）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
 | operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36 は**修正済み**（条件欄の添字を戻した。値は検証 12/12 一致） | ✅ |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
 | memory_configs | 67 | **全行 conflict** | products と往復 | conflict は**意図した記録**: EVT ヘッダの `FLASH_OBR` フィールド幅（2bit）と RM 中文版（3bit）が食い違う。5通りの組合せに3bit要るので中文版が正、と basis に両論併記 | 🟡 |
@@ -48,8 +48,8 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた） | 🔵 |
-| remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
+| remap_fields | 288 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた）。F-47 で V407/V467 の `ETHPHY_LED_REMAP` が入った | 🔵 |
+| remap_routes | 4,919 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。F-8（V003 の ADC 規則転換トリガ PD3/PC2）と F-47（V407/V467 の LED0/LED1）の経路が入り、`candidates` の未解決は **F-6 の32 function だけ**。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
 | flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
 | opa_cmp_registers | 293 | confirmed 199 / ref 89 / conflict 5 | 結合・address=base+offset・bits=mask | EVT ヘッダ×RM レジスタ表。conflict 5 は**EVT ヘッダ側の誤り**と判断できるもの（F-44 X035 CMP_LOCK bit13→RM bit31 / F-45 L103 ITRIM 幅・V205 HYS_H 位置）。V20x/V103/X315 は bit define が無く行なし | 🟡 |
@@ -74,7 +74,7 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| pin_roles | 24,118 | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴を名前ごと固定 | 語彙で覆えない 26種122行（0.5%）。**全26種の所属を原典で確認済み**（worklist F-21）——語彙を足せば0になる | 🟡 |
+| pin_roles | 24,266 | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
 | feature_tags | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
@@ -233,7 +233,7 @@ EVT ヘッダの綴り。field 名も `*_RM`（RM）と `*_REMAP`（EVT）が出
 
 ## 既知の穴の一覧はどこにあるか
 
-- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: ツール側 F-8/F-21/F-31/F-32/F-24残り、実機待ち F-11、資料側の記録 F-6/7/33/43〜46）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
+- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: 資料が決めない F-24残り8行・F-4残り6行、実機待ち F-11、資料側の記録 F-6/7/33/43〜46。**ツール側の穴は2026-08-25時点で0**）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
 - 語彙の穴: `tools/check_tables.py` の `KNOWN_ROLE_GAPS`（綴りと行数で固定）
 - 数の不変量: `tools/check_tables.py` の `KNOWN_SHARED_LEADS`、`tools/check_counts.py` の `KNOWN`
 

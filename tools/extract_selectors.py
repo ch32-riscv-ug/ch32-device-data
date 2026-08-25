@@ -21,7 +21,7 @@ least-significant first, and both halves joined into one field.
 This tool therefore emits *candidates* for review. It never writes device records.
 
 Usage:
-    uv run tools/extract_selectors.py <header.h> [--compare devices/<id>.json] [--emit]
+    uv run tools/extract_selectors.py <header.h> [--compare <record>.json] [--emit]
 """
 
 from __future__ import annotations
