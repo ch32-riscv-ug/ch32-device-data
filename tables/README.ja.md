@@ -35,10 +35,10 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
   timers.csv               67行  タイマ1つずつの素性（**カウンタ幅**・種類・チャネル数・相補出力・更新割り込み）
   flash_geometry.csv       12行  flashの消去単位・書き込み粒度（標準/快速ページ・ブロック・word書き込みの有無）
-  opa_cmp_registers.csv   264行  OPA/CMPのレジスタとフィールド配置（enable・入力select・出力・gain。EVTヘッダ×RM照合）
+  opa_cmp_registers.csv   293行  OPA/CMPのレジスタとフィールド配置（enable・入力select・出力・gain。EVTヘッダ×RM照合）
   clock_enables.csv       429行  周辺クロックのenable bit（family×peripheral→PCENRレジスタとbit。EVT rcc.h×RM照合）
   adc_internal.csv         19行  ADC内部チャネル（温度センサ・VREFINT・VDD/2のチャネル番号・換算定数・サンプル時間）
-  usbpd_plumbing.csv       24行  USBPDの配管（RCC enable bit＋PHY設定bitの所在。family で置き場所が違う）
+  usbpd_plumbing.csv       13行  USBPDの配管（RCC enable bit＋PHY設定bitの所在。family で置き場所が違う）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
   eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
@@ -240,9 +240,9 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 | V30x / V407 | OPA blockは`CR` 1本 |
 | V003 | OPAは**`EXTEN_CTR`のbit16-18**（blockを持たない） |
 
-`unit`列が**そのレジスタがOPAのものかCMPのものか**を言います。RMの見出しは`OPA控制寄存器 2（OPA_CTLR2）`としか書かないので、フィールドの説明文（「使能比较器CMP1」）の多数決で決めています。決まらなければ空。
+`unit`列が**そのレジスタがOPAのものかCMPのものか**を言います。RMの見出しは`OPA控制寄存器 2（OPA_CTLR2）`としか書かず（blockを言うだけ）、フィールドの説明文（「CMP3正端输入通道选择」対「OPA2正向输入端选择」）の多数決で決めています。RMがそのblockのfieldを1つも書かないfamily（V30x/V407の`CR`、H417）は名前で分かる`CMP_*`以外をOPAとします。
 
-出所はEVTヘッダの構造体（配置）とbit define（`OPA_CTLR2_EN1 ((uint32_t)0x00000001)`）で、**RMのレジスタ表と突き合わせ**ます。bit位置が一致すればconfirmed。**食い違いが3件**あり、いずれもEVTヘッダ側の誤りと判断できます——CH32X035の`OPA_CTLR2_CMP_LOCK`は`0x2000`（bit13＝`PSEL3`と同じ）と書かれていますがRMはbit31で、**ヘッダの値で書くとCMP3の正入力選択を壊します**（F-44）。L103の`ITRIMN`/`ITRIMP`はヘッダ5bit・RM6bit。
+出所はEVTヘッダの構造体（配置）とbit define（`OPA_CTLR2_EN1 ((uint32_t)0x00000001)`）で、**RMのレジスタ表と突き合わせ**ます。bit位置が一致すればconfirmed（293行中199）。**食い違いが5件**あり、両論を`basis`に残しています（F-44/F-45）——CH32X035の`OPA_CTLR2_CMP_LOCK`は`0x2000`（bit13＝`PSEL3`と同じ）と書かれていますがRMはbit31で、**ヘッダの値で書くとCMP3の正入力選択を壊します**。L103の`ITRIMN`/`ITRIMP`はヘッダ5bit・RM6bit、V205の`HYS1_H`/`HYS2_H`はヘッダbit29/30・RMbit19/29。
 
 `purpose`はfield名の綴りから機械的に付けます（`EN`→enable、`PSEL`→positive input select…）。名乗っていないものは空です。多bit fieldの値の列挙（`BKIN_CFG_0`/`_1`）はfieldではないので載せません。OPA/CMPのbit defineを持たないfamily（V20x・V103・X315）は行がありません。
 
@@ -278,13 +278,13 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 
 | family | PHY設定bit |
 |---|---|
-| X035 | `AFIO->CTLR` の `USBPD_PHY_V33`(bit8) / `USBPD_IN_HVT`(bit9) / `UDP_PUE` … |
-| L103 / V205 | `AFIO->CR` の `USBPD_IN_HVT`(bit9) / `UDP_BC_*` |
+| X035 | `AFIO->CTLR` の `USBPD_PHY_V33`(bit8) / `USBPD_IN_HVT`(bit9) |
+| L103 / V205 | `AFIO->CR` の `USBPD_IN_HVT`(bit9) |
 | X315 | `AFIO->CR` の `USBPDHVT`(bit0) / `USBPDRISE`(bit2:1) |
 | H417 | `AFIO->PCFR1` の `USBPD_CC_HVT`(bit20) |
 | M030 | `EXTEN->EXTEN_CTLR0` の `USBPD0/1_CC_REF` / `CC_HVT` / `LVE_T`（PDが2つ） |
 
-1行が1つのPHY fieldで、RCC側の列は行ごとに繰り返します。出所はEVTヘッダ（define名がレジスタを名乗るか、名乗らないものは直前のbanner「Bit definition for EXTEN_CTLR0 register」）で、RMのレジスタ表とbit位置を突き合わせています。
+**PDのfieldだけ**を載せます。X035の`AFIO_CTLR`やM030の`EXTEN_CTLR1`にある`UDP_*`/`UDM_*`（USBのD+/D-パッド制御）はUSBの配管でPDではないので入れていません。1行が1つのPHY fieldで、RCC側の列は行ごとに繰り返します。出所はEVTヘッダ（define名がレジスタを名乗るか、名乗らないものは直前のbanner「Bit definition for EXTEN_CTLR0 register」）で、RMのレジスタ表とbit位置を突き合わせています。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 

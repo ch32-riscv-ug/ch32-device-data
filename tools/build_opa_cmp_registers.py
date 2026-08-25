@@ -183,28 +183,16 @@ def read_manual_fields(family_dir: Path) -> tuple[dict, dict, str]:
     for f in fields:
         if re.search(r"OPA|CMP|OPCM|EXTEN", f["register"]):
             out.setdefault((f["register"], f["field"]), (f["bit_offset"], f["bit_width"]))
-            text = f.get("description") or ""
+            # レジスタ名（OPA_CTLR2）は block を言うだけで持ち主ではないので除いて数える。
+            text = re.sub(r"\b(?:OPA|CMP|OPCM)_\w+", "", f.get("description") or "")
             for word, unit in UNIT_WORDS:
                 if word in text:
                     votes[f["register"]][unit] += 1
-    # 見出しからレジスタの持ち主を読む。
-    import pdfplumber  # noqa: PLC0415
+    # **見出しは使わない。** CH32X035 の RM は CMP のレジスタを `OPA控制寄存器 2
+    # （OPA_CTLR2）` と呼ぶ——見出しは block を言うだけ。field の説明文の多数決
+    # （「CMP3正端输入通道选择」対「OPA2正向输入端选择」）で決め、1票差以下なら決めない。
     units: dict[str, str] = {}
-    with pdfplumber.open(paths[0]) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            page.close()
-            if "OPA_" not in text and "CMP_" not in text and "EXTEN_" not in text:
-                continue
-            for m in RM_HEADING.finditer(text):
-                title = m.group("title")
-                unit = next((u for word, u in UNIT_WORDS if word in title), "")
-                if unit:
-                    units.setdefault(m.group("register"), unit)
-    # 見出しが言わないレジスタは field の説明文の多数決。1票差以下なら決めない。
     for register, tally in votes.items():
-        if register in units:
-            continue
         ranked = tally.most_common(2)
         if ranked and (len(ranked) == 1 or ranked[0][1] > ranked[1][1] + 1):
             units[register] = ranked[0][0]
@@ -279,6 +267,12 @@ def main() -> int:
             if not unit:
                 unit = "CMP" if register.startswith("CMP") else \
                        "OPA" if register.startswith("OPA") else ""
+            if not unit and not any(r in units for r in
+                                    (f"{block}_{m}" for m, _, _ in structs.get(block, []))) \
+                    and block == "OPA":
+                # RM がこの block の field を1つも書いていない（CH32V30x/V407 の CR、
+                # CH32H417）。名前で分かる CMP_* 以外は OPA block の OPA レジスタ。
+                unit = "OPA"
             rows.append({
                 "family": family,
                 "block": block,
