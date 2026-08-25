@@ -38,7 +38,7 @@
 | product_attributes | 1,721 | confirmed 1,684 / conflict 25 / ref 12 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2） | ✅ |
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
 | pins | 4,532 | confirmed 4,396 / ref 135 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）・F-31（lead欠け10型番）・F-32（V205の綴り `VVDD_IO_1`） | 🟡 |
-| pin_functions | 28,425 | confirmed 28,196 / ref 229 | 結合・pins と結合 | F-6/7/8（資料側）・**F-40（X035 PC3の余分2行）・F-41（V103 TIM3の12行がremap-1のまま）**。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
+| pin_functions | 28,423 | confirmed 28,174 / ref 237 / conflict 12 | 結合・pins と結合 | F-6/7/8（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
 | operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36（条件文字列の下付き文字ずれ。値は検証12/12一致） | ✅ |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
 | memory_configs | 67 | **全行 conflict** | products と往復 | conflict は**意図した記録**: EVT ヘッダの `FLASH_OBR` フィールド幅（2bit）と RM 中文版（3bit）が食い違う。5通りの組合せに3bit要るので中文版が正、と basis に両論併記 | 🟡 |
@@ -49,19 +49,19 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。**F-34（reset_value空欄45行）・F-35（TIM5CH4のvalid_values欠け）** | 🔵 |
-| remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27 は修正済み（V103 TIM3 の値は RM 格子優先）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠 | 🔵 |
+| remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
 
 ### EVT から（単一出所・テキスト写し）
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| interrupts | 791 | 全行 reference | 結合・condition の macro・境界不変量 | **F-37（OR条件の切り詰め・V006の2ベクタ）** | 🔵 |
-| memory_map | 797 | 全行 reference | 結合 | **F-38（link-origin 2行が誤値。V407 RAM +1024欠落・H417 RAM）**。ヘッダ由来の行は検証で全一致 | 🟡 |
+| interrupts | 791 | 全行 reference | 結合・condition の macro・境界不変量 | F-37 は**修正済み**（OR条件を`\|`区切りで全部持つ） | 🔵 |
+| memory_map | 799 | 全行 reference | 結合 | F-38 は**修正済み**（基準リンカを式評価で読む。H417 はコア別2行）。ヘッダ由来の行は検証で全一致 | 🔵 |
 | systick | 53 | 全行 reference | 結合 | — | 🔵 |
 | evt_variants | 56 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
-| clock_configs 他 clock_* 5表 | 1,065 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）・**F-39（clock_init: V307分岐条件の欠落・V006 RMW手順の欠落）** | 🔵 |
+| clock_configs 他 clock_* 5表 | 1,066 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
 | evt_examples | 1,593 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 
