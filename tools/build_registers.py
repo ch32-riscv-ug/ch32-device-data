@@ -29,10 +29,13 @@ consumer の R-20（レジスタマップ）の **機械的に集められる部
 3. **値の列挙**は field の部分集合。`RCC_PLLMULL_3` は `RCC_PLLMULL` の中の値。
    同じ banner の中で、名前が親＋`_…` で mask が親に含まれるものを `kind=value` にする
 
-**RM との突き合わせ**は (register, field) の綴りが一致するものだけ（`GPIOx_CFGLR`
-の `x`・`IDRy` の `y` は数字を落として比べる）。一致して bit 位置が同じなら confirmed、
-違えば conflict（両論を basis に）、RM に無ければ reference。RM の access と reset を
-列で持つ。**RM の読みは遅い**（family 1本 15秒〜数分）ので `--rm-cache` に JSON で置く。
+**RM との突き合わせ**は2段。(1) レジスタ表: (register, field) の綴りが一致するもの
+（`GPIOx_CFGLR` の `x`・`IDRy` の `y` は数字を落として比べる）で bit 位置が同じなら
+confirmed、違えば conflict（両論を basis に）、RM に無ければ reference。RM の access と
+reset を列で持つ。(2) **各章冒頭の絶対アドレス表**（`R32_PWR_CTLR | 0x40007000 | … |
+復位値`）: EVT の base+offset と比べ、一致した block/register を confirmed に、違えば
+conflict。RM の register 復位値もここから採る（`rm_reset`）。
+**RM の読みは遅い**（family 1本 15秒〜数分）ので `--rm-cache` に JSON で置く。
 
 実行:
     uv run tools/build_registers.py [--mirrors <dir>] [--out tables] [--rm-cache <dir>] [--family F]
@@ -59,7 +62,7 @@ MIRRORS = Path("/home/mt/dev_wch")
 
 BLOCK_COLUMNS = ["family", "block", "type", "layout", "base_address", "#", "confidence", "basis"]
 REGISTER_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
-                    "rm_register", "#", "confidence", "basis"]
+                    "rm_register", "rm_reset", "rm_address_check", "#", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "register", "type", "member", "field", "kind", "of_field",
                  "bits", "mask", "value", "description", "rm_access", "rm_reset",
                  "#", "confidence", "basis"]
@@ -379,6 +382,143 @@ def rm_fields(family_dir: Path, cache: Path | None) -> tuple[dict, str]:
     return out, paths[0].name
 
 
+# ---------------------------------------------------------------- RM の絶対アドレス表
+
+# RM zh 版の各章冒頭にある表: `R32_PWR_CTLR | 0x40007000 | 电源控制寄存器 | 0x00000000`。
+# register の絶対アドレスと復位値を言う。D-1（base）と D-3（offset）の**独立した裏取り**。
+ADDR_NAME = re.compile(r"^R(?:8|16|32)_(?P<name>\w+)$")
+HEX32 = re.compile(r"^0x[0-9A-Fa-f]{8}$")
+
+
+def rm_addresses(family_dir: Path, cache: Path | None) -> tuple[list[dict], str]:
+    """[{name, address, reset}] を RM の表から。ページ単位に読んで閉じる（メモリ）。"""
+    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
+        sorted(family_dir.glob("datasheet_en/*RM.PDF"))
+    if not paths:
+        return [], ""
+    cached = cache / f"{family_dir.name}.addr.json" if cache else None
+    if cached and cached.exists():
+        return json.loads(cached.read_text(encoding="utf-8")), paths[0].name
+    import pdfplumber  # noqa: PLC0415
+    rows: list[dict] = []
+    with pdfplumber.open(paths[0]) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text() or ""
+            if "R32_" in text or "R16_" in text or "R8_" in text:
+                for table in page.find_tables():
+                    for row in table.extract():
+                        cells = [(c or "").replace("\n", "").replace(" ", "").strip() for c in row]
+                        for i, cell in enumerate(cells[:-1]):
+                            m = ADDR_NAME.match(cell)
+                            if m and HEX32.match(cells[i + 1]):
+                                rows.append({"name": m.group("name"),
+                                             "address": int(cells[i + 1], 16),
+                                             "reset": cells[i + 3] if len(cells) > i + 3 else ""})
+                                break
+            page.close()
+    if cached:
+        cached.parent.mkdir(parents=True, exist_ok=True)
+        cached.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
+    return rows, paths[0].name
+
+
+def locate(reg: str, offsets: dict[str, dict], block: str, block_name: str) -> list[tuple[str, int]]:
+    """RM の register 名に当たり得る header のメンバー [(メンバー名, block 内 offset)]。
+
+    (a) 同名、(b) block 名付き（`EXTEN_TypeDef.EXTEN_CTR`、union の32bit側
+    `USBPD_TypeDef.USBPD_STATUS`——8bit の `STATUS` と**両方**返す。RM の
+    `R32_USBPD_STATUS` は32bit側なので、どちらかが番地と合えばよい）、(c) 配列＋番号
+    （`AFIO_EXTICR1` → `EXTICR[0]`）、(d) instance 番号が block 側にある
+    （`DMA_CFGR3` → `DMA1_Channel3.CFGR`）、(e) 入れ子構造体の配列
+    （`CAN1_F0R1` → `sFilterRegister[0].FR1`、`TXMI0R` → `sTxMailBox[0].TXMIR`）。
+    """
+    found: list[tuple[str, int]] = []
+    if reg in offsets:
+        found.append((reg, offsets[reg]["offset"]))
+    if f"{block_name}_{reg}" in offsets:
+        found.append((f"{block_name}_{reg}", offsets[f"{block_name}_{reg}"]["offset"]))
+    if found:
+        return found
+    m = TRAILING_DIGITS.match(reg)
+    if m:
+        stem, digits = m.groups()
+        if stem in offsets:
+            member = offsets[stem]
+            if member["count"] > 1 and 1 <= int(digits) <= member["count"]:
+                return [(stem, member["offset"] + (int(digits) - 1) * member["width_bits"] // 8)]
+            if block.endswith(digits):
+                return [(stem, member["offset"])]
+    first = FIRST_DIGITS.search(reg)
+    if first:
+        leaf = reg[:first.start()] + reg[first.end():]
+        idx = int(first.group())
+        for name, member in offsets.items():
+            head, _, tail = name.rpartition(".")
+            if tail == leaf and head.endswith(f"[{idx}]"):
+                return [(name, member["offset"])]
+    return []
+
+
+def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
+                    registers: dict[str, dict[str, dict]]) -> tuple[dict, dict, set]:
+    """RM の行を (block, register) に解いて EVT の base+offset と比べる。
+
+    返り値: ({(type, register): {"ok": n, "bad": [addr], "reset": set}},
+             {block: ok 件数}, 解けなかった名前の集合)。
+    `R32_GPIOx_CFGLR` の x は任意の instance——どれかの instance の番地と合えば ok。
+    名前の `_` の切り方は block 名が blocks に居る位置で決める（`EXTEN_CTR` は
+    block `EXTEN` + register `CTR`）。
+    """
+    per_register: dict = collections.defaultdict(lambda: {"ok": 0, "bad": [], "reset": set()})
+    per_block: dict = collections.Counter()
+    unresolved: set[str] = set()
+    for r in rows:
+        parts = r["name"].split("_")
+        hit = False
+        for k in range(1, len(parts)):
+            block_name, reg = "_".join(parts[:k]), "_".join(parts[k:])
+            if block_name in blocks:
+                names = [block_name]
+            elif "x" in block_name:
+                pattern = re.compile("^" + re.escape(block_name).replace("x", "[A-Za-z0-9]+") + "$")
+                names = [b for b in blocks if pattern.match(b)]
+            else:
+                # RM は instance を書かないことがある（`R32_ADC_CTLR1` で header は `ADC1`）。
+                # 型が一致する block、または block 名＋数字の block を候補に。
+                names = [b for b, (t, _) in blocks.items()
+                         if t == block_name or re.fullmatch(re.escape(block_name) + r"\d+", b)]
+            if not names:
+                continue
+            # `R32_DMA_CFGR3` は header の `DMA1_Channel3.CFGR`——register 名の末尾の
+            # 数字が instance を選ぶ。block 名で始まる block も候補に入れる。
+            names = list(dict.fromkeys(names + [b for b in blocks if b.startswith(block_name)]))
+            matched = False
+            for b in names:
+                type_name, base = blocks[b]
+                located = locate(reg, registers.get(type_name, {}), b, block_name)
+                if not located:
+                    continue
+                hit = True
+                key = (type_name, located[0][0])
+                for use, offset in located:
+                    if base + offset == r["address"]:
+                        per_register[(type_name, use)]["ok"] += 1
+                        per_block[b] += 1
+                        if r["reset"]:
+                            per_register[(type_name, use)]["reset"].add(r["reset"])
+                        matched = True
+                        break
+                if matched:
+                    break
+            if hit and not matched:
+                per_register[key]["bad"].append(r["address"])
+            if hit:
+                break
+        if not hit:
+            unresolved.add(r["name"])
+    return per_register, per_block, unresolved
+
+
 # ---------------------------------------------------------------- main
 
 def main() -> int:
@@ -438,6 +578,7 @@ def main() -> int:
             })
 
         # blocks
+        blocks_here: dict[str, tuple[str, int]] = {}
         for line in lines:
             p = POINTER.match(line)
             if not p:
@@ -446,24 +587,63 @@ def main() -> int:
             if base is None:
                 notes.append(f"{family}: {p.group('block')} の base {p.group('base')} を解けない")
                 continue
-            blocks_out.append({
-                "family": family, "block": p.group("block"), "type": p.group("type"),
-                "layout": layout_of.get(p.group("type"), ""),
-                "base_address": f"{base:#010x}", "confidence": "reference", "basis": evt,
-            })
+            blocks_here[p.group("block")] = (p.group("type"), base)
 
         # registers（構造体のメンバー。reserved は出さない）
+        regs_here: dict[str, dict[str, dict]] = collections.defaultdict(dict)
+        members_here: dict[str, list[dict]] = {}
         for st in structs.values():
-            for m in flat_members(st, structs):
-                if m["name"].upper().startswith("RESERVED") or "RESERVED" in m["name"].upper():
-                    continue
-                rm_name = rm_registers.get(rm_key(f"{st.name}_{m['name']}"), "")
+            members_here[st.name] = [m for m in flat_members(st, structs)
+                                     if "RESERVED" not in m["name"].upper()]
+            for m in members_here[st.name]:
+                regs_here[st.name][m["name"]] = m
+
+        # RM の絶対アドレス表で base+offset を裏取り
+        per_register: dict = {}
+        per_block: dict = {}
+        addr_name = ""
+        if not args.no_rm:
+            addr_rows, addr_name = rm_addresses(family_dir, args.rm_cache)
+            per_register, per_block, unresolved_addr = check_addresses(addr_rows, blocks_here, regs_here)
+            checked = sum(v["ok"] for v in per_register.values())
+            bad = sum(len(v["bad"]) for v in per_register.values())
+            notes.append(f"{family}: RM のアドレス表 {len(addr_rows)} 行 → 一致 {checked}・"
+                         f"不一致 {bad}・解けない名前 {len(unresolved_addr)}"
+                         + (f"（例: {', '.join(sorted(unresolved_addr)[:6])}）" if unresolved_addr else ""))
+
+        for block, (type_name, base) in blocks_here.items():
+            ok = per_block.get(block, 0)
+            blocks_out.append({
+                "family": family, "block": block, "type": type_name,
+                "layout": layout_of.get(type_name, ""),
+                "base_address": f"{base:#010x}",
+                "confidence": "confirmed" if ok else "reference",
+                "basis": evt + (f"+rm-address({addr_name})" if ok else ""),
+            })
+
+        for type_name, members in members_here.items():
+            for m in members:
+                rm_name = rm_registers.get(rm_key(f"{type_name}_{m['name']}"), "")
+                found = per_register.get((type_name, m["name"]))
+                confidence, basis, check_text, reset = "reference", [evt], "", ""
+                if rm_name:
+                    confidence = "confirmed"
+                    basis.append(f"rm({manual_name})")
+                if found and found["ok"]:
+                    confidence = "confirmed"
+                    check_text = f"ok:{found['ok']}"
+                    basis.append(f"rm-address({addr_name})")
+                    reset = ";".join(sorted(found["reset"]))
+                if found and found["bad"]:
+                    confidence = "conflict"
+                    check_text = (check_text + ";" if check_text else "") + f"mismatch:{len(found['bad'])}"
+                    basis.append(f"!rm-address({addr_name})(={found['bad'][0]:#010x})")
                 regs_out.append({
-                    "family": family, "type": st.name, "register": m["name"],
+                    "family": family, "type": type_name, "register": m["name"],
                     "offset": f"{m['offset']:#05x}", "width_bits": m["width_bits"],
-                    "count": m["count"], "rm_register": rm_name,
-                    "confidence": "confirmed" if rm_name else "reference",
-                    "basis": evt + (f"+rm({manual_name})" if rm_name else ""),
+                    "count": m["count"], "rm_register": rm_name, "rm_reset": reset,
+                    "rm_address_check": check_text,
+                    "confidence": confidence, "basis": "+".join(basis),
                 })
 
         # fields

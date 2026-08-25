@@ -1,8 +1,7 @@
 # レジスタマップを持つとしたら: 現状調査
 
 日付: 2026-08-21（調査）／2026-08-25（機械収集ぶんを実装）
-状態: **機械的に集められる部分（D-1/D-3/D-4/D-5）は `tables/register_*.csv` に実装済み**（`tools/build_registers.py`）。
-下の調査はその根拠。D-7（DMA channel の対応）と RM 側の絶対アドレス表の抽出は未着手
+状態: **機械的に集められる部分は実装済み**——D-1/D-3/D-4/D-5 は `tables/register_*.csv`（`tools/build_registers.py`。RM の絶対アドレス表で裏取り）、D-7 は `tables/dma_requests.csv`（`tools/build_dma_requests.py`。2026-08-26）。下の調査はその根拠
 発端: ArduinoCore-CH32 の R-20「レジスタマップを持つとしたら何のデータが要るか」
 （`docs/research/register-map-data.ja.md`）が D-1〜D-8 を列挙し、
 「device-dataへ依頼を出すかどうか」を判断待ちにしている。その判断に要る事実を測った。

@@ -40,9 +40,10 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   adc_internal.csv         19行  ADC内部チャネル（温度センサ・VREFINT・VDD/2のチャネル番号・換算定数・サンプル時間）
   usbpd_plumbing.csv       13行  USBPDの配管（RCC enable bit＋PHY設定bitの所在。family で置き場所が違う）
   register_blocks.csv     676行  block（USART1）→型・base address・layout key（EVTヘッダ。R-20）
-  registers.csv          4995行  型×register→構造体内offset・幅・配列数。RMのレジスタ表と名前が一致すればconfirmed
+  registers.csv          4995行  型×register→構造体内offset・幅・配列数・RMの復位値。RMのアドレス表/レジスタ表と一致で confirmed 2762・conflict 4
   register_fields.csv   33365行  register×bit define→bit位置・mask・field/値・EVTの説明・RMのaccess/reset。RMとbit位置一致で confirmed
   register_layouts.csv    353行  型×layout key。同じkeyのfamilyはレジスタ定義を共有できる（D-5）
+  dma_requests.csv        650行  DMA要求→channel（family×variant×DMA×channel×要求。H417はDMAMUXの要求番号）。RM zh/en照合（D-7）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
   eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
@@ -322,8 +323,8 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
 
 | 表 | 1行 | 何が分かるか |
 |---|---|---|
-| `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
-| `registers` | family × 型 × register 4,995行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行 |
+| `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（548）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
+| `registers` | family × 型 × register 4,995行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
 | `register_fields` | family × register × bit define 33,365行（field 24,792・value 8,573） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。fieldの27.5%（6,829）がRMとbit位置一致、38がconflict |
 | `register_layouts` | family × 型 353行（70型） | **layout key**（構造体の並びとdefine名の集合のハッシュ）。同じkeyのfamilyは同じレジスタ定義を共有できる。実測: I2C 4型・GPIO 6型・USART/SPI 8型・TIM/ADC 11型・RCC/AFIO 12型（family全部違う） |
 
@@ -348,10 +349,41 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
   なので常に`reference`です
 - `conflict`は本物の食い違いです（例: CH32V003の`GPIO_LCKR.LCKK`はEVT bit8 / RM bit16、
   `ADC_RDATAR.DATA`はEVT 32bit / RM 16bit）。どちらかに寄せていません
+- **絶対アドレスの裏取り**: RM zh版の各章冒頭の表（`R32_PWR_CTLR | 0x40007000 | 説明 | 復位値`）
+  8,369行のうち**5,110行がEVTのblock base＋offsetと一致、不一致4行**（`registers`のconflict 4＝
+  H417のCAN2の`FMCFGR`/`FSCFGR`/`FAFIFOR`/`FWR`がRMでは+4。CAN1は一致）。残り2,937行は名前が
+  headerの構造体に結べないもの（`BMC_*`・`ESIG_*`・`PFIC_*`・V20xの`CAN1_TTCNT`など、device header
+  以外の型やheaderに無いregister）。RMが`R32_USBPD_STATUS`のように32bitの名で書くregisterは、
+  EVTがunionで重ねた32bit側のメンバー（`USBPD_STATUS`@0x08）と照合する（8bitの`STATUS`@0x09ではない）
 
-**持っていないもの**: D-7（DMA channel→周辺の対応。RMの表にしかない）、RM zh版の絶対アドレス表
-（`R32_AFIO_PCFR1 / 0x40010004`。D-1/D-3の裏取りに使えるが未抽出）、RMのfield説明文
+**持っていないもの**: D-7（DMA channel→周辺の対応。RMの表にしかない）、RMのfield説明文
 （中国語。行が多いので入れていない。`extract_registers.py`で取れる）。
+
+### `dma_requests.csv`
+
+**どの周辺の要求がどのDMA channelに繋がるか**（consumerのR-20 D-7）。EVT headerには無く、
+reference manualのDMA章の「DMAx各通道外设映射表」だけが持つ情報です。zh版とen版を別々に読んで
+(family, variant, dma, channel, request)で突き合わせ、両版一致で`confirmed`、片方だけなら`reference`。
+650行のうち577がconfirmed、73のreferenceは全部CH32V407（RMがzh版しかない）。
+綴りは資料のまま（`request`）で、`peripheral`は語彙規則で揃えた周辺名です。
+
+| 列 | 意味 |
+|---|---|
+| `variant` | 同じRMの中でDMAの構成が違う組（CH32V20x/V30x）。EVTのmacro名（`CH32V20x_D6`など、`|`区切り）。それ以外は空 |
+| `dma` / `channel` | `DMA1`/`DMA2`と1始まりのchannel番号。**H417は空**（下記） |
+| `request_id` | **H417だけ**。DMAMUXの要求入力番号（1〜123。`CHANNELx_MUX`に書く値は番号−1）。channelは固定でなく、どのchannelにもこの要求を割り当てられる |
+| `remap` | `selectable`=`*`印（V205/V20x/V30x。`EXTEN_CTLR1`で経路を選ぶ要求。同じ要求がDMA1とDMA2の両方に出る）、X315の`_0`/`_1`は`default`/`remap`（`EXTEN_CTR`で選ぶ） |
+| `note` | 脚注の印（V006の`（1）（2）`＝CH32M007とV006/V007でTIM3の割り当てが違う）、資料の誤植の注記（V407の`13C`、H417の`I3X_RX`は綴りを保ったまま「as printed」）、`*`印が片方の版にしか無いこと |
+
+**見方**:
+- 「USART1_TXはどのchannelか」→ `request=USART1_TX`（またはperipheral=USART1）で引く。1つの要求が複数channelに出ることがある（V205の`*`付き、X315の`_0`/`_1`）
+- 1つのセルに複数の要求（`TIM1_CH4`と`TIM1_TRIG`）が書かれているものは行を分けてある。**同じchannelに複数の要求が来る＝同時には使えない**という資料の含意はそのまま
+- CH32V20x/V30xは`variant`で絞ってください。V20x_D6は1 DMA・8ch、V20x_D8/D8Wは1 DMA・8ch、V30x_D8/D8Cは DMA1 7ch＋DMA2 11ch
+- H417はDMAMUX方式で、この表は「要求の番号表」です。channelへの割り当ては実行時に`DMAMUX`へ書く
+
+表の形が5通りある（1ページ格子／次ページに見出し無しで続く／channel 8以降が別の表／2 DMA＋`*`印＋セルの
+ページ跨ぎ／DMAMUX番号表）のを1つの読み方で読んでいます。読み方の規則と資料側の癖は
+`tools/build_dma_requests.py`の冒頭に書きました。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
@@ -935,6 +967,7 @@ uv run tools/build_clock_enables.py --out tables             # clock_enables（E
 uv run tools/build_adc_internal.py --out tables              # adc_internal（datasheet両言語の散文と電気的特性表）
 uv run tools/build_usbpd_plumbing.py --out tables            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
 uv run tools/build_registers.py --out tables --rm-cache .cache/rm   # register_blocks/registers/register_fields/register_layouts（EVTヘッダ＋RM全読み。10分以上）
+uv run tools/build_dma_requests.py --out tables                # dma_requests（RM zh/en のDMA章の格子。全ページ走査で15分前後）
 uv run tools/build_eval_boards.py --out tables                # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py --out tables               # feature_tags（features + 比較表から。PDF不要）
 uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）

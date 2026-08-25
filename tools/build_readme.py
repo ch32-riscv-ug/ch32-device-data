@@ -696,11 +696,28 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
     return out
 
 
+def synced_line(data: Data, family: str) -> list[str]:
+    """いつの原典から作ったか（worklist の D4）。U5（原典に届かない人）が最初に見る。
+
+    `tables/sources.csv` が持つ mirror の commit と日付を出す。生成時刻は出さない
+    （冪等性——入力が同じなら出力も同じ、を保つため。sources.csv も同じ方針）。
+    """
+    row = next((r for r in data.sources if r["family"] == family), None)
+    if not row or not row.get("commit"):
+        return []
+    date = row["committed_at"][:10]
+    short = row["commit"][:7]
+    return [f"*Generated from the mirror at commit "
+            f"[`{short}`](https://github.com/{row['repository']}/tree/{row['commit']}) "
+            f"({date}). Newer PDFs may exist upstream; see Documents below.*", ""]
+
+
 def render(data: Data, family: str) -> str:
     # **節の順は U1（初めて触る人）→ U2 → U3。** 以前は U3（開発中の人）向けに
     # Series・Debug defaults・Documents が先に来ていた。最初に触る人が要るのは
     # 「どう書き込むか」と「どの型番か」で、資料の一覧はその後（worklist の B4）。
     lines = [f"# {family}", "", NOTICE, ""]
+    lines += synced_line(data, family)
     lines += quick_start_section(data, family)
     lines += series_section(data, family)
     if data.family_series(family):
@@ -787,6 +804,34 @@ def org_profile(data: Data) -> str:
         url = f"https://github.com/ch32-riscv-ug/{s['family']}"
         lines.append(f"| **{s['series']}** | [{s['family']}]({url}) "
                      f"| {len(parts)} | {shown} |")
+
+    # 機能から辿れるように（worklist の B5）。`feature_tags.csv` は datasheet の
+    # 機能説明章の節見出しから作ったタグ（A6）で、series 単位。比較表が型番単位で
+    # 裏付けるものは precision=part、節見出しだけのものは precision=datasheet。
+    by_tag: dict[str, dict[str, set[str]]] = collections.defaultdict(
+        lambda: collections.defaultdict(set))
+    loose: set[str] = set()
+    for r in data.feature_tags:
+        if r["parent"]:
+            continue  # 子タグ（USB の下の USBFS 等）は親の行で数える
+        by_tag[r["tag"]][r["family"]].add(r["series"])
+        if r["precision"] != "part":
+            loose.add(r["tag"])
+    if by_tag:
+        lines += ["", "## Find by feature", "",
+                  "Which series have a given peripheral, from the feature "
+                  "chapter of each datasheet. Series marked \* are tagged at "
+                  "datasheet granularity (the whole datasheet lists the feature; "
+                  "the comparison table does not confirm it per part).", "",
+                  "| Feature | Series (repository) |", "|---|---|"]
+        for tag in sorted(by_tag):
+            cells = []
+            for family in sorted(by_tag[tag]):
+                names = ", ".join(sorted(by_tag[tag][family]))
+                url = f"https://github.com/ch32-riscv-ug/{family}"
+                cells.append(f"{names} ([{family}]({url}))")
+            mark = "\*" if tag in loose else ""
+            lines.append(f"| **{tag}**{mark} | {'; '.join(cells)} |")
 
     common = sorted(d["document"] for d in data.documents
                     if "WCH-common" in d["repositories"].split(";")
