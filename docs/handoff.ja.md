@@ -6,7 +6,7 @@
 
 ## いまの正本は `tables/`
 
-このrepositoryの成果物は **`tables/*.csv`（36表）と、そこから生成する各family
+このrepositoryの成果物は **`tables/*.csv`（41表）と、そこから生成する各family
 リポジトリのREADME**。一次資料（datasheet zh/en・reference manual・EVT）を
 `/home/mt/dev_wch/<FAMILY>/` のmirrorから機械抽出し、出所を`basis`、確度を
 `confidence`に残す。
@@ -28,7 +28,7 @@ JSON schema草案（`schemas/`・`devices/`・`tools/validate.py`・`docs/schema
 ```sh
 cd /home/mt/dev_wch/ch32-device-data
 git status --short                      # 未commitの変更（commitはユーザーが行う）
-uv run tools/check_tables.py            # 36表の参照結合・書式・数の不変量
+uv run tools/check_tables.py            # 41表の参照結合・書式・数の不変量
 uv run tools/check_counts.py            # 比較表の数 vs pin側の数
 ```
 

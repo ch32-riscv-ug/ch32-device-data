@@ -3,7 +3,7 @@
 [English](README.md)
 
 WCHのCH32シリーズ（12 family・27 series・103型番）について、一次資料（datasheet 中英両版・
-reference manual・EVT）から**機械抽出した正規化CSV**（`tables/`、36表）と、そこから
+reference manual・EVT）から**機械抽出した正規化CSV**（`tables/`、41表）と、そこから
 各familyリポジトリのREADMEを生成するtoolを置く独立データリポジトリです。
 すべての値が**出所（`basis`）と確度（`confidence`）**を持ちます。
 
@@ -94,7 +94,7 @@ reference manual・EVT）から**機械抽出した正規化CSV**（`tables/`、
 ## 検証
 
 ```sh
-uv run tools/check_tables.py    # 36表の参照結合・書式・数の不変量
+uv run tools/check_tables.py    # 41表の参照結合・書式・数の不変量
 uv run tools/check_counts.py    # 比較表が数える周辺の数 vs pin表から引ける数
 ```
 

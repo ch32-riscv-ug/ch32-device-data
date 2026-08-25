@@ -73,3 +73,14 @@
 | `candidates/` | **未review**の機械抽出出力。根拠にはなるが確定ではない |
 | `curated/` | 人が確認して記録した確定情報（根拠・確認日つき） |
 | `tables/` | 正規化CSV。確度と根拠つき。階層はこの用語集の通り |
+
+## 表の中の特別な値（2026-08-26 追記）
+
+| 用語 | 定義 |
+|---|---|
+| `route` の `main` / `default` | pin表の列そのもの。`main`=主功能（复位后。電源投入直後に動く）、`default`=默认复用功能（remapを書かずに届くが**AFモードにしないと出ない**）。[tables/README](../tables/README.ja.md)の「`route`の値の意味」 |
+| `route` の `alias` | pad名の欄に資料が括弧で添えたGPIO名（CH32M007の`LO1 (PA0)`）。**機能ではない**。`pin_roles`には載せず、`port`/`pin`の材料にだけ使う |
+| `PREDRV` | CH32M030/M007のゲートドライバ出力（`HO0`〜`HO3`／`LO0`〜`LO3`）の周辺名。WCHの「预驱 / pre-drive」から。RMは独立章を持たない |
+| layout key（`register_layouts.layout`） | 型（`USART_TypeDef`）の構造体の並びとbit define名の集合のハッシュ。**同じか違うかだけ**を言う。同じkeyのfamilyはレジスタ定義を共有できる（R-20のD-5） |
+| `kind=field` / `kind=value`（`register_fields`） | headerのbit defineが、fieldそのもの（`PLLMULL`）か、その中の値（`PLLMULL_3`）か。値は`of_field`が親、`value`がその値 |
+| banner | EVT headerの`/* Bit definition for RCC_APB2PCENR register */`というコメント。bit defineがどのregisterのものかを言う唯一の場所。`register_fields.register`はこの綴り |

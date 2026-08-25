@@ -126,7 +126,7 @@ def main() -> int:
                       "feature_tags", "pin_roles", "timers", "flash_geometry",
                       "opa_cmp_registers", "clock_enables", "adc_internal",
                       "usbpd_plumbing", "register_blocks", "registers",
-                      "register_fields", "register_layouts")}
+                      "register_fields", "register_layouts", "dma_requests")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -255,6 +255,25 @@ def main() -> int:
         if r["member"] and (r["family"], r["member"].split(".")[0]) not in layouts:
             bad.append(f"register_fields: {r['family']} {r['register']} の member {r['member']} の"
                        "構造体が register_layouts にない")
+
+    # dma_requests: 格子（dma+channel）か DMAMUX（request_id）のどちらか一方を持つこと。
+    # variant は evt_variants の macro（`|` 区切り）にあること。remap の値。
+    macros = {r["macro"] for r in t["evt_variants"]} if t.get("evt_variants") else set()
+    for r in t["dma_requests"]:
+        check("dma_requests", r["request"], r["family"], families, "families")
+        has_channel = bool(r["dma"]) and r["channel"].isdigit()
+        has_mux = r["request_id"].isdigit()
+        if has_channel == has_mux:
+            bad.append(f"dma_requests: {r['family']} {r['request']} は dma+channel か request_id の"
+                       f"どちらか一方を持つこと（dma={r['dma']!r} channel={r['channel']!r} "
+                       f"request_id={r['request_id']!r}）")
+        if r["remap"] not in ("", "selectable", "default", "remap"):
+            bad.append(f"dma_requests: {r['family']} {r['request']} の remap {r['remap']!r}")
+        if not r["peripheral"]:
+            bad.append(f"dma_requests: {r['family']} {r['request']} の peripheral が空")
+        for macro in filter(None, r["variant"].split("|")):
+            if macros and macro not in macros:
+                bad.append(f"dma_requests: {r['family']} の variant {macro!r} が evt_variants にない")
 
     # flash_geometry は family ごと1行。参照と、幾何の常識的な不変量
     # （fast page は標準 page より小さい・2の冪）を見る。

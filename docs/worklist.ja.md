@@ -15,11 +15,11 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 区分 | 完了 | 残り |
 |---|---:|---:|
 | データ収集 | 9 | 0 |
-| README生成 | 3 | 3（B4〜B6。新規） |
+| README生成 | 6 | 0 |
 | 画像 | 0 | 3（保留） |
-| 検査・運用 | 5 | 2（D4・D7。新規） |
+| 検査・運用 | 6 | 1（D7） |
 | consumerからの依頼 | 8 | 0（R-20は機械収集ぶんまで。残りはconsumerの要否次第） |
-| 既知の穴（F系） | 42 | 5 = 資料が決めない 2（F-24残り8行・F-4残り6行）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-33・F-43〜46） |
+| 既知の穴（F系） | 43 | 4 = 資料が決めない 1（F-4残り。実害なし）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-24残り・F-33・F-43〜46） |
 
 （2026-08-25 棚卸し時点。次にやる順は [次の作業](#次の作業優先順) にある）
 
@@ -56,6 +56,10 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 - [x] ✅ **B1 12リポジトリのTOP生成** — Series/Documents/比較表/ピン表/remap/Errata/Diagrams。日次でミラーが取得
 - [x] ✅ **B2 org TOPの生成** — 現行はリポジトリ一覧＋横断文書＋toolchain
 - [x] ✅ **B3 org TOP「型番から探す」** — **今あるデータだけで作れる**（series.csv: series→family、products.csv: part_number→family）。CH32M007がCH32V006に、CH32M103がCH32L103に、CH32V317がCH32V307に入っている件が検索者に見えるようになる。～~これができれば`curated/readme-extras/CH32V20x.md`（V205分離の手書きNotes）を削除して**特殊処理ゼロ**にできる~～ → **この見通しは誤りだった**（2026-08-24に確認。手書きNotesは消さない。[記録](worklist-archive.ja.md)）
+- [x] ✅ **B4 節構成の組み替え** — `build_readme.render`がU1→U2→U3順（Quick start → Series → Product comparison → Pinout reference → Pin definitions → remap → Block diagrams → Errata → EVT examples → Documents → Evaluation boards → Reference）。棚卸しで確認（2026-08-26）
+- [x] ✅ **B5 org TOP「機能から探す」** — `feature_tags.csv`（tag→series）から`## Find by feature`表をorg TOPに生成（2026-08-26）。datasheet粒度のタグ（`precision=datasheet`）はその旨を注記
+- [x] ✅ **B6 評価ボード情報** — `eval_boards.csv`（117行）から`### Evaluation boards`節を生成済み（`eval_board_lines`）。棚卸しで確認（2026-08-26）
+
 ## C. 画像（保留）
 
 **現時点では生成READMEに画像を使いません。** 切り出しの品質が実用水準に達していないためです。ピン配置図は「パッケージ→型番→データシート」の対応表で代替しています。
@@ -72,13 +76,13 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 
 ## D. 検査・運用
 
-- [x] ✅ **D1 参照結合検査** — `tools/check_tables.py`が全36テーブルの参照結合・書式・数の不変量を検査（`check_counts.py`が比較表の数とpin側の数を突き合わせる）
+- [x] ✅ **D1 参照結合検査** — `tools/check_tables.py`が全41テーブルの参照結合・書式・数の不変量を検査（`check_counts.py`が比較表の数とpin側の数を突き合わせる）
 - [x] ✅ **D2 中国語混入検査** — `#`より左のデータ列にCJKがあればCIが落ちる
 - [x] ✅ **D3 エラッタ増分検査** — `tools/scan_errata.py`（ミラーPDFが要るのでCIではなく手動運用）
 - [x] ✅ **D5 画像の検査** — 寸法異常と同一切り出しの共有を機械検出（目視の前段。実際に4件の欠損を捕捉）
 - [x] ✅ **D6 読んだ原典の版を記録** — `tables/sources.csv`新設（2026-08-23）。mirror 12本のcommitとその日付。**生成時刻は入れない**（毎回書き換わると「差分が出たら異常」の判定が使えなくなる）。生成物の差分の原因を「入力が変わった」と「再生成を忘れた」に切り分けるため
 - [ ] ⬜ **D7 生成のGitHub Actions化** — 日次起動・datasheetかEVTが変わっていたら全生成。**計画のみ**（下記）。抽出の作り込みが落ち着くまでは手動
-- [ ] ⬜ **D4 同期日時の表示** — 各READMEに「いつ原典と同期したか」。U5（原典に到達できない人）が最初に確認する情報
+- [x] ✅ **D4 同期日時の表示** — 各READMEの冒頭に`sources.csv`のmirror commit（リンク）と日付を出す（`synced_line`。2026-08-26）。生成時刻は出さない（冪等性）
 
 
 ### D7 生成のGitHub Actions化（計画のみ・2026-08-23）
@@ -149,7 +153,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | # | 依頼 | 状態 |
 |---|---|---|
 | R-19 | signal名の正規化と分割remap field | ✅ **実装済み**（2026-08-20〜21）。D-0〜D-4すべて。[extraction-survey](extraction-survey.ja.md)参照 |
-| R-20 | レジスタマップ（D-1〜D-8） | 🔧 **機械的に集められる部分を実装**（2026-08-25、`tools/build_registers.py`）。`register_blocks` 676行（D-1）・`registers` 4,995行（D-3）・`register_fields` 33,365行（D-4。field 24,792のうちRM一致6,829・conflict 38）・`register_layouts` 353行（D-5。型数は調査どおりI2C 4/GPIO 6/USART 8…）。D-6は`interrupts.csv`。**未着手**: D-7（DMA channel→周辺。RMの表）、RM zh版の絶対アドレス表（D-1/D-3の裏取り）、構造体を持たないdefine群（M030 `UART_*`等1,591行）のmember対応。見方は`tables/README`。[register-map-survey.ja.md](register-map-survey.ja.md) |
+| R-20 | レジスタマップ（D-1〜D-8） | 🔧 **機械的に集められる部分を実装**（2026-08-25、`tools/build_registers.py`）。`register_blocks` 676行（D-1）・`registers` 4,995行（D-3）・`register_fields` 33,365行（D-4。field 24,792のうちRM一致6,829・conflict 38）・`register_layouts` 353行（D-5。型数は調査どおりI2C 4/GPIO 6/USART 8…）。D-6は`interrupts.csv`。**RM zh版の絶対アドレス表でD-1/D-3を裏取り済み**（2026-08-26: 8,369行のうち5,110行が一致・不一致4、blocks 548 confirmed、registers 2,762 confirmed）。**D-7 も実装**（2026-08-26: `dma_requests.csv` 650行。RMのDMA章の格子をzh/en両版で照合、577 confirmed。H417はDMAMUXの番号表）。**未着手**: 構造体を持たないdefine群（M030 `UART_*`等1,591行）のmember対応。見方は`tables/README`。[register-map-survey.ja.md](register-map-survey.ja.md) |
 | R-24 | クロック関連データ（C-1〜C-8） | ✅ **C-1〜C-8を実装**（2026-08-21）。`clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`＋`operating_conditions.csv`拡張 |
 | R-24追補 | クロック表の追補（A-1〜A-4）とremapの要確認（B） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`・`evt_variants.csv`新設、`operating_conditions.csv`に`typ`列、remapの誤帰属を修正 |
 | R-24追補2 | クロック切替に要るレジスタ/ビットとflash latencyの取りこぼし（D-1〜D-4） | ✅ **実装済み**（2026-08-21）。`clock_symbols.csv`を77→429行に拡張、`clock_init.csv`新設、`clock_configs`に`flash_sck_div`列 |
@@ -190,7 +194,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-21 | `pin_roles`が語彙で覆えない signal 110種 | 1046行（4.4%）→**0行（100%）** | ツール | ✅ **修理済み**（2026-08-25）。最後の26種（M030の22種→`PREDRV`/`ISP1,2`/`QII1,2`/`ISINK`/`ISOURCE`/`PWR`/`SDI`、V003の`AETR`/`AETR2`/`TIETR`、V208の`ANT`→`BLE`）を原典で所属確認して語彙へ。`KNOWN_ROLE_GAPS`は空。[記録](worklist-archive.ja.md) |
 | F-22 | セル内の折り返しで**空白が落ちる**（`Communicationinterfaces`） | 全family | ツール | ✅ **修理済み**（2026-08-24）。[記録](worklist-archive.ja.md) |
 | F-23 | READMEの比較表の**行の並びが資料の並びでない** | 全family | ツール | ✅ **修理済み**（2026-08-24）。`order`列を新設。[記録](worklist-archive.ja.md) |
-| F-24 | **lead番号のセルが縦結合された行**を落としている（同じ足に2つのpad） | 42行 → 8行 | ツール | ✅ **修理済み**（2026-08-25）。残り8行は結合でもない空欄（資料が`-`を書き忘れたか別の意味か決まらない。`build_pins`のnotesに出る）。[記録](worklist-archive.ja.md) |
+| F-24 | **lead番号のセルが縦結合された行**を落としている（同じ足に2つのpad） | 42行 → 8行 | ツール→資料 | ✅ **修理済み**（2026-08-25）。残り8行は**zh/en両版とも空欄**と確認（2026-08-26: M007K8U7 `VSS`、V203 LQFP48/QFN48X7 `VSS`、V208 QFN68 `VSS_4`、V20x TSSOP20/QFN28 `PA8`、V20x QFN68 `VDD_IO_3`、X035 TSSOP20 `PB19`、X315 WCU6 `VDD`）。資料が空欄なので表にも無い——記録のみ。片方の版だけ空欄の7セル（H417 PB10、M103 PA13/PB5、V203 PB8×2、V205 PD0×2）は他方の版から復元され`reference`行になっている（F-4の残りと同じもの）。[記録](worklist-archive.ja.md) |
 | F-25 | pad名が**8文字を超えると落ちる**（`PC13-TAMPER-RTC`） | 103型番中99がPC13を持たなかった | ツール | ✅ **修理済み**（2026-08-24）。[記録](worklist-archive.ja.md) |
 | F-26 | 同じpadの**封装別の行**を「ページの続き」と誤認 | CH32X035 PC3 | ツール | ✅ **修理済み**（2026-08-24）。[記録](worklist-archive.ja.md) |
 | F-27 | CH32V103のTIM3 remap値が**RMと食い違う**（pin表の接尾辞が誤り） | 18行 | 資料/ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
@@ -259,8 +263,8 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 | 項目 | 状態 | できること |
 |---|---|---|
-| F-24 残り8行（lead番号が結合でもない空欄） | 資料が`-`を書き忘れたか別の意味か決まらない | zh/en両版で空欄が一致するかを確かめ、一致なら「資料が空欄」として閉じる（小） |
-| F-4 残り6行（片方の言語版だけの`reference`行） | 実害小 | 放置可。増えたら見る |
+| ~~F-24 残り8行~~ | **閉じた**（2026-08-26）。8セルとも zh/en 両版で空欄＝資料側 | — |
+| F-4 残り（片方の言語版だけの`reference`行） | 結合セルの版面が版で違い、片方の`fill_merged`だけ埋まる7セル（H417/M103/V203/V205）。値は他方の版で取れている | 実害なし。記録のみ |
 | F-11 WCH-Linkの版番号 | **実機が要る**（更新前後で`minichlink`の表示を控える） | ユーザー作業 |
 | F-6/F-7、資料側の記録 | 原典に無い | 台帳（下）に記録。WCHへ報告する材料 |
 | `remap_fields`のreset_value空欄7行 | RMが復位値を書かない | 推測で埋めない（仕様） |
@@ -271,16 +275,17 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
   `.github/workflows/validate.yml`）は2026-08-25に削除した。** `tables/`が正本。記録はgitの履歴
 - **R-20（レジスタマップ）**は機械収集ぶんを実装した（2026-08-25。E表参照）。残りの手作業ぶん（D-7・RMの絶対アドレス表）は consumer側の要否を見て
 
-### 3. 新規（穴が尽きてから）
+### 3. 新規
 
-| 順 | 項目 | なぜこの順 |
+2026-08-26に D4（同期日時）・B5（機能から探す）・B6（評価ボード）・B4（節構成）を済ませた。
+R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日。残り:
+
+| 順 | 項目 | 状態 |
 |---|---|---|
-| 1 | **D4** 同期日時の表示 | `sources.csv`が既にあるので小さい。U5（原典に届かない人）が最初に見る |
-| 2 | **B6** 評価ボード情報 | `eval_boards.csv`（117行）が既にあり、READMEに節を足すだけ |
-| 3 | **B5** org TOP「機能から探す」 | A6（`features`/`feature_tags`）が済んで着手できる |
-| 4 | **B4** 節構成の組み替え | U1→U2→U3順。B5/B6の節が揃ってから並べ替えるほうが1回で済む |
-| 5 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
-| 6 | C1〜C3 画像 | 保留のまま |
+| 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
+| 2 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
+| 3 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
+| 4 | C1〜C3 画像 | 保留のまま |
 
 ## 資料側の問題台帳（原典の誤り・記録のみ）
 
@@ -311,6 +316,8 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-31 | CH32M103 datasheet en | pin説明でHO*を「N型」（p31）と「P型」（p32）の両方で書く | 表には影響なし（記録のみ） |
 | F-21 | CH32M030 EVT header | `ISP_CTLR_ISP2_QDET1_*`と綴る（RMは`QDET2`） | 語彙には使わない（記録のみ） |
 | F-21 | CH32V003 datasheet | pin表2-1のPD4が`TIETR_2`（同じ行が表2-3では`T1ETR_2`。`I`と`1`） | 語彙で`T1ETR`へ寄せる。層1の綴りは残す |
+| R-20 | CH32V407 RM / CH32H417 RM（DMA章） | V407 表11-2 の `I3C_TC` 行の周辺名が `13C`（`I`→`1`）、H417 表10-2 の要求84が `I3X_RX`（`I3C_RX`） | `dma_requests`は綴りを保ち note に「as printed」。`peripheral`は正しい方 |
+| R-20 | CH32H417 RM vs EVT header（`registers`の conflict 4） | CAN2 の `FMCFGR`/`FSCFGR`/`FAFIFOR`/`FWR` の番地が RM のアドレス表では EVT の構造体より +4（CAN1 は一致） | conflict＋両論。**実機未確認** |
 | R-20 | EVT header vs RM（`register_fields`の conflict 38） | bit位置がEVTとRMで**入れ替わっている**もの: M030 `ADC_STATR` `MULT_CMP1`(EVT bit9/RM bit7)⇄`MULT_CMP3`(bit7/bit9)、V407 `RCC_CFGR2` `UTMI1ON`(bit31/bit30)⇄`UTMI2ON`(bit30/bit31)。**幅が違う**: V003/V006 `GPIO_LCKR.LCKK` EVT bit8/RM bit16、L103 `CAN_BTIMR.TS2` 3bit/4bit・`SJW` 2bit/4bit、V103 `FLASH_ACTLR.LATENCY` 2bit/3bit・`ADC_CTLR1.DUALMOD` 4bit/6bit、V20x/V307 `RCC_CFGR0.USBPRE` 1bit/2bit、X035 `ADC_CTLR3.CLK_DIV` 4bit/9bit・TIM `CCR3/4` 16/32bit、V003 `ADC_RDATAR.DATA` 32/16bit。`FLASH_OBR.USER`（8 family）はRM側が行を別の切り方で書くため | 全部 conflict＋両論。**実機未確認**。どちらが正しいかは決めていない |
 
 いずれも**実機では未確認**。「正しい側」はもう一方の資料が複数一致することで決めている。

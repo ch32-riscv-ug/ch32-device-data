@@ -37,7 +37,7 @@
 | products | 103 | 列ごと（confirmed大半・packing missing 102） | 結合・比較表と突き合わせ | flash/sram が空の series あり（比較表が書かない） | ✅ |
 | product_attributes | 1,721 | confirmed 1,684 / conflict 25 / ref 12 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2） | ✅ |
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
-| pins | 4,558 | confirmed 4,524 / ref 33 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）。F-31/F-32は**修正済み**（M007/M103のゲートドライバpad 26 leadが入った。lead欠けは資料が`未使用`と書く5型番のみ。`VDD_VIO_1`の綴りも直った） | 🟡 |
+| pins | 4,558 | confirmed 4,524 / ref 33 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8セルは**zh/en両版とも空欄**と確認（資料側。表に無いのが正しい）。F-31/F-32は**修正済み**（M007/M103のゲートドライバpad 26 leadが入った。lead欠けは資料が`未使用`と書く5型番のみ。`VDD_VIO_1`の綴りも直った）。ref 33の大半は片方の版だけ結合セルが埋まらない7セル由来 | ✅ |
 | pin_functions | 28,484 | confirmed 28,235 / ref 237 / conflict 12 | 結合・pins と結合・**alias行の形** | F-6/7（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。`route=alias`（30行）はpad名の括弧のGPIO別名で機能ではない（`tables/README`）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
 | operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36 は**修正済み**（条件欄の添字を戻した。値は検証 12/12 一致） | ✅ |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
@@ -56,6 +56,7 @@
 | clock_enables | 429 | confirmed 370 / ref 59 | 結合・address=RCC base+offset | EVT rcc.h×RM。**conflict 0**。ref 59 は RM の field 名綴りが違う（`ETH_MAC_Rx` 等）だけで bit の不一致ではない | ✅ |
 | adc_internal | 19 | confirmed 13 / ref 4 / conflict 2 | 結合・channel が数 | datasheet zh/en 照合。conflict 2 = V20x/V307 の Avg_Slope 最大値が **zh 4.8 / en 4.7**（資料側の食い違い、F-46）。V003/X035 のチャネル番号は RM から | ✅ |
 | usbpd_plumbing | 13 | confirmed 11 / ref 2 | 結合・clock_enables と一致 | EVT ヘッダ×RM。ref 2 = M030 の LVE_T（RM に field 名が無い） | ✅ |
+| dma_requests | 650 | confirmed 577 / ref 73 | 結合・dma+channel か request_id の一方・remap の値・variant が evt_variants の macro | RM の DMA 章の格子を **zh/en 両版で照合**（R-20 D-7、2026-08-26）。ref 73 = CH32V407（RM は zh のみ）。H417 は DMAMUX の番号表（channel 固定でない）。V006 の TIM3 は型番で割り当てが違う（脚注を note に）。資料の誤植 2件（V407 `13C`、H417 `I3X_RX`）は綴りを保って note | ✅ |
 
 ### EVT から（単一出所・テキスト写し）
 
@@ -69,8 +70,8 @@
 | clock_configs 他 clock_* 5表 | 1,066 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
 | evt_examples | 1,593 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
-| register_blocks | 676 | 全行 reference | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。`extract_addresses` の既知番地7点は全一致（survey）。H417 `UHSIF` は型の構造体が header に無く layout 空 | 🔵 |
-| registers | 4,995 | confirmed 1,468 / ref 3,527 | layouts と結合・offset/幅の書式 | confirmed = RM のレジスタ表に同名（`GPIOx_CFGLR` の x は数字を落として比較）がある。union で重なる register は同 offset の2行 | 🔵 |
+| register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |
+| registers | 4,995 | confirmed 2,762 / ref 2,229 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |
 | register_fields | 33,365 | field 24,792（confirmed 6,829 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方）。`member` 空 1,591 行（CAN 以外の入れ子・構造体の無い define 群） | 🟡 |
 | register_layouts | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
 
@@ -237,7 +238,7 @@ EVT ヘッダの綴り。field 名も `*_RM`（RM）と `*_REMAP`（EVT）が出
 
 ## 既知の穴の一覧はどこにあるか
 
-- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: 資料が決めない F-24残り8行・F-4残り6行、実機待ち F-11、資料側の記録 F-6/7/33/43〜46。**ツール側の穴は2026-08-25時点で0**）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
+- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: 実機待ち F-11、資料側の記録 F-6/7/24残り/33/43〜46、F-4残りは実害なし。**ツール側の穴は0**）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
 - 語彙の穴: `tools/check_tables.py` の `KNOWN_ROLE_GAPS`（綴りと行数で固定）
 - 数の不変量: `tools/check_tables.py` の `KNOWN_SHARED_LEADS`、`tools/check_counts.py` の `KNOWN`
 
