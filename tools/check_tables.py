@@ -128,7 +128,7 @@ def main() -> int:
                       "clock_symbols", "clock_init", "evt_variants", "systick",
                       "memory_configs", "pin_alternate", "interrupts",
                       "memory_map", "features", "sources", "eval_boards",
-                      "feature_tags", "pin_roles")}
+                      "feature_tags", "pin_roles", "timers")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -205,6 +205,20 @@ def main() -> int:
         bad.append(f"pin_roles: pin_functions にない行が {len(invented)} 件ある"
                    f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
     bad += pin_role_coverage(t)
+
+    # timers.csv は RM の register 見出しから読む。**周辺として実在すること**と、
+    # 更新割り込みが interrupts.csv にあることを見る。
+    irq_names = {(r["family"], r["name"]) for r in t["interrupts"]}
+    variant_macros = {(r["family"], r["macro"]) for r in t["evt_variants"]}
+    for r in t["timers"]:
+        check("timers", r["timer"], r["family"], families, "families")
+        if r["update_vector"] and (r["family"], r["update_vector"]) not in irq_names:
+            bad.append(f"timers: {r['family']} の {r['timer']} が指す割り込み "
+                       f"{r['update_vector']!r} が interrupts にない")
+        for macro in (m for m in r["condition"].split(";") if m):
+            if (r["family"], macro) not in variant_macros:
+                bad.append(f"timers: {r['family']} の condition が呼ぶ {macro} が "
+                           "evt_variants にない")
     # The two remap tables have to agree with each other as well as join, because
     # the ways they can disagree are the ways a consumer writes the wrong register
     # and gets a different route with no error at all.
