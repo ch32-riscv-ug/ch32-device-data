@@ -33,6 +33,7 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   interrupts.csv          791行  割り込みベクタ表（family×番号。variantで入れ替わる分はcondition付き）
   memory_map.csv          797行  アドレス空間の地図（FLASH/SRAM/OB・バス・周辺のベース番地）
   features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
+  timers.csv               63行  タイマ1つずつの素性（**カウンタ幅**・種類・チャネル数・相補出力・更新割り込み）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
   eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
@@ -155,6 +156,25 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 読み方は資料の別の場所で検算できます。CH32L103の注記8は`F8U6`について`PB1`/`PB10`・`PB6`/`PB13`・`PA12`/`PA14`・`PA11`/`PA13`の**4組を名指し**していて、結合セルから復元した4組と一致します。CH32V407の`VREF-`と`VSSA`が同じ足になるのは、電気特性表の`V_REF- is equal to V_SS`が独立に裏付けます。
 
+### `timers.csv`
+
+**「このタイマのカウンタは何ビットか」**を機械可読にした表です。比較表は`Timer General-purpose TIM4 (32-bit)`のような**文**をseries粒度で持つだけで、綴りも`ADTM`/`GPTM`/`高级定时器`と揺れます。consumer側が32bitタイマの一覧を手書きすると、そこが間違ったときに周期の計算が静かにずれます。
+
+出所は**RMのregister見出し**です。見出しが種類と対象タイマを、直後のfield表が幅を言います。
+
+```
+14.4.10 高级定时器的计数器（TIMx_CNT）（x=1/8）      [15:0] CNT[15:0]  → advanced 16bit
+15.4.11 通用定时器的计数器（TIMx_CNT）（x=9/10/11/12） [31:0] CNT[31:0]  → 32bit
+```
+
+`channels`と`complementary`は`pin_roles.csv`から数えます——**pinout単位の下限**であって silicon の上限ではありません（`channels`は「pinに出ている最大のチャネル番号」）。`update_vector`は`interrupts.csv`から引きます。高級タイマはベクタが4本に割れるので（`BRK`/`UP`/`TRG_COM`/`CC`）、**更新割り込みの`TIMn_UP`を名前で選びます**。
+
+**幅がvariantで変わるものがあります。** CH32V20xのTIM5がそれで、RMの注が
+
+> 注：32位的TIM5_CNT仅适用于型号为CH32F20x_D8W、CH32V20x_D8、CH32V20x_D8W系列的产品，其他系列芯片的TIM5_CNT为16位。
+
+と書きます。名指しされたmacroを`condition`に置き（`interrupts.csv`と同じ持ち方）、`confidence`は`varies-by-package`。**同じRMを共有する別familyがそのvariantを持たない場合は`conflict`**にします——CH32V307はCH32V20xとRMを共有しますが注のvariantを持たないので、32bitと言い切れません。
+
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
 datasheetのpin表がそう書いています（`CH32V20x_30xDS0`は表の直前に断っています）:
@@ -179,6 +199,8 @@ consumerが型番ごとの機能一覧を作るなら、**この2つを掛け合
 この表は`tools/signal_vocabulary.py`の語彙規則を通した`(peripheral, role)`を持ちます。**新しい事実は足しません**——`pin_functions.csv`の行を言い換えるだけで、語彙で覆えない行は載せません。載せるとしたら語彙か抽出を直すのが筋で、ここで補うと資料に無いものが表に生まれます。`tools/check_tables.py`が「pin_functionsに無い行が入っていないか」と「覆えない綴りが増えていないか」を毎回見ます。
 
 `routing`は`pin_functions.csv`の`route`と同じ（`default` / `main` / `remap-N` / `af-N`）、`signal`は原典の綴りで、そこから層1へ戻れます。
+
+**`port`/`pin`は装飾を落としたGPIOとしての読み**です。datasheetは`PA0-WKUP`（432行）や`PC13-TAMPER-RTC`（89行）のように、そのpadの特別な役割を名前の一部として書きます。`pad`はその綴りをそのまま持つので（綴りは証拠）、`PA0`で探すと`PA0-WKUP`を取りこぼします。`pin_alternate.csv`が既に`pad, port, pin`を持っているので同じ形に揃えました。GPIOでないpad（`OSC_IN`・`XI`、51行）は両方とも空です。
 
 **pad自身の名前は載りません。** `PA9`の主機能が`PA9`、`PC13-RTC`の主機能が`PC13`、`VSS`の主機能が`VSS`と書かれるのは、そのpadが何であるかを言っているだけで役割ではないためです。逆引きに出てこないpadは4269中584で、内訳は電源400・その他136・GPIO 39・アナログ9です。
 
@@ -705,6 +727,7 @@ uv run tools/build_memory.py --out tables                     # memory_configs�
 uv run tools/build_interrupts.py --out tables                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py --out tables                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run tools/build_features.py --out tables                  # features（datasheetの機能説明章から・数分かかる）
+uv run tools/build_timers.py --out tables                    # timers（RMのTIMx_CNT見出しから・数分かかる）
 uv run tools/build_eval_boards.py --out tables                # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py --out tables               # feature_tags（features + 比較表から。PDF不要）
 uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）

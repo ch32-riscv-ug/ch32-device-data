@@ -79,7 +79,13 @@ def read_timers(path: Path) -> tuple[list[dict], list[str]]:
                 if not group and not single:
                     continue
                 width = None
-                for after in lines[i:i + LOOKAHEAD]:
+                for step, after in enumerate(lines[i:i + LOOKAHEAD]):
+                    # **次の見出しを跨がない。** 同じページに2つ並ぶことがあり
+                    # （CH32H417 の 15.4.10 は 16bit、15.4.11 は 32bit）、跨ぐと
+                    # 隣の幅を静かに拾う。
+                    if step and (HEAD_GROUP.match(after.strip())
+                                 or HEAD_ONE.match(after.strip())):
+                        break
                     hit = WIDTH.search(after)
                     if hit:
                         width = int(hit.group("hi")) + 1
@@ -124,12 +130,21 @@ def main() -> int:
     families = [r["family"] for r in load("families")]
     variants = {(r["family"], r["macro"]) for r in load("evt_variants")
                 if "macro" in r}
-    irq_of: dict[tuple[str, str], str] = {}
+    # **更新割り込みは `TIMn_UP`。** 高級タイマはベクタが4本に割れていて
+    # （`TIMn_BRK` / `TIMn_UP` / `TIMn_TRG_COM` / `TIMn_CC`）、表の並び順で
+    # 最初に当たるのは `BRK` なので、名前で選ばないと**中断入力のベクタを
+    # 更新割り込みとして渡してしまいます**。ベクタが1本のタイマは `TIMn`。
+    by_timer: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
     for row in load("interrupts"):
-        hit = re.match(r"^(TIM\d+)_(?:UP|BRK|IRQ)", row["name"]) or \
-              re.fullmatch(r"^(TIM\d+)", row["name"])
-        if hit and (row["family"], hit.group(1)) not in irq_of:
-            irq_of[(row["family"], hit.group(1))] = row["name"]
+        hit = re.match(r"^(TIM\d+)(?:_|$)", row["name"])
+        if hit:
+            by_timer[(row["family"], hit.group(1))].add(row["name"])
+    irq_of: dict[tuple[str, str], str] = {}
+    for key, found in by_timer.items():
+        exact = f"{key[1]}_UP"
+        irq_of[key] = (exact if exact in found else
+                       key[1] if key[1] in found else
+                       sorted(found)[0] if found else "")
     channels: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
     for row in load("pin_roles"):
         if row["peripheral"].startswith("TIM") and row["role"].startswith("CH"):
@@ -150,6 +165,15 @@ def main() -> int:
             seen = channels.get((family, timer["timer"]), set())
             plain = {c for c in seen if not c.endswith("N")}
             varies = timer.get("_varies")
+            # **注が名指しする variant をこの family が持たないなら、その幅は
+            # ここには適用されない。** CH32V20x と CH32V30x は RM を共有していて、
+            # 注は「32位の TIM5_CNT は CH32V20x_D8/D8W にだけ、他は16位」と書く。
+            # CH32V307 の側で 32bit と言い切ると嘘になるので conflict にする。
+            applies = [m for m in (varies[1] if varies else []) if (family, m) in variants]
+            if varies and not applies:
+                notes.append(f"{family} {timer['timer']}: RMの注が名指しする variant を"
+                             f"この family は持たない（{varies[1]}）。幅は"
+                             f"{timer['counter_width_bits']}bitと読めるが適用外の可能性")
             rows.append({
                 "family": family,
                 "timer": timer["timer"],
@@ -161,9 +185,9 @@ def main() -> int:
                 "complementary": "1" if any(c.endswith("N") for c in seen) else "",
                 "update_vector": irq_of.get((family, timer["timer"]), ""),
                 # 幅が variant で変わるなら、その variant を条件に置く。
-                "condition": ";".join(m for m in (varies[1] if varies else [])
-                                      if (family, m) in variants),
-                "confidence": "varies-by-package" if varies else "reference",
+                "condition": ";".join(applies),
+                "confidence": ("varies-by-package" if applies else
+                               "conflict" if varies else "reference"),
                 "basis": f"rm({manual.name}:p{timer['page']})",
             })
 
