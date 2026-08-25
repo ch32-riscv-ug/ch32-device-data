@@ -14,7 +14,7 @@ The repository is the canonical home of the device database. The current schema 
 - `tools/extract_selectors.py`, `tools/extract_pins.py`, `tools/extract_remap.py`, `tools/extract_registers.py`: review aids that propose candidates from EVT headers, datasheets and reference manuals; they never modify records
 - `tools/build_candidate.py`: joins those four into a single candidate fragment
 - `candidates/*.json`: unreviewed machine extraction, one file per SKU
-- `docs/`: Japanese design notes, extraction survey, and work handoff
+- `docs/`: Japanese notes — work list (`worklist.ja.md`), per-table reliability (`table-reliability.ja.md`), handoff, extraction survey, and the archive of resolved items
 
 ## Validation
 
