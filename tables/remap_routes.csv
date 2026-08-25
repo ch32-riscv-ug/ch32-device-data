@@ -690,6 +690,7 @@ CH32M030,afio-tim3-remap,4,TIM3_CH1N,PB12,TIM3,CH1N,#,reference,candidates(datas
 CH32M030,afio-tim3-remap,4,TIM3_CH1_ETR,PB13,TIM3,CH1_ETR,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
 CH32M030,afio-tim3-remap,4,TIM3_CH2,PB15,TIM3,CH2,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
 CH32M030,afio-tim3-remap,4,TIM3_CH2N,PB14,TIM3,CH2N,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
+CH32M030,afio-uart1-remap,0,Q_DET1,PA14,,,#,reference,candidates(datasheet-pin-table-default:en)
 CH32M030,afio-uart1-remap,0,UART_CTS,PA14,USART1,CTS,#,reference,candidates(datasheet-pin-table-default:en)
 CH32M030,afio-uart1-remap,0,UART_RTS,PA15,USART1,RTS,#,reference,candidates(datasheet-pin-table-default:en)
 CH32M030,afio-uart1-remap,0,UART_RX,PC0,USART1,RX,#,reference,candidates(datasheet-pin-table-default:en)

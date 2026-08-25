@@ -468,7 +468,14 @@
         },
         {
           "signal": "Q_DET1",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-uart1-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "UART_CTS",

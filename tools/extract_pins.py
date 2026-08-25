@@ -66,7 +66,15 @@ POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
 # ことで見つかった）。版番号を許すだけで、他の datasheet の行は1つも増減しません
 # （全 datasheet で実測）。
 PIN_TYPE = re.compile(r"^[A-Z]{1,4}\d?(?:\.\d)?(?:/[A-Z]{1,4}\d?)*$")
-PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,7}$")
+# pad 名の長さ。8文字までにしていたので `OSC8M_OUT`（9文字）が落ち、CH32V103 の
+# **x6 品用の pin 表**（表2-2）で lead 6 が丸ごと消えていました。
+#
+# **広げると1つ悪くなる名前があります。** CH32V205 の pin 表は1つのセルに
+# `V`＋添字`DD_` と `V`＋添字`IO_1` の**2つの名前**を書いていて、詰めると
+# `VVDD_IO_1` になります（8文字制限のときは丸ごと落ちて、別の行から拾った
+# `VIO_1` が残っていた）。**欠けた lead より見える誤記のほうがまし**なので広げ、
+# 綴りの問題は worklist の F-32 に記録します。
+PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,11}$")
 # **GPIO の名前に役割を継ぎ足した pad 名**。datasheet は `PA0-WKUP` のように
 # その pad の特別な役割を pad 名の一部として書く。8文字までの `PAD_TOKEN` では
 # `PC13-TAMPER-RTC`・`PC14-OSC32_IN`・`PC15-OSC32_OUT` が長すぎて外れ、

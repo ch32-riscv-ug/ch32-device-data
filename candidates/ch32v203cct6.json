@@ -784,6 +784,13 @@
       ]
     },
     {
+      "number": 24,
+      "pad": "VVDD_IO_1",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
+    },
+    {
       "number": 25,
       "pad": "PB12",
       "kind": "gpio",
@@ -1155,6 +1162,13 @@
           "route": "main"
         }
       ]
+    },
+    {
+      "number": 36,
+      "pad": "VVDD_IO_2",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
     },
     {
       "number": 37,
@@ -1558,6 +1572,13 @@
           "route": "main"
         }
       ]
+    },
+    {
+      "number": 48,
+      "pad": "VVDD_IO_3",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": []
     }
   ]
 }
