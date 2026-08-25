@@ -39,14 +39,12 @@ def load(tables: Path, name: str) -> list[dict]:
 #   Q_DET* / V_DET         CH32M030 の検出入力。周辺名を名乗らない綴り
 KNOWN_ROLE_GAPS = {
     "AETR": 6, "AETR2": 8, "TIETR": 4,
-    "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 4,
+    "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 8,
     "LO0": 5, "LO1": 5, "LO2": 4, "LO3": 3,
     "ISINK1": 4, "ISINK2": 5, "ISOURCE1": 4, "ISOURCE2": 3,
-    "ISN1": 5, "ISN2": 4, "ISP2": 5,
+    "ISN1": 5, "ISN2": 4, "ISP1": 5, "ISP2": 5,
     "QII1": 3, "QII2": 5,
-    "SWIM": 5,
-    # CH32M030 の検出入力。`PERIPHERAL_ROLE` の形をしていないので `_` で割ると
-    # 「Q という周辺」が生まれる。覆えないと出るほうが正しい。
+    "SWIM": 5, "ANT": 4,
     "Q_DET1": 4, "Q_DET2": 3, "V_DET": 5,
 }
 
@@ -98,7 +96,8 @@ def pin_role_coverage(t: dict) -> list[str]:
     import build_pin_roles  # noqa: PLC0415
 
     catalogue = {r["part_number"]: r for r in t["products"]}
-    _, unresolved = build_pin_roles.roles(t["pin_functions"], catalogue)
+    kinds = {(r["part_number"], r["pad"]): r["kind"] for r in t["pins"]}
+    _, unresolved = build_pin_roles.roles(t["pin_functions"], catalogue, kinds)
     found: dict[str, int] = {}
     for (_, signal), count in unresolved.items():
         found[signal] = found.get(signal, 0) + count
