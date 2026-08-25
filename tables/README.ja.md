@@ -155,6 +155,23 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 読み方は資料の別の場所で検算できます。CH32L103の注記8は`F8U6`について`PB1`/`PB10`・`PB6`/`PB13`・`PA12`/`PA14`・`PA11`/`PA13`の**4組を名指し**していて、結合セルから復元した4組と一致します。CH32V407の`VREF-`と`VSSA`が同じ足になるのは、電気特性表の`V_REF- is equal to V_SS`が独立に裏付けます。
 
+### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
+
+datasheetのpin表がそう書いています（`CH32V20x_30xDS0`は表の直前に断っています）:
+
+> 注意，下表中的引脚功能描述针对的是**所有功能，不涉及具体型号产品**。不同型号之间外设资源有差异
+
+同じpinoutを共有する型番は同じpad行を読むので、`pin_functions.csv`（と`pin_roles.csv`）は**そのsiliconが出せる機能の和**になります。CH32V303CBT6はUSARTを3つしか持ちませんが、pin表には`UART8_TX`まで並びます。**どの型番が実際に持つかは比較表**（`product_attributes.csv`）が型番単位で数えます。個別の例外は脚注が名指しします（注17「CH32V303CBT6和CH32V303RBT6芯片均不支持TIM8」）。
+
+consumerが型番ごとの機能一覧を作るなら、**この2つを掛け合わせてください**。`tools/check_counts.py`が両者を突き合わせて数を出します:
+
+```
+突き合わせた組 391  一致 352  pin側が多い（共有pinoutの上位集合）30  pin側が少ない 9
+  - 比較表が数えているのに pin に1つも出ない: 0 組
+```
+
+`pin側が多い`が共有pinoutの分、`pin側が少ない`はその封装に出ていないinstance（`CMP2`・`LPTIM1`で、入力が内部だけの可能性がある）。**`pin に1つも出ない`が0であること**が、比較表が数える周辺は必ずpinから引けるという保証です。
+
 ### `pin_roles.csv`
 
 **「USART1のTXはどのpadか」を素直に引くための索引**です。`pin_functions.csv`は資料が綴ったままの`signal`を持ちます——綴りは証拠なのでそれでよいのですが、同じ役割が`USART1_TX` / `TX1` / `UTX` / `UART_TX`と4通りに出るため、読む側が全部を知っていないと引けませんでした。実際にREADMEの生成側がそれを抱え込み、`UART_TX`を取りこぼしてCH32M030の欄が空になり、pad名を条件に混ぜたせいで2線式SDIのfamily全部でSWDIOの欄が空になっていました。
@@ -696,6 +713,7 @@ uv run tools/build_link_firmware.py --out tables              # link_firmware（
 uv run tools/extract_images.py                                # 各repoのimage/（数分かかる）
 uv run tools/check_images.py [--missing|--prune]              # 画像の必要一覧と検査
 uv run tools/check_tables.py                                  # 全テーブルの参照結合検査
+uv run tools/check_counts.py                                  # 比較表の周辺数 vs pinのinstance数
 uv run tools/scan_errata.py                                   # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --out tables --family CH32V006   # 1familyだけ
 ```

@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import re
 import sys
 from pathlib import Path
 
@@ -41,8 +42,18 @@ import signal_vocabulary  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
 
-COLUMNS = ["part_number", "series", "family", "peripheral", "role", "pad",
-           "routing", "signal", "#", "confidence", "basis"]
+COLUMNS = ["part_number", "series", "family", "peripheral", "role",
+           "pad", "port", "pin", "routing", "signal", "#", "confidence", "basis"]
+
+# **pad 名には役割が継ぎ足されることがある。** datasheet は `PA0-WKUP` /
+# `PC13-TAMPER-RTC` のように、その pad の特別な役割を名前の一部として書きます
+# （`pins.csv` はその綴りをそのまま持ちます——綴りは証拠なので）。読む側が
+# `PA0` を探して `PA0-WKUP` を取りこぼすのはそこで、装飾が増えたことに気付かない
+# まま PC13/PC14/PC15 が現れたのが実際に起きたことです。
+#
+# `pin_alternate.csv` が既に `pad, port, pin` を持っているので、新しい概念では
+# なく**揃えるだけ**。GPIO でない pad（`OSC_IN`・`XI`）は両方とも空にします。
+GPIO_PAD = re.compile(r"^P(?P<port>[A-H])(?P<pin>\d{1,2})(?:[-_]|$)")
 
 
 def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collections.Counter]:
@@ -70,6 +81,7 @@ def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collectio
         product = catalogue.get(fn["part_number"])
         if not product:
             continue
+        gpio = GPIO_PAD.match(fn["pad"])
         for pair in found:
           rows.append({
             "part_number": fn["part_number"],
@@ -78,6 +90,9 @@ def roles(functions: list[dict], catalogue: dict) -> tuple[list[dict], collectio
             "peripheral": pair[0],
             "role": pair[1],
             "pad": fn["pad"],
+            # 装飾を落とした GPIO としての読み。GPIO でなければ空。
+            "port": gpio.group("port") if gpio else "",
+            "pin": gpio.group("pin") if gpio else "",
             "routing": fn["route"],
             # 層1 へ戻る手がかり。綴りは資料のまま。
             "signal": fn["signal"],

@@ -1143,6 +1143,10 @@ CH32H416RDU6,PF9,TIM10_CH2,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32
 CH32H416RDU6,PF9,TIM11_CH4,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF9,USART8_CTS,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF9,USART8_RTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
+CH32H416RDU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
+CH32H416RDU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
+CH32H416RDU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
+CH32H416RDU6,SSTXB,SSTXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,VDD12A,VDD12A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,VDD33,VDD33,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,VDD33A,VDD33A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
@@ -2139,6 +2143,10 @@ CH32H417MEU6,PF5,UHSIF_PORT45,default,#,confirmed,pin-table:zh+pin-table:en,2-1-
 CH32H417MEU6,PF5,UHSIF_PORT45,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PF5,UHSIF_PORT45,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PF5,USART5_RX,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,SSTXB,SSTXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,VDD12A,VDD12A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,VDD33,VDD33,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,VDD33A,VDD33A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3423,6 +3431,10 @@ CH32H417QEU6,PF9,TIM10_CH2,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PF9,TIM11_CH4,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF9,USART8_CTS,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF9,USART8_RTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,SSTXB,SSTXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,VBAT,VBAT,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,VDD12A,VDD12A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,VDD33,VDD33,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -4221,6 +4233,10 @@ CH32H417WEU6,PF5,UHSIF_PORT45,default,#,confirmed,pin-table:zh+pin-table:en,2-1-
 CH32H417WEU6,PF5,UHSIF_PORT45,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PF5,UHSIF_PORT45,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PF5,USART5_RX,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,SSTXB,SSTXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,VDD12A,VDD12A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,VDD33,VDD33,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,VDD33A,VDD33A,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF

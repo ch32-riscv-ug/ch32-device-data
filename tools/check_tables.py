@@ -36,6 +36,7 @@ def load(tables: Path, name: str) -> list[dict]:
 #   HO* / LO* / IS* / QII  CH32M030 のモータ駆動。比較表が
 #                          `Source current module ISOURCE` のように群を名乗る
 #   SWIM                   CH32M030 PA3。資料に対応の記述が見つかっていない
+#   Q_DET* / V_DET         CH32M030 の検出入力。周辺名を名乗らない綴り
 KNOWN_ROLE_GAPS = {
     "AETR": 6, "AETR2": 8, "TIETR": 4,
     "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 4,
@@ -44,6 +45,9 @@ KNOWN_ROLE_GAPS = {
     "ISN1": 5, "ISN2": 4, "ISP2": 5,
     "QII1": 3, "QII2": 5,
     "SWIM": 5,
+    # CH32M030 の検出入力。`PERIPHERAL_ROLE` の形をしていないので `_` で割ると
+    # 「Q という周辺」が生まれる。覆えないと出るほうが正しい。
+    "Q_DET1": 4, "Q_DET2": 3, "V_DET": 5,
 }
 
 
