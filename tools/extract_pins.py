@@ -59,7 +59,13 @@ POWER_PADS = {"VSS", "VDD", "VDDA", "VSSA", "VBAT", "VREF+", "VREF-"}
 # Supply and special pads are named per family (CH32M030 alone adds VS0-3, VB0-3,
 # VHV, VDD8, VDD33, ISP1), so rows are recognised by their pin-type cell instead of
 # by a list of pad names. Types read like P, A, O, I/O, I/O/A, I/O/FT.
-PIN_TYPE = re.compile(r"^[A-Z]{1,3}(?:/[A-Z]{1,3}){0,3}$")
+# 型の欄は電気的な種別の記号（`I/O/A`・`P`）か、**その pad が属する interface の
+# 名前**です。既に `ETH`・`USB`・`I/O/SDP` が通っていて、CH32H417 の USB 3.0 の
+# 差動 pad だけが `USB3.0` と版番号付きで書かれるため外れ、**SSTXA/SSTXB/SSRXA/
+# SSRXB の4 pad が QFN128 から丸ごと落ちていました**（封装の lead 数と合わない
+# ことで見つかった）。版番号を許すだけで、他の datasheet の行は1つも増減しません
+# （全 datasheet で実測）。
+PIN_TYPE = re.compile(r"^[A-Z]{1,4}\d?(?:\.\d)?(?:/[A-Z]{1,4}\d?)*$")
 PAD_TOKEN = re.compile(r"^[A-Z][A-Z0-9_+-]{0,7}$")
 # **GPIO の名前に役割を継ぎ足した pad 名**。datasheet は `PA0-WKUP` のように
 # その pad の特別な役割を pad 名の一部として書く。8文字までの `PAD_TOKEN` では

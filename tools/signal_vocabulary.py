@@ -237,7 +237,11 @@ def canonical_field(field: str) -> str:
 def split(signal: str) -> tuple[str, str] | None:
     """(peripheral, role) for a signal name, or None where no rule applies."""
     head, sep, tail = signal.partition("_")
-    if sep and tail:
+    # **1文字は周辺の名前ではない。** `PERIPHERAL_ROLE` の形をしていない signal を
+    # `_` で割ると、CH32M030 の `Q_DET1`（電荷検出）が「Q という周辺の DET1」に、
+    # `V_DET` が「V という周辺」になる。`extract_pins.stem()` が同じ理由で同じ
+    # 条件を持っている。覆えないものは覆えないと出るほうが使える。
+    if sep and tail and len(head) > 1:
         return canonical_peripheral(head), tail
 
     m = SERIAL.match(signal)

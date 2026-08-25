@@ -311,9 +311,6 @@
         3
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_values_not_in_grid": [
-        2
-      ],
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -430,8 +427,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MISO",
@@ -487,8 +483,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH2",
@@ -796,8 +791,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART2_RTS",
@@ -808,8 +802,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART2_RTS",
@@ -981,8 +974,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH1_ETR",
@@ -1101,8 +1093,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART2_CK",
@@ -1440,8 +1431,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM1_CH4",
@@ -1600,8 +1590,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART2_RX",
@@ -1703,8 +1692,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM2_CH1_ETR",
@@ -1741,8 +1729,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART2_TX",
@@ -1764,8 +1751,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "I2C1_SDA",
@@ -1810,8 +1796,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "TIM1_BKIN",
@@ -1939,8 +1924,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_SCK",
@@ -1995,8 +1979,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     },
@@ -2052,8 +2035,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "USART1_CTS",
@@ -2148,8 +2130,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MOSI",
@@ -2193,8 +2174,7 @@
             "values": [
               5
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         }
       ]
     }

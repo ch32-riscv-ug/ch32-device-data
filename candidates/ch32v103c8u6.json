@@ -139,14 +139,10 @@
       ],
       "valid_values": [
         0,
-        1,
         2,
         3
       ],
       "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
-      "_values_not_in_grid": [
-        1
-      ],
       "reset_value": 0
     },
     {
@@ -1338,15 +1334,16 @@
         },
         {
           "signal": "TIM3_CH1",
-          "route": "remap-1",
-          "_selector_value": 1,
+          "route": "remap-2",
+          "_selector_value": 2,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 1,
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
-              1
+              2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MISO",
@@ -1384,15 +1381,16 @@
         },
         {
           "signal": "TIM3_CH2",
-          "route": "remap-1",
-          "_selector_value": 1,
+          "route": "remap-2",
+          "_selector_value": 2,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 1,
           "selection": {
             "selector": "afio-tim3-remap",
             "values": [
-              1
+              2
             ]
-          },
-          "_selector_resolved_by": "peripheral"
+          }
         },
         {
           "signal": "SPI1_MOSI",

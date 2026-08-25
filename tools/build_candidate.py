@@ -394,9 +394,39 @@ def join(
                 return found
         return None, ""
 
+    # **RM の格子が同じ (signal, pad) を別の値で名指ししているなら、格子が正しい。**
+    # datasheet の pin 表は経路を signal の接尾辞で書きますが（`TIM3_CH1_1`）、
+    # CH32V103 はそれを **PB4 と PC6 の両方に `_1`** と書いていて、RM の表10-12 は
+    #
+    #     TIM3_RM=00: PA6   TIM3_RM=10: PB4   TIM3_RM=11: PC6
+    #
+    # と書き分けます。`TIM3_REMAP=1` は RM が定義していない値で、書いても
+    # どちらの pad にも出ません（worklist の F-27）。
+    #
+    # **格子が黙っている値には手を出しません。** 格子は不完全なことがあり
+    # （CH32X035 は RM に格子の表が無く、register field の説明文だけ。CH32V30x の
+    # 格子は I2S3 の経路を書いていない——F-6）、「格子に無い＝無効」ではない。
+    # 同じ (signal, pad) を**格子自身が別の値で名指ししている**ときだけ直します。
+    grid_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
+    for r in routes:
+        if r.get("_source") == "grid":
+            grid_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
+
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
     for pin, fn in routed:
+        stated = fn["_selector_value"]
+        says = grid_value_of.get((canonical_signal(fn["signal"]), pin["pad"]))
+        if says and stated not in says and len(says) == 1:
+            corrected = next(iter(says))
+            fn["_selector_value"] = corrected
+            fn["route"] = f"remap-{corrected}"
+            fn["_value_from_grid"] = True
+            fn["_value_in_pin_table"] = stated
+            notes.append(
+                f"[join] {pin['pad']} {fn['signal']}: pin表は値{stated}と書くが"
+                f"RMの格子はこのpadを値{corrected}に置く。格子を採った"
+            )
         key, how = resolve(pin, fn, fn["_selector_value"])
         if key is None:
             fn["_unresolved_selector"] = True

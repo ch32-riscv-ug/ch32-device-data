@@ -8383,6 +8383,30 @@
       ]
     },
     {
+      "number": 123,
+      "pad": "SSTXB",
+      "kind": "other",
+      "_pin_type": "USB3.0",
+      "functions": [
+        {
+          "signal": "SSTXB",
+          "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 124,
+      "pad": "SSTXA",
+      "kind": "other",
+      "_pin_type": "USB3.0",
+      "functions": [
+        {
+          "signal": "SSTXA",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 125,
       "pad": "VDD12A",
       "kind": "power",
@@ -8390,6 +8414,30 @@
       "functions": [
         {
           "signal": "VDD12A",
+          "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 126,
+      "pad": "SSRXB",
+      "kind": "other",
+      "_pin_type": "USB3.0",
+      "functions": [
+        {
+          "signal": "SSRXB",
+          "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 127,
+      "pad": "SSRXA",
+      "kind": "other",
+      "_pin_type": "USB3.0",
+      "functions": [
+        {
+          "signal": "SSRXA",
           "route": "main"
         }
       ]

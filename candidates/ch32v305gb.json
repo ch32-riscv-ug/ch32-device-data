@@ -892,23 +892,27 @@
         },
         {
           "signal": "USART1_CTS",
-          "route": "remap-2",
-          "_selector_value": 2,
+          "route": "remap-0",
+          "_selector_value": 0,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 2,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              2
+              0
             ]
           }
         },
         {
           "signal": "USART1_CK",
-          "route": "remap-3",
-          "_selector_value": 3,
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 3,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              3
+              1
             ]
           }
         }
@@ -979,12 +983,14 @@
         },
         {
           "signal": "USART1_TX",
-          "route": "remap-3",
-          "_selector_value": 3,
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 3,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              3
+              1
             ]
           }
         },
@@ -1106,12 +1112,14 @@
         },
         {
           "signal": "USART1_RX",
-          "route": "remap-3",
-          "_selector_value": 3,
+          "route": "remap-1",
+          "_selector_value": 1,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 3,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              3
+              1
             ]
           }
         },
@@ -1580,12 +1588,14 @@
         },
         {
           "signal": "USART1_TX",
-          "route": "remap-2",
-          "_selector_value": 2,
+          "route": "remap-0",
+          "_selector_value": 0,
+          "_value_from_grid": true,
+          "_value_in_pin_table": 2,
           "selection": {
             "selector": "afio-usart1-remap",
             "values": [
-              2
+              0
             ]
           }
         }

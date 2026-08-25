@@ -103,6 +103,63 @@ def read_header(row: list[str]) -> list[tuple[str, list[int]] | None] | None:
     return columns if len(named) >= 2 else None
 
 
+# 値だけの列見出し。CH32L103 の格子は field 名を列に書かない。
+BARE_VALUE = re.compile(r"^[01xX]+$")
+
+
+def read_bare_header(rows: list[list[str]],
+                     notes: list[str]) -> list[tuple[str, list[int]] | None] | None:
+    """値だけの列見出しを、行ラベルが名乗る周辺名で field に結び付ける。
+
+    CH32L103 の格子は列見出しに field 名を書かず、値だけを並べます:
+
+        复用功能  | 00   | 10   | 11        ← CH32L103
+        USART2_TX | PA2  | PA11 | PA12
+
+        复用功能  | TIM3_RM=00/默认映射 | …  ← CH32V103 は列に field 名がある
+
+    **field 名は行ラベルが名乗っています**（`USART2_TX` は USART2 のもの）。
+    表題（`表10-17 USART2复用功能重映射`）にも書いてありますが、行ラベルのほうが
+    綴りの揺れに強く、語彙規則をそのまま使えます。
+
+    これが無いと CH32L103 の格子は**1行も読めず**、その family の remap 経路は
+    datasheet の pin 表の接尾辞だけが根拠になります——他 family では格子と pin 表を
+    突き合わせているのに、L103 だけ片肺でした（worklist の F-28）。
+
+    **行ラベルの周辺が1つに決まらない表は採りません。** どの field の話か決まらず、
+    混ざったまま採ると別の周辺の経路をこの field に付けてしまいます。
+    """
+    head = rows[0]
+    if flatten(head[0]).replace(" ", "") not in ROW_LABEL_HEADING:
+        return None
+    columns: list[list[int] | None] = []
+    for cell in head[1:]:
+        text = flatten(cell)
+        if not text:
+            columns.append(None)
+            continue
+        if not BARE_VALUE.match(text):
+            return None
+        columns.append(expand(text))
+    if sum(1 for c in columns if c is not None) < 2:
+        return None
+    peripherals = set()
+    for row in rows[1:]:
+        label = flatten(row[0])
+        if not label or not SIGNAL.match(label):
+            continue
+        pair = signal_vocabulary.split(label)
+        if pair:
+            peripherals.add(pair[0])
+    if len(peripherals) != 1:
+        if peripherals:
+            notes.append("値だけの列見出しの格子で行ラベルの周辺が1つに決まらず"
+                         f"読み飛ばした: {sorted(peripherals)}")
+        return None
+    field = f"{peripherals.pop()}_RM"
+    return [None if c is None else (field, c) for c in columns]
+
+
 def is_header_row(row: list[str]) -> bool:
     """Whether this row heads its own grid rather than continuing another.
 
@@ -144,7 +201,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                 rows = [[flatten(c) for c in row] for row in table.extract()]
                 if not rows or len(rows[0]) < MIN_COLUMNS:
                     continue
-                header = read_header(rows[0])
+                header = read_header(rows[0]) or read_bare_header(rows, notes)
                 if header:
                     pending, pending_page = header, page.page_number
                     body = rows[1:]
