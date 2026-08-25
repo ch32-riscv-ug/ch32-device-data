@@ -969,6 +969,32 @@
       ]
     },
     {
+      "number": 37,
+      "pad": "PB2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PB2",
+          "route": "main"
+        },
+        {
+          "signal": "CMP1_CHP1",
+          "route": "default"
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "QSPI_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
+        }
+      ]
+    },
+    {
       "number": 38,
       "pad": "PE7",
       "kind": "gpio",

@@ -414,6 +414,18 @@
       ]
     },
     {
+      "number": 14,
+      "pad": "VDD",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VDD",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 15,
       "pad": "PA0",
       "kind": "gpio",

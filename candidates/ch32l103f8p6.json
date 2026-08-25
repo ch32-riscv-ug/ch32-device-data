@@ -67,6 +67,7 @@
       ],
       "valid_values": [
         0,
+        2,
         3
       ],
       "_valid_values_source": "datasheet pin表",
@@ -371,6 +372,134 @@
         {
           "signal": "BOOT0",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 1,
+      "pad": "PB8",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PB8",
+          "route": "main"
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim4-rm",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "CMP2_P0",
+          "route": "default"
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim4-rm",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart1-rm",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "USART1_RTS",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart1-rm",
+            "values": [
+              5
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-spi1-rm",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "SPI1_MISO",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-spi1-rm",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-can-rm",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-tim1-rm",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH2",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-tim1-rm",
+            "values": [
+              5
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "TIM2_CH2",
+          "route": "remap-7",
+          "_selector_value": 7,
+          "selection": {
+            "selector": "afio-tim2-rm",
+            "values": [
+              7
+            ]
+          }
         }
       ]
     },

@@ -341,6 +341,54 @@
       ]
     },
     {
+      "number": 1,
+      "pad": "PA4",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PA4",
+          "route": "main"
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "default",
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "OPA_N2",
+          "route": "default"
+        },
+        {
+          "signal": "USART2_TX",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "USART2_CTS",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              5
+            ]
+          }
+        }
+      ]
+    },
+    {
       "number": 2,
       "pad": "PA1",
       "kind": "gpio",
@@ -639,6 +687,18 @@
             ]
           },
           "_selector_resolved_by": "pad+value(grid)"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VSS",
+          "route": "main"
         }
       ]
     },

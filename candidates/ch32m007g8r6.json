@@ -41,6 +41,24 @@
   },
   "route_selectors": [
     {
+      "id": "afio-adc-etrginj-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ADC_ETRGINJ_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 18
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "reset_value": 0
+    },
+    {
       "id": "afio-adc-etrgreg-remap",
       "controller": "afio",
       "register": "PCFR1",
@@ -1165,6 +1183,161 @@
             ]
           },
           "_selector_resolved_by": "pad+value(grid)"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "pad": "PD1",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PD1",
+          "route": "main"
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "SWIO",
+          "route": "default"
+        },
+        {
+          "signal": "SWDIO",
+          "route": "default"
+        },
+        {
+          "signal": "OPA_P3",
+          "route": "default"
+        },
+        {
+          "signal": "ADC_IETR",
+          "route": "default",
+          "_selector_resolved_by": "pad+value(grid)",
+          "selection": {
+            "selector": "afio-adc-etrginj-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH4",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "TIM1_CH3N",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "USART1_TX",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              4
+            ]
+          }
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              2
+            ]
+          }
+        },
+        {
+          "signal": "USART1_RX",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart1-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "USART2_RX",
+          "route": "remap-5",
+          "_selector_value": 5,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              5
+            ]
+          }
+        },
+        {
+          "signal": "I2C_SCL",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-i2c1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "I2C_SDA",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-i2c1-remap",
+            "values": [
+              4
+            ]
+          }
         }
       ]
     },

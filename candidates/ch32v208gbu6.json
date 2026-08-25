@@ -1199,6 +1199,50 @@
       ]
     },
     {
+      "number": 26,
+      "pad": "PB8",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PB8",
+          "route": "main"
+        },
+        {
+          "signal": "TIM4_CH3",
+          "route": "default",
+          "selection": {
+            "selector": "afio-tim4-remap",
+            "values": [
+              0
+            ]
+          }
+        },
+        {
+          "signal": "I2C1_SCL",
+          "route": "remap-1",
+          "_selector_value": 1,
+          "selection": {
+            "selector": "afio-i2c1-remap",
+            "values": [
+              1
+            ]
+          }
+        },
+        {
+          "signal": "CAN1_RX",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-can-remap",
+            "values": [
+              2
+            ]
+          }
+        }
+      ]
+    },
+    {
       "number": 27,
       "pad": "VDD_IO_3",
       "kind": "power",

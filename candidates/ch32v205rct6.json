@@ -152,6 +152,33 @@
       ]
     },
     {
+      "number": 5,
+      "pad": "PD0",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PD0",
+          "route": "main"
+        },
+        {
+          "signal": "USART4_CK",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "CAN_RX",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "FSMC_D2",
+          "route": "af-7",
+          "_alternate_function": 7
+        }
+      ]
+    },
+    {
       "number": 6,
       "pad": "OSC_OUT",
       "kind": "other",
@@ -165,6 +192,33 @@
           "signal": "PD1",
           "route": null,
           "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "pad": "PD1",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PD1",
+          "route": "main"
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "CAN_TX",
+          "route": "af-6",
+          "_alternate_function": 6
+        },
+        {
+          "signal": "FSMC_D3",
+          "route": "af-7",
+          "_alternate_function": 7
         }
       ]
     },
@@ -817,6 +871,32 @@
         {
           "signal": "BOOT1",
           "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "pad": "PB2",
+      "kind": "gpio",
+      "_pin_type": "I/O/A",
+      "functions": [
+        {
+          "signal": "PB2",
+          "route": "main"
+        },
+        {
+          "signal": "CMP1_CHP1",
+          "route": "default"
+        },
+        {
+          "signal": "USART5_TX",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "QSPI_SCK",
+          "route": "af-5",
+          "_alternate_function": 5
         }
       ]
     },

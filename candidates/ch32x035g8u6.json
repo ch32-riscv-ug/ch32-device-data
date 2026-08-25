@@ -2177,6 +2177,18 @@
       ]
     },
     {
+      "number": 26,
+      "pad": "PC11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC11",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 27,
       "pad": "PC17",
       "kind": "gpio",
@@ -2277,6 +2289,18 @@
               1
             ]
           }
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "pad": "PC10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC10",
+          "route": "main"
         }
       ]
     },
