@@ -59,9 +59,12 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
   AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
   CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
 - `candidates/*.json`: 全SKUの機械抽出結果。未reviewで、schemaにも準拠しない
-- `docs/schema-notes.ja.md`: schema調査、確認済みの構造差、未決定事項
+- `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
+- `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）
+- `docs/handoff.ja.md`: 正本の所在、再開手順、守ること
+- `docs/worklist-archive.ja.md`: 解決済みの穴・依頼の記録（何を直し、なぜそう判断したか）
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
-- `docs/handoff.ja.md`: 作業状態、既知の資料矛盾、再開手順
+- `docs/schema-notes.ja.md`: JSON schema草案（`0.1-draft`）の調査。`tables/`が正本になってからは更新していない
 
 ## データの境界
 

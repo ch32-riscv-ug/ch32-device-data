@@ -37,7 +37,7 @@
 | products | 103 | 列ごと（confirmed大半・packing missing 102） | 結合・比較表と突き合わせ | flash/sram が空の series あり（比較表が書かない） | ✅ |
 | product_attributes | 1,721 | confirmed 1,684 / conflict 25 / ref 12 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2） | ✅ |
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
-| pins | 4,532 | confirmed 4,396 / ref 135 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）・F-31（lead欠け10型番）・F-32（V205の綴り `VVDD_IO_1`） | 🟡 |
+| pins | 4,532 | confirmed 4,396 / ref 135 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）・F-31（lead欠け10型番。うちM007×4/M103の26 leadは**ゲートドライバpad `LO1(PA0)` の括弧が原因と判明**、残り5型番は資料が`未使用`）・F-32（V205DS0の綴り `VVDD_IO_1`→資料は`VDD_VIO_1`。詰め順の誤り） | 🟡 |
 | pin_functions | 28,423 | confirmed 28,174 / ref 237 / conflict 12 | 結合・pins と結合 | F-6/7/8（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
 | operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36 は**修正済み**（条件欄の添字を戻した。値は検証 12/12 一致） | ✅ |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
@@ -74,7 +74,7 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| pin_roles | 24,120 | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴を名前ごと固定 | 語彙で覆えない 26種122行（0.5%）＋ pin_functions の F-40/F-41 を引き継ぐ | 🟡 |
+| pin_roles | 24,118 | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴を名前ごと固定 | 語彙で覆えない 26種122行（0.5%）。**全26種の所属を原典で確認済み**（worklist F-21）——語彙を足せば0になる | 🟡 |
 | feature_tags | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
@@ -233,7 +233,7 @@ EVT ヘッダの綴り。field 名も `*_RM`（RM）と `*_REMAP`（EVT）が出
 
 ## 既知の穴の一覧はどこにあるか
 
-- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（F-6/7/8/11/24/31/32 が未解決）
+- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: ツール側 F-8/F-21/F-31/F-32/F-24残り、実機待ち F-11、資料側の記録 F-6/7/33/43〜46）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
 - 語彙の穴: `tools/check_tables.py` の `KNOWN_ROLE_GAPS`（綴りと行数で固定）
 - 数の不変量: `tools/check_tables.py` の `KNOWN_SHARED_LEADS`、`tools/check_counts.py` の `KNOWN`
 
