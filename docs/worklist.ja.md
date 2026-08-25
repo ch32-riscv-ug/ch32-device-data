@@ -663,8 +663,10 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-42 | **2レジスタに割れたfieldの格子列見出しを低位ビットだけで読んでいた** | V407/V467のUSART1等 | ツール | ✅ **修理済み**（2026-08-25）。F-41の適用で発覚。下記 |
 | F-43 | CH32V407 RMの**I3C格子の列見出しが両列とも`I3C_RM=0`**（原典の誤植） | 2列 | 資料 | 記録のみ。pin表の`I3C_SCL_1`が正。誤植への歯止めを実装 |
 | F-44 | CH32X035 EVTヘッダの**`OPA_CTLR2_CMP_LOCK`のmaskが`0x2000`（bit13=PSEL3と同じ）**。RMはbit31 | 1 define | 資料 | 記録のみ（2026-08-25）。opa_cmp_registersでconflict表示。使うとCMP3の正入力選択を壊す |
+| F-45 | EVTヘッダとRMで**OPA/CMPのbit位置が食い違う**（L103 ITRIMN/ITRIMP 5bit vs 6bit、V205 HYS1_H/HYS2_H bit29/30 vs 19/29） | 4 define | 資料 | 記録のみ。opa_cmp_registersでconflict＋両論 |
+| F-46 | datasheet zh/en で**温度センサのAvg_Slope最大値が違う**（V20x/V307: 4.8 vs 4.7 mV/℃） | 2 family | 資料 | 記録のみ。adc_internalでconflict＋両論 |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | 🔧 2件実装・1件は設計を返す。下記 |
-| R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | 🔧 1（flash_geometry）実装済み。2〜4は下記 |
+| R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | ✅ **全5件実装**（2026-08-25）。下記 |
 
 ### F-1 / F-4 pin表のsignal名が改行で分断される（修理済み）
 
@@ -1824,17 +1826,27 @@ TIM5=32bit の実バグを直した**（手書きの WIDE_TIMERS は TIM4 しか
    依頼の `program_unit_bytes` は `program_word`（word/halfword の直接書き込みが
    あるか）と `fast_program_bytes` に分けた——X035/L103/M030/V006/V205 は
    快速ページ経由のみ。CH32H417 は flash モードで幾何が変わる（note 列）
-2. **CMP/OPAのレジスタ表** `[高]` — systick.csv と同じ粒度で
-   enable / 入力select / 出力読み出しbit / PGA gain のフィールド配置のみ。
-   まず X035（CMP1-3+OPA）・M030（CMP1-3）・L103・V00x
-3. **ADC内部チャネル表** `[中]` — 温度センサ/Vrefint のチャネル番号・必要サンプル
-   時間・換算定数（V25・傾き・Vrefint mV）
-4. **USBPDの配管表** `[中]` — RCC の enable bit と PHY 設定 bit
-   （X035 は `AFIO_CTLR` の bit9/bit8）が L103/V205/X315/H417/M030 でどこか
+2. **CMP/OPAのレジスタ表** `[高]` — ✅ `tables/opa_cmp_registers.csv`（293行・9 family）。
+   EVT ヘッダの構造体と bit define を RM のレジスタ表と突き合わせ、199行 confirmed。
+   **block の置き方が family で違う**（X035 は OPA block の CTLR2 が CMP、V003 は
+   EXTEN_CTR の bit16-18、M030 は OPA block に CMP_CTLR）ので `unit` 列を持つ。
+   RM の見出しは block しか言わないので、field 説明文の多数決で決めた。
+   EVT ヘッダ側の誤りを 5 件見つけた（F-44/F-45）
+3. **ADC内部チャネル表** `[中]` — ✅ `tables/adc_internal.csv`（19行・11 family）。
+   datasheet の散文（チャネル番号）と電気的特性表（V25・Avg_Slope・VREFINT・
+   サンプル時間）を zh/en 照合。**V003/X035 は datasheet がチャネル番号を書かず
+   RM が書く**（IN8/IN15）のでそこは RM から。サンプル時間の単位が family で違う
+   （us / ADC クロック周期数）ので揃えず両方持つ。zh/en の食い違い 1 件（F-46）
+4. **USBPDの配管表** `[中]` — ✅ `tables/usbpd_plumbing.csv`（13行・6 family）。
+   RCC の enable は clock_enables から、PHY 設定 bit は EVT ヘッダの define
+   （X035 AFIO_CTLR / L103・V205 AFIO_CR / X315 AFIO_CR の USBPDHVT・USBPDRISE /
+   H417 AFIO_PCFR1 / M030 EXTEN_CTLR0）。M030 の EXTEN 構造体は**途中に union を
+   持ち**、`{…}` を1段で読む正規表現では丸ごと落ちていた——直した
 
-参考（低優先）: **周辺クロック enable bit の表**（family × peripheral →
-PCENR レジスタと bit）。EVT ヘッダの `RCC_*EN` define の機械写しで出所は最も
-きれいなので、上4件の後に滑り込ませる価値あり。
+参考: **周辺クロック enable bit の表** — ✅ `tables/clock_enables.csv`（429行・
+12 family）。EVT の rcc.h の `RCC_<bus>Periph_X` を `<bus>PCENR` に結び、RM の
+レジスタ表と突き合わせて **370行 confirmed・conflict 0**。依頼4の RCC 側は
+ここから引いている。
 
 **着手順**: 配信中の誤値（F-38 memory_map・F-41 V103 TIM3・F-40 X035 PC3）と
 不完全表現（F-39 clock_init・F-37 interrupts）を先に直してから 1→2→3→4。

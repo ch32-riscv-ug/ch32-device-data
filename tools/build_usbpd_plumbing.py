@@ -10,11 +10,12 @@ base は `memory_map.csv`、CC pad は `pin_roles.csv` が持っている。足�
 
 **PHY 設定 bit の置き場所が family で違い、それが表の要る理由です。**
 
-    CH32X035        AFIO->CTLR    USBPD_PHY_V33 / USBPD_IN_HVT / UDP_PUE …
+    CH32X035        AFIO->CTLR    USBPD_PHY_V33 / USBPD_IN_HVT
     CH32L103/V205   AFIO->CR      USBPD_IN_HVT
     CH32H417        AFIO->PCFR1   USBPD_CC_HVT
-    CH32M030        EXTEN->EXTEN_CTLR0   USBPD0_CC_REF / CC_HVT / LVE_T（PD が2つ）
-    CH32X315        header に PHY 設定の define が無い（RCC の enable だけ載せる）
+    CH32M030        EXTEN->EXTEN_CTLR0   USBPD0_CC_REF / CC_HVT / LVE_T（PD が2つ。
+                    構造体が途中に union を持つので読み方に注意——read_structs）
+    CH32X315        AFIO->CR      USBPDHVT / USBPDRISE（綴りが他 family と違う）
 
 出所は EVT の device header。define の名前がレジスタを名乗る（`AFIO_CTLR_…`）か、
 名乗らないものは直前の banner コメント（`Bit definition for EXTEN_CTLR0 register`）
@@ -46,7 +47,10 @@ COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
            "phy_block", "phy_register", "phy_field", "phy_bits", "phy_mask", "phy_address",
            "#", "confidence", "basis"]
 
-DEFINE = re.compile(r"^\s*#define\s+(?P<name>(?:AFIO|EXTEN)_\w*(?:USBPD|UDP|UDM|PD_PHY)\w*)\s+"
+# PD の field だけ。`UDP_*`/`UDM_*`（USB の D+/D- pad 制御。X035 の AFIO_CTLR や
+# M030 の EXTEN_CTLR1 にある）は USB の配管で PD ではないので入れない——入れると
+# M030 で PD0/PD1 の両方に同じ USB の行が付いて表が2倍に膨れる。
+DEFINE = re.compile(r"^\s*#define\s+(?P<name>(?:AFIO|EXTEN)_\w*USBPD\w*)\s+"
                     r"\(\s*\(\s*u?int\d+_t\s*\)\s*(?P<mask>0[xX][0-9A-Fa-f]+)\s*\)", re.M)
 BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+)\s+register", re.IGNORECASE)
 STRUCT = re.compile(r"typedef\s+struct\s*\{(?P<body>[^{}]*?)\}\s*(?P<name>AFIO|EXTEN)_TypeDef\s*;", re.S)

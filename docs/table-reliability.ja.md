@@ -52,6 +52,10 @@
 | remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
 | flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
+| opa_cmp_registers | 293 | confirmed 199 / ref 89 / conflict 5 | 結合・address=base+offset・bits=mask | EVT ヘッダ×RM レジスタ表。conflict 5 は**EVT ヘッダ側の誤り**と判断できるもの（F-44 X035 CMP_LOCK bit13→RM bit31 / F-45 L103 ITRIM 幅・V205 HYS_H 位置）。V20x/V103/X315 は bit define が無く行なし | 🟡 |
+| clock_enables | 429 | confirmed 370 / ref 59 | 結合・address=RCC base+offset | EVT rcc.h×RM。**conflict 0**。ref 59 は RM の field 名綴りが違う（`ETH_MAC_Rx` 等）だけで bit の不一致ではない | ✅ |
+| adc_internal | 19 | confirmed 13 / ref 4 / conflict 2 | 結合・channel が数 | datasheet zh/en 照合。conflict 2 = V20x/V307 の Avg_Slope 最大値が **zh 4.8 / en 4.7**（資料側の食い違い、F-46）。V003/X035 のチャネル番号は RM から | ✅ |
+| usbpd_plumbing | 13 | confirmed 11 / ref 2 | 結合・clock_enables と一致 | EVT ヘッダ×RM。ref 2 = M030 の LVE_T（RM に field 名が無い） | ✅ |
 
 ### EVT から（単一出所・テキスト写し）
 
