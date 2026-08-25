@@ -6,6 +6,9 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 
 ## 進捗
 
+テーブルごとの信頼度は [table-reliability.ja.md](table-reliability.ja.md)（どのテーブルがどこまで固いか・既知の穴の所在）。
+
+
 | 区分 | 完了 | 残り |
 |---|---:|---:|
 | データ収集 | 9 | 0 |
@@ -648,6 +651,15 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-30 | 語彙が**1文字の周辺**を作る（`Q_DET1`→周辺`Q`） | 12行 | ツール | ✅ **修理済み**（2026-08-25）。下記 |
 | F-31 | **封装のlead数とpins.csvが合わない型番が12** | 最大6 lead | ツール/資料 | 🔜 下記 |
 | F-32 | 添字の**2つの名前が1セルに入る**（`V`＋`DD_` と `V`＋`IO_1`） | CH32V205 の 3 pad | ツール | 🔜 下記 |
+| F-33 | `documents.csv`の版番号が**WCH APIのメタデータ**で、PDF表紙より遅れることがある | CH32V20x_30xDS0（3.5 vs V3.9） | 資料 | 記録のみ（2026-08-25）。全PDFの表紙スキャンで他は一致 |
+| F-34 | `remap_fields.csv`の**reset_value空欄が45行**（RMでは0と確定できる） | 45行 | ツール | 🔜 原典検証（2026-08-25）で発見 |
+| F-35 | `TIM5CH4_RM`の**valid_valuesに値1（LSI）が無い** | V20x/V30x系6行 | ツール | 🔜 L103のLSI値(7)は入っており不統一 |
+| F-36 | `operating_conditions`の条件文字列に**下付き文字のずれ**（`f > 1MHz S`） | 少数 | ツール | 🔜 F_HCLK(USB) typ=96 の要約も再検討 |
+| F-37 | `interrupts.csv`の**OR結合variant条件が先頭マクロに切り詰め** | V006の2ベクタ | ツール | 🔜 原典検証（2026-08-25）で発見 |
+| F-38 | `memory_map.csv`の**link-origin 2行が誤値**（ORIGINの算術未評価・H417の2コア別リンカ） | V407 RAM・H417 RAM | ツール | 🔜 **値の誤り**。V407は+1024が欠落、H417はV3F/V5Fで別番地 |
+| F-39 | `clock_init.csv`の**V307分岐条件の欠落とV006のRMW手順の丸ごと欠落** | 2 family | ツール | 🔜 数値は正確、手順が不完全 |
+| F-40 | `pin_functions`が**封装別の既定機能をunionで潰す**（X035 PC3のRSTが全封装に付く） | 余分2行 | ツール | 🔜 candidatesは正しい。`build_pins.read_edition`の(表,pad)単位union |
+| F-41 | **F-27の格子優先修正がpin_functions/pin_rolesに未反映**（build_pinsはPDF直読み） | V103 TIM3 12行 | ツール | 🔜 candidates/remap_routesには反映済み |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | 🔧 2件実装・1件は設計を返す。下記 |
 
 ### F-1 / F-4 pin表のsignal名が改行で分断される（修理済み）
