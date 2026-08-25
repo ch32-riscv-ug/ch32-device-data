@@ -69,6 +69,10 @@
 | clock_configs 他 clock_* 5表 | 1,066 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
 | evt_examples | 1,593 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
+| register_blocks | 676 | 全行 reference | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。`extract_addresses` の既知番地7点は全一致（survey）。H417 `UHSIF` は型の構造体が header に無く layout 空 | 🔵 |
+| registers | 4,995 | confirmed 1,468 / ref 3,527 | layouts と結合・offset/幅の書式 | confirmed = RM のレジスタ表に同名（`GPIOx_CFGLR` の x は数字を落として比較）がある。union で重なる register は同 offset の2行 | 🔵 |
+| register_fields | 33,365 | field 24,792（confirmed 6,829 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方）。`member` 空 1,591 行（CAN 以外の入れ子・構造体の無い define 群） | 🟡 |
+| register_layouts | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
 
 ### 導出（他テーブルから機械生成。原典を新たに読まない）
 
