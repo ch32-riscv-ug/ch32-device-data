@@ -1016,6 +1016,18 @@
       ]
     },
     {
+      "number": 12,
+      "pad": "VREF-",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VREF-",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 13,
       "pad": "VREF+",
       "kind": "power",
@@ -1023,6 +1035,18 @@
       "functions": [
         {
           "signal": "VREF+",
+          "route": "main"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "pad": "VDDA",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VDDA",
           "route": "main"
         }
       ]

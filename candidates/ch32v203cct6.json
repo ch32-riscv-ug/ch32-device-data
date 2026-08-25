@@ -152,6 +152,28 @@
       ]
     },
     {
+      "number": 5,
+      "pad": "PD0",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PD0",
+          "route": "main"
+        },
+        {
+          "signal": "USART4_CK",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "CAN_RX",
+          "route": "af-6",
+          "_alternate_function": 6
+        }
+      ]
+    },
+    {
       "number": 6,
       "pad": "OSC_OUT",
       "kind": "gpio",
@@ -165,6 +187,28 @@
           "signal": "PD1",
           "route": null,
           "_needs_review": true
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "pad": "PD1",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PD1",
+          "route": "main"
+        },
+        {
+          "signal": "USART8_CK",
+          "route": "af-3",
+          "_alternate_function": 3
+        },
+        {
+          "signal": "CAN_TX",
+          "route": "af-6",
+          "_alternate_function": 6
         }
       ]
     },
@@ -636,6 +680,18 @@
           "signal": "QSPI_SCK",
           "route": "af-5",
           "_alternate_function": 5
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "pad": "BOOT1",
+      "kind": "other",
+      "_pin_type": "I",
+      "functions": [
+        {
+          "signal": "BOOT1",
+          "route": "main"
         }
       ]
     },

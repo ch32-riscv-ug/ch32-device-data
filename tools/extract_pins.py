@@ -321,6 +321,69 @@ def variant_row(cells: list[str], previous: list[str], pad_col: int) -> bool:
                    for a, b in zip(lead, above))
 
 
+# 行の帯（y範囲）を比べるときの許容差（pt）。同じ表の罫線なので動かないが、
+# PDF の丸めぶんだけ見る。
+ROW_TOLERANCE = 1.0
+
+
+def fill_merged(table, extracted: list[list[str]]) -> list[list[str]]:
+    """縦に結合されたセルを、その矩形が覆っている行にも配る。
+
+    **datasheet は「2つの pad が同じ足に出ている」ことを、lead 番号のセルを縦に
+    結合して2行に掛けることで書きます。**
+
+        17 17 27 21 32  PA11(8)        ← G8R6 は 27
+        18 16 28 22 33  PA12(7)(8)     ┐ この 28 のセルが
+        19 17    23 34  PA13(7)(8)(9)  ┘ 2行に掛かっている
+
+    `table.extract()` は結合セルの値を**テキストが描かれた側の行にだけ**返し、
+    もう片方を空にします。空欄を「この封装には無い」（資料は `-` と書く）と
+    同じに扱っていたので、**CH32M103 の PA13/PA14 が丸ごと落ち、SWDIO/SWCLK を
+    1つも持たない series になっていました**（worklist の F-24）。
+
+    どちらの行にテキストが載るかは版面次第で、上とも下とも限りません
+    ——CH32L103 の PA13 は上の PA12 に、CH32M103 の PA13 は下の PA12 に載ります。
+    **「上から継ぐ」ではなく、矩形が覆っている行を持ち主**とします。
+
+    埋めた結果は資料の注記と突き合わせて検算できます。CH32L103 の注記 7 は
+    「PA12 and PA13 pins are short-connected」と書いていて、結合セルが結ぶ相手と
+    一致します。CH32L103F8U6 に至っては表が `17` を2度書いていて、結合を使わずに
+    同じことを言っています。
+    """
+    bands: list[tuple[float, float] | None] = []
+    for row in table.rows:
+        boxes = [c for c in row.cells if c]
+        # 行そのものの帯は**いちばん低いセル**が決める。結合されたセルは
+        # 2行ぶんの高さを持つので、それに合わせると帯が広がってしまう。
+        bands.append((max(b[1] for b in boxes), min(b[3] for b in boxes))
+                     if boxes else None)
+    for i, row in enumerate(table.rows):
+        band = bands[i]
+        if band is None or i >= len(extracted):
+            continue
+        for j, cell in enumerate(row.cells):
+            if cell is not None or j >= len(extracted[i]) or extracted[i][j]:
+                continue
+            # 結合は連続した行にしか起きないので、近いほうから外へ探す。
+            for k in _outwards(i, len(table.rows)):
+                box = table.rows[k].cells[j] if j < len(table.rows[k].cells) else None
+                if box is None:
+                    continue
+                if box[1] <= band[0] + ROW_TOLERANCE and box[3] >= band[1] - ROW_TOLERANCE:
+                    if k < len(extracted) and j < len(extracted[k]):
+                        extracted[i][j] = extracted[k][j]
+                break
+    return extracted
+
+
+def _outwards(start: int, total: int):
+    """start に近い順に添字を返す（結合セルの持ち主は隣接する行にいる）。"""
+    for step in range(1, total):
+        for index in (start - step, start + step):
+            if 0 <= index < total:
+                yield index
+
+
 def find_pin_tables(
     pdf, table_label: str, stop_label: str
 ) -> tuple[list[list], list[str], dict[str, int]]:
@@ -350,7 +413,8 @@ def find_pin_tables(
                 continue
             if cut is not None and table.bbox[1] >= cut:
                 continue
-            extracted = [[(c or "").strip() for c in row] for row in table.extract()]
+            extracted = fill_merged(
+                table, [[(c or "").strip() for c in row] for row in table.extract()])
             if not extracted:
                 continue
             if width and len(extracted[0]) != width:
@@ -690,14 +754,14 @@ def pins_for(
             # `-` は「この封装にこの pad は無い」と資料が書いたもの。
             continue
         if number == "":
-            # **空欄は「無い」ではない。** その pad は在るが lead 番号を持たない
-            # ——チップの中で別の pad に繋がっているため。CH32M103 の
-            # PA13/PA14 がこれで（中文版 p.25 が PA11/PA12 と内部接続だと書く）、
-            # 落としたので SWDIO/SWCLK が1つも無い series になっていた。
-            # **どう持つかは決まっていない**（worklist の F-24）ので今は落とすが、
-            # 黙って落とさない。
-            notes.append(f"{cells[pad_col]}: lead番号が空欄。pad は在るが番号を"
-                         "持たない（内部で別のpadに接続）ため、この表からは落とした")
+            # **空欄は「無い」ではない**（資料は無いことを `-` と書く）。同じ足に
+            # 出ている pad は番号のセルを縦に結合して書かれ、それは `fill_merged`
+            # が埋める。ここまで空で残るのは結合でもない空欄で、資料が `-` を
+            # 書き忘れたのか別の意味があるのかこの表からは決まらない
+            # ——8行あり、CH32V20x の PA8（TSSOP20/QFN28）のように、同じ表の
+            # 隣の行が `-` を書いているものもある。落とすが、黙って落とさない。
+            notes.append(f"{cells[pad_col]}: lead番号が空欄。結合セルでもないので"
+                         "この封装にあるのかどうか決まらず、落とした")
             continue
         pad = cells[pad_col]
         pin_type = normalise_pad(cells[type_col])

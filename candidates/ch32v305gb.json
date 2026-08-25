@@ -1745,6 +1745,18 @@
       ]
     },
     {
+      "number": 20,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VSS",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 21,
       "pad": "VDD",
       "kind": "power",

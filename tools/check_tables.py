@@ -47,6 +47,42 @@ KNOWN_ROLE_GAPS = {
 }
 
 
+# 同じ lead 番号を複数の pad が持つ組の数。**目標は「資料のとおり」**で、
+# 増減はどちらも異常——増えれば結合セルの読み違い、減れば pad の取りこぼし。
+# 内訳は kind の組で持つ。gpio どうしなら内部短絡、power どうしなら同じ節点。
+KNOWN_SHARED_LEADS = {
+    ("gpio", "gpio"): 65,
+    ("gpio", "other"): 15,
+    ("power", "power"): 12,
+    ("gpio", "gpio", "gpio"): 2,
+    ("power", "power", "power"): 2,
+}
+
+
+def shared_leads(t: dict) -> list[str]:
+    """同じ (part_number, pin) を持つ pad の組を数え、記録と突き合わせる。"""
+    together: dict[tuple[str, str], list[dict]] = {}
+    for r in t["pins"]:
+        if r["pin"] in ("", "EP"):
+            continue
+        together.setdefault((r["part_number"], r["pin"]), []).append(r)
+    found: dict[tuple, int] = {}
+    for members in together.values():
+        if len(members) < 2:
+            continue
+        shape = tuple(sorted(m["kind"] for m in members))
+        found[shape] = found.get(shape, 0) + 1
+    out = []
+    for shape in sorted(set(found) | set(KNOWN_SHARED_LEADS)):
+        now, before = found.get(shape, 0), KNOWN_SHARED_LEADS.get(shape, 0)
+        if now != before:
+            out.append(f"pins: 同じ lead 番号を共有する {'+'.join(shape)} の組が "
+                       f"{before} から {now} に変わった——結合セルの読み方か "
+                       "pad の拾い方が動いている（tables/README.ja.md の"
+                       "「同じlead番号を複数のpadが持つ行」）")
+    return out
+
+
 def pin_role_coverage(t: dict) -> list[str]:
     """`pin_roles` が覆えていない signal を、記録してある実測値と突き合わせる。
 
@@ -141,6 +177,11 @@ def main() -> int:
     for r in t["pin_functions"]:
         if (r["part_number"], r["pad"]) not in pin_pads:
             bad.append(f"pin_functions: {r['part_number']} の pad {r['pad']!r} が pins にない")
+    # **1本の足に2つの pad が出る行**（内部で短絡された IO ペア、共用の電源
+    # 節点）。番号が一致していることが「同じ足」そのもので、内部接続を別の列で
+    # 持たない代わりに、その形が壊れていないことをここで見る。
+    bad += shared_leads(t)
+
     for r in t["product_attributes"]:
         check("product_attributes", r["attribute"], r["part_number"], products, "products")
 

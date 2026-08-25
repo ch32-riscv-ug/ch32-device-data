@@ -527,6 +527,18 @@
       ]
     },
     {
+      "number": 2,
+      "pad": "PC11",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC11",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 3,
       "pad": "PC17",
       "kind": "gpio",
@@ -627,6 +639,18 @@
               1
             ]
           }
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "pad": "PC10",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PC10",
+          "route": "main"
         }
       ]
     },
@@ -886,6 +910,10 @@
       "_pin_type": "I/O/A",
       "functions": [
         {
+          "signal": "PC3",
+          "route": "main"
+        },
+        {
           "signal": "RST",
           "route": "default"
         },
@@ -904,6 +932,64 @@
         {
           "signal": "A13",
           "route": "default"
+        },
+        {
+          "signal": "RTS2",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              3
+            ]
+          }
+        },
+        {
+          "signal": "T1C4",
+          "route": "remap-3",
+          "_selector_value": 3,
+          "selection": {
+            "selector": "afio-tim1-remap",
+            "values": [
+              3
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "T2C3N",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              4
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "T2C1N",
+          "route": "remap-2",
+          "_selector_value": 2,
+          "selection": {
+            "selector": "afio-tim2-remap",
+            "values": [
+              2
+            ]
+          },
+          "_selector_resolved_by": "peripheral"
+        },
+        {
+          "signal": "RTS2",
+          "route": "remap-4",
+          "_selector_value": 4,
+          "selection": {
+            "selector": "afio-usart2-remap",
+            "values": [
+              4
+            ]
+          }
         }
       ]
     },

@@ -1091,6 +1091,23 @@
       ]
     },
     {
+      "number": 16,
+      "pad": "PA13",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "SWDIO",
+          "route": "main"
+        },
+        {
+          "signal": "PA13",
+          "route": null,
+          "_needs_review": true
+        }
+      ]
+    },
+    {
       "number": 17,
       "pad": "PA11",
       "kind": "gpio",

@@ -1360,6 +1360,18 @@
       ]
     },
     {
+      "number": 14,
+      "pad": "VIO",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VIO",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 15,
       "pad": "PA14",
       "kind": "gpio",
@@ -1553,6 +1565,18 @@
               1
             ]
           }
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "pad": "VSS",
+      "kind": "power",
+      "_pin_type": "P",
+      "functions": [
+        {
+          "signal": "VSS",
+          "route": "main"
         }
       ]
     },

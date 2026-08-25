@@ -545,6 +545,18 @@
       ]
     },
     {
+      "number": 4,
+      "pad": "PA4",
+      "kind": "gpio",
+      "_pin_type": "I/O",
+      "functions": [
+        {
+          "signal": "PA4",
+          "route": "main"
+        }
+      ]
+    },
+    {
       "number": 5,
       "pad": "PA1",
       "kind": "gpio",
