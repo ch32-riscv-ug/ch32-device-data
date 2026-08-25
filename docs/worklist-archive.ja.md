@@ -1585,6 +1585,143 @@ build_pins（従来どおり）。
 最終状態: 訂正は **V103 TIM3 の12行だけ**（conflict として自己申告）。
 pin_functions 28,423行、X035 PC3 の余分2行は消え、全検査通過。
 
+### F-21 `pin_roles`が語彙で覆えない signal（修理済み・2026-08-25）
+
+`tables/pin_roles.csv`は`signal_vocabulary.split()`を通せた行だけを載せ、覆えなかった
+綴りは`tools/check_tables.py`の`KNOWN_ROLE_GAPS`に**名前と行数で固定**してある
+（増減はどちらも検査で落ちる）。110種1046行（4.4%）から始めて、2026-08-25時点で
+**26種122行（0.5%）**。内訳と行き先:
+
+| 内訳 | signal（行数） | 行き先 |
+|---|---|---|
+| CH32M030 のモータ/アナログ専用機能（22種・99行） | `HO0`〜`HO3`／`LO0`〜`LO3`（PB8〜PB15の`default`。`HO3`はM007の専用padにも）、`ISP1`（専用pad）`ISP2` `ISN1` `ISN2`、`ISINK1/2`、`ISOURCE1/2`、`QII1/2`、`Q_DET1/2`、`V_DET`、`SWIM`（PA3） | **語彙を足す**。所属は下表（2026-08-25 原典で確認） |
+| CH32V003 の略記（3種・18行） | `AETR`(PD3/PC2)・`AETR2`(PD1/PA2)・`TIETR`(PD4, remap-2) | `AETR`→(ADC1, RETR)、`AETR2`→(ADC1, IETR)（F-8。padでRMの表7-13/7-14と一致）。`TIETR`は`T1ETR`の誤植（`I`と`1`。同じ行が表2-3では`T1ETR_2`、RM表7-8で`TIM1_RM=10`のETRがPD4）→(TIM1, ETR) |
+| CH32V208 の専用pad（1種・4行） | `ANT`（凡例「射频信号输入输出（天线）」。`main`） | (BLE, ANT)。die上のRFブロックはBLE5.3だけ（header `BB_IRQn`「BLE BB」） |
+
+**全26種が語彙で覆える見込み**（F-8も含めて）。M030の22種はF-31のM007/M103の`HO*`/`LO*`と
+同じpad群なので、F-31と同時に語彙を入れると一度で済む。
+
+**CH32M030の22種の所属**（datasheet zh/en・RM・`ch32m030.h`で確認。WCHの呼び方に揃える）:
+
+| signal | 資料の説明 | WCHの呼び方 | 提案 (peripheral, role) |
+|---|---|---|---|
+| `HO0`〜`HO3` / `LO0`〜`LO3` | DS 表2-2「内部高侧/低侧栅极驱动器的输出，控制N型MOSFETの栅极」。§1.4.20 栅极驱动器 / Gate Driver「4个独立半桥驱动器」 | RMは独立章を持たず§6.2.10「MVのGPIO構造」で説明。headerは`AFIO_PCFR1_HO_DIO_EN0..3_REMAP`のみ。比較表は「半桥栅极驱动器 / Half-bridge gate driver」「预驱动I/O（MV I/O）/ Pre-drive I/O」。M007は「三相预驱 / three-phase pre-driver」 | **(PREDRV, HO0)…(PREDRV, LO3)**。M030/M007の両datasheetと比較表が共通に使う語が「预驱/pre-drive」。代案の`HB`はRMで「HB时钟」（AHB）を意味するので避ける。**要判断** |
+| `ISP1`（専用pad）`ISP2`(PA10) / `ISN1`(PA8) `ISN2`(PA11) | DS §1.4.18.2「差分输入电流采样（ISP）」。「ISP1和ISN1/PA8为一对差分输入，ISP2/PA10和ISN2/PA11为另一对」 | RM §17.2.6（OPA/CMP章）。header `OPA_TypeDef.ISP_CTLR`、`ISP_CTLR_ISP1_EN/GAIN/NSEL` | **(ISP1, P) (ISP1, N) (ISP2, P) (ISP2, N)**（CMPの`C3N0`→(CMP3, N0)と同じ流儀） |
+| `QII1`(PA12) `QII2`(PA13) | DS §1.4.18.1「交流小信号放大解码器（QII）」。QII1=OPA1+CMP1+デジタルフィルタ | RM §17.2.5。header `OPA_TypeDef.QII_CFGR`、`QII_CFGR_QII1_AE` | **(QII1, IN) (QII2, IN)**（役割語は資料に無いのでこちらで置く） |
+| `Q_DET1`(PA14) `Q_DET2`(PA15) | pin表のみ。RM `ISP_CTLR`の`QDET1_EN`「ISP1模块Q值检测使能」、ADC章「ADC_IN9/IN10を使うには`QDET1_EN`/`QDET2_EN`を1に」 | ISPモジュールのQ値検出経路。header `ISP_CTLR_ISP1_QDET1_EN`（**`ISP2_QDET1_*`はheaderの誤記**。RMはQDET2） | **(ISP1, QDET) (ISP2, QDET)** |
+| `V_DET`(PB4) | DS「PB4引脚支持ADC和OVP过压复位。VHVを外部抵抗で分圧してPB4へ」 | RM 電源制御（PWR）§2.2.2 过压复位 / §2.2.3 分压监测。`PWR_CTLR[13:12] SEL_IO_VHV`「PB4端口功能选择」。header `PWR_CTLR_SEL_IO_VHV` | **(PWR, V_DET)** |
+| `ISINK1`(PA6) `ISINK2`(PA7) | DS §1.4.19「可编程灌电流模块ISINK」10bit | RM EXTEN章§20.1 `R16_ISINK1_CFGR`/`R32_ISINK_ADJ`。header `EXTEN_TypeDef.ISINK1_CFGR` | **(ISINK1, OUT) (ISINK2, OUT)** |
+| `ISOURCE1`(PA4) `ISOURCE2`(PA5) | 同§1.4.19「源电流模块ISOURCE」（NTC用）。pin図の凡例「ISRC:ISOURCE」 | RM EXTEN_CTLR0 `ISRC1_EN/ISRC1_SEL` | **(ISOURCE1, OUT) (ISOURCE2, OUT)** |
+| `SWIM`(PA3) | pin表の`default`列だけに出る（`SWDIO/SWIM/CC4/…`）。RMにもEVTにも無い | DS §1.4.22 SDI「单线调试…对应**SWIO**引脚，双线…SWDIO和SWCLK」。**STM8のSWIMではなく1-wire SDIのデータ線**を`SWIO`と綴り違えたもの | 既存規則`SWIO`→(SDI, SWDIO)に揃えると PA3 が (SDI, SWDIO) を2回持つ。**要判断**: 1-wire/2-wireを区別するなら`SWIO`と`SWIM`を (SDI, SWIO) に |
+
+比較表との整合: `half_bridge_gate_driver`（4/4/4/2/3）・`pre_drive_i_o_mv_i_0`（8/8/8/6/6＝HO/LOのpad数）・
+`current_sampling_isp_isn`・`signal_decoding_qii`（2）・`programmable_current_injection_module_isink`（2）・
+`source_current_module_isource`（2）が`product_attributes`に既にあり、数が合う。
+
+**実装（2026-08-25）**: 上表の提案どおり`signal_vocabulary.SYSTEM`に26種を入れた（根拠は
+コメントに書いた）。判断2件は推奨どおり——ゲートドライバは`PREDRV`、`SWIM`は既存の
+`SWIO`規則に揃えて(SDI, SWDIO)（PA3は`SWDIO`と`SWIM`の2綴りから同じ対を得る。索引では
+綴り違いの2行）。`pin_roles.csv`は24,118→**24,266行、覆い100%**。`KNOWN_ROLE_GAPS`は空で、
+**空であることを検査する**（新しい綴りが現れれば落ちる）。`tables/README`に周辺名の表を書いた。
+
+### F-31 封装のlead数とpins.csvが合わない型番（修理済み・2026-08-25）
+
+`packages.csv` の `pin_count` と `pins.csv` の lead 番号の数を突き合わせると、
+103型番中10で足りません（F-29で16→12、`PAD_TOKEN`の拡張で12→10。2026-08-25実測）。
+
+| 型番 | 封装 | 欠け |
+|---|---|---|
+| CH32M007E8R6 / E8U7 / G8R6 / K8U7 | QSOP24 / QFN26C3 / QSOP28 / QFN32 | 各5 |
+| CH32M103G8R6 | QSOP28 | 6 |
+| ~~CH32V203CCT6~~ | LQFP48 | ~~3（24・36・48）~~ 解消（`PAD_TOKEN`を12文字に。綴りはF-32） |
+| ~~CH32V103C6T6~~ | LQFP48 | ~~1（6）~~ 解消（`OSC8M_OUT`が9文字だった） |
+| CH32V203RBT6 | LQFP64M | 1（48） |
+| CH32V205VCT6 / V303VCT6 / V307VCT6 / V317VCT6 | LQFP100 | 1（73） |
+
+**LQFP100 の 73 番は資料が `未使用` と書いています**（`['-','-','-','-','-','-',
+'73','未使用','']`）——pad ではないので機能は無く、落ちているのは正しいとも
+言えますが、**封装の lead としては在る**ので、番号で pad を引く consumer には
+「データが無い」と区別が付きません。`NC` として持つかどうかは持ち方の判断。
+
+**CH32V103C6T6 の 6 番は解消しました（2026-08-25）。** この datasheet は pin 表を
+2つ持ち（x8 品の3封装用と x6 品の2封装用）、x6 側は同じ端子を
+`OSC8M_IN`/`OSC8M_OUT` と綴ります。`build_pins` は**両方の表を読んでいる**
+（キャプション単位で全部見る。`choose_table` は単体 CLI 用）ので表の選択は
+問題ではなく、`OSC8M_OUT` が9文字で `PAD_TOKEN` の8文字に掛かっていたのが原因
+でした。**最初の測定で「広げても増えない」と書いたのは誤りで**、その測定が
+`choose_table` 経由で表を1つしか見ていませんでした。`build_pins.read_edition`
+で測り直すと `OSC8M_OUT` と CH32V203CCT6 の lead 24/36/48 が増えます（F-32）。
+
+**CH32M007 / CH32M103 の欠け 26 lead は原因が1つです（2026-08-25 原典で確認）。**
+どれもゲートドライバ出力の pad で、datasheet は pad 欄を **pad 名＋括弧の GPIO 別名**の
+2行で書きます:
+
+```
+['14', '17', '9', '10', 'LO1\n(PA0)', 'O', 'LO1', '', '']     ← M007 表2-2（zh p21 / en p28）
+['15', 'HO1\n(PA8)', 'O', 'FT', 'HO1', '', '']                  ← M103 表2-1-2（zh p23 / en p29）
+```
+
+`normalise_pad` は数字の脚注 `(7)` しか剥がさないので `LO1(PA0)` が残り、
+`PAD_TOKEN`（`^[A-Z][A-Z0-9_+-]{0,11}$`）が括弧を通さない。`variant_row` も
+`continues` も当たらないので**notes も出さず黙って落ちる**。M007 の `HO3` だけが
+残っているのは en 版が別名なしで `HO3` と書くから（zh は `HO3\n(PB1)`）——それで
+`reference` になっている。
+
+| 型番 | 落ちている pad（別名） |
+|---|---|
+| CH32M007 ×4 | `LO1(PA0)` `LO2(PA2)` `LO3(PD0)` `HO1(PA3)` `HO2(PB0)`、＋zh側の `HO3(PB1)` |
+| CH32M103G8R6 | `HO1(PA8)` `LO1(PB13)` `HO2(PA9)` `LO2(PB14)` `HO3(PA10)` `LO3(PB15)` |
+
+同じ足は素の CH32V007 では普通の GPIO（E8R6 の lead 18〜23 = PA0/PA2/PD0/PA3/PB0/PB1）で、
+M007 はそれをドライバ出力に振り替えて別名で GPIO 名を残している。CH32M030 は逆に
+pad を `PB9` と書いて `HO0` を default 機能の側に置く（F-21 の M030 の22種と同じ pad 群）。
+
+**直し方**: 括弧の GPIO 別名を `normalise_pad` で分離して pad 名を通す。
+**要判断**: 別名 `(PA0)` をどう持つか。案は (a) 捨てる（GPIO として使えるかは資料が
+言っていない）、(b) `pin_functions` に `signal=PA0` の行を足す——ただし `route` の値が
+要る（`main`/`default` ではない。新しい値 `alias` を定義するか）、(c) `PA0-WKUP` と同じ
+複合 pad 名 `LO1-PA0` にする——ただし既存の形は GPIO が先で順序が逆になる。
+**推奨は (b)**: 資料が書いていることを落とさず、`port`/`pin` から引く consumer に
+M007 の PA0 が lead 14 にあると見える。値の意味は `tables/README` に書く。
+
+**実装（2026-08-25）**: `extract_pins`に`ALIASED`（`LO1(PA0)`の形）を足し、pad名は括弧の前、
+別名は`route=alias`のfunctionにした（案(b)。理由は上記）。`pins.csv`は4,532→**4,558行**（＋26＝
+欠けていたlead全部）、`pin_functions.csv`は28,423→**28,484行**（主機能26行＋alias 30行。
+aliasのうち4行はM007の`HO3(PB1)`でzh版だけが別名を書くので`reference`）。`pin_roles`の
+`port`/`pin`はaliasからも埋める（M007の`LO1`は`port=A, pin=0`）。`check_tables`がalias行の形
+（signalはGPIO名・padはGPIO名でない・padごとに1つ）を見る。生成READMEのpin mapは
+`LO1 (PA0)`と資料どおり括弧で出し、機能表には混ぜない。pins.htmlも同じ。
+
+**lead欠けは10型番→5型番**。残る5つ（CH32V203RBT6の48、LQFP100の73×4）は資料が
+`未使用`と書く足（RBT6の48は未確認）で、padではないので表に無いのが正しい。
+`NC`行として持つかは持ち方の判断で、いまは持たない。
+
+### F-32 添字が2組あるpad名の詰め方が誤り（`VVDD_IO_1`・修理済み・2026-08-25）
+
+CH32V205DS0 の pin 表は `VDD_VIO_1`〜`_3` という pad を、**基準サイズの `V` と添字の
+組を2つ並べて**書きます（図中の回転ラベルも `VDD_VIO_1` と綴る）:
+
+```
+V(基準 x=163)  D D _(添字 x=169-174)  V(基準 x=177)  I O _ 1(添字 x=182-190)
+```
+
+**当初「2つの pad 名が1セルに入っている」と読んだのは誤り**で、資料の綴りが
+`VDD_VIO_1` という1つの名前です（同じ足を CH32V203DS0 は `VDD_IO_1` と書く——
+版の違い）。いまの詰め方は**基準文字を先に、添字を後に**並べるので `V`+`V`+`DD_`+`IO_1`
+＝`VVDD_IO_1` になります。x 順に並べれば `VDD_VIO_1` になり、pdfplumber の
+`extract_text` もそう読みます。
+
+- 該当: CH32V203CCT6 の lead 24/36/48、CH32V205CCT6 の lead 25/48（5行。zh/en とも同じ誤り）
+- **直し方**: 添字を戻すとき、基準文字の並びの中に添字を x 順で差し込む（F-1 の
+  `dewrap` の並べ方の問題。`build_pins` 側）。判断は要らない——**資料の綴りをそのまま採る**
+  （layer-1 の綴りは証拠。`VDD_IO_1` へ寄せない）
+
+**実装（2026-08-25）**: `extract_pins.interleave`。セルの上の行と下の行の語数が同じ（2以上）なら
+列ごとに組む（`V V`／`DD_ IO_1`→`VDD_VIO_1`）。語数が合わない折り返し（`LO1\n(PA0)`・
+`PA13(7\n)`）は従来どおり。英語版の主機能欄は`DD_ IO`／`_1`と3行に割るので、3行目以降は
+最後の添字の続きとして繋ぐ。主機能欄が pad 名そのものならpadと同じ読みを使う。
+`VVDD_IO_1`は0行、`VDD_VIO_1`〜`_3`の5行がzh/en一致で`confirmed`。
+
 ### F-34〜F-36 原典検証の改善点（2026-08-25 処理）
 
 **F-34**: `extract_registers` の復位値の正規表現が `0x…` と10進しか認めず、RM が

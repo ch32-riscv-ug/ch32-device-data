@@ -20,9 +20,8 @@
 | 用語 | [glossary.ja.md](glossary.ja.md) |
 | 抽出できる範囲の実測（設計の根拠） | [extraction-survey.ja.md](extraction-survey.ja.md) |
 
-**`schemas/`・`devices/`・`tools/validate.py` は2026-08-17時点のJSON schema草案
-（8 sample record）で、`tables/` が正本になってからは更新していない。** 消すか
-残すかは未決（worklist の「次の作業」参照）。
+JSON schema草案（`schemas/`・`devices/`・`tools/validate.py`・`docs/schema-notes.ja.md`、2026-08-17）は
+2026-08-25に**削除した**。記録は git の履歴にある。
 
 ## 再開手順
 

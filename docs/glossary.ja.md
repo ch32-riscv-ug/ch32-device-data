@@ -73,4 +73,3 @@
 | `candidates/` | **未review**の機械抽出出力。根拠にはなるが確定ではない |
 | `curated/` | 人が確認して記録した確定情報（根拠・確認日つき） |
 | `tables/` | 正規化CSV。確度と根拠つき。階層はこの用語集の通り |
-| `devices/` | schema検証用のsample record（Arduino対応宣言ではない） |

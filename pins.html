@@ -178,6 +178,7 @@ function matrixHTML(partNames, withPins) {
   for (const r of state.fns) {
     if (!partNames.includes(r.part_number)) continue;
     if (r.route === "main" && r.signal === r.pad) continue;
+    if (r.route === "alias") continue;  // pad の GPIO 別名（LO1 (PA0)）。機能ではない
     if (routeSel.length && !routeSel.includes(routeKind(r.route))) continue;
     const key = r.pad + "|" + r.signal + "|" + r.route;
     if (seen.has(key)) continue;
@@ -304,6 +305,7 @@ function rebuildFeatureBoxes(partNames) {
   for (const r of state.fns) {
     if (!partNames.includes(r.part_number)) continue;
     if (r.route === "main" && r.signal === r.pad) continue;
+    if (r.route === "alias") continue;
     present.add(groupOf(r.signal));
   }
   const hasTim = [...present].some(isTimGroup);

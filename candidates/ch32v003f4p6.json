@@ -234,8 +234,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "pad+value(grid)"
+          }
         },
         {
           "signal": "T1CH4",
@@ -498,7 +497,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value(grid)"
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "T1CH2N",
@@ -806,7 +805,13 @@
           "signal": "AETR",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-adc1-etrgreg-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "T2CH2",
@@ -1306,7 +1311,14 @@
         },
         {
           "signal": "AETR2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "role",
+          "selection": {
+            "selector": "afio-adc1-etrginj-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SCL",
@@ -1446,7 +1458,14 @@
         },
         {
           "signal": "AETR",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "role",
+          "selection": {
+            "selector": "afio-adc1-etrgreg-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "UCTS",

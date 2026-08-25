@@ -53,6 +53,24 @@
       "reset_value": 0
     },
     {
+      "id": "afio-adc1-etrgreg-remap",
+      "controller": "afio",
+      "register": "PCFR1",
+      "field": "ADC1_ETRGREG_REMAP",
+      "bits": [
+        {
+          "register": "PCFR1",
+          "bit": 18
+        }
+      ],
+      "valid_values": [
+        0,
+        1
+      ],
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
+    },
+    {
       "id": "afio-i2c1-remap",
       "controller": "afio",
       "register": "PCFR1",
@@ -317,7 +335,7 @@
               1
             ]
           },
-          "_selector_resolved_by": "pad+value(grid)"
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "T1CH2N",
@@ -488,7 +506,13 @@
           "signal": "AETR",
           "route": "remap-1",
           "_selector_value": 1,
-          "_unresolved_selector": true
+          "selection": {
+            "selector": "afio-adc1-etrgreg-remap",
+            "values": [
+              1
+            ]
+          },
+          "_selector_resolved_by": "role"
         },
         {
           "signal": "T2CH2",
@@ -647,8 +671,7 @@
             "values": [
               2
             ]
-          },
-          "_selector_resolved_by": "pad+value(grid)"
+          }
         },
         {
           "signal": "T1CH4",
@@ -737,7 +760,14 @@
         },
         {
           "signal": "AETR2",
-          "route": "default"
+          "route": "default",
+          "_selector_resolved_by": "role",
+          "selection": {
+            "selector": "afio-adc1-etrginj-remap",
+            "values": [
+              0
+            ]
+          }
         },
         {
           "signal": "SCL",

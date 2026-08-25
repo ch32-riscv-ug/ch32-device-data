@@ -15,9 +15,4 @@
 - [レジスタマップの調査](register-map-survey.ja.md): consumerのR-20に対する現状調査（方針未決）
 - [WCH-Linkファームウェアの調査](link-firmware-survey.ja.md): 版番号が確定しない理由（F-11）
 
-## 過去のもの（JSON schema草案の時代・2026-08-17）
-
-- [schema調査ノート](schema-notes.ja.md): `schemas/device.schema.json`（`0.1-draft`）と`devices/`の8 sampleの調査。
-  **`tables/`が正本になってからは更新していない**
-
 配置とArduino側のconsumer境界は、`ArduinoCore-CH32`のADR-0001に記録しています。

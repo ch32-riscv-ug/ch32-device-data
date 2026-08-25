@@ -2,19 +2,26 @@
 
 [English](README.md)
 
-CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に記述するための独立データリポジトリです。
+WCHのCH32シリーズ（12 family・27 series・103型番）について、一次資料（datasheet 中英両版・
+reference manual・EVT）から**機械抽出した正規化CSV**（`tables/`、36表）と、そこから
+各familyリポジトリのREADMEを生成するtoolを置く独立データリポジトリです。
+すべての値が**出所（`basis`）と確度（`confidence`）**を持ちます。
 
 > [!IMPORTANT]
-> 現在のschema version `0.1-draft`はQ-011を検討するための提案であり、確定仕様ではありません。
-> `devices/`のrecordもArduinoコアの対応宣言ではありません。
-> このリポジトリをdevice databaseの正本としますが、schema自体はまだ草案です。
+> このリポジトリはArduinoコアの対応宣言ではありません。表に載っている型番＝対応、ではありません。
+
+**どこから読むか**: 表の意味と列は [tables/README.ja.md](tables/README.ja.md)、
+表ごとの信頼度は [docs/table-reliability.ja.md](docs/table-reliability.ja.md)、
+作業の状態は [docs/worklist.ja.md](docs/worklist.ja.md)。
 
 ## 構成
 
-- `schemas/device.schema.json`: exact SKU、CPU、memory、package、peripheral、pin、出典のschema草案
-- `devices/*.json`: schemaを評価するための代表SKUデータ
-- `tools/validate.py`: JSON Schemaと追加の整合性規則を検査するvalidator
-- `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するreview支援tool。recordは書き換えない
+- `tables/*.csv`: 正規化した表（正本）。`#`列より左がデータ、右が出所と確度のメタ
+- `candidates/*.json`: 全型番の機械抽出結果（未review）。`tables/`の材料
+- `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
+- `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する
+- `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
+- `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
 - `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables tables`で規則一覧とremap_routes.csvに対する当たり具合を出す
@@ -58,13 +65,12 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 - `tools/crosscheck_ch32data.py`: [ch32-rs/ch32-data](https://github.com/ch32-rs/ch32-data)と
   AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
   CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
-- `candidates/*.json`: 全SKUの機械抽出結果。未reviewで、schemaにも準拠しない
+- `candidates/*.json`: 全SKUの機械抽出結果（未review）。`tables/`の材料
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
 - `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）
 - `docs/handoff.ja.md`: 正本の所在、再開手順、守ること
 - `docs/worklist-archive.ja.md`: 解決済みの穴・依頼の記録（何を直し、なぜそう判断したか）
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
-- `docs/schema-notes.ja.md`: JSON schema草案（`0.1-draft`）の調査。`tables/`が正本になってからは更新していない
 
 ## データの境界
 
@@ -88,10 +94,9 @@ CH32のexact orderable SKUを、出典と検証状態を含めて機械可読に
 ## 検証
 
 ```sh
-python3 tools/validate.py
+uv run tools/check_tables.py    # 36表の参照結合・書式・数の不変量
+uv run tools/check_counts.py    # 比較表が数える周辺の数 vs pin表から引ける数
 ```
-
-`jsonschema` packageが利用可能ならJSON Schema全体を検査します。なくても標準libraryだけで、ID、出典参照、pin coverageなどの追加規則を検査します。
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。
 
@@ -115,8 +120,10 @@ uv run tools/signal_vocabulary.py --tables tables # signal名の語彙規則と�
 ```
 
 ```sh
-uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare devices/<id>.json
-uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20 --compare devices/<id>.json
-uv run tools/extract_remap.py <manual>.PDF --compare devices/<id>.json
-uv run tools/extract_registers.py <manual>.PDF --compare devices/<id>.json
+uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h
+uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20
+uv run tools/extract_remap.py <manual>.PDF
+uv run tools/extract_registers.py <manual>.PDF
 ```
+
+全表の生成順は [tables/README.ja.md](tables/README.ja.md) の「生成順」を参照。

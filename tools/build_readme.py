@@ -443,6 +443,10 @@ def pin_map_section(data: Data, series: dict) -> list[str]:
                 types[r["pad"]][r["type"]] += 1
         per_part[part] = cells
     pads = sorted({pad for cells in per_part.values() for pad in cells}, key=pad_key)
+    # datasheet が pad 名に括弧で添える GPIO の別名（CH32M007 の `LO1 (PA0)`）。
+    # pin_functions では `route=alias` の行。pad 名の隣に資料どおり括弧で出す。
+    alias = {fn["pad"]: fn["signal"] for part in parts
+             for fn in data.fns_by_part[part] if fn["route"] == "alias"}
     defaults = default_signals(data, parts[0])
     everything = all_signals(data, parts[0])
 
@@ -460,7 +464,8 @@ def pin_map_section(data: Data, series: dict) -> list[str]:
         type_counter = types.get(pad)
         pin_type = type_counter.most_common(1)[0][0] if type_counter else ""
         cells = [per_part[p].get(pad, "-") for p in parts]
-        out.append(f"| {md_escape(pad)} | {md_escape(pin_type)} | "
+        shown = f"{pad} ({alias[pad]})" if pad in alias else pad
+        out.append(f"| {md_escape(shown)} | {md_escape(pin_type)} | "
                    + " | ".join(cells)
                    + f" | {notes_for(pad, defaults, everything)} |")
     out.append("")
@@ -478,7 +483,8 @@ def functions_section(data: Data, series: dict) -> list[str]:
         lambda: collections.defaultdict(set))
     for part in parts:
         for fn in data.fns_by_part[part]:
-            if fn["route"] != "main":
+            # `alias` は機能ではなく pad の GPIO 名（`LO1 (PA0)`）。pin map の側で出す。
+            if fn["route"] not in ("main", "alias"):
                 by_pad[fn["pad"]][fn["route"]].add(fn["signal"])
     if not by_pad:
         return []

@@ -31,7 +31,7 @@ Usage:
     uv run tools/build_all.py --out candidates [--family CH32M030] [--limit 5]
         [--jobs N]
 
-Output is unreviewed machine extraction, written outside devices/.
+Output is unreviewed machine extraction (candidates/).
 """
 
 from __future__ import annotations

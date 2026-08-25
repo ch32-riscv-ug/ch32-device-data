@@ -37,16 +37,12 @@ def load(tables: Path, name: str) -> list[dict]:
 #                          `Source current module ISOURCE` のように群を名乗る
 #   SWIM                   CH32M030 PA3。資料に対応の記述が見つかっていない
 #   Q_DET* / V_DET         CH32M030 の検出入力。周辺名を名乗らない綴り
-KNOWN_ROLE_GAPS = {
-    "AETR": 6, "AETR2": 8, "TIETR": 4,
-    "HO0": 5, "HO1": 5, "HO2": 5, "HO3": 8,
-    "LO0": 5, "LO1": 5, "LO2": 4, "LO3": 3,
-    "ISINK1": 4, "ISINK2": 5, "ISOURCE1": 4, "ISOURCE2": 3,
-    "ISN1": 5, "ISN2": 4, "ISP1": 5, "ISP2": 5,
-    "QII1": 3, "QII2": 5,
-    "SWIM": 5, "ANT": 4,
-    "Q_DET1": 4, "Q_DET2": 3, "V_DET": 5,
-}
+# 2026-08-25 に最後の26種（CH32M030 の専用機能・CH32V003 の略記・CH32V208 の
+# `ANT`）を語彙へ入れて空になった。**空であることが検査の対象**——新しい綴りが
+# 資料に現れれば、ここに名前が無いので落ちる。
+KNOWN_ROLE_GAPS: dict[str, int] = {}
+
+GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
 
 
 # 同じ lead 番号を複数の pad が持つ組の数。**目標は「資料のとおり」**で、
@@ -182,6 +178,20 @@ def main() -> int:
     for r in t["pin_functions"]:
         if (r["part_number"], r["pad"]) not in pin_pads:
             bad.append(f"pin_functions: {r['part_number']} の pad {r['pad']!r} が pins にない")
+    # `route=alias` は「pad 名に資料が括弧で添えた GPIO 名」（CH32M007 の `LO1 (PA0)`）。
+    # signal は GPIO 名、pad は GPIO 名でない、pad ごとに1つ——それ以外の形で
+    # 出たら抽出の読み違い。
+    alias_of: dict[tuple[str, str], set[str]] = {}
+    for r in t["pin_functions"]:
+        if r["route"] != "alias":
+            continue
+        if not GPIO_NAME.match(r["signal"]) or GPIO_NAME.match(r["pad"]):
+            bad.append(f"pin_functions: alias 行の形が違う {r['part_number']} "
+                       f"{r['pad']!r} -> {r['signal']!r}（GPIO 名の別名だけを許す）")
+        alias_of.setdefault((r["part_number"], r["pad"]), set()).add(r["signal"])
+    for key, names in alias_of.items():
+        if len(names) > 1:
+            bad.append(f"pin_functions: {key} に alias が複数 {sorted(names)}")
     # **1本の足に2つの pad が出る行**（内部で短絡された IO ペア、共用の電源
     # 節点）。番号が一致していることが「同じ足」そのもので、内部接続を別の列で
     # 持たない代わりに、その形が壊れていないことをここで見る。

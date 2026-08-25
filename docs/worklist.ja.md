@@ -19,7 +19,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 5 | 2（D4・D7。新規） |
 | consumerからの依頼 | 7 | 1（R-20。方針が要る） |
-| 既知の穴（F系） | 36 | 10 = ツール側 5（F-8・F-21・F-31・F-32・F-24残り）＋ 実機待ち 1（F-11）＋ 資料側の記録 4（F-6/7・F-33・F-43〜46） |
+| 既知の穴（F系） | 42 | 5 = 資料が決めない 2（F-24残り8行・F-4残り6行）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-33・F-43〜46） |
 
 （2026-08-25 棚卸し時点。次にやる順は [次の作業](#次の作業優先順) にある）
 
@@ -174,7 +174,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-5 | `extract_registers`の見出しrun-on | 見出し432・field多数 | ツール | ✅ **修理済み**（2026-08-22）。[記録](worklist-archive.ja.md) |
 | F-6 | CH32V30xのRM格子がI2S3のremap経路を書いていない | 32 function・4 series | 資料 | 記録のみ（実測 2026-08-24） |
 | F-7 | CH32V30xのheaderに`DVP_REMAP`が無い | 2 function | 資料 | 記録のみ |
-| F-8 | CH32V003の`AETR`がADC 2 fieldのどちらか決まらない | 4 function・4 part | ~~資料~~ **ツール** | 🔜 **再調査で決まった**（2026-08-25）。zh版RMの表7-13/7-14が`ETRGREG`=PD3/PC2、`ETRGINJ`=PD1/PA2と書き、`AETR`(PD3/PC2)・`AETR2`(PD1/PA2)のpadと一致する。決まらなかったのは**en版RMのbit17説明が誤植**（ETRGINJの説明にETRGREGの文を繰り返しPC2と書く）で両fieldにPC2が出るため。下記 |
+| F-8 | CH32V003の`AETR`がADC 2 fieldのどちらか決まらない | 4 function・4 part | ~~資料~~ ツール | ✅ **修理済み**（2026-08-25）。`AETR`→(ADC1, RETR)、`AETR2`→(ADC1, IETR)を語彙に、`RETR`↔`ETRGREG`・`IETR`↔`ETRGINJ`の対応（`ROLE_FIELD`）でselectorを名前から決める。V003の4型番は未解決0、`remap_routes`に`ETRGREG`の経路（PD3/PC2）が入った。[記録](worklist-archive.ja.md) |
 | F-9 | USBが48MHzを要求する根拠が散文 | 22行 | ツール | ✅ **実装済み**（2026-08-22）。48MHzは全familyの話ではなかった。[記録](worklist-archive.ja.md) |
 | F-10 | CH32V205・CH32X315のRMから経路が0件 | V203CCT6のUSART5-8 | 資料/ツール | ✅ **原因判明**（2026-08-22）。**AFIO remapを持たない世代**だった。[記録](worklist-archive.ja.md) |
 | F-11 | WCH-Link系ファームウェアの版番号が確定しない | — | 資料 | 🔜 実機で1回突き合わせる |
@@ -187,7 +187,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-18 | lead番号に脚注が付いたまま出る（`int`にできない） | 16行 | ツール | ✅ **修理済み**（2026-08-22）。[記録](worklist-archive.ja.md) |
 | F-19 | 比較表が**ページ境界**をまたぐと継続ページを読めない | en 141行が欠落・H417 4ラベル | ツール | ✅ **修理済み**（2026-08-24）。[記録](worklist-archive.ja.md) |
 | F-20 | 行グループ見出しが属性名に混ざる（`Communication interface CAN`） | 全family | ツール | ✅ **実装済み**（2026-08-24）。`group`/`label`を新設。[記録](worklist-archive.ja.md) |
-| F-21 | `pin_roles`が語彙で覆えない signal 110種 | 1046行（4.4%）→**26種122行（0.5%）** | ツール/資料 | 🔜 大半を解消（2026-08-24）。残りはM030の22種・V003の3種・V208の`ANT`。下記 |
+| F-21 | `pin_roles`が語彙で覆えない signal 110種 | 1046行（4.4%）→**0行（100%）** | ツール | ✅ **修理済み**（2026-08-25）。最後の26種（M030の22種→`PREDRV`/`ISP1,2`/`QII1,2`/`ISINK`/`ISOURCE`/`PWR`/`SDI`、V003の`AETR`/`AETR2`/`TIETR`、V208の`ANT`→`BLE`）を原典で所属確認して語彙へ。`KNOWN_ROLE_GAPS`は空。[記録](worklist-archive.ja.md) |
 | F-22 | セル内の折り返しで**空白が落ちる**（`Communicationinterfaces`） | 全family | ツール | ✅ **修理済み**（2026-08-24）。[記録](worklist-archive.ja.md) |
 | F-23 | READMEの比較表の**行の並びが資料の並びでない** | 全family | ツール | ✅ **修理済み**（2026-08-24）。`order`列を新設。[記録](worklist-archive.ja.md) |
 | F-24 | **lead番号のセルが縦結合された行**を落としている（同じ足に2つのpad） | 42行 → 8行 | ツール | ✅ **修理済み**（2026-08-25）。残り8行は結合でもない空欄（資料が`-`を書き忘れたか別の意味か決まらない。`build_pins`のnotesに出る）。[記録](worklist-archive.ja.md) |
@@ -197,8 +197,8 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-28 | **CH32L103のremap格子を1行も読めていない** | 0 → 195経路 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
 | F-29 | pin type欄が`USB3.0`だと落ちる | H417のUSB3.0差動4 pad×4型番 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
 | F-30 | 語彙が**1文字の周辺**を作る（`Q_DET1`→周辺`Q`） | 12行 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
-| F-31 | **封装のlead数とpins.csvが合わない型番が10** | 26 lead | ツール/資料 | 🔜 **原因判明**（2026-08-25）: M007×4・M103の26 leadは全部ゲートドライバ出力pad `LO1\n(PA0)`で、GPIO別名の括弧を`PAD_TOKEN`が通さず黙って落ちる。V203RBT6/LQFP100の`未使用`は資料どおり。下記 |
-| F-32 | 添字が2組あるpad名を**基準文字→添字の順に詰めて**`VVDD_IO_1`にしている（資料は`VDD_VIO_1`） | CH32V205DS0 の 3 pad・5行 | ツール | 🔜 下記 |
+| F-31 | **封装のlead数とpins.csvが合わない型番が10** | 26 lead | ツール/資料 | ✅ **修理済み**（2026-08-25）。pad欄の`LO1\n(PA0)`（GPIO別名の括弧）を読めるようにし、`pins`に26行・`pin_functions`に主機能26行＋**`route=alias`30行**（別名の持ち方は`tables/README`）。残る5型番（V203RBT6の48・LQFP100の73）は資料が`未使用`と書く足で、表に無いのが正しい。[記録](worklist-archive.ja.md) |
+| F-32 | 添字が2組あるpad名を**基準文字→添字の順に詰めて**`VVDD_IO_1`にしている（資料は`VDD_VIO_1`） | CH32V205DS0 の 3 pad・5行 | ツール | ✅ **修理済み**（2026-08-25）。上下の行の語数が同じなら列ごとに組む（`interleave`）。`VDD_VIO_1`〜`_3`に。[記録](worklist-archive.ja.md) |
 | F-33 | `documents.csv`の版番号が**WCH APIのメタデータ**で、PDF表紙より遅れることがある | CH32V20x_30xDS0（3.5 vs V3.9） | 資料 | 記録のみ（2026-08-25）。全PDFの表紙スキャンで他は一致 |
 | F-34 | `remap_fields.csv`の**reset_value空欄が45行**（RMでは0と確定できる） | 45行→**7行** | ツール | ✅ **修理済み**（2026-08-25）。RMの復位値`00b`/`000b`（2進）を読めていなかった。残り7行はRMが復位値を書かないもの（EXTEN `CTR`のM030 `ISINK*_ADJ`・V20x `ETH_10M_EN`、V103 `TIM4_REMAP`/`USART2_REMAP`、X315 `PD0_1_REMAP`）。推測で0と埋めない |
 | F-35 | `TIM5CH4_RM`の**valid_valuesに値1（LSI）が無い** | V20x/V30x系6行 | ツール | ✅ **修理済み**（2026-08-25）。RM説明文が列挙する値（`0：…；1：…`）をvalid_valuesの出所に足した |
@@ -213,6 +213,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-44 | CH32X035 EVTヘッダの**`OPA_CTLR2_CMP_LOCK`のmaskが`0x2000`（bit13=PSEL3と同じ）**。RMはbit31 | 1 define | 資料 | 記録のみ（2026-08-25）。opa_cmp_registersでconflict表示。使うとCMP3の正入力選択を壊す |
 | F-45 | EVTヘッダとRMで**OPA/CMPのbit位置が食い違う**（L103 ITRIMN/ITRIMP 5bit vs 6bit、V205 HYS1_H/HYS2_H bit29/30 vs 19/29） | 4 define | 資料 | 記録のみ。opa_cmp_registersでconflict＋両論 |
 | F-46 | datasheet zh/en で**温度センサのAvg_Slope最大値が違う**（V20x/V307: 4.8 vs 4.7 mV/℃） | 2 family | 資料 | 記録のみ。adc_internalでconflict＋両論 |
+| F-47 | CH32V407/V467の**Ethernet LED（`LED0`/`LED1`、remap-1）のselectorが決まらない** | 8 function・4 part | ツール | ✅ **修理済み**（2026-08-25）。headerは`AFIO_PCFR1_ETHPHY_LED_REMAP`とPHYの名で綴り、語彙の(ETH, LED0)からは名前でも接頭辞でも当たらなかった。`FIELD_OF_SIGNAL`で結び、`remap_fields`に`afio-ethphy-led-remap`（V407/V467）、`remap_routes`に4経路（値0=PE8/PE9、値1=PD14/PD15）。`unresolved`は**32＝F-6だけ** |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | ✅ 2件実装・1件は回答（`route`の`main`/`default`を文書化）。[記録](worklist-archive.ja.md) |
 | R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | ✅ **全5件実装**（2026-08-25）。[記録](worklist-archive.ja.md) |
 
@@ -236,160 +237,39 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
   **CH32V407/V467は書いているので決まる**——同じ周辺が資料の書き方次第で決まったり
   決まらなかったりする
 - **CH32V30xの`DVP_*`**。CH32V407にはある`DVP_REMAP`がV30xのheaderに無い
-- ~~**CH32V003の`AETR`**（PC2, remap-1）。datasheet独自の略記で、
-  `ADC_ETRGINJ`と`ADC_ETRGREG`のどちらか決められない~~ → **決まる**（2026-08-25 再調査）。
-  datasheetの凡例は`AETR(ADC_ETR)`、RM zh 表7-14は`ADC_ETRGREG_RM` 0=PD3 / 1=PC2、
-  表7-13は`ADC_ETRGINJ_RM` 0=PD1 / 1=PA2。`AETR`のpad（PD3→PC2）は`ETRGREG`の、
-  `AETR2`（PD1→PA2）は`ETRGINJ`のpadと一致する。tool側が決められなかったのは
-  **en版RMのbit17（ETRGINJ）の説明文が規則転換（PC2）の文を誤って繰り返す**ためで、
-  英語版を読むと両fieldがPC2を名乗る。zh版だけで決める（zh散文のpadはF-3で読める）。
-  語彙は`AETR`→(ADC1, RETR)、`AETR2`→(ADC1, IETR)（V00xの`ADC_RETR`/`ADC_IETR`の既存規則と同じ綴り）
+- ~~**CH32V003の`AETR`**~~ → **F-8 は修理済み**（2026-08-25。資料側ではなくツール側だった。
+  [記録](worklist-archive.ja.md)）
 
-**`candidates/_report.json`の`unresolved`はこの2件だけ**です（2026-08-24の全体生成で
-**36 function・13型番**）。内訳はF-6が32（V303/V305/V307/V317の`I2S3_CK`/`I2S3_SD`/
-`I2S3_WS`）、F-8が4（V003の4型番の`AETR`）。**これ以外の未解決はありません**。
-F-8を直すと**32**になる。
+**`candidates/_report.json`の`unresolved`は32 = F-6 だけ**（2026-08-25。V303/V305/V307/V317の
+`I2S3_CK`/`I2S3_SD`/`I2S3_WS`）。F-8 の4と F-47 の8は解消した。この数から動いたら資料側が
+変わったか抽出が壊れたかのどちらか。
 
 `--family`だけで回すと`_report.json`が上書きされてこの数が見えなくなる問題は
 2026-08-24に直しました（触ったSKUだけ差し替える。D6の項）。逆に言えば、
 **この36という数から動いたら、それは資料側が変わったか抽出が壊れたかのどちらか**です。
 
-### F-21 `pin_roles`が語彙で覆えない signal
-
-`tables/pin_roles.csv`は`signal_vocabulary.split()`を通せた行だけを載せ、覆えなかった
-綴りは`tools/check_tables.py`の`KNOWN_ROLE_GAPS`に**名前と行数で固定**してある
-（増減はどちらも検査で落ちる）。110種1046行（4.4%）から始めて、2026-08-25時点で
-**26種122行（0.5%）**。内訳と行き先:
-
-| 内訳 | signal（行数） | 行き先 |
-|---|---|---|
-| CH32M030 のモータ/アナログ専用機能（22種・99行） | `HO0`〜`HO3`／`LO0`〜`LO3`（PB8〜PB15の`default`。`HO3`はM007の専用padにも）、`ISP1`（専用pad）`ISP2` `ISN1` `ISN2`、`ISINK1/2`、`ISOURCE1/2`、`QII1/2`、`Q_DET1/2`、`V_DET`、`SWIM`（PA3） | **語彙を足す**。所属は下表（2026-08-25 原典で確認） |
-| CH32V003 の略記（3種・18行） | `AETR`(PD3/PC2)・`AETR2`(PD1/PA2)・`TIETR`(PD4, remap-2) | `AETR`→(ADC1, RETR)、`AETR2`→(ADC1, IETR)（F-8。padでRMの表7-13/7-14と一致）。`TIETR`は`T1ETR`の誤植（`I`と`1`。同じ行が表2-3では`T1ETR_2`、RM表7-8で`TIM1_RM=10`のETRがPD4）→(TIM1, ETR) |
-| CH32V208 の専用pad（1種・4行） | `ANT`（凡例「射频信号输入输出（天线）」。`main`） | (BLE, ANT)。die上のRFブロックはBLE5.3だけ（header `BB_IRQn`「BLE BB」） |
-
-**全26種が語彙で覆える見込み**（F-8も含めて）。M030の22種はF-31のM007/M103の`HO*`/`LO*`と
-同じpad群なので、F-31と同時に語彙を入れると一度で済む。
-
-**CH32M030の22種の所属**（datasheet zh/en・RM・`ch32m030.h`で確認。WCHの呼び方に揃える）:
-
-| signal | 資料の説明 | WCHの呼び方 | 提案 (peripheral, role) |
-|---|---|---|---|
-| `HO0`〜`HO3` / `LO0`〜`LO3` | DS 表2-2「内部高侧/低侧栅极驱动器的输出，控制N型MOSFETの栅极」。§1.4.20 栅极驱动器 / Gate Driver「4个独立半桥驱动器」 | RMは独立章を持たず§6.2.10「MVのGPIO構造」で説明。headerは`AFIO_PCFR1_HO_DIO_EN0..3_REMAP`のみ。比較表は「半桥栅极驱动器 / Half-bridge gate driver」「预驱动I/O（MV I/O）/ Pre-drive I/O」。M007は「三相预驱 / three-phase pre-driver」 | **(PREDRV, HO0)…(PREDRV, LO3)**。M030/M007の両datasheetと比較表が共通に使う語が「预驱/pre-drive」。代案の`HB`はRMで「HB时钟」（AHB）を意味するので避ける。**要判断** |
-| `ISP1`（専用pad）`ISP2`(PA10) / `ISN1`(PA8) `ISN2`(PA11) | DS §1.4.18.2「差分输入电流采样（ISP）」。「ISP1和ISN1/PA8为一对差分输入，ISP2/PA10和ISN2/PA11为另一对」 | RM §17.2.6（OPA/CMP章）。header `OPA_TypeDef.ISP_CTLR`、`ISP_CTLR_ISP1_EN/GAIN/NSEL` | **(ISP1, P) (ISP1, N) (ISP2, P) (ISP2, N)**（CMPの`C3N0`→(CMP3, N0)と同じ流儀） |
-| `QII1`(PA12) `QII2`(PA13) | DS §1.4.18.1「交流小信号放大解码器（QII）」。QII1=OPA1+CMP1+デジタルフィルタ | RM §17.2.5。header `OPA_TypeDef.QII_CFGR`、`QII_CFGR_QII1_AE` | **(QII1, IN) (QII2, IN)**（役割語は資料に無いのでこちらで置く） |
-| `Q_DET1`(PA14) `Q_DET2`(PA15) | pin表のみ。RM `ISP_CTLR`の`QDET1_EN`「ISP1模块Q值检测使能」、ADC章「ADC_IN9/IN10を使うには`QDET1_EN`/`QDET2_EN`を1に」 | ISPモジュールのQ値検出経路。header `ISP_CTLR_ISP1_QDET1_EN`（**`ISP2_QDET1_*`はheaderの誤記**。RMはQDET2） | **(ISP1, QDET) (ISP2, QDET)** |
-| `V_DET`(PB4) | DS「PB4引脚支持ADC和OVP过压复位。VHVを外部抵抗で分圧してPB4へ」 | RM 電源制御（PWR）§2.2.2 过压复位 / §2.2.3 分压监测。`PWR_CTLR[13:12] SEL_IO_VHV`「PB4端口功能选择」。header `PWR_CTLR_SEL_IO_VHV` | **(PWR, V_DET)** |
-| `ISINK1`(PA6) `ISINK2`(PA7) | DS §1.4.19「可编程灌电流模块ISINK」10bit | RM EXTEN章§20.1 `R16_ISINK1_CFGR`/`R32_ISINK_ADJ`。header `EXTEN_TypeDef.ISINK1_CFGR` | **(ISINK1, OUT) (ISINK2, OUT)** |
-| `ISOURCE1`(PA4) `ISOURCE2`(PA5) | 同§1.4.19「源电流模块ISOURCE」（NTC用）。pin図の凡例「ISRC:ISOURCE」 | RM EXTEN_CTLR0 `ISRC1_EN/ISRC1_SEL` | **(ISOURCE1, OUT) (ISOURCE2, OUT)** |
-| `SWIM`(PA3) | pin表の`default`列だけに出る（`SWDIO/SWIM/CC4/…`）。RMにもEVTにも無い | DS §1.4.22 SDI「单线调试…对应**SWIO**引脚，双线…SWDIO和SWCLK」。**STM8のSWIMではなく1-wire SDIのデータ線**を`SWIO`と綴り違えたもの | 既存規則`SWIO`→(SDI, SWDIO)に揃えると PA3 が (SDI, SWDIO) を2回持つ。**要判断**: 1-wire/2-wireを区別するなら`SWIO`と`SWIM`を (SDI, SWIO) に |
-
-比較表との整合: `half_bridge_gate_driver`（4/4/4/2/3）・`pre_drive_i_o_mv_i_0`（8/8/8/6/6＝HO/LOのpad数）・
-`current_sampling_isp_isn`・`signal_decoding_qii`（2）・`programmable_current_injection_module_isink`（2）・
-`source_current_module_isource`（2）が`product_attributes`に既にあり、数が合う。
-
-### F-31 封装のlead数とpins.csvが合わない型番が10
-
-`packages.csv` の `pin_count` と `pins.csv` の lead 番号の数を突き合わせると、
-103型番中10で足りません（F-29で16→12、`PAD_TOKEN`の拡張で12→10。2026-08-25実測）。
-
-| 型番 | 封装 | 欠け |
-|---|---|---|
-| CH32M007E8R6 / E8U7 / G8R6 / K8U7 | QSOP24 / QFN26C3 / QSOP28 / QFN32 | 各5 |
-| CH32M103G8R6 | QSOP28 | 6 |
-| ~~CH32V203CCT6~~ | LQFP48 | ~~3（24・36・48）~~ 解消（`PAD_TOKEN`を12文字に。綴りはF-32） |
-| ~~CH32V103C6T6~~ | LQFP48 | ~~1（6）~~ 解消（`OSC8M_OUT`が9文字だった） |
-| CH32V203RBT6 | LQFP64M | 1（48） |
-| CH32V205VCT6 / V303VCT6 / V307VCT6 / V317VCT6 | LQFP100 | 1（73） |
-
-**LQFP100 の 73 番は資料が `未使用` と書いています**（`['-','-','-','-','-','-',
-'73','未使用','']`）——pad ではないので機能は無く、落ちているのは正しいとも
-言えますが、**封装の lead としては在る**ので、番号で pad を引く consumer には
-「データが無い」と区別が付きません。`NC` として持つかどうかは持ち方の判断。
-
-**CH32V103C6T6 の 6 番は解消しました（2026-08-25）。** この datasheet は pin 表を
-2つ持ち（x8 品の3封装用と x6 品の2封装用）、x6 側は同じ端子を
-`OSC8M_IN`/`OSC8M_OUT` と綴ります。`build_pins` は**両方の表を読んでいる**
-（キャプション単位で全部見る。`choose_table` は単体 CLI 用）ので表の選択は
-問題ではなく、`OSC8M_OUT` が9文字で `PAD_TOKEN` の8文字に掛かっていたのが原因
-でした。**最初の測定で「広げても増えない」と書いたのは誤りで**、その測定が
-`choose_table` 経由で表を1つしか見ていませんでした。`build_pins.read_edition`
-で測り直すと `OSC8M_OUT` と CH32V203CCT6 の lead 24/36/48 が増えます（F-32）。
-
-**CH32M007 / CH32M103 の欠け 26 lead は原因が1つです（2026-08-25 原典で確認）。**
-どれもゲートドライバ出力の pad で、datasheet は pad 欄を **pad 名＋括弧の GPIO 別名**の
-2行で書きます:
-
-```
-['14', '17', '9', '10', 'LO1\n(PA0)', 'O', 'LO1', '', '']     ← M007 表2-2（zh p21 / en p28）
-['15', 'HO1\n(PA8)', 'O', 'FT', 'HO1', '', '']                  ← M103 表2-1-2（zh p23 / en p29）
-```
-
-`normalise_pad` は数字の脚注 `(7)` しか剥がさないので `LO1(PA0)` が残り、
-`PAD_TOKEN`（`^[A-Z][A-Z0-9_+-]{0,11}$`）が括弧を通さない。`variant_row` も
-`continues` も当たらないので**notes も出さず黙って落ちる**。M007 の `HO3` だけが
-残っているのは en 版が別名なしで `HO3` と書くから（zh は `HO3\n(PB1)`）——それで
-`reference` になっている。
-
-| 型番 | 落ちている pad（別名） |
-|---|---|
-| CH32M007 ×4 | `LO1(PA0)` `LO2(PA2)` `LO3(PD0)` `HO1(PA3)` `HO2(PB0)`、＋zh側の `HO3(PB1)` |
-| CH32M103G8R6 | `HO1(PA8)` `LO1(PB13)` `HO2(PA9)` `LO2(PB14)` `HO3(PA10)` `LO3(PB15)` |
-
-同じ足は素の CH32V007 では普通の GPIO（E8R6 の lead 18〜23 = PA0/PA2/PD0/PA3/PB0/PB1）で、
-M007 はそれをドライバ出力に振り替えて別名で GPIO 名を残している。CH32M030 は逆に
-pad を `PB9` と書いて `HO0` を default 機能の側に置く（F-21 の M030 の22種と同じ pad 群）。
-
-**直し方**: 括弧の GPIO 別名を `normalise_pad` で分離して pad 名を通す。
-**要判断**: 別名 `(PA0)` をどう持つか。案は (a) 捨てる（GPIO として使えるかは資料が
-言っていない）、(b) `pin_functions` に `signal=PA0` の行を足す——ただし `route` の値が
-要る（`main`/`default` ではない。新しい値 `alias` を定義するか）、(c) `PA0-WKUP` と同じ
-複合 pad 名 `LO1-PA0` にする——ただし既存の形は GPIO が先で順序が逆になる。
-**推奨は (b)**: 資料が書いていることを落とさず、`port`/`pin` から引く consumer に
-M007 の PA0 が lead 14 にあると見える。値の意味は `tables/README` に書く。
-
-### F-32 添字が2組あるpad名の詰め方が誤り（`VVDD_IO_1`）
-
-CH32V205DS0 の pin 表は `VDD_VIO_1`〜`_3` という pad を、**基準サイズの `V` と添字の
-組を2つ並べて**書きます（図中の回転ラベルも `VDD_VIO_1` と綴る）:
-
-```
-V(基準 x=163)  D D _(添字 x=169-174)  V(基準 x=177)  I O _ 1(添字 x=182-190)
-```
-
-**当初「2つの pad 名が1セルに入っている」と読んだのは誤り**で、資料の綴りが
-`VDD_VIO_1` という1つの名前です（同じ足を CH32V203DS0 は `VDD_IO_1` と書く——
-版の違い）。いまの詰め方は**基準文字を先に、添字を後に**並べるので `V`+`V`+`DD_`+`IO_1`
-＝`VVDD_IO_1` になります。x 順に並べれば `VDD_VIO_1` になり、pdfplumber の
-`extract_text` もそう読みます。
-
-- 該当: CH32V203CCT6 の lead 24/36/48、CH32V205CCT6 の lead 25/48（5行。zh/en とも同じ誤り）
-- **直し方**: 添字を戻すとき、基準文字の並びの中に添字を x 順で差し込む（F-1 の
-  `dewrap` の並べ方の問題。`build_pins` 側）。判断は要らない——**資料の綴りをそのまま採る**
-  （layer-1 の綴りは証拠。`VDD_IO_1` へ寄せない）
-
 ## 次の作業（優先順）
 
 **方針: 完全新規より過去の穴を埋めるほうが先**（2026-08-25 確認）。上から順に。
 
-### 1. 穴を埋める（ツール側で直せるもの）
+### 1. 穴を埋める
 
-| 順 | 項目 | 何が直るか | 判断の要否 |
-|---|---|---|---|
-| 1 | **F-31** M007×4・M103のゲートドライバpad 26 lead | `pins`に26行、`pin_functions`に主機能26行が入り、lead欠けは資料が`未使用`と書く5型番だけになる。**黙って落ちていた**ので検出も足す（pad欄が空でないのに採らなかった行はnotesへ） | **要**: 括弧のGPIO別名`(PA0)`の持ち方（F-31節の(a)(b)(c)。推奨(b)） |
-| 2 | **F-32** `VVDD_IO_1`→`VDD_VIO_1` | 5行の綴り。x順に詰めるだけ | 不要（資料の綴りをそのまま） |
-| 3 | **F-21＋F-8** 語彙の穴 26種122行 | `pin_roles`の覆いが99.5%→**100%**、`candidates`の`unresolved`が36→32 function。所属は全部原典で確認済み（F-21節の表） | **要（2件）**: ゲートドライバの周辺名 `PREDRV`（推奨）か `HB` か／`SWIM`を`SWDIO`に畳むか`SWIO`として分けるか |
-| 4 | F-24 残り8行（結合でもない空欄） | 資料の意図が決まらない。**zh/en両版で空欄が一致するか**だけ確かめて、一致なら「資料が空欄」として記録で閉じる | — |
-| 5 | F-4 残り6行（片方の言語版だけの`reference`行） | 実害は小。F-31/F-32の修正で動くか見てから | — |
+**ツール側で直せる穴は2026-08-25に全部埋めた**（F-8・F-21・F-31・F-32・F-47）。残っているのは
+資料が決めないものと実機が要るものだけ:
 
-残る穴のうち**触らないもの**: `remap_fields`のreset_value空欄7行（RMが書かない。推測しない）、
-F-6/F-7（資料側）、F-11（実機が要る。ユーザー作業）。
+| 項目 | 状態 | できること |
+|---|---|---|
+| F-24 残り8行（lead番号が結合でもない空欄） | 資料が`-`を書き忘れたか別の意味か決まらない | zh/en両版で空欄が一致するかを確かめ、一致なら「資料が空欄」として閉じる（小） |
+| F-4 残り6行（片方の言語版だけの`reference`行） | 実害小 | 放置可。増えたら見る |
+| F-11 WCH-Linkの版番号 | **実機が要る**（更新前後で`minichlink`の表示を控える） | ユーザー作業 |
+| F-6/F-7、資料側の記録 | 原典に無い | 台帳（下）に記録。WCHへ報告する材料 |
+| `remap_fields`のreset_value空欄7行 | RMが復位値を書かない | 推測で埋めない（仕様） |
 
-### 2. 過去情報の整理で残った判断（ユーザー）
+### 2. 過去情報の整理（決着）
 
-- **`schemas/`・`devices/`（8 sample）・`tools/validate.py`・`docs/schema-notes.ja.md`を消すか。**
-  2026-08-17のJSON schema草案で、`tables/`が正本になってから触っていない。
-  READMEの「構成」冒頭がまだこれを主役として書いている（今回は文書一覧だけ直した）
-- **R-20（レジスタマップ）**を受けるか。consumer側の要否から
+- **JSON schema草案（`schemas/`・`devices/`8 sample・`tools/validate.py`・`docs/schema-notes.ja.md`・
+  `.github/workflows/validate.yml`）は2026-08-25に削除した。** `tables/`が正本。記録はgitの履歴
+- **R-20（レジスタマップ）**を受けるかは未決。consumer側の要否から
 
 ### 3. 新規（穴が尽きてから）
 
