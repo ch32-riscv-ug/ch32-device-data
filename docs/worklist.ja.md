@@ -655,11 +655,13 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-34 | `remap_fields.csv`の**reset_value空欄が45行**（RMでは0と確定できる） | 45行 | ツール | 🔜 原典検証（2026-08-25）で発見 |
 | F-35 | `TIM5CH4_RM`の**valid_valuesに値1（LSI）が無い** | V20x/V30x系6行 | ツール | 🔜 L103のLSI値(7)は入っており不統一 |
 | F-36 | `operating_conditions`の条件文字列に**下付き文字のずれ**（`f > 1MHz S`） | 少数 | ツール | 🔜 F_HCLK(USB) typ=96 の要約も再検討 |
-| F-37 | `interrupts.csv`の**OR結合variant条件が先頭マクロに切り詰め** | V006の2ベクタ | ツール | 🔜 原典検証（2026-08-25）で発見 |
-| F-38 | `memory_map.csv`の**link-origin 2行が誤値**（ORIGINの算術未評価・H417の2コア別リンカ） | V407 RAM・H417 RAM | ツール | 🔜 **値の誤り**。V407は+1024が欠落、H417はV3F/V5Fで別番地 |
-| F-39 | `clock_init.csv`の**V307分岐条件の欠落とV006のRMW手順の丸ごと欠落** | 2 family | ツール | 🔜 数値は正確、手順が不完全 |
-| F-40 | `pin_functions`が**封装別の既定機能をunionで潰す**（X035 PC3のRSTが全封装に付く） | 余分2行 | ツール | 🔜 candidatesは正しい。`build_pins.read_edition`の(表,pad)単位union |
-| F-41 | **F-27の格子優先修正がpin_functions/pin_rolesに未反映**（build_pinsはPDF直読み） | V103 TIM3 12行 | ツール | 🔜 candidates/remap_routesには反映済み |
+| F-37 | `interrupts.csv`の**OR結合variant条件が先頭マクロに切り詰め** | V006の2ベクタ | ツール | ✅ **修理済み**（2026-08-25）。`\|`区切り（memory_mapと同じ規約） |
+| F-38 | `memory_map.csv`の**link-origin 2行が誤値**（ORIGINの算術未評価・H417の2コア別リンカ） | V407 RAM・H417 RAM | ツール | ✅ **修理済み**（2026-08-25）。多数決をやめ基準リンカ（EXAM/SRC/Ld）を式評価で読む。H417はコア別2行（condition=V3F/V5F） |
+| F-39 | `clock_init.csv`の**V307分岐条件の欠落とV006のRMW手順の丸ごと欠落** | 2 family | ツール | ✅ **修理済み**（2026-08-25）。#if分岐をconditionへ、ローカル変数経由のRMWを手順として採る |
+| F-40 | `pin_functions`が**封装別の既定機能をunionで潰す**（X035 PC3のRSTが全封装に付く） | 余分2行 | ツール | ✅ **修理済み**（2026-08-25）。機能を(表,封装,pad)単位に。下記 |
+| F-41 | **F-27の格子優先修正がpin_functions/pin_rolesに未反映**（build_pinsはPDF直読み） | V103 TIM3 12行 | ツール | ✅ **修理済み**（2026-08-25）。candidatesの`_value_from_grid`をbuild_pinsが適用（conflict+両論のbasis）。下記 |
+| F-42 | **2レジスタに割れたfieldの格子列見出しを低位ビットだけで読んでいた** | V407/V467のUSART1等 | ツール | ✅ **修理済み**（2026-08-25）。F-41の適用で発覚。下記 |
+| F-43 | CH32V407 RMの**I3C格子の列見出しが両列とも`I3C_RM=0`**（原典の誤植） | 2列 | 資料 | 記録のみ。pin表の`I3C_SCL_1`が正。誤植への歯止めを実装 |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | 🔧 2件実装・1件は設計を返す。下記 |
 | R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | 🔜 誤値修正（F-38/40/41→F-39/37）の後に着手。下記 |
 
@@ -1833,6 +1835,39 @@ PCENR レジスタと bit）。EVT ヘッダの `RCC_*EN` define の機械写し
 不完全表現（F-39 clock_init・F-37 interrupts）を先に直してから 1→2→3→4。
 理由: 依頼4件のうち3件が memory_map / pin_roles を「既にあるもの」として前提に
 しており、その前提側の誤りを残したまま積むのは順序が逆。
+
+### F-40〜F-43 原典検証の後始末（2026-08-25）
+
+**F-40**: `build_pins.read_edition` が機能を (表, pad) 単位で union していたので、
+封装別の行の帰属が潰れていた。(表, 封装, pad) 単位に変えた。**この変更で
+CH32V203 の zh 側 QFN48X7 列が0 pinだったことが露見**——curated の列直し
+（LQFP48/QFN48X7 の積み見出し）が**英語版のラベルにしか当たっていなかった**。
+`表3-1-1` にも同じ直しを足して解消（union が穴を隠していた例）。
+CH32V205 の PD0/PD1 は8行が en 片翼の reference になったが、これは F-24 の
+内部接続 pad（OSC_IN と同じ足）で、en 版は結合セルから復元でき zh 版は本当に
+空セル——正直な表現であり、以前の丸ごと欠けより良い。
+
+**F-41**: `build_pins` は candidates を読み、`_value_from_grid` の印がある訂正を
+pin_functions にも適用する（route を直し、confidence=conflict、basis に
+`rm-remap-grid+!pin-table(=remap-1)` と両論を残す）。生成順は build_all →
+build_pins（従来どおり）。
+
+**F-42（F-41の適用で発覚）**: 最初の適用で84行が訂正され、72行が誤訂正だった。
+原因は2つあり、どちらも直した:
+
+1. **2レジスタに割れた field の格子は列見出しも2行**になる（CH32V407 の USART1 は
+   高位が `USART1_RM1=…`、低位が `USART1_RM=…`）。`COLUMN_HEADER` が `_RM` で
+   終わる名前しか認めず高位の行が見えないため、**列の値が低位ビットだけ**
+   （0,1,0,1）になっていた——remap_routes の V407/V467 USART1 が元から誤り
+   （PB15 が値0）。名前の末尾の数字をビット位置として合成するようにした。
+   修正後: PB15=値2・PA6=値3 で pin 表と一致し confirmed に昇格
+2. **F-43**: V407 RM の I3C 格子は列見出しが両列とも `I3C_RM=0`（原典の誤植。
+   pin 表の `I3C_SCL_1` が正）。鵜呑みにすると正しい値1を0に「訂正」するので、
+   **同じ (signal, 値) に別の pad が既に居るなら列見出しの誤植を疑い訂正しない**
+   という歯止めを build_candidate に入れた
+
+最終状態: 訂正は **V103 TIM3 の12行だけ**（conflict として自己申告）。
+pin_functions 28,423行、X035 PC3 の余分2行は消え、全検査通過。
 
 ## 利用状況（優先順位の根拠）
 
