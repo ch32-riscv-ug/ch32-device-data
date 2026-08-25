@@ -662,8 +662,9 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-41 | **F-27の格子優先修正がpin_functions/pin_rolesに未反映**（build_pinsはPDF直読み） | V103 TIM3 12行 | ツール | ✅ **修理済み**（2026-08-25）。candidatesの`_value_from_grid`をbuild_pinsが適用（conflict+両論のbasis）。下記 |
 | F-42 | **2レジスタに割れたfieldの格子列見出しを低位ビットだけで読んでいた** | V407/V467のUSART1等 | ツール | ✅ **修理済み**（2026-08-25）。F-41の適用で発覚。下記 |
 | F-43 | CH32V407 RMの**I3C格子の列見出しが両列とも`I3C_RM=0`**（原典の誤植） | 2列 | 資料 | 記録のみ。pin表の`I3C_SCL_1`が正。誤植への歯止めを実装 |
+| F-44 | CH32X035 EVTヘッダの**`OPA_CTLR2_CMP_LOCK`のmaskが`0x2000`（bit13=PSEL3と同じ）**。RMはbit31 | 1 define | 資料 | 記録のみ（2026-08-25）。opa_cmp_registersでconflict表示。使うとCMP3の正入力選択を壊す |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | 🔧 2件実装・1件は設計を返す。下記 |
-| R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | 🔜 誤値修正（F-38/40/41→F-39/37）の後に着手。下記 |
+| R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | 🔧 1（flash_geometry）実装済み。2〜4は下記 |
 
 ### F-1 / F-4 pin表のsignal名が改行で分断される（修理済み）
 
@@ -1816,9 +1817,13 @@ TIM5=32bit の実バグを直した**（手書きの WIDE_TIMERS は TIM4 しか
 
 新規4件（依頼側の優先度順）:
 
-1. **flashの幾何** `[高]` — `family, page_erase_bytes, fast_page_bytes,
-   program_unit_bytes, zero_wait_note`。出所は EVT の `ch32*_flash.c` の define と RM。
-   consumer 側の手書きは 32 family ぶんの誤記リスク
+1. **flashの幾何** `[高]` — ✅ `tables/flash_geometry.csv` を新設（2026-08-25）。
+   出所は EVT driver の `@brief`（define ではなく関数コメントに寸法がある）と
+   RM の闪存章の本文で、両方を突き合わせた。12 family中11が confirmed、
+   CH32V103 の fast_program が conflict（EVT コメント 256B vs RM 128B。RM が正）。
+   依頼の `program_unit_bytes` は `program_word`（word/halfword の直接書き込みが
+   あるか）と `fast_program_bytes` に分けた——X035/L103/M030/V006/V205 は
+   快速ページ経由のみ。CH32H417 は flash モードで幾何が変わる（note 列）
 2. **CMP/OPAのレジスタ表** `[高]` — systick.csv と同じ粒度で
    enable / 入力select / 出力読み出しbit / PGA gain のフィールド配置のみ。
    まず X035（CMP1-3+OPA）・M030（CMP1-3）・L103・V00x

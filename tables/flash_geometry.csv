@@ -1,0 +1,13 @@
+family,page_erase_bytes,fast_erase_bytes,fast_program_bytes,block_erase_bytes,program_word,zero_wait_note,note,#,confidence,basis
+CH32H417,4096,,256,32768,1,zero-wait execution loads Code FLASH into RAM_CODE (Link.ld); flash_bytes is the non-zero-wait Code FLASH total,"dual flash mode (FLASH_CFGR0 bit28): page 8K, block 64K",#,confirmed,evt(ch32h417_flash.c)+rm(CH32H417RM.PDF)
+CH32L103,2048,256,256,32768,,,,#,confirmed,evt(ch32l103_flash.c)+rm(CH32L103RM.PDF)
+CH32M030,1024,128,128,,,,,#,confirmed,evt(ch32m030_flash.c)+rm(CH32M030RM.PDF)
+CH32V003,1024,64,64,,1,,,#,confirmed,evt(ch32v00x_flash.c)+rm(CH32V003RM.PDF)
+CH32V006,1024,256,256,32768,,,,#,confirmed,evt(ch32v00X_flash.c)+rm(CH32V00XRM.PDF)
+CH32V103,1024,128,128,,1,,,#,conflict,evt(ch32v10x_flash.c)+rm(CH32xRM.PDF)+!evt-comment:fast_program_bytes(=256)
+CH32V205,2048,256,256,65536,,,,#,confirmed,evt(ch32v205_flash.c)+rm(CH32V205RM.PDF)
+CH32V20x,4096,256,256,32768,1,zero-wait region is set by option byte (memory_configs.csv),,#,confirmed,evt(ch32v20x_flash.c)+rm(CH32FV2x_V3xRM.PDF)
+CH32V307,4096,256,256,32768,1,zero-wait region is set by option byte (memory_configs.csv); products.flash_bytes is the zero-wait region; total is product_attributes code_flash_bytes,,#,confirmed,evt(ch32v30x_flash.c)+rm(CH32FV2x_V3xRM.PDF)
+CH32V407,4096,,256,32768,1,zero-wait region is set by option byte (memory_configs.csv),,#,confirmed,evt(ch32v4x7_flash.c)+rm(CH32V407RM.PDF)
+CH32X035,1024,256,256,32768,,,,#,confirmed,evt(ch32x035_flash.c)+rm(CH32X035RM.PDF)
+CH32X315,4096,,256,32768,1,products.flash_bytes is the zero-wait region; total is product_attributes code_flash_bytes,,#,confirmed,evt(ch32x3x5_flash.c)+rm(CH32X315RM.PDF)

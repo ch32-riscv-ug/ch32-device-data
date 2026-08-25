@@ -127,7 +127,9 @@ def main() -> int:
                       "clock_symbols", "clock_init", "evt_variants", "systick",
                       "memory_configs", "pin_alternate", "interrupts",
                       "memory_map", "features", "sources", "eval_boards",
-                      "feature_tags", "pin_roles", "timers")}
+                      "feature_tags", "pin_roles", "timers", "flash_geometry",
+                      "opa_cmp_registers", "clock_enables", "adc_internal",
+                      "usbpd_plumbing")}
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -204,6 +206,64 @@ def main() -> int:
         bad.append(f"pin_roles: pin_functions にない行が {len(invented)} 件ある"
                    f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
     bad += pin_role_coverage(t)
+
+    # flash_geometry は family ごと1行。参照と、幾何の常識的な不変量
+    # （fast page は標準 page より小さい・2の冪）を見る。
+    for r in t["flash_geometry"]:
+        check("flash_geometry", r["family"], r["family"], families, "families")
+        for column in ("page_erase_bytes", "fast_erase_bytes",
+                       "fast_program_bytes", "block_erase_bytes"):
+            value = r[column]
+            if value and (not value.isdigit() or int(value) & (int(value) - 1)):
+                bad.append(f"flash_geometry: {r['family']} の {column}={value!r} が"
+                           "2の冪でない")
+        if (r["page_erase_bytes"] and r["fast_erase_bytes"]
+                and int(r["fast_erase_bytes"]) >= int(r["page_erase_bytes"])):
+            bad.append(f"flash_geometry: {r['family']} の fast_erase が標準 page 以上")
+
+    # opa_cmp_registers は EVT header の構造体＋bit define。address が memory_map の
+    # block base と整合すること（base + offset）、mask と bits が同じことを言う
+    # ことを見る。
+    block_base = {(r["family"], r["region"]): int(r["base_address"], 16)
+                  for r in t["memory_map"] if r["kind"] == "peripheral"}
+    for r in t["opa_cmp_registers"]:
+        check("opa_cmp_registers", r["field"], r["family"], families, "families")
+        base = block_base.get((r["family"], r["block"]))
+        if base is not None and r["address"]:
+            if int(r["address"], 16) != base + int(r["offset"], 16):
+                bad.append(f"opa_cmp_registers: {r['family']} {r['block']}.{r['register']} の "
+                           f"address {r['address']} が memory_map の base+offset と合わない")
+        mask = int(r["mask"], 16)
+        if r["bits"]:
+            hi, _, lo = r["bits"].partition(":")
+            lo = lo or hi
+            expected = ((1 << (int(hi) + 1)) - 1) ^ ((1 << int(lo)) - 1)
+            if expected != mask:
+                bad.append(f"opa_cmp_registers: {r['family']} {r['register']}.{r['field']} の "
+                           f"bits {r['bits']} と mask {r['mask']} が合わない")
+
+    # clock_enables: family と、RCC の base + offset が memory_map と整合すること。
+    rcc_base = {r["family"]: int(r["base_address"], 16) for r in t["memory_map"]
+                if r["kind"] == "peripheral" and r["region"] == "RCC"}
+    for r in t["clock_enables"]:
+        check("clock_enables", r["macro"], r["family"], families, "families")
+        base = rcc_base.get(r["family"])
+        if base is not None and r["address"] and int(r["address"], 16) != base + int(r["offset"], 16):
+            bad.append(f"clock_enables: {r['family']} {r['register']} の address が "
+                       "memory_map の RCC base+offset と合わない")
+    # adc_internal: family と、チャネル番号が数であること。
+    for r in t["adc_internal"]:
+        check("adc_internal", r["source"], r["family"], families, "families")
+        if r["channel"] and not r["channel"].isdigit():
+            bad.append(f"adc_internal: {r['family']} {r['source']} の channel が数でない")
+    # usbpd_plumbing: clock_enables の USBPD 行と一致すること。
+    enable_bits = {(r["family"], r["peripheral"]): (r["register"], r["bit"])
+                   for r in t["clock_enables"]}
+    for r in t["usbpd_plumbing"]:
+        check("usbpd_plumbing", r["peripheral"], r["family"], families, "families")
+        if enable_bits.get((r["family"], r["peripheral"])) != (r["rcc_register"], r["rcc_bit"]):
+            bad.append(f"usbpd_plumbing: {r['family']} {r['peripheral']} の RCC が "
+                       "clock_enables と合わない")
 
     # timers.csv は RM の register 見出しから読む。**周辺として実在すること**と、
     # 更新割り込みが interrupts.csv にあることを見る。

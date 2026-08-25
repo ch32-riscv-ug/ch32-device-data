@@ -33,7 +33,12 @@ families.csv        12行   ファミリー一覧（mirror repository = 文書�
   interrupts.csv          791行  割り込みベクタ表（family×番号。variantで入れ替わる分はcondition付き）
   memory_map.csv          797行  アドレス空間の地図（FLASH/SRAM/OB・バス・周辺のベース番地）
   features.csv            397行  familyが持つ周辺の一覧（datasheetの機能説明章の節見出し）
-  timers.csv               63行  タイマ1つずつの素性（**カウンタ幅**・種類・チャネル数・相補出力・更新割り込み）
+  timers.csv               67行  タイマ1つずつの素性（**カウンタ幅**・種類・チャネル数・相補出力・更新割り込み）
+  flash_geometry.csv       12行  flashの消去単位・書き込み粒度（標準/快速ページ・ブロック・word書き込みの有無）
+  opa_cmp_registers.csv   264行  OPA/CMPのレジスタとフィールド配置（enable・入力select・出力・gain。EVTヘッダ×RM照合）
+  clock_enables.csv       429行  周辺クロックのenable bit（family×peripheral→PCENRレジスタとbit。EVT rcc.h×RM照合）
+  adc_internal.csv         19行  ADC内部チャネル（温度センサ・VREFINT・VDD/2のチャネル番号・換算定数・サンプル時間）
+  usbpd_plumbing.csv       24行  USBPDの配管（RCC enable bit＋PHY設定bitの所在。family で置き場所が違う）
   systick.csv              53行  SysTickのregister配置（family×block。CH32V103だけ形が違う）
   link_firmware.csv        10行  WCH-Link系デバッガのファームウェア一覧（sha256・取得元）※版番号は未解決
   eval_boards.csv         117行  評価ボードの資料・回路図・型番ごとの板（EVT/PUB/から）
@@ -204,6 +209,82 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 > 注：32位的TIM5_CNT仅适用于型号为CH32F20x_D8W、CH32V20x_D8、CH32V20x_D8W系列的产品，其他系列芯片的TIM5_CNT为16位。
 
 と書きます。名指しされたmacroを`condition`に置き（`interrupts.csv`と同じ持ち方）、`confidence`は`varies-by-package`。**同じRMを共有する別familyがそのvariantを持たない場合は`conflict`**にします——CH32V307はCH32V20xとRMを共有しますが注のvariantを持たないので、32bitと言い切れません。
+
+### `flash_geometry.csv`
+
+**低レベルflash APIの前提**です。`products.csv`は容量しか持たず、消去単位と書き込み粒度はfamilyごとに違います。
+
+| 列 | 意味 |
+|---|---|
+| `page_erase_bytes` | 標準ページ消去の単位（1K/2K/4K） |
+| `fast_erase_bytes` | 快速ページ消去の単位（64B/128B/256B）。V407/X315/H417は**per-pageの快速消去を持たず**ブロック消去のみ（空） |
+| `fast_program_bytes` | 快速ページ書き込みの単位 |
+| `block_erase_bytes` | 快速ブロック消去の単位（32K。V205は64K） |
+| `program_word` | `FLASH_ProgramWord`/`ProgramHalfWord`がdriverにあるか。**空＝快速ページ経由のみ**（L103/M030/V006/V205/X035） |
+| `zero_wait_note` | `flash_bytes`（零等待領域）と総容量の関係。option byteで動くfamilyは`memory_configs.csv`、総容量は`product_attributes`の`code_flash_bytes`を指す |
+| `note` | モード依存。CH32H417は`FLASH_CFGR0` bit28（dual flash mode）でページ8K・ブロック64Kになる。列の値はsingle mode |
+
+出所は**EVTのflash driverの`@brief`**（`page size 4KB`・`1page = 256Byte`）と**RMの闪存章の本文**（`标准页（1K字节）`・`快速编程按页（128字节）`）の2つで、突き合わせて確度を決めます。**実際に食い違いが1件**あります——CH32V103のdriverは`ProgramPage_Fast ... 256Byte`と書きますが、RMは`快速编程按页（128字节）`、同じdriverの消去側も128B、`ROM_ERASE`の引数条件も`StartAddr%128 == 0`。EVTコメントの写し間違いと判断して値は128、`conflict`で両論を`basis`に残しています。
+
+### `opa_cmp_registers.csv`
+
+**コンパレータ/OPAクラスの前提**です。baseは`memory_map.csv`、入力padは`pin_roles.csv`が持つので、足りないのは**フィールドの配置**——enable・入力select・出力・gain。
+
+**blockの置き方がfamilyごとに違い、それがこの表の要る理由です。**
+
+| family | 置き場所 |
+|---|---|
+| X035 / L103 / V006 | OPA block。`CTLR1`がOPA、`CTLR2`がCMP（同じblock） |
+| M030 | OPA blockの中に`CMP_CTLR`/`CMP_STATR`（QII/ISPと同居） |
+| V205 / H417 | OPA blockに`OPA_CFGR1`/`CMP_CTLR`…と名前を全部書く |
+| V30x / V407 | OPA blockは`CR` 1本 |
+| V003 | OPAは**`EXTEN_CTR`のbit16-18**（blockを持たない） |
+
+`unit`列が**そのレジスタがOPAのものかCMPのものか**を言います。RMの見出しは`OPA控制寄存器 2（OPA_CTLR2）`としか書かないので、フィールドの説明文（「使能比较器CMP1」）の多数決で決めています。決まらなければ空。
+
+出所はEVTヘッダの構造体（配置）とbit define（`OPA_CTLR2_EN1 ((uint32_t)0x00000001)`）で、**RMのレジスタ表と突き合わせ**ます。bit位置が一致すればconfirmed。**食い違いが3件**あり、いずれもEVTヘッダ側の誤りと判断できます——CH32X035の`OPA_CTLR2_CMP_LOCK`は`0x2000`（bit13＝`PSEL3`と同じ）と書かれていますがRMはbit31で、**ヘッダの値で書くとCMP3の正入力選択を壊します**（F-44）。L103の`ITRIMN`/`ITRIMP`はヘッダ5bit・RM6bit。
+
+`purpose`はfield名の綴りから機械的に付けます（`EN`→enable、`PSEL`→positive input select…）。名乗っていないものは空です。多bit fieldの値の列挙（`BKIN_CFG_0`/`_1`）はfieldではないので載せません。OPA/CMPのbit defineを持たないfamily（V20x・V103・X315）は行がありません。
+
+### `clock_enables.csv`
+
+**family × peripheral → どのRCCレジスタの何bitか。** consumer側が`CH32_RCC_APB1_TIM4`のようなdefineをfamilyごとに手書きしていたものを、全peripheral分揃えたものです。
+
+出所はEVTの`ch32*_rcc.h`——`RCC_<bus>PeriphClockCmd()`に渡す定数がperipheralごとのbitで、**busの名前がレジスタを言います**（`RCC_AHBPeriph_USBPD`→`RCC->AHBPCENR`）。busの呼び名はfamilyで違います（AHB/APB1/APB2、HB/PB1/PB2、HB/HB1/HB2）。`RCC_<bus>PeriphClockCmd`が`RCC-><bus>PCENR`へ書くことは8 familyのrcc.cで確かめ、例外はありません。
+
+RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行中370行がconfirmed、conflict 0**。referenceの59行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
+
+### `adc_internal.csv`
+
+**`temperatureRead()`相当のAPIの前提**です。温度センサと内部参考電圧が**ADCのどのチャネルか**はfamilyで違い、温度センサを持たないfamilyもあります（V003/V006/M030/X035/X315は`vrefint`行のみ）。
+
+| 列 | 意味 |
+|---|---|
+| `source` | `temperature_sensor` / `vrefint` / `vdd_half` |
+| `channel` | ADC_INの番号 |
+| `sample_time` / `sample_time_unit` | 読むときに必要なサンプル時間。**単位がfamilyで違う**（`us`または`adc_cycles`=ADCクロック周期数）ので揃えず両方持つ。`sample_clock_mhz`は`us`のときの条件 |
+| `v25_mv`（min/max） | 25℃での温度センサ出力 |
+| `avg_slope_uv_c`（min/max） | 平均傾き（負温度係数。datasheetはmV/℃、ここはuV/℃） |
+| `vrefint_mv`（min/max） | 内部参考電圧 |
+| `temp_range_c` / `temp_error_c` | 測定範囲・誤差 |
+
+出所はdatasheetの散文（「温度传感器在内部被连接到IN16输入通道上」）と電気的特性の表（`温度传感器特性`・`内置参考电压`）。英語版に同じ表があるので数値が一致すればconfirmed。**V003とX035はdatasheetがチャネル番号を書かず、RMのADC章が書く**（`连接ADC_IN8通道`/`ADC_IN15`）ので、そこはRMから取って`basis`に書いています。
+
+**conflictはzh/enの食い違いそのもの**です。CH32V20x/V307のAvg_Slope最大値はzh 4.8 / en 4.7 mV/℃。
+
+### `usbpd_plumbing.csv`
+
+**X035以外のseriesへPDを広げる前提**です。足りなかったのは**RCCのenable bit**（`clock_enables.csv`のUSBPD行）と**PHY設定bitの所在**で、後者はfamilyで置き場所が違います。
+
+| family | PHY設定bit |
+|---|---|
+| X035 | `AFIO->CTLR` の `USBPD_PHY_V33`(bit8) / `USBPD_IN_HVT`(bit9) / `UDP_PUE` … |
+| L103 / V205 | `AFIO->CR` の `USBPD_IN_HVT`(bit9) / `UDP_BC_*` |
+| X315 | `AFIO->CR` の `USBPDHVT`(bit0) / `USBPDRISE`(bit2:1) |
+| H417 | `AFIO->PCFR1` の `USBPD_CC_HVT`(bit20) |
+| M030 | `EXTEN->EXTEN_CTLR0` の `USBPD0/1_CC_REF` / `CC_HVT` / `LVE_T`（PDが2つ） |
+
+1行が1つのPHY fieldで、RCC側の列は行ごとに繰り返します。出所はEVTヘッダ（define名がレジスタを名乗るか、名乗らないものは直前のbanner「Bit definition for EXTEN_CTLR0 register」）で、RMのレジスタ表とbit位置を突き合わせています。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
@@ -767,6 +848,11 @@ uv run tools/build_interrupts.py --out tables                # interrupts（EVT�
 uv run tools/build_memory_map.py --out tables                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run tools/build_features.py --out tables                  # features（datasheetの機能説明章から・数分かかる）
 uv run tools/build_timers.py --out tables                    # timers（RMのTIMx_CNT見出しから・数分かかる）
+uv run tools/build_flash_geometry.py --out tables            # flash_geometry（EVTのflash driver＋RMの闪存章）
+uv run tools/build_opa_cmp_registers.py --out tables         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
+uv run tools/build_clock_enables.py --out tables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
+uv run tools/build_adc_internal.py --out tables              # adc_internal（datasheet両言語の散文と電気的特性表）
+uv run tools/build_usbpd_plumbing.py --out tables            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
 uv run tools/build_eval_boards.py --out tables                # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py --out tables               # feature_tags（features + 比較表から。PDF不要）
 uv run tools/build_sources.py --out tables                   # sources（読んだmirrorの版。**生成の一式の中で回す**）

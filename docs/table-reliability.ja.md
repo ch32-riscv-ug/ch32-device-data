@@ -51,6 +51,7 @@
 | remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。**F-34（reset_value空欄45行）・F-35（TIM5CH4のvalid_values欠け）** | 🔵 |
 | remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
+| flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
 
 ### EVT から（単一出所・テキスト写し）
 
