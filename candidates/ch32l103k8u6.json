@@ -67,11 +67,12 @@
       ],
       "valid_values": [
         0,
+        1,
         2,
         3
       ],
-      "_valid_values_source": "datasheet pin表",
-      "_reset_value_missing": true
+      "_valid_values_source": "datasheet pin表+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-i2c1-rm",
@@ -93,7 +94,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -115,7 +116,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -139,7 +140,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -174,7 +175,7 @@
         5,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "_values_only_from_evt": [
         7
       ],
@@ -212,7 +213,7 @@
         5,
         7
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -234,7 +235,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -252,7 +253,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -282,7 +283,7 @@
         4,
         5
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -310,7 +311,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -337,8 +338,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-usart4-rm",
@@ -355,7 +356,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     }
   ],

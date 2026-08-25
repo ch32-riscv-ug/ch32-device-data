@@ -123,11 +123,32 @@ def norm_symbol(cell):
     return sym
 
 
+# 条件欄の添字。`f_S`・`V_DD33`・`T_A` の添字は PDF の文字層で別の行になり、
+# 改行を空白で繋ぐと `f > 1MHz S` / `V ≥ 3V DD33` / `T = Ambient A temperature`
+# と**孤立した大文字の語**になる（worklist の F-36）。この表に出る添字は
+# 数えられるほどしか無いので、孤立したそれを、手前の裸の記号（f / V / T / I が
+# 比較演算子の前に単独で立っている所）へ戻す。
+SUBSCRIPTS = ("DD33", "DDIO", "DDA", "DD", "SS", "IO", "REF", "A", "S")
+BARE_SYMBOL = re.compile(r"(?<![\w_])([fVTI])(?=\s*[=≥≤<>＝~～])")
+
+
+def attach_subscript(text: str) -> str:
+    tokens = text.split(" ")
+    for i, token in enumerate(tokens):
+        if token in SUBSCRIPTS and i > 0:
+            head = " ".join(tokens[:i])
+            m = BARE_SYMBOL.search(head)
+            if m:
+                head = head[:m.start(1)] + f"{m.group(1)}_{token}" + head[m.end(1):]
+                return attach_subscript(" ".join([head] + tokens[i + 1:]))
+    return text
+
+
 def norm_text(cell):
     text = re.sub(r"\s+", " ", (cell or "").replace("\n", " ")).strip()
     for pattern, repl in TEXT_REPAIRS:
         text = pattern.sub(repl, text)
-    return text
+    return attach_subscript(text)
 
 
 def norm_value(cell):

@@ -46,7 +46,18 @@ REGISTER_IN_HEADING = re.compile(r"[(\uff08]([A-Z][A-Za-z0-9_]*)[)\uff09]")
 BIT_RANGE = re.compile(r"^\[(\d+):(\d+)\]$")
 BIT_SINGLE = re.compile(r"^(\d+)$")
 FIELD_NAME = re.compile(r"^([A-Za-z][A-Za-z0-9_]*)(?:\[\d+:\d+\])?$")
-RESET = re.compile(r"^(0x[0-9A-Fa-f]+|\d+)$")
+# 復位値の書き方は3通り。`0x0`（16進）・`0`（10進）・**`00b`/`000b`（2進、b付き）**。
+# 2進を認めていなかったので、多bit field の復位値が 45 行で空欄になっていた
+# （CH32V30x の PCFR2 の USART6〜8、CH32H417 の PCFR1 全部——worklist の F-34）。
+RESET = re.compile(r"^(?:(?P<hex>0x[0-9A-Fa-f]+)|(?P<bin>[01]+)b|(?P<dec>\d+))$")
+
+
+def parse_reset(found: "re.Match[str]") -> int:
+    if found.group("hex"):
+        return int(found.group("hex"), 16)
+    if found.group("bin"):
+        return int(found.group("bin"), 2)
+    return int(found.group("dec"))
 
 # Routing written into the description instead of a grid: CH32X035 states
 # "001: Mapping (SCL/PA13, SDA/PA14)" and CH32M030 "000: Default mapping
@@ -159,7 +170,7 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
                     name = FIELD_NAME.match(row[layout["name"]].replace(" ", ""))
                     if not bits or not name or name.group(1).lower() == "reserved":
                         continue
-                    reset = RESET.match(row[layout["reset"]])
+                    reset = RESET.match(row[layout["reset"]].replace(" ", "").strip())
                     if not reset:
                         notes.append(
                             f"{register}.{name.group(1)}: reset値を読めず ({row[layout['reset']]!r})"
@@ -170,7 +181,7 @@ def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
                             "field": name.group(1),
                             "bit_offset": bits[0],
                             "bit_width": bits[1],
-                            "reset_value": int(reset.group(1), 0) if reset else None,
+                            "reset_value": parse_reset(reset) if reset else None,
                             "access": row[layout["access"]],
                             "description": (
                                 row[layout["description"]]
@@ -231,6 +242,26 @@ def routes_in(field: dict) -> list[dict]:
                             "_from_description": True,
                         }
                     )
+    return out
+
+
+# 説明文が列挙する値。`00：默认映射…；01：重映射…；1x：重映射…` / `0：…；1：…`。
+ENUMERATED = re.compile(r"(?:^|[\s;.])(?P<value>[01xX]{1,4})[:：]")
+
+
+def values_in(field: dict) -> set[int]:
+    """説明文が列挙している field の値（`x` は両方に展開）。
+
+    remap 格子に無い値でも説明文が定義していることがある——CH32V30x の
+    `TIM5CH4_RM` は格子を持たず、説明文が `1：重映射，…映射至LSI内部时钟` と
+    書く。pad に出ない経路なので `routes_in` は拾えず、valid_values が 0 だけに
+    なっていた（worklist の F-35）。
+    """
+    text = (field.get("description") or "").translate(FULLWIDTH)
+    out: set[int] = set()
+    for m in ENUMERATED.finditer(text):
+        for bits in _expand_bits(m.group("value").lower()):
+            out.add(int("".join(bits), 2))
     return out
 
 

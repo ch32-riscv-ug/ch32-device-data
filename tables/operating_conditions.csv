@@ -18,8 +18,8 @@ CH32H415;CH32H416;CH32H417,F_PLL_OUT,PLL multiplier output clock,,100,,600,MHz,#
 CH32H415;CH32H416;CH32H417,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32H417RM.PDF:zh(p.20)+CH32H417RM.PDF:en(p.26),CH32H417RM.PDF
 CH32H415;CH32H416;CH32H417,F_XI,Resonator frequency,,5,25,32,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_ADC,ADC clock frequency,,,14,80,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
-CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T = Ambient A temperature range as shown in Table 3-2-1,-2.2,,2.2,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.6,,1.6,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = Ambient temperature range as shown in Table 3-2-1,-2.2,,2.2,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_HSE,Duty Cycle,,,50,,%,#,reference,CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_HSI,Duty Cycle,,45,50,55,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_LSE,Duty Cycle,,,50,,%,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
@@ -57,8 +57,8 @@ CH32M007;CH32V007,F_XI,Resonator frequency,,3,24,32,MHz,#,confirmed,CH32V007DS0.
 CH32M007;CH32V007,V_DD,Output voltage of internal low-voltage regulator,,4.9,5,5.1,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.41),CH32V007DS0.PDF
 CH32M007;CH32V007,V_DD,Standard operating voltage,ADC not used,2.0,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
 CH32M007;CH32V007,V_DD,Standard operating voltage,ADC used,2.4,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
-CH32M007;CH32V007,V_DD,Supply voltage,f > 1MHz S,4.5,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
-CH32M007;CH32V007,V_DD,Supply voltage,f ≤ 1MHz S,2.4,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
+CH32M007;CH32V007,V_DD,Supply voltage,f_S > 1MHz,4.5,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
+CH32M007;CH32V007,V_DD,Supply voltage,f_S ≤ 1MHz,2.4,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~125℃,-2.2,,2.2,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-2.0,,2.0,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
@@ -71,7 +71,7 @@ CH32M030,F_HSI,Frequency (after calibration),,,8,,MHz,#,confirmed,CH32M030DS0.PD
 CH32M030,F_LSI,Frequency,,240,340,450,kHz,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,F_MAIN,System main frequency,,,,72,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.1)+CH32M030DS0.PDF:en(p.1),CH32M030DS0.PDF
 CH32M030,F_XI,Resonator frequency,,4,8,25,MHz,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
-CH32M030,F_max(IO)out,I/O pin output highest frequency,"CL = 50pF, V ≥ 3V DD33",,,30,MHz,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
+CH32M030,F_max(IO)out,I/O pin output highest frequency,"CL = 50pF, V_DD33 ≥ 3V",,,30,MHz,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,f_ADC,ADC clock frequency,,,,18,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.1,,2.1,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -40℃~85℃",-3,,3,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
@@ -85,8 +85,8 @@ CH32V002,F_LSI,Frequency,,90,128,172,KHz,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH
 CH32V002,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.1)+CH32V002DS0.PDF:en(p.1),CH32V002DS0.PDF
 CH32V002,V_DD,Standard operating voltage,ADC feature is not used,2.0,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
 CH32V002,V_DD,Standard operating voltage,Use the ADC feature,2.4,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
-CH32V002,V_DD,Supply voltage,f > 1MHz S,4.5,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
-CH32V002,V_DD,Supply voltage,f ≤ 1MHz S,2.4,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,V_DD,Supply voltage,f_S > 1MHz,4.5,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,V_DD,Supply voltage,f_S ≤ 1MHz,2.4,,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃～85℃,-2.2,,2.2,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃～70℃,-1.2,,1.6,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
@@ -100,9 +100,9 @@ CH32V003,F_OSC_IN,Resonator frequency,,4,24,25,MHz,#,confirmed,CH32V003DS0.PDF:z
 CH32V003,V_DD,Supply voltage,,2.8,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,V_DD,Standard operating voltage,ADC not used,2.7,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
 CH32V003,V_DD,Standard operating voltage,Use ADC (recommended),2.8,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
-CH32V003,f_ADC,ADC clock frequency,V = 2.8 to 5.5V DD,1,,6,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
-CH32V003,f_ADC,ADC clock frequency,V = 3.2 to 5.5V DD,1,,12,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
-CH32V003,f_ADC,ADC clock frequency,V = 4.5 to 5.5V DD,1,,24,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
+CH32V003,f_ADC,ADC clock frequency,V_DD = 2.8 to 5.5V,1,,6,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
+CH32V003,f_ADC,ADC clock frequency,V_DD = 3.2 to 5.5V,1,,12,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
+CH32V003,f_ADC,ADC clock frequency,V_DD = 4.5 to 5.5V,1,,24,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V004,ACC_HSI,Accuracy of HSI oscillator (after,"HSI_LP = 0,",-2.2,,2.2,%,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
 CH32V004,DuCy_HSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
 CH32V004,DuCy_LSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
@@ -113,10 +113,10 @@ CH32V004,F_HSI,Frequency (after calibration),HSI_LP = 1,30,42,58,KHz,#,confirmed
 CH32V004,F_LSI,Frequency,,90,128,172,KHz,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.1)+CH32V004DS0.PDF:en(p.1),CH32V004DS0.PDF
 CH32V004,F_XI,Resonator frequency,,3,24,32,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
-CH32V004,F_max(IO)out,Maximum frequency,"CL = 50pF, V = 2.7-5.5V DD",,,30,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.26),CH32V004DS0.PDF
+CH32V004,F_max(IO)out,Maximum frequency,"CL = 50pF, V_DD = 2.7-5.5V",,,30,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.26),CH32V004DS0.PDF
 CH32V004,V_DD,Standard operating voltage,,2.7,,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.18)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
-CH32V004,V_DD,Supply voltage,f > 1MHz S,4.5,,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
-CH32V004,V_DD,Supply voltage,f ≤ 1MHz S,2.7,,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
+CH32V004,V_DD,Supply voltage,f_S > 1MHz,4.5,,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
+CH32V004,V_DD,Supply voltage,f_S ≤ 1MHz,2.7,,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V005;CH32V006,ACC_HSI,Accuracy of HSI oscillator (after,"HSI_LP = 0, TA = -10℃~70℃",-2.0,,2.0,%,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
 CH32V005;CH32V006,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
@@ -130,8 +130,8 @@ CH32V005;CH32V006,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V006DS0
 CH32V005;CH32V006,F_XI,Resonator frequency,,3,24,32,MHz,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
 CH32V005;CH32V006,V_DD,Standard operating voltage,ADC feature is not used,2.0,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
 CH32V005;CH32V006,V_DD,Standard operating voltage,Use the ADC feature,2.4,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
-CH32V005;CH32V006,V_DD,Supply voltage,f > 1MHz S,4.5,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
-CH32V005;CH32V006,V_DD,Supply voltage,f ≤ 1MHz S,2.4,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
+CH32V005;CH32V006,V_DD,Supply voltage,f_S > 1MHz,4.5,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
+CH32V005;CH32V006,V_DD,Supply voltage,f_S ≤ 1MHz,2.4,,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V103,ACC_HSI,Accuracy of HSI oscillator,T_A = -40℃~85℃,-2.5,,2.5,%,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,ACC_HSI,Accuracy of HSI oscillator,T_A = 0℃~70℃,-1.8,,1.8,%,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
@@ -178,7 +178,7 @@ CH32V203,F_PLL_IN,PLL input clock,applied for V203RBT6,4,8,25,MHz,#,confirmed,CH
 CH32V203,F_PLL_OUT,PLL multiplier output clock,,18,,144,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,F_PLL_OUT,PLL multiplier output clock,applied for V203RBT6,40,,240,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.7)+CH32V203DS0.PDF:en(p.11),CH32V203DS0.PDF
-CH32V203,F_prog,Programming frequency(1),T = The working A environment temperature range shown in Table 4-2,,,60,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
+CH32V203,F_prog,Programming frequency(1),T_A = The working environment temperature range shown in Table 4-2,,,60,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,V_DD,Standard operating voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DD,Standard operating voltage,Use USB,3.0,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
@@ -250,7 +250,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,F_PLL_OUT,PLL multiplier output clock,,30,,1
 CH32V303;CH32V305;CH32V307;CH32V317,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.10)+CH32V20x_30xDS0.PDF:en(p.13),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,F_VCO,VCO output clock,,60,,150,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.60)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,F_VCO,VCO output clock,,60,,200,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.60)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
-CH32V303;CH32V305;CH32V307;CH32V317,F_prog,Programming frequency(1),T = Operating ambient A temperature range shown in Table 4-2,,,60,MHz,#,reference,CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,F_prog,Programming frequency(1),T_A = Operating ambient temperature range shown in Table 4-2,,,60,MHz,#,reference,CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_DD,Standard operating voltage,USB or ETH not used.,2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_DD,Standard operating voltage,Use USB or ETH,3.0,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
@@ -286,8 +286,8 @@ CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Enable USB or PD fu
 CH32X033;CH32X035,V_DD,Supply voltage,Performance may be reduced,2.5,,5.5,V,#,conflict,"CH32X035DS0.PDF:en(p.36)+!CH32X035DS0.PDF:zh(min=3.0,typ=5,max=5.3)",CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Supply voltage,Rated performance,3.0,5,5.3,V,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Supply voltage,Recommended not less than 2.5V,2,5,5.5,V,#,reference,CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
-CH32X033;CH32X035,f_ADC,ADC clock frequency,V < 3.2V DD,3,,6,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,f_ADC,ADC clock frequency,V ≥ 3.2V DD,3,,8,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD < 3.2V,3,,6,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD ≥ 3.2V,3,,8,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X305;CH32X315,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
 CH32X305;CH32X315,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.5,,1.8,%,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
 CH32X305;CH32X315,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF

@@ -60,7 +60,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -78,7 +78,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -96,7 +96,7 @@
         0,
         1
       ],
-      "_valid_values_source": "datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "datasheet pin表+EVTデコーダ+RM説明文",
       "_values_only_from_evt": [
         1
       ],
@@ -117,7 +117,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -135,7 +135,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -159,7 +159,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -183,8 +183,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-tim2-remap",
@@ -207,7 +207,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -231,7 +231,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -249,7 +249,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -267,7 +267,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -291,8 +291,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-usart1-remap",
@@ -315,7 +315,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0,
       "_split_registers": [
         "PCFR1",
@@ -337,7 +337,7 @@
         0,
         1
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -361,7 +361,7 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
       "reset_value": 0
     },
     {
@@ -385,8 +385,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+ヘッダ+EVTデコーダ+RM説明文",
+      "reset_value": 0
     }
   ],
   "pins": [

@@ -89,8 +89,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-uhsif-clk-remap",
@@ -113,8 +113,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
     },
     {
       "id": "afio-uhsif-port-remap",
@@ -137,8 +137,8 @@
         2,
         3
       ],
-      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ",
-      "_reset_value_missing": true
+      "_valid_values_source": "RM remap格子+datasheet pin表+EVTデコーダ+RM説明文",
+      "reset_value": 0
     }
   ],
   "pins": [

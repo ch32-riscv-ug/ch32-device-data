@@ -39,7 +39,7 @@
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
 | pins | 4,532 | confirmed 4,396 / ref 135 / conflict 1 | 結合・**共有lead数を形ごとに固定**・封装lead数 | F-24残り8行（結合でもない空欄）・F-31（lead欠け10型番）・F-32（V205の綴り `VVDD_IO_1`） | 🟡 |
 | pin_functions | 28,423 | confirmed 28,174 / ref 237 / conflict 12 | 結合・pins と結合 | F-6/7/8（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
-| operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36（条件文字列の下付き文字ずれ。値は検証12/12一致） | ✅ |
+| operating_conditions | 305 | confirmed 279 / ref 21 / conflict 5 | 結合 | F-36 は**修正済み**（条件欄の添字を戻した。値は検証 12/12 一致） | ✅ |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
 | memory_configs | 67 | **全行 conflict** | products と往復 | conflict は**意図した記録**: EVT ヘッダの `FLASH_OBR` フィールド幅（2bit）と RM 中文版（3bit）が食い違う。5通りの組合せに3bit要るので中文版が正、と basis に両論併記 | 🟡 |
 | errata | 21 | 列ごと | 結合・scan_errata で増分監視 | curated（人手）。両版のページ番号は照合済み | ✅ |
@@ -48,7 +48,7 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。**F-34（reset_value空欄45行）・F-35（TIM5CH4のvalid_values欠け）** | 🔵 |
+| remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた） | 🔵 |
 | remap_routes | 4,908 | 全行 reference | fields と結合・valid_values | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
 | flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
