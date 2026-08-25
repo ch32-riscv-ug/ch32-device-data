@@ -163,9 +163,13 @@ def join(
     reset_of: dict[str, int] = {}
     reg_bits: dict[tuple[str, str, str], set[int]] = collections.defaultdict(set)
     field_names: dict[str, str] = {}
+    # 説明文が列挙する値（`0：…；1：…映射至LSI`）。pad に出ない経路は格子にも
+    # pin 表にも現れないので、これが無いと valid_values から落ちる（F-35）。
+    enumerated_of: dict[str, set[int]] = collections.defaultdict(set)
     for f in reg_fields:
         key = canonical_field(f["field"])
         controller, _, register = f["register"].rpartition("_")
+        enumerated_of[key] |= extract_registers.values_in(f)
         if f["reset_value"] is not None:
             known = reset_of.get(key)
             if known is not None and known != f["reset_value"]:
@@ -579,7 +583,8 @@ def join(
             if s.get("_valid_values_enumerated") and not completed
             else set()
         )
-        found = grid | pins_say | header_says | evt
+        spelled = set(enumerated_of.get(key, ()))
+        found = grid | pins_say | header_says | evt | spelled
         limit = 1 << len(bits)
         over = sorted(v for v in found if v >= limit)
         if over:
@@ -592,7 +597,7 @@ def join(
             name
             for name, source in (
                 ("RM remap格子", grid), ("datasheet pin表", pins_say),
-                ("ヘッダ", header_says), ("EVTデコーダ", evt),
+                ("ヘッダ", header_says), ("EVTデコーダ", evt), ("RM説明文", spelled),
             )
             if source
         ) or "既定値のみ"
