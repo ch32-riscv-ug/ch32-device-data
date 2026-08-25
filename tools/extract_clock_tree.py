@@ -179,6 +179,11 @@ INIT_FUNCTION = re.compile(
     re.M | re.S)
 ANY_FUNCTION = re.compile(r"^(?:static\s+)?\w[\w\s*]*?\b(?P<name>\w+)\s*\(")
 NUMBER = re.compile(r"^(?:0[xX][0-9A-Fa-f]+|\d+)$")
+# `(1<<20)` — RMW の set がビット位置で書かれる。
+# （`SHIFT` は後方でヘッダ用に別定義があるので名前を分ける）
+RMW_SHIFT = re.compile(r"^(?P<base>\d+)\s*<<\s*(?P<by>\d+)$")
+# `#if defined(CH32V30x_D8C)` の macro。
+MACRO_NAME = re.compile(r"\b(CH32[A-Za-z0-9_]+)\b")
 # `while ((RCC->CTLR & RCC_HSIRDY) != RCC_HSIRDY)` -- the mask and the comparison
 # the body waits for. Both are needed; the comparison is kept verbatim rather
 # than interpreted, because what counts as "ready" is the vendor's statement.
@@ -424,14 +429,25 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
     """The ordered steps of SystemInit, plus every HSI trim load in the file.
 
     This is the one place order is recorded, and it is a transcription rather
-    than a decision: SystemInit is a straight line with no #if branches, and
-    `RCC->CTLR |= 1` has to precede clearing SW or the chip has no clock to run
-    on. The switching sequence proper is not here, because when to raise the
-    flash latency relative to the switch is a policy and this file is not one.
+    than a decision: `RCC->CTLR |= 1` has to precede clearing SW or the chip has
+    no clock to run on. The switching sequence proper is not here, because when
+    to raise the flash latency relative to the switch is a policy and this file
+    is not one.
 
     A `clear` step's value is the AND mask exactly as the source writes it --
     the bits to keep, not the bits to drop -- because that is what the vendor
     states and inverting it would be an interpretation.
+
+    **SystemInit は一直線とは限らない**（以前はそう決め打っていた——worklist の
+    F-39。原典検証で発覚）:
+
+    - CH32V30x は `#ifdef CH32V30x_D8C` / `#else` で手順が分岐する。落とすと
+      D8 系に D8C の3手順を混ぜて再生することになる。分岐は `condition` に
+      variant macro で書く（interrupts.csv と同じ。`!` は「定義されていない」）
+    - CH32V00X は `tmp = RCC->CTLR; tmp &= …; tmp |= …; RCC->CTLR = tmp;` と
+      **ローカル変数経由の read-modify-write** で書く。行ごとの直接代入しか
+      見ていなかったので、この4行が丸ごと落ちていた。演算はソースの順に
+      clear/set の手順として採り、最後の書き戻しは commit なので採らない
     """
     steps: list[dict] = []
 
@@ -442,19 +458,67 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
 
     found = INIT_FUNCTION.search(text)
     if found:
+        branch: list[str] = []      # 開いている #if の variant macro
+        seen: list[list[str]] = []  # #else が否定する枝
+        alias: dict[str, tuple[str, str]] = {}
+
+        def guarded(extra: str = "") -> str:
+            parts = [c for c in branch if c] + ([extra] if extra else [])
+            return "+".join(parts)
+
         for line in found.group("body").splitlines():
             bare = CAST.sub("", line)
+            directive = CPP.match(bare)
+            if directive:
+                kind = directive.group("directive")
+                macros = MACRO_NAME.findall(directive.group("condition") or "")
+                if kind in ("if", "ifdef", "ifndef"):
+                    branch.append("|".join(macros))
+                    seen.append(list(macros))
+                elif kind == "elif" and branch:
+                    branch[-1] = "|".join(macros)
+                    seen[-1].extend(macros)
+                elif kind == "else" and branch:
+                    branch[-1] = "+".join(f"!{m}" for m in (seen[-1] if seen else []))
+                elif kind == "endif" and branch:
+                    branch.pop()
+                    if seen:
+                        seen.pop()
+                continue
+            copy = ALIAS.match(bare)
+            if copy:
+                alias[copy.group("name")] = (copy.group("block"),
+                                             copy.group("register"))
+                continue
             write = WRITE.search(bare)
             if write:
                 operand = write.group("value").strip().strip("()~ ").strip()
                 value = number(operand)
                 if value is None:
+                    # `RCC->CTLR = tmp;` — RMW の書き戻し。演算は下で採っている。
                     continue
                 steps.append({
                     "function": "SystemInit",
                     "action": {"|=": "set", "&=": "clear", "=": "write"}[write.group("op")],
                     "register": f"{write.group('block')}->{write.group('register')}",
-                    "value": value, "condition": "", "source": "",
+                    "value": value, "condition": guarded(), "source": "",
+                })
+                continue
+            local = LOCAL_WRITE.match(bare)
+            if local and local.group("name") in alias:
+                operand = local.group("value").strip().strip("()~ ").strip()
+                value = number(operand)
+                if value is None and RMW_SHIFT.match(operand):
+                    m = RMW_SHIFT.match(operand)
+                    value = int(m.group("base")) << int(m.group("by"))
+                if value is None:
+                    continue
+                block, register = alias[local.group("name")]
+                steps.append({
+                    "function": "SystemInit",
+                    "action": {"|=": "set", "&=": "clear"}[local.group("op")],
+                    "register": f"{block}->{register}",
+                    "value": value, "condition": guarded(), "source": "",
                 })
                 continue
             poll = POLL.search(bare)
@@ -468,7 +532,7 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
                     "action": "poll",
                     "register": f"{poll.group('block')}->{poll.group('register')}",
                     "value": value,
-                    "condition": " ".join(test.group("compare").split()),
+                    "condition": guarded(" ".join(test.group("compare").split())),
                     "source": "",
                 })
 

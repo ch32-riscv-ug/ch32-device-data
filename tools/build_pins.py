@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -40,6 +41,8 @@ import pdfplumber  # noqa: E402
 
 import build_all  # noqa: E402
 import extract_pins  # noqa: E402
+
+REPO = Path(__file__).resolve().parent.parent
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
@@ -137,10 +140,16 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
                     # tolerance and analogue capability the kind flattens.
                     cell["pins"][(p["number"], p["pad"])] = (
                         p.get("kind") or "", p.get("_pin_type", ""))
-            for p in pins:
-                for f in p.get("functions", []):
-                    functions[(tkey, p["pad"])].add(
-                        (f.get("signal") or "", f.get("route") or ""))
+                # **機能は封装の列ごとに帰属させる。** 同じ pad が封装別の行に
+                # 分かれることがあり（CH32X035 の PC3 は QSOP28/TSSOP20 の行に
+                # だけ `RST` を持つ）、(表, pad) で union すると **その封装に
+                # 無い機能が全封装に付く**（worklist の F-40。原典検証で発覚）。
+                # `pins_for` は封装ごとに正しい行だけを返しているので、
+                # ここで潰さなければよい。
+                for p in pins:
+                    for f in p.get("functions", []):
+                        functions[(tkey, canon_variant(component), p["pad"])].add(
+                            (f.get("signal") or "", f.get("route") or ""))
     return columns, dict(functions), titles
 
 
@@ -163,9 +172,9 @@ def pair_leftovers(zh: dict, en: dict) -> dict[tuple, tuple]:
     return remap
 
 
-def merge_cells(zh: dict, en: dict) -> dict:
+def merge_cells(zh: dict, en: dict, remap: dict | None = None) -> dict:
     """Cross-edition judgement per (tkey, cvar): {(pin, pad): (kind, conf, basis)}."""
-    for old, new in pair_leftovers(zh, en).items():
+    for old, new in (pair_leftovers(zh, en) if remap is None else remap).items():
         en[new] = en.pop(old)
         en[new]["renamed_from"] = en[new]["variant"]
     merged: dict = {}
@@ -203,7 +212,7 @@ def merge_cells(zh: dict, en: dict) -> dict:
 
 
 def merge_function_sets(zh: dict, en: dict) -> dict:
-    """Cross-edition judgement per (tkey, pad): {(signal, route): (conf, basis)}."""
+    """Cross-edition judgement per (tkey, cvar, pad): {(signal, route): (conf, basis)}."""
     merged: dict = {}
     for key in set(zh) | set(en):
         zh_set, en_set = zh.get(key, set()), en.get(key, set())
@@ -311,6 +320,51 @@ def write_csv(path: Path, rows: list[dict], columns: list[str]) -> None:
         writer.writerows({**row, "#": "#"} for row in rows)
 
 
+def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
+    """RM の格子が pin 表の remap 値を訂正したものを、この表にも効かせる。
+
+    CH32V103 の pin 表は `TIM3_CH1_1` を PB4 と PC6 の**両方**に書くが、RM の
+    格子（表10-12）は PB4=2・PC6=3 で、値1はそもそも定義されていない
+    ——`TIM3_REMAP=1` と書いてもどちらの pad にも出ない（worklist の F-27）。
+    `build_candidate` は格子が同じ (signal, pad) を別の値で名指しするときだけ
+    格子を採り、candidates/ に `_value_from_grid` の印と pin 表の元の値を残す。
+
+    このツールは PDF を直接読むのでその判断を持っていない。**candidates を
+    読んで同じ訂正を適用する**（candidates が無い型番はそのまま——生成順は
+    build_all → build_pins。tables/README.ja.md の実行手順）。訂正した行は
+    両出所の食い違いなので confidence を conflict にし、basis に両論を残す。
+    """
+    corrections: dict[str, dict] = {}
+
+    def table_for(part: str) -> dict:
+        if part not in corrections:
+            found: dict = {}
+            path = REPO / "candidates" / f"{part.lower()}.json"
+            if path.exists():
+                data = json.loads(path.read_text(encoding="utf-8"))
+                for pin in data.get("pins", []):
+                    for fn in pin.get("functions", []):
+                        if fn.get("_value_from_grid"):
+                            found[(pin["pad"], fn["signal"],
+                                   f"remap-{fn['_value_in_pin_table']}")] = fn["route"]
+            corrections[part] = found
+        return corrections[part]
+
+    fixed = 0
+    for row in fn_rows:
+        route = table_for(row["part_number"]).get(
+            (row["pad"], row["signal"], row["route"]))
+        if route:
+            stated = row["route"]
+            row["route"] = route
+            row["confidence"] = "conflict"
+            row["basis"] = f"rm-remap-grid+!{row['basis']}(={stated})"
+            fixed += 1
+    if fixed:
+        print(f"RMの格子で remap 値を訂正: {fixed} 行", file=sys.stderr)
+    return fn_rows
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=Path("tables"))
@@ -331,8 +385,14 @@ def main() -> int:
             except Exception as exc:  # noqa: BLE001
                 print(f"{family}/{datasheet} {lang}: 読めません {exc}", file=sys.stderr)
                 editions[lang] = ({}, {}, {})
-        cells = merge_cells(editions["zh"][0], editions["en"][0])
-        functions = merge_function_sets(editions["zh"][1], editions["en"][1])
+        # 列の対応（zh LQFP64M ↔ en LQFP64）は封装ごとの機能にも同じに効く。
+        remap = pair_leftovers(editions["zh"][0], editions["en"][0])
+        en_functions = {
+            (key[0], remap.get((key[0], key[1]), (key[0], key[1]))[1], key[2])
+            if (key[0], key[1]) in remap else key: value
+            for key, value in editions["en"][1].items()}
+        cells = merge_cells(editions["zh"][0], editions["en"][0], remap)
+        functions = merge_function_sets(editions["zh"][1], en_functions)
         titles: dict = collections.defaultdict(list)
         for _, _, ed_titles in editions.values():
             for tkey, (_, title) in ed_titles.items():
@@ -356,7 +416,7 @@ def main() -> int:
                 })
             for pad in pads:
                 for (signal, route), (conf, basis) in \
-                        functions.get((key[0], pad), {}).items():
+                        functions.get((key[0], key[1], pad), {}).items():
                     fn_rows.append({
                         "part_number": part, "pad": pad,
                         "signal": signal, "route": route,
@@ -366,6 +426,7 @@ def main() -> int:
         print(f"{family}/{datasheet}: pins {len(pin_rows)} / functions {len(fn_rows)} 累計",
               file=sys.stderr)
 
+    fn_rows = apply_grid_corrections(fn_rows)
     pin_rows.sort(key=lambda r: (r["part_number"], pin_key(r["pin"]), r["pad"]))
     fn_rows.sort(key=lambda r: (r["part_number"], r["pad"], r["signal"], r["route"]))
     write_csv(args.out / "pins.csv", pin_rows, PIN_COLUMNS)

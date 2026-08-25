@@ -408,9 +408,11 @@ def join(
     # 格子は I2S3 の経路を書いていない——F-6）、「格子に無い＝無効」ではない。
     # 同じ (signal, pad) を**格子自身が別の値で名指ししている**ときだけ直します。
     grid_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
+    grid_pads_at: dict[tuple[str, int], set[str]] = collections.defaultdict(set)
     for r in routes:
         if r.get("_source") == "grid":
             grid_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
+            grid_pads_at[(canonical_signal(r["signal"]), r["value"])].add(r["pad"])
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
@@ -419,14 +421,27 @@ def join(
         says = grid_value_of.get((canonical_signal(fn["signal"]), pin["pad"]))
         if says and stated not in says and len(says) == 1:
             corrected = next(iter(says))
-            fn["_selector_value"] = corrected
-            fn["route"] = f"remap-{corrected}"
-            fn["_value_from_grid"] = True
-            fn["_value_in_pin_table"] = stated
-            notes.append(
-                f"[join] {pin['pad']} {fn['signal']}: pin表は値{stated}と書くが"
-                f"RMの格子はこのpadを値{corrected}に置く。格子を採った"
-            )
+            # **格子の誤植への歯止め。** CH32V407 の I3C 格子は列見出しを
+            # `I3C_RM=0  I3C_RM=0` と2列とも 0 に誤植していて、鵜呑みにすると
+            # pin 表の正しい値1を 0 に「訂正」してしまう。同じ (signal, 値) に
+            # **別の pad が既に居る**なら列が重複している証拠なので、訂正しない
+            # （1つの selector 値は 1 pad を選ぶ——それが remap の意味）。
+            others = grid_pads_at.get(
+                (canonical_signal(fn["signal"]), corrected), set()) - {pin["pad"]}
+            if others:
+                notes.append(
+                    f"[join] {pin['pad']} {fn['signal']}: 格子は値{corrected}と言うが"
+                    f"同じ値に {sorted(others)} も居る（列見出しの誤植の疑い）。"
+                    f"pin表の値{stated}を保った")
+            else:
+                fn["_selector_value"] = corrected
+                fn["route"] = f"remap-{corrected}"
+                fn["_value_from_grid"] = True
+                fn["_value_in_pin_table"] = stated
+                notes.append(
+                    f"[join] {pin['pad']} {fn['signal']}: pin表は値{stated}と書くが"
+                    f"RMの格子はこのpadを値{corrected}に置く。格子を採った"
+                )
         key, how = resolve(pin, fn, fn["_selector_value"])
         if key is None:
             fn["_unresolved_selector"] = True

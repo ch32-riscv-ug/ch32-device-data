@@ -661,6 +661,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-40 | `pin_functions`が**封装別の既定機能をunionで潰す**（X035 PC3のRSTが全封装に付く） | 余分2行 | ツール | 🔜 candidatesは正しい。`build_pins.read_edition`の(表,pad)単位union |
 | F-41 | **F-27の格子優先修正がpin_functions/pin_rolesに未反映**（build_pinsはPDF直読み） | V103 TIM3 12行 | ツール | 🔜 candidates/remap_routesには反映済み |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | 🔧 2件実装・1件は設計を返す。下記 |
+| R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | 🔜 誤値修正（F-38/40/41→F-39/37）の後に着手。下記 |
 
 ### F-1 / F-4 pin表のsignal名が改行で分断される（修理済み）
 
@@ -1804,6 +1805,34 @@ CH32V205 の2型番で綴りが `VIO_1` → `VVDD_IO_1` に悪化します。
 **直し方は分かっています**——基準サイズの文字が現れるたびに新しい名前が始まる、
 という規則（F-1 と同じ添字の話）。1セルに2つの pad 名が入るとき `pad` 列に
 どう持つかの判断が要るので、そこを決めてから直します。
+
+### R-26 consumerからの追加テーブル依頼（2026-08-25受領）
+
+timers.csv と pin_roles の port/pin は取り込まれ、**timers.csv が V208 の tone用
+TIM5=32bit の実バグを直した**（手書きの WIDE_TIMERS は TIM4 しか見ていなかった）
+との報告。preferred 印は consumer 側の方針変更で優先度下げ（急がない）。
+
+新規4件（依頼側の優先度順）:
+
+1. **flashの幾何** `[高]` — `family, page_erase_bytes, fast_page_bytes,
+   program_unit_bytes, zero_wait_note`。出所は EVT の `ch32*_flash.c` の define と RM。
+   consumer 側の手書きは 32 family ぶんの誤記リスク
+2. **CMP/OPAのレジスタ表** `[高]` — systick.csv と同じ粒度で
+   enable / 入力select / 出力読み出しbit / PGA gain のフィールド配置のみ。
+   まず X035（CMP1-3+OPA）・M030（CMP1-3）・L103・V00x
+3. **ADC内部チャネル表** `[中]` — 温度センサ/Vrefint のチャネル番号・必要サンプル
+   時間・換算定数（V25・傾き・Vrefint mV）
+4. **USBPDの配管表** `[中]` — RCC の enable bit と PHY 設定 bit
+   （X035 は `AFIO_CTLR` の bit9/bit8）が L103/V205/X315/H417/M030 でどこか
+
+参考（低優先）: **周辺クロック enable bit の表**（family × peripheral →
+PCENR レジスタと bit）。EVT ヘッダの `RCC_*EN` define の機械写しで出所は最も
+きれいなので、上4件の後に滑り込ませる価値あり。
+
+**着手順**: 配信中の誤値（F-38 memory_map・F-41 V103 TIM3・F-40 X035 PC3）と
+不完全表現（F-39 clock_init・F-37 interrupts）を先に直してから 1→2→3→4。
+理由: 依頼4件のうち3件が memory_map / pin_roles を「既にあるもの」として前提に
+しており、その前提側の誤りを残したまま積むのは順序が逆。
 
 ## 利用状況（優先順位の根拠）
 

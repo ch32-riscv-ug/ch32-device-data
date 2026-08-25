@@ -35,7 +35,10 @@ import signal_vocabulary  # noqa: E402
 # A remap column is headed by the selector field and the value it takes, wrapped
 # over several lines: "TIM1_R\nM=000\nDefault\nmapping". A digit may be "x" where
 # the manual does not care about that bit (CH32H417 writes SDMMC_RM=1x).
-COLUMN_HEADER = re.compile(r"(?P<field>[A-Z0-9]+(?:_[A-Z0-9]+)*_RM)=(?P<value>[01xX]+)")
+# 名前の末尾に数字が付くことがある——2レジスタに割れた field の高位半分
+# （CH32V407 の `USART1_RM1`）。`_RM` だけを要求すると高位の行が見えず、
+# 列の値が低位ビットだけになる。
+COLUMN_HEADER = re.compile(r"(?P<field>[A-Z0-9]+(?:_[A-Z0-9]+)*_RM\d?)=(?P<value>[01xX]+)")
 # What the grid calls its first column. A continuation page does not repeat it.
 ROW_LABEL_HEADING = frozenset({"复用功能", "复用功能（1）", "复用功能(1)",
                                "Alternatefunction", "AlternateFunction", "AF"})
@@ -95,10 +98,36 @@ def read_header(row: list[str]) -> list[tuple[str, list[int]] | None] | None:
         if not text:
             columns.append(None)
             continue
-        m = COLUMN_HEADER.search(text)
-        if not m:
+        found = COLUMN_HEADER.findall(text)
+        if not found:
             return None
-        columns.append((m.group("field"), expand(m.group("value"))))
+        if len(found) == 1:
+            field, value = found[0]
+            columns.append((field, expand(value)))
+            continue
+        # **2つのレジスタに割れた field は、列見出しも2行になる。** CH32V407 の
+        # USART1 は選択値の高位が PCFR2:26（`USART1_RM1`）、低位が PCFR1:2
+        # （`USART1_RM`）で、格子の列見出しが
+        #
+        #     USART1_RM1=0   USART1_RM1=0   USART1_RM1=1   USART1_RM1=1
+        #     USART1_RM=0    USART1_RM=1    USART1_RM=0    USART1_RM=1
+        #
+        # と**両方の半分を書く**。最初の1つだけ読むと列の値が 0,0,1,1（または
+        # 0,1,0,1）になり、**PB15 が値2ではなく値0に置かれる**——remap_routes が
+        # このフィールドで元から誤っていた（worklist F-27 の続きで発覚）。
+        # 名前の末尾の数字がビット位置（`USART1_RM1` の 1 は bit1。
+        # `signal_vocabulary.canonical_field` が同じ規約を書いている）。
+        # 無印は bit0。位置ごとの値を合成する。
+        pieces = []
+        for field, value in found:
+            tail = re.search(r"(?:RM|REMAP)(\d*)$", field)
+            shift = int(tail.group(1)) if tail and tail.group(1) else 0
+            pieces.append((shift, expand(value)))
+        base = min(found, key=lambda fv: len(fv[0]))[0]
+        values = [0]
+        for shift, options in pieces:
+            values = [v | (o << shift) for v in values for o in options]
+        columns.append((base, sorted(set(values))))
     named = [c for c in columns if c]
     return columns if len(named) >= 2 else None
 
