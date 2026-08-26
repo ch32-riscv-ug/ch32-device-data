@@ -56,6 +56,7 @@
 | clock_enables | 429 | confirmed 370 / ref 59 | 結合・address=RCC base+offset | EVT rcc.h×RM。**conflict 0**。ref 59 は RM の field 名綴りが違う（`ETH_MAC_Rx` 等）だけで bit の不一致ではない | ✅ |
 | adc_internal | 19 | confirmed 13 / ref 4 / conflict 2 | 結合・channel が数 | datasheet zh/en 照合。conflict 2 = V20x/V307 の Avg_Slope 最大値が **zh 4.8 / en 4.7**（資料側の食い違い、F-46）。V003/X035 のチャネル番号は RM から | ✅ |
 | usbpd_plumbing | 13 | confirmed 11 / ref 2 | 結合・clock_enables と一致 | EVT ヘッダ×RM。ref 2 = M030 の LVE_T（RM に field 名が無い） | ✅ |
+| debug_data | 12 | confirmed 7 / ref 4 / missing 1 | 結合・番地の書式・data1=data0+4 | EVT debug.c の define × QingKe マニュアル hartinfo 表 × consumer の実測（R-27）。ref 4 は V3 系（マニュアルが値を固定しない）で EVT のみ。missing 1 = H417（EVT に define 無し。実測待ち） | 🟡 |
 | dma_requests | 650 | confirmed 577 / ref 73 | 結合・dma+channel か request_id の一方・variant が evt_variants の macro（印の読み `remap` は `index/dma` 側で検査） | RM の DMA 章の格子を **zh/en 両版で照合**（R-20 D-7、2026-08-26）。ref 73 = CH32V407（RM は zh のみ）。H417 は DMAMUX の番号表（channel 固定でない）。V006 の TIM3 は型番で割り当てが違う（脚注を note に）。資料の誤植 2件（V407 `13C`、H417 `I3X_RX`）は綴りを保って note | ✅ |
 
 ### EVT から（単一出所・テキスト写し）

@@ -47,7 +47,7 @@ served from GitHub Pages). There are no per-part copies -- they would only dupli
 Read: every table in `catalog/`, the combined tables in `index/`, and the evidence tables the
 evidence README marks *stable* (those copied from EVT headers: `interrupts`, `memory_map`,
 `clock_*`, `systick`, `evt_variants`, `clock_enables`, `pin_alternate`, `memory_configs`,
-`flash_geometry`, `adc_internal`). Other evidence tables may change shape. Pin by commit plus
+`flash_geometry`, `adc_internal`, `debug_data`). Other evidence tables may change shape. Pin by commit plus
 the sha256 of the files you read (or the single sha256 of `manifest.csv`). Column changes are
 recorded in [docs/worklist.ja.md](../docs/worklist.ja.md) and in this README.
 

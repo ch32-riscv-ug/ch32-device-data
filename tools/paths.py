@@ -43,7 +43,7 @@ EVIDENCE_TABLES = (
     "register_blocks", "registers", "register_fields", "dma_requests",
     "opa_cmp_registers", "clock_enables", "usbpd_plumbing",
     "interrupts", "memory_map", "systick", "clock_configs", "clock_prescalers",
-    "clock_sources", "clock_symbols", "clock_init", "evt_variants",
+    "clock_sources", "clock_symbols", "clock_init", "evt_variants", "debug_data",
 )
 
 # Evidence tables copied from EVT headers, whose names are already the machine
@@ -51,7 +51,7 @@ EVIDENCE_TABLES = (
 STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
                    "clock_prescalers", "clock_sources", "clock_symbols",
                    "clock_init", "evt_variants", "clock_enables", "pin_alternate",
-                   "memory_configs", "flash_geometry", "adc_internal")
+                   "memory_configs", "flash_geometry", "adc_internal", "debug_data")
 
 # Index tables: one combined file each (all parts / all families). People filter
 # them in the viewer (pins.html); CSV is for programs, so there are no per-part

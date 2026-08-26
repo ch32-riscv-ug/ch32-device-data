@@ -1,0 +1,13 @@
+family,core,dm_data0_addr,dm_data1_addr,#,confidence,basis,evt_file
+CH32H417,QingKe V5F + QingKe V3F,,,#,missing,manual:qingke-v3(dataaddr=read hartinfo)+manual:qingke-v5(dataaddr=read hartinfo),
+CH32L103,QingKe V4C,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c
+CH32M030,QingKe V3B,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/APPLICATION/Electric_Fan/Debug/debug.c)+3 more+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/APPLICATION/Electric_Fan/Debug/debug.c
+CH32V003,QingKe V2A,0xE00000F4,0xE00000F8,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v2(dataaddr=0x0f4)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
+CH32V006,QingKe V2C,0xE00000F4,0xE00000F8,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+2 more+manual:qingke-v2(dataaddr=0x0f4),EVT/EXAM/SRC/Debug/debug.c
+CH32V103,QingKe V3A,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v3(dataaddr=read hartinfo)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
+CH32V205,QingKe V3B,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/SRC/Debug/debug.c
+CH32V20x,QingKe V4B + QingKe V4C,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
+CH32V307,QingKe V4F,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380),EVT/EXAM/SRC/Debug/debug.c
+CH32V407,QingKe V3V,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c)+1 more+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c
+CH32X035,QingKe V4C,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
+CH32X315,QingKe V3F,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/ADC/ADC_ScanOut/Debug/debug.c)+2 more+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/ADC/ADC_ScanOut/Debug/debug.c
