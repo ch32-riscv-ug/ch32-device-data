@@ -2,7 +2,7 @@
 """OPA / CMP のレジスタとフィールド配置 → tables/opa_cmp_registers.csv
 
 **コンパレータ・OPA クラスの前提**（consumer の依頼 R-26-2）。base は
-`memory_map.csv`、入力 pad は `pin_roles.csv` が持っているので、足りないのは
+`memory_map.csv`、入力 pad は `index/pinout.csv` が持っているので、足りないのは
 **フィールドの配置だけ**——enable / 入力 select / 出力の読み出し bit / gain。
 
 **block の置き方が family ごとに違い、それがこの表の要る理由です。**
@@ -45,6 +45,8 @@ import extract_addresses  # noqa: E402
 import extract_registers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "block", "register", "unit", "offset", "address", "field", "bits",
@@ -202,11 +204,11 @@ def read_manual_fields(family_dir: Path) -> tuple[dict, dict, str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--family", help="1 family だけ")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
     if args.family:
         families = [f for f in families if f == args.family]
@@ -288,7 +290,7 @@ def main() -> int:
                 "basis": "+".join(basis),
             })
 
-    dest = args.out / "opa_cmp_registers.csv"
+    dest = paths.table("opa_cmp_registers", args.out)
     if args.family and dest.exists():
         # 1 family だけ回したときは他 family の行を残す（全 RM を読み直すと長い）。
         with dest.open(newline="", encoding="utf-8") as f:

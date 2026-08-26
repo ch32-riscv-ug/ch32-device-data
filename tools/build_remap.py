@@ -48,15 +48,18 @@ sys.path.insert(0, str(Path(__file__).parent))
 import signal_vocabulary  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
-CANDIDATES = REPO / "candidates"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
+CANDIDATES = paths.CANDIDATES
 
 SERIES = re.compile(r"^(CH32[A-Z]\d{3})")
 
 FIELD_COLUMNS = ["series", "selector", "controller", "register", "field",
                  "bits", "valid_values", "reset_value",
                  "#", "confidence", "basis"]
+# `peripheral`/`role`（語彙で揃えた読み）は索引 `index/routes.csv` が付ける
+# （tools/build_index.py）。ここは資料の綴り（signal・pad）だけ。
 ROUTE_COLUMNS = ["series", "selector", "value", "signal", "pad",
-                 "peripheral", "role",
                  "#", "confidence", "basis"]
 
 FIELD_BASIS = "candidates(evt-header+rm-register-table+rm-remap-grid:en)"
@@ -77,7 +80,7 @@ def bits_of(selector: dict) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--candidates", type=Path, default=CANDIDATES)
     args = ap.parse_args()
 
@@ -144,16 +147,10 @@ def main() -> int:
         row["confidence"] = "reference"
         row["basis"] = MANUAL_BASIS if row.pop("_from_manual") else FIELD_BASIS
     route_rows = []
-    undecided: dict[str, int] = {}
     for (s, sel, value, signal, pad) in sorted(routes):
-        pair = signal_vocabulary.split(signal)
-        if pair is None:
-            undecided[signal] = undecided.get(signal, 0) + 1
         route_rows.append(
             {"series": s, "selector": sel, "value": value, "signal": signal,
              "pad": pad,
-             "peripheral": pair[0] if pair else "",
-             "role": pair[1] if pair else "",
              "confidence": "reference",
              "basis": DEFAULT_BASIS if value == 0 else ROUTE_BASIS}
         )
@@ -164,28 +161,23 @@ def main() -> int:
         for r in manual_only:
             print(f"    {r['series']} {r['selector']:24} {r['bits']}", file=sys.stderr)
 
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.out:
+
+        args.out.mkdir(parents=True, exist_ok=True)
     for name, rows, columns in (("remap_fields.csv", field_rows, FIELD_COLUMNS),
                                 ("remap_routes.csv", route_rows, ROUTE_COLUMNS)):
-        with (args.out / name).open("w", encoding="utf-8", newline="") as out:
+        dest = paths.table(name.removesuffix(".csv"), args.out)
+        with dest.open("w", encoding="utf-8", newline="") as out:
             writer = csv.DictWriter(out, fieldnames=columns)
             writer.writeheader()
             writer.writerows({**row, "#": "#"} for row in rows)
-        print(f"{args.out}/{name}: {len(rows)} 行", file=sys.stderr)
+        print(f"{dest}: {len(rows)} 行", file=sys.stderr)
     defaults = sum(1 for r in route_rows if r["value"] == 0)
     print(f"  うち既定経路(value=0): {defaults} 行", file=sys.stderr)
     split = [r for r in field_rows if "|" in r["register"]]
     print(f"  registerをまたぐ分割field: {len(split)} selector", file=sys.stderr)
     for r in split:
         print(f"    - {r['series']} {r['selector']} {r['bits']}", file=sys.stderr)
-    if undecided:
-        total = sum(undecided.values())
-        print(
-            f"  peripheral/role を決められない signal: {len(undecided)} 種 {total} 行",
-            file=sys.stderr,
-        )
-        for signal, n in sorted(undecided.items(), key=lambda kv: -kv[1]):
-            print(f"    - {signal} ({n})", file=sys.stderr)
     orphans = {(r["series"], r["selector"]) for r in route_rows} \
         - {(r["series"], r["selector"]) for r in field_rows}
     for series, sel in sorted(orphans):

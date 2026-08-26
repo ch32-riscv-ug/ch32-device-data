@@ -8,7 +8,7 @@ consumer の R-20（レジスタマップ）の **機械的に集められる部
     register_blocks.csv    D-1  block（USART1）→ 型（USART）と base address
     registers.csv          D-3  型 × register → 構造体内の offset・幅・配列数
     register_fields.csv    D-4  register × bit define → bit 位置・mask・種類（field / 値）
-    register_layouts.csv   D-5  型 × layout key（構造体と define 名の集合のハッシュ）
+    index/register_layouts.csv   D-5  型 × layout key（構造体と define 名の集合のハッシュ）
 
 **header の作りで読み方が決まる。**
 
@@ -58,12 +58,14 @@ import extract_addresses  # noqa: E402
 import extract_registers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 BLOCK_COLUMNS = ["family", "block", "type", "layout", "base_address", "#", "confidence", "basis"]
 REGISTER_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
                     "rm_register", "rm_reset", "rm_address_check", "#", "confidence", "basis"]
-FIELD_COLUMNS = ["family", "register", "type", "member", "field", "kind", "of_field",
+FIELD_COLUMNS = ["family", "register", "type", "member", "field", "define", "kind", "of_field",
                  "bits", "mask", "value", "description", "rm_access", "rm_reset",
                  "#", "confidence", "basis"]
 LAYOUT_COLUMNS = ["family", "type", "layout", "registers", "fields", "size_bytes",
@@ -360,15 +362,15 @@ def field_key(name: str) -> str:
 
 
 def rm_fields(family_dir: Path, cache: Path | None) -> tuple[dict, str]:
-    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
+    manuals = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
         sorted(family_dir.glob("datasheet_en/*RM.PDF"))
-    if not paths:
+    if not manuals:
         return {}, ""
     cached = cache / f"{family_dir.name}.json" if cache else None
     if cached and cached.exists():
         fields = json.loads(cached.read_text(encoding="utf-8"))
     else:
-        fields, _ = extract_registers.extract(paths[0], None)
+        fields, _ = extract_registers.extract(manuals[0], None)
         if cached:
             cached.parent.mkdir(parents=True, exist_ok=True)
             cached.write_text(json.dumps(fields, ensure_ascii=False), encoding="utf-8")
@@ -379,7 +381,7 @@ def rm_fields(family_dir: Path, cache: Path | None) -> tuple[dict, str]:
         out.setdefault((rm_key(f["register"]), field_key(f["field"])), f)
     registers = {rm_key(f["register"]): f["register"] for f in fields}
     out["__registers__"] = registers
-    return out, paths[0].name
+    return out, manuals[0].name
 
 
 # ---------------------------------------------------------------- RM の絶対アドレス表
@@ -392,16 +394,16 @@ HEX32 = re.compile(r"^0x[0-9A-Fa-f]{8}$")
 
 def rm_addresses(family_dir: Path, cache: Path | None) -> tuple[list[dict], str]:
     """[{name, address, reset}] を RM の表から。ページ単位に読んで閉じる（メモリ）。"""
-    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
+    manuals = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
         sorted(family_dir.glob("datasheet_en/*RM.PDF"))
-    if not paths:
+    if not manuals:
         return [], ""
     cached = cache / f"{family_dir.name}.addr.json" if cache else None
     if cached and cached.exists():
-        return json.loads(cached.read_text(encoding="utf-8")), paths[0].name
+        return json.loads(cached.read_text(encoding="utf-8")), manuals[0].name
     import pdfplumber  # noqa: PLC0415
     rows: list[dict] = []
-    with pdfplumber.open(paths[0]) as pdf:
+    with pdfplumber.open(manuals[0]) as pdf:
         for page in pdf.pages:
             text = page.extract_text() or ""
             if "R32_" in text or "R16_" in text or "R8_" in text:
@@ -419,7 +421,7 @@ def rm_addresses(family_dir: Path, cache: Path | None) -> tuple[list[dict], str]
     if cached:
         cached.parent.mkdir(parents=True, exist_ok=True)
         cached.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
-    return rows, paths[0].name
+    return rows, manuals[0].name
 
 
 def locate(reg: str, offsets: dict[str, dict], block: str, block_name: str) -> list[tuple[str, int]]:
@@ -524,13 +526,13 @@ def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--rm-cache", type=Path, default=None)
     ap.add_argument("--family", action="append", default=None)
     ap.add_argument("--no-rm", action="store_true", help="RM を読まない（速い。全行 reference）")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
     if args.family:
         families = [x for x in families if x in set(args.family)]
@@ -696,7 +698,9 @@ def main() -> int:
                     "member": (f"{member['struct']}.{member['name']}"
                                + (f"[{int(member['index']) - 1}]" if member["index"] and member["count"] > 1 else "")
                                if member else ""),
-                    "field": fname, "kind": kind, "of_field": of_field,
+                    # `field` は読むための名前（型・register の接頭辞を落とした）、
+                    # `define` は EVT header の綴りそのまま——証拠へ戻る鍵。
+                    "field": fname, "define": name, "kind": kind, "of_field": of_field,
                     "bits": bits, "mask": f"{mask:#x}", "value": value,
                     "description": d["comment"], "rm_access": rm_access, "rm_reset": rm_reset,
                     "confidence": confidence, "basis": "+".join(basis),
@@ -710,9 +714,9 @@ def main() -> int:
                          + (" …" if len(missing) > 12 else ""))
 
     # 出力
-    def write(name: str, columns: list[str], rows: list[dict], key) -> None:
+    def write(dest: Path, columns: list[str], rows: list[dict], key) -> None:
         rows.sort(key=key)
-        dest = args.out / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
         if args.family:
             # 部分実行は既存の他 family の行を保つ
             try:
@@ -728,13 +732,13 @@ def main() -> int:
         tally = collections.Counter(r["confidence"] for r in rows)
         print(f"{dest}: {len(rows)} 行  {dict(tally)}", file=sys.stderr)
 
-    write("register_blocks.csv", BLOCK_COLUMNS, blocks_out,
+    write(paths.table("register_blocks", args.out), BLOCK_COLUMNS, blocks_out,
           lambda r: (r["family"], int(r["base_address"], 16), r["block"]))
-    write("registers.csv", REGISTER_COLUMNS, regs_out,
+    write(paths.table("registers", args.out), REGISTER_COLUMNS, regs_out,
           lambda r: (r["family"], r["type"], int(r["offset"], 16), r["register"]))
-    write("register_fields.csv", FIELD_COLUMNS, fields_out,
+    write(paths.table("register_fields", args.out), FIELD_COLUMNS, fields_out,
           lambda r: (r["family"], r["register"], int(r["mask"], 16), r["field"]))
-    write("register_layouts.csv", LAYOUT_COLUMNS, layouts_out,
+    write(paths.index("register_layouts", args.out), LAYOUT_COLUMNS, layouts_out,
           lambda r: (r["family"], r["type"]))
     for note in dict.fromkeys(notes):
         print(f"  - {note}", file=sys.stderr)

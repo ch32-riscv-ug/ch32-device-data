@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CH32 Pin Alternate Functions</title>
-<!-- Two views over tables/*.csv in this repository, chosen by what ?chip= names:
+<!-- Two views over catalog/, evidence/ and index/ in this repository, chosen by what ?chip= names:
        series view  (?chip=CH32V006)     - product comparison table for choosing a
                                            product, and the pad x function matrix
                                            without per-package noise
@@ -87,11 +87,11 @@ const FEATURE_ALIAS = { ART: "USART", UART: "USART", ADC: "ADC/DAC",
 const ROUTES = [["default", "default"], ["remap", "remap"], ["af", "AF"],
                 ["unstated", "unstated"]];
 // Where the debug and console pins sit by default.
-// **Matched on tables/pin_roles.csv, not on spellings.** The same role is
+// **Matched on index/pinout.csv, not on spellings.** The same role is
 // written four ways across the datasheets (USART1_TX / TX1 / UTX / UART_TX,
 // SWDIO / DIO), so a list of spellings here always misses some: this page
 // showed no SWD pins at all for CH32X033/X035, which write DIO and DCK.
-// pin_roles.csv is pin_functions.csv read through tools/signal_vocabulary.py,
+// pinout.csv is pins.csv x pin_functions.csv read through tools/signal_vocabulary.py,
 // so the spellings are already folded onto one (peripheral, role) pair.
 const DEFAULT_ROLES = [
   ["SWDIO", p => p === "SDI", r => r === "SWDIO"],
@@ -131,9 +131,10 @@ function parseCSV(text) {
   const head = rows.shift();
   return rows.map(r => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ""])));
 }
-const load = name => fetch("tables/" + name + ".csv")
+const load = (dir, name) => fetch(dir + "/" + name + ".csv")
   .then(r => { if (!r.ok) throw new Error(name + ": HTTP " + r.status); return r.text(); })
   .then(parseCSV);
+
 
 const state = {};
 const $ = id => document.getElementById(id);
@@ -331,8 +332,8 @@ function defaultsLine(partNames) {
   // USART instance -> pads, per role, so the line can say which USART it is.
   const found = DEFAULT_ROLES.map(() => new Map());
   for (const r of state.roles) {
-    if (r.part_number !== partNames[0]) continue;
-    if (r.routing !== "default" && r.routing !== "main") continue;
+    if (r.part_number !== partNames[0] || !r.peripheral) continue;
+    if (r.route !== "default" && r.route !== "main") continue;
     DEFAULT_ROLES.forEach(([_, wantPeripheral, wantRole], i) => {
       if (!wantPeripheral(r.peripheral) || !wantRole(r.role)) return;
       if (!found[i].has(r.peripheral)) found[i].set(r.peripheral, new Set());
@@ -393,9 +394,9 @@ function render() {
   history.replaceState(null, "", "?" + params.toString());
 }
 
-Promise.all([load("products"), load("pins"), load("pin_functions"),
-             load("product_attributes"), load("remap_fields"),
-             load("pin_roles")])
+Promise.all([load("catalog", "products"), load("evidence", "pins"),
+             load("evidence", "pin_functions"), load("evidence", "product_attributes"),
+             load("evidence", "remap_fields"), load("index", "pinout")])
 .then(([products, pins, fns, attrs, remap, roles]) => {
   Object.assign(state, { products, pins, fns, attrs, remap, roles });
   const series = [...new Set(products.map(p => p.series))].sort();

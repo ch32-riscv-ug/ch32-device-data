@@ -23,12 +23,22 @@ sys.path.insert(0, str(Path(__file__).parent))
 import signal_vocabulary  # noqa: E402
 
 
-def load(tables: Path, name: str) -> list[dict]:
-    with (tables / f"{name}.csv").open(encoding="utf-8") as f:
+import paths  # noqa: E402
+
+
+def load(tables: Path | None, name: str) -> list[dict]:
+    """catalog/evidence の表。``tables`` は試験用の上書きディレクトリ。"""
+    path = paths.table(name, tables)
+    with path.open(encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
-# `pin_roles` が語彙で覆えなかった signal。**目標は 0** で、ここに並んでいるのは
+def load_index(name: str) -> list[dict]:
+    with paths.index(name).open(encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+# 索引 `pinout` が語彙で覆えなかった signal。**目標は 0** で、ここに並んでいるのは
 # まだ埋まっていない穴の実測値。増えたら失敗させ、減らしたらこの表も一緒に減らす。
 #
 #   AETR / AETR2 / TIETR   CH32V003。ADCのトリガがADC2 fieldのどちらか資料が
@@ -43,6 +53,12 @@ def load(tables: Path, name: str) -> list[dict]:
 KNOWN_ROLE_GAPS: dict[str, int] = {}
 
 GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
+
+
+def build_index_grid(basis: str) -> str | None:
+    m = GRID_VALUE.search(basis)
+    return m.group("route") if m else None
 
 
 # 同じ lead 番号を複数の pad が持つ組の数。**目標は「資料のとおり」**で、
@@ -82,18 +98,16 @@ def shared_leads(t: dict) -> list[str]:
 
 
 def pin_role_coverage(t: dict) -> list[str]:
-    """`pin_roles` が覆えていない signal を、記録してある実測値と突き合わせる。
+    """索引 `pinout` が覆えていない signal を、記録してある実測値と突き合わせる。
 
     **数の閾値ではなく名前で持つ。** 「95%以上あればよい」にすると、片方が
     直って別の穴が開いても気付けない。名前で持てば、新しい綴りが増えたことも
     埋まったことも、どちらも同じ検査が言う。
     """
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    import build_pin_roles  # noqa: PLC0415
+    import build_index  # noqa: PLC0415
 
-    catalogue = {r["part_number"]: r for r in t["products"]}
-    kinds = {(r["part_number"], r["pad"]): r["kind"] for r in t["pins"]}
-    _, unresolved = build_pin_roles.roles(t["pin_functions"], catalogue, kinds)
+    _, unresolved = build_index.pinout_rows(t["products"], t["pins"], t["pin_functions"],
+                                            t["remap_routes"])
     found: dict[str, int] = {}
     for (_, signal), count in unresolved.items():
         found[signal] = found.get(signal, 0) + count
@@ -101,32 +115,93 @@ def pin_role_coverage(t: dict) -> list[str]:
     for signal in sorted(set(found) | set(KNOWN_ROLE_GAPS)):
         now, before = found.get(signal, 0), KNOWN_ROLE_GAPS.get(signal, 0)
         if now > before:
-            out.append(f"pin_roles: 語彙で覆えない {signal!r} が {before} 行から "
+            out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
                        f"{now} 行に増えた（tools/signal_vocabulary.py に規則を足すか"
                        "、抽出を直す）")
         elif now < before:
-            out.append(f"pin_roles: 語彙で覆えない {signal!r} が {before} 行から "
+            out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
                        f"{now} 行に減った——KNOWN_ROLE_GAPS を更新すること")
     return out
 
 
+def index_checks(t: dict) -> list[str]:
+    """索引は証拠から機械生成したもので、証拠に無い行が無いこと。manifest が中身と一致すること。
+
+    pinout の戻し方は main() にある（route だけ格子の値を採る行があるため）。
+    """
+    bad: list[str] = []
+    # routes ⊆ remap_routes
+    routes = {(r["series"], r["selector"], r["value"], r["signal"], r["pad"]) for r in t["remap_routes"]}
+    for r in t["index:routes"]:
+        if (r["series"], r["selector"], r["value"], r["signal"], r["pad"]) not in routes:
+            bad.append(f"routes: remap_routes にない行 {r['series']} {r['selector']} 値{r['value']} {r['signal']}")
+    # registers（索引）⊆ register_fields ∪ registers（証拠）
+    defines = {(r["family"], r["define"]) for r in t["register_fields"]}
+    regs = {(r["family"], r["type"], r["register"]) for r in t["registers"]}
+    for r in t["index:registers"]:
+        if r["define"]:
+            if (r["family"], r["define"]) not in defines:
+                bad.append(f"registers(index): register_fields にない define {r['family']} {r['define']}")
+        elif (r["family"], r["type"], r["register"]) not in regs:
+            bad.append(f"registers(index): registers にない {r['family']} {r['type']}.{r['register']}")
+    # register_map ⊆ register_blocks × registers、address = base + offset
+    base_of = {(r["family"], r["block"]): int(r["base_address"], 16) for r in t["register_blocks"]}
+    for r in t["index:register_map"]:
+        base = base_of.get((r["family"], r["block"]))
+        if base is None:
+            bad.append(f"register_map: register_blocks にない block {r['family']} {r['block']}")
+        elif r["register"] and (r["family"], r["type"], r["register"]) not in regs:
+            bad.append(f"register_map: registers にない {r['family']} {r['type']}.{r['register']}")
+        elif r["offset"] and int(r["address"], 16) != base + int(r["offset"], 16):
+            bad.append(f"register_map: {r['family']} {r['block']}.{r['register']} の address が base+offset でない")
+    # dma ⊆ dma_requests（綴りそのままの列で戻す）
+    requests = {(r["family"], r["variant"], r["dma"], r["channel"], r["request_id"], r["request"])
+                for r in t["dma_requests"]}
+    for r in t["index:dma"]:
+        if (r["family"], r["variant"], r["dma"], r["channel"], r["request_id"], r["spelled"]) not in requests:
+            bad.append(f"dma: dma_requests にない行 {r['family']} {r['spelled']}")
+        if r["remap"] not in ("", "selectable", "default", "remap"):
+            bad.append(f"dma: {r['family']} {r['request']} の remap {r['remap']!r}")
+        if not r["peripheral"]:
+            bad.append(f"dma: {r['family']} {r['request']} の peripheral が空")
+    # timers（索引）⊆ timers（証拠）
+    timers = {(r["family"], r["timer"]) for r in t["timers"]}
+    for r in t["index:timers"]:
+        if (r["family"], r["timer"]) not in timers:
+            bad.append(f"timers(index): timers にない {r['family']} {r['timer']}")
+    # parts ⊆ products
+    products = {r["part_number"] for r in t["products"]}
+    if {r["part_number"] for r in t["index:parts"]} != products:
+        bad.append("parts: 型番の集合が products と違う")
+
+    # manifest: index/ の全ファイルと sha256 が一致
+    import hashlib  # noqa: PLC0415
+    listed = {}
+    with (paths.INDEX / "manifest.csv").open(encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            listed[r["path"]] = r["sha256"]
+    actual = {p.relative_to(paths.INDEX).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in paths.INDEX.rglob("*.csv") if p.name != "manifest.csv"}
+    if listed != actual:
+        changed = sorted(set(listed) ^ set(actual)) or sorted(k for k in listed if listed[k] != actual.get(k))
+        bad.append(f"manifest: index/ の内容と一致しない（{len(changed)} ファイル。例 {changed[:3]}）"
+                   "——tools/build_index.py を回し直す")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--tables", type=Path, default=Path("tables"))
+    ap.add_argument("--tables", type=Path, default=None,
+                    help="catalog/evidence の表を読むディレクトリ（試験用の上書き）")
     args = ap.parse_args()
+    # 目録と証拠は名前で、索引は `index:` を付けて持つ（`registers`・`timers` が
+    # 証拠と索引の両方にあるので）。
     t = {name: load(args.tables, name)
-         for name in ("families", "series", "products", "packages",
-                      "cores", "documents", "pins", "pin_functions",
-                      "product_attributes", "remap_fields", "remap_routes",
-                      "errata", "operating_conditions", "evt_examples",
-                      "clock_configs", "clock_prescalers", "clock_sources",
-                      "clock_symbols", "clock_init", "evt_variants", "systick",
-                      "memory_configs", "pin_alternate", "interrupts",
-                      "memory_map", "features", "sources", "eval_boards",
-                      "feature_tags", "pin_roles", "timers", "flash_geometry",
-                      "opa_cmp_registers", "clock_enables", "adc_internal",
-                      "usbpd_plumbing", "register_blocks", "registers",
-                      "register_fields", "register_layouts", "dma_requests")}
+         for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES}
+    for name in paths.INDEX_TABLES:
+        t[f"index:{name}"] = load_index(name)
+    if len(t) != len(paths.CATALOG_TABLES) + len(paths.EVIDENCE_TABLES) + len(paths.INDEX_TABLES):
+        raise SystemExit("paths.py の表の名前が重複している")
 
     families = {r["family"] for r in t["families"]}
     series = {r["series"] for r in t["series"]}
@@ -201,30 +276,44 @@ def main() -> int:
     for r in t["product_attributes"]:
         check("product_attributes", r["attribute"], r["part_number"], products, "products")
 
-    # pin_roles は pin_functions を語彙で言い換えた索引で、**新しい事実は足さない**。
-    # 行が pin_functions に戻せることと、覆えなかった数が増えていないことを見る。
-    for r in t["pin_roles"]:
-        check("pin_roles", r["part_number"], r["part_number"], products, "products")
-        check("pin_roles", r["part_number"], r["series"], series, "series")
-        if (r["part_number"], r["pad"]) not in pin_pads:
-            bad.append(f"pin_roles: {r['part_number']} の pad {r['pad']!r} が pins にない")
-    stated = {(r["part_number"], r["pad"], r["routing"], r["signal"])
-              for r in t["pin_roles"]}
+    # 索引 pinout は pins × pin_functions を語彙で言い換えたもので、**新しい事実は
+    # 足さない**。行が pin_functions に戻せること（route だけは RM 格子の値を採る
+    # 行があり、その場合 basis に `!rm-remap-grid(=その値)` があること）、lead が
+    # pins にあること、覆えなかった数が増えていないことを見る。
+    lead_of = {(r["part_number"], r["pad"], r["pin"]) for r in t["pins"]}
+    grid_route = {}
+    for r in t["pin_functions"]:
+        m = build_index_grid(r["basis"])
+        if m:
+            grid_route[(r["part_number"], r["pad"], r["signal"], r["route"])] = m
     verbatim = {(r["part_number"], r["pad"], r["route"], r["signal"])
                 for r in t["pin_functions"]}
-    invented = stated - verbatim
+    invented = []
+    for r in t["index:pinout"]:
+        check("pinout", r["part_number"], r["part_number"], products, "products")
+        check("pinout", r["part_number"], r["series"], series, "series")
+        if (r["part_number"], r["pad"], r["pin"]) not in lead_of:
+            bad.append(f"pinout: {r['part_number']} の lead {r['pin']} pad {r['pad']!r} が pins にない")
+        if not r["signal"]:
+            continue
+        key = (r["part_number"], r["pad"], r["route"], r["signal"])
+        if key in verbatim:
+            continue
+        stated = [k for k in verbatim if k[:2] == key[:2] and k[3] == key[3]]
+        if not any(grid_route.get((k[0], k[1], k[3], k[2])) == r["route"] for k in stated):
+            invented.append(key)
     if invented:
-        bad.append(f"pin_roles: pin_functions にない行が {len(invented)} 件ある"
+        bad.append(f"pinout: pin_functions にない行が {len(invented)} 件ある"
                    f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
     bad += pin_role_coverage(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に
     # あること、bits/mask/kind の書式、layout key が (family, 型) で一意であること。
-    layouts = {(r["family"], r["type"]): r["layout"] for r in t["register_layouts"]}
-    if len(layouts) != len(t["register_layouts"]):
+    layouts = {(r["family"], r["type"]): r["layout"] for r in t["index:register_layouts"]}
+    if len(layouts) != len(t["index:register_layouts"]):
         bad.append("register_layouts: (family, type) が重複している")
-    for r in t["register_layouts"]:
+    for r in t["index:register_layouts"]:
         check("register_layouts", r["type"], r["family"], families, "families")
     for r in t["register_blocks"]:
         check("register_blocks", r["block"], r["family"], families, "families")
@@ -267,10 +356,8 @@ def main() -> int:
             bad.append(f"dma_requests: {r['family']} {r['request']} は dma+channel か request_id の"
                        f"どちらか一方を持つこと（dma={r['dma']!r} channel={r['channel']!r} "
                        f"request_id={r['request_id']!r}）")
-        if r["remap"] not in ("", "selectable", "default", "remap"):
-            bad.append(f"dma_requests: {r['family']} {r['request']} の remap {r['remap']!r}")
-        if not r["peripheral"]:
-            bad.append(f"dma_requests: {r['family']} {r['request']} の peripheral が空")
+        if not r["request"]:
+            bad.append(f"dma_requests: {r['family']} の request が空")
         for macro in filter(None, r["variant"].split("|")):
             if macros and macro not in macros:
                 bad.append(f"dma_requests: {r['family']} の variant {macro!r} が evt_variants にない")
@@ -396,10 +483,6 @@ def main() -> int:
         values = {int(v) for v in field["valid_values"].split(";") if v != ""}
         if int(r["value"]) not in values:
             bad.append(f"remap_routes: {where} が remap_fields の valid_values にない")
-        # An empty pair means the vocabulary has no rule for that spelling, which
-        # is a recorded gap. One half filled is a bug in the rule.
-        if bool(r.get("peripheral")) != bool(r.get("role")):
-            bad.append(f"remap_routes: {where} の peripheral と role が片方だけ埋まっている")
 
     # A route must sit on the selector its own peripheral owns. The ways it can
     # end up elsewhere are silent: a manual's grid split across two pages reads
@@ -423,9 +506,13 @@ def main() -> int:
         return bool(ma and mb and ma.group(1) == mb.group(1)
                     and ma.group(2) != mb.group(2))
 
-    for r in t["remap_routes"]:
+    for r in t["index:routes"]:
         peripheral = r.get("peripheral")
         field = field_by_key.get((r["series"], r["selector"]))
+        # An empty pair means the vocabulary has no rule for that spelling, which
+        # is a recorded gap. One half filled is a bug in the rule.
+        if bool(r.get("peripheral")) != bool(r.get("role")):
+            bad.append(f"routes: {r['series']} {r['selector']} 値{r['value']} の peripheral と role が片方だけ埋まっている")
         if not peripheral or field is None:
             continue
         key = signal_vocabulary.canonical_field(field["field"])
@@ -433,9 +520,11 @@ def main() -> int:
             continue
         if (peripheral in owners.get(r["series"], set())
                 or same_name_other_instance(key, peripheral)):
-            bad.append(f"remap_routes: {r['series']} {r['selector']} 値{r['value']} の "
+            bad.append(f"routes: {r['series']} {r['selector']} 値{r['value']} の "
                        f"{r['signal']} ({r['pad']}) は {peripheral} の信号なので "
                        f"{key} の selector には載らない")
+
+    bad += index_checks(t)
 
     # The clock tables come from EVT's system_ch32*.c, one row per configuration
     # and #if branch. What can be checked without EVT is that they join, that a
@@ -679,13 +768,13 @@ def main() -> int:
 
     # 機能の索引。1 series 1 タグで、precision がどちらの読みかを言う。
     seen_tag: set[tuple[str, str]] = set()
-    for r in t["feature_tags"]:
+    for r in t["index:features"]:
         check("feature_tags", r["tag"], r["family"], families, "families")
         check("feature_tags", r["tag"], r["series"], series, "series")
         if r["precision"] not in ("part", "datasheet"):
             bad.append(f"feature_tags: {r['tag']} の precision "
                        f"{r['precision']!r} が part/datasheet でない")
-        if r["parent"] and r["parent"] not in {x["tag"] for x in t["feature_tags"]}:
+        if r["parent"] and r["parent"] not in {x["tag"] for x in t["index:features"]}:
             bad.append(f"feature_tags: {r['tag']} の parent {r['parent']} が"
                        "タグとして存在しない")
         key = (r["tag"], r["series"])

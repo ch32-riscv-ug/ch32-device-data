@@ -4,11 +4,10 @@
 
 - [作業リスト](worklist.ja.md): 生きている項目・既知の穴・**次の作業の優先順**・資料側の問題台帳
 - [テーブル別の信頼度](table-reliability.ja.md): 表ごとにどこまで信用してよいか、原典サンプル検証の結果
-- [データの区分・形式・置き場所の再定義（案）](data-layout.ja.md): 目録・証拠・索引の3区分、CSVのまま／索引は用途単位で分割、`catalog/`・`evidence/`・`index/`への移行手順（2026-08-26。**推奨で書いた案。実施前**）
-- [テーブルの役割の定義と確認](table-roles.ja.md): 上の案の入力。A/B/Cの区分で42表を定義し、データがその定義どおりかを確認した結果（2026-08-26）
+- [データの区分・形式・置き場所の定義](data-layout.ja.md): 目録 `catalog/`・証拠 `evidence/`・索引 `index/` の3区分と、その規則・形式・consumer の契約（2026-08-26 実施）。確認の記録は [worklist-archive](worklist-archive.ja.md) の「表の役割の確認」
 - [作業引継ぎ](handoff.ja.md): 正本の所在、再開手順、守ること
 - [用語集](glossary.ja.md)
-- [tables/README.ja.md](../tables/README.ja.md): 表の意味・列・生成順（データ構造の正本）
+- [evidence/README.ja.md](../evidence/README.ja.md): 表の意味・列・生成順（データ構造の正本）
 
 ## 記録（判断の根拠。読み返す用）
 

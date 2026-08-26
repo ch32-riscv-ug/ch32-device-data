@@ -2,7 +2,7 @@
 
 This is a user group that uses RISC-V chips such as WCH's CH32V series.
 
-<!-- This file is generated from ch32-riscv-ug/ch32-device-data (tables/ + tools/build_readme.py). Edit there, not here. -->
+<!-- This file is generated from ch32-riscv-ug/ch32-device-data (index/ + evidence/ + tools/build_readme.py). Edit there, not here. -->
 
 ## Device documentation mirrors
 

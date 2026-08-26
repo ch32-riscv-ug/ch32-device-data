@@ -265,7 +265,7 @@ ADC_SCAN = re.compile(r"^ADCS(?P<n>\d)$")
 
 # **pad 自身の GPIO 名は役割ではない。** ピン表の「リセット後の主機能」欄は
 # `PC13-RTC` のような pad に `PC13` と書く——その pad が GPIO であること自体を
-# 言っているだけで、周辺の役割ではない。`pin_roles` に載せると
+# 言っているだけで、周辺の役割ではない。索引 `pinout` に載せると
 # 「PC13 という周辺の PC13 という役割」が生まれてしまう。
 GPIO_NAME = re.compile(r"^P[A-Z]\d{1,2}$")
 

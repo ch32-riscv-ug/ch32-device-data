@@ -2,7 +2,7 @@
 """USBPD を動かすための配管（RCC の enable bit と PHY 設定 bit）→ tables/usbpd_plumbing.csv
 
 **CH32X035 以外の series へ PD を広げる前提**（consumer の依頼 R-26-4）。block の
-base は `memory_map.csv`、CC pad は `pin_roles.csv` が持っている。足りないのは
+base は `memory_map.csv`、CC pad は `index/pinout.csv` が持っている。足りないのは
 
     RCC の enable bit      `clock_enables.csv` の USBPD 行（family で bus が違う）
     PHY の設定 bit         X035 は AFIO_CTLR の USBPD_PHY_V33(bit8) / USBPD_IN_HVT(bit9)。
@@ -41,6 +41,8 @@ import extract_addresses  # noqa: E402
 import extract_registers  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
@@ -137,13 +139,13 @@ def phy_defines(text: str, structs: dict) -> list[tuple[str, str, str, int]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
     enables: dict[str, list[dict]] = collections.defaultdict(list)
-    with (args.out / "clock_enables.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("clock_enables").open(newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             if re.fullmatch(r"USBPD\d*", r["peripheral"]):
                 enables[r["family"]].append(r)
@@ -204,7 +206,7 @@ def main() -> int:
                              "phy_address": f"{base + offset:#010x}" if base is not None else "",
                              "confidence": confidence, "basis": "+".join(basis)})
 
-    dest = args.out / "usbpd_plumbing.csv"
+    dest = paths.table("usbpd_plumbing", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

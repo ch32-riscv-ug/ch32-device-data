@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""機能から製品を探すための索引 → tables/feature_tags.csv
+"""機能から製品を探すための索引 → index/features.csv
 
 `features.csv` は datasheet の節見出しをそのまま持つので、綴りが版と family で
 揺れる——`General DMA Controller` と `General-purpose DMA Controller` と
@@ -56,6 +56,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 CURATED = REPO / "curated" / "feature-tags.json"
 
 COLUMNS = ["tag", "parent", "series", "family", "precision", "features",
@@ -98,20 +100,20 @@ def tags_for(title: str, curated: dict, unknown: collections.Counter) -> list[st
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
     curated = json.loads(CURATED.read_text(encoding="utf-8"))
     for key in ("aliases", "titles", "excluded", "parents"):
         curated[key] = {k: v for k, v in curated[key].items() if k != "_comment"}
 
-    with (args.out / "features.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("features").open(newline="", encoding="utf-8") as f:
         features = list(csv.DictReader(f))
-    with (args.out / "series.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("series").open(newline="", encoding="utf-8") as f:
         family_of = {r["series"]: r["family"] for r in csv.DictReader(f)}
-    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
         catalogue = list(csv.DictReader(f))
-    with (args.out / "product_attributes.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("product_attributes").open(newline="", encoding="utf-8") as f:
         attributes = list(csv.DictReader(f))
 
     # 型番 → その型番が載る datasheet、と series。
@@ -201,7 +203,7 @@ def main() -> int:
         })
     rows.sort(key=lambda r: (r["tag"], r["series"]))
 
-    dest = args.out / "feature_tags.csv"
+    dest = paths.index("features", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

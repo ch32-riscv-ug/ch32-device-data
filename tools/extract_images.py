@@ -30,6 +30,8 @@ import pdfplumber
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 RESOLUTION = 200
 
 ARCH_CAPTION = re.compile(
@@ -92,7 +94,7 @@ def caption_corrections():
 
 
 def load(name):
-    with (REPO / "tables" / f"{name}.csv").open(encoding="utf-8") as f:
+    with paths.table(name).open(encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 

@@ -39,6 +39,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "number", "name", "kind", "description", "condition",
@@ -149,10 +151,10 @@ def read_enum(header: Path, notes: list[str]) -> list[dict]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
 
     rows: list[dict] = []
@@ -188,7 +190,7 @@ def main() -> int:
                          "basis": f"evt({header.name})"})
 
     rows.sort(key=lambda r: (r["family"], r["number"], r["condition"]))
-    dest = args.out / "interrupts.csv"
+    dest = paths.table("interrupts", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

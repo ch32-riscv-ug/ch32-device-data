@@ -21,6 +21,9 @@ from pathlib import Path
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
+import sys  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 WIDTH = 760
 PAD = 16
@@ -33,7 +36,7 @@ CHIP_FILL = "#eef3f8"
 
 
 def load(name):
-    with (REPO / "tables" / f"{name}.csv").open(encoding="utf-8") as f:
+    with paths.table(name).open(encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 

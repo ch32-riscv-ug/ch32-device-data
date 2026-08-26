@@ -59,6 +59,8 @@ from pathlib import Path
 import pdfplumber
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["part_number", "value", "code_bytes", "sram_bytes",
@@ -264,12 +266,11 @@ def expand(applies: list[str], parts: list[dict], variants: dict[str, list[str]]
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
     def table(name: str) -> list[dict]:
-        with (args.out / name).open(newline="", encoding="utf-8") as f:
-            return list(csv.DictReader(f))
+        return paths.load(name.removesuffix(".csv"))
 
     families = table("families.csv")
     parts = table("products.csv")
@@ -434,7 +435,7 @@ def main() -> int:
                                      for (c, s), n in counted))
 
     rows.sort(key=lambda r: (r["part_number"], r["value"]))
-    dest = args.out / "memory_configs.csv"
+    dest = paths.table("memory_configs", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

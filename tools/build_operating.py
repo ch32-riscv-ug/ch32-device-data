@@ -23,6 +23,8 @@ import pdfplumber
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 # 対象の表。「一般動作条件」に加えて発振器の表も読む。後者はクロック源の
 # 許容範囲と確度で、R-24のC-2（HSIの確度・HSEの許容範囲）がここにある。
@@ -330,14 +332,14 @@ def read_headline_clock(pdf_path, lang):
 
 
 def main():
-    with (REPO / "tables/products.csv").open(encoding="utf-8") as f:
+    with paths.table("products").open(encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     ds_series = {}
     ds_family = {}
     for p in products:
         ds_series.setdefault(p["datasheet"], set()).add(p["series"])
         ds_family[p["datasheet"]] = p["family"]
-    with (REPO / "tables/families.csv").open(encoding="utf-8") as f:
+    with paths.table("families").open(encoding="utf-8") as f:
         family_manuals = {r["family"]: r["reference_manuals"]
                           for r in csv.DictReader(f)}
 
@@ -474,7 +476,7 @@ def main():
                             "basis": basis, "datasheet": paper})
 
     out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"], r["typ"]))
-    dest = REPO / "tables/operating_conditions.csv"
+    dest = paths.table("operating_conditions")
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

@@ -163,7 +163,7 @@ V407からのコピー忘れで、**RM側と突き合わせるとこれが自動
 | 要確認 | 252 |
 
 上はこの調査時点（掃引単体）の数です。**その後の`build_pins.py`経由の現況は
-pin 4342 / pin function 27926**（2026-08-22）で、`tables/README.ja.md`の現況表が
+pin 4342 / pin function 27926**（2026-08-22）で、`evidence/README.ja.md`の現況表が
 正本です。差はF-1/F-4/F-13の改行処理、F-16の全角脚注、F-17のページ境界、
 F-18のlead番号の正規化と、両言語の突き合わせによるものです。
 
@@ -572,7 +572,7 @@ signalとpadと値から「どのselectorがこの経路を決めるのか」を
 
 [`tools/build_all.py`](../tools/build_all.py)が、比較表が挙げる全SKUに対して候補を生成します。reference manualの読み取りが支配的なので、familyごとに1回解析して各SKUで使い回します。
 
-生成結果は[`candidates/`](../candidates/)に置いています。**人のreviewを経ていない機械出力**で、`devices/`とは別物です。
+生成結果は`.cache/candidates/`に置きます（commitしない。`tools/build_all.py`が作る）。**人のreviewを経ていない機械出力**で、reviewを経た抽出結果が`evidence/`の表です。
 
 | family | SKU | pin取得 | pin | function | 解決経路 | selector |
 |---|---:|---:|---:|---:|---:|---:|
@@ -840,8 +840,8 @@ I2C1・SPI1・USART2のselectorへ付いていました。**TIM1の経路が3つ
 
 ### 収集済みにしたもの
 
-- **一般動作条件（General operating conditions / 通用工作条件）表** → `tables/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
-- **ロット依存注記（エラッタ）** → `tables/errata.csv` 21行（`tools/scan_errata.py`で走査、`curated/errata.csv`で管理）
+- **一般動作条件（General operating conditions / 通用工作条件）表** → `evidence/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
+- **ロット依存注記（エラッタ）** → `evidence/errata.csv` 21行（`tools/scan_errata.py`で走査、`curated/errata.csv`で管理）
 
 抽出上の注意（build_operating.pyが吸収済み）: zh版の表題は「通用工作条件」（「一般」ではない）、絶対最大定格表が同一ページにあり`条件`列の有無で区別する、記号セルの折返しで`F_HCLK or F_SYS`が壊れる、脚注は全角括弧`（2）`、rowspanの単位セルはzh版で空になる。
 

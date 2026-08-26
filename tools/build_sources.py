@@ -36,6 +36,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "repository", "commit", "committed_at", "dirty",
@@ -55,10 +57,10 @@ def git(repo: Path, *args: str) -> str | None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [(r["family"], r.get("repository", "")) for r in csv.DictReader(f)]
 
     rows: list[dict] = []
@@ -91,7 +93,7 @@ def main() -> int:
         })
 
     rows.sort(key=lambda r: r["family"])
-    dest = args.out / "sources.csv"
+    dest = paths.table("sources", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

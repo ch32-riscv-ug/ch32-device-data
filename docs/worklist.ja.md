@@ -1,6 +1,6 @@
 # 作業リスト
 
-README自動生成の対象は**データシートとEVTを持つ12リポジトリのTOP**と**org TOP（.github）**です。両方とも特殊処理なしの全自動生成を目標にします。根拠は[docs/extraction-survey.ja.md](extraction-survey.ja.md)、データ構造は[tables/README.ja.md](../tables/README.ja.md)。
+README自動生成の対象は**データシートとEVTを持つ12リポジトリのTOP**と**org TOP（.github）**です。両方とも特殊処理なしの全自動生成を目標にします。根拠は[docs/extraction-survey.ja.md](extraction-survey.ja.md)、データ構造は[evidence/README.ja.md](../evidence/README.ja.md)。
 
 状態: ✅完了 / 🔜次 / ⬜未着手 / ❓要確認（人の判断待ち）
 
@@ -42,14 +42,14 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 ## A. データ収集
 
 - [x] ✅ **A1 エラッタ** — 21件、全件が中英両版のページ根拠つきconfirmed。`tools/scan_errata.py`で増分検出（NEWがあれば終了コード1）
-- [x] ✅ **A2 動作条件** — `tables/operating_conditions.csv` 62行。クロック上限F_*と動作電圧V_DD。全27シリーズ
+- [x] ✅ **A2 動作条件** — `evidence/operating_conditions.csv` 62行。クロック上限F_*と動作電圧V_DD。全27シリーズ
 - [x] ✅ **A3 remap** — `remap_fields`/`remap_routes`（全行reference。根拠記録つき再実行で確定化するのは別課題）。2026-08-20に作り直し: `bits`がbitごとにregister名を持つようになり、PCFR1とPCFR2にまたがるselectorを表せる。`peripheral`/`role`列で`TX1`/`UTX`/`USART1_TX`の綴り差を吸収。value=0の既定経路を同じ表に収録。CH32V407/V467はRM未mirrorでも header+datasheet から生成する。`tools/check_tables.py`が表だけで整合を検査する（bit形式、値の幅、route値がvalid_valuesに含まれること）
 - [x] ✅ **A4 公称主周波数** — U2/U1が最初に見る値。**現状は誤解を招く**: CH32V003のMax clockが電気的特性の50MHzで出るが、公称は48MHz（DS1ページ目「48MHz system main frequency」）。product_attributesには8シリーズ分しか無く自由文（`Max: 144MHz`、`40MHz@Zero-wait; Max: 192MHz@Non-zero wait`）。DS第1章の特徴リストから全シリーズ抽出し、`Main clock`列と`Fmax (HCLK)`列を分離する
-- [x] ✅ **A5 EVT例題索引** — U1/U3への効果が最大。材料は全12リポジトリの`EVT/<FAMILY>_List_EN.txt`（周辺→例題→1行説明のツリー）に揃っている。パースして`tables/evt_examples.csv`へ
-- [x] ✅ **A6 機能フラグ（USB/Ethernet/CAN/PD/DVP…）** — `tables/features.csv`新設（2026-08-23）。比較表からは作れない（[調査結果はarchive](worklist-archive.ja.md)）ので、**機能説明章の節見出し**を採った。節番号は言語に依らないので中英が厳密に対応する
-- [x] ✅ **A7 メモリマップ** — `tables/memory_map.csv`新設（2026-08-23）。**DS 1.2章ではなくEVTヘッダーの`*_BASE`から**。相対の連鎖を解く処理は`extract_addresses`が既に持っていた
+- [x] ✅ **A5 EVT例題索引** — U1/U3への効果が最大。材料は全12リポジトリの`EVT/<FAMILY>_List_EN.txt`（周辺→例題→1行説明のツリー）に揃っている。パースして`evidence/evt_examples.csv`へ
+- [x] ✅ **A6 機能フラグ（USB/Ethernet/CAN/PD/DVP…）** — `evidence/features.csv`新設（2026-08-23）。比較表からは作れない（[調査結果はarchive](worklist-archive.ja.md)）ので、**機能説明章の節見出し**を採った。節番号は言語に依らないので中英が厳密に対応する
+- [x] ✅ **A7 メモリマップ** — `evidence/memory_map.csv`新設（2026-08-23）。**DS 1.2章ではなくEVTヘッダーの`*_BASE`から**。相対の連鎖を解く処理は`extract_addresses`が既に持っていた
 - [x] ✅ **A8 書き込み方式** — **A6の副産物**（2026-08-23）。`1-wire Serial Debug Interface (SDI)`／`2-wire SDI Serial Debug Interface`が節見出しとして立っているので、`curated/`への手書きは不要だった
-- [x] ✅ **A9 割り込みベクタ表** — `tables/interrupts.csv`新設（2026-08-23）。**RM側と書いたのは材料の見落とし**で、EVTヘッダーの`IRQn_Type`列挙が番号・名前・説明を全部持っている。variantで番号が入れ替わるので`#if`の条件を`condition`列に持つ
+- [x] ✅ **A9 割り込みベクタ表** — `evidence/interrupts.csv`新設（2026-08-23）。**RM側と書いたのは材料の見落とし**で、EVTヘッダーの`IRQn_Type`列挙が番号・名前・説明を全部持っている。variantで番号が入れ替わるので`#if`の条件を`condition`列に持つ
 
 ## B. README生成
 
@@ -80,7 +80,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 - [x] ✅ **D2 中国語混入検査** — `#`より左のデータ列にCJKがあればCIが落ちる
 - [x] ✅ **D3 エラッタ増分検査** — `tools/scan_errata.py`（ミラーPDFが要るのでCIではなく手動運用）
 - [x] ✅ **D5 画像の検査** — 寸法異常と同一切り出しの共有を機械検出（目視の前段。実際に4件の欠損を捕捉）
-- [x] ✅ **D6 読んだ原典の版を記録** — `tables/sources.csv`新設（2026-08-23）。mirror 12本のcommitとその日付。**生成時刻は入れない**（毎回書き換わると「差分が出たら異常」の判定が使えなくなる）。生成物の差分の原因を「入力が変わった」と「再生成を忘れた」に切り分けるため
+- [x] ✅ **D6 読んだ原典の版を記録** — `catalog/sources.csv`新設（2026-08-23）。mirror 12本のcommitとその日付。**生成時刻は入れない**（毎回書き換わると「差分が出たら異常」の判定が使えなくなる）。生成物の差分の原因を「入力が変わった」と「再生成を忘れた」に切り分けるため
 - [ ] ⬜ **D7 生成のGitHub Actions化** — 日次起動・datasheetかEVTが変わっていたら全生成。**計画のみ**（下記）。抽出の作り込みが落ち着くまでは手動
 - [x] ✅ **D4 同期日時の表示** — 各READMEの冒頭に`sources.csv`のmirror commit（リンク）と日付を出す（`synced_line`。2026-08-26）。生成時刻は出さない（冪等性）
 
@@ -98,7 +98,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | mirror の更新 | **すでにActions**（各mirrorの`update.yml`が毎日15:07 UTC、WCHから取り直してcommit/push） |
 | 目録の更新 | **すでにActions**（`ch32-device-data/update.yml`が毎日13:07 UTC。mirrorより2時間早く回して同じ日の目録を使わせる） |
 | `build_all`の冪等性 | **実測済み**。入力とコードが同じなら何度回しても差分ゼロ |
-| 読んだ版の記録 | **`tables/sources.csv`**（2026-08-23）。mirror 12本のcommitとその日付 |
+| 読んだ版の記録 | **`catalog/sources.csv`**（2026-08-23）。mirror 12本のcommitとその日付 |
 
 手作業として残るのは**ローカルcloneの`git pull`**と**重い抽出**の2つだけ。
 
@@ -108,7 +108,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 
 ```
 1. mirror 12本を clone/pull（shallow で可。EVTとdatasheetだけあればよい）
-2. tables/sources.csv が記録する commit と、いまの mirror の HEAD を比べる
+2. catalog/sources.csv が記録する commit と、いまの mirror の HEAD を比べる
 3. どれも同じなら **何もせず終わる**（生成物は最新のはず）
 4. 変わっていたら全生成 → 検査 → 差分を報告
 ```
@@ -118,7 +118,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 
 #### 全生成の中身と時間
 
-`tables/README.ja.md`の生成順そのまま。実測で`build_all`が**2並列16.6分**、
+`evidence/README.ja.md`の生成順そのまま。実測で`build_all`が**2並列16.6分**、
 6並列ならもっと速い（pdfplumberのtext-map LRUを落として1 worker 360MiBになった）。
 `build_pins`と`build_operating`と`build_features`がそれぞれ数分。
 **全部で30分前後**を見込む。GitHub Actionsの標準runnerで収まる。
@@ -182,7 +182,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-9 | USBが48MHzを要求する根拠が散文 | 22行 | ツール | ✅ **実装済み**（2026-08-22）。48MHzは全familyの話ではなかった。[記録](worklist-archive.ja.md) |
 | F-10 | CH32V205・CH32X315のRMから経路が0件 | V203CCT6のUSART5-8 | 資料/ツール | ✅ **原因判明**（2026-08-22）。**AFIO remapを持たない世代**だった。[記録](worklist-archive.ja.md) |
 | F-11 | WCH-Link系ファームウェアの版番号が確定しない | — | 資料 | 🔜 実機で1回突き合わせる |
-| F-12 | AF番号で多重化するfamilyの選択レジスタが未収録 | 240行 | ツール | ✅ **実装済み**（2026-08-22）。`tables/pin_alternate.csv`新設。[記録](worklist-archive.ja.md) |
+| F-12 | AF番号で多重化するfamilyの選択レジスタが未収録 | 240行 | ツール | ✅ **実装済み**（2026-08-22）。`evidence/pin_alternate.csv`新設。[記録](worklist-archive.ja.md) |
 | F-13 | pin表のslashが改行で落ちてsignalが連結する | 32種・17 part | ツール | ✅ **修理済み**（2026-08-22）。F-1の副作用。[記録](worklist-archive.ja.md) |
 | F-14 | `flash_bytes`が零等待領域ではなく総容量を指すfamilyがある | 18 part | ツール | ✅ **修理済み**（V30xは2026-08-22、X305/X315は2026-08-23）。[記録](worklist-archive.ja.md) |
 | F-15 | 比較表の**行グループ**（左セルが複数行にまたがる）が1行に潰れる | H41x 5 part・480行 | ツール | ✅ **修理済み**（2026-08-22）。`sram_bytes`が896KBのうち128KBだった。[記録](worklist-archive.ja.md) |
@@ -223,7 +223,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 ### F-11 WCH-Link系ファームウェアの版番号（[link-firmware-survey](link-firmware-survey.ja.md)）
 
-`tables/link_firmware.csv`（10行）と`tools/build_link_firmware.py`を作り、
+`evidence/link_firmware.csv`（10行）と`tools/build_link_firmware.py`を作り、
 ファイルの同定・sha256・取得の自動化まではできた。**版番号だけが確定していない。**
 
 配布物が名乗る版（`wchlink.wcfg`の`CH32V307Ver=42`等）と、実機がUSBで申告する版
@@ -274,6 +274,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 - **JSON schema草案（`schemas/`・`devices/`8 sample・`tools/validate.py`・`docs/schema-notes.ja.md`・
   `.github/workflows/validate.yml`）は2026-08-25に削除した。** `tables/`が正本。記録はgitの履歴
 - **R-20（レジスタマップ）**は機械収集ぶんを実装した（2026-08-25。E表参照）。残りの手作業ぶん（D-7・RMの絶対アドレス表）は consumer側の要否を見て
+- **`tables/` は 2026-08-26 に `catalog/`・`evidence/`・`index/` へ分けた**（[data-layout.ja.md](data-layout.ja.md)）。表の置き場所は `tools/paths.py` が1箇所で決める
 
 ### 3. 新規
 
@@ -282,7 +283,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 
 | 順 | 項目 | 状態 |
 |---|---|---|
-| 0 | **データの区分・形式・置き場所のやり直し** | 📝 案 → [data-layout.ja.md](data-layout.ja.md)（目録`catalog/`・証拠`evidence/`・索引`index/`。証拠はCSVのまま訂正なし、索引は結合した正本1ファイル＋型番/familyごとの分片、`pin_roles`→`index/pinout.csv`（分片`parts/<PART>.csv`）、`candidates/`はcommitしない）。入力は [table-roles.ja.md](table-roles.ja.md)（定義違反3つ・検索性の穴）。**案の確認待ち。OKなら移行手順1〜8の順に実施** |
+| 0 | ~~**データの区分・形式・置き場所のやり直し**~~ | ✅ **実施**（2026-08-26）→ [data-layout.ja.md](data-layout.ja.md)。`tables/`→`catalog/`（目録7）・`evidence/`（証拠32）・`index/`（索引10表）。`pin_roles`→`index/pinout.csv`、`feature_tags`→`index/features.csv`、証拠の訂正（F-41）を索引側へ、`register_fields.define`・`dma_requests.request`原綴り・`remap_routes`/`timers`の導出列外し、`candidates/`→`.cache/`。**残り: consumer（ArduinoCore-CH32）の lock 付け替え（別 repository）**。確認の記録は [worklist-archive](worklist-archive.ja.md)「表の役割の確認」 |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
 | 2 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
 | 3 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |

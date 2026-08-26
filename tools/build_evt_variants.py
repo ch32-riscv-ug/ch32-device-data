@@ -44,6 +44,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import extract_clock_tree  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "macro", "part_number", "default",
@@ -87,10 +89,10 @@ def variants(header: Path) -> list[tuple[str, list[str], bool]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     parts_of: dict[str, list[str]] = collections.defaultdict(list)
     for p in products:
@@ -126,8 +128,9 @@ def main() -> int:
             notes.append(f"{family} {macro}: 該当する部品が products.csv に無い")
 
     rows.sort(key=lambda r: (r["family"], r["macro"], r["part_number"]))
-    args.out.mkdir(parents=True, exist_ok=True)
-    dest = args.out / "evt_variants.csv"
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
+    dest = paths.table("evt_variants", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
