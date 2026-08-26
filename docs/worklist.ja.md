@@ -18,7 +18,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | README生成 | 6 | 0 |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 6 | 1（D7） |
-| consumerからの依頼 | 8 | 0（R-20は機械収集ぶんまで。残りはconsumerの要否次第） |
+| consumerからの依頼 | 8 | 1（R-27 debug module の DATA0/DATA1 アドレス。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
 | 既知の穴（F系） | 43 | 4 = 資料が決めない 1（F-4残り。実害なし）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-24残り・F-33・F-43〜46） |
 
 （2026-08-25 棚卸し時点。次にやる順は [次の作業](#次の作業優先順) にある）
@@ -160,6 +160,38 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-24追補3 | CH32V103のSTKレジスタほか（E-1〜E-5） | ✅ **全件クローズ**（2026-08-22）。E-1は探されたレジスタが存在せず`systick.csv`で回答、E-2はRMに記述なし、E-3は`memory_configs.csv`新設、E-4/E-5は`clock_symbols`の集め方を直した |
 | R-25 | 表の追加依頼3件（timers・port/pin・preferred印） | ✅ **2件実装・1件は回答**（2026-08-25）。`timers.csv`新設、`pin_roles`に`port`/`pin`。preferred印は「電源投入時の状態」なら資料が既に持つ（`route`の`main`/`default`）ので列を足さず`tables/README`に区別を書いた |
 | R-26 | 追加テーブル4件＋参考1件 | ✅ **全5件実装**（2026-08-25）。`flash_geometry`・`opa_cmp_registers`・`adc_internal`・`usbpd_plumbing`・`clock_enables` |
+| R-27 | debug module の DATA0/DATA1 レジスタの hart 側アドレス（family別） | ⬜ **未着手**（2026-08-26受領）。下の「R-27」参照 |
+
+### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領）
+
+Arduino コア側で SDI print（DMDATA0/1 mailbox 経由の printf）を実装したところ、**書き込み先
+アドレスが core 世代で違う**ことが実測で分かった。現状は V4 系の `0xE0000380` を既定にして
+V003 だけビルド時に上書きしている状態なので、生成で正しくするために family（または core）別の
+値を表に。
+
+consumer の実測（WCH-LinkE 経由で RISC-V DM の `hartinfo.dataaddr` を読んだもの）:
+
+| family | core | DATA0 / DATA1 |
+|---|---|---|
+| CH32V003 | QingKe V2A | `0xE00000F4` / `0xE00000F8` |
+| CH32V103 | V3A | `0xE0000380` / `0xE0000384` |
+| CH32V203 | V4B | `0xE0000380` / `0xE0000384` |
+| CH32X035 | V4C | `0xE0000380` / `0xE0000384` |
+| CH32L103 | V4C | `0xE0000380` / `0xE0000384` |
+
+V003 の値は EVT の SDI_Printf 例（`DEBUG_DATA0_ADDRESS = 0xE00000F4`）と一致、V4 系は
+SDI_Printf 例が `0xE0000380` を使っていて実測とも一致。
+
+- **欲しいもの**: 残りの family——V00x（V002/004/005/006/007）・M 系・X033・V20x/V30x の各 die・
+  X305/X315・H41x
+- **出所の候補**: QingKe プロセッサマニュアル（V2/V3/V4/V5）の debug 章、各 EVT の SDI_Printf 例の
+  `#define`（機械抽出できる。EVT 全ツリーの grep）、hartinfo の実測
+- **列の案**（置き場所・形式は任せる。`cores.csv` があるので core 単位でもよい）:
+  `family`（または `core`）, `dm_data0_addr`, `dm_data1_addr`, `confidence`, `basis`
+- **方針メモ**: まず EVT の SDI_Printf 例の define を全 family で機械抽出して証拠の表にし
+  （`evidence/debug_data.csv` 案。出所 `evt(<file>)`）、QingKe マニュアルの debug 章の記述と
+  突き合わせて confirmed へ。core 世代で決まるなら `catalog/cores.csv` に列を足す形も検討。
+  V003 の実測値と EVT define の一致は consumer 側で確認済み
 
 R-24系・R-25・R-26の実装記録は [archive](worklist-archive.ja.md)。この過程で見つけて手を付けなかった穴は [F. 既知の穴](#f-既知の穴埋める順) に一覧にした。
 
@@ -285,9 +317,10 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 |---|---|---|
 | 0 | ~~**データの区分・形式・置き場所のやり直し**~~ | ✅ **実施**（2026-08-26）→ [data-layout.ja.md](data-layout.ja.md)。`tables/`→`catalog/`（目録7）・`evidence/`（証拠32）・`index/`（索引10表）。`pin_roles`→`index/pinout.csv`、`feature_tags`→`index/features.csv`、証拠の訂正（F-41）を索引側へ、`register_fields.define`・`dma_requests.request`原綴り・`remap_routes`/`timers`の導出列外し、`candidates/`→`.cache/`。**残り: consumer（ArduinoCore-CH32）の lock 付け替え（別 repository）**。確認の記録は [worklist-archive](worklist-archive.ja.md)「表の役割の確認」 |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
-| 2 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
-| 3 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
-| 4 | C1〜C3 画像 | 保留のまま |
+| 2 | **R-27** debug module の DATA0/DATA1 アドレス（family別。E 表参照） | ⬜ 未着手。EVT の SDI_Printf 例の define を機械抽出 → QingKe マニュアル debug 章で裏取り。consumer は V003 だけ手で上書きしている状態なので優先度高め |
+| 3 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
+| 4 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
+| 5 | C1〜C3 画像 | 保留のまま |
 
 ## 資料側の問題台帳（原典の誤り・記録のみ）
 
