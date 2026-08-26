@@ -362,6 +362,21 @@ def main() -> int:
             if macros and macro not in macros:
                 bad.append(f"dma_requests: {r['family']} の variant {macro!r} が evt_variants にない")
 
+    # debug_data は family ごと1行。data1 は data0 の次の word、番地は DM の 0xE0000000 台。
+    # 番地が空なのは missing の行だけ（H417: EVT に define が無く、V5/V3 のマニュアルは固定しない）。
+    for r in t["debug_data"]:
+        check("debug_data", r["family"], r["family"], families, "families")
+        if r["confidence"] == "missing":
+            if r["dm_data0_addr"] or r["dm_data1_addr"]:
+                bad.append(f"debug_data: {r['family']} は missing なのに番地がある")
+            continue
+        for column in ("dm_data0_addr", "dm_data1_addr"):
+            if not re.fullmatch(r"0xE000[0-9A-F]{4}", r[column]):
+                bad.append(f"debug_data: {r['family']} の {column} {r[column]!r}")
+        if (r["dm_data0_addr"] and r["dm_data1_addr"]
+                and int(r["dm_data1_addr"], 16) != int(r["dm_data0_addr"], 16) + 4):
+            bad.append(f"debug_data: {r['family']} の data1 が data0+4 でない")
+
     # flash_geometry は family ごと1行。参照と、幾何の常識的な不変量
     # （fast page は標準 page より小さい・2の冪）を見る。
     for r in t["flash_geometry"]:

@@ -1,0 +1,12 @@
+{
+  "_comment": "Debug-module data0/data1 addresses read from the RISC-V DM hartinfo.dataaddr register over WCH-LinkE, reported by the ArduinoCore-CH32 consumer (worklist R-27). Hand-recorded measurements; tools/build_debug_data.py folds them into evidence/debug_data.csv as the basis `hartinfo:wch-linke`.",
+  "verified": "2026-08-26",
+  "method": "hartinfo.dataaddr read through WCH-LinkE while implementing SDI print (DMDATA0/1 mailbox printf) in ArduinoCore-CH32",
+  "measured": {
+    "CH32V003": {"part_number_hint": "CH32V003", "core": "QingKe V2A", "dm_data0_addr": "0xE00000F4", "dm_data1_addr": "0xE00000F8"},
+    "CH32V103": {"part_number_hint": "CH32V103", "core": "QingKe V3A", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
+    "CH32V20x": {"part_number_hint": "CH32V203", "core": "QingKe V4B", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
+    "CH32X035": {"part_number_hint": "CH32X035", "core": "QingKe V4C", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
+    "CH32L103": {"part_number_hint": "CH32L103", "core": "QingKe V4C", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"}
+  }
+}

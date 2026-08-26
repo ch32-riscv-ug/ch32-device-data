@@ -3,7 +3,7 @@
 [English](README.md)
 
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
-32 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
+33 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
 `PA0-WKUP` と装飾ごと持ちます。資料どうしが食い違えば値を直さず `conflict` にして両方を残します。
 **引く**ための表（語彙で揃えた名前・結合済み・型番ごとに割ったもの）は
@@ -27,7 +27,7 @@
 
 **そのまま読める表（安定）**: EVT ヘッダから写した `interrupts`・`memory_map`・`systick`・
 `clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`と、`memory_configs`・
-`flash_geometry`・`adc_internal` は、名前が最初から機械の語彙なので索引に写していません。
+`flash_geometry`・`adc_internal`・`debug_data` は、名前が最初から機械の語彙なので索引に写していません。
 consumer はこれらを直接読んでよく、列は索引と同じ扱いで安定させます。
 
 ## 各ファイル
@@ -399,6 +399,25 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 出典は`evt(system_ch32*.c)`・`evt(rcc-header+rcc-driver)`・`evt(device-header+system_ch32*.c)`・`evt(device-header)`・`evt(system_ch32*.c+device-header)`・`evt(device-header-comment)`で単一資料のため**conflictを除いて全行reference**です。reference manualが同じfieldを記述しているので、そちらを second reading にするのが確定化の道筋です。
 
+### `debug_data.csv`
+
+**debug module の data0/data1 レジスタの hart 側アドレス**（consumer の R-27。SDI print＝DMDATA0/1 の
+mailbox 経由の printf が書く番地）。1行1 family。**番地は die で違う**——V2 系（V003/V00x）は
+`0xE00000F4`、V4 系（L103/M103・V20x・V30x・X035）は `0xE0000380`、V3 系の多く（M030・V205・V407・X315）
+は `0xE0000340`、ただし V3A の V103 は `0xE0000380`。core 世代では決まらないので family 単位。
+
+出所は3つで、揃ったものが `confirmed`:
+
+| basis | 中身 |
+|---|---|
+| `evt(<debug.c>)` | 各 EVT の debug.c の `#define DEBUG_DATA0_ADDRESS ((volatile uint32_t*)0x…)`（SDI_Printf の実装）。family 内の全 debug.c で同じ値であることを見る（`+N more`） |
+| `manual:qingke-vN(dataaddr=0x380)` | QingKe プロセッサマニュアル debug 章の hartinfo 表。**V2（`0x0f4`）と V4（`0x380`）は固定値**、V3 と V5 は `0xXXX`＝「以具体读出为准」（実装ごとに hartinfo を読め）なので `dataaddr=read hartinfo` と書き、根拠には数えない |
+| `hartinfo:wch-linke(consumer 2026-08-26)` | consumer が WCH-LinkE で hartinfo.dataaddr を読んだ実測（`curated/debug-data-measured.json`。V003・V103・V203・X035・L103） |
+
+CH32H417 は EVT に define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しないので、
+行は残して番地は空・`missing`。埋めるには hartinfo の実測が要る。`dm_data1_addr` は常に `dm_data0_addr + 4`
+（`check_tables` が見る）。生成は `tools/build_debug_data.py`。
+
 ### `link_firmware.csv`
 
 WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/build_link_firmware.py`で、
@@ -741,6 +760,7 @@ uv run tools/build_feature_tags.py              # index/features（features + �
 uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
+uv run tools/build_debug_data.py                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run tools/extract_images.py                  # 各repoのimage/（数分かかる）

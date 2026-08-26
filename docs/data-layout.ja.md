@@ -126,7 +126,7 @@ tools/ docs/
 | `opa_cmp_registers` `clock_enables` `usbpd_plumbing` | `evidence/`（`clock_enables` は安定） | `unit`（OPA/CMP の分類）は付与と印 |
 | `interrupts` `memory_map` `systick` `clock_configs` `clock_prescalers` `clock_sources` `clock_symbols` `clock_init` `evt_variants` | `evidence/`（**安定**——そのまま読める） | そのまま。`clock_symbols.role` は付与と印 |
 
-証拠 32表・目録 7表・索引 10表（manifest 含む）。
+証拠 33表（2026-08-26 に `debug_data` を追加）・目録 7表・索引 10表（manifest 含む）。
 
 ## 6. 新しく作る索引の中身
 
