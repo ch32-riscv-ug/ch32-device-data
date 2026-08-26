@@ -282,6 +282,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 
 | 順 | 項目 | 状態 |
 |---|---|---|
+| 0 | **データの区分・形式・置き場所のやり直し** | 📝 案 → [data-layout.ja.md](data-layout.ja.md)（目録`catalog/`・証拠`evidence/`・索引`index/`。証拠はCSVのまま訂正なし、索引は用途単位で分割、`pin_roles`→`index/parts/<PART>.csv`、`candidates/`はcommitしない）。入力は [table-roles.ja.md](table-roles.ja.md)（定義違反3つ・検索性の穴）。**案の確認待ち。OKなら移行手順1〜8の順に実施** |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
 | 2 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
 | 3 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
