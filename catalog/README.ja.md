@@ -1,5 +1,7 @@
 # 目録（catalog/）
 
+[English](README.md)
+
 **何が存在し、何と呼ぶか**を決める7つの表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
 ほかの全部の表（証拠 `evidence/`・索引 `index/`）はここの名前——family・series・型番・
 package・core・文書・mirror の版——を鍵にして結合します。名前の追加や改名は全表に波及するので、

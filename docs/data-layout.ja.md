@@ -211,3 +211,7 @@ consumer は commit を固定しているので、途中の状態で壊れるこ
   の `STARTS_REQUEST`・`GLUED`）
 - `dma_requests.request_en`（en 版の綴りが zh 版と違うときだけ入る列）は、再生成の結果**全行空**
   だった——`*` 印も `_0`/`_1` も両版が同じ綴りで書いている。列は規則どおり残す（違いが出たら入る）
+- **公開する情報に日本語を入れない**（2026-08-26 指摘）。`catalog/cores.csv`・`series.csv` の `basis`
+  に curated/*.json 由来の日本語が残っていたので英語にし、`check_tables` の CJK 検査を `#` の右の列
+  （`basis`）まで広げた（`*_zh` と `path` だけ例外）。README は各ディレクトリに英語版 `README.md` を
+  置き、日本語版 `README.ja.md` を併記する。`docs/` の作業文書だけ日本語

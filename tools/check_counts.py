@@ -123,8 +123,8 @@ def main() -> int:
             missing += 1
             gaps.append((part, name, count, sorted(instances), label))
 
-    print(f"突き合わせた組 {len(claims)}  一致 {agree}  "
-          f"pin側が多い（共有pinoutの上位集合）{superset}  pin側が少ない {missing}",
+    print(f"pairs cross-checked {len(claims)}  agree {agree}  "
+          f"more on the pin side (superset from a shared pinout) {superset}  fewer on the pin side {missing}",
           file=sys.stderr)
     empty = [g for g in gaps if not g[3]]
     now = {"superset": superset, "short": missing, "empty": len(empty)}
@@ -132,7 +132,7 @@ def main() -> int:
     if gaps:
         # **1本も取れていないものが最も怪しい。** 比較表がその周辺を数えているのに
         # pin 表から instance が1つも出ないのは、封装の都合というより読み落とし。
-        print(f"  - 比較表が数えているのに pin に1つも出ない: {len(empty)} 組",
+        print(f"  - counted by the comparison table but on no pin at all: {len(empty)} pairs",
               file=sys.stderr)
         for part, name, count, _, label in sorted(empty)[:20]:
             print(f"      {part:<14}{name:<6}表={count}  ({label})", file=sys.stderr)

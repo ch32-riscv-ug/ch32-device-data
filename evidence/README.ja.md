@@ -1,5 +1,7 @@
 # 証拠（evidence/）
 
+[English](README.md)
+
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
 32 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
@@ -304,8 +306,8 @@ datasheetのpin表がそう書いています（`CH32V20x_30xDS0`は表の直前
 consumerが型番ごとの機能一覧を作るなら、**この2つを掛け合わせてください**。`tools/check_counts.py`が両者を突き合わせて数を出します:
 
 ```
-突き合わせた組 391  一致 352  pin側が多い（共有pinoutの上位集合）30  pin側が少ない 9
-  - 比較表が数えているのに pin に1つも出ない: 0 組
+pairs cross-checked 391  agree 352  more on the pin side (superset from a shared pinout) 30  fewer on the pin side 9
+  - counted by the comparison table but on no pin at all: 0 pairs
 ```
 
 `pin側が多い`が共有pinoutの分、`pin側が少ない`はその封装に出ていないinstance（`CMP2`・`LPTIM1`で、入力が内部だけの可能性がある）。**`pin に1つも出ない`が0であること**が、比較表が数える周辺は必ずpinから引けるという保証です。
