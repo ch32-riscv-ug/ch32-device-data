@@ -15,7 +15,7 @@
 `varies-by-package`=型番・variantで値が変わる。
 
 **生成は冪等**です（同じ入力・同じコードなら何度回しても差分ゼロ。実測済み）。
-入力の版は `tables/sources.csv` が持つので、差分が出たら原因は「コードを変えた」か
+入力の版は `catalog/sources.csv` が持つので、差分が出たら原因は「コードを変えた」か
 「ミラーが更新された」かに絞れます。
 
 ## 総合評価の凡例
@@ -56,7 +56,7 @@
 | clock_enables | 429 | confirmed 370 / ref 59 | 結合・address=RCC base+offset | EVT rcc.h×RM。**conflict 0**。ref 59 は RM の field 名綴りが違う（`ETH_MAC_Rx` 等）だけで bit の不一致ではない | ✅ |
 | adc_internal | 19 | confirmed 13 / ref 4 / conflict 2 | 結合・channel が数 | datasheet zh/en 照合。conflict 2 = V20x/V307 の Avg_Slope 最大値が **zh 4.8 / en 4.7**（資料側の食い違い、F-46）。V003/X035 のチャネル番号は RM から | ✅ |
 | usbpd_plumbing | 13 | confirmed 11 / ref 2 | 結合・clock_enables と一致 | EVT ヘッダ×RM。ref 2 = M030 の LVE_T（RM に field 名が無い） | ✅ |
-| dma_requests | 650 | confirmed 577 / ref 73 | 結合・dma+channel か request_id の一方・remap の値・variant が evt_variants の macro | RM の DMA 章の格子を **zh/en 両版で照合**（R-20 D-7、2026-08-26）。ref 73 = CH32V407（RM は zh のみ）。H417 は DMAMUX の番号表（channel 固定でない）。V006 の TIM3 は型番で割り当てが違う（脚注を note に）。資料の誤植 2件（V407 `13C`、H417 `I3X_RX`）は綴りを保って note | ✅ |
+| dma_requests | 650 | confirmed 577 / ref 73 | 結合・dma+channel か request_id の一方・variant が evt_variants の macro（印の読み `remap` は `index/dma` 側で検査） | RM の DMA 章の格子を **zh/en 両版で照合**（R-20 D-7、2026-08-26）。ref 73 = CH32V407（RM は zh のみ）。H417 は DMAMUX の番号表（channel 固定でない）。V006 の TIM3 は型番で割り当てが違う（脚注を note に）。資料の誤植 2件（V407 `13C`、H417 `I3X_RX`）は綴りを保って note | ✅ |
 
 ### EVT から（単一出所・テキスト写し）
 
@@ -73,14 +73,14 @@
 | register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |
 | registers | 4,995 | confirmed 2,762 / ref 2,229 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |
 | register_fields | 33,365 | field 24,792（confirmed 6,829 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方）。`member` 空 1,591 行（CAN 以外の入れ子・構造体の無い define 群） | 🟡 |
-| register_layouts | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
+| register_layouts（`index/`） | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
 
-### 導出（他テーブルから機械生成。原典を新たに読まない）
+### 導出＝索引 `index/`（証拠から機械生成。原典を新たに読まない。2026-08-26 に `pin_roles`→`pinout`・`feature_tags`→`features` へ移った）
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| pin_roles | 24,266 | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
-| feature_tags | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
+| pinout（旧 pin_roles） | 24,977（機能行 24,266＋機能の無い lead 711） | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
+| features（旧 feature_tags） | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
 

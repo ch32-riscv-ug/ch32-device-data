@@ -67,6 +67,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import extract_clock_tree  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 # Keyed by family, not series. A clock tree is a property of the silicon, and
@@ -105,9 +107,9 @@ CONFIDENCE = "reference"
 CONDITIONED = re.compile(r"^(?P<symbol>\S+) \[(?P<condition>.*)\]$")
 
 
-def known_families(tables: Path) -> set[str]:
+def known_families(tables: Path | None) -> set[str]:
     """The family names families.csv carries, which are the EVT clone names."""
-    path = tables / "families.csv"
+    path = paths.table("families", tables)
     if not path.exists():
         return set()
     with path.open(newline="", encoding="utf-8") as f:
@@ -129,7 +131,7 @@ def split_by_condition(pll: list[str]) -> dict[str, list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
     observed, notes = extract_clock_tree.extract_all(args.mirrors)
@@ -206,7 +208,8 @@ def main() -> int:
                     "confidence": CONFIDENCE, "basis": BASIS,
                     "evt_copies": entry["copies"],
                 })
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
     for name, rows, columns in (
         ("clock_configs.csv", config_rows, CONFIG_COLUMNS),
         ("clock_prescalers.csv", prescaler_rows, PRESCALER_COLUMNS),
@@ -218,11 +221,12 @@ def main() -> int:
             rows.sort(key=lambda r: (r["family"], r["function"], r["step"]))
         else:
             rows.sort(key=lambda r: tuple(str(r.get(c, "")) for c in columns[:4]))
-        with (args.out / name).open("w", encoding="utf-8", newline="") as out:
+        dest = paths.table(name.removesuffix(".csv"), args.out)
+        with dest.open("w", encoding="utf-8", newline="") as out:
             writer = csv.DictWriter(out, fieldnames=columns)
             writer.writeheader()
             writer.writerows({**row, "#": "#"} for row in rows)
-        print(f"{args.out}/{name}: {len(rows)} 行", file=sys.stderr)
+        print(f"{dest}: {len(rows)} 行", file=sys.stderr)
 
     staged = [r for r in config_rows if r["domains"].count("=") > 1]
     print(f"  クロックドメインが2段以上: {len(staged)} 行", file=sys.stderr)

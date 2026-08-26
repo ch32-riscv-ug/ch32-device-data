@@ -51,6 +51,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import pdfplumber  # noqa: E402
 
 import build_candidate  # noqa: E402
+import paths  # noqa: E402
 import extract_pins  # noqa: E402
 import extract_ordering  # noqa: E402
 import extract_products  # noqa: E402
@@ -392,7 +393,7 @@ def default_jobs() -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=Path("candidates"))
+    ap.add_argument("--out", type=Path, default=paths.CANDIDATES)
     ap.add_argument("--family", help="この family dir だけ処理する")
     ap.add_argument("--limit", type=int, help="family あたりの SKU 上限（試験用）")
     ap.add_argument("--jobs", type=int, default=default_jobs(),
@@ -413,7 +414,8 @@ def main() -> int:
             show(name, rows, seconds, error)
             report += rows
     else:
-        args.out.mkdir(parents=True, exist_ok=True)
+        if args.out:
+            args.out.mkdir(parents=True, exist_ok=True)
         print(f"family {len(families)} 件を最大 {args.jobs} 並列で処理します"
               f"（終わった順に出ます）", file=sys.stderr, flush=True)
         with concurrent.futures.ProcessPoolExecutor(max_workers=args.jobs) as pool:

@@ -46,6 +46,8 @@ import zipfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 SOURCE = "https://file.wch.cn/download/file?id=418"
 PAGE = "https://www.wch.cn/downloads/wch-linkutility_zip.html"
 
@@ -110,7 +112,7 @@ def read_source(where: str | None) -> tuple[dict[str, bytes], str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--zip", help="ローカルのZIP、または展開済み Firmware_Link ディレクトリ")
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
     try:
@@ -156,8 +158,9 @@ def main() -> int:
         notes.append(f"配布物に無い: {name}")
 
     rows.sort(key=lambda r: (r["device"], r["mode"], r["role"]))
-    args.out.mkdir(parents=True, exist_ok=True)
-    dest = args.out / "link_firmware.csv"
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
+    dest = paths.table("link_firmware", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

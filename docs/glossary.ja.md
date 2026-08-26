@@ -2,7 +2,7 @@
 
 文書基準日: 2026-08-18
 
-この repository と `tables/` のCSVが使う用語の定義です。特に **ファミリーとシリーズはこのプロジェクトの運用単位** であり、WCHの公式分類とは限りません。
+この repository の CSV（`catalog/`・`evidence/`・`index/`）が使う用語の定義です。特に **ファミリーとシリーズはこのプロジェクトの運用単位** であり、WCHの公式分類とは限りません。
 
 ## 階層
 
@@ -10,10 +10,10 @@
 
 | 用語 | 定義 | 例 | 対応 |
 |---|---|---|---|
-| **ファミリー family** | mirror repository = 文書の単位。**分離規則はEVT単位（1 repository = 1 EVT archive）**。WCHが専用EVTを出す製品群は専用repositoryになる（CH32V205はV20xから分離）。このプロジェクトがrepository構成に合わせて定めた単位で、WCH公式の分類名ではない | `CH32V20x` | `tables/families.csv`（1行1ファミリー） |
-| **シリーズ series** | 型番の先頭8文字（`CH32`+英字1+数字3）が表す製品系列。die・coreの単位に最も近い | `CH32V203` | `tables/series.csv`（1行1シリーズ） |
-| **注文型番 part number** | 実際に注文できる完全型番。SKUと同義に使う | `CH32V006K8U7` | `tables/products.csv`（1行1型番） |
-| **package** | 物理パッケージ。同一型番＝単一package。寸法・pitch・lead数はpackageの属性としてマスタ表に正規化し、productsは名前で参照する | `LQFP48` | `tables/packages.csv`（1行1package） |
+| **ファミリー family** | mirror repository = 文書の単位。**分離規則はEVT単位（1 repository = 1 EVT archive）**。WCHが専用EVTを出す製品群は専用repositoryになる（CH32V205はV20xから分離）。このプロジェクトがrepository構成に合わせて定めた単位で、WCH公式の分類名ではない | `CH32V20x` | `catalog/families.csv`（1行1ファミリー） |
+| **シリーズ series** | 型番の先頭8文字（`CH32`+英字1+数字3）が表す製品系列。die・coreの単位に最も近い | `CH32V203` | `catalog/series.csv`（1行1シリーズ） |
+| **注文型番 part number** | 実際に注文できる完全型番。SKUと同義に使う | `CH32V006K8U7` | `catalog/products.csv`（1行1型番） |
+| **package** | 物理パッケージ。同一型番＝単一package。寸法・pitch・lead数はpackageの属性としてマスタ表に正規化し、productsは名前で参照する | `LQFP48` | `catalog/packages.csv`（1行1package） |
 | ~~silicon~~ | 旧称。**series** に改称した（`silicon.csv`→`series.csv`） | — | — |
 
 注意:
@@ -72,15 +72,18 @@
 | `manifests/documents.json` | 取得すべき文書のカタログ。日次同期。mirrorはこれを読んで取得する |
 | `candidates/` | **未review**の機械抽出出力。根拠にはなるが確定ではない |
 | `curated/` | 人が確認して記録した確定情報（根拠・確認日つき） |
-| `tables/` | 正規化CSV。確度と根拠つき。階層はこの用語集の通り |
+| `catalog/` | **目録**。何が存在し何と呼ぶか（family・series・型番・package・core・文書・mirror版）。全表の鍵 |
+| `evidence/` | **証拠**。資料が何と書いているかを綴りのまま写した表。行ごとに確度と根拠。訂正はしない |
+| `index/` | **索引**。証拠から語彙で揃え、用途の形に組み直した表。1表1ファイル |
+| 付与識別子 | 資料が名前を付けていないものに repository が付けた鍵（`selector`・`symbol`・`attribute`）。証拠の表に置いてよいが、資料の綴りが同じ行に残ること |
 
 ## 表の中の特別な値（2026-08-26 追記）
 
 | 用語 | 定義 |
 |---|---|
-| `route` の `main` / `default` | pin表の列そのもの。`main`=主功能（复位后。電源投入直後に動く）、`default`=默认复用功能（remapを書かずに届くが**AFモードにしないと出ない**）。[tables/README](../tables/README.ja.md)の「`route`の値の意味」 |
-| `route` の `alias` | pad名の欄に資料が括弧で添えたGPIO名（CH32M007の`LO1 (PA0)`）。**機能ではない**。`pin_roles`には載せず、`port`/`pin`の材料にだけ使う |
+| `route` の `main` / `default` | pin表の列そのもの。`main`=主功能（复位后。電源投入直後に動く）、`default`=默认复用功能（remapを書かずに届くが**AFモードにしないと出ない**）。[tables/README](../evidence/README.ja.md)の「`route`の値の意味」 |
+| `route` の `alias` | pad名の欄に資料が括弧で添えたGPIO名（CH32M007の`LO1 (PA0)`）。**機能ではない**。索引`index/pinout`には機能として載せず、`port`/`gpio`の材料にだけ使う |
 | `PREDRV` | CH32M030/M007のゲートドライバ出力（`HO0`〜`HO3`／`LO0`〜`LO3`）の周辺名。WCHの「预驱 / pre-drive」から。RMは独立章を持たない |
-| layout key（`register_layouts.layout`） | 型（`USART_TypeDef`）の構造体の並びとbit define名の集合のハッシュ。**同じか違うかだけ**を言う。同じkeyのfamilyはレジスタ定義を共有できる（R-20のD-5） |
+| layout key（`index/register_layouts.layout`） | 型（`USART_TypeDef`）の構造体の並びとbit define名の集合のハッシュ。**同じか違うかだけ**を言う。同じkeyのfamilyはレジスタ定義を共有できる（R-20のD-5） |
 | `kind=field` / `kind=value`（`register_fields`） | headerのbit defineが、fieldそのもの（`PLLMULL`）か、その中の値（`PLLMULL_3`）か。値は`of_field`が親、`value`がその値 |
 | banner | EVT headerの`/* Bit definition for RCC_APB2PCENR register */`というコメント。bit defineがどのregisterのものかを言う唯一の場所。`register_fields.register`はこの綴り |

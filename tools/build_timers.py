@@ -20,9 +20,9 @@
 **幅**を言います。注が付くものは variant によって幅が変わるので、`condition` に
 EVT の variant macro を置きます（`interrupts.csv` と同じ持ち方）。
 
-チャネル数と相補出力の有無は pin 側から数えます——`pin_roles.csv` の
-`(TIMn, CHm)` と `(TIMn, CHmN)`。**pinout 単位の下限**であって silicon の上限では
-ないので、`channels` は「pin に出ている最大のチャネル番号」です。
+チャネル数と相補出力の有無はこの表には無く、pin 側から数えた導出として索引
+`index/timers.csv` が持ちます（tools/build_index.py。`pinout` の `(TIMn, CHm)` と
+`(TIMn, CHmN)`。**pinout 単位の下限**であって silicon の上限ではない）。
 
 実行:
     uv run tools/build_timers.py [--mirrors <dir>] [--out tables]
@@ -40,10 +40,13 @@ from pathlib import Path
 import pdfplumber
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "timer", "kind", "counter_width_bits", "channels",
-           "complementary", "update_vector", "condition",
+# `channels`/`complementary`（pin に出ているチャネルから数える導出）は索引
+# `index/timers.csv` が持つ（tools/build_index.py）。ここは RM と EVT の記述だけ。
+COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition",
            "#", "confidence", "basis"]
 
 # `15.4.10 通用定时器的计数器（TIMx_CNT）（x=2/3/4）` と、単体の
@@ -142,12 +145,11 @@ def read_timers(path: Path) -> tuple[list[dict], list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
     def load(name: str) -> list[dict]:
-        with (args.out / f"{name}.csv").open(encoding="utf-8") as f:
-            return list(csv.DictReader(f))
+        return paths.load(name)
 
     families = [r["family"] for r in load("families")]
     variants = {(r["family"], r["macro"]) for r in load("evt_variants")
@@ -167,10 +169,6 @@ def main() -> int:
         irq_of[key] = (exact if exact in found else
                        key[1] if key[1] in found else
                        sorted(found)[0] if found else "")
-    channels: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
-    for row in load("pin_roles"):
-        if row["peripheral"].startswith("TIM") and row["role"].startswith("CH"):
-            channels[(row["family"], row["peripheral"])].add(row["role"])
 
     rows: list[dict] = []
     notes: list[str] = []
@@ -184,8 +182,6 @@ def main() -> int:
         if not found:
             notes.append(f"{family}: タイマの計数器の見出しを1つも読めない")
         for timer in found:
-            seen = channels.get((family, timer["timer"]), set())
-            plain = {c for c in seen if not c.endswith("N")}
             varies = timer.get("_varies")
             # **注が名指しする variant をこの family が持たないなら、その幅は
             # ここには適用されない。** CH32V20x と CH32V30x は RM を共有していて、
@@ -201,10 +197,6 @@ def main() -> int:
                 "timer": timer["timer"],
                 "kind": timer["kind"],
                 "counter_width_bits": timer["counter_width_bits"],
-                # **pin に出ている最大のチャネル番号**で、silicon の上限ではない。
-                "channels": max((int(re.sub(r"\D", "", c) or 0) for c in plain),
-                                default=""),
-                "complementary": "1" if any(c.endswith("N") for c in seen) else "",
                 "update_vector": irq_of.get((family, timer["timer"]), ""),
                 # 幅が variant で変わるなら、その variant を条件に置く。
                 "condition": ";".join(applies),
@@ -213,7 +205,7 @@ def main() -> int:
                 "basis": f"rm({manual.name}:p{timer['page']})",
             })
 
-    dest = args.out / "timers.csv"
+    dest = paths.table("timers", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

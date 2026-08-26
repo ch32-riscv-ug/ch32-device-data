@@ -39,6 +39,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import extract_addresses  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "region", "base_address", "kind", "condition",
@@ -155,10 +157,10 @@ def read_link_origins(family_dir: Path) -> dict[tuple[str, str], int]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
 
     rows: list[dict] = []
@@ -206,7 +208,7 @@ def main() -> int:
             notes.append(f"{family}: linker script から ORIGIN が読めない")
 
     rows.sort(key=lambda r: (r["family"], r["kind"], r["base_address"], r["region"]))
-    dest = args.out / "memory_map.csv"
+    dest = paths.table("memory_map", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

@@ -47,10 +47,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import signal_vocabulary  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "variant", "dma", "channel", "request_id", "peripheral", "request",
-           "remap", "note", "#", "confidence", "basis"]
+# `request` は RM の綴りそのまま（zh 版。`TIM1_UP*` の `*`、X315 の `_0`/`_1` も
+# 残す）。en 版の綴りが違えば `request_en`。印の読み（selectable / default / remap）
+# と peripheral 名は索引 `index/dma.csv` が付ける（tools/build_index.py）。
+COLUMNS = ["family", "variant", "dma", "channel", "request_id", "request", "request_en",
+           "note", "#", "confidence", "basis"]
 
 HEAD_FIRST = re.compile(r"^(外设|Peripheral)s?$", re.IGNORECASE)
 HEAD_CHANNEL = re.compile(r"^(?:通道|Channel)\s*(\d+)$", re.IGNORECASE)
@@ -83,6 +88,11 @@ REMAPPED = re.compile(r"^(?P<request>[A-Z0-9]+_(?:RX|TX|CH\dN?|UP|TRIG|COM|TC))_
 
 
 ROLES = {"RX", "TX", "UP", "TRIG", "COM", "TC", "RS", "DMA", "BRK", "CC", "TRG"}
+# 改行無しで2つの要求が1語に見えるセル（en 版 L103/V205/X035 の `TIM1_CH4TIM1_TRIG`）。
+# 周辺名の頭で切って、**両側とも完結した要求名になるときだけ**分ける
+# （`SPI_I2S2_RX` は `SPI_` が完結しないので切らない）。
+STARTS_REQUEST = re.compile(r"^[A-Z]{2,}\d*_")
+GLUED = re.compile(r"(?<=[A-Z0-9])(?=(?:TIM|USART|UART|SPI|I2C|I2S|ADC|DAC|SDIO|SDMMC|USB|CAN|LPTIM|DVP|QSPI|SAI)\d*_)")
 BARE = re.compile(r"^[A-Z][A-Z0-9]{2,}\*?$")          # ADC1・QSPI1・ADC・SPI
 QUALIFIED = re.compile(r"^[A-Z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+(?:_[01])?\*?$")
 
@@ -104,8 +114,8 @@ def complete(text: str) -> bool:
         or bool(re.fullmatch(r"[A-Z]+\d+", tail))
 
 
-def cell_tokens(cell: str) -> list[tuple[str, str, str]]:
-    """セル → [(request, remap, note)]。
+def cell_tokens(cell: str) -> list[tuple[str, str, str, str]]:
+    """セル → [(request の正規形, 綴りそのまま, remap の印, note)]。
 
     改行は複数の要求（`TIM1_CH4\\nTIM1_TRIG`）。ただし **`_` で終わる行**は次の行と
     1語（V407 の `SPI_I2S2_\\nRX`）、**1〜2文字の大文字だけの行**は前の行の切れ端
@@ -116,14 +126,23 @@ def cell_tokens(cell: str) -> list[tuple[str, str, str]]:
     for ln in lines:
         # 前の行が語として完結していなければ（`TIM1_CH`・`USART3_T`・`SPI_I2S2_`）、
         # または今の行が語の切れ端なら（`1`・`X_0`・`G`）、前の行に繋ぐ
-        if joined and (not complete(joined[-1]) or not complete(ln)):
+        # ただし、完結していない行でも**周辺名で始まる**なら新しい要求の先頭
+        # （`TIM1_TRI` の後に `G` が来る形）。前の完結した要求に繋ぐと
+        # `TIM1_CH4TIM1_TRIG` になる。
+        starts_new = bool(STARTS_REQUEST.match(ln))
+        if joined and (not complete(joined[-1]) or (not complete(ln) and not starts_new)):
             joined[-1] += ln
         else:
             joined.append(ln)
-    out = []
+    split: list[str] = []
     for text in joined:
+        pieces = GLUED.split(text)
+        split.extend(pieces if len(pieces) > 1 and all(complete(x) for x in pieces) else [text])
+    out = []
+    for text in split:
         note = "".join(FOOTNOTE.findall(text))
         text = FOOTNOTE.sub("", text).replace(" ", "")
+        verbatim = text
         remap = ""
         if text.endswith("*"):
             remap, text = "selectable", text.rstrip("*")
@@ -133,7 +152,7 @@ def cell_tokens(cell: str) -> list[tuple[str, str, str]]:
         if not text or text in ("-", "—", "保留", "Reserved") or not TOKEN.match(text):
             # 要求名は ASCII。脚注の文（`仅适用于CH32F20x_D8…`）が表に入ったものは捨てる
             continue
-        out.append((text, remap, note))
+        out.append((text, verbatim, remap, note))
     return out
 
 
@@ -188,10 +207,10 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
                         row = [c.replace("\n", "") for c in row]
                         for i in range(0, len(row) - 1, 2):
                             if row[i].isdigit():
-                                for req, remap, note in cell_tokens(row[i + 1]):
+                                for req, verbatim, remap, note in cell_tokens(row[i + 1]):
                                     rows.append({"variant": "", "dma": "", "channel": "",
                                                  "request_id": int(row[i]), "request": req,
-                                                 "remap": remap, "note": note,
+                                                 "verbatim": verbatim, "remap": remap, "note": note,
                                                  "page": pno, "table": number})
                     grid = {"mux": True, "table": number, "skip": True, "width": -1}
                     page_has_grid = True
@@ -242,10 +261,11 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
                         channel = grid["cols"][ci] if ci < len(grid["cols"]) else None
                         if channel is None or not cell:
                             continue
-                        for req, remap, note in cell_tokens(cell):
+                        for req, verbatim, remap, note in cell_tokens(cell):
                             rows.append({"variant": grid["variant"], "dma": grid["dma"],
                                          "channel": channel, "request_id": "",
-                                         "request": req, "remap": remap, "note": note,
+                                         "request": req, "verbatim": verbatim,
+                                         "remap": remap, "note": note,
                                          "page": pno, "table": grid["table"]})
                     if label:
                         grid["last"] = label
@@ -259,11 +279,11 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--family", action="append", default=None)
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
     if args.family:
         families = [x for x in families if x in set(args.family)]
@@ -273,11 +293,11 @@ def main() -> int:
         family_dir = args.mirrors / family
         editions: dict[str, tuple[Path, list[dict]]] = {}
         for lang in ("zh", "en"):
-            paths = sorted((family_dir / f"datasheet_{lang}").glob("*RM.PDF"))
-            if not paths:
+            manuals = sorted((family_dir / f"datasheet_{lang}").glob("*RM.PDF"))
+            if not manuals:
                 continue
-            rows, _ = read_manual(paths[0], family)
-            editions[lang] = (paths[0], rows)
+            rows, _ = read_manual(manuals[0], family)
+            editions[lang] = (manuals[0], rows)
         if not editions:
             print(f"  - {family}: RM が無い", file=sys.stderr)
             continue
@@ -291,30 +311,26 @@ def main() -> int:
         for lang, (path, rows) in editions.items():
             for r in rows:
                 k = key(r)
-                entry = seen.setdefault(k, {**r, "langs": {}, "remaps": {}})
+                entry = seen.setdefault(k, {**r, "langs": {}, "spelled": {}})
                 entry["langs"][lang] = f"rm:{lang}({path.name} p.{r['page']})"
-                entry["remaps"][lang] = r["remap"]
+                entry["spelled"][lang] = r["verbatim"]
                 if r["note"] and not entry["note"]:
                     entry["note"] = r["note"]
-        for e in seen.values():
-            marks = {l: v for l, v in e["remaps"].items() if v}
-            e["remap"] = next(iter(marks.values()), "")
-            if marks and len(marks) < len(e["langs"]):
-                e["note"] = (e["note"] + "; " if e["note"] else "") + \
-                    f"remap marker only in {'/'.join(sorted(marks))}"
         for k, e in seen.items():
             langs = e["langs"]
             confidence = "confirmed" if len(langs) == 2 else "reference"
             note = e["note"]
             if e["request"] in TYPO:
                 note = (note + "; " if note else "") + f"as printed; RM typo for {TYPO[e['request']]}"
-            if e["request_id"] != "":
-                note = (note + "; " if note else "") + "DMAMUX: any channel can take this request"
+            # 綴りは原典（zh）を採り、en 版が違う綴り（`*` を落とす等）なら並べて残す
+            spelled = e["spelled"].get("zh") or e["spelled"].get("en")
+            spelled_en = e["spelled"].get("en", "")
             out_rows.append({
                 "family": family, "variant": e["variant"], "dma": e["dma"],
                 "channel": e["channel"], "request_id": e["request_id"],
-                "peripheral": peripheral_of(TYPO.get(e["request"], e["request"])),
-                "request": e["request"], "remap": e["remap"], "note": note,
+                "request": spelled,
+                "request_en": spelled_en if spelled_en and spelled_en != spelled else "",
+                "note": note,
                 "confidence": confidence, "basis": "+".join(langs[l] for l in ("zh", "en") if l in langs),
             })
         tally = collections.Counter(r["confidence"] for r in out_rows if r["family"] == family)
@@ -323,7 +339,7 @@ def main() -> int:
 
     out_rows.sort(key=lambda r: (r["family"], r["variant"], r["dma"],
                                  int(r["channel"] or 0), int(r["request_id"] or 0), r["request"]))
-    dest = args.out / "dma_requests.csv"
+    dest = paths.table("dma_requests", args.out)
     if args.family:
         try:
             with dest.open(newline="", encoding="utf-8") as f:

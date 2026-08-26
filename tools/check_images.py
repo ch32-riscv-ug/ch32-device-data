@@ -26,10 +26,13 @@ from pathlib import Path
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
+import sys  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 
 def load(name):
-    with (REPO / "tables" / f"{name}.csv").open(encoding="utf-8") as f:
+    with paths.table(name).open(encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 

@@ -16,6 +16,8 @@ from pathlib import Path
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 # 目録の1行。`  |      |-- NAME: description` 形式で、深さは "|" の数で決まる。
 # 区切りは半角コロンと全角コロンの両方が使われる（CH32L103は全角）。
@@ -149,7 +151,7 @@ def main():
             })
 
     rows.sort(key=lambda r: (r["family"], r["group"], r["example"]))
-    dest = REPO / "tables/evt_examples.csv"
+    dest = paths.table("evt_examples")
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()

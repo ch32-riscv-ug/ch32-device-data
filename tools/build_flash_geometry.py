@@ -53,6 +53,8 @@ from pathlib import Path
 import pdfplumber
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "page_erase_bytes", "fast_erase_bytes", "fast_program_bytes",
@@ -152,21 +154,21 @@ def read_manual(family_dir: Path) -> tuple[dict, str] | None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "families.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
-    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
         family_of = {r["part_number"]: r["family"] for r in csv.DictReader(f)}
     # 零等待の注意はデータから導く。option byte で領域が動く family と、
     # 比較表が総容量（code_flash_bytes）を別に数える family。
     movable = set()
-    with (args.out / "memory_configs.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("memory_configs").open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             movable.add(family_of.get(row["part_number"], ""))
     stated_total = set()
-    with (args.out / "product_attributes.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("product_attributes").open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             if row["attribute"].startswith("code_flash"):
                 stated_total.add(family_of.get(row["part_number"], ""))
@@ -229,7 +231,7 @@ def main() -> int:
         rows.append(row)
 
     rows.sort(key=lambda r: r["family"])
-    dest = args.out / "flash_geometry.csv"
+    dest = paths.table("flash_geometry", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

@@ -36,6 +36,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import paths  # noqa: E402
 import signal_vocabulary  # noqa: E402
 
 SERIES = re.compile(r"^(CH32[A-Z]\d{2}[0-9A-Za-z])")
@@ -112,12 +113,12 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--ch32-data", type=Path, required=True, dest="root",
                     help="ch32-rs/ch32-data の clone")
-    ap.add_argument("--tables", type=Path, default=Path("tables"))
+    ap.add_argument("--tables", type=Path, default=None, help="remap_fields.csv のあるディレクトリ（既定 evidence/）")
     ap.add_argument("--verbose", action="store_true",
                     help="うちが持たない field を1件ずつ出す")
     args = ap.parse_args()
 
-    mine = ours(args.tables)
+    mine = ours(args.tables or paths.EVIDENCE)
     versions = peripheral_versions(args.root)
     our_series = sorted({series for series, _ in mine})
 

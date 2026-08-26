@@ -42,6 +42,8 @@ from pathlib import Path
 import pdfplumber
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 # 機能説明の章は必ず前の方にある。ここまで見れば足りる。
 MAX_PAGES = 40
@@ -91,10 +93,10 @@ def read_headings(path: Path) -> tuple[str, dict[str, str]]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
-    with (args.out / "products.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     by_datasheet: dict[str, str] = {}
     covers: dict[str, set[str]] = {}
@@ -158,7 +160,7 @@ def main() -> int:
             })
 
     rows.sort(key=lambda r: (r["series"], [int(n) for n in r["section"].split(".")]))
-    dest = args.out / "features.csv"
+    dest = paths.table("features", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

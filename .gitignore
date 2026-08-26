@@ -24,5 +24,7 @@ a.out
 # a vendored toolchain belongs here rather than in the tree.
 .tools/
 
-# build_registers.py --rm-cache の置き場（RM のレジスタ表の読み結果。再生成できる）
+# 中間生成物。`.cache/rm` は build_registers.py --rm-cache の RM 読み取り、
+# `.cache/candidates` は build_all.py の型番ごとの抽出候補（証拠の表がその review 結果）。
+# どちらも再生成できる
 .cache/

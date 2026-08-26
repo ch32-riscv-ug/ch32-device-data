@@ -23,6 +23,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 DOCUMENTS = REPO / "manifests" / "documents.json"
 
 # URL shapes verified live on 2026-08-18; a red daily run is the signal that
@@ -89,7 +91,7 @@ def write(out_dir: Path) -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=REPO / "tables")
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
     write(args.out)
     return 0

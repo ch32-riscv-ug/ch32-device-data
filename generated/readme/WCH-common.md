@@ -1,6 +1,6 @@
 # WCH-common
 
-<!-- This file is generated from ch32-riscv-ug/ch32-device-data (tables/ + tools/build_readme.py). Edit there, not here. -->
+<!-- This file is generated from ch32-riscv-ug/ch32-device-data (index/ + evidence/ + tools/build_readme.py). Edit there, not here. -->
 
 ## Documents
 
@@ -14,4 +14,4 @@
 | WCH-LinkUserManual.PDF | other | [page](https://www.wch-ic.com/downloads/WCH-LinkUserManual_PDF.html) [mirror](https://ch32-riscv-ug.github.io/WCH-common/datasheet_en/WCH-LinkUserManual.PDF) v2.7 | [page](https://www.wch.cn/downloads/WCH-LinkUserManual_PDF.html) [mirror](https://ch32-riscv-ug.github.io/WCH-common/datasheet_zh/WCH-LinkUserManual.PDF) v2.8 |
 
 ---
-Data: [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data) (tables/ -- each value carries its evidence and confidence there).
+Data: [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data) (evidence/ and index/ -- each value carries its evidence and confidence there).

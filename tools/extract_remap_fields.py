@@ -48,6 +48,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+import paths  # noqa: E402
 import signal_vocabulary  # noqa: E402
 
 FN = re.compile(r"void GPIO_PinRemapConfig\(.*?\n\}", re.S)
@@ -338,9 +339,9 @@ def main() -> int:
                     help="CH32* の EVT clone を並べたディレクトリ")
     ap.add_argument("--family", help="この family だけ処理する")
     ap.add_argument("--json", type=Path)
-    ap.add_argument("--compare", type=Path, help="突き合わせる tables/ ディレクトリ")
-    ap.add_argument("--candidates", type=Path, default=Path("candidates"),
-                    help="family と series の対応を読む candidates/ ディレクトリ")
+    ap.add_argument("--compare", type=Path, help="突き合わせる remap_fields.csv のあるディレクトリ（evidence/）")
+    ap.add_argument("--candidates", type=Path, default=paths.CANDIDATES,
+                    help="family と series の対応を読む candidates ディレクトリ（既定 .cache/candidates）")
     ap.add_argument("--raw", action="store_true",
                     help="観測した set/clear をそのまま出す（デバッグ用）")
     args = ap.parse_args()

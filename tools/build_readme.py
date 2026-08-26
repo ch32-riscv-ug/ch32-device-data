@@ -2,7 +2,7 @@
 """Generate each mirror repository's README.md from the normalised tables.
 
 This is the project's target direction: the mirrors' human-facing pin tables
-are rendered from tables/ -- the judged, evidence-carrying data -- instead of
+are rendered from evidence/ and index/ -- the judged, evidence-carrying data -- instead of
 being maintained by hand or linking to hand-made pages. The output goes to
 generated/readme/<FAMILY>.md in this repository; each mirror's daily update
 fetches its own file, the same way it fetches the document catalogue, so no
@@ -35,7 +35,8 @@ import signal_vocabulary  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 REPO = Path(__file__).resolve().parent.parent
-TABLES = REPO / "tables"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 PAGES = "https://ch32-riscv-ug.github.io"
 
@@ -43,7 +44,7 @@ PAGES = "https://ch32-riscv-ug.github.io"
 # （`USART1_TX` / `TX1` / `UTX` / `UART_TX`、`SWDIO` / `DIO`）ので、集合で書くと
 # 必ず取りこぼす——実際 CH32M030 の `UART_TX` が漏れ、pad 名を入れたせいで
 # 2線式SDIの family 全部で SWDIO の列が空だった。綴りを揃えた索引が
-# `tables/pin_roles.csv` にあるので、そこから (peripheral, role) で引く。
+# `index/pinout.csv` にあるので、そこから (peripheral, role) で引く。
 # **UART は instance を決め打たない。** CH32X033 の 20 ピン品は USART1 を既定の
 # route に持たず、既定で出ているのは USART2 と USART4。`USART1` で引くと
 # 「UART が無い」という誤った空欄になる。
@@ -51,12 +52,14 @@ USART = re.compile(r"^USART\d+$")
 OSC = {"OSCI", "OSCO", "OSC_IN", "OSC_OUT", "XTAL1", "XTAL2", "OSC32_IN", "OSC32_OUT"}
 
 NOTICE = ("<!-- This file is generated from ch32-riscv-ug/ch32-device-data "
-          "(tables/ + tools/build_readme.py). Edit there, not here. -->")
+          "(index/ + evidence/ + tools/build_readme.py). Edit there, not here. -->")
 
 
 def load(name: str) -> list[dict]:
-    with (TABLES / f"{name}.csv").open(encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+    """目録・証拠の表は名前で、索引は `index:` を付けて読む（tools/paths.py）。"""
+    if name.startswith("index:"):
+        return paths.load_index(name[len("index:"):])
+    return paths.load(name)
 
 
 def pad_key(pad: str) -> tuple:
@@ -108,16 +111,17 @@ class Data:
         except FileNotFoundError:
             self.errata = []
         # B4 で足した節が読むもの。無くても頁は組めるようにしておく。
-        for name in ("feature_tags", "eval_boards", "memory_map", "sources",
-                     "families", "pin_roles"):
+        for name in ("eval_boards", "memory_map", "sources", "families"):
             try:
                 setattr(self, name, load(name))
             except FileNotFoundError:
                 setattr(self, name, [])
-
+        self.feature_tags = load("index:features")
+        # 索引 pinout の、機能を持つ行だけ（lead だけの行は peripheral が空）。
         self.roles_by_part = collections.defaultdict(list)
-        for r in self.pin_roles:
-            self.roles_by_part[r["part_number"]].append(r)
+        for r in load("index:pinout"):
+            if r["peripheral"]:
+                self.roles_by_part[r["part_number"]].append(r)
 
     def family_series(self, family: str) -> list[dict]:
         return [s for s in self.series if s["family"] == family]
@@ -128,7 +132,7 @@ class Data:
 
 
 def operating_summary(data: Data, series: str) -> tuple[str, str]:
-    """(クロック, VDD範囲) -- tables/operating_conditions.csv のシリーズ行から。
+    """(クロック, VDD範囲) -- evidence/operating_conditions.csv のシリーズ行から。
 
     クロックはデータシート1ページ目が謳う系統主頻(F_MAIN)を最優先する。
     電気的特性表のF_HCLKはAHBの上限値で、製品として謳われる周波数とは別物
@@ -223,7 +227,7 @@ def all_signals(data: Data, part: str) -> dict[str, set[str]]:
 def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
     """Quick start の「とりあえずどこに繋ぐか」の表。
 
-    **`tables/pin_roles.csv` から素直に引く。** 綴りを揃えるのはあちらの仕事で、
+    **`index/pinout.csv` から素直に引く。** 綴りを揃えるのはあちらの仕事で、
     ここで `USART1_TX` / `TX1` / `UTX` / `UART_TX` の4通りを知っている必要は無い
     ——以前はここが綴りを抱え込み、`UART_TX` を取りこぼして CH32M030 の欄が
     空になっていた。
@@ -238,7 +242,7 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
     out = [f"{level} Debug / serial defaults", "",
            "Where these land **without writing a remap register**. SWD is live at "
            "reset; the UART pads are not -- the pin must still be put into "
-           "alternate-function mode. See `route` in tables/README.ja.md.", "",
+           "alternate-function mode. See `route` in evidence/README.ja.md.", "",
            "| Series | SWDIO | SWCLK | UART TX | UART RX |",
            "|---|---|---|---|---|"]
     marked = False
@@ -252,15 +256,15 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
         # **`main` と `default` の両方を見る。** どちらの列に書くかは datasheet が
         # family ごとに違い（SWD は 4 family が主功能列、7 family が既定代替功能列）、
         # `main` だけで引くと 7 family の SWD を落とす。意味の違いは
-        # tables/README.ja.md の「`route` の値の意味」にある。
+        # evidence/README.ja.md の「`route` の値の意味」にある。
         default: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
         alternate: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
         for product in products:
             for r in data.roles_by_part[product["part_number"]]:
                 key = (r["peripheral"], r["role"])
-                if r["routing"] in ("default", "main"):
+                if r["route"] in ("default", "main"):
                     default[key].add(r["pad"])
-                elif r["routing"].startswith("af-"):
+                elif r["route"].startswith("af-"):
                     # **AF 方式の family（V205・X315・H41x）に「既定」は無い。**
                     # どの機能もレジスタで選ぶので、`af-7` に出る USART1 は
                     # 「そこへ出せる」であって「そこに出ている」ではない。
@@ -524,7 +528,7 @@ def remap_section(data: Data, family: str) -> list[str]:
 
 
 def errata_section(data: Data, family: str) -> list[str]:
-    """Errata rows for this family's series, from tables/errata.csv."""
+    """Errata rows for this family's series, from evidence/errata.csv."""
     mine = {s["series"] for s in data.family_series(family)}
     rows = [e for e in data.errata
             if mine & set(e["series"].split(";"))]
@@ -619,7 +623,7 @@ def evt_examples_section(data: Data, family: str) -> list[str]:
 def quick_start_section(data: Data, family: str) -> list[str]:
     """最初に触る人が要るもの——**どうやって書き込むか**と、debug/serial のpad。
 
-    書き込み方式は `feature_tags.csv` の SDI の行が持つ。CH32V003 系は1線式、
+    書き込み方式は `index/features.csv` の SDI の行が持つ。CH32V003 系は1線式、
     CH32V20x 系は2線式で、**線数が違うと配線が違う**ので最初に要る
     （worklist の A8）。見出しの綴りは版で揺れるので `features` 列の原文から
     線数を読む。
@@ -662,9 +666,9 @@ def reference_section(data: Data, family: str) -> list[str]:
             "real -- CH32V307 answers at `0x08000000` and at `0x00000000`.", "",
             "Peripheral base addresses are in "
             "[memory_map.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
-            "/blob/main/tables/memory_map.csv); interrupt numbers in "
+            "/blob/main/evidence/memory_map.csv); interrupt numbers in "
             "[interrupts.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
-            "/blob/main/tables/interrupts.csv).", ""]
+            "/blob/main/evidence/interrupts.csv).", ""]
     return out
 
 
@@ -699,7 +703,7 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
 def synced_line(data: Data, family: str) -> list[str]:
     """いつの原典から作ったか（worklist の D4）。U5（原典に届かない人）が最初に見る。
 
-    `tables/sources.csv` が持つ mirror の commit と日付を出す。生成時刻は出さない
+    `catalog/sources.csv` が持つ mirror の commit と日付を出す。生成時刻は出さない
     （冪等性——入力が同じなら出力も同じ、を保つため。sources.csv も同じ方針）。
     """
     row = next((r for r in data.sources if r["family"] == family), None)
@@ -740,7 +744,7 @@ def render(data: Data, family: str) -> str:
     lines += extras_section(family)
     lines += ["---",
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"
-              "ch32-device-data) (tables/ -- each value carries its evidence "
+              "ch32-device-data) (evidence/ and index/ -- each value carries its evidence "
               "and confidence there).", ""]
     return "\n".join(lines)
 
@@ -820,7 +824,7 @@ def org_profile(data: Data) -> str:
     if by_tag:
         lines += ["", "## Find by feature", "",
                   "Which series have a given peripheral, from the feature "
-                  "chapter of each datasheet. Series marked \* are tagged at "
+                  "chapter of each datasheet. Series marked \\* are tagged at "
                   "datasheet granularity (the whole datasheet lists the feature; "
                   "the comparison table does not confirm it per part).", "",
                   "| Feature | Series (repository) |", "|---|---|"]
@@ -830,7 +834,7 @@ def org_profile(data: Data) -> str:
                 names = ", ".join(sorted(by_tag[tag][family]))
                 url = f"https://github.com/ch32-riscv-ug/{family}"
                 cells.append(f"{names} ([{family}]({url}))")
-            mark = "\*" if tag in loose else ""
+            mark = "\\*" if tag in loose else ""
             lines.append(f"| **{tag}**{mark} | {'; '.join(cells)} |")
 
     common = sorted(d["document"] for d in data.documents
@@ -859,7 +863,8 @@ def main() -> int:
     ap.add_argument("--family")
     args = ap.parse_args()
     data = Data()
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
     # Every mirror repository gets a README: the families, and the common-
     # document repository, which renders as its document list alone.
     families = sorted(

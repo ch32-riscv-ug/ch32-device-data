@@ -41,7 +41,9 @@ from crosscheck_languages import canonical_value  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
-CANDIDATES = REPO / "candidates"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
+CANDIDATES = paths.CANDIDATES
 SERIES_FACTS = REPO / "curated" / "series-facts.json"
 CORE_FACTS = REPO / "curated" / "core-facts.json"
 DOCUMENTS = REPO / "manifests" / "documents.json"
@@ -617,10 +619,11 @@ def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=Path("tables"))
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--family")
     args = ap.parse_args()
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
 
     dims = load_package_dims()
     rows: list[dict] = []
@@ -648,18 +651,17 @@ def main() -> int:
     attributes = attribute_rows(rows)  # removes the stashed attribute dicts
     packages = package_rows(rows, dims)  # also removes the stashed evidence
     series = series_rows(rows)
-    write_csv(args.out / "products.csv", rows, PRODUCT_COLUMNS)
-    write_csv(args.out / "packages.csv", packages, PACKAGE_COLUMNS)
-    write_csv(args.out / "series.csv", series, SERIES_COLUMNS)
-    write_csv(args.out / "families.csv", family_rows(series), FAMILY_COLUMNS)
-    write_csv(args.out / "cores.csv", core_rows(), CORE_COLUMNS)
-    write_csv(args.out / "errata.csv", errata_rows(), ERRATA_COLUMNS)
-    write_csv(args.out / "product_attributes.csv", attributes, ATTRIBUTE_COLUMNS)
-    build_documents.write(args.out)
-    print(f"{args.out}/product_attributes.csv: {len(attributes)} 行", file=sys.stderr)
-    (args.out / "silicon.csv").unlink(missing_ok=True)  # 旧名。series.csvに置き換え
-    tally(args.out / "products.csv", rows)
-    print(f"{args.out}/series.csv: {len(series)} 行", file=sys.stderr)
+    write_csv(paths.table("products", args.out), rows, PRODUCT_COLUMNS)
+    write_csv(paths.table("packages", args.out), packages, PACKAGE_COLUMNS)
+    write_csv(paths.table("series", args.out), series, SERIES_COLUMNS)
+    write_csv(paths.table("families", args.out), family_rows(series), FAMILY_COLUMNS)
+    write_csv(paths.table("cores", args.out), core_rows(), CORE_COLUMNS)
+    write_csv(paths.table("errata", args.out), errata_rows(), ERRATA_COLUMNS)
+    write_csv(paths.table("product_attributes", args.out), attributes, ATTRIBUTE_COLUMNS)
+    build_documents.write(args.out if args.out else paths.CATALOG)
+    print(f"{paths.table('product_attributes', args.out)}: {len(attributes)} 行", file=sys.stderr)
+    tally(paths.table("products", args.out), rows)
+    print(f"{paths.table('series', args.out)}: {len(series)} 行", file=sys.stderr)
     return 0
 
 
@@ -689,15 +691,18 @@ ATTRIBUTE_COLUMNS = ["part_number", "order", "attribute", "value",
 
 def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
     keys = {k for r in rows for k in r}
-    plain = [k for k in keys if not k.endswith(("_confidence", "_basis"))]
+    plain = [k for k in keys
+             if not k.endswith(("_confidence", "_basis")) and k not in ("confidence", "basis")]
     values = [k for k in priority if k in keys]
     values += sorted(k for k in plain if k not in values)  # safety net for new fields
     # An empty column named "#" separates the data from its metadata: everything
     # to its right is confidence/basis, not the data itself. One file, so the two
     # can never drift apart, and a reader can simply drop the columns from "#" on.
+    # Row-level confidence/basis (product_attributes) sit right of "#" as well.
     meta = (
         [f"{k}_confidence" for k in values if f"{k}_confidence" in keys]
         + [f"{k}_basis" for k in values if f"{k}_basis" in keys]
+        + [k for k in ("confidence", "basis") if k in keys]
     )
     columns = values + ["#"] + meta if meta else values
     with path.open("w", encoding="utf-8", newline="") as out:

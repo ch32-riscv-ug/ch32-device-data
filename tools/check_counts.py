@@ -34,6 +34,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 # 比較表が数える周辺のうち、pin に出るので突き合わせられるもの。TIM は比較表が
 # 高級/通用/基本と種類で分けて数えるので、instance 番号と対応が取れず外す。
@@ -66,9 +68,6 @@ UNCOUNTABLE = frozenset({"ADC"})
 KNOWN = {"superset": 30, "short": 9, "empty": 0}
 
 
-def load(tables: Path, name: str) -> list[dict]:
-    with (tables / f"{name}.csv").open(encoding="utf-8") as f:
-        return list(csv.DictReader(f))
 
 
 def observed(roles: list[dict]) -> dict[tuple[str, str], set[int]]:
@@ -106,12 +105,11 @@ def stated(attributes: list[dict]) -> list[tuple[str, str, int, str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--tables", type=Path, default=REPO / "tables")
     ap.add_argument("--short", action="store_true", help="不足の側も1件ずつ出す")
     args = ap.parse_args()
 
-    seen = observed(load(args.tables, "pin_roles"))
-    claims = stated(load(args.tables, "product_attributes"))
+    seen = observed(paths.load_index("pinout"))
+    claims = stated(paths.load("product_attributes"))
 
     agree = superset = missing = 0
     gaps: list[tuple] = []

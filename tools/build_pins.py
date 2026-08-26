@@ -43,6 +43,8 @@ import build_all  # noqa: E402
 import extract_pins  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import paths  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
@@ -302,7 +304,7 @@ def resolve(part: str, package: str, cells: dict, titles: dict) -> tuple | None:
 def load_products(family_filter: str | None) -> dict:
     """products.csv rows grouped by (family, datasheet): [(part, package)]."""
     grouped: dict = collections.defaultdict(list)
-    with (REPO / "tables" / "products.csv").open(encoding="utf-8") as f:
+    with paths.table("products").open(encoding="utf-8") as f:
         for row in csv.DictReader(f):
             if family_filter and row["family"] != family_filter:
                 continue
@@ -321,7 +323,11 @@ def write_csv(path: Path, rows: list[dict], columns: list[str]) -> None:
 
 
 def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
-    """RM の格子が pin 表の remap 値を訂正したものを、この表にも効かせる。
+    """RM の格子が pin 表の remap 値と食い違う行に、格子の値を basis で並べる。
+
+    **値は書き換えない。** この表は証拠（資料が何と書いているか）なので、pin 表の
+    値を残し、`conflict` にして basis に `!rm-remap-grid(=remap-N)` を並べる。
+    格子を採るのは索引の側（`index/pinout.csv`。tools/build_index.py）。
 
     CH32V103 の pin 表は `TIM3_CH1_1` を PB4 と PC6 の**両方**に書くが、RM の
     格子（表10-12）は PB4=2・PC6=3 で、値1はそもそも定義されていない
@@ -339,7 +345,7 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
     def table_for(part: str) -> dict:
         if part not in corrections:
             found: dict = {}
-            path = REPO / "candidates" / f"{part.lower()}.json"
+            path = paths.CANDIDATES / f"{part.lower()}.json"
             if path.exists():
                 data = json.loads(path.read_text(encoding="utf-8"))
                 for pin in data.get("pins", []):
@@ -350,27 +356,26 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
             corrections[part] = found
         return corrections[part]
 
-    fixed = 0
+    flagged = 0
     for row in fn_rows:
         route = table_for(row["part_number"]).get(
             (row["pad"], row["signal"], row["route"]))
         if route:
-            stated = row["route"]
-            row["route"] = route
             row["confidence"] = "conflict"
-            row["basis"] = f"rm-remap-grid+!{row['basis']}(={stated})"
-            fixed += 1
-    if fixed:
-        print(f"RMの格子で remap 値を訂正: {fixed} 行", file=sys.stderr)
+            row["basis"] = f"{row['basis']}+!rm-remap-grid(={route})"
+            flagged += 1
+    if flagged:
+        print(f"RMの格子と remap 値が食い違う行（値は pin 表のまま）: {flagged} 行", file=sys.stderr)
     return fn_rows
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=Path("tables"))
+    ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--family")
     args = ap.parse_args()
-    args.out.mkdir(parents=True, exist_ok=True)
+    if args.out:
+        args.out.mkdir(parents=True, exist_ok=True)
 
     products = load_products(args.family)
     pin_rows: list[dict] = []
@@ -429,11 +434,12 @@ def main() -> int:
     fn_rows = apply_grid_corrections(fn_rows)
     pin_rows.sort(key=lambda r: (r["part_number"], pin_key(r["pin"]), r["pad"]))
     fn_rows.sort(key=lambda r: (r["part_number"], r["pad"], r["signal"], r["route"]))
-    write_csv(args.out / "pins.csv", pin_rows, PIN_COLUMNS)
-    write_csv(args.out / "pin_functions.csv", fn_rows, FUNCTION_COLUMNS)
-    for name, rows in (("pins.csv", pin_rows), ("pin_functions.csv", fn_rows)):
+    for name, rows, columns in (("pins", pin_rows, PIN_COLUMNS),
+                                ("pin_functions", fn_rows, FUNCTION_COLUMNS)):
+        dest = paths.table(name, args.out)
+        write_csv(dest, rows, columns)
         counts = collections.Counter(r["confidence"] for r in rows)
-        print(f"{args.out}/{name}: {len(rows)} 行 {dict(counts)}", file=sys.stderr)
+        print(f"{dest}: {len(rows)} 行 {dict(counts)}", file=sys.stderr)
     if unresolved:
         print(f"pin表に対応付けできなかった型番 {len(unresolved)} 件:", file=sys.stderr)
         for u in unresolved:

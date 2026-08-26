@@ -1,7 +1,7 @@
 # レジスタマップを持つとしたら: 現状調査
 
 日付: 2026-08-21（調査）／2026-08-25（機械収集ぶんを実装）
-状態: **機械的に集められる部分は実装済み**——D-1/D-3/D-4/D-5 は `tables/register_*.csv`（`tools/build_registers.py`。RM の絶対アドレス表で裏取り）、D-7 は `tables/dma_requests.csv`（`tools/build_dma_requests.py`。2026-08-26）。下の調査はその根拠
+状態: **機械的に集められる部分は実装済み**——D-1/D-3/D-4/D-5 は `tables/register_*.csv`（`tools/build_registers.py`。RM の絶対アドレス表で裏取り）、D-7 は `evidence/dma_requests.csv`（`tools/build_dma_requests.py`。2026-08-26）。下の調査はその根拠
 発端: ArduinoCore-CH32 の R-20「レジスタマップを持つとしたら何のデータが要るか」
 （`docs/research/register-map-data.ja.md`）が D-1〜D-8 を列挙し、
 「device-dataへ依頼を出すかどうか」を判断待ちにしている。その判断に要る事実を測った。
@@ -164,7 +164,7 @@ R-20の推測（M007も無いだろう）は外れで、M007はあります。�
 
 ### 突き合わせた結果（AFIO remap field）
 
-`tools/crosscheck_ch32data.py`で`tables/remap_fields.csv`と照合しました。
+`tools/crosscheck_ch32data.py`で`evidence/remap_fields.csv`と照合しました。
 19 seriesが照合可能で、**185一致・不一致1**。
 
 不一致の1件はこちらが正しく、**ch32-data側の過度な一般化**でした。
@@ -249,7 +249,7 @@ EVTの`<PERIPH>_TypeDef`のメンバ列と`<PERIPH>_*` bit define名の集合を
 つまりD-5は「familyごとに人が1個ずつ足す」ものではなく、**D-3/D-4を抽出した副産物として
 出てくる**。R-20の表でD-5が「手で足している」とされている箇所は、機械化できます。
 
-## 現状のtables/に無いもの
+## 調査時点（2026-08-21）の表に無かったもの
 
 `tables/`にあるのは products / series / families / packages / pins / pin_functions /
 remap_fields / remap_routes / errata / documents / cores / evt_examples /
@@ -268,7 +268,7 @@ operating_conditions / product_attributes。**registerの表は1つもありま�
 ## 先出し1: SysTick（R-24追補3のE-1）
 
 **`millis()`/`micros()`/`delay()`がCH32V103で動かない**という報告を受けて、
-1周辺だけ先に出した。`tables/systick.csv`（53行）が配置を持ち、bit定義は
+1周辺だけ先に出した。`evidence/systick.csv`（53行）が配置を持ち、bit定義は
 reference manualにしか無いのでここに記録する。
 
 ### 配置は4種類ある（`core_riscv.h`から機械抽出）
