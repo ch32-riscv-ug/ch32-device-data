@@ -78,14 +78,16 @@ def document_rows() -> list[dict]:
     return out
 
 
-def write(out_dir: Path) -> int:
+def write(out_dir: Path | None = None) -> int:
+    """documents.csv を書く。``out_dir`` が無ければ目録（catalog/）へ。"""
     rows = document_rows()
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with (out_dir / "documents.csv").open("w", encoding="utf-8", newline="") as f:
+    dest = paths.table("documents", out_dir)
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=DOCUMENT_COLUMNS)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"{out_dir}/documents.csv: {len(rows)} 行", file=sys.stderr)
+    print(f"{dest}: {len(rows)} 行", file=sys.stderr)
     return len(rows)
 
 

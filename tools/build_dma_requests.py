@@ -40,7 +40,6 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -174,6 +173,11 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
     rows: list[dict] = []
     notes: list[str] = []
     grid: dict | None = None      # 読みかけの格子 {dma, variant, channels:[...], last_row}
+    # 遅延 import: tools/build_index.py と check_tables.py がこのモジュールの
+    # 正規化規則（REMAPPED・TYPO・peripheral_of）だけを使う。CI は標準ライブラリ
+    # だけの python で検査を回すので、PDF を読むときにだけ pdfplumber を要る。
+    import pdfplumber  # noqa: PLC0415
+
     with pdfplumber.open(pdf_path) as pdf:
         for pno, page in enumerate(pdf.pages, start=1):
             text = page.extract_text() or ""
