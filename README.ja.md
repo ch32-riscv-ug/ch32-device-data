@@ -24,7 +24,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `catalog/`・`evidence/`・`index/`: 上の3区分の表。`#`列より左がデータ、右が出所と確度のメタ。`tools/paths.py` が置き場所を1箇所で決める
 - `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`build_pins`/`build_remap`/`build_tables` の入力）
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
-- `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する
+- `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない

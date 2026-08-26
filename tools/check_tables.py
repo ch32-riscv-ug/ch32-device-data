@@ -884,28 +884,21 @@ def main() -> int:
                     bad.append(f"{table}: {r['family']} の condition が呼ぶ "
                                f"{macro} が evt_variants にない")
 
-    # Data columns carry no CJK: Chinese readings are evidence (kept in the
-    # *_basis and *_zh columns), never the displayed value. A leak here
-    # means the translation dictionary in curated/translations.json is missing
-    # an entry, or an extractor let prose fragments through.
-    #
-    # `_zh` で終わる列は中文の原文を残すためのもの（`label_zh`・`feature_zh`）。
-    # 名前で除くので、同じ役目の列が増えても検査を書き足さずに済む。
-    #
-    # `path` は別の理由で除く。**ファイル名そのもの**で、
-    # `EVT/PUB/CH32V30x评估板说明书.pdf` は中文名で実在する。翻訳したら指す先が
-    # 無くなるので、これは「表示する値」ではなく識別子。
+    # No Japanese anywhere, and no Chinese outside the columns that quote the
+    # source: the tables are published data. Chinese readings live in `*_zh`
+    # columns (`label_zh`, `features_zh`); `path` is a file name that exists in
+    # Chinese in the EVT tree (`EVT/PUB/CH32V30x评估板说明书.pdf`) and is an
+    # identifier, not a displayed value. Everything else -- data columns and the
+    # provenance columns right of `#` alike -- is English. A leak means the
+    # translation dictionary in curated/translations.json is missing an entry,
+    # a curated basis string was written in Japanese, or an extractor let prose
+    # fragments through.
     cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
     LITERAL = ("path",)
     for name, rows in t.items():
         if not rows:
             continue
-        columns = []
-        for column in rows[0]:
-            if column == "#":
-                break
-            if not column.endswith("_zh") and column not in LITERAL:
-                columns.append(column)
+        columns = [c for c in rows[0] if c != "#" and not c.endswith("_zh") and c not in LITERAL]
         for r in rows:
             for column in columns:
                 value = r.get(column, "")

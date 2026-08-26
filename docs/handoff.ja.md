@@ -42,7 +42,7 @@ uv run tools/check_counts.py            # 比較表の数 vs pin側の数
 - **git の書き込み操作（add/commit/push/stash/reset）はしない。** mirrorも含めて
   すべてユーザーが行う。読むだけ（`git show/log/status/diff`）は可
 - Pythonは **`uv run`** で動かす（`python3` 直はNG）
-- データ列（`#`より左）は英語。中国語は `*_zh` 列だけ。`check_tables` が落とす
+- **公開する情報（表の全列・生成 README・各ディレクトリの README）に日本語を入れない。** 表は `basis` 列も含めて英語、中国語は `*_zh` 列と `path` だけ（`check_tables` が全列を見て落とす）。README は英語版（`README.md`）を必ず置き、日本語版（`.ja.md`）は併記。`docs/` の作業文書だけが日本語
 - **索引（`index/`）に事実を足さない。** 直すのは語彙か抽出（証拠 `evidence/`）。
   証拠の綴りは資料どおりに残し、訂正しない（食い違いは `conflict`）。区分の定義は
   [data-layout.ja.md](data-layout.ja.md)
