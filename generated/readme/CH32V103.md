@@ -18,9 +18,11 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
+Flash and SRAM list every value the series has; more than one means it varies by part number, and the per-part values are in the comparison table below.
+
 | Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
-| **CH32V103** | QingKe V3A | RV32IMAC | - | - | 80 MHz | 2.7-5.5V | LQFP48,LQFP64M,QFN48X7 | 4 | [en](https://www.wch-ic.com/products/CH32V103.html) / [zh](https://www.wch.cn/products/CH32V103.html) |
+| **CH32V103** | QingKe V3A | RV32IMAC | 32K/64K | 10K/20K | 80 MHz | 2.7-5.5V | LQFP48,LQFP64M,QFN48X7 | 4 | [en](https://www.wch-ic.com/products/CH32V103.html) / [zh](https://www.wch.cn/products/CH32V103.html) |
 
 ## Product comparison
 

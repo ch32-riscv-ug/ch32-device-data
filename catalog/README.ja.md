@@ -24,7 +24,7 @@ toolchains を生成します。確度・根拠の読み方は
 
 ### `series.csv`
 
-1行1シリーズ（CH32V006, CH32V203, …）。core・ISAと、配下の全packageが共有する値だけを持ちます。packageで変わる値は`varies-by-package`として空になり、products.csvへ降ります。**シリーズとdatasheetは1対1ではありません**（CH32V203CCT6はCH32V205DS0に掲載）。
+1行1シリーズ（CH32V006, CH32V203, …）。core・ISAと、配下の全packageが共有する値だけを持ちます。packageで変わる値は`varies-by-package`として空になり、products.csvへ降ります（**表では空でも「不明」ではありません**。生成READMEのSeries表はこの場合、型番側の実値を全部並べます——`128K/256K`。2026-08-27）。**シリーズとdatasheetは1対1ではありません**（CH32V203CCT6はCH32V205DS0に掲載）。
 
 ### `products.csv`
 
