@@ -84,6 +84,7 @@
 | features（旧 feature_tags） | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
+| toolchains | 15 | confirmed 15 | 語彙・重複・日付・URLの宛先・件数の下限 | 上流（MounRiver）のAPIが「いま最新」と言う配布物の写し。**行ごとに配信側を HEAD して**掲載と突き合わせている（サイズ一致で confirmed）。旧版は持たない（IDE の旧版は `--history`、ツールチェーンの旧版は上流APIに無い） | ✅ |
 
 ### 未解決
 

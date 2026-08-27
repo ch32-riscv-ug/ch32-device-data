@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**何が存在し、何と呼ぶか**を決める7つの表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
+**何が存在し、何と呼ぶか**を決める8つの表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
 ほかの全部の表（証拠 `evidence/`・索引 `index/`）はここの名前——family・series・型番・
 package・core・文書・mirror の版——を鍵にして結合します。名前の追加や改名は全表に波及するので、
 [worklist](../docs/worklist.ja.md) に記録して行います。
@@ -11,8 +11,11 @@ package・core・文書・mirror の版——を鍵にして結合します。�
 ordering 表を突き合わせた主要仕様（flash・SRAM・GPIO 数・温度）を**列ごとの確度と根拠つき**で
 持ちます。利用者向けの見やすい比較表は索引の [`index/parts.csv`](../index/README.ja.md) です。
 
+`toolchains.csv` だけは他の表の鍵ではなく、**上流のツールの版**を写した一覧です（結合先を持ちません）。
+
 `tools/build_tables.py` が products/packages/series/families/cores を、`tools/build_documents.py`
-が documents を、`tools/build_sources.py` が sources を生成します。確度・根拠の読み方は
+が documents を、`tools/build_sources.py` が sources を、`tools/build_toolchains.py` が
+toolchains を生成します。確度・根拠の読み方は
 [evidence/README.ja.md](../evidence/README.ja.md) の「確定の基準」「根拠の種類」を参照してください。
 
 ### `families.csv` — 最上位
@@ -84,6 +87,49 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 この表は`evidence/`を作り直す一連の実行の中で回します。mirrorを同期した後・生成の
 前後どちらでもよいですが、**生成の途中で同期しないこと**。
+
+
+### `toolchains.csv` — 上流のツールの版
+
+**MounRiver が「いま最新」と言っている配布物**の一覧です。1行1ファイル。ArduinoCore-CH32 を
+建てるのに要る IDE（MounRiver Studio）・RISC-V ツールチェーン（`MRS_Toolchain_*`）・
+ベンダのチップ対応パックが対象で、`.github/workflows/toolchains.yml` が毎週取り直します。
+
+版の情報は <https://www.mounriver.com/download> にしか出ませんが、あのページは Vue の SPA で、
+中身は公開 JSON API（`https://api.mounriver.com/mountriver/api/version/…`）から来ています。
+`tools/build_toolchains.py` の docstring にどの endpoint が何を返すかを書いてあります。
+
+| 列 | 意味 |
+|---|---|
+| `kind` | `toolchain`（`MRS_Toolchain_*`）/ `ide` / `ide-community` / `components`（ベンダのチップ対応パック） |
+| `edition` | IDE は製品系列（`mrs1` / `mrs2` / `community`）、`components` は**ベンダ名**（`wch` ほか）。`toolchain` は空 |
+| `os` / `arch` | `windows`・`linux`・`macos` / `x86`・`x64`・`arm64`。上流の綴り（`MAC`・`X64`）ではなくこちらで正規化した語彙。上流が bits を言わない行は**配布ファイル名の語**から取る（言っても書いてもいなければ空） |
+| `version` | 上流の版番号。`components` だけは連番（`verIndex`）で、実体の日付はファイル名にある |
+| `size_bytes` | 配信されている実サイズ（生成時に HEAD で確かめた値） |
+| `released` | 上流の掲載日 |
+| `download_api` | **URLを返すAPI**。叩くとその場で有効なダウンロードURLが返る |
+
+**ダウンロードURLを直接は持ちません。**上流の URL は署名つきで、しかも**要求した側のIPに
+紐付きます**（`?sign=…&from=<IP>`）。表に書き写しても他のホストからは 403 になるので、
+代わりに URL を返す API を持ちます。使う側はこうします:
+
+```sh
+curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"])'
+```
+
+確度は「掲載」と「配信」の2つの出所で決まります。`confirmed` = 掲載されたファイルが実際に
+配信されている（署名URLを解決して HEAD 200。上流がサイズを言う行はサイズも一致）、
+`conflict` = 配信されているサイズが掲載と食い違う、`reference` = 掲載のみ（`--no-verify`）。
+
+**旧版は表に入れません**（「いま最新」だけを持ちます）。IDE の旧版は
+`uv run tools/build_toolchains.py --history` で上流の一覧が出ます。ツールチェーンの旧版は
+上流のAPIが持っていないので、必要なら
+[ch32-riscv-ug/MounRiver_Studio_Community_miror](https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror/releases)
+の release（1.91・1.92）から取ります。
+
+なお [worklist](../docs/worklist.ja.md) の「載せないもの」——ツールチェーンの**チップ別対応状況**
+——とは別物です。あちらは人が書き写すしかなく検出手段がないので載せません。こちらは上流が
+公開している版の一覧そのもので、毎週機械が取り直し、上流が壊れれば run が赤くなります。
 
 
 ## 全表の結合キー

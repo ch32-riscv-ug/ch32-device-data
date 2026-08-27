@@ -40,8 +40,9 @@
 ### 区分ごとの規則
 
 **目録**
-- 小さく保つ（7表）。`basis` は任意（repositoryの決定なので）。資料の表記との対応（`listed_as`・`label_zh`）は列で持つ
+- 小さく保つ（8表）。`basis` は任意（repositoryの決定なので）。資料の表記との対応（`listed_as`・`label_zh`）は列で持つ
 - 手で書くもの（`curated/`の core-facts・series-facts）と、WCHカタログから同期するもの（documents）がある。どちらも「名前の正本」
+- 唯一の例外が `toolchains`（上流ツールの版。2026-08-27 追加）。**鍵ではなく上流の状態の写し**で、結合先を持たない。人が書き写す表ではなく毎週 CI が API から取り直すので、腐れば差分に出る
 
 **証拠**
 - 資料の綴り・値のまま。合成しない（構造体入れ子の平坦化名 `sTxMailBox[0].TXMIR` のような**こちらの記法は、元の名前を別列で残す**）
@@ -126,7 +127,7 @@ tools/ docs/
 | `opa_cmp_registers` `clock_enables` `usbpd_plumbing` | `evidence/`（`clock_enables` は安定） | `unit`（OPA/CMP の分類）は付与と印 |
 | `interrupts` `memory_map` `systick` `clock_configs` `clock_prescalers` `clock_sources` `clock_symbols` `clock_init` `evt_variants` | `evidence/`（**安定**——そのまま読める） | そのまま。`clock_symbols.role` は付与と印 |
 
-証拠 33表（2026-08-26 に `debug_data` を追加）・目録 7表・索引 10表（manifest 含む）。
+証拠 33表（2026-08-26 に `debug_data` を追加）・目録 8表（2026-08-27 に `toolchains` を追加）・索引 10表（manifest 含む）。
 
 ## 6. 新しく作る索引の中身
 

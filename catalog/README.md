@@ -2,7 +2,7 @@
 
 [日本語](README.ja.md)
 
-The seven tables that decide **what exists and what it is called** ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)).
+The eight tables that decide **what exists and what it is called** ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)).
 Every other table (evidence `evidence/`, index `index/`) joins on the names defined here -- family, series, part number,
 package, core, document, and mirror version. Adding or renaming a name propagates to every table, so it is done by
 recording it in the [worklist](../docs/worklist.ja.md) (Japanese).
@@ -12,8 +12,10 @@ the main specifications (flash, SRAM, GPIO count, temperature) obtained by cross
 ordering table, **with per-column confidence and basis**. The reader-friendly comparison table for users is the index's
 [`index/parts.csv`](../index/README.md).
 
+`toolchains.csv` alone is not a key for the other tables: it records **the versions of the upstream tools** and joins nothing.
+
 `tools/build_tables.py` generates products/packages/series/families/cores, `tools/build_documents.py`
-generates documents, and `tools/build_sources.py` generates sources. For how to read confidence and basis, see
+generates documents, `tools/build_sources.py` generates sources, and `tools/build_toolchains.py` generates toolchains. For how to read confidence and basis, see
 "Criteria for confirmed" and "Kinds of basis" in [evidence/README.md](../evidence/README.md).
 
 ### `families.csv` -- top level
@@ -85,6 +87,51 @@ that commit itself are recorded -- neither moves on re-execution.
 
 This table is run as part of the series of runs that rebuild `evidence/`. It may be run after synchronising the mirrors,
 either before or after generation, but **do not synchronise in the middle of generation**.
+
+
+### `toolchains.csv` -- versions of the upstream tools
+
+One row per file that MounRiver currently calls the latest: the IDE (MounRiver Studio), the RISC-V
+toolchain (`MRS_Toolchain_*`) and the vendor chip-support packs -- the tools needed to build
+ArduinoCore-CH32. `.github/workflows/toolchains.yml` refetches it weekly.
+
+The versions are published only on <https://www.mounriver.com/download>, but that page is a Vue SPA
+whose content comes from a public JSON API (`https://api.mounriver.com/mountriver/api/version/…`).
+The docstring of `tools/build_toolchains.py` records which endpoint returns what.
+
+| column | meaning |
+|---|---|
+| `kind` | `toolchain` (`MRS_Toolchain_*`) / `ide` / `ide-community` / `components` (vendor chip-support pack) |
+| `edition` | For the IDE, the product line (`mrs1` / `mrs2` / `community`); for `components`, the **vendor** (`wch` and others). Empty for `toolchain` |
+| `os` / `arch` | `windows`, `linux`, `macos` / `x86`, `x64`, `arm64`. The vocabulary is normalised here, not upstream's spelling (`MAC`, `X64`). Where upstream states no bits, it is taken from **the word in the file name** (empty when neither states it) |
+| `version` | Upstream's version number. For `components` alone it is a running index (`verIndex`); the date of the artefact itself is in the file name |
+| `size_bytes` | The size actually served (checked with a HEAD at generation time) |
+| `released` | The date upstream lists |
+| `download_api` | **The API that returns a URL.** Calling it yields a download URL valid at that moment |
+
+**It holds no direct download URL.** Upstream's URLs are signed and **bound to the requesting IP**
+(`?sign=…&from=<IP>`), so a URL copied into the table answers 403 from any other host. The table
+carries the URL-returning API instead. A consumer does this:
+
+```sh
+curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"])'
+```
+
+Confidence comes from two sources, the listing and the file store. `confirmed` = the listed file is
+actually served (the signed URL resolves and HEAD answers 200; where upstream states a size, it
+matches), `conflict` = the size served differs from the one listed, `reference` = listing only
+(`--no-verify`).
+
+**Older versions are not in the table** (it holds only what is current). For the IDE, upstream's
+archive is printed by `uv run tools/build_toolchains.py --history`. For the toolchain, upstream's API
+does not keep one; older builds are in the releases of
+[ch32-riscv-ug/MounRiver_Studio_Community_miror](https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror/releases)
+(1.91, 1.92).
+
+Note this is a different thing from what the [worklist](../docs/worklist.ja.md) (Japanese) excludes --
+the **per-chip support status** of toolchains. That would have to be transcribed by a person with no
+way to detect staleness. This is upstream's own list of versions, refetched by machine every week,
+and the run goes red when upstream breaks.
 
 
 ## Join keys across all tables

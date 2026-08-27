@@ -33,7 +33,7 @@ CANDIDATES = CACHE / "candidates"
 MIRRORS = Path("/home/mt/dev_wch")
 
 CATALOG_TABLES = ("families", "series", "products", "packages", "cores",
-                  "documents", "sources")
+                  "documents", "sources", "toolchains")
 
 EVIDENCE_TABLES = (
     "pins", "pin_functions", "pin_alternate", "product_attributes",

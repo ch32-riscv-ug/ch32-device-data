@@ -1,0 +1,61 @@
+name: Update tool versions
+
+# Keeps catalog/toolchains.csv in step with what MounRiver publishes: the IDE,
+# the RISC-V toolchain and the vendor chip-support packs the consumer builds
+# against. The download page is a Vue SPA, so the versions come from the JSON
+# API behind it (tools/build_toolchains.py documents the endpoints).
+#
+# Like the catalogue job, this is meant to fail when upstream moves rather than
+# write down a silently empty answer: the API is undocumented and can change.
+# ダウンロードページはSPAなので、版はその裏のJSON APIから取る。APIは公開仕様では
+# ないので、変わったら黙って空を書かず落ちる（update.ymlと同じ考え）。
+#
+# Weekly, not daily: MounRiver ships a few releases a year, and the mirrors'
+# daily rhythm has nothing to do with this one.
+# 上流のリリースは年数回なので週1で足りる。
+
+on:
+  schedule:
+    # Mondays 13:20 UTC (21:20 CST China / 22:20 JST). Thirteen minutes after the
+    # daily catalogue job starts, and in its concurrency group, so the two never
+    # push over each other.
+    - cron: '20 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  toolchains:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Standard library only. Each row is verified against the file store from
+      # this runner (the download URL is signed per requesting IP), so the
+      # resolve and the HEAD have to happen on the same host.
+      - name: Refresh the tool versions
+        run: python tools/build_toolchains.py --write
+
+      - name: Check table joins
+        run: python tools/check_tables.py
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add catalog/toolchains.csv
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "update tool versions (automated)"
+            git push
+          fi
