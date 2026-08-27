@@ -19,9 +19,11 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
+Flash and SRAM list every value the series has; more than one means it varies by part number, and the per-part values are in the comparison table below.
+
 | Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
-| **CH32V203** | QingKe V4B | RV32IMAC | - | - | 144/192 MHz | 1.8-3.6V | LQFP32,LQFP48,LQFP64M,QFN20,QFN28,QFN32,QFN48X7,QSOP28,TSSOP20 | 13 | [en](https://www.wch-ic.com/products/CH32V203.html) / [zh](https://www.wch.cn/products/CH32V203.html) |
+| **CH32V203** | QingKe V4B | RV32IMAC | 32K/64K/128K/256K | 10K/20K/32K/64K | 144/192 MHz | 1.8-3.6V | LQFP32,LQFP48,LQFP64M,QFN20,QFN28,QFN32,QFN48X7,QSOP28,TSSOP20 | 13 | [en](https://www.wch-ic.com/products/CH32V203.html) / [zh](https://www.wch.cn/products/CH32V203.html) |
 | **CH32V208** | QingKe V4C | RV32IMAC | 128K | 64K | 144 MHz | 2.4-3.6V | LQFP64M,QFN28,QFN48,QFN68 | 4 | [en](https://www.wch-ic.com/products/CH32V208.html) / [zh](https://www.wch.cn/products/CH32V208.html) |
 
 ## Product comparison

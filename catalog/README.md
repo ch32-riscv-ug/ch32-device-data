@@ -24,7 +24,7 @@ One row per family. Which series it contains, and which datasheets, reference ma
 
 ### `series.csv`
 
-One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty as `varies-by-package` and go down to products.csv. **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
+One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty as `varies-by-package` and go down to products.csv (**empty here does not mean unknown**: the Series table of the generated README lists every value the parts have instead, as `128K/256K`). **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
 
 ### `products.csv`
 

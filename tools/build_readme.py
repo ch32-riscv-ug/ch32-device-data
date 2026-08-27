@@ -84,6 +84,22 @@ def human_bytes(value: str) -> str:
     return f"{n // 1024}K" if n % 1024 == 0 else str(n)
 
 
+def series_bytes(data: "Data", series: dict, column: str) -> str:
+    """Series 行の Flash/SRAM。**型番で違う series は実値を全部並べる**（`128K/256K`）。
+
+    `catalog/series.csv` は「その series の全型番で同じ値」だけを持ち、型番で変わる
+    ものは空にして `confidence` に `varies-by-package` と書く（値は products 側）。
+    表示までそれに従うと空欄になり、**資料に無い**のか**1つに決まらない**のかが
+    読む側から区別できない。決まらない理由は型番差なので、その差そのものを出す。
+    条件で複数値になる Clock 列（`200/240`）と同じ `/` 区切り。
+    """
+    if series[column]:
+        return human_bytes(series[column])
+    values = sorted({int(p[column]) for p in data.series_products(series["series"])
+                     if p[column].isdigit()})
+    return "/".join(human_bytes(str(v)) for v in values) or "-"
+
+
 def md_escape(text: str) -> str:
     return text.replace("|", "\\|")
 
@@ -162,19 +178,24 @@ def operating_summary(data: Data, series: str) -> tuple[str, str]:
 def series_section(data: Data, family: str) -> list[str]:
     if not data.family_series(family):
         return []
-    out = ["## Series", "",
-           "| Series | Core | ISA | Flash | SRAM | Clock | VDD "
-           "| Packages | Products | Official |",
-           "|---|---|---|---|---|---|---|---|---|---|"]
+    rows, varies = [], False
     for s in data.family_series(family):
         official = (f"[en]({s['product_url_en']}) / [zh]({s['product_url_zh']})")
         clock, vdd = operating_summary(data, s["series"])
-        out.append(
+        flash, sram = series_bytes(data, s, "flash_bytes"), series_bytes(data, s, "sram_bytes")
+        varies = varies or "/" in flash or "/" in sram
+        rows.append(
             f"| **{s['series']}** | {s['core'] or '-'} | {s['isa'] or '-'} "
-            f"| {human_bytes(s['flash_bytes'])} | {human_bytes(s['sram_bytes'])} "
-            f"| {clock} | {vdd} "
+            f"| {flash} | {sram} | {clock} | {vdd} "
             f"| {s['packages'] or '-'} | {s['part_number_count']} | {official} |")
-    out.append("")
+    out = ["## Series", ""]
+    if varies:
+        out += ["Flash and SRAM list every value the series has; more than one "
+                "means it varies by part number, and the per-part values are in "
+                "the comparison table below.", ""]
+    out += ["| Series | Core | ISA | Flash | SRAM | Clock | VDD "
+            "| Packages | Products | Official |",
+            "|---|---|---|---|---|---|---|---|---|---|"] + rows + [""]
     return out
 
 

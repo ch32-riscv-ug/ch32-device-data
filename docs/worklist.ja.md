@@ -15,7 +15,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 区分 | 完了 | 残り |
 |---|---:|---:|
 | データ収集 | 9 | 0 |
-| README生成 | 6 | 0 |
+| README生成 | 7 | 0 |
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 7 | 1（D7） |
 | consumerからの依頼 | 9 | 0（R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
@@ -62,6 +62,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 - [x] ✅ **B4 節構成の組み替え** — `build_readme.render`がU1→U2→U3順（Quick start → Series → Product comparison → Pinout reference → Pin definitions → remap → Block diagrams → Errata → EVT examples → Documents → Evaluation boards → Reference）。棚卸しで確認（2026-08-26）
 - [x] ✅ **B5 org TOP「機能から探す」** — `feature_tags.csv`（tag→series）から`## Find by feature`表をorg TOPに生成（2026-08-26）。datasheet粒度のタグ（`precision=datasheet`）はその旨を注記
 - [x] ✅ **B6 評価ボード情報** — `eval_boards.csv`（117行）から`### Evaluation boards`節を生成済み（`eval_board_lines`）。棚卸しで確認（2026-08-26）
+- [x] ✅ **B7 Series表の`varies-by-package`を空欄にしない** — 利用者の指摘（2026-08-27）。CH32V303/V305のFlash・SRAMが`-`だったのは「資料に無い」ではなく「型番で違う」。`series_bytes`が型番側の実値を全部並べる（`128K/256K`）。**空欄だと不明との区別が読む側に付かない**のが理由。複数値になる族のREADMEには読み方の1行を添える。影響: V006・V103・V20x・V307の4リポジトリ
 
 ## C. 画像（保留）
 
