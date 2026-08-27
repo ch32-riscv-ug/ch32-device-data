@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import collections
 import csv
 import re
 import sys
@@ -51,6 +52,13 @@ def load_index(name: str) -> list[dict]:
 # `ANT`）を語彙へ入れて空になった。**空であることが検査の対象**——新しい綴りが
 # 資料に現れれば、ここに名前が無いので落ちる。
 KNOWN_ROLE_GAPS: dict[str, int] = {}
+
+# catalog/toolchains.csv の語彙。上流（MounRiver）の綴りではなく、こちらで
+# 正規化した名前（build_toolchains.py の OS_NAME / ARCH_NAME / KIND_ORDER と対）。
+TOOLCHAIN_KINDS = {"toolchain", "ide", "ide-community", "components"}
+TOOLCHAIN_OSES = {"windows", "linux", "macos"}
+TOOLCHAIN_ARCHES = {"", "x86", "x64", "arm64"}
+TOOLCHAIN_API = "https://api.mounriver.com/mountriver/api/version/"
 
 GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
 GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
@@ -238,6 +246,38 @@ def main() -> int:
             check("families", r["family"], token, cores, "cores", " + ")
     for r in t["cores"]:
         check("cores", r["core"], r["manual"], documents, "documents")
+
+    # toolchains は上流（MounRiver）が「いま最新」と言っている配布物の一覧で、
+    # 毎週 build_toolchains.py が取り直す（結合先を持たない目録なので、見るのは形）。
+    # 語彙・重複・日付・URL の宛先まで。実体があるかは生成時に配信側を HEAD して見る。
+    toolchain_files: set[str] = set()
+    for r in t["toolchains"]:
+        if r["kind"] not in TOOLCHAIN_KINDS:
+            bad.append(f"toolchains: {r['file']} の kind {r['kind']!r} が語彙にない")
+        if r["os"] not in TOOLCHAIN_OSES:
+            bad.append(f"toolchains: {r['file']} の os {r['os']!r} が語彙にない")
+        if r["arch"] not in TOOLCHAIN_ARCHES:
+            bad.append(f"toolchains: {r['file']} の arch {r['arch']!r} が語彙にない")
+        if not r["file"] or not r["version"]:
+            bad.append(f"toolchains: file か version が空: {r!r}")
+        if r["file"] in toolchain_files:
+            bad.append(f"toolchains: {r['file']} が重複している")
+        toolchain_files.add(r["file"])
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", r["released"]):
+            bad.append(f"toolchains: {r['file']} の released {r['released']!r}")
+        # サイズは配信側の HEAD で埋まる。空でよいのは配信側が Content-Length を
+        # 言わなかった行（basis がそう名乗る）と、配信側を見ていない行だけ。
+        sized = r["confidence"] == "confirmed" and "head(no size)" not in r["basis"]
+        if not re.fullmatch(r"[1-9]\d*", r["size_bytes"]) and (sized or r["size_bytes"]):
+            bad.append(f"toolchains: {r['file']} の size_bytes {r['size_bytes']!r}")
+        if not (r["download_api"].startswith(TOOLCHAIN_API) and "resourceId=" in r["download_api"]):
+            bad.append(f"toolchains: {r['file']} の download_api {r['download_api'][:60]!r}")
+        if r["confidence"] not in ("confirmed", "reference", "conflict"):
+            bad.append(f"toolchains: {r['file']} の confidence {r['confidence']!r}")
+    kinds = collections.Counter(r["kind"] for r in t["toolchains"])
+    # 上流の仕様変更は「空の表」として現れる。**使う側が当てにする形**を数で固定する。
+    if kinds["toolchain"] < 1 or kinds["ide"] < 3:
+        bad.append(f"toolchains: 行が足りない（上流の取得が壊れた？）: {dict(kinds)}")
     for r in t["errata"]:
         check("errata", r["id"], r["series"], series, "series", ";")
     for r in t["evt_examples"]:

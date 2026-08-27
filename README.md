@@ -10,7 +10,7 @@ each family repository from it. The tables come in three kinds
 
 | | What | For whom |
 |---|---|---|
-| [`catalog/`](catalog/README.md) (7 tables) | what exists and what it is called: families, series, parts, packages, cores, documents, mirror versions | the keys every other table joins on |
+| [`catalog/`](catalog/README.md) (8 tables) | what exists and what it is called: families, series, parts, packages, cores, documents, mirror versions, upstream tool versions | the keys every other table joins on |
 | [`evidence/`](evidence/README.md) (33 tables) | what the documents say, **spelled as they spell it**, every row with its provenance (`basis`) and confidence (`confidence`) | anyone checking correctness |
 | [`index/`](index/README.md) | lookup tables derived from the evidence with normalised names: one file per table; filter by part or feature in the viewer (`pins.html`) | users and generators |
 
