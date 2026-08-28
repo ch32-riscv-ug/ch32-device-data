@@ -42,6 +42,13 @@ jobs:
       - name: Check table joins
         run: python tools/check_tables.py
 
+      # The vocabulary rules are documented by their doctests, so nothing else
+      # notices when a rule is added and the examples are not. `AETR2` had gone
+      # on asserting it was undecided for as long as it took someone to run the
+      # doctest by hand.
+      - name: Signal vocabulary doctests
+        run: python -m doctest tools/signal_vocabulary.py -o FAIL_FAST
+
       - name: Documents.csv matches the catalogue
         run: |
           python tools/build_documents.py

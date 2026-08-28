@@ -74,7 +74,7 @@ commit と読む表の sha256（`manifest.csv` の sha256 を1つ固定しても
 | `pin` | lead 番号。露出パッドは `EP` |
 | `pad` | 資料の綴り（`PA0-WKUP`・`LO1`・`VDD_VIO_1`） |
 | `port` `gpio` | GPIO としての読み（`A`・`0`）。装飾を落とし、括弧の別名（`LO1 (PA0)`）からも埋める。GPIO でなければ空 |
-| `kind` | `gpio` / `power` / `analog` / `other`（`evidence/pins` の付与列） |
+| `kind` | `gpio` / `power` / `analog` / `other` / `nc`（`evidence/pins` の付与列）。`nc` は資料が「使わない」と書いた足で、番号だけがあり pad 名も型も機能も無い |
 | `peripheral` `role` | 語彙で揃えた機能（`USART1`・`TX`）。周辺名の特殊な綴りは下の表 |
 | `signal` | 資料の綴り（`USART1_TX` / `TX1` / `UTX`） |
 | `route` | `main`（主功能。リセット直後に生きている）／`default`（默认复用功能。AF モードにすれば remap 無しで届く）／`remap-N`／`af-N`。**`main` と `default` は別のこと**で、どちらに書くかは family で違う（[evidence/README](../evidence/README.ja.md) の「`route` の値の意味」） |

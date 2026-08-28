@@ -475,6 +475,24 @@ def main():
                             "unit": "MHz", "#": "#", "confidence": confidence,
                             "basis": basis, "datasheet": paper})
 
+    # **同じ事実を2度書かない。** 1ページに PLL の表が変種ごとに複数あり
+    # （CH32V20x_30xDS0 の p.60/p.68 は F_PLL_OUT が 144／75／100MHz の3表）、
+    # F_PLL_OUT は表ごとに違うが F_PLL_IN は 3〜25MHz と同じことを書く表が
+    # 2つある。この表はどの表から来たかを持たない（列がない）ので、両者は
+    # 完全同一行になる——数える意味のない重複で、CH32V303/305/307/317 の
+    # F_PLL_IN が2行あった。値・確度・根拠まで同じ行は1行にする。
+    seen: set[tuple] = set()
+    unique = []
+    for r in out:
+        key = tuple(r.get(c, "") for c in COLUMNS)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(r)
+    if len(unique) != len(out):
+        print(f"完全同一の重複行を落とした: {len(out) - len(unique)} 行", file=sys.stderr)
+    out = unique
+
     out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"], r["typ"]))
     dest = paths.table("operating_conditions")
     with dest.open("w", newline="", encoding="utf-8") as f:

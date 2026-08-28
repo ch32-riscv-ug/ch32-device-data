@@ -19,9 +19,9 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 7 | 1（D7） |
 | consumerからの依頼 | 9 | 0（R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
-| 既知の穴（F系） | 43 | 4 = 資料が決めない 1（F-4残り。実害なし）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-24残り・F-33・F-43〜46） |
+| 既知の穴（F系） | 46 | 6 = 資料が決めない 1（F-4残り。実害なし）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-6/7・F-24残り・F-33・F-43〜46・F-51）＋ ツール側だが実害なしと判断（F-53） |
 
-（2026-08-25 棚卸し時点。次にやる順は [次の作業](#次の作業優先順) にある）
+（2026-08-25 棚卸し＋2026-08-28 の監査ぶん。次にやる順は [次の作業](#次の作業優先順) にある）
 
 ## 着手順の方針
 
@@ -87,6 +87,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 - [x] ✅ **D6 読んだ原典の版を記録** — `catalog/sources.csv`新設（2026-08-23）。mirror 12本のcommitとその日付。**生成時刻は入れない**（毎回書き換わると「差分が出たら異常」の判定が使えなくなる）。生成物の差分の原因を「入力が変わった」と「再生成を忘れた」に切り分けるため
 - [ ] ⬜ **D7 生成のGitHub Actions化** — 日次起動・datasheetかEVTが変わっていたら全生成。**計画のみ**（下記）。抽出の作り込みが落ち着くまでは手動
 - [x] ✅ **D8 上流ツールの版の定期取得** — `catalog/toolchains.csv`新設（2026-08-27）。MounRiverのIDE・`MRS_Toolchain_*`・ベンダのチップ対応パックの**最新版15件**を、ダウンロードページの裏にある公開JSON APIから取る（`tools/build_toolchains.py`）。`.github/workflows/toolchains.yml`が毎週月曜13:20 UTCに取り直してcommit（update.ymlと同じconcurrency群なのでpushがぶつからない）。行ごとに**配信側をHEADして掲載と突き合わせ**（サイズ一致でconfirmed）。ダウンロードURLは署名つきで要求元IPに紐付くため表には入れず、URLを返すAPIを`download_api`に持つ
+- [x] ✅ **D9 語彙のdoctestをCIで回す** — `tools/signal_vocabulary.py` の doctest は**規則そのものの説明**だが、`__main__` でしか走らないので誰も回しておらず、F-8 で `AETR2` を語彙へ入れたあとも「未解決のはず」と主張し続けていた（2026-08-28 の監査が手で回して発見）。`check.yml` に1行足した。他の tools に doctest は無い（実測）
 - [x] ✅ **D4 同期日時の表示** — 各READMEの冒頭に`sources.csv`のmirror commit（リンク）と日付を出す（`synced_line`。2026-08-26）。生成時刻は出さない（冪等性）
 
 
@@ -240,7 +241,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-28 | **CH32L103のremap格子を1行も読めていない** | 0 → 195経路 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
 | F-29 | pin type欄が`USB3.0`だと落ちる | H417のUSB3.0差動4 pad×4型番 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
 | F-30 | 語彙が**1文字の周辺**を作る（`Q_DET1`→周辺`Q`） | 12行 | ツール | ✅ **修理済み**（2026-08-25）。[記録](worklist-archive.ja.md) |
-| F-31 | **封装のlead数とpins.csvが合わない型番が10** | 26 lead | ツール/資料 | ✅ **修理済み**（2026-08-25）。pad欄の`LO1\n(PA0)`（GPIO別名の括弧）を読めるようにし、`pins`に26行・`pin_functions`に主機能26行＋**`route=alias`30行**（別名の持ち方は`tables/README`）。残る5型番（V203RBT6の48・LQFP100の73）は資料が`未使用`と書く足で、表に無いのが正しい。[記録](worklist-archive.ja.md) |
+| F-31 | **封装のlead数とpins.csvが合わない型番が10** | 26 lead | ツール/資料 | ✅ **修理済み**（2026-08-25）。pad欄の`LO1\n(PA0)`（GPIO別名の括弧）を読めるようにし、`pins`に26行・`pin_functions`に主機能26行＋**`route=alias`30行**（別名の持ち方は`tables/README`）。~~残る5型番（V203RBT6の48・LQFP100の73）は資料が`未使用`と書く足で、表に無いのが正しい~~→ **この結論は誤りだった**（2026-08-28 の監査で発覚）。資料はその行を印刷していて、落としていたのはこちら。**F-49** で修理。[記録](worklist-archive.ja.md) |
 | F-32 | 添字が2組あるpad名を**基準文字→添字の順に詰めて**`VVDD_IO_1`にしている（資料は`VDD_VIO_1`） | CH32V205DS0 の 3 pad・5行 | ツール | ✅ **修理済み**（2026-08-25）。上下の行の語数が同じなら列ごとに組む（`interleave`）。`VDD_VIO_1`〜`_3`に。[記録](worklist-archive.ja.md) |
 | F-33 | `documents.csv`の版番号が**WCH APIのメタデータ**で、PDF表紙より遅れることがある | CH32V20x_30xDS0（3.5 vs V3.9） | 資料 | 記録のみ（2026-08-25）。全PDFの表紙スキャンで他は一致 |
 | F-34 | `remap_fields.csv`の**reset_value空欄が45行**（RMでは0と確定できる） | 45行→**7行** | ツール | ✅ **修理済み**（2026-08-25）。RMの復位値`00b`/`000b`（2進）を読めていなかった。残り7行はRMが復位値を書かないもの（EXTEN `CTR`のM030 `ISINK*_ADJ`・V20x `ETH_10M_EN`、V103 `TIM4_REMAP`/`USART2_REMAP`、X315 `PD0_1_REMAP`）。推測で0と埋めない |
@@ -257,6 +258,11 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-45 | EVTヘッダとRMで**OPA/CMPのbit位置が食い違う**（L103 ITRIMN/ITRIMP 5bit vs 6bit、V205 HYS1_H/HYS2_H bit29/30 vs 19/29） | 4 define | 資料 | 記録のみ。opa_cmp_registersでconflict＋両論 |
 | F-46 | datasheet zh/en で**温度センサのAvg_Slope最大値が違う**（V20x/V307: 4.8 vs 4.7 mV/℃） | 2 family | 資料 | 記録のみ。adc_internalでconflict＋両論 |
 | F-47 | CH32V407/V467の**Ethernet LED（`LED0`/`LED1`、remap-1）のselectorが決まらない** | 8 function・4 part | ツール | ✅ **修理済み**（2026-08-25）。headerは`AFIO_PCFR1_ETHPHY_LED_REMAP`とPHYの名で綴り、語彙の(ETH, LED0)からは名前でも接頭辞でも当たらなかった。`FIELD_OF_SIGNAL`で結び、`remap_fields`に`afio-ethphy-led-remap`（V407/V467）、`remap_routes`に4経路（値0=PE8/PE9、値1=PD14/PD15）。`unresolved`は**32＝F-6だけ** |
+| F-49 | 資料が「使わない」と書いた足（`NC`・`NC.`・`未使用`・`Unused`）を pad と見ておらず、**落ちるだけでなく直前の行の pad 名を継いで別の pad に化けていた** | 6行（うち1行は誤った pad 名） | ツール | ✅ **修理済み**（2026-08-28）。`extract_pins.NO_CONNECT` を pad の形の判定より先に見て、綴りを `NC`・`kind=nc` に正規化（露出パッドを `EP` と綴るのと同じ）。CH32V203RBT6 の lead 47 は `VDD_2`→`NC`、48 が復活。CH32V205VCT6・CH32V303/307/317VCT6 の lead 73 も。**封装のlead数との照合を検査に入れた**（`check_tables.pin_numbering`）——F-31 で「表に無いのが正しい」と閉じてしまったのは、この不変条件を機械が見ていなかったから |
+| F-50 | CH32X033 の candidate が **CH32X035 の pin 表**の列を読んでいた（`CH32X035DS0.PDF` に TSSOP20 列を持つ表が2つあり、先に当たった方を採っていた） | series CH32X033 の remap 経路が別の pad 由来・`pinout` 14行が selector 不明 | ツール | ✅ **修理済み**（2026-08-28）。表の見出しは**封装**を名乗るだけで series を名乗らないので、caption の scope（`CH32X033引脚定义`）で決着させる（`build_all.choose_table`。`build_pins` が既にやっていた `extract_pins.scope_allows` と同じ梯子）。監査が「X033 の 17行が routes に無い」と報告した症状の原因 |
+| F-51 | CH32H417 の PF12/PF13/PE7 の remap 欄に**中文版だけ**が `UHSIF_PORT0_1`〜`_2` と書く（英語版は空欄）。RM の格子はその3 padを値0（既定）に当て、値1は PC1→`PORT3` のようにずらす | 3行 | 資料 | 記録のみ（2026-08-28）。`pin_functions` では `reference`／`pin-table:zh` として残り、`pinout` の selector は空。台帳（下）にも記録 |
+| F-52 | `operating_conditions.csv` に**完全同一行の重複**（CH32V303/305/307/317 の `F_PLL_IN`） | 1行 | ツール | ✅ **修理済み**（2026-08-28）。1ページに PLL の表が変種ごとに3つあり（`F_PLL_OUT` が 144／75／100MHz）、`F_PLL_IN` は2つの表が同じ 3〜25MHz を書く。この表はどの表から来たかを持たないので同一行になっていた。値・確度・根拠まで同じ行は1行にする |
+| F-53 | pin 表の**見出し行がページ境界で割れている**と、その塊を丸ごと読み落とす（`read_layout` が見出しを読めず、次のページで見出しが再掲されて初めて成立する） | CH32X305RCT6 の lead 1〜25（英語版のみ） | ツール | 記録のみ（2026-08-28）。**データは欠けていない**——`pins`/`pin_functions` は中英を別々に読んで足すので、中文版（表2-1-2、65行）から全 lead が入り、英語版が寄与しない26行が `reference`／`pin-table:zh` になるだけ（`basis` がどちらの版の裏づけかを行ごとに言う）。CH32X305 は AF 番号で多重化する family なので `remap_routes` に行が無く、candidate が lead 26〜64 しか持たないことの影響も無い。**この綴じ方の取りこぼしが他に無いことは `check_tables.pin_numbering` が言う**（封装の lead 数と連番が合うかを全103型番で見て、合わないものは0件）。`find_pin_tables` を「layout が決まってから前の塊に戻る」形に直せば confirmed に上がるが、全 datasheet の読みが動くので、確度の過小申告1件のために回す変更ではないと判断した |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | ✅ 2件実装・1件は回答（`route`の`main`/`default`を文書化）。[記録](worklist-archive.ja.md) |
 | R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | ✅ **全5件実装**（2026-08-25）。[記録](worklist-archive.ja.md) |
 
@@ -283,13 +289,27 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 - ~~**CH32V003の`AETR`**~~ → **F-8 は修理済み**（2026-08-25。資料側ではなくツール側だった。
   [記録](worklist-archive.ja.md)）
 
-**`candidates/_report.json`の`unresolved`は32 = F-6 だけ**（2026-08-25。V303/V305/V307/V317の
-`I2S3_CK`/`I2S3_SD`/`I2S3_WS`）。F-8 の4と F-47 の8は解消した。この数から動いたら資料側が
-変わったか抽出が壊れたかのどちらか。
+#### 未解決の数は2つあり、**単位が違う**
+
+「未解決は32件だけ」と書いていたのが `index` に対する主張として読めてしまい、
+2026-08-28 の監査で「index には52行ある」と指摘された。数え方を分けて書く。
+
+| どこ | 何を数えるか | いま | 何が入るか |
+|---|---|---:|---|
+| `.cache/candidates/_report.json` の `unresolved` | candidate 1件ごとの function 数（102件の合計） | **32** | F-6 だけ（V303/V305/V307/V317 の `I2S3_CK`/`I2S3_SD`/`I2S3_WS`）。F-8 の4と F-47 の8は解消した |
+| `index/pinout.csv` の `remap-N` 行で `selector` が空 | 103型番へ展開したあとの**行数** | **38** | F-6 が35行（同じ4 seriesだが型番数だけ増える）＋ F-51 が3行 |
+
+**candidate を通らない事実があるので、前者は後者の部分集合ではありません。** F-51
+（CH32H417 の `UHSIF_PORT*_1`）は datasheet の**中文版だけ**が書いた経路で、
+candidate は RM 格子と英語版の pin 表から作るので `_report.json` には現れず、
+`pin_functions`（両版を別々に読んで突き合わせる）と `index` にだけ出ます。
+
+index 側の数は `KNOWN_SELECTOR_GAPS`（`tools/check_tables.py`）が `(series, signal)`
+ごとに持ち、増減どちらでも検査が落ちます。**監査の指摘の本体はこれが無かったこと**で、
+数が合わないこと自体ではありませんでした。
 
 `--family`だけで回すと`_report.json`が上書きされてこの数が見えなくなる問題は
-2026-08-24に直しました（触ったSKUだけ差し替える。D6の項）。逆に言えば、
-**この36という数から動いたら、それは資料側が変わったか抽出が壊れたかのどちらか**です。
+2026-08-24に直しました（触ったSKUだけ差し替える。D6の項）。
 
 ## 次の作業（優先順）
 
@@ -297,12 +317,22 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 ### 1. 穴を埋める
 
-**ツール側で直せる穴は2026-08-25に全部埋めた**（F-8・F-21・F-31・F-32・F-47）。残っているのは
-資料が決めないものと実機が要るものだけ:
+~~**ツール側で直せる穴は2026-08-25に全部埋めた**~~（F-8・F-21・F-31・F-32・F-47）
+→ **2026-08-28 の監査でツール側の穴が3つ出た**（F-49 NC の足・F-50 X033 が別 series の
+pin 表・F-52 完全同一行）。**いずれも「気付く手段が無かった」たぐい**で、直したのと同時に
+検査を足した（`pin_numbering`・`KNOWN_SELECTOR_GAPS`・doctest の CI 化）。
+
+**教訓**: F-31 は封装の lead 数を人が一度数えて閉じ、その数え方を機械に移していなかった。
+「一度確かめた」と「これからも確かめる」は別のことで、[table-reliability](table-reliability.ja.md)
+の「検査」欄に書いてあることは**機械が本当にやっているか**を疑う値がある。
+
+残っているのは資料が決めないものと実機が要るものだけ:
 
 | 項目 | 状態 | できること |
 |---|---|---|
 | ~~F-24 残り8行~~ | **閉じた**（2026-08-26）。8セルとも zh/en 両版で空欄＝資料側 | — |
+| F-51 CH32H417 の `UHSIF_PORT*_1` | 中文版だけが書き、RM 格子が裏づけない | 台帳に記録。WCH へ報告する材料 |
+| F-53 見出しがページ境界で割れた塊 | X305 の lead 1〜25 が英語版から入らない（**データは欠けていない**。確度だけ `reference`） | 直せるが全 datasheet の読みが動く。確度の過小申告1件なので見送り |
 | F-4 残り（片方の言語版だけの`reference`行） | 結合セルの版面が版で違い、片方の`fill_merged`だけ埋まる7セル（H417/M103/V203/V205）。値は他方の版で取れている | 実害なし。記録のみ |
 | F-11 WCH-Linkの版番号 | **実機が要る**（更新前後で`minichlink`の表示を控える） | ユーザー作業 |
 | F-6/F-7、資料側の記録 | 原典に無い | 台帳（下）に記録。WCHへ報告する材料 |
@@ -356,6 +386,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | 2026-08-17 | CH32V407 EVT `ch32v4x7_gpio.c` | `GPIO_PinRemapConfig()`のUSART1上位bitがclear=PCFR2 bit26、set=`(GPIO_Remap & 0x2) << 26`＝bit27で1つずれる。headerとRMはbit26 | `extract_remap_fields`が観測値の一意性検査で自動検出し、この1 fieldの値は採らない |
 | 2026-08-17 | CH32M030 RM | Table 6-15の`ADC_ETRGIN_RM`のpad対応が、datasheet Table 2-1・RMのregister説明/reset・EVT実装の3根拠と逆 | `0=PA14`、`1=PB6`（3根拠側）を採る。`extract_remap`が照合時に矛盾を提示 |
 | 2026-08-17 | CH32V003 RM | `ADC_ETRGINJ_RM`のregister説明がregular trigger（PD3/PC2）の文を誤って繰り返す | datasheet Table 2-2とRM Table 7-13が一致する`0=PD1`、`1=PA2`を採る |
+| F-51 | CH32H417 datasheet zh | pin表2-1-1 の PF12/PF13/PE7 の重映射欄に `UHSIF_PORT0_1`／`_1`／`_2`。**英語版の同じ欄は空**で、RM の格子はその3 pad を `UHSIF_PORT_REMAP=0`（既定）に当て、値1は PC1→`PORT3`・PC2→`PORT4`・PC3→`PORT5` とずらして書く | `pin_functions` に `reference`／`pin-table:zh` として残す（既定側は両版一致で `confirmed`）。格子に裏づけが無いので `pinout` の `selector` は空。`KNOWN_SELECTOR_GAPS` に3行として記録 |
 | F-31 | CH32M103 datasheet en | pin説明でHO*を「N型」（p31）と「P型」（p32）の両方で書く | 表には影響なし（記録のみ） |
 | F-21 | CH32M030 EVT header | `ISP_CTLR_ISP2_QDET1_*`と綴る（RMは`QDET2`） | 語彙には使わない（記録のみ） |
 | F-21 | CH32V003 datasheet | pin表2-1のPD4が`TIETR_2`（同じ行が表2-3では`T1ETR_2`。`I`と`1`） | 語彙で`T1ETR`へ寄せる。層1の綴りは残す |

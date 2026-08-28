@@ -89,6 +89,22 @@ ALIASED = re.compile(r"^(?P<pad>[A-Z][A-Z0-9_+-]{1,11})[（(](?P<alias>P[A-H]\d{
 # PC13 を持たない状態だった）。長さで測るのをやめて形で見る——GPIO の名前で
 # 始まり `-` で役割が続く、という形は signal 名には無い。
 PAD_COMPOUND = re.compile(r"^P[A-H]\d{1,2}-[A-Z0-9][A-Z0-9_+-]*$")
+# **繋がっていない足にも番号がある。** 封装の lead 数と番号の連番はそれ自体が
+# 検査になる（`check_tables.pin_numbering`）ので、資料が「この足は使わない」と
+# 書いた行も番号を持つ pad として拾う。**同じ文書群が4通りに綴る**——中文版は
+# `未使用`（表3-1）か `NC`（表3-1-4）か `NC.`（表3-2・表2-1-1）、英語版は
+# `Unused` か `NC` か `NC.`——ので綴りは `NC` に正規化する（exposed pad の番号 0
+# を `EP` と綴るのと同じ）。CJK は公開する表に出さない。**実測した綴りだけを
+# 並べる**（`不使用` のような有りそうな綴りは、出てくるまで足さない——pad 名を
+# 誤って no-connect と読む側の危険がある）。
+#
+# 拾わなかったときに黙って消えるのではなく**前の行の pad 名が付く**のが厄介で、
+# pad 欄が pad 名に見えないと `variant_row`（同じ pad の別の封装の行）に落ちて
+# 直前の pad を継いでいた: CH32V203RBT6 の lead 47 が `VDD_2`（資料は `NC`）に
+# なり、48 は丸ごと落ちていた。ほかに CH32V205VCT6・CH32V303/307/317VCT6 の
+# lead 73 が落ちていた。
+NO_CONNECT = re.compile(r"^(?:NC\.?|未使用|Unused)$", re.I)
+NO_CONNECT_PAD = "NC"
 # **括弧は半角とは限らない。** 中文版は全角で（7）と打つ。半角だけを剥がすと
 # SDIO_D0（7）や PD0（4）が signal 名としてそのまま表に出る（46種・364行あった）。
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
@@ -98,6 +114,19 @@ FOOTNOTE = re.compile(r"[（(]\d+[)）]")
 # multiplexes per pin and names the alternate-function number (TIM8_CH1(AF0)).
 ROUTED = re.compile(r"^(?P<signal>.+?)_(?P<value>\d+)$")
 ALTERNATE = re.compile(r"^(?P<signal>.+?)[（(](?:AF|af)(?P<value>\d+)[)）]$")
+
+
+def lead_number(number: str) -> int | str:
+    """The lead's number as the schema keeps it: an int, or "EP"/the raw text.
+
+    WCH numbers the exposed thermal pad 0; the schema spells it EP.
+    """
+    try:
+        value: int | str = int(number)
+    except ValueError:
+        return number
+    return "EP" if value == 0 else value
+
 
 def kind_for(pin_type: str) -> str | None:
     """Map the datasheet's pin-type letters onto the schema's pin kinds.
@@ -479,7 +508,16 @@ def find_pin_tables(
                     continue
                 pad = normalise_pad(cells[pad_col])
                 pin_type = normalise_pad(cells[type_col])
-                if PAD.match(pad) or PAD_COMPOUND.match(pad) or (
+                if NO_CONNECT.match(pad):
+                    # 型も機能も書かれない足。綴りを揃え、**残りの欄は捨てる**
+                    # ——主機能の欄がもう一度 `NC`／`未使用` と言っているだけで、
+                    # signal ではないため（表の語彙 `table_vocabulary` にも
+                    # 入れない）。`PAD_TOKEN` は `NC` を通すので、型の欄で
+                    # 判断する下の枝より先に見る。
+                    cells = [c if i < pad_col else "" for i, c in enumerate(cells)]
+                    cells[pad_col] = NO_CONNECT_PAD
+                    rows.append(cells)
+                elif PAD.match(pad) or PAD_COMPOUND.match(pad) or (
                         (PAD_TOKEN.match(pad) or ALIASED.match(pad))
                         and PIN_TYPE.match(pin_type)):
                     cells[pad_col] = pad
@@ -763,6 +801,54 @@ def datasheet_names(tables) -> frozenset[str]:
                                for rows, layout in tables)) if tables else frozenset()
 
 
+# "TSSOP20(F8)" -- the pin-class letter and capacity digit that pick the SKU group.
+GROUP_TOKEN = re.compile(r"[（(]([A-Z]\d)[)）]")
+
+
+def scope_allows(part: str, titles: list[str]) -> bool | None:
+    """Does a table's caption scope cover this part number?
+
+    Returns True (named or matched), False (excluded or another group named),
+    None (the caption states no scope this part can be judged by).
+    """
+    verdict: bool | None = None
+    for title in titles:
+        if not title:
+            continue
+        excluded = re.search(r"除(.*?)以外", title) or re.search(r"except([^)）]*)", title, re.I)
+        if excluded and part in excluded.group(1).replace(" ", ""):
+            return False
+        if part in title.replace(" ", ""):
+            return True
+        tokens = []
+        for m in re.finditer(r"(CH32[A-Z])([A-Z0-9x]+)((?:/\d{3})+)?", title):
+            tokens.append(m.group(1) + m.group(2))
+            # "CH32V303/305/307" abbreviates the later series to their digits.
+            for digits in re.findall(r"\d{3}", m.group(3) or ""):
+                tokens.append(m.group(1) + digits)
+        for token in tokens:
+            if excluded and token in excluded.group(1).replace(" ", ""):
+                continue
+            if "x" in token:
+                # CH32V103x8x6: the lower-case x stands for any character.
+                if re.fullmatch(token.replace("x", "[A-Z0-9]") + "[A-Z0-9]*", part):
+                    return True
+                verdict = False
+            elif part.startswith(token):
+                return True
+            else:
+                # The caption names some other group, which speaks against this
+                # table unless a later token claims the part after all.
+                verdict = False
+        groups = GROUP_TOKEN.findall(title)
+        if groups:
+            # "TSSOP20(F8)/QSOP28(G8)": the pin-class+capacity pair names the group.
+            if part[8:10] in groups:
+                return True
+            verdict = False
+    return verdict
+
+
 def pins_for(
     rows: list[list[str]], packages: list[str], layout: dict[str, int], package: str,
     names: frozenset[str] | None = None
@@ -817,6 +903,11 @@ def pins_for(
             # `LO1(PA0)`: pad は LO1、PA0 は資料が括弧で添えた GPIO の別名。
             pad, alias = aliased.group("pad"), aliased.group("alias")
         pin_type = normalise_pad(cells[type_col])
+        if pad == NO_CONNECT_PAD:
+            # 資料が「使わない」と書いた足。型も機能も無いのが正しい姿。
+            pins.append({"number": lead_number(number), "pad": pad, "kind": "nc",
+                         "_pin_type": "", "functions": []})
+            continue
         kind = kind_for(pin_type)
         if kind is None:
             kind = "other"
@@ -875,13 +966,8 @@ def pins_for(
                     f"{pad}: remap列の {token!r} に経路番号がない。"
                     "どのselectorが選ぶかRMで要確認"
                 )
-        try:
-            number_value: int | str = int(number)
-        except ValueError:
-            number_value = number
-        if number_value == 0:
-            # WCH numbers the exposed thermal pad 0; the schema spells it EP.
-            number_value = "EP"
+        number_value = lead_number(number)
+        if number_value == "EP":
             notes.append(f"{pad}: pin番号0をexposed pad (EP) として扱った")
         pins.append(
             {
