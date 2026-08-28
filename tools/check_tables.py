@@ -129,6 +129,137 @@ def shared_leads(t: dict) -> list[str]:
     return out
 
 
+# 表 → その列を決めている生成器と定数。**生成器を書き換えたのに表を作り直して
+# いない**ことを見つけるための対応表で、`tools/paths.py` が「どこに置くか」を1箇所で
+# 決めているのと対になる（あちらが場所、こちらが形）。
+#
+# **この検査は実際に2件の取りこぼしを見つけました。** 2026-08-26 の区分やり直しで
+# `remap_routes` と `timers` から導出列（`peripheral`/`role`、`channels`/
+# `complementary`）を外す設計にしたのに、CSV を作り直していなかった——ツールと
+# 生成物が2日ずれたまま、どの検査にも掛からずにいた（worklist の F-54）。
+# 中身の鮮度は PDF が要るので CI では見られないが、**列の食い違いなら CSV の1行目と
+# ソースの定数を読むだけで分かる**。
+#
+# 値は (ファイル名, 定数名)。定数は `ast` で読むので、pdfplumber を要する生成器でも
+# import せずに見られる。
+COLUMN_SOURCES: dict[str, tuple[str, str]] = {
+    "adc_internal": ("build_adc_internal.py", "COLUMNS"),
+    "clock_configs": ("build_clock.py", "CONFIG_COLUMNS"),
+    "clock_enables": ("build_clock_enables.py", "COLUMNS"),
+    "clock_init": ("build_clock.py", "INIT_COLUMNS"),
+    "clock_prescalers": ("build_clock.py", "PRESCALER_COLUMNS"),
+    "clock_sources": ("build_clock.py", "SOURCE_COLUMNS"),
+    "clock_symbols": ("build_clock.py", "SYMBOL_COLUMNS"),
+    "cores": ("build_tables.py", "CORE_COLUMNS"),
+    "debug_data": ("build_debug_data.py", "COLUMNS"),
+    "dma_requests": ("build_dma_requests.py", "COLUMNS"),
+    "documents": ("build_documents.py", "DOCUMENT_COLUMNS"),
+    "errata": ("build_tables.py", "ERRATA_COLUMNS"),
+    "eval_boards": ("build_eval_boards.py", "COLUMNS"),
+    "evt_examples": ("build_evt_examples.py", "COLUMNS"),
+    "evt_variants": ("build_evt_variants.py", "COLUMNS"),
+    "families": ("build_tables.py", "FAMILY_COLUMNS"),
+    "features": ("build_features.py", "COLUMNS"),
+    "flash_geometry": ("build_flash_geometry.py", "COLUMNS"),
+    "interrupts": ("build_interrupts.py", "COLUMNS"),
+    "link_firmware": ("build_link_firmware.py", "COLUMNS"),
+    "memory_configs": ("build_memory.py", "COLUMNS"),
+    "memory_map": ("build_memory_map.py", "COLUMNS"),
+    "opa_cmp_registers": ("build_opa_cmp_registers.py", "COLUMNS"),
+    "operating_conditions": ("build_operating.py", "COLUMNS"),
+    "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
+    "pin_alternate": ("build_pin_alternate.py", "COLUMNS"),
+    "pin_functions": ("build_pins.py", "FUNCTION_COLUMNS"),
+    "pins": ("build_pins.py", "PIN_COLUMNS"),
+    "product_attributes": ("build_tables.py", "ATTRIBUTE_COLUMNS"),
+    "products": ("build_tables.py", "PRODUCT_COLUMNS"),
+    "register_blocks": ("build_registers.py", "BLOCK_COLUMNS"),
+    "register_fields": ("build_registers.py", "FIELD_COLUMNS"),
+    "registers": ("build_registers.py", "REGISTER_COLUMNS"),
+    "remap_fields": ("build_remap.py", "FIELD_COLUMNS"),
+    "remap_routes": ("build_remap.py", "ROUTE_COLUMNS"),
+    "series": ("build_tables.py", "SERIES_COLUMNS"),
+    "sources": ("build_sources.py", "COLUMNS"),
+    "systick": ("build_systick.py", "COLUMNS"),
+    "timers": ("build_timers.py", "COLUMNS"),
+    "toolchains": ("build_toolchains.py", "COLUMNS"),
+    "usbpd_plumbing": ("build_usbpd_plumbing.py", "COLUMNS"),
+    "index:dma": ("build_index.py", "DMA_COLUMNS"),
+    "index:features": ("build_feature_tags.py", "COLUMNS"),
+    "index:parts": ("build_index.py", "PARTS_COLUMNS"),
+    "index:pinout": ("build_index.py", "PINOUT_COLUMNS"),
+    "index:register_layouts": ("build_registers.py", "LAYOUT_COLUMNS"),
+    "index:register_map": ("build_index.py", "MAP_COLUMNS"),
+    "index:registers": ("build_index.py", "REGISTERS_COLUMNS"),
+    "index:routes": ("build_index.py", "ROUTES_COLUMNS"),
+    "index:timers": ("build_index.py", "TIMERS_COLUMNS"),
+}
+
+# 出所の列。`build_tables.py` の6表は**データ列だけを定数に持ち**、確度と根拠は
+# 列ごとに（`flash_bytes_confidence` のように）書き出し時に足すので、定数は
+# ヘッダの接頭辞になる。それ以外の表は定数がヘッダそのもの。
+PROVENANCE = re.compile(r"^(#|confidence|basis|.+_(confidence|basis))$")
+
+
+def column_definitions() -> dict[str, list[str]]:
+    """`tools/build_*.py` の module-level な列定数を、import せずに読む。
+
+    生成器の多くは pdfplumber を要するが、この検査は標準ライブラリだけで動く
+    必要がある（CI がそう）。定数はどれもリテラルのリストなので `ast` で足りる。
+    """
+    import ast  # noqa: PLC0415
+
+    out: dict[str, list[str]] = {}
+    for path in sorted((paths.REPO / "tools").glob("build_*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue
+        for node in tree.body:
+            if not isinstance(node, ast.Assign):
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id.endswith("COLUMNS"):
+                    try:
+                        out[f"{path.name}:{target.id}"] = ast.literal_eval(node.value)
+                    except ValueError:
+                        pass
+    return out
+
+
+def column_drift(t: dict) -> list[str]:
+    """表のヘッダが、その列を決めている生成器の定数と合っているか。
+
+    **合わないなら生成器を書き換えて表を作り直していない。** 中身が古いことは
+    PDF を持たない CI では見られないが、列が動いたことなら1行目で分かる。
+    """
+    defined = column_definitions()
+    out = []
+    for name in sorted(t):
+        where = COLUMN_SOURCES.get(name)
+        if where is None:
+            out.append(f"{name}: 列を決めている生成器が COLUMN_SOURCES に無い"
+                       "——表を足したら対応も足すこと")
+            continue
+        columns = defined.get(f"{where[0]}:{where[1]}")
+        if columns is None:
+            out.append(f"{name}: {where[0]} の {where[1]} を読めない"
+                       "（リテラルのリストでなくなった？）")
+            continue
+        header = list(t[name][0]) if t[name] else []
+        if header == columns:
+            continue
+        extra = header[len(columns):]
+        if header[:len(columns)] == columns and all(PROVENANCE.match(c) for c in extra):
+            continue  # 出所列を書き出し時に足す表（build_tables.py の6表）
+        out.append(
+            f"{name}: ヘッダが {where[0]} の {where[1]} と違う"
+            f"（定数のみ={[c for c in columns if c not in header]} / "
+            f"表のみ={[c for c in header if c not in columns]}）"
+            "——生成器を書き換えて表を作り直していない")
+    return out
+
+
 def pin_numbering(t: dict) -> list[str]:
     """封装の公称 lead 数と、pins が持つ番号の連番が一致するか。
 
@@ -459,6 +590,8 @@ def main() -> int:
     # **1本の足に2つの pad が出る行**（内部で短絡された IO ペア、共用の電源
     # 節点）。番号が一致していることが「同じ足」そのもので、内部接続を別の列で
     # 持たない代わりに、その形が壊れていないことをここで見る。
+    # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
+    bad += column_drift(t)
     bad += shared_leads(t)
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)
