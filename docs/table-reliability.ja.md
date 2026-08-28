@@ -26,6 +26,18 @@
   写し間違いの余地が小さい（テキストの grep に近い）
 - 🔴 **弱い** — 未解決の不定さがある
 
+全表に効く検査（2026-08-28〜29 に追加）:
+
+| 検査 | 何を見るか | 見つけた実例 |
+|---|---|---|
+| `column_drift` | 表のヘッダが、その列を決めている生成器の定数と合っているか | `remap_routes`・`timers` の導出列（**ツールと生成物が数日ずれていた**。F-54） |
+| `routes_backed_by_pins` | `remap_routes` の (pad, signal) が、その series の `pin_functions` にあるか | 別 series の pin 表を読んでいた128行（F-50） |
+| `pin_numbering` | 封装の公称 lead 数と番号の連番 | NC の足を落としていた5型番（F-49） |
+| `remap_selector_coverage` | `remap-N` 行が selector まで辿れているか | index 側の数を誰も持っていなかった（監査の指摘） |
+| CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
+
+**中身の鮮度は PDF が要るので CI では見られません。** そこは `catalog/sources.csv`（読んだミラーの commit）と手動のフル実行が担当です。`column_drift` は「中身は見られなくても列なら見られる」という割り切りで、実際に F-54 の2件はこれで捕まりました。
+
 ## 一覧
 
 行数・confidence 分布は 2026-08-25（穴埋め後）時点。**pins・pin_functions・operating_conditions・remap_* は 2026-08-28 の監査ぶんを反映**（F-49〜F-53）。検証結果の詳細は下の各節（検証時の行数は当時のもの）。
