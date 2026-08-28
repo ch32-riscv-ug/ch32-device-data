@@ -105,6 +105,11 @@ PAD_COMPOUND = re.compile(r"^P[A-H]\d{1,2}-[A-Z0-9][A-Z0-9_+-]*$")
 # lead 73 が落ちていた。
 NO_CONNECT = re.compile(r"^(?:NC\.?|未使用|Unused)$", re.I)
 NO_CONNECT_PAD = "NC"
+# **GPIO 名＋裸のハイフンで終わる pad 名は無い。** `PC14-` はセルの2行目
+# （`OSC32_IN(2)`）を読み落とした形で、`VREF-` のように `-` で終わる本物の名前とは
+# 形が違う（あちらは GPIO 名で始まらない）。`PAD_COMPOUND` がハイフンの後に何かを
+# 要求しているので、この形は「読めたが不完全」だと分かる。
+TRUNCATED_PAD = re.compile(r"^P[A-H]\d{1,2}-$")
 # **括弧は半角とは限らない。** 中文版は全角で（7）と打つ。半角だけを剥がすと
 # SDIO_D0（7）や PD0（4）が signal 名としてそのまま表に出る（46種・364行あった）。
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
@@ -470,12 +475,23 @@ def find_pin_tables(
     drop the header entirely (CH32V003) or repeat it (CH32V006), so the layout found
     first is carried forward and a table whose column count differs is treated as
     belonging to another product.
+
+    **The chunks are collected first and read afterwards**, so a chunk that comes
+    before the one which settled the layout is not lost. The header is two rows --
+    the column words and the rotated package name -- and a page break can put one
+    on each page, leaving neither able to state the layout alone. The whole first
+    chunk went missing that way: CH32X315DS0's English Table 2-2 starts on the page
+    after its caption and repeats the header only on the page after that, so
+    CH32X305RCT6's leads 1..25 came from the Chinese edition alone and stayed
+    `reference` (worklist F-53). Collecting first keeps the reading order that the
+    page-break and shared-pad heuristics need (`continues`, `variant_row`).
     """
     rows: list[list] = []
     variants: list[str] = []
     layout: dict[str, int] = {}
     width = 0
     started = False
+    chunks: list[list[list[str]]] = []
     for page in pdf.pages:
         begin = caption_position(page, table_label)
         if begin is not None:
@@ -492,60 +508,63 @@ def find_pin_tables(
                 table, [[(c or "").strip() for c in row] for row in table.extract()])
             if not extracted:
                 continue
-            if width and len(extracted[0]) != width:
-                continue
             if not layout:
                 found = read_layout(extracted)
-                if not found:
-                    continue
-                layout, variants = found
-                width = len(extracted[0])
-            pad_col, type_col = layout["pad"], layout["type"]
-            signal_cols = [c for c in (layout.get("main"), layout.get("default"),
-                                       layout.get("remap")) if c is not None]
-            for cells in extracted:
-                if max(pad_col, type_col) >= len(cells):
-                    continue
-                pad = normalise_pad(cells[pad_col])
-                pin_type = normalise_pad(cells[type_col])
-                if NO_CONNECT.match(pad):
-                    # 型も機能も書かれない足。綴りを揃え、**残りの欄は捨てる**
-                    # ——主機能の欄がもう一度 `NC`／`未使用` と言っているだけで、
-                    # signal ではないため（表の語彙 `table_vocabulary` にも
-                    # 入れない）。`PAD_TOKEN` は `NC` を通すので、型の欄で
-                    # 判断する下の枝より先に見る。
-                    cells = [c if i < pad_col else "" for i, c in enumerate(cells)]
-                    cells[pad_col] = NO_CONNECT_PAD
-                    rows.append(cells)
-                elif PAD.match(pad) or PAD_COMPOUND.match(pad) or (
-                        (PAD_TOKEN.match(pad) or ALIASED.match(pad))
-                        and PIN_TYPE.match(pin_type)):
-                    cells[pad_col] = pad
-                    rows.append(cells)
-                elif rows and variant_row(cells, rows[-1], pad_col):
-                    # 同じ pad の別の封装の行。結合された pad/型の欄を上から継ぐ。
-                    cells[pad_col] = rows[-1][pad_col]
-                    if not cells[type_col]:
-                        cells[type_col] = rows[-1][type_col]
-                    rows.append(cells)
-                elif continues(cells, pad_col, type_col, signal_cols) and rows:
-                    # A row split by a page break: the pad and type cells are on
-                    # the page above and only the wide signal columns carry over.
-                    # CH32V407 breaks PB7 mid-name, leaving "TIM4_CH2/I2C_S" on
-                    # one page and "DA/USBHS2_DP/FSMC_NADV" on the next -- dropped
-                    # as pad-less, that lost I2C_SDA and three remap functions.
-                    #
-                    # **Only the signal columns are carried over.** A stray digit
-                    # left in a pin-number column would otherwise be glued onto
-                    # the number above and invent a pin.
-                    for i in signal_cols:
-                        if i < len(cells) and i < len(rows[-1]) and cells[i]:
-                            rows[-1][i] = f"{rows[-1][i]}\n{cells[i]}".strip()
+                if found:
+                    layout, variants = found
+                    width = len(extracted[0])
+            chunks.append(extracted)
         # 読み終えたページの解析キャッシュは捨てる。同じ pdf を表ごとに
         # 何度も走査するので、貯め込むと datasheet 1本でも重くなる。
         page.close()
         if cut is not None:
             break
+    if layout:
+        pad_col, type_col = layout["pad"], layout["type"]
+        signal_cols = [c for c in (layout.get("main"), layout.get("default"),
+                                   layout.get("remap")) if c is not None]
+        for extracted in chunks:
+            # 列数が違う塊は別の製品の表（見出しを持たない継続表と見分けられない）。
+            if len(extracted[0]) != width:
+                continue
+            for cells in extracted:
+                    if max(pad_col, type_col) >= len(cells):
+                        continue
+                    pad = normalise_pad(cells[pad_col])
+                    pin_type = normalise_pad(cells[type_col])
+                    if NO_CONNECT.match(pad):
+                        # 型も機能も書かれない足。綴りを揃え、**残りの欄は捨てる**
+                        # ——主機能の欄がもう一度 `NC`／`未使用` と言っているだけで、
+                        # signal ではないため（表の語彙 `table_vocabulary` にも
+                        # 入れない）。`PAD_TOKEN` は `NC` を通すので、型の欄で
+                        # 判断する下の枝より先に見る。
+                        cells = [c if i < pad_col else "" for i, c in enumerate(cells)]
+                        cells[pad_col] = NO_CONNECT_PAD
+                        rows.append(cells)
+                    elif PAD.match(pad) or PAD_COMPOUND.match(pad) or (
+                            (PAD_TOKEN.match(pad) or ALIASED.match(pad))
+                            and PIN_TYPE.match(pin_type)):
+                        cells[pad_col] = pad
+                        rows.append(cells)
+                    elif rows and variant_row(cells, rows[-1], pad_col):
+                        # 同じ pad の別の封装の行。結合された pad/型の欄を上から継ぐ。
+                        cells[pad_col] = rows[-1][pad_col]
+                        if not cells[type_col]:
+                            cells[type_col] = rows[-1][type_col]
+                        rows.append(cells)
+                    elif continues(cells, pad_col, type_col, signal_cols) and rows:
+                        # A row split by a page break: the pad and type cells are on
+                        # the page above and only the wide signal columns carry over.
+                        # CH32V407 breaks PB7 mid-name, leaving "TIM4_CH2/I2C_S" on
+                        # one page and "DA/USBHS2_DP/FSMC_NADV" on the next -- dropped
+                        # as pad-less, that lost I2C_SDA and three remap functions.
+                        #
+                        # **Only the signal columns are carried over.** A stray digit
+                        # left in a pin-number column would otherwise be glued onto
+                        # the number above and invent a pin.
+                        for i in signal_cols:
+                            if i < len(cells) and i < len(rows[-1]) and cells[i]:
+                                rows[-1][i] = f"{rows[-1][i]}\n{cells[i]}".strip()
     return rows, variants, layout
 
 
@@ -793,6 +812,42 @@ def table_vocabulary(rows: list[list[str]],
     cells_read = table_cells(rows, layout)
     known, plain = vocabulary(cells_read)
     return known, plain.union(*(frozenset(signals(cell, known)) for cell in cells_read))
+
+
+def complete_truncated_pads(tables) -> list[str]:
+    """`PC14-` のような不完全な pad 名を、**同じ版の他の表**の綴りで補う。
+
+    ``tables`` は (rows, layout) の並び。rows の pad 欄を直接書き換えて、
+    補った内容を1行1件で返す。
+
+    pad 欄が縦に2行で組まれていると、セルの2行目が取れない表があります。
+    CH32V203DS0 の中文版は 表3-1-1 では `PC14-\nOSC32_IN(2)` と両方取れるのに、
+    表3-1-4（LQFP64M）では `PC14-` だけになり、**英語版だけが完全な綴りを持つ
+    ことになって `conflict` が立っていました**（pins.csv 唯一の conflict）。
+    資料が食い違っているのではなく、こちらの読みが片方だけ失敗しています。
+
+    **同じ版の別の表が同じ pad を完全に綴っている**ことを根拠にします
+    （`datasheet_names` が signal に対してやっているのと同じ考え方——狭い欄で
+    折り返す名前は、別の表では折り返さずに出る）。補える綴りが1つに決まらない
+    ときは触りません。
+    """
+    whole = {cells[layout["pad"]]
+             for rows, layout in tables if layout.get("pad") is not None
+             for cells in rows
+             if layout["pad"] < len(cells) and not TRUNCATED_PAD.match(cells[layout["pad"]])}
+    notes: list[str] = []
+    for rows, layout in tables:
+        col = layout.get("pad")
+        if col is None:
+            continue
+        for cells in rows:
+            if col >= len(cells) or not TRUNCATED_PAD.match(cells[col]):
+                continue
+            found = sorted(p for p in whole if p.startswith(cells[col]))
+            if len(found) == 1:
+                notes.append(f"{cells[col]!r} を同じ版の他の表の綴り {found[0]!r} で補った")
+                cells[col] = found[0]
+    return notes
 
 
 def datasheet_names(tables) -> frozenset[str]:
