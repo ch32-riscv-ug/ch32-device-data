@@ -217,8 +217,8 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-3 | 中国語版の文章中のpadを拾えない | **増分0** | ツール | ✅ **修理済み**（2026-08-22）。今の資料では表は動かない。[記録](worklist-archive.ja.md) |
 | F-4 | pin表のsignal名が縦書きセルで切れる | 約100行 | ツール | ✅ **ほぼ修理済み**（F-1と同一原因）。残り6行 |
 | F-5 | `extract_registers`の見出しrun-on | 見出し432・field多数 | ツール | ✅ **修理済み**（2026-08-22）。[記録](worklist-archive.ja.md) |
-| F-6 | CH32V30xのRM格子がI2S3のremap経路を書いていない | 32 function・4 series | 資料 | 記録のみ（実測 2026-08-24） |
-| F-7 | CH32V30xのheaderに`DVP_REMAP`が無い | 2 function | 資料 | 記録のみ |
+| F-6 | CH32V30xのRM格子がI2S3のremap経路を書いていない | 32 function・4 series | ~~資料~~ ツール | ✅ **修理済み**（2026-08-28）。**F-8・F-47 と同じで、資料側ではなくツール側だった。** I2S3 は I2S モードの SPI3 で専用の remap フィールドを持たず、`SPI3_REMAP` が両方を動かす——`build_candidate` のコメント自身がそう書いていたのに、周辺名からは selector に当たらず、pad ベースで決めると PC7 の `I2S3_MCK` が pad を共有する TIM8 に化けるため**意図的に未決定**にしていた。F-47 と同じ**名前ベース**の段（`FIELD_OF_PERIPHERAL = {"I2S3": "SPI3"}` → `how=shared-field`）にすればその危険は起きない。根拠は資料そのもの: **CH32V407/V467 の RM 格子が `SPI3_REMAP` の値0/値1の下に `I2S3_CK`/`I2S3_SD`/`I2S3_WS` を SPI3 と同じ pad で名指ししている**。V30x に当てた結果はV407 の格子と完全一致（値0=PB3/PB5/PA15/PC7、値1=PC10/PC12/PA4）。`candidates` の `unresolved` は **32 → 0**、`pinout` の selector 未決定は remap-N 35行＋default 67行が埋まった |
+| F-7 | CH32V30xのheaderに`DVP_REMAP`が無い | ~~2 function~~ **0**（下記） | 資料 | 記録のみ。**2026-08-28 に見直したら穴ではなかった。** V30x の pin 表は DVP を**既定機能としてしか書かない**（`pin_functions` 184行すべて `route=default`。V407/V467 は `remap-N` を90行持つ）ので、解決すべき `remap-N` の行がそもそも無い。header に DVP の field が無いことも datasheet と整合していて、3つの出所が食い違っていない。`default` 行に selector が付かないのは remap フィールドを持たない周辺の通常の姿（全体で4,128行ある。`check_tables.remap_selector_coverage` の註）。「V30x の silicon に DVP_REMAP ビットが本当は在るのか」は資料から答えられず、**表に現れる違いも無い**ので、V407 の header から借りることはしない |
 | F-8 | CH32V003の`AETR`がADC 2 fieldのどちらか決まらない | 4 function・4 part | ~~資料~~ ツール | ✅ **修理済み**（2026-08-25）。`AETR`→(ADC1, RETR)、`AETR2`→(ADC1, IETR)を語彙に、`RETR`↔`ETRGREG`・`IETR`↔`ETRGINJ`の対応（`ROLE_FIELD`）でselectorを名前から決める。V003の4型番は未解決0、`remap_routes`に`ETRGREG`の経路（PD3/PC2）が入った。[記録](worklist-archive.ja.md) |
 | F-9 | USBが48MHzを要求する根拠が散文 | 22行 | ツール | ✅ **実装済み**（2026-08-22）。48MHzは全familyの話ではなかった。[記録](worklist-archive.ja.md) |
 | F-10 | CH32V205・CH32X315のRMから経路が0件 | V203CCT6のUSART5-8 | 資料/ツール | ✅ **原因判明**（2026-08-22）。**AFIO remapを持たない世代**だった。[記録](worklist-archive.ja.md) |
@@ -285,13 +285,19 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 ### F-6〜F-8 資料側で決まらないもの（記録のみ）
 
-- **CH32V30xの`I2S3_*` remap-1**（`I2S3_WS`/PA4、`I2S3_CK`/PC10、`I2S3_SD`/PC12、
-  4 series）。`SPI3_REMAP`が経路を決めるが、V30xのRM格子がその経路を書いていない。
-  **CH32V407/V467は書いているので決まる**——同じ周辺が資料の書き方次第で決まったり
-  決まらなかったりする
+- ~~**CH32V30xの`I2S3_*` remap-1**~~ → **F-6 は修理済み**（2026-08-28。資料側ではなくツール側だった。
+  V407/V467 の格子が同じ `SPI3_REMAP` の下に I2S3 を名指ししているので、周辺の対応
+  （I2S3 = I2S モードの SPI3）を語彙に入れて決めた）
 - **CH32V30xの`DVP_*`**。CH32V407にはある`DVP_REMAP`がV30xのheaderに無い
 - ~~**CH32V003の`AETR`**~~ → **F-8 は修理済み**（2026-08-25。資料側ではなくツール側だった。
   [記録](worklist-archive.ja.md)）
+
+**「資料側」と書いた3件のうち2件がツール側だった**（F-8・F-6）。残る F-7 も同じ疑いで
+見直したが、あちらは**穴ではなかった**——V30x の pin 表は DVP を既定機能としてしか書かず、
+解決すべき `remap-N` の行が無い。header に field が無いことも datasheet と整合している（F-7 の行）。
+
+**教訓**: 「資料が書いていない」と記録する前に、**同じ事実を別の族の資料が書いていないか**を
+見る価値がある。F-6 は V407/V467 の格子が同じフィールドの下に I2S3 を名指ししていたので決まった。
 
 #### 未解決の数は2つあり、**単位が違う**
 
@@ -300,8 +306,8 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 
 | どこ | 何を数えるか | いま | 何が入るか |
 |---|---|---:|---|
-| `.cache/candidates/_report.json` の `unresolved` | candidate 1件ごとの function 数（102件の合計） | **32** | F-6 だけ（V303/V305/V307/V317 の `I2S3_CK`/`I2S3_SD`/`I2S3_WS`）。F-8 の4と F-47 の8は解消した |
-| `index/pinout.csv` の `remap-N` 行で `selector` が空 | 103型番へ展開したあとの**行数** | **38** | F-6 が35行（同じ4 seriesだが型番数だけ増える）＋ F-51 が3行 |
+| `.cache/candidates/_report.json` の `unresolved` | candidate 1件ごとの function 数（102件の合計） | **0** | F-6 の32が 2026-08-28 に解消して空になった。F-8 の4と F-47 の8も既に解消 |
+| `index/pinout.csv` の `remap-N` 行で `selector` が空 | 103型番へ展開したあとの**行数** | **3** | F-51 だけ（CH32H417 の `UHSIF_PORT0`〜`2`。中文版のみの主張で RM 格子が裏づけない） |
 
 **candidate を通らない事実があるので、前者は後者の部分集合ではありません。** F-51
 （CH32H417 の `UHSIF_PORT*_1`）は datasheet の**中文版だけ**が書いた経路で、
@@ -358,7 +364,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | 0 | ~~**データの区分・形式・置き場所のやり直し**~~ | ✅ **実施**（2026-08-26）→ [data-layout.ja.md](data-layout.ja.md)。`tables/`→`catalog/`（目録7）・`evidence/`（証拠32）・`index/`（索引10表）。`pin_roles`→`index/pinout.csv`、`feature_tags`→`index/features.csv`、証拠の訂正（F-41）を索引側へ、`register_fields.define`・`dma_requests.request`原綴り・`remap_routes`/`timers`の導出列外し、`candidates/`→`.cache/`。**残り: consumer（ArduinoCore-CH32）の lock 付け替え（別 repository）**。確認の記録は [worklist-archive](worklist-archive.ja.md)「表の役割の確認」 |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
 | 2 | ~~**R-27** debug module の DATA0/DATA1 アドレス~~ | ✅ `evidence/debug_data.csv`（2026-08-26）。H417 だけ実測待ち |
-| 3 | **R-20** 構造体を持たないdefine群（M030 `UART_*`・`CMP_*`、H417 `SERDES_*`等1,591行）の`member`対応 | headerに型が無いので名前の規則だけでは決まらない。RMのアドレス表で番地が取れたものから逆に結ぶ案 |
+| 3 | **R-20** 構造体を持たないdefine群の`member`対応 | **1,591 → 1,248 行**（2026-08-28。343行を解決）。原因は2種類あった:<br>・**banner が型を名乗らない**だけで構造体には居る 343行 → ✅ **解決**。header の banner は `CMP_CTLR` とだけ書き、型は define の側にしかない（`OPA_CMP_CTLR_PSEL_0` の `OPA_`）。`resolve_member` は banner の先頭語を型として探すので `CMP_TypeDef が無い` で止まっていた。**register 名そのものをメンバーに持つ構造体**が1つに決まるときだけ採る段を足した（`member_named`。衝突0件を実測）。M030 `EXTEN_CTLR*`・`QII_CFGR`・`ISP_CTLR`、V205/H417 `CMP_CTLR`・`OPA_CTLR1`、L103 `CANFD_*` 等。`type` も正しくなり（`CMP3`→`OPA`）、25 register が「bit define を持たない場所行」から実体のある register になった<br>・**構造体に本当に居ない** 1,248行 → ⬜ 残り。header が宣言していない register の bit define（H417 `FMC_*`248・`DFSDM_*`109、M030 `EXTEN_*`87 等）。RM のアドレス表を**検算からソースへ格上げ**すれば結べる見込み——`build_registers` は既に表を読んでいて、例えば X315 は 699行中 397 が一致・**288 が構造体に解けない名前**（`BOOT_MODEKEYR` 等）と自己申告している。そこを register の出所として採るかは設計判断（証拠の出所が header から RM へ変わる） |
 | 4 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
 | 5 | C1〜C3 画像 | 保留のまま |
 
@@ -370,7 +376,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 
 | # | 資料 | 何が | こちらの扱い |
 |---|---|---|---|
-| F-6 | CH32V30x RM | I2S3のremap経路（`SPI3_REMAP`）を格子が書かない | 32 functionが`unresolved`のまま。V407/V467は書いているので決まる |
+| F-6 | CH32V30x RM | I2S3のremap経路（`SPI3_REMAP`）を格子が書かない | ~~32 functionが`unresolved`のまま~~ → **2026-08-28 に解消**。V407/V467 の格子が同じフィールドの下に I2S3 を名指ししているので、周辺の対応（I2S3=SPI3）を語彙に入れて決めた。台帳に残すのは**同じ周辺を族によって書いたり書かなかったりする**という資料側の事実の記録として |
 | F-7 | CH32V30x EVT header | `DVP_REMAP`の定義が無い（V407にはある） | 2 function unresolved |
 | F-8 | CH32V003 RM **en版** | `AFIO_PCFR1` bit17（`ADC_ETRGINJ_RM`）の説明が規則転換の文（PC2）を誤って繰り返す。zh版と表7-13は正しい（PD1/PA2） | zh版で決める（F-8はツール側で解消可能） |
 | F-33 | WCH 検索API | `CH32V20x_30xDS0.PDF`の版がAPI 3.5 / 表紙V3.9（メタデータがファイルより遅れる） | `documents.csv`は上書きしない。他75文書は一致 |

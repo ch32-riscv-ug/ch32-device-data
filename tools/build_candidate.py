@@ -367,6 +367,16 @@ def join(
         named = signal_vocabulary.FIELD_OF_SIGNAL.get(fn["signal"])
         if named in by_canonical:
             return named, "role"
+        # The peripheral has no field of its own because it *is* another
+        # peripheral in a different mode: I2S3 is SPI3 in I2S mode and
+        # SPI3_REMAP routes both (worklist F-6). Decided by name, before the pad
+        # gets a say -- by pad alone this went wrong, which is why it was left
+        # undecided: I2S3_MCK shares PC7 with TIM8's channel 2, so the pad at
+        # value 0 answered TIM8. The name says SPI3 and nothing else.
+        if pair:
+            shared = signal_vocabulary.FIELD_OF_PERIPHERAL.get(pair[0])
+            if shared in by_canonical:
+                return shared, "shared-field"
         # Align on the pad and the value. This identifies a route without reading
         # the name, so it cannot say whose route it is -- which means it may not
         # answer against the name either. CH32V002's ADC_IETR shares PA2 with
