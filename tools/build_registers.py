@@ -283,6 +283,49 @@ def field_name(define: str, register: str, type_name: str) -> str:
 FIRST_DIGITS = re.compile(r"\d+")
 
 
+def member_at_address(address: int | None, blocks: dict[str, tuple[str, int]],
+                      members: dict[str, list[dict]]) -> tuple[str, dict, str] | None:
+    """RM の絶対アドレスが指す構造体のメンバー（配列なら要素）、無ければ None。
+
+    **名前では引けない register がある。** CH32H417 の FMC は BCR と BTR が1つの
+    配列に交互に入っていて（`FMC_Bank1.BTCR[8]`）、RM が書く `FMC_BCR1`/`FMC_BTR1`
+    はどのメンバー名とも一致しません。CH32V006/X035 の `OPA_KEY`/`CMP_KEY` は
+    header が `OPAKEY`/`CMPKEY` と綴ります。どちらも **RM の各章冒頭の絶対アドレス表**
+    が番地を書いているので、block の base を引いて offset にすれば実体が決まる:
+    `FMC_BCR1` 0x40025400 → `BTCR[0]`、`FMC_BTR1` 0x40025404 → `BTCR[1]`。
+
+    アドレス表は元々 base+offset の**裏取り**（`check_addresses`）に使っていて、
+    ここでは同じ表を**置き場所の出所**として読みます。読みが増えるのではなく、
+    既に読んである番地を名前の代わりの鍵に使うだけなので、出所は変わりません。
+
+    番地を含む block は **base が最大のもの**から順に試します（DMA1/DMA2 のように
+    instance の base が近いことがあるため）。offset が要素の境界に載らないもの、
+    メンバーの範囲外のものは採りません。
+    """
+    if address is None:
+        return None
+    for type_name, base in sorted(blocks.values(), key=lambda tb: -tb[1]):
+        if base > address:
+            continue
+        offset = address - base
+        for m in members.get(type_name, ()):
+            width = int(m["width_bits"]) // 8
+            if not width:
+                continue
+            span = m["offset"] + int(m["count"]) * width
+            if not (m["offset"] <= offset < span):
+                continue
+            if (offset - m["offset"]) % width:
+                continue
+            index = (offset - m["offset"]) // width
+            # `member` 欄の綴りは 1 起点で持つ（`resolve_member` と同じ約束）。
+            return type_name, {**m, "struct": type_name,
+                               "index": str(index + 1) if int(m["count"]) > 1 else ""}, ""
+        # base が最大の block に載らなければ、その下の block は範囲外なので見ない。
+        break
+    return None
+
+
 def member_named(name: str, structs: dict[str, Struct]) -> tuple[str, dict, str] | None:
     """その名前のメンバーを持つ構造体が1つだけなら (型, メンバー, 註)、他は None。
 
@@ -681,8 +724,14 @@ def main() -> int:
 
         # fields
         unresolved = collections.Counter()
+        # RM の絶対アドレス表を名前の代わりの鍵に使う（`member_at_address`）。
+        addr_of = {r["name"]: r["address"] for r in addr_rows} if not args.no_rm else {}
         for register, defs in banners:
             type_name, member, why = resolve_member(register, structs)
+            if member is None:
+                placed = member_at_address(addr_of.get(register), blocks_here, members_here)
+                if placed:
+                    type_name, member, why = placed
             if member is None:
                 unresolved[why] += 1
             by_name = {d["name"]: d for d in defs}

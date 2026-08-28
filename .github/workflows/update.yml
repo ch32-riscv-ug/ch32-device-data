@@ -44,9 +44,19 @@ jobs:
       # it follows the catalogue in the same commit. The join check then fails
       # the run if the fresh catalogue broke a reference (a renamed or removed
       # document that series/products still point at) -- the signal to look.
-      - name: Regenerate documents.csv and check table joins
+      #
+      # **Everything downstream of it follows in the same commit too.** The
+      # generated READMEs quote each document's version, so a catalogue that
+      # moves leaves them stale -- which is exactly what check.yml's freshness
+      # step now fails on, so this job would turn the next run red for a change
+      # it made itself. These four generators are standard library only and take
+      # seconds; the order is the dependency order (see check.yml).
+      - name: Regenerate the derived tables and READMEs, and check table joins
         run: |
           python tools/build_documents.py
+          python tools/build_feature_tags.py
+          python tools/build_index.py
+          python tools/build_readme.py
           python tools/check_tables.py
 
       - name: Check the mirrors against it

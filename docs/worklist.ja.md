@@ -17,7 +17,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | データ収集 | 9 | 0 |
 | README生成 | 7 | 0 |
 | 画像 | 0 | 3（保留） |
-| 検査・運用 | 9 | 1（D7） |
+| 検査・運用 | 11 | 1（D7） |
 | consumerからの依頼 | 9 | 0（R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
 | 既知の穴（F系） | 52 | 3 = 資料が決めない 1（F-4残り。実害なし）＋ 実機待ち 1（F-11）＋ 資料側の記録（F-24残り・F-33・F-43〜46・F-51・F-55の誤植2件） |
 
@@ -88,6 +88,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 - [ ] ⬜ **D7 生成のGitHub Actions化** — 日次起動・datasheetかEVTが変わっていたら全生成。**計画のみ**（下記）。抽出の作り込みが落ち着くまでは手動
 - [x] ✅ **D8 上流ツールの版の定期取得** — `catalog/toolchains.csv`新設（2026-08-27）。MounRiverのIDE・`MRS_Toolchain_*`・ベンダのチップ対応パックの**最新版15件**を、ダウンロードページの裏にある公開JSON APIから取る（`tools/build_toolchains.py`）。`.github/workflows/toolchains.yml`が毎週月曜13:20 UTCに取り直してcommit（update.ymlと同じconcurrency群なのでpushがぶつからない）。行ごとに**配信側をHEADして掲載と突き合わせ**（サイズ一致でconfirmed）。ダウンロードURLは署名つきで要求元IPに紐付くため表には入れず、URLを返すAPIを`download_api`に持つ
 - [x] ✅ **D10 カタログの写しを担当ぶんだけにする** — 各 mirror が `documents.json` に**全76文書を丸ごと**持っていた（13 mirror すべて md5 一致。担当は3〜7件）。無関係な文書の download id が1つ変わっただけで13 mirror 全部に `update (automated)` の空身のコミットが立ち（実例: `CH32V003` の `28d2fc8` は `documents.json` だけの変更）、`catalog/sources.csv` が持つ mirror の HEAD が動くので**「入力が動いた」と「再生成を忘れた」の切り分け（D6 の目的）が効かなくなっていた**。`templates/update.sh` が担当ぶんだけ書くようにした（40,862 → 2.2〜4.9 KB）。取得失敗時の写しとしての役目は変わらず（`plan()` はこの行だけを読む）、**空スライスは既存の写しを上書きしない**という歯止めも追加。全13 mirror でオフライン検証済み。⚠ **13の mirror repository への反映は別作業**（このrepoはテンプレだけ持つ）
+- [x] ✅ **D11 カタログ更新が導出物を置き去りにしないようにする** — `update.yml` は `documents.csv` だけ再生成して commit していたが、**生成READMEは各文書の版番号を引用している**ので置き去りになっていた（実例: `88f7a7a update catalogue (automated)` の直後、README は EVT v1.4 のまま documents.csv は v1.5）。D10 で入れた鮮度検査があると**日次 job が自分の変更で翌 run を赤くする**ので、同じコミットで4本回すようにした（stdlib のみ・数秒。順は依存順）。実測で緑を確認
 - [x] ✅ **D9 語彙のdoctestをCIで回す** — `tools/signal_vocabulary.py` の doctest は**規則そのものの説明**だが、`__main__` でしか走らないので誰も回しておらず、F-8 で `AETR2` を語彙へ入れたあとも「未解決のはず」と主張し続けていた（2026-08-28 の監査が手で回して発見）。`check.yml` に1行足した。他の tools に doctest は無い（実測）
 - [x] ✅ **D4 同期日時の表示** — 各READMEの冒頭に`sources.csv`のmirror commit（リンク）と日付を出す（`synced_line`。2026-08-26）。生成時刻は出さない（冪等性）
 
@@ -364,7 +365,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | 0 | ~~**データの区分・形式・置き場所のやり直し**~~ | ✅ **実施**（2026-08-26）→ [data-layout.ja.md](data-layout.ja.md)。`tables/`→`catalog/`（目録7）・`evidence/`（証拠32）・`index/`（索引10表）。`pin_roles`→`index/pinout.csv`、`feature_tags`→`index/features.csv`、証拠の訂正（F-41）を索引側へ、`register_fields.define`・`dma_requests.request`原綴り・`remap_routes`/`timers`の導出列外し、`candidates/`→`.cache/`。**残り: consumer（ArduinoCore-CH32）の lock 付け替え（別 repository）**。確認の記録は [worklist-archive](worklist-archive.ja.md)「表の役割の確認」 |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
 | 2 | ~~**R-27** debug module の DATA0/DATA1 アドレス~~ | ✅ `evidence/debug_data.csv`（2026-08-26）。H417 だけ実測待ち |
-| 3 | **R-20** 構造体を持たないdefine群の`member`対応 | **1,591 → 1,248 行**（2026-08-28。343行を解決）。原因は2種類あった:<br>・**banner が型を名乗らない**だけで構造体には居る 343行 → ✅ **解決**。header の banner は `CMP_CTLR` とだけ書き、型は define の側にしかない（`OPA_CMP_CTLR_PSEL_0` の `OPA_`）。`resolve_member` は banner の先頭語を型として探すので `CMP_TypeDef が無い` で止まっていた。**register 名そのものをメンバーに持つ構造体**が1つに決まるときだけ採る段を足した（`member_named`。衝突0件を実測）。M030 `EXTEN_CTLR*`・`QII_CFGR`・`ISP_CTLR`、V205/H417 `CMP_CTLR`・`OPA_CTLR1`、L103 `CANFD_*` 等。`type` も正しくなり（`CMP3`→`OPA`）、25 register が「bit define を持たない場所行」から実体のある register になった<br>・**構造体に本当に居ない** 1,248行 → ⬜ 残り。header が宣言していない register の bit define（H417 `FMC_*`248・`DFSDM_*`109、M030 `EXTEN_*`87 等）。RM のアドレス表を**検算からソースへ格上げ**すれば結べる見込み——`build_registers` は既に表を読んでいて、例えば X315 は 699行中 397 が一致・**288 が構造体に解けない名前**（`BOOT_MODEKEYR` 等）と自己申告している。そこを register の出所として採るかは設計判断（証拠の出所が header から RM へ変わる） |
+| 3 | **R-20** 構造体を持たないdefine群の`member`対応 | **1,591 → 911 行**（2026-08-28〜29。680行を解決）。原因は3種類だった:<br>・**banner が型を名乗らない**だけで構造体には居る 343行 → ✅ **解決**。header の banner は `CMP_CTLR` とだけ書き、型は define 側にしかない（`OPA_CMP_CTLR_PSEL_0` の `OPA_`）。register 名そのものをメンバーに持つ構造体が1つに決まるときだけ採る（`member_named`。衝突0件）<br>・**名前では引けないが RM の絶対番地なら引ける** 337行 → ✅ **解決**。CH32H417/V205 の FMC/FSMC は **BCR と BTR が1つの配列に交互**に入っていて（`FMC_Bank1.BTCR[8]`）、RM の `FMC_BCR1`/`FMC_BTR1` はどのメンバー名とも一致しない。V006/X035 の `OPA_KEY` は header が `OPAKEY` と綴る。**RM の各章冒頭の絶対アドレス表**（12 family 全部にある）が番地を書いているので、block の base を引いて offset にすれば実体が決まる（`member_at_address`。0x40025400→`BTCR[0]`、0x40025404→`BTCR[1]` と RM の番地で検算済み）。**スキーマ変更も出所の変更も要らなかった**——アドレス表はもともと base+offset の裏取りに読んであり、それを名前の代わりの鍵に使うだけ<br>・**置き場所がそもそも無い** 911行 → ⬜ 残り。うち62行は RM が番地を書くのに **header に構造体が無い**（V20x の `DVP_*` 0x50050000。F-7 と同じ事実）。残る849行は header にも RM のアドレス表にも無く、`member` は header の概念なので**埋めようがない**。bit 位置と define 名は事実なので offset 無しで載せている |
 | 4 | **D7** GitHub Actions化 | 抽出の作り込みが落ち着いてから（計画は上記） |
 | 5 | C1〜C3 画像 | 保留のまま |
 

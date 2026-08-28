@@ -380,9 +380,9 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 
 | Document | Kind | English | 中文 |
 |---|---|---|---|
-| CH32X315DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32X315DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) v1.1 | [page](https://www.wch.cn/downloads/CH32X315DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) v1.1 |
-| CH32X315RM.PDF | reference-manual | [page](https://www.wch-ic.com/downloads/CH32X315RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315RM.PDF) v1.1 | [page](https://www.wch.cn/downloads/CH32X315RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315RM.PDF) v1.1 |
-| CH32X315EVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32X315EVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT) v1.0 |
+| CH32X315DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32X315DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) v1.1 | [page](https://www.wch.cn/downloads/CH32X315DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) v1.2 |
+| CH32X315RM.PDF | reference-manual | [page](https://www.wch-ic.com/downloads/CH32X315RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315RM.PDF) v1.1 | [page](https://www.wch.cn/downloads/CH32X315RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315RM.PDF) v1.2 |
+| CH32X315EVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32X315EVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT) v1.1 |
 
 ### Evaluation boards
 
