@@ -49,7 +49,27 @@ jobs:
       - name: Signal vocabulary doctests
         run: python -m doctest tools/signal_vocabulary.py -o FAIL_FAST
 
-      - name: Documents.csv matches the catalogue
+      # Everything derivable without a PDF must already be committed in its
+      # regenerated form. This used to cover catalog/documents.csv only, and the
+      # two things it did not cover both went stale unnoticed (found 2026-08-28):
+      # generated/readme/CH32V003.md still showed EVT v2.1 after the catalogue
+      # moved to v1.0, and evidence/remap_routes.csv still carried the two
+      # derived columns that the 2026-08-26 layout change had removed from
+      # ROUTE_COLUMNS -- the tool and the file were two days apart.
+      #
+      # The order is the dependency order: documents.csv feeds the READMEs,
+      # index/features.csv is hashed into index/manifest.csv, and the READMEs
+      # read index/. All four generators are standard library only and take
+      # seconds, which is why they can run here at all.
+      #
+      # **evidence/ is out of reach on purpose.** Those tables come from the
+      # datasheets and the EVT trees, which this job does not have; their
+      # freshness is what `catalog/sources.csv` and a manual full run cover.
+      - name: Derived tables and READMEs are up to date
         run: |
           python tools/build_documents.py
-          git diff --exit-code -- catalog/documents.csv
+          python tools/build_feature_tags.py
+          python tools/build_index.py
+          python tools/build_readme.py
+          git diff --exit-code -- catalog/documents.csv index/ generated/readme/ \
+            || { echo "::error::a generated file is stale -- re-run the generators and commit"; exit 1; }

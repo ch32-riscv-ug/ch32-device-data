@@ -110,6 +110,12 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
                 # the columns are, not always what they are called.
                 variants = fixed + variants[len(fixed):]
             parsed.append((label, title, rows, variants, layout))
+    # **pad 欄を先に直す。** 折り返しを読み落とした `PC14-` を同じ版の他の表の
+    # 綴りへ寄せる（`extract_pins.complete_truncated_pads`）。機能は pad をキーに
+    # 帰属させるので、語彙と機能を作る前にやる必要がある。
+    for note in extract_pins.complete_truncated_pads(
+            [(r, lay) for _, _, r, _, lay in parsed]):
+        print(f"{path.name}: {note}", file=sys.stderr)
     spelled = extract_pins.datasheet_names([(r, lay) for _, _, r, _, lay in parsed])
     for label, title, rows, variants, layout in parsed:
         m = re.search(r"CH32[A-Z0-9]+", title)
