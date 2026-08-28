@@ -2208,7 +2208,8 @@ CH32V203RBT6,43,PA10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V2
 CH32V203RBT6,44,PA11,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
 CH32V203RBT6,45,PA12,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
 CH32V203RBT6,46,PA13,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
-CH32V203RBT6,47,VDD_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
+CH32V203RBT6,47,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
+CH32V203RBT6,48,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
 CH32V203RBT6,49,PA14,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
 CH32V203RBT6,50,PA15,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
 CH32V203RBT6,51,PC10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1-4,CH32V203DS0.PDF
@@ -2415,6 +2416,7 @@ CH32V205VCT6,69,PA10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V2
 CH32V205VCT6,70,PA11,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205VCT6,71,PA12,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205VCT6,72,PA13,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
+CH32V205VCT6,73,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205VCT6,74,VSS_2,power,P,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205VCT6,75,VDD_2,power,P,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
 CH32V205VCT6,76,PA14,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V205DS0.PDF
@@ -2966,6 +2968,7 @@ CH32V303VCT6,69,PA10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x
 CH32V303VCT6,70,PA11,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V303VCT6,71,PA12,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V303VCT6,72,PA13,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
+CH32V303VCT6,73,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V303VCT6,74,VSS_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V303VCT6,75,VDD_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V303VCT6,76,PA14,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
@@ -3294,6 +3297,7 @@ CH32V307VCT6,69,PA10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x
 CH32V307VCT6,70,PA11,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V307VCT6,71,PA12,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V307VCT6,72,PA13,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
+CH32V307VCT6,73,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V307VCT6,74,VSS_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V307VCT6,75,VDD_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
 CH32V307VCT6,76,PA14,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-1,CH32V20x_30xDS0.PDF
@@ -3462,6 +3466,7 @@ CH32V317VCT6,69,PA10,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x
 CH32V317VCT6,70,PA11,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
 CH32V317VCT6,71,PA12,gpio,I/O/A,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
 CH32V317VCT6,72,PA13,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
+CH32V317VCT6,73,NC,nc,,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
 CH32V317VCT6,74,VSS_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
 CH32V317VCT6,75,VDD_2,power,P,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF
 CH32V317VCT6,76,PA14,gpio,I/O,#,confirmed,pin-table:zh+pin-table:en,3-2,CH32V20x_30xDS0.PDF

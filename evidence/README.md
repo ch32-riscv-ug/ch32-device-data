@@ -128,6 +128,12 @@ Shared power pads (`VS1`/`VS2`/`VS3`, `VREF-` and `VSSA`) are naturally used sim
 
 The reading can be checked elsewhere in the documents. Note 8 of CH32L103 **names 4 pairs** for `F8U6` -- `PB1`/`PB10`, `PB6`/`PB13`, `PA12`/`PA14`, `PA11`/`PA13` -- matching the 4 pairs recovered from the merged cells. That `VREF-` and `VSSA` of CH32V407 fall on the same lead is independently backed by `V_REF- is equal to V_SS` in the electrical characteristics table.
 
+#### Leads the datasheet marks as not connected (`kind=nc`)
+
+A lead that carries nothing still has a number, and the pin table prints a row for it: the same document family spells that row's pad cell four ways -- `NC`, `NC.`, `未使用`, `Unused` -- with the type and function cells empty. Those rows are kept, with the pad spelled `NC` and `kind=nc` (the same normalisation as numbering the exposed pad `EP`), and no `pin_functions` rows: 8 leads on 5 part numbers (CH32V203RBT6 47/48, CH32V205VCT6 and CH32V303/307/317VCT6 73).
+
+**They are kept because the count is a check.** `catalog/packages.pin_count` says an LQFP100 has leads 1..100 and nothing else, which is the one invariant on the pin tables that does not come from the pin tables -- `tools/check_tables.py` (`pin_numbering`) measures the reading against it. Dropping the NC rows did not merely lose them: with the pad cell unrecognised, lead 47 of CH32V203RBT6 inherited the pad name above it and **became `VDD_2`**, a pad the LQFP64M table does not put there at all (worklist F-49).
+
 ### `timers.csv`
 
 A machine-readable table of **"how many bits is this timer's counter"**. The comparison table only has **sentences** such as `Timer General-purpose TIM4 (32-bit)` at series granularity, and the spelling varies between `ADTM`/`GPTM`/`高级定时器`. If consumers hand-write the list of 32-bit timers, a mistake there silently skews period calculations.

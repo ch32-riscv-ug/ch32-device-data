@@ -74,7 +74,7 @@ one row**, so `port`+`gpio` -> lead is a single lookup.
 | `pin` | lead number; exposed pad is `EP` |
 | `pad` | as the datasheet spells it (`PA0-WKUP`, `LO1`, `VDD_VIO_1`) |
 | `port`, `gpio` | the pad read as a GPIO (`A`, `0`), decorations dropped; also filled from a parenthesised alias (`LO1 (PA0)`); empty for non-GPIO pads |
-| `kind` | `gpio` / `power` / `analog` / `other` |
+| `kind` | `gpio` / `power` / `analog` / `other` / `nc` (a lead the datasheet marks as not connected -- it has a number but no pad name, type or function) |
 | `peripheral`, `role` | normalised function (`USART1`, `TX`) |
 | `signal` | the datasheet's spelling (`USART1_TX` / `TX1` / `UTX`) |
 | `route` | `main` (primary function, live at reset) / `default` (default alternate function: reachable without remap once in AF mode) / `remap-N` / `af-N`. **`main` and `default` are different things** and which column a datasheet uses varies by family |

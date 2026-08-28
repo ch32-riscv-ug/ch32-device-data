@@ -28,7 +28,9 @@ decided", which a consumer can skip, and that is more useful than a wrong guess.
     ('PIOC', 'IO0')
     >>> split("LPT_OUT")
     ('LPTIM', 'OUT')
-    >>> split("AETR2") is None
+    >>> split("AETR2")
+    ('ADC1', 'IETR')
+    >>> split("VDD") is None
     True
     >>> split("A10")
     ('ADC1', 'IN10')

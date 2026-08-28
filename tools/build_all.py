@@ -103,8 +103,14 @@ def curated_columns() -> dict:
     return json.loads(CURATED_COLUMNS.read_text(encoding="utf-8"))
 
 
-def pin_tables(datasheet: Path) -> list[tuple[str, list[list[str]], list[str], dict]]:
-    """Every pin-definition table in a datasheet, parsed once."""
+def pin_tables(
+    datasheet: Path,
+) -> list[tuple[str, str, list[list[str]], list[str], dict]]:
+    """Every pin-definition table in a datasheet, parsed once.
+
+    The caption title comes back with each table because the column name alone
+    does not always say which table is this SKU's -- see `choose_table`.
+    """
     overrides = curated_columns().get(datasheet.name, {})
     out = []
     with pdfplumber.open(datasheet) as pdf:
@@ -123,7 +129,7 @@ def pin_tables(datasheet: Path) -> list[tuple[str, list[list[str]], list[str], d
                 # columns are, not always what they are called.
                 variants = fixed + variants[len(fixed):]
             if variants:
-                out.append((label, rows, variants, layout))
+                out.append((label, title, rows, variants, layout))
     return out
 
 
@@ -155,14 +161,25 @@ def choose_column(
     named = (ordering or {}).get(part, {}).get("package", "")
     if named:
         want = named.upper()
-        for v in variants:
-            # A heading may stack the packages that share a numbering, as CH32V203
-            # does with "LQFP48/QFN48X7".
-            for got in (part.strip() for part in v.upper().split("/")):
-                # The two tables also spell one package differently: the ordering
-                # table says LQFP64M where the pin table says LQFP64.
-                if got and (got == want or want.startswith(got) or got.startswith(want)):
-                    return v, "ordering-table"
+        # **The exact name first, across every column.** The prefix rule below is
+        # there because the two tables spell one package differently (the ordering
+        # table says LQFP64M where the pin table says LQFP64), but a prefix also
+        # matches a *different, shorter* package that happens to head an earlier
+        # column: CH32M030's pin table has both `QFN48` and `QFN48X7_A`, so
+        # CH32M030C8U3 (ordering: QFN48X7_A) was reading QFN48's numbering --
+        # a whole pinout two leads out of step. Take an exact match wherever it
+        # is before settling for a prefix.
+        for exact in (True, False):
+            for v in variants:
+                # A heading may stack the packages that share a numbering, as
+                # CH32V203 does with "LQFP48/QFN48X7".
+                for got in (name.strip() for name in v.upper().split("/")):
+                    if not got:
+                        continue
+                    if got == want:
+                        return v, "ordering-table"
+                    if not exact and (want.startswith(got) or got.startswith(want)):
+                        return v, "ordering-table-prefix"
     for v in variants:
         if v == part or part.endswith(v) or v.endswith(part):
             return v, "part-number"
@@ -197,6 +214,73 @@ def choose_column(
     # Several columns fit; which one is a question for a person, so name them.
     rest = typed or sized
     return None, ("候補=" + ",".join(rest)) if rest else "手掛かりなし"
+
+
+# `choose_column` が返す決定理由を、**強い順**に並べたもの（関数本体で試す順と同じ）。
+# 一致した列がどれだけ確かかを、表をまたいで比べるために要る——`choose_table` を
+# 参照。ここに無い文字列は「一致しなかった理由」で、最弱として扱う。
+COLUMN_METHODS = (
+    "ordering-table",                      # ordering表がその封装を名乗り、列名と一致
+    "ordering-table-prefix",               # 同じ封装の綴り違い（LQFP64M ↔ LQFP64）
+    "part-number",                         # 列名が型番そのもの
+    "part-number-without-variant-digit",   # 末尾の枝番だけ違う（V006E8R ↔ E8R6/E8R7）
+    "part-number-inside-column",           # 列名が封装＋型番（LQFP48(V303CBT6)）
+    "package-attribute",                   # 比較表の属性値に列名が出てくる
+    "pin-count",                           # lead 数が合う列が1つだけ
+    "pin-count+package-letter",            # lead 数＋型番の封装文字
+)
+
+
+def choose_table(
+    part: str, attributes: dict, tables: list[tuple], ordering: dict[str, dict] | None = None
+) -> tuple:
+    """Which pin table, and which of its columns, belongs to this SKU.
+
+    `choose_column` reads column headings, and a heading says the package, not
+    the series. **When two tables of one datasheet print the same package, the
+    heading cannot tell them apart** and taking the first was wrong: CH32X035DS0
+    holds 表2-1 `CH32X035引脚定义` and 表2-2 `CH32X033引脚定义`, both with a
+    TSSOP20 column, so CH32X033F8P6 was given CH32X035's TSSOP20 pinout. Every
+    remap route of series CH32X033 came from the wrong pads that way -- 14 of
+    its pin_functions rows named a route that its own routes table did not have,
+    and `index/pinout.csv` could not name the selector for any of them.
+
+    The caption states the scope ("CH32X033引脚定义", "除CH32V006F4U6以外"), so
+    it is the tie-breaker: a caption that names this part wins over one that
+    states no scope, which in turn wins over one that names some other group.
+    `tools/build_pins.py` already resolved its columns this way
+    (`extract_pins.scope_allows`); this is the same ladder for candidates.
+
+    **The caption only breaks a tie; it never beats a stronger column match.**
+    `choose_column`'s ladder (`COLUMN_METHODS`) is ranked first, because a
+    caption can claim a part whose column is in another table: CH32V203DS0's
+    表3-1-2 is captioned "TSSOP20(F8)/QSOP28(G8)", and `(F8)` names the capacity
+    group, not the package -- CH32V203F8U6 is an F8 part in a **QFN20**, whose
+    column is in 表3-1-1. Ranking the caption first put that SKU on TSSOP20's
+    numbering; ranking the match first keeps 表3-1-1's `ordering-table` hit
+    ahead of 表3-1-2's weaker `package-attribute` one.
+
+    Returns (table label, column, how it was decided, rows, variants, layout),
+    all None but `how` when no table has a column for this SKU.
+    """
+    hits = []
+    how = None
+    for order, (label, title, rows, variants, layout) in enumerate(tables):
+        found, method = choose_column(part, attributes, variants, ordering)
+        how = how or method  # keep the reason even when nothing matched
+        if not found:
+            continue
+        strength = (COLUMN_METHODS.index(method) if method in COLUMN_METHODS
+                    else len(COLUMN_METHODS))
+        scope = {True: 0, None: 1, False: 2}[extract_pins.scope_allows(part, [title])]
+        hits.append((strength, scope, order, label, found, method,
+                     rows, variants, layout))
+    if not hits:
+        return None, None, how, None, None, None
+    _, _, _, label, column, method, rows, variants, layout = min(hits)
+    if len(hits) > 1:
+        method = f"{method}+caption-scope"
+    return label, column, method, rows, variants, layout
 
 
 def merge_sku_lists(products: list[dict], ordering: dict[str, dict]) -> list[dict]:
@@ -255,7 +339,7 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
             products, _ = extract_products.extract(datasheet)
             tables = pin_tables(datasheet)
             # 名前の語彙は datasheet 単位。片方の表でしか綴られない名前がある。
-            spelled = extract_pins.datasheet_names([(r, lay) for _, r, _, lay in tables])
+            spelled = extract_pins.datasheet_names([(r, lay) for _, _, r, _, lay in tables])
             ordering = {e["part_number"]: e for e in extract_ordering.extract(datasheet)[0]}
         except Exception as exc:  # noqa: BLE001
             report.append({"family": family.name, "datasheet": datasheet.name, "error": str(exc)})
@@ -269,15 +353,8 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
                 "attributes": len(product["attributes"]),
                 "ordering": bool(ordering.get(part)),
             }
-            column = table_label = how = None
-            rows = variants = layout = None
-            for label, r, v, lay in tables:
-                found, method = choose_column(part, product["attributes"], v, ordering)
-                how = how or method  # keep the reason even when nothing matched
-                if found:
-                    column, table_label, rows, variants, layout = found, label, r, v, lay
-                    how = method
-                    break
+            table_label, column, how, rows, variants, layout = choose_table(
+                part, product["attributes"], tables, ordering)
             if column is None:
                 entry["pins"] = 0
                 entry["note"] = f"pin表の列を特定できず {how or ''}".strip()

@@ -53,6 +53,24 @@ def load_index(name: str) -> list[dict]:
 # 資料に現れれば、ここに名前が無いので落ちる。
 KNOWN_ROLE_GAPS: dict[str, int] = {}
 
+# 索引 `pinout` の `remap-N` 行のうち、**どの selector がその経路を選ぶのか
+# 名前を付けられなかった行**の実測値。`(series, signal)` ごとに数える。
+#
+# `candidates/_report.json` の `unresolved`（worklist の F-6 の32）とは**別の
+# 数**です。あちらは candidate 1件ごとの function 数、こちらは 103 型番へ
+# 展開したあとの行数で、しかも candidate を作る経路（RM格子）を通らない
+# 事実——datasheet の pin 表が片方の版だけで書いた経路——はあちらに現れま
+# せん。「未解決は32件だけ」を index に対する主張として読むと合わないので、
+# index 側の数はここで別に持ちます（2026-08-28 に監査で指摘された）。
+#
+#   I2S3_*   CH32V303/305/307/317。`SPI3_REMAP` が経路を決めるが V30x の RM
+#            格子がその経路を書かない（F-6。資料側）
+#   UHSIF_*  CH32H417 の PF12/PF13/PE7。**中文版だけ**が remap 欄に
+#            `UHSIF_PORT0_1` と書き、英語版の同じ欄は空。RM 格子は値1を
+#            PC1→PORT3 のようにずらして書き、この3 pad を値0（既定）に
+#            当てているので、中文版の主張を裏づける行がない（F-51。資料側）
+KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {}
+
 # catalog/toolchains.csv の語彙。上流（MounRiver）の綴りではなく、こちらで
 # 正規化した名前（build_toolchains.py の OS_NAME / ARCH_NAME / KIND_ORDER と対）。
 TOOLCHAIN_KINDS = {"toolchain", "ide", "ide-community", "components"}
@@ -105,6 +123,50 @@ def shared_leads(t: dict) -> list[str]:
     return out
 
 
+def pin_numbering(t: dict) -> list[str]:
+    """封装の公称 lead 数と、pins が持つ番号の連番が一致するか。
+
+    **これは資料に依らない検査です。** LQFP100 の足は 1〜100 の100本しかなく、
+    それは package 名が言っていること——pin 表の読み方が正しいかどうかを、
+    pin 表とは別の出所（`catalog/packages.pin_count`）で測れる唯一の不変条件
+    です。番号は行のキーなので、抜けても他の行はずれず、読み比べるだけでは
+    気付けません。
+
+    実際にこれで5型番が見つかりました（2026-08-28）。資料が「使わない」と
+    書いた足（`NC`・`未使用`・`Unused`）を pad と見ていなかったため、
+    CH32V203RBT6 の lead 47 は直前の pad 名 `VDD_2` を継いで**別の pad に
+    化け**、48 は落ち、CH32V205VCT6・CH32V303/307/317VCT6 の lead 73 が
+    落ちていました（`extract_pins.NO_CONNECT`）。
+
+    exposed pad は番号を持たない（`EP`）ので数に入れない。同じ番号を複数の
+    pad が持つ行（内部短絡・共用節点）は `shared_leads` が別に見るので、
+    ここは番号の**集合**だけを見る。
+    """
+    count_of = {r["package"]: r["pin_count"] for r in t["packages"]}
+    leads: dict[str, set[int]] = collections.defaultdict(set)
+    for r in t["pins"]:
+        if r["pin"].isdigit():
+            leads[r["part_number"]].add(int(r["pin"]))
+    out = []
+    for product in sorted(t["products"], key=lambda r: r["part_number"]):
+        part, package = product["part_number"], product["package"]
+        want = count_of.get(package)
+        if not want or not want.isdigit():
+            continue
+        got = leads.get(part, set())
+        expected = set(range(1, int(want) + 1))
+        missing = sorted(expected - got)
+        extra = sorted(got - expected)
+        if missing:
+            out.append(f"pins: {part} ({package}, {want} lead) の lead 番号 "
+                       f"{missing} が無い——pin 表の行を落としている"
+                       "（NC の足も番号を持つ。extract_pins.NO_CONNECT）")
+        if extra:
+            out.append(f"pins: {part} ({package}, {want} lead) に範囲外の lead 番号 "
+                       f"{extra} がある——列の対応か番号の読みが違う")
+    return out
+
+
 def pin_role_coverage(t: dict) -> list[str]:
     """索引 `pinout` が覆えていない signal を、記録してある実測値と突き合わせる。
 
@@ -129,6 +191,38 @@ def pin_role_coverage(t: dict) -> list[str]:
         elif now < before:
             out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
                        f"{now} 行に減った——KNOWN_ROLE_GAPS を更新すること")
+    return out
+
+
+def remap_selector_coverage(t: dict) -> list[str]:
+    """`remap-N` の行が selector まで辿れているか、記録した実測値と突き合わせる。
+
+    `pinout` の `remap-N` 行は「この pad にこの signal がこの経路で出る」と
+    言っているだけで、**どのレジスタ field のどの値がその経路か**は
+    `remap_routes` と結合して初めて分かります。結合できなかった行は
+    `selector` が空になり、consumer からは「remap すれば出るが、書くレジスタが
+    分からない」に見えます。
+
+    `pin_role_coverage` と同じ持ち方——閾値ではなく `(series, signal)` の名前で
+    持つ。片方が埋まって別の穴が開いたことも、増えたことも同じ検査が言う。
+    """
+    found: dict[tuple[str, str], int] = collections.Counter()
+    for r in t["index:pinout"]:
+        if r["route"].startswith("remap-") and not r["selector"]:
+            found[(r["series"], r["signal"])] += 1
+    out = []
+    for key in sorted(set(found) | set(KNOWN_SELECTOR_GAPS)):
+        now, before = found.get(key, 0), KNOWN_SELECTOR_GAPS.get(key, 0)
+        if now == before:
+            continue
+        where = f"{key[0]} の {key[1]}"
+        if now > before:
+            out.append(f"pinout: selector を決められない {where} が {before} 行から "
+                       f"{now} 行に増えた（remap_routes に経路が無いか、"
+                       "pin 表の読みが壊れている）")
+        else:
+            out.append(f"pinout: selector を決められない {where} が {before} 行から "
+                       f"{now} 行に減った——KNOWN_SELECTOR_GAPS を更新すること")
     return out
 
 
@@ -312,6 +406,8 @@ def main() -> int:
     # 節点）。番号が一致していることが「同じ足」そのもので、内部接続を別の列で
     # 持たない代わりに、その形が壊れていないことをここで見る。
     bad += shared_leads(t)
+    # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
+    bad += pin_numbering(t)
 
     for r in t["product_attributes"]:
         check("product_attributes", r["attribute"], r["part_number"], products, "products")
@@ -346,6 +442,8 @@ def main() -> int:
         bad.append(f"pinout: pin_functions にない行が {len(invented)} 件ある"
                    f"（索引は言い換えるだけで足さない）: {sorted(invented)[:3]}")
     bad += pin_role_coverage(t)
+    # 語彙で読めても selector まで辿れない `remap-N` 行が残る。別の数として持つ。
+    bad += remap_selector_coverage(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に

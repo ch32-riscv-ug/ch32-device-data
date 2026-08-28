@@ -57,8 +57,6 @@ FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route",
 
 SERIES_TOKEN = re.compile(r"CH32[A-Z0-9x]+")
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
-# "TSSOP20(F8)" -- the pin-class letter and capacity digit that pick the SKU group.
-GROUP_TOKEN = re.compile(r"[（(]([A-Z]\d)[)）]")
 
 
 def pin_key(value) -> tuple:
@@ -229,50 +227,6 @@ def merge_function_sets(zh: dict, en: dict) -> dict:
     return merged
 
 
-def scope_allows(part: str, titles: list[str]) -> bool | None:
-    """Does a table's caption scope cover this part number?
-
-    Returns True (named or matched), False (excluded or another group named),
-    None (the caption states no scope this part can be judged by).
-    """
-    verdict: bool | None = None
-    for title in titles:
-        if not title:
-            continue
-        excluded = re.search(r"除(.*?)以外", title) or re.search(r"except([^)）]*)", title, re.I)
-        if excluded and part in excluded.group(1).replace(" ", ""):
-            return False
-        if part in title.replace(" ", ""):
-            return True
-        tokens = []
-        for m in re.finditer(r"(CH32[A-Z])([A-Z0-9x]+)((?:/\d{3})+)?", title):
-            tokens.append(m.group(1) + m.group(2))
-            # "CH32V303/305/307" abbreviates the later series to their digits.
-            for digits in re.findall(r"\d{3}", m.group(3) or ""):
-                tokens.append(m.group(1) + digits)
-        for token in tokens:
-            if excluded and token in excluded.group(1).replace(" ", ""):
-                continue
-            if "x" in token:
-                # CH32V103x8x6: the lower-case x stands for any character.
-                if re.fullmatch(token.replace("x", "[A-Z0-9]") + "[A-Z0-9]*", part):
-                    return True
-                verdict = False
-            elif part.startswith(token):
-                return True
-            else:
-                # The caption names some other group, which speaks against this
-                # table unless a later token claims the part after all.
-                verdict = False
-        groups = GROUP_TOKEN.findall(title)
-        if groups:
-            # "TSSOP20(F8)/QSOP28(G8)": the pin-class+capacity pair names the group.
-            if part[8:10] in groups:
-                return True
-            verdict = False
-    return verdict
-
-
 def resolve(part: str, package: str, cells: dict, titles: dict) -> tuple | None:
     """The (tkey, cvar) column that defines this product's pins.
 
@@ -291,11 +245,11 @@ def resolve(part: str, package: str, cells: dict, titles: dict) -> tuple | None:
     if len(matches) == 1:
         return matches[0]
     if len(matches) > 1:
-        allowed = [k for k in matches if scope_allows(part, titles.get(k[0], []))]
+        allowed = [k for k in matches if extract_pins.scope_allows(part, titles.get(k[0], []))]
         if len(allowed) == 1:
             return allowed[0]
         undecided = [k for k in matches
-                     if scope_allows(part, titles.get(k[0], [])) is None]
+                     if extract_pins.scope_allows(part, titles.get(k[0], [])) is None]
         if len(undecided) == 1:
             return undecided[0]
     return None
