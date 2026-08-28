@@ -341,6 +341,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | F-7 | CH32V30x EVT header | `DVP_REMAP`の定義が無い（V407にはある） | 2 function unresolved |
 | F-8 | CH32V003 RM **en版** | `AFIO_PCFR1` bit17（`ADC_ETRGINJ_RM`）の説明が規則転換の文（PC2）を誤って繰り返す。zh版と表7-13は正しい（PD1/PA2） | zh版で決める（F-8はツール側で解消可能） |
 | F-33 | WCH 検索API | `CH32V20x_30xDS0.PDF`の版がAPI 3.5 / 表紙V3.9（メタデータがファイルより遅れる） | `documents.csv`は上書きしない。他75文書は一致 |
+| F-48 | WCH 検索API | `CH32V003EVT.ZIP` が id 409（版2.1）から id 412（版**1.0**）へ差し替わり、**掲載の版番号が下がった**（旧idは404）。`scope` も `CH32V003` から4型番の列挙になり、DS/RMと同じ体裁に揃った | **中身は同一**（2026-08-28に新idからDLして比較。686ファイルのsha256が全一致、ミラーのEVTは2026-05-09から不変）。EVT自身は版を名乗らない（`CH32V00x_List_EN.txt` は 2025.01、内部の最新ファイル日付は2025-03-11）ので、版番号はWCHの掲載メタデータでしかない。カタログは掲載の写しなので新id・新版をそのまま持つ |
 | F-43 | CH32V407 RM | I3C格子の列見出しが両列とも`I3C_RM=0`（誤植） | pin表の`I3C_SCL_1`が正。`build_candidate`に「同じ値に別padが居たら訂正しない」歯止め |
 | F-44 | CH32X035 EVT header | `OPA_CTLR2_CMP_LOCK`のmaskが`0x2000`（bit13＝`PSEL3`と衝突）。RMはbit31 | `opa_cmp_registers`でconflict。使うとCMP3の正入力選択を壊す |
 | F-45 | CH32L103 / CH32V205 EVT header | `ITRIMN`/`ITRIMP`が5bit（RMは6bit）、`HYS1_H`/`HYS2_H`がbit29/30（RMは19/29） | conflict＋両論 |
