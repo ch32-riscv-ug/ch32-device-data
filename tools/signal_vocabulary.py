@@ -238,6 +238,21 @@ ROLE_FIELD = {"RETR": "ETRGREG", "IETR": "ETRGINJ"}
 # 未解決のままだった（worklist F-47）。canonical_field 後の綴りで書く。
 FIELD_OF_SIGNAL = {"LED0": "ETHPHY_LED", "LED1": "ETHPHY_LED"}
 
+# **同じブロックがモードで名前を変える。** I2S3 は I2S モードの SPI3 で、専用の
+# remap フィールドを持たない——`SPI3_REMAP` が両方を動かす。周辺の名前だけが
+# 違うので、signal の周辺名からは selector に当たらない。
+#
+# **根拠は資料そのもの。** CH32V407/V467 の RM の remap 格子は `SPI3_REMAP` の
+# 値0と値1の下に `I2S3_CK`/`I2S3_SD`/`I2S3_WS` を SPI3 の同じ pad と並べて
+# 名指ししている（`remap_routes` の basis が `rm-remap-grid`）。CH32V30x の格子は
+# SPI3 側しか綴らないが、フィールドは同じ `PCFR1:28`（1bit・値0/1）で、pin 表が
+# I2S3 に付ける値も 1 だけなので経路は同じもの。
+#
+# **`I2S2` は入れない。** `afio-spi2-remap` はどの family にも無く（実測0件）、
+# I2S2 を持つのは AF 番号方式の CH32H41x だけなので、対応づける相手が居ない。
+# 資料が名指ししている対だけを持つ。
+FIELD_OF_PERIPHERAL = {"I2S3": "SPI3"}
+
 # **1つの綴りが2つの役割を名指しすることがある。** PC13 は改竄検知の入力と
 # RTC の出力を兼ねていて、CH32L103 の pin 表は `TAMPER` と `RTC` を改行で分けて
 # 書くのに、CH32V103/V20x/V30x/V4x7 は `TAMPER-RTC` と1語で書く。同じ silicon の

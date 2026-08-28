@@ -283,6 +283,28 @@ def field_name(define: str, register: str, type_name: str) -> str:
 FIRST_DIGITS = re.compile(r"\d+")
 
 
+def member_named(name: str, structs: dict[str, Struct]) -> tuple[str, dict, str] | None:
+    """その名前のメンバーを持つ構造体が1つだけなら (型, メンバー, 註)、他は None。
+
+    **banner が型を名乗らないことがある。** EVT header の banner は `CMP_CTLR`
+    とだけ書き、型は define の側にしかない（`OPA_CMP_CTLR_PSEL_0` の `OPA_`）。
+    `resolve_member` は banner の先頭語を型として構造体を探すので、この形では
+    `CMP_TypeDef が無い` で止まり、**field の member 欄が空のまま**になっていた。
+
+    register 名**そのもの**をメンバー名として持つ構造体を全型から探し、1つに
+    決まるときだけ採る。CH32M030 の `EXTEN_CTLR*`・`QII_CFGR`・`ISP_CTLR`、
+    CH32V205/H417 の `CMP_CTLR`・`OPA_CTLR1` などで、`registers` 側と突き合わせて
+    **344行が一意に決まり衝突は0件**だと実測した（worklist の R-20）。
+    """
+    owners = [st for st in structs.values()
+              if name in {m["name"] for m in st.members}]
+    if len(owners) != 1:
+        return None
+    st = owners[0]
+    member = next(m for m in st.members if m["name"] == name)
+    return st.name, {**member, "struct": st.name, "index": ""}, ""
+
+
 def resolve_member(register: str, structs: dict[str, Struct]) -> tuple[str, dict | None, str]:
     """banner の register 名 → (型, メンバー, 註)。
 
@@ -299,6 +321,11 @@ def resolve_member(register: str, structs: dict[str, Struct]) -> tuple[str, dict
     candidates = [s for s in structs.values()
                   if s.name == type_name or s.name.startswith(type_name + "_")]
     if not candidates:
+        # banner が型を名乗らない形。型が分からないので下の梯子には入れず、
+        # register 名そのままの一致だけを試す（`member_named` を参照）。
+        found = member_named(register, structs)
+        if found:
+            return found
         return type_name, None, f"{type_name}_TypeDef が無い"
     ordered = sorted(candidates, key=lambda s: (s.name != type_name, len(s.name)))
     for st in ordered:
@@ -345,6 +372,10 @@ def resolve_member(register: str, structs: dict[str, Struct]) -> tuple[str, dict
         st = owners[0]
         member = next(m for m in st.members if m["name"] == rest)
         return type_name, {**member, "struct": st.name, "index": ""}, ""
+    # banner が型を名乗らないだけで、名前そのままなら決まることがある。
+    found = member_named(register, structs)
+    if found:
+        return found
     return type_name, None, "構造体に同名のメンバーが無い"
 
 

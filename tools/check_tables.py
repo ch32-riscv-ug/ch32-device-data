@@ -262,6 +262,13 @@ def remap_selector_coverage(t: dict) -> list[str]:
 
     `pin_role_coverage` と同じ持ち方——閾値ではなく `(series, signal)` の名前で
     持つ。片方が埋まって別の穴が開いたことも、増えたことも同じ検査が言う。
+
+    **`remap-N` の行だけを見る。** `default`/`main` の行は selector を持たなくて
+    当然です——`remap-N` の N は「あるフィールドにこの値を書く」という意味なので
+    selector が無ければ行が意味をなさないのに対し、`default` は「remap を触らずに
+    AF モードにすれば出る」という話で、そもそも remap フィールドを持たない周辺
+    （ADC・OPA、AF 番号方式の family）が大半です。実測 4,128 行あり、数えても
+    穴の指標になりません（2026-08-28 に確認）。
     """
     found: dict[tuple[str, str], int] = collections.Counter()
     for r in t["index:pinout"]:
