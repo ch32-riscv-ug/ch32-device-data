@@ -42,12 +42,12 @@ Consumers may read these directly; their columns are kept stable in the same way
 
 | `route` | Source column | Meaning | **Active right after power-on?** | Rows |
 |---|---|---|---|---|
-| `main` | 主功能（复位后）/ Main function (after reset) | What the pad is doing right after reset | **Yes** | 130 |
-| `default` | 默认复用功能 / Default alternate function / 引脚功能 | The function that appears **once the pad is put in AF mode** without touching the remap register (left at 0) | **No** | 9,261 |
-| `remap-N` | 重映射功能 | Write N to the AFIO remap field | No | about 10,000 |
-| `af-N` | The AF number is written alongside in the same column (`SDA(AF7)`) | Write N to that pad's AF number | No | about 4,100 |
+| `main` | 主功能（复位后）/ Main function (after reset) | What the pad is doing right after reset | **Yes** | 4,510 |
+| `default` | 默认复用功能 / Default alternate function / 引脚功能 | The function that appears **once the pad is put in AF mode** without touching the remap register (left at 0) | **No** | 9,335 |
+| `remap-N` | 重映射功能 | Write N to the AFIO remap field | No | 9,869 |
+| `af-N` | The AF number is written alongside in the same column (`SDA(AF7)`) | Write N to that pad's AF number | No | 4,497 |
 | `alias` | Parentheses in the pad-name cell (`LO1\n(PA0)`) | **Not a function.** The pad's **name as a GPIO**, given by the document as an alias | -- | 30 |
-| empty | -- | The document gives no route number; needs checking | -- | 107 |
+| empty | -- | The document gives no route number; needs checking | -- | 242 |
 
 #### `alias` -- when the pad name carries a GPIO name in parentheses (CH32M007 / CH32M103)
 
@@ -454,7 +454,7 @@ so they were placed in [register-map-survey](../docs/register-map-survey.ja.md#�
 
 ### `pin_alternate.csv`
 
-**Where to write the AF number.** The destination of the N in `route = af-N` (4412 rows) of `pin_functions.csv`,
+**Where to write the AF number.** The destination of the N in `route = af-N` (4,497 rows) of `pin_functions.csv`,
 one row per (family, pad). `tools/build_pin_alternate.py`.
 
 The 3 families CH32V205, CH32X315 and CH32H417 are **the generation without AFIO remap**;

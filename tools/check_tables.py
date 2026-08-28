@@ -69,7 +69,23 @@ KNOWN_ROLE_GAPS: dict[str, int] = {}
 #            `UHSIF_PORT0_1` と書き、英語版の同じ欄は空。RM 格子は値1を
 #            PC1→PORT3 のようにずらして書き、この3 pad を値0（既定）に
 #            当てているので、中文版の主張を裏づける行がない（F-51。資料側）
-KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {}
+KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {
+    ("CH32H417", "UHSIF_PORT0"): 1,
+    ("CH32H417", "UHSIF_PORT1"): 1,
+    ("CH32H417", "UHSIF_PORT2"): 1,
+    ("CH32V303", "I2S3_CK"): 4,
+    ("CH32V303", "I2S3_SD"): 4,
+    ("CH32V303", "I2S3_WS"): 5,
+    ("CH32V305", "I2S3_CK"): 2,
+    ("CH32V305", "I2S3_SD"): 2,
+    ("CH32V305", "I2S3_WS"): 3,
+    ("CH32V307", "I2S3_CK"): 3,
+    ("CH32V307", "I2S3_SD"): 3,
+    ("CH32V307", "I2S3_WS"): 3,
+    ("CH32V317", "I2S3_CK"): 2,
+    ("CH32V317", "I2S3_SD"): 2,
+    ("CH32V317", "I2S3_WS"): 2,
+}
 
 # catalog/toolchains.csv の語彙。上流（MounRiver）の綴りではなく、こちらで
 # 正規化した名前（build_toolchains.py の OS_NAME / ARCH_NAME / KIND_ORDER と対）。
@@ -191,6 +207,47 @@ def pin_role_coverage(t: dict) -> list[str]:
         elif now < before:
             out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
                        f"{now} 行に減った——KNOWN_ROLE_GAPS を更新すること")
+    return out
+
+
+def routes_backed_by_pins(t: dict) -> list[str]:
+    """`remap_routes` の各経路が、その series の pin 表に実在するか。
+
+    **どちらも同じ datasheet の pin 表から来るのに、通る道が違います。**
+    `pin_functions` は `build_pins` が PDF を直読みして両言語版を突き合わせたもの、
+    `remap_routes` は `build_all` が作った candidate 経由。**同じ事実の2つの読みが
+    食い違っていないことを、ここで初めて突き合わせます。**
+
+    これが無かったために、candidate が**別の series の pin 表**を読んでいても
+    誰も気付きませんでした（2026-08-28 の監査を追って発覚）:
+
+    - CH32V317 が `CH32V303/305/307引脚定义`（表3-1）を読み、V307 の
+      `ETH_*`54 経路と `FSMC_*`34 経路が**そのまま CH32V317 の経路として**
+      入っていた。88 経路が V307 と1つ違わず一致していたのが証拠で、
+      CH32V317 自身の表（表3-2）には `ETH_`/`FSMC_` が1つも無い（F-50）
+    - CH32X033 が `CH32X035引脚定义` を読み、series 全体の経路が別の pad 由来
+    - CH32M030C8U3 が `QFN48X7_A` ではなく `QFN48` の番号列を読んでいた
+
+    lead 番号ではなく **(pad, signal)** で見る。同じ series の型番なら封装で
+    lead 番号は変わるが、pad にその signal が出るかは series の性質なので。
+    """
+    series_of = {r["part_number"]: r["series"] for r in t["products"]}
+    backed: dict[str, set] = collections.defaultdict(set)
+    for r in t["pin_functions"]:
+        series = series_of.get(r["part_number"])
+        if series:
+            backed[series].add((r["pad"], r["signal"]))
+    missing: dict[tuple[str, str], int] = collections.Counter()
+    for r in t["remap_routes"]:
+        if (r["pad"], r["signal"]) not in backed[r["series"]]:
+            missing[(r["series"], r["signal"])] += 1
+    if not missing:
+        return []
+    out = [f"remap_routes: pin_functions に無い (pad, signal) の経路が "
+           f"{sum(missing.values())} 行ある——candidate がその series の pin 表とは"
+           "別の表・別の列を読んでいる疑い（build_all.choose_table）"]
+    for (series, signal), count in sorted(missing.items(), key=lambda kv: -kv[1])[:10]:
+        out.append(f"  {series} の {signal}: {count} 行")
     return out
 
 
@@ -444,6 +501,8 @@ def main() -> int:
     bad += pin_role_coverage(t)
     # 語彙で読めても selector まで辿れない `remap-N` 行が残る。別の数として持つ。
     bad += remap_selector_coverage(t)
+    # 経路の pad と signal が、その series の pin 表にあること（別の表を読んでいない）。
+    bad += routes_backed_by_pins(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に
