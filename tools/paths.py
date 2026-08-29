@@ -57,7 +57,7 @@ STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
 # them in the viewer (pins.html); CSV is for programs, so there are no per-part
 # copies to keep in step.
 INDEX_TABLES = ("parts", "pinout", "routes", "registers", "register_map", "dma",
-                "timers", "features", "register_layouts")
+                "timers", "features", "capabilities", "register_layouts")
 
 
 def where(name: str) -> Path:

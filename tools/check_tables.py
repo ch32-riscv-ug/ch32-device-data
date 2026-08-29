@@ -184,6 +184,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "timers": ("build_timers.py", "COLUMNS"),
     "toolchains": ("build_toolchains.py", "COLUMNS"),
     "usbpd_plumbing": ("build_usbpd_plumbing.py", "COLUMNS"),
+    "index:capabilities": ("build_capabilities.py", "CAPABILITY_COLUMNS"),
     "index:dma": ("build_index.py", "DMA_COLUMNS"),
     "index:features": ("build_feature_tags.py", "COLUMNS"),
     "index:parts": ("build_index.py", "PARTS_COLUMNS"),
@@ -460,6 +461,21 @@ def index_checks(t: dict) -> list[str]:
     products = {r["part_number"] for r in t["products"]}
     if {r["part_number"] for r in t["index:parts"]} != products:
         bad.append("parts: 型番の集合が products と違う")
+    # capabilities ⊆ product_attributes。値は綴りのまま写すので値まで戻して見る。
+    # **`count` は資料が素の整数を書いたときだけ**入る（読みを足していないこと）。
+    attributes = {(r["part_number"], r["attribute"], r["value"].strip()) for r in t["product_attributes"]}
+    for r in t["index:capabilities"]:
+        if (r["part_number"], r["attribute"], r["value"]) not in attributes:
+            bad.append(f"capabilities: product_attributes にない行 "
+                       f"{r['part_number']} {r['attribute']}={r['value']!r}")
+        if not r["capability"]:
+            bad.append(f"capabilities: {r['part_number']} {r['attribute']} の capability が空")
+        if r["stated"] not in ("count", "marker", "text"):
+            bad.append(f"capabilities: {r['part_number']} {r['attribute']} の stated {r['stated']!r}")
+        if (r["stated"] == "count") != bool(r["count"]):
+            bad.append(f"capabilities: {r['part_number']} {r['attribute']} の count と stated が食い違う")
+        if r["count"] and r["count"] != r["value"]:
+            bad.append(f"capabilities: {r['part_number']} {r['attribute']} の count が値そのままでない")
 
     # manifest: index/ の全ファイルと sha256 が一致
     import hashlib  # noqa: PLC0415

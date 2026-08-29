@@ -13,6 +13,7 @@ split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanes
 | Question | Table |
 |---|---|
 | Which part meets my requirements? | [`parts.csv`](parts.csv) |
+| Which parts have capability X, and how many of it? | [`capabilities.csv`](capabilities.csv) |
 | Which series have feature X? | [`features.csv`](features.csv) |
 | What is this lead of this part? Which lead carries USART1 TX? | [`pinout.csv`](pinout.csv) |
 | Which remap value routes the signal where I want it? | [`routes.csv`](routes.csv) |
@@ -120,6 +121,37 @@ one row with `register` empty.
 channel number reaching a pin, counted from `pinout.csv` -- not the silicon's limit) and
 `complementary` (`1` if any `CHxN` reaches a pin).
 
+### `capabilities.csv` -- part x capability, long format
+
+One row per (part, capability, qualifier, source attribute), from
+`evidence/product_attributes` alone (by `tools/build_capabilities.py`). `parts.csv` is the
+comparison table laid out wide and can hold 13 of the 158 attribute spellings as columns; this
+table holds all of them as rows, under a normalised capability name, so a query does not have to
+know that "how many SPI" is spelled `spi` in one family and `communication_interfaces_spi` in
+another.
+
+| Column | Meaning |
+|---|---|
+| `capability` | normalised name (`usart`, `can-fd`, `usb-hs`, `timer-general`, `adc`, `adc-channel`, ...) |
+| `qualifier` | the distinction the document itself draws inside that capability (`32bit`, `tim1`, `include-phy`, `adc1`, `with-tkey`). Spelling differences are **not** a distinction -- they stay in `attribute` |
+| `stated` | how the document states the value: `count` (a bare integer), `marker` (`√`, `Supported` -- it claims presence without a number), `text` (anything else: `8+2`, `3/2`, `10@2`, `MAC+10M/100M PHY`) |
+| `count` | the integer, and only when `stated` is `count`. **No counting rule is applied**: `8+2` is not read as 10 |
+| `value` | the document's value verbatim |
+| `attribute` | the `evidence/product_attributes` key this row came from -- the way back |
+
+**The existence of a row is the claim that the part has it.** A comparison-table cell reading `-`
+is already dropped in `product_attributes`, so it is absent here too. **That reading only holds
+within a family**: a missing row means either "this part does not have it" or "this family's
+comparison table has no such row", and the table cannot tell the two apart. Do not count
+"parts without X" across families.
+
+`adc` is the **unit** count and `adc-channel` the **channel** count; the source spells both "ADC"
+in places (`adc` = `8+2` channels, `adc_unit` = `2` units), which is why the attribute-to-capability
+map is an exhaustive dictionary rather than a set of patterns. Clock, voltage, flash, SRAM and GPIO
+rows are carried too, so the comparison table is fully represented -- but for those,
+`parts.csv` has the better-sourced value (`evidence/operating_conditions`, `catalog/products`)
+rather than the comparison table's prose (`Max: 144MHz`).
+
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 
 `features.csv` (by `tools/build_feature_tags.py`): one row per (tag, series); `precision` says
@@ -129,6 +161,7 @@ hashes share register definitions. `manifest.csv`: path, row count and sha256 of
 here.
 
 ```sh
+uv run tools/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)
 uv run tools/build_index.py          # rebuild everything (seconds; evidence must be current)
 uv run tools/check_tables.py         # index ⊆ evidence, manifest matches
 ```

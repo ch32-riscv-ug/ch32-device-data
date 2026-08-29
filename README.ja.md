@@ -26,6 +26,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
+- `tools/check_docs.py`: **文書が書いている行数と穴の状態**を表と worklist の台帳で検算する。データが正しくても説明が古ければ、利用者が読むのは古いほう（2026-08-29 の監査で見つかった腐りの型）
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
@@ -63,7 +64,14 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   しか書かず、EVTの例題も1組に揃っていない
 - `tools/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
   一覧を`evidence/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
-  **版番号は未解決**（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
+  配布物の版番号（`wchlink.wcfg`）と実機が申告する`major.minor`の対応は
+  `wcfg = major*10 + minor`で、`tools/read_link_version.py`が実機から読んだ値と
+  突き合わせる（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
+- `tools/build_capabilities.py`: 比較表の属性（158種類の綴り・1,721行）を
+  「型番 × 能力」の縦持ち索引`index/capabilities.csv`にする。`index/parts.csv`は
+  横長なので13種類しか列に持てない。属性→能力の対応は**総当たりの辞書**で、
+  辞書に無い属性が現れたら生成が落ちる（`adc`はチャネル数、`adc_unit`はユニット数、
+  というように似た綴りで意味が違うため規則では畳めない）
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
@@ -89,6 +97,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 ```sh
 uv run tools/check_tables.py    # 全表の参照結合・書式・索引⊆証拠・manifest
 uv run tools/check_counts.py    # 比較表が数える周辺の数 vs pin表から引ける数
+uv run tools/check_docs.py      # 文書が書いている行数・穴の状態 vs 実際の表と台帳
 ```
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。

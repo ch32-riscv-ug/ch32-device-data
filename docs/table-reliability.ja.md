@@ -35,8 +35,11 @@
 | `pin_numbering` | 封装の公称 lead 数と番号の連番 | NC の足を落としていた5型番（F-49） |
 | `remap_selector_coverage` | `remap-N` 行が selector まで辿れているか | index 側の数を誰も持っていなかった（監査の指摘） |
 | CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
+| `check_docs.py` | **文書が書いている行数と穴の状態**が、表と worklist の台帳と合っているか | 解決済みの F-11 を3つの文書が古いまま説明していた・この資料の pinout 行数が5行古かった（2026-08-29 の監査） |
 
 **中身の鮮度は PDF が要るので CI では見られません。** そこは `catalog/sources.csv`（読んだミラーの commit）と手動のフル実行が担当です。`column_drift` は「中身は見られなくても列なら見られる」という割り切りで、実際に F-54 の2件はこれで捕まりました。
+
+**説明文の鮮度は PDF が無くても見られます。** データが直っても文章が古いままなら、利用者が読むのは古いほうです。`check_docs.py` はその型の腐りだけを見ます——文書が書いている行数を表から数え直し、worklist の F 台帳で ✅ の穴を別の文書が「未解決」と書いていないかを見る。文書側に印は足しません（印は書き忘れるので検査になりません）。どの綴りがどの数かは `check_docs.py` が持ち、綴りが変わって当たらなくなったこと自体を失敗として言います。
 
 ## 一覧
 
@@ -82,29 +85,33 @@
 | systick | 53 | 全行 reference | 結合 | — | 🔵 |
 | evt_variants | 56 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
-| clock_configs 他 clock_* 5表 | 1,066 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
+| clock_configs 他 clock_* 5表 | 1,067 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
 | evt_examples | 1,593 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 | register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |
 | registers | 4,995 | confirmed 2,762 / ref 2,229 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |
-| register_fields | 33,365 | field 24,792（confirmed 6,831 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | **`member` が空な行は 1,591 → 911**（2026-08-28〜29。R-20。banner が型を名乗らないだけの343行と、**名前では引けないが RM の絶対番地なら引ける**337行を結んだ——FMC/FSMC は BCR と BTR が1つの配列に交互に入り、`OPA_KEY` は header が `OPAKEY` と綴る。残り911行は header に構造体が無く、`member` は header の概念なので埋めようがない）。RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方）。`member` 空 1,591 行（CAN 以外の入れ子・構造体の無い define 群） | 🟡 |
+| register_fields | 33,365 | field 24,792（confirmed 6,831 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | **`member` が空な行は 1,591 → 911**（2026-08-28〜29。R-20。banner が型を名乗らないだけの343行と、**名前では引けないが RM の絶対番地なら引ける**337行を結んだ——FMC/FSMC は BCR と BTR が1つの配列に交互に入り、`OPA_KEY` は header が `OPAKEY` と綴る。残り911行は header に構造体が無く、`member` は header の概念なので埋めようがない）。RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方） | 🟡 |
 | register_layouts（`index/`） | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
 
 ### 導出＝索引 `index/`（証拠から機械生成。原典を新たに読まない。2026-08-26 に `pin_roles`→`pinout`・`feature_tags`→`features` へ移った）
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| pinout（旧 pin_roles） | 24,977（機能行 24,266＋機能の無い lead 711） | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
+| pinout（旧 pin_roles） | 24,982（機能行 24,266＋機能の無い lead 716） | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
+| capabilities（`index/`） | 1,714 | 元の行を引き継ぐ | **product_attributes に (型番, 属性, 値) で戻せること**・`count` が値そのままであること・属性が能力の語彙にあること（無ければ生成が落ちる） | 資料の値のうち素の整数だけが `count` に入る（1,186行。`8+2`・`3/2`・`10@2` は `value` のまま）。**行が無い＝持っていない、と読めるのは family の中だけ**——比較表の `-` は証拠の時点で落ちていて、「その family の比較表にその行が無い」と区別が付かない | ✅ |
 | features（旧 feature_tags） | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
 | toolchains | 15 | confirmed 15 | 語彙・重複・日付・URLの宛先・件数の下限 | 上流（MounRiver）のAPIが「いま最新」と言う配布物の写し。**行ごとに配信側を HEAD して**掲載と突き合わせている（サイズ一致で confirmed）。旧版は持たない（IDE の旧版は `--history`、ツールチェーンの旧版は上流APIに無い） | ✅ |
 
-### 未解決
+### 実機観測を伴うもの
 
-| テーブル | 行数 | 状態 |
-|---|---:|---|
-| link_firmware | 10 | 🔴 **版番号が未確定**（F-11）。sha256 と取得元は事実だが、`wcfg_version`/`set_version` の解釈に実機の突き合わせが要る |
+| テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
+|---|---:|---|---|---|---|
+| link_firmware | 10 | 全行 reference | 結合を持たない（配布物の写し）・`reported_version` が `wcfg_version` の復号と一致すること | **版番号は解決済み**（F-11。2026-08-29）。`wcfg_version` は `major*10 + minor`（major は観測した全個体で 2）で、`reported_version` が復号値、`measured_version` が実機の申告値。LinkE と CH549 の2機種は実測で一致（`tools/read_link_version.py`）。残る8行は実機を持っていないぶんで `measured_version` が空 | 🟡 |
+
+この表だけは**資料ではなく配布物と実機**を出所にするので、他の表の「両言語照合」に
+あたる裏取りが `measured_version`（実機が USB で申告する版）になる。
 
 ## 原典サンプル検証（2026-08-25）
 
@@ -254,7 +261,7 @@ EVT ヘッダの綴り。field 名も `*_RM`（RM）と `*_REMAP`（EVT）が出
 
 ## 既知の穴の一覧はどこにあるか
 
-- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（未解決: 実機待ち F-11、資料側の記録 F-6/7/24残り/33/43〜46、F-4残りは実害なし。**ツール側の穴は0**）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)
+- 穴の台帳: [worklist.ja.md](worklist.ja.md) の F 番号（開いているのは資料側の記録だけ: F-7・F-33・F-43〜46・F-51。F-4 と F-24 は残りだけが資料側で実害なし。**ツール側の穴は0**）。解決済みの記録は [worklist-archive.ja.md](worklist-archive.ja.md)。この一覧が台帳とずれていないことは `tools/check_docs.py` が見る
 - 語彙の穴: `tools/check_tables.py` の `KNOWN_ROLE_GAPS`（綴りと行数で固定）
 - 数の不変量: `tools/check_tables.py` の `KNOWN_SHARED_LEADS`、`tools/check_counts.py` の `KNOWN`
 

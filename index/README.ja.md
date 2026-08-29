@@ -12,6 +12,7 @@
 | 知りたいこと | 表 |
 |---|---|
 | 要求を満たす型番は（U2） | [`parts.csv`](parts.csv) |
+| 能力（と、その数）から型番を絞る | [`capabilities.csv`](capabilities.csv) |
 | 機能から series を探す | [`features.csv`](features.csv) |
 | この型番のこの足は何か・この機能はどの足に出るか（U1/U3） | [`pinout.csv`](pinout.csv) |
 | remap の値をどれにするか（U3） | [`routes.csv`](routes.csv) |
@@ -143,6 +144,40 @@ channel 固定でなく、`note` にそう書く。variant・channel の意味�
 `channels`（pin に出ている最大チャネル番号。silicon の上限ではない）と
 `complementary`（`CHxN` が pin に出ていれば `1`）を足したもの。
 
+### `capabilities.csv` — 型番 × 能力（縦持ち）
+
+`tools/build_capabilities.py` が `evidence/product_attributes` **だけ**から作ります。
+1行1（型番, 能力, qualifier, 元の属性）。
+
+`parts.csv` は比較表を横に並べたもので、158種類ある属性の綴りのうち列に持てるのは13種類だけです。
+この表は残りも含めて全部を行に落とし、**能力の名前を揃えて**あるので、
+「SPI が何本か」を family ごとに `spi`・`communication_interfaces_spi` と綴り分けている事情を
+引く側が知らなくて済みます。
+
+| 列 | 中身 |
+|---|---|
+| `capability` | 揃えた名前（`usart`・`can-fd`・`usb-hs`・`timer-general`・`adc`・`adc-channel` …） |
+| `qualifier` | **資料自身がその能力の中で付けている区別**（`32bit`・`tim1`・`include-phy`・`adc1`・`with-tkey`）。綴りの違いは区別ではないので `attribute` 列に残ります |
+| `stated` | 資料の言い方。`count`＝素の整数／`marker`＝`√`・`Supported`（数を言わずに有ると言っている）／`text`＝それ以外（`8+2`・`3/2`・`10@2`・`MAC+10M/100M PHY`） |
+| `count` | その整数。`stated=count` のときだけ入ります。**数える規則は当てません**——`8+2` を 10 とは読みません |
+| `value` | 資料の値そのまま |
+| `attribute` | 元になった `evidence/product_attributes` の鍵（戻り道） |
+
+**行があること自体が「持っている」の主張**です。比較表が `-` と書いたセルは
+`product_attributes` の時点で落ちているので、ここにも現れません。ただし
+**その読みが効くのは family の中だけ**——行が無いのは「その型番が持っていない」か
+「その family の比較表にその行が無い」かのどちらかで、表からは区別できません。
+family をまたいで「X を持たない型番」を数えないこと。
+
+`adc` は**ユニット数**、`adc-channel` は**チャネル数**です。資料はどちらも「ADC」と書くことがあり
+（`adc`＝`8+2` はチャネル、`adc_unit`＝`2` はユニット）、規則で畳むと静かに間違えるので、
+属性→能力の対応は**総当たりの辞書**にしてあります（`tools/build_capabilities.py`。
+辞書に無い属性が現れたら生成が落ちます）。
+
+クロック・電圧・Flash・SRAM・GPIO の行も比較表にあるぶんは載せますが、
+**数として引くなら `parts.csv` のほうが出所が良い**です（`evidence/operating_conditions` と
+`catalog/products` から来た数で、比較表の自由文 `Max: 144MHz` ではありません）。
+
 ### `features.csv` — 機能から series を探す
 
 `tools/build_feature_tags.py` が作ります（比較表を優先し、無ければ datasheet の節見出し）。
@@ -163,6 +198,7 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 ## 生成と検査
 
 ```sh
+uv run tools/build_capabilities.py     # capabilities.csv（manifest に入るので build_index より前）
 uv run tools/build_index.py            # 全部（1〜2秒。証拠の表が揃っていること）
 uv run tools/build_index.py --only pinout,timers
 uv run tools/check_tables.py           # 索引 ⊆ 証拠、manifest 一致

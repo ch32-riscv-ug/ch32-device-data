@@ -431,12 +431,14 @@ WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/buil
 **`.bin`自体はこのrepositoryに置いていない**——再配布になるため、載せるのは
 sha256・サイズ・取得元URLだけ。
 
-**この表はまだ「あなたのLinkは古い」を言えない。** `wcfg_version`列はWCH独自の
-番号（`wchlink.wcfg`の`CH32V307Ver=42`等）で、**実機がUSBで申告する`2.12`のような
-`major.minor`との対応が取れていない**。詳細と再挑戦の手順は
+**「あなたのLinkは古い」を言える**（2026-08-29、F-11 解決）。`wcfg_version`列はWCH独自の
+番号（`wchlink.wcfg`の`CH32V307Ver=42`等）で、実機がUSBで申告する`major.minor`との
+対応は **`wcfg = major*10 + minor`**（majorは観測した全個体で2）。復号した値が
+`reported_version`列で、`tools/read_link_version.py`が実機から読んだ値が
+`measured_version`列。**両者が食い違う行はconflictにする**規則で、いまは全一致
+（実機を持っている2機種ぶんだけ埋まり、残り8行は空）。導出と実測の記録は
 [docs/link-firmware-survey.ja.md](../docs/link-firmware-survey.ja.md)。
-いま確実に使えるのは**sha256**で、「手元のファイルが今配られているものと同じか」は
-これで判る。
+「手元のファイルが今配られているものと同じか」は**sha256**で判る。
 
 MCUの割り当ては推測ではなく先頭命令から出している（`02`=8051の`LJMP`、
 `6f`=RISC-Vの`jal`）。WindowsのZIPとLinux版MounRiver Studioの10本は
@@ -763,6 +765,7 @@ uv run tools/build_registers.py --rm-cache .cache/rm   # register_blocks/registe
 uv run tools/build_dma_requests.py              # dma_requests（RM zh/en のDMA章の格子。全ページ走査で15分前後）
 uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
+uv run tools/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）
 uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
@@ -773,6 +776,7 @@ uv run tools/extract_images.py                  # 各repoのimage/（数分か�
 uv run tools/check_images.py [--missing|--prune] # 画像の必要一覧と検査
 uv run tools/check_tables.py                    # 全テーブルの参照結合・索引⊆証拠・manifest
 uv run tools/check_counts.py                    # 比較表の周辺数 vs pinのinstance数
+uv run tools/check_docs.py                      # 文書が書いている行数・穴の状態 vs 実際の表
 uv run tools/scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --family CH32V006  # 1familyだけ
 ```
