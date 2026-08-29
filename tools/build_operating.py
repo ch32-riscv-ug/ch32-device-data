@@ -11,9 +11,10 @@
 ACC_HSI の ±% 側にある。min/max だけを載せると、公称周波数そのものが
 落ちる — つまりPLL入力が決まらず、逓倍後のSYSCLKが計算できない。
 
-実行: uv run python tools/build_operating.py
+実行: uv run python tools/build_operating.py [--out <dir>]
 """
 
+import argparse
 import csv
 import re
 import sys
@@ -332,6 +333,14 @@ def read_headline_clock(pdf_path, lang):
 
 
 def main():
+    # **`--out` が無いと安全に試せない。** 他の生成器はどれも試験用の出力先を
+    # 受けるのに、この tool だけ受けず、`--out` を渡しても黙って無視して
+    # `evidence/` に書いていた。抽出を変えて様子を見るのに正本を上書きするしか
+    # 手が無い、というのは事故のもとで、実際に一度やった（2026-08-29）。
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--out", type=Path, default=None,
+                    help="出力先のディレクトリを上書きする（試験用）")
+    args = ap.parse_args()
     with paths.table("products").open(encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     ds_series = {}
@@ -494,13 +503,15 @@ def main():
     out = unique
 
     out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"], r["typ"]))
-    dest = paths.table("operating_conditions")
+    dest = paths.table("operating_conditions", args.out)
+    dest.parent.mkdir(parents=True, exist_ok=True)
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(out)
     from collections import Counter
-    print(f"{dest.relative_to(REPO)}: {len(out)} 行",
+    shown = dest.relative_to(REPO) if dest.is_relative_to(REPO) else dest
+    print(f"{shown}: {len(out)} 行",
           dict(Counter(r["confidence"] for r in out)))
     if DROPPED:
         print(f"  噛み合わないので採らなかった行 {len(DROPPED)}:", file=sys.stderr)

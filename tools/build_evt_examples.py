@@ -6,9 +6,10 @@
 表にします。EVT展開ツリーの実ディレクトリも突き合わせ、**目録2版と実体の
 3つの根拠**で確度を決めます（実体＋どちらかの目録で確定）。
 
-実行: uv run python tools/build_evt_examples.py
+実行: uv run python tools/build_evt_examples.py [--out <dir>]
 """
 
+import argparse
 import csv
 import re
 import sys
@@ -109,6 +110,12 @@ def disk_coverage(evt_dir, keys):
 
 
 def main():
+    # 他の生成器と同じく試験用の出力先を受ける。受けないと、抽出を変えて様子を
+    # 見るのに正本を上書きするしか手が無い（`build_operating.py` で実際に事故った）。
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--out", type=Path, default=None,
+                    help="出力先のディレクトリを上書きする（試験用）")
+    args = ap.parse_args()
     rows = []
     for repo in sorted(MIRRORS.glob("CH32*")):
         evt = repo / "EVT"
@@ -151,13 +158,15 @@ def main():
             })
 
     rows.sort(key=lambda r: (r["family"], r["group"], r["example"]))
-    dest = paths.table("evt_examples")
+    dest = paths.table("evt_examples", args.out)
+    dest.parent.mkdir(parents=True, exist_ok=True)
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
         w.writerows(rows)
     from collections import Counter
-    print(f"{dest.relative_to(REPO)}: {len(rows)} 行",
+    shown = dest.relative_to(REPO) if dest.is_relative_to(REPO) else dest
+    print(f"{shown}: {len(rows)} 行",
           dict(Counter(r["confidence"] for r in rows)))
 
 

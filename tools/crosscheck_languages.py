@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -61,13 +62,31 @@ PUNCTUATION = str.maketrans({"（": "(", "）": ")", "，": ",", "、": ",",
                              "～": "~", "－": "-", "＋": "+", "／": "/"})
 
 
+# 容量の単位は版で `512KB` と `512K` に割れる。**値としては同じもの**で、
+# `build_tables.SIZE` も両方を受けるのに、canonical だけが別物と読んでいた。
+# 揃っている行が対応付けに使えないと LCS が外れ、同じ見出しが2行に割れて
+# 両方 reference になる（F-57。CH32H416 の SRAM 共有領域が zh `512KB` /
+# en `512K` でそうなっていた）。`512kbyte` のように語が続くものは触らない。
+SIZE_UNIT = re.compile(r"(?<=\d)\s*([kmg])b\b")
+
+
 def canonical_value(value) -> str:
+    """比較のための読み。**綴りの差だけを畳み、値は変えない。**
+
+    >>> canonical_value("512KB") == canonical_value("512K")
+    True
+    >>> canonical_value("8 MB"), canonical_value("24V")
+    ('8m', '24v')
+    >>> canonical_value("512kbytes")
+    '512kbytes'
+    """
     # Lower-case first, so "Supported" meets the equivalence for "supported".
     text = str(value).translate(PUNCTUATION).lower()
     for word, canon in EQUIVALENTS:
         text = text.replace(word, canon)
     for word in UNIT_WORDS:
         text = text.replace(word, "")
+    text = SIZE_UNIT.sub(r"\1", text)
     return text.replace("°c", "c").replace(" ", "").strip()
 
 

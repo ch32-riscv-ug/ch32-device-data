@@ -55,12 +55,9 @@ CH32H416RDU6,CH32H416,CH32H417,rtc,,marker,,√,rtc,#,confirmed,products:zh+prod
 CH32H416RDU6,CH32H416,CH32H417,sai,,count,1,1,sai,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,sdmmc,,count,1,1,sdmmc,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,spi-i2s,,text,,3/2,spi_i2s,#,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-fast-dtcm,text,,256KB,sram_core_1_fast_dtcm,#,reference,products:zh
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-fast-itcm,text,,128KB,sram_core_1_fast_itcm,#,reference,products:zh
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-dtcm,text,,256K,sram_core_1_hs_dtcm,#,reference,products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-itcm,text,,128K,sram_core_1_hs_itcm,#,reference,products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,shared,text,,512KB,sram_shared_code_and_data_area,#,reference,products:zh
-CH32H416RDU6,CH32H416,CH32H417,sram,shared,text,,512K,sram_shared_code_and_data_area_,#,reference,products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-dtcm,text,,256K,sram_core_1_hs_dtcm,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-itcm,text,,128K,sram_core_1_hs_itcm,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,shared,text,,512K,sram_shared_code_and_data_area,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,swpmi,,count,1,1,swpmi,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,systick,32bit,count,2,2,timer_systick_32_bit,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,timer-advanced,16bit,count,2,2,timer_adtm_16_bit,#,confirmed,products:zh+products:en
@@ -543,7 +540,6 @@ CH32V002J4M6,CH32V002,CH32V006,usart,,count,1,1,serial_port,#,confirmed,products
 CH32V002J4M6,CH32V002,CH32V006,watchdog,,count,2,2,watchdog,#,confirmed,products:zh+products:en
 CH32V003A4M6,CH32V003,CH32V003,adc-channel,,count,6,6,adc_channel_no,#,confirmed,products:zh+products:en
 CH32V003A4M6,CH32V003,CH32V003,clock,sources,count,3,3,system_clock_source,#,confirmed,products:zh+products:en
-CH32V003A4M6,CH32V003,CH32V003,gpio,,count,14,14,general_purpose_i_o,#,reference,products:en
 CH32V003A4M6,CH32V003,CH32V003,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V003A4M6,CH32V003,CH32V003,timer-advanced,,count,1,1,advanced_control_timer,#,confirmed,products:zh+products:en
 CH32V003A4M6,CH32V003,CH32V003,timer-general,,count,1,1,general_purpose_timer,#,confirmed,products:zh+products:en
@@ -551,7 +547,6 @@ CH32V003A4M6,CH32V003,CH32V003,usart,,count,1,1,usart,#,confirmed,products:zh+pr
 CH32V003A4M6,CH32V003,CH32V003,watchdog,,count,2,2,watchdog,#,confirmed,products:zh+products:en
 CH32V003F4P6,CH32V003,CH32V003,adc-channel,,count,8,8,adc_channel_no,#,confirmed,products:zh+products:en
 CH32V003F4P6,CH32V003,CH32V003,clock,sources,count,3,3,system_clock_source,#,confirmed,products:zh+products:en
-CH32V003F4P6,CH32V003,CH32V003,gpio,,count,18,18,general_purpose_i_o,#,reference,products:en
 CH32V003F4P6,CH32V003,CH32V003,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V003F4P6,CH32V003,CH32V003,spi,,count,1,1,spi,#,confirmed,products:zh+products:en
 CH32V003F4P6,CH32V003,CH32V003,timer-advanced,,count,1,1,advanced_control_timer,#,confirmed,products:zh+products:en
@@ -560,7 +555,6 @@ CH32V003F4P6,CH32V003,CH32V003,usart,,count,1,1,usart,#,confirmed,products:zh+pr
 CH32V003F4P6,CH32V003,CH32V003,watchdog,,count,2,2,watchdog,#,confirmed,products:zh+products:en
 CH32V003F4U6,CH32V003,CH32V003,adc-channel,,count,8,8,adc_channel_no,#,confirmed,products:zh+products:en
 CH32V003F4U6,CH32V003,CH32V003,clock,sources,count,3,3,system_clock_source,#,confirmed,products:zh+products:en
-CH32V003F4U6,CH32V003,CH32V003,gpio,,count,18,18,general_purpose_i_o,#,reference,products:en
 CH32V003F4U6,CH32V003,CH32V003,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V003F4U6,CH32V003,CH32V003,spi,,count,1,1,spi,#,confirmed,products:zh+products:en
 CH32V003F4U6,CH32V003,CH32V003,timer-advanced,,count,1,1,advanced_control_timer,#,confirmed,products:zh+products:en
@@ -569,7 +563,6 @@ CH32V003F4U6,CH32V003,CH32V003,usart,,count,1,1,usart,#,confirmed,products:zh+pr
 CH32V003F4U6,CH32V003,CH32V003,watchdog,,count,2,2,watchdog,#,confirmed,products:zh+products:en
 CH32V003J4M6,CH32V003,CH32V003,adc-channel,,count,6,6,adc_channel_no,#,confirmed,products:zh+products:en
 CH32V003J4M6,CH32V003,CH32V003,clock,sources,count,3,3,system_clock_source,#,confirmed,products:zh+products:en
-CH32V003J4M6,CH32V003,CH32V003,gpio,,count,6,6,general_purpose_i_o,#,reference,products:en
 CH32V003J4M6,CH32V003,CH32V003,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V003J4M6,CH32V003,CH32V003,timer-advanced,,count,1,1,advanced_control_timer,#,confirmed,products:zh+products:en
 CH32V003J4M6,CH32V003,CH32V003,timer-general,,count,1,1,general_purpose_timer,#,confirmed,products:zh+products:en

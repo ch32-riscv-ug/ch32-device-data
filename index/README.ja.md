@@ -13,6 +13,7 @@
 |---|---|
 | 要求を満たす型番は（U2） | [`parts.csv`](parts.csv) |
 | 能力（と、その数）から型番を絞る | [`capabilities.csv`](capabilities.csv) |
+| 資料どうしが食い違っている箇所を全部見る | [`conflicts.csv`](conflicts.csv) |
 | 機能から series を探す | [`features.csv`](features.csv) |
 | この型番のこの足は何か・この機能はどの足に出るか（U1/U3） | [`pinout.csv`](pinout.csv) |
 | remap の値をどれにするか（U3） | [`routes.csv`](routes.csv) |
@@ -197,6 +198,25 @@ family をまたいで「X を持たない型番」を数えないこと。
 **数として引くなら `parts.csv` のほうが出所が良い**です（`evidence/operating_conditions` と
 `catalog/products` から来た数で、比較表の自由文 `Max: 144MHz` ではありません）。
 
+### `conflicts.csv` — 資料どうしの食い違い
+
+`tools/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
+（165行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
+「両版で食い違う仕様を全部」に答えるには全表を grep するしかありませんでした。
+
+| 列 | 中身 |
+|---|---|
+| `table`・`subject` | どの表のどの行か（鍵の列を `col=value` で並べたもの） |
+| `field`・`kept` | 争っている列と、表が採った値。列ごとの印のとき／`basis` がその表に実在する列名を名乗るとき／その表が1行につき1つの値を主張するとき（`pin_functions.route`・`product_attributes.value`・`register_fields.bits` 等）に埋まる |
+| `dissenting` | `basis` で `!` が付いている出所 |
+| `alternative` | その出所が言う値（`basis` の `(=…)`） |
+
+**85行に相手の値が入り、68行は空**です。`memory_configs`（67行）と `timers`（1行）は
+食い違いを散文で記録していて DSL に持たないので、空欄は「[evidence/README.ja.md](../evidence/README.ja.md)
+の該当節を読め」の意味になります。`product_attributes` の25行は**仕様の差**（`2 (OPA1/3)` と
+`1（OPA1）`）と**言い回しの差**（`Typical: 72MHz` と `Typ. 72MHz`）が混ざります。
+中文版が異を唱えている行の `alternative` は、`basis` が持つ**訳した読み**であって原文の綴りではありません。
+
 ### `features.csv` — 機能から series を探す
 
 `tools/build_feature_tags.py` が作ります（比較表を優先し、無ければ datasheet の節見出し）。
@@ -218,6 +238,7 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 
 ```sh
 uv run tools/build_capabilities.py     # capabilities.csv（manifest に入るので build_index より前）
+uv run tools/build_conflicts.py        # conflicts.csv（同上）
 uv run tools/build_index.py            # 全部（1〜2秒。証拠の表が揃っていること）
 uv run tools/build_index.py --only pinout,timers
 uv run tools/check_tables.py           # 索引 ⊆ 証拠、manifest 一致
