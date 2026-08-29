@@ -207,15 +207,22 @@ family をまたいで「X を持たない型番」を数えないこと。
 | 列 | 中身 |
 |---|---|
 | `table`・`subject` | どの表のどの行か（鍵の列を `col=value` で並べたもの） |
-| `field`・`kept` | 争っている列と、表が採った値。列ごとの印のとき／`basis` がその表に実在する列名を名乗るとき／その表が1行につき1つの値を主張するとき（`pin_functions.route`・`product_attributes.value`・`register_fields.bits` 等）に埋まる |
+| `field`・`kept` | 争っている列と、表が採った値。列ごとの印のとき／`basis` がその表に実在する列名を名乗るとき／その表が1行につき1つの値を主張するとき（`pin_functions.route`・`product_attributes.value`・`register_fields.bits`）に埋まる。1行で複数の値を主張する表は空で、`basis` の側が欄を名指しする |
 | `dissenting` | `basis` で `!` が付いている出所 |
 | `alternative` | その出所が言う値（`basis` の `(=…)`） |
 
-**85行に相手の値が入り、68行は空**です。`memory_configs`（67行）と `timers`（1行）は
+**115行に相手の値が入り、68行は空**です。`memory_configs`（67行）と `timers`（1行）は
 食い違いを散文で記録していて DSL に持たないので、空欄は「[evidence/README.ja.md](../evidence/README.ja.md)
-の該当節を読め」の意味になります。`product_attributes` の25行は**仕様の差**（`2 (OPA1/3)` と
-`1（OPA1）`）と**言い回しの差**（`Typical: 72MHz` と `Typ. 72MHz`）が混ざります。
-中文版が異を唱えている行の `alternative` は、`basis` が持つ**訳した読み**であって原文の綴りではありません。
+の該当節を読め」の意味になります。
+
+**`conflict` の印は「事実が食い違っている」と同義ではありません。** `product_attributes` の25行は
+**仕様の差**（`2 (OPA1/3)` と `1（OPA1）`）と**言い回しの差**（`Typical: 72MHz` と `Typ. 72MHz`）が
+混ざり、`operating_conditions` の30行のうち8行は**綴りの差だけ**です（`mS` と `ms`、`0.8VDD` と
+`0.8*VDD`、`VI/O` と `VIO`）。中文版が異を唱えている行の `alternative` は、`basis` が持つ
+**訳した読み**であって原文の綴りではありません。
+
+`operating_conditions` は1行で min/typ/max/unit の4つを主張していて、争っているのがどれかは
+行ごとに違うので、`field` は空にして `alternative` の側が欄を名指しします（`min=60,typ=82,max=110`）。
 
 ### `features.csv` — 機能から series を探す
 
