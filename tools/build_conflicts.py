@@ -86,7 +86,30 @@ KEYS: dict[str, tuple[str, ...]] = {
 #   `evt(ch32v10x_flash.c)+rm(CH32xRM.PDF)+!evt-comment:fast_program_bytes(=256)`
 # **括弧は入れ子になる**（`!products:zh(=1（OPA1）)`）ので、`(=` からは対応する
 # 閉じ括弧まで数えて取る。正規表現の最短一致だと値を途中で切る。
-DISSENT = re.compile(r"!([^+]*)")
+def dissenting_tokens(basis: str) -> list[str]:
+    """`basis` の `!` で始まる項。**`+` は括弧の外だけが区切り**。
+
+    値そのものに `+` が入る（`!…:zh(typ=V+VCC12VS)`）ので、素朴に `+` で
+    割ると値が途中で切れる。
+
+    >>> dissenting_tokens("a(p.1)+!b:zh(typ=V+VCC12VS)+c")
+    ['b:zh(typ=V+VCC12VS)']
+    >>> dissenting_tokens("pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)")
+    ['rm-remap-grid(=remap-2)']
+    """
+    out, depth, token = [], 0, []
+    for ch in basis:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "+" and depth == 0:
+            out.append("".join(token))
+            token = []
+        else:
+            token.append(ch)
+    out.append("".join(token))
+    return [t[1:].strip() for t in out if t.startswith("!") and t[1:].strip()]
 # 異を唱える出所が列名を名乗ることがある（`!evt-comment:fast_program_bytes(=256)`）。
 # **その表に本当にある列のときだけ採る**——`!products:zh(=…)` の `zh` や
 # `!rm-remap-grid(=…)` の `grid` は出所の名前であって列ではないので、
@@ -101,21 +124,31 @@ ASSERTS: dict[str, str] = {
     "product_attributes": "value",
     "register_fields": "bits",
     "opa_cmp_registers": "bits",
-    "operating_conditions": "max",
 }
+# `operating_conditions` はここに載せない。1行が min/typ/max/unit の4つを主張して
+# いて、争っているのがどれかは行ごとに違う（`basis` の `(min=60,typ=82,…)` が
+# 名指ししている）。1つの列を決め打つと、min の食い違いを max の話として書く。
+
+
+# 相手の値の書き方は表で2通りある。1つの値を争う表は `(=<値>)`、欄ごとに
+# 争う表（`operating_conditions`）は `(min=…,typ=…,max=…,unit=…)`。
+STATED = re.compile(r"\((?==|(?:min|typ|max|unit)=)")
 
 
 def stated_value(token: str) -> str:
-    """`…(=<value>)` の値。**括弧は入れ子になる**ので深さを数えて閉じを探す。
+    """相手の出所が言う値。**括弧は入れ子になる**ので深さを数えて閉じを探す。
 
     >>> stated_value("evt-comment:fast_program_bytes(=256)")
     '256'
     >>> stated_value("products:zh(=1（OPA1）)")
     '1（OPA1）'
+    >>> stated_value("CH32V203DS0.PDF:zh(min=60,typ=82,max=110,unit=)")
+    'min=60,typ=82,max=110,unit='
     >>> stated_value("CH32V203DS0.PDF:en")
     ''
     """
-    at = token.find("(=")
+    m = STATED.search(token)
+    at = m.start() if m else -1
     if at == -1:
         return ""
     depth, out = 0, []
@@ -143,7 +176,7 @@ def conflicts_in(name: str, rows: list[dict]) -> list[dict]:
                 continue
             field = "" if column == "confidence" else column[:-len("_confidence")]
             basis = row.get("basis" if not field else f"{field}_basis", "") or ""
-            tokens = [t.strip() for t in DISSENT.findall(basis) if t.strip()]
+            tokens = dissenting_tokens(basis)
             named = [m.group(1) for t in tokens if (m := NAMES_FIELD.search("!" + t))
                      and m.group(1) in row]
             about = field or (named[0] if named else ASSERTS.get(name, ""))
@@ -155,7 +188,8 @@ def conflicts_in(name: str, rows: list[dict]) -> list[dict]:
                 "subject": " ".join(f"{k}={row.get(k, '')}" for k in key if row.get(k)),
                 "field": about,
                 "kept": row.get(about, ""),
-                "dissenting": ";".join(t.split("(=")[0] for t in tokens),
+                "dissenting": ";".join(
+                    t[:m.start()] if (m := STATED.search(t)) else t for t in tokens),
                 "alternative": ";".join(v for t in tokens if (v := stated_value(t))),
                 "basis": basis,
             })

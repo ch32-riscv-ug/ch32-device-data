@@ -184,16 +184,23 @@ keeps both and marks the row `conflict`. Those marks were spread over eleven tab
 | Column | Meaning |
 |---|---|
 | `table`, `subject` | where the row lives, and its key columns as `col=value` |
-| `field`, `kept` | the column in dispute and the value the table kept -- filled when the mark is per-column, when the basis names a real column of that table, or when the table asserts one value per row (`pin_functions.route`, `product_attributes.value`, `register_fields.bits`, ...) |
+| `field`, `kept` | the column in dispute and the value the table kept -- filled when the mark is per-column, when the basis names a real column of that table, or when the table asserts one value per row (`pin_functions.route`, `product_attributes.value`, `register_fields.bits`). Empty where a row asserts several values and the basis says which one differs |
 | `dissenting` | the sources marked `!` in `basis` |
 | `alternative` | what those sources state, from `(=...)` in `basis` |
 
-**85 rows carry an alternative and 68 do not.** `memory_configs` (67) and `timers` (1) record
+**115 rows carry an alternative and 68 do not.** `memory_configs` (67) and `timers` (1) record
 their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
-table's section of [evidence/README.md](../evidence/README.md)". And the 25
-`product_attributes` rows mix real differences (`2 (OPA1/3)` against `1 (OPA1)`) with wording
-(`Typical: 72MHz` against `Typ. 72MHz`) -- for a Chinese dissent, `alternative` is the
-translated reading the basis carries, not the original spelling.
+table's section of [evidence/README.md](../evidence/README.md)".
+
+**A `conflict` mark is not always a disagreement about the fact.** The 25 `product_attributes`
+rows mix real differences (`2 (OPA1/3)` against `1 (OPA1)`) with wording (`Typical: 72MHz`
+against `Typ. 72MHz`), and 8 of the 30 `operating_conditions` rows are spelling only (`mS`
+against `ms`, `0.8VDD` against `0.8*VDD`, `VI/O` against `VIO`). For a Chinese dissent,
+`alternative` is the translated reading the basis carries, not the original spelling.
+
+`operating_conditions` states four values per row (`min`/`typ`/`max`/`unit`) and which one is
+disputed varies, so those rows leave `field` empty and name the columns inside `alternative`
+(`min=60,typ=82,max=110`).
 
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 
