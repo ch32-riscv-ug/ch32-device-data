@@ -78,6 +78,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "pinout（旧 pin_roles）": ("index:pinout",),
     "features（旧 feature_tags）": ("index:features",),
     "capabilities（`index/`）": ("index:capabilities",),
+    "conflicts（`index/`）": ("index:conflicts",),
     "sources": ("sources",),
     "series / families / cores / documents": ("series", "families", "cores", "documents"),
     "toolchains": ("toolchains",),
@@ -109,6 +110,18 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("docs/worklist.ja.md", r"置き場所がそもそも無い\*\* (?P<n>[\d,]+)行",
      "register_fields_without_member"),
     ("docs/worklist.ja.md", r"証拠の表の conflict は (?P<n>[\d,]+) 行", "conflict_rows"),
+    ("README.ja.md", r"比較表の属性（(?P<n>\d+)種類の綴り", "product_attributes:kinds"),
+    ("README.ja.md", r"種類の綴り・(?P<n>[\d,]+)行", "product_attributes"),
+    # confidence の分布。**行数より先に動く**（資料の版が変わらなくても、
+    # 読み方を直せば confirmed が増える）ので、書いてあるなら数え直す。
+    ("docs/table-reliability.ja.md", r"\| product_attributes \| [\d,]+ \| confirmed (?P<n>[\d,]+)",
+     "product_attributes:confirmed"),
+    ("docs/table-reliability.ja.md", r"\| product_attributes \|[^|]*\|[^|]*conflict (?P<n>[\d,]+)",
+     "product_attributes:conflict"),
+    ("docs/table-reliability.ja.md", r"\| product_attributes \|[^|]*\|[^|]*ref (?P<n>[\d,]+)",
+     "product_attributes:reference"),
+    ("docs/worklist.ja.md", r"`index/capabilities.csv`新設（2026-08-29。(?P<n>[\d,]+)行）",
+     "index:capabilities"),
     ("docs/handoff.ja.md", r"目録(?P<n>\d+)表", "catalog_tables"),
     ("docs/handoff.ja.md", r"証拠(?P<n>\d+)表", "evidence_tables"),
     ("docs/handoff.ja.md", r"索引(?P<n>\d+)表", "index_tables"),
@@ -140,6 +153,15 @@ def quantities() -> dict[str, int]:
     out = {name: len(rows(name)) for name in
            paths.CATALOG_TABLES + paths.EVIDENCE_TABLES}
     out.update({f"index:{name}": len(paths.load_index(name)) for name in paths.INDEX_TABLES})
+    # 表ごとの confidence の分布と、product_attributes の属性の種類数。
+    for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+        table = rows(name)
+        for level in ("confirmed", "reference", "conflict"):
+            out[f"{name}:{level}"] = sum(
+                1 for r in table for c, v in r.items()
+                if c and "confidence" in c and (v or "").strip() == level)
+    out["product_attributes:kinds"] = len({r["attribute"] for r in
+                                           paths.load("product_attributes")})
     out["catalog_tables"] = len(paths.CATALOG_TABLES)
     out["evidence_tables"] = len(paths.EVIDENCE_TABLES)
     # 索引は manifest.csv も1表として数える（文書がそう数えている）。

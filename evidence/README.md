@@ -766,6 +766,7 @@ uv run tools/build_dma_requests.py              # dma_requests (DMA chapter grid
 uv run tools/build_eval_boards.py               # eval_boards (from EVT's PUB/)
 uv run tools/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
 uv run tools/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)
+uv run tools/build_conflicts.py                 # index/conflicts (every conflict mark in catalog/ and evidence/. No PDF needed; likewise before build_index)
 uv run tools/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
 uv run tools/build_evt_variants.py              # evt_variants (from the EVT device headers)
 uv run tools/build_link_firmware.py             # link_firmware (from WCH's distribution)

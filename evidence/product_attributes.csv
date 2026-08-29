@@ -34,46 +34,43 @@ CH32H415REU6,31,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS
 CH32H415REU6,32,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
 CH32H415REU6,33,pdusb_usbpd_type_c,1,PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,confirmed,products:zh+products:en
 CH32H415REU6,34,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
-CH32H416RDU6,0,sram_core_1_fast_itcm,128KB,SRAM,SRAM Core 1 fast ITCM,SRAM 内核1高速ITCM,,#,reference,products:zh
-CH32H416RDU6,1,sram_core_1_fast_dtcm,256KB,SRAM,SRAM Core 1 fast DTCM,SRAM 内核1高速DTCM,,#,reference,products:zh
-CH32H416RDU6,2,sram_shared_code_and_data_area,512KB,SRAM,SRAM Shared code and data area,SRAM 共享代码和数据区,,#,reference,products:zh
-CH32H416RDU6,3,sram_core_1_hs_itcm,128K,SRAM,SRAM Core 1 HS ITCM,,SRAM Core 1 HS ITCM,#,reference,products:en
-CH32H416RDU6,4,sram_core_1_hs_dtcm,256K,SRAM,SRAM Core 1 HS DTCM,,SRAM Core 1 HS DTCM,#,reference,products:en
-CH32H416RDU6,5,sram_shared_code_and_data_area_,512K,SRAM,SRAM Shared code and data area,,SRAM Shared code and data area,#,reference,products:en
-CH32H416RDU6,6,timer_adtm_16_bit,2,Timer,Timer ADTM (16-bit),定时器 高级（16位）,Timer ADTM (16-bit),#,confirmed,products:zh+products:en
-CH32H416RDU6,7,timer_gptm_16_bit,4,Timer,Timer GPTM (16-bit),定时器 通用（16位）,Timer GPTM (16-bit),#,confirmed,products:zh+products:en
-CH32H416RDU6,8,timer_gptm_32_bit,4,Timer,Timer GPTM (32-bit),定时器 通用（32位）,Timer GPTM (32-bit),#,confirmed,products:zh+products:en
-CH32H416RDU6,9,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32H416RDU6,10,timer_lptim,2,Timer,Timer LPTIM,定时器 LPTIM,Timer LPTIM,#,confirmed,products:zh+products:en
-CH32H416RDU6,11,timer_watchdog,WWDG+IWDG,Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32H416RDU6,12,timer_systick_32_bit,2,Timer,Timer SysTick 32-bit,定时器 系统时基32位,Timer SysTick 32-bit,#,confirmed,products:zh+products:en
-CH32H416RDU6,13,rtc,√,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32H416RDU6,14,adc_tkey_units,2,ADC/TKey,ADC/TKey Units,ADC/TKey 单元数,ADC/TKey Units,#,confirmed,products:zh+products:en
-CH32H416RDU6,15,adc_tkey_channels,16+2,ADC/TKey,ADC/TKey Channels,ADC/TKey 通道数,ADC/TKey Channels,#,confirmed,products:zh+products:en
-CH32H416RDU6,16,hsadc_units,1,HSADC,HSADC Units,HSADC 单元数,HSADC Units,#,confirmed,products:zh+products:en
-CH32H416RDU6,17,hsadc_channels,7,HSADC,HSADC Channels,HSADC 通道数,HSADC Channels,#,confirmed,products:zh+products:en
-CH32H416RDU6,18,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32H416RDU6,19,opa,3,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32H416RDU6,20,cmp,1,,CMP,CMP,CMP,#,confirmed,products:zh+products:en
-CH32H416RDU6,21,dfsdm,1,,DFSDM,DFSDM,DFSDM,#,confirmed,products:zh+products:en
-CH32H416RDU6,22,rng,1,,RNG,RNG,RNG,#,confirmed,products:zh+products:en
-CH32H416RDU6,23,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32H416RDU6,24,gpha,1,,GPHA,GPHA（5）,GPHA,#,confirmed,products:zh+products:en
-CH32H416RDU6,25,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32H416RDU6,26,usart,7,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32H416RDU6,27,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32H416RDU6,28,qspi,1 (QSPI2),,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:en
-CH32H416RDU6,29,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32H416RDU6,30,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32H416RDU6,31,can,3,,CAN(5),CAN（5）,CAN(5),#,confirmed,products:zh+products:en
-CH32H416RDU6,32,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
-CH32H416RDU6,33,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
-CH32H416RDU6,34,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
-CH32H416RDU6,35,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
-CH32H416RDU6,36,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
-CH32H416RDU6,37,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
-CH32H416RDU6,38,pdusb_usbpd_type_c,1 Built-in Rd(4),PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,conflict,products:en+!products:zh(=1 built-in Rd(4))
-CH32H416RDU6,39,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
+CH32H416RDU6,0,sram_core_1_hs_itcm,128K,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,#,confirmed,products:zh+products:en
+CH32H416RDU6,1,sram_core_1_hs_dtcm,256K,SRAM,SRAM Core 1 HS DTCM,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,#,confirmed,products:zh+products:en
+CH32H416RDU6,2,sram_shared_code_and_data_area,512K,SRAM,SRAM Shared code and data area,SRAM 共享代码和数据区,SRAM Shared code and data area,#,confirmed,products:zh+products:en
+CH32H416RDU6,3,timer_adtm_16_bit,2,Timer,Timer ADTM (16-bit),定时器 高级（16位）,Timer ADTM (16-bit),#,confirmed,products:zh+products:en
+CH32H416RDU6,4,timer_gptm_16_bit,4,Timer,Timer GPTM (16-bit),定时器 通用（16位）,Timer GPTM (16-bit),#,confirmed,products:zh+products:en
+CH32H416RDU6,5,timer_gptm_32_bit,4,Timer,Timer GPTM (32-bit),定时器 通用（32位）,Timer GPTM (32-bit),#,confirmed,products:zh+products:en
+CH32H416RDU6,6,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32H416RDU6,7,timer_lptim,2,Timer,Timer LPTIM,定时器 LPTIM,Timer LPTIM,#,confirmed,products:zh+products:en
+CH32H416RDU6,8,timer_watchdog,WWDG+IWDG,Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32H416RDU6,9,timer_systick_32_bit,2,Timer,Timer SysTick 32-bit,定时器 系统时基32位,Timer SysTick 32-bit,#,confirmed,products:zh+products:en
+CH32H416RDU6,10,rtc,√,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32H416RDU6,11,adc_tkey_units,2,ADC/TKey,ADC/TKey Units,ADC/TKey 单元数,ADC/TKey Units,#,confirmed,products:zh+products:en
+CH32H416RDU6,12,adc_tkey_channels,16+2,ADC/TKey,ADC/TKey Channels,ADC/TKey 通道数,ADC/TKey Channels,#,confirmed,products:zh+products:en
+CH32H416RDU6,13,hsadc_units,1,HSADC,HSADC Units,HSADC 单元数,HSADC Units,#,confirmed,products:zh+products:en
+CH32H416RDU6,14,hsadc_channels,7,HSADC,HSADC Channels,HSADC 通道数,HSADC Channels,#,confirmed,products:zh+products:en
+CH32H416RDU6,15,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32H416RDU6,16,opa,3,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32H416RDU6,17,cmp,1,,CMP,CMP,CMP,#,confirmed,products:zh+products:en
+CH32H416RDU6,18,dfsdm,1,,DFSDM,DFSDM,DFSDM,#,confirmed,products:zh+products:en
+CH32H416RDU6,19,rng,1,,RNG,RNG,RNG,#,confirmed,products:zh+products:en
+CH32H416RDU6,20,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32H416RDU6,21,gpha,1,,GPHA,GPHA（5）,GPHA,#,confirmed,products:zh+products:en
+CH32H416RDU6,22,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32H416RDU6,23,usart,7,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32H416RDU6,24,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32H416RDU6,25,qspi,1 (QSPI2),,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:en
+CH32H416RDU6,26,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32H416RDU6,27,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32H416RDU6,28,can,3,,CAN(5),CAN（5）,CAN(5),#,confirmed,products:zh+products:en
+CH32H416RDU6,29,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
+CH32H416RDU6,30,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
+CH32H416RDU6,31,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
+CH32H416RDU6,32,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
+CH32H416RDU6,33,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
+CH32H416RDU6,34,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
+CH32H416RDU6,35,pdusb_usbpd_type_c,1 Built-in Rd(4),PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,conflict,products:en+!products:zh(=1 built-in Rd(4))
+CH32H416RDU6,36,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
 CH32H417MEU6,0,sram_core_1_hs_itcm,128KB,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,#,confirmed,products:zh+products:en
 CH32H417MEU6,1,sram_core_1_hs_dtcm,256KB,SRAM,SRAM Core 1 HS DTCM,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,#,confirmed,products:zh+products:en
 CH32H417MEU6,2,sram_shared_code_and_data_area,512KB,SRAM,SRAM Shared code and data area,SRAM 共享代码和数据区,SRAM Shared code and data area,#,confirmed,products:zh+products:en
@@ -548,40 +545,36 @@ CH32V002J4M6,2,watchdog,2,,Watchdog,看 门 狗,Watchdog,#,confirmed,products:zh
 CH32V002J4M6,3,adc,6+2,,ADC,ADC,ADC,#,confirmed,products:zh+products:en
 CH32V002J4M6,4,serial_port,1,Serial,Serial port,串口,Serial port,#,confirmed,products:zh+products:en
 CH32V002J4M6,5,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V003A4M6,0,general_purpose_i_o,14,General- purpose,General- purpose I/O,,General- purpose I/O,#,reference,products:en
-CH32V003A4M6,1,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
-CH32V003A4M6,2,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
-CH32V003A4M6,3,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
-CH32V003A4M6,4,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
-CH32V003A4M6,5,adc_channel_no,6,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
-CH32V003A4M6,6,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V003A4M6,7,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V003F4P6,0,general_purpose_i_o,18,General- purpose,General- purpose I/O,,General- purpose I/O,#,reference,products:en
-CH32V003F4P6,1,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
-CH32V003F4P6,2,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
-CH32V003F4P6,3,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
-CH32V003F4P6,4,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
-CH32V003F4P6,5,adc_channel_no,8,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
-CH32V003F4P6,6,spi,1,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
-CH32V003F4P6,7,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V003F4P6,8,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V003F4U6,0,general_purpose_i_o,18,General- purpose,General- purpose I/O,,General- purpose I/O,#,reference,products:en
-CH32V003F4U6,1,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
-CH32V003F4U6,2,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
-CH32V003F4U6,3,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
-CH32V003F4U6,4,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
-CH32V003F4U6,5,adc_channel_no,8,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
-CH32V003F4U6,6,spi,1,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
-CH32V003F4U6,7,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V003F4U6,8,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V003J4M6,0,general_purpose_i_o,6,General- purpose,General- purpose I/O,,General- purpose I/O,#,reference,products:en
-CH32V003J4M6,1,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
-CH32V003J4M6,2,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
-CH32V003J4M6,3,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
-CH32V003J4M6,4,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
-CH32V003J4M6,5,adc_channel_no,6,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
-CH32V003J4M6,6,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V003J4M6,7,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V003A4M6,0,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
+CH32V003A4M6,1,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
+CH32V003A4M6,2,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
+CH32V003A4M6,3,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
+CH32V003A4M6,4,adc_channel_no,6,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
+CH32V003A4M6,5,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V003A4M6,6,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V003F4P6,0,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
+CH32V003F4P6,1,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
+CH32V003F4P6,2,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
+CH32V003F4P6,3,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
+CH32V003F4P6,4,adc_channel_no,8,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
+CH32V003F4P6,5,spi,1,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
+CH32V003F4P6,6,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V003F4P6,7,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V003F4U6,0,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
+CH32V003F4U6,1,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
+CH32V003F4U6,2,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
+CH32V003F4U6,3,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
+CH32V003F4U6,4,adc_channel_no,8,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
+CH32V003F4U6,5,spi,1,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
+CH32V003F4U6,6,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V003F4U6,7,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V003J4M6,0,advanced_control_timer,1,Advanced- control,Advanced- control timer,高级 定时器,Advanced- control timer,#,confirmed,products:zh+products:en
+CH32V003J4M6,1,general_purpose_timer,1,General- purpose,General- purpose timer,通用 定时器,General- purpose timer,#,confirmed,products:zh+products:en
+CH32V003J4M6,2,watchdog,2,,Watchdog,看门狗,Watchdog,#,confirmed,products:zh+products:en
+CH32V003J4M6,3,system_clock_source,3,System clock,System clock source,系统 时钟源,System clock source,#,confirmed,products:zh+products:en
+CH32V003J4M6,4,adc_channel_no,6,ADC Channel,ADC Channel No.,ADC 通道数,ADC Channel No.,#,confirmed,products:zh+products:en
+CH32V003J4M6,5,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V003J4M6,6,usart,1,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32V004F6P1,0,adtm,1,,ADTM,高级 定时 器,ADTM,#,confirmed,products:zh+products:en
 CH32V004F6P1,1,gptm,1,,GPTM,通用 定时 器,GPTM,#,confirmed,products:zh+products:en
 CH32V004F6P1,2,watchdog,2,,Watchdog,看 门 狗,Watchdog,#,confirmed,products:zh+products:en

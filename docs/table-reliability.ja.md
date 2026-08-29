@@ -37,6 +37,7 @@
 | CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
 | `check_docs.py` | **文書が書いている行数と穴の状態**が、表と worklist の台帳と合っているか | 解決済みの F-11 を3つの文書が古いまま説明していた・この資料の pinout 行数が5行古かった（2026-08-29 の監査） |
 | `check_viewer.js` | **`pins.html` の表示**が壊れていないか（DOM 無しで関数を評価して出力を見る） | series view の Defaults が先頭型番だけを見ていた（G1。CH32V006 の SWCLK と UART が全部 `-` になっていた） |
+| `out_option` | 表を書く生成器が**試験用の出力先 `--out` を受ける**か | `build_operating` と `build_evt_examples` が argparse を持たず、`--out` を黙って無視して `evidence/` に書いていた（2026-08-29。実際に正本を1つ潰した） |
 
 **中身の鮮度は PDF が要るので CI では見られません。** そこは `catalog/sources.csv`（読んだミラーの commit）と手動のフル実行が担当です。`column_drift` は「中身は見られなくても列なら見られる」という割り切りで、実際に F-54 の2件はこれで捕まりました。
 
@@ -53,7 +54,7 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | products | 103 | 列ごと（confirmed大半・packing missing 102） | 結合・比較表と突き合わせ | flash/sram が空の series あり（比較表が書かない） | ✅ |
-| product_attributes | 1,721 | confirmed 1,684 / conflict 25 / ref 12 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2） | ✅ |
+| product_attributes | 1,714 | confirmed 1,687 / conflict 25 / ref 2 | 結合・CJK漏れ | conflict は本物の版間食い違い（例: H417WEU6 の OPA 数 zh=1/en=2）。**ref は 12 → 2 になった**（2026-08-29、F-57/F-58）——残る2行は CH32V317 の2型番の `code_flash_bytes`（480K）で、中文版にしか行が無い | ✅ |
 | packages | 25 | 列ごと | products と結合・lead数 | — | ✅ |
 | pins | 4,563 | **confirmed 4,556 / ref 7（conflict 0）** | 結合・**共有lead数を形ごとに固定**・**封装の公称lead数と番号の連番**（`pin_numbering`。2026-08-28 に実装） | F-24残り8セルは**zh/en両版とも空欄**と確認（資料側。表に無いのが正しい）。F-31/F-32は**修正済み**（M007/M103のゲートドライバpad 26 leadが入った。`VDD_VIO_1`の綴りも直った）。~~lead欠けは資料が`未使用`と書く5型番のみ~~→ **その5型番も資料は行を印刷していた**（F-49。2026-08-28）。`NC`／`未使用`／`Unused` を pad と見ておらず、CH32V203RBT6 の lead 47 は**直前の pad 名 `VDD_2` に化けていた**。**封装lead数の照合はこの欄に書いてありながら機械では見ていなかった**——F-31 で人が一度数えただけだったので、`check_tables.pin_numbering` にした。いま欠け0・範囲外0。**ref は 33 → 7 になり、conflict は 0 になった**——F-53（見出しがページ境界で割れた塊を落とし、CH32X305RCT6 の lead 1〜25 が中文版だけになっていた 26行）と F-56（`PC14-`。資料の食い違いではなく片方の版の読み落としで、同じ版の他の表の綴りで補えた 1行）を直した。**残る7行は F-4 の残り**（片方の版だけ結合セルが埋まらない。H417 PB10・M103 PB5/PA13・V203 PB8×2・V205 PD0×2）で、**未確定が記録済みの資料側の穴だけになった** | ✅ |
 | pin_functions | 28,483 | confirmed 28,325 / ref 146 / conflict 12 | 結合・pins と結合・**alias行の形** | F-6/7・F-51（資料側）。F-40/F-41 は**修正済み**（conflict 12 = V103 TIM3 の格子訂正の自己申告）。`route=alias`（30行）はpad名の括弧のGPIO別名で機能ではない（`tables/README`）。**pinout単位**で型番の機能一覧ではない（仕様） | 🟡 |
@@ -99,7 +100,8 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | pinout（旧 pin_roles） | 24,982（機能行 24,266＋機能の無い lead 716） | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
-| capabilities（`index/`） | 1,714 | 元の行を引き継ぐ | **product_attributes に (型番, 属性, 値) で戻せること**・`count` が値そのままであること・属性が能力の語彙にあること（無ければ生成が落ちる） | 資料の値のうち素の整数だけが `count` に入る（1,186行。`8+2`・`3/2`・`10@2` は `value` のまま）。**行が無い＝持っていない、と読めるのは family の中だけ**——比較表の `-` は証拠の時点で落ちていて、「その family の比較表にその行が無い」と区別が付かない | ✅ |
+| capabilities（`index/`） | 1,707 | 元の行を引き継ぐ | **product_attributes に (型番, 属性, 値) で戻せること**・`count` が値そのままであること・属性が能力の語彙にあること（無ければ生成が落ちる） | 資料の値のうち素の整数だけが `count` に入る（1,182行。`8+2`・`3/2`・`10@2` は `value` のまま）。**行が無い＝持っていない、と読めるのは family の中だけ**——比較表の `-` は証拠の時点で落ちていて、「その family の比較表にその行が無い」と区別が付かない | ✅ |
+| conflicts（`index/`） | 165 | 元の行を引き継ぐ（全行が `conflict`） | **証拠の `conflict` 行の数と一致すること**・`field` がその表に実在する列であること | 資料が食い違っている箇所を1表に集めたもの。`basis` の DSL から「どの出所が異を唱えるか」（`!<source>`）と「その出所は何と言うか」（`(=<value>)`）を取り出す。**85行に相手の値が入り、68行は空**——`memory_configs` の67行と `timers` の1行は食い違いを散文で記録していて DSL に持たないため（空欄自体が「evidence/README を読め」の意味）。`product_attributes` の25行は**言い回しの差が混じる**（`Typical: 72MHz` と `Typ. 72MHz`）ので、仕様の食い違いと同一視しないこと | ✅ |
 | features（旧 feature_tags） | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
 | series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |

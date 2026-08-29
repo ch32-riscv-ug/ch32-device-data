@@ -88,8 +88,12 @@ CANONICAL = {
                     "zerowaitcodeflash", "nonzerowaitcodeflash"),
     "sram_bytes": ("sram", "ram", "零等待sram"),
     "pin_count": ("pinno", "pincount", "pinnumber", "chippinnumber", "芯片引脚数", "引脚数"),
+    # 英語版は `General- purpose I/O` と書く（PDF の折り返しでハイフンが割れる）。
+    # これが同義語表に無いと、**中文版の `通用IO` だけが列に昇格して英語版の行は
+    # 属性に残り**、比較表に `GPIO` と `General-purpose I/O` が同じ値で2行並ぶ
+    # （F-58）。`gpio` より長いので CANONICAL_ORDER ではこちらが先に当たる。
     "gpio_count": ("gpio", "gpioportnumber", "gpioportcount", "numberofgpios",
-                   "gpio端口数", "通用io"),
+                   "generalpurposeio", "gpio端口数", "通用io"),
     "package": ("packageform", "package", "封装形式", "封装"),
     "temperature": ("operatingtemperature", "maximumworkingtemperature",
                     "maxoperatingambienttemperature", "工作温度", "最大工作环境温度",

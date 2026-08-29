@@ -766,6 +766,7 @@ uv run tools/build_dma_requests.py              # dma_requests（RM zh/en のDMA
 uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
 uv run tools/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）
+uv run tools/build_conflicts.py                 # index/conflicts（catalog/・evidence/ の conflict を全部。PDF不要。同じく build_index より前）
 uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）

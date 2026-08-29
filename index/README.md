@@ -14,6 +14,7 @@ split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanes
 |---|---|
 | Which part meets my requirements? | [`parts.csv`](parts.csv) |
 | Which parts have capability X, and how many of it? | [`capabilities.csv`](capabilities.csv) |
+| Where do the sources disagree with each other? | [`conflicts.csv`](conflicts.csv) |
 | Which series have feature X? | [`features.csv`](features.csv) |
 | What is this lead of this part? Which lead carries USART1 TX? | [`pinout.csv`](pinout.csv) |
 | Which remap value routes the signal where I want it? | [`routes.csv`](routes.csv) |
@@ -173,6 +174,27 @@ rows are carried too, so the comparison table is fully represented -- but for th
 `parts.csv` has the better-sourced value (`evidence/operating_conditions`, `catalog/products`)
 rather than the comparison table's prose (`Max: 144MHz`).
 
+### `conflicts.csv` -- where the sources disagree
+
+One row per `conflict` mark anywhere in `catalog/` and `evidence/` (165 today), by
+`tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
+keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
+"show me every spec the two editions disagree on" meant grepping all of them.
+
+| Column | Meaning |
+|---|---|
+| `table`, `subject` | where the row lives, and its key columns as `col=value` |
+| `field`, `kept` | the column in dispute and the value the table kept -- filled when the mark is per-column, when the basis names a real column of that table, or when the table asserts one value per row (`pin_functions.route`, `product_attributes.value`, `register_fields.bits`, ...) |
+| `dissenting` | the sources marked `!` in `basis` |
+| `alternative` | what those sources state, from `(=...)` in `basis` |
+
+**85 rows carry an alternative and 68 do not.** `memory_configs` (67) and `timers` (1) record
+their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
+table's section of [evidence/README.md](../evidence/README.md)". And the 25
+`product_attributes` rows mix real differences (`2 (OPA1/3)` against `1 (OPA1)`) with wording
+(`Typical: 72MHz` against `Typ. 72MHz`) -- for a Chinese dissent, `alternative` is the
+translated reading the basis carries, not the original spelling.
+
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 
 `features.csv` (by `tools/build_feature_tags.py`): one row per (tag, series); `precision` says
@@ -183,6 +205,7 @@ here.
 
 ```sh
 uv run tools/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)
+uv run tools/build_conflicts.py      # conflicts.csv (likewise)
 uv run tools/build_index.py          # rebuild everything (seconds; evidence must be current)
 uv run tools/check_tables.py         # index ⊆ evidence, manifest matches
 ```

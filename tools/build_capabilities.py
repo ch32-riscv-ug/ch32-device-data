@@ -219,13 +219,9 @@ CAPABILITIES: dict[str, str] = {
     "operating_voltage": "voltage",
     "code_flash_bytes": "flash",
     "extended_psram_bytes": "psram",
-    "sram_core_1_fast_dtcm": "sram:core1-fast-dtcm",
-    "sram_core_1_fast_itcm": "sram:core1-fast-itcm",
     "sram_core_1_hs_dtcm": "sram:core1-hs-dtcm",
     "sram_core_1_hs_itcm": "sram:core1-hs-itcm",
     "sram_shared_code_and_data_area": "sram:shared",
-    "sram_shared_code_and_data_area_": "sram:shared",
-    "general_purpose_i_o": "gpio",
 }
 
 # 能力ではない属性。**落とす理由を書いて明示的に持つ**——`CAPABILITIES` に無い
@@ -235,11 +231,12 @@ NOT_CAPABILITIES: dict[str, str] = {
                                       "能力の有無でも数でもない",
 }
 
-# **同じ (型番, 能力, qualifier) が2行になるもの。** 資料側で zh/en の行が対に
-# ならなかったぶんで、`product_attributes` が綴りを1文字変えて（末尾 `_`）両方
-# 残している。索引は証拠を落とさないので2行のまま出し、数だけ固定しておく。
-#   CH32H416RDU6 の SRAM 共有領域: zh `512KB` / en `512K`（値は同じ）
-KNOWN_DOUBLED = 1
+# 同じ (型番, 能力, qualifier) が2行になるものの数。**いまは0**——
+# CH32H416RDU6 の SRAM 共有領域が zh `512KB` / en `512K` で対にならず2行に
+# なっていたが、F-57（`canonical_value` に容量単位の同一視）で解消した
+# （その部品の SRAM は6行の reference から3行の confirmed になった）。
+# 0 のまま固定するので、同種の綴り差が新しく出れば生成が落ちる。
+KNOWN_DOUBLED = 0
 
 COUNT = re.compile(r"^\d+$")
 # 「持っている」とだけ言う印。資料が数を言っていないので `count` は空になる。
@@ -303,6 +300,12 @@ def main() -> int:
     names = {(r["capability"], r["qualifier"]) for r in rows}
     print(f"{dest}: {len(rows)} 行  能力 {len({c for c, _ in names})} 種"
           f"（qualifier 込みで {len(names)}）  {dict(kinds)}", file=sys.stderr)
+    # **どの属性にも当たらない語彙は報告する。** 証拠側で綴りが直ると（F-57/F-58 が
+    # `general_purpose_i_o` と SRAM の重複行を消したように）辞書の項が黙って死ぬ。
+    used = {a["attribute"] for a in paths.load("product_attributes")}
+    unused = sorted((set(CAPABILITIES) | set(NOT_CAPABILITIES)) - used)
+    if unused:
+        print(f"  - どの属性にも当たらない語彙 {len(unused)}: {unused}", file=sys.stderr)
     dropped = collections.Counter(a["attribute"] for a in paths.load("product_attributes")
                                   if a["attribute"] in NOT_CAPABILITIES)
     if dropped:

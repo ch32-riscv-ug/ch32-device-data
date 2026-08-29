@@ -185,6 +185,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "toolchains": ("build_toolchains.py", "COLUMNS"),
     "usbpd_plumbing": ("build_usbpd_plumbing.py", "COLUMNS"),
     "index:capabilities": ("build_capabilities.py", "CAPABILITY_COLUMNS"),
+    "index:conflicts": ("build_conflicts.py", "COLUMNS"),
     "index:dma": ("build_index.py", "DMA_COLUMNS"),
     "index:features": ("build_feature_tags.py", "COLUMNS"),
     "index:parts": ("build_index.py", "PARTS_COLUMNS"),
@@ -225,6 +226,49 @@ def column_definitions() -> dict[str, list[str]]:
                         out[f"{path.name}:{target.id}"] = ast.literal_eval(node.value)
                     except ValueError:
                         pass
+    return out
+
+
+def out_option(t: dict) -> list[str]:
+    """表を書く生成器が、試験用の出力先 `--out` を受けること。
+
+    **受けないと、抽出を変えて様子を見るのに正本を上書きするしか手が無い。**
+    `evidence/README` は「出力先は各ツールが `tools/paths.py` で決めます
+    （`--out <dir>` は試験用の上書き）」と全 tool について書いていたが、
+    `build_operating.py` と `build_evt_examples.py` は argparse 自体を持たず、
+    `--out` を渡しても黙って無視して `evidence/` に書いていた——2026-08-29 に
+    それで正本を1つ潰した。文書のほうが正しく、tool が追いついていなかった。
+
+    表を書くかどうかは、`paths.write(...)` を呼ぶか、`paths.table(...)` /
+    `paths.index(...)` の戻りを変数に束ねている（＝書き出し先として持つ）かで見る。
+    読むだけの tool（`with paths.table(name).open(...)`）は対象にしない。
+    """
+    import ast  # noqa: PLC0415
+
+    out = []
+    for path in sorted((paths.REPO / "tools").glob("build_*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue
+        writes = takes_out = False
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = getattr(node.func, "attr", "")
+            if name == "write" and getattr(node.func.value, "id", "") == "paths":
+                writes = True
+            if name == "add_argument" and any(
+                    isinstance(a, ast.Constant) and a.value == "--out" for a in node.args):
+                takes_out = True
+        for node in ast.walk(tree):
+            if (isinstance(node, ast.Assign) and isinstance(node.value, ast.Call)
+                    and getattr(node.value.func, "attr", "") in ("table", "index")
+                    and getattr(getattr(node.value.func, "value", None), "id", "") == "paths"):
+                writes = True
+        if writes and not takes_out:
+            out.append(f"{path.name}: 表を書くのに `--out` を受けない"
+                       "——正本を上書きせずに試す方法が無い")
     return out
 
 
@@ -470,6 +514,20 @@ def index_checks(t: dict) -> list[str]:
         missing = sorted(leads - in_index)
         bad.append(f"pinout: pins にある (型番, pad, lead) が索引に無い "
                    f"{len(missing)} 件（例 {missing[:3]}）——viewer は索引だけを読む")
+    # conflicts は「confidence が conflict の行」を集めたものなので、数が合うこと。
+    # **索引が古いと食い違いを見落とす**——増えたのに索引に無いのがいちばん困る。
+    marked = sum(1 for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+                 for r in t[name]
+                 for c, v in r.items()
+                 if c and "confidence" in c and (v or "").strip() == "conflict")
+    if len(t["index:conflicts"]) != marked:
+        bad.append(f"conflicts: 索引が {len(t['index:conflicts'])} 行だが、"
+                   f"証拠に conflict は {marked} 行——tools/build_conflicts.py を回し直す")
+    for r in t["index:conflicts"]:
+        if r["table"] not in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+            bad.append(f"conflicts: 知らない表 {r['table']!r}")
+        elif r["field"] and r["field"] not in (t[r["table"]][0] if t[r["table"]] else {}):
+            bad.append(f"conflicts: {r['table']} に列 {r['field']!r} が無い")
     # capabilities ⊆ product_attributes。値は綴りのまま写すので値まで戻して見る。
     # **`count` は資料が素の整数を書いたときだけ**入る（読みを足していないこと）。
     attributes = {(r["part_number"], r["attribute"], r["value"].strip()) for r in t["product_attributes"]}
@@ -617,6 +675,7 @@ def main() -> int:
     # 持たない代わりに、その形が壊れていないことをここで見る。
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
+    bad += out_option(t)
     bad += shared_leads(t)
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)

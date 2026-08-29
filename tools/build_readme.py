@@ -377,11 +377,11 @@ def leaf_of(label: str, group: str) -> str:
     return leaf if NAMES_ITSELF.search(leaf) or group in CLASSIFYING_GROUPS else label
 
 
-# **固定列と同じ事実を言い直しているだけの属性。** 比較表の見出しは版で綴りが
-# 違い、中文版の `通用IO` は `gpio_count` に昇格するのに英語版の
-# `General- purpose I/O` は同義語表に無くて昇格しない（F-58）。結果、比較表に
-# `GPIO` と `General-purpose I/O` が同じ値で2行並ぶ。**値が全型番で一致する
-# ときだけ**落とす——違っていればそれは見せるべき差なので残す。
+# 固定列と同じ事実を言い直しているだけの属性。**いまは当たらない**——
+# 英語版の `General- purpose I/O` が同義語表に無くて昇格せず、比較表に `GPIO` と
+# 同じ値で2行並んでいた件は F-58 で証拠側を直した（属性そのものが消えた）。
+# 同じ形の重複が別の綴りで再発したときの歯止めとして残す。**値が全型番で
+# 一致するときだけ**落とす——違っていればそれは見せるべき差なので残す。
 RESTATES = {"general_purpose_i_o": "gpio_count"}
 
 
