@@ -777,6 +777,7 @@ uv run tools/check_images.py [--missing|--prune] # list of required images and c
 uv run tools/check_tables.py                    # reference joins of all tables, index ⊆ evidence, manifest
 uv run tools/check_counts.py                    # peripheral counts of the comparison table vs pin instance counts
 uv run tools/check_docs.py                      # row counts and hole states claimed by the documents vs the tables
+node tools/check_viewer.js                      # what pins.html shows (its script evaluated without a DOM)
 uv run tools/scan_errata.py                     # incremental errata check (exit code 1 on NEW)
 uv run tools/build_tables.py --family CH32V006  # one family only
 ```

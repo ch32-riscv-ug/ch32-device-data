@@ -461,6 +461,15 @@ def index_checks(t: dict) -> list[str]:
     products = {r["part_number"] for r in t["products"]}
     if {r["part_number"] for r in t["index:parts"]} != products:
         bad.append("parts: 型番の集合が products と違う")
+    # **pinout は pins の (pad, lead) を全部持っている。** viewer はこれを当てにして
+    # `evidence/pins.csv` を読むのをやめた（3.1MB 減った。worklist G9）ので、
+    # 「pin 番号は pins にしかない」に戻ったら気付けるようにしておく。
+    leads = {(r["part_number"], r["pad"], r["pin"]) for r in t["pins"]}
+    in_index = {(r["part_number"], r["pad"], r["pin"]) for r in t["index:pinout"] if r["pin"]}
+    if leads - in_index:
+        missing = sorted(leads - in_index)
+        bad.append(f"pinout: pins にある (型番, pad, lead) が索引に無い "
+                   f"{len(missing)} 件（例 {missing[:3]}）——viewer は索引だけを読む")
     # capabilities ⊆ product_attributes。値は綴りのまま写すので値まで戻して見る。
     # **`count` は資料が素の整数を書いたときだけ**入る（読みを足していないこと）。
     attributes = {(r["part_number"], r["attribute"], r["value"].strip()) for r in t["product_attributes"]}

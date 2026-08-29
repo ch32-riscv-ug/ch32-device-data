@@ -27,6 +27,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
 - `tools/check_docs.py`: **文書が書いている行数と穴の状態**を表と worklist の台帳で検算する。データが正しくても説明が古ければ、利用者が読むのは古いほう（2026-08-29 の監査で見つかった腐りの型）
+- `tools/check_viewer.js`: `pins.html` の表示を DOM 無しで評価して確かめる。**表と文書には検査があるのに表示だけ外**で、series view の Defaults が先頭型番だけを見ていた穴（G1）が残っていた。node が要る唯一の検査
 - `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
@@ -98,6 +99,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 uv run tools/check_tables.py    # 全表の参照結合・書式・索引⊆証拠・manifest
 uv run tools/check_counts.py    # 比較表が数える周辺の数 vs pin表から引ける数
 uv run tools/check_docs.py      # 文書が書いている行数・穴の状態 vs 実際の表と台帳
+node tools/check_viewer.js      # pins.html の表示（DOM 無しで関数を評価して出力を見る）
 ```
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。

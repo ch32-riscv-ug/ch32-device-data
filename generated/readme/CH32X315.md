@@ -4,6 +4,8 @@
 
 *Generated from the mirror at commit [`31b865f`](https://github.com/ch32-riscv-ug/CH32X315/tree/31b865fc9138011a3f6e5b067afb9a2db7c5abad) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
 
+[Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Errata](#errata) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
+
 ## Quick start
 
 ### Debug / serial defaults
@@ -19,7 +21,7 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
+| Series | Core | ISA | Flash | SRAM | Main clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
 | **CH32X305** | QingKe V3F | RV32IMAFBC-X | 192K | 64K | 480 MHz | 2.8-3.6V | LQFP64 | 1 | [en](https://www.wch-ic.com/products/CH32X305.html) / [zh](https://www.wch.cn/products/CH32X305.html) |
 | **CH32X315** | QingKe V3F | RV32IMAFBC-X | 192K | 64K | 480 MHz | 2.8-3.6V | QFN48,QFN68X7,QFN76 | 3 | [en](https://www.wch-ic.com/products/CH32X315.html) / [zh](https://www.wch.cn/products/CH32X315.html) |
@@ -28,13 +30,26 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ### CH32X315 product comparison
 
-| | CH32X315&#8203;CCU6&#8203;(QFN48) | CH32X315&#8203;MCU6&#8203;(QFN76) | CH32X315&#8203;WCU6&#8203;(QFN68X7) |
+Only the 6 rows that differ between these 3 products; the other 17 are the same for all of them.
+
+| | [CH32X315&#8203;CCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315CCU6)&#8203;(QFN48) | [CH32X315&#8203;MCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315MCU6)&#8203;(QFN76) | [CH32X315&#8203;WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315WCU6)&#8203;(QFN68X7) |
 |---|---|---|---|
-| **Flash** | 192K | 192K | 192K |
+| **GPIO** | 40 | 64 | 59 |
+| ADC1 channel | 8+1 | 12+1 | 12+1 |
+| ADC2 channel | 6 | 12 | 12 |
+| ADC3 channel | 8 | 12 | 12 |
+| ADC4 channel | 6 | 12 | 12 |
+| USBPD | 1 | 1 Built-in Rd(2) | 1 |
+
+<details><summary>All 23 rows</summary>
+
+| | [CH32X315&#8203;CCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315CCU6)&#8203;(QFN48) | [CH32X315&#8203;MCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315MCU6)&#8203;(QFN76) | [CH32X315&#8203;WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315WCU6)&#8203;(QFN68X7) |
+|---|---|---|---|
+| **Flash (zero-wait)** | 192K | 192K | 192K |
 | **SRAM** | 64K | 64K | 64K |
 | **GPIO** | 40 | 64 | 59 |
 | **Temperature** | -40..85C | -40..85C | -40..85C |
-| Code FLASH (Bytes) | 480K(1) | 480K(1) | 480K(1) |
+| Code FLASH, total (bytes) | 480K(1) | 480K(1) | 480K(1) |
 | Advanced-control (16-bit) | 1 | 1 | 1 |
 | General-purpose (16-bit) | 2 | 2 | 2 |
 | General-purpose (32-bit) | 1 | 1 | 1 |
@@ -54,7 +69,9 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 | ARGB | 1 | 1 | 1 |
 | CPU main frequency | Max: 480MHz | Max: 480MHz | Max: 480MHz |
 
-## Pinouts
+</details>
+
+## Packages & pinout drawings
 
 Pinout drawings are in the datasheet (chapter *Pinouts*):
 
@@ -65,11 +82,16 @@ Pinout drawings are in the datasheet (chapter *Pinouts*):
 | QFN76 | CH32X315MCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN76.png) |
 | QFN68X7 | CH32X315WCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68X7.png) |
 
-## Pin definitions
+## Pin maps & alternate functions
+
+> [!NOTE]
+> These are the **pin-table superset**: the datasheet prints one pad table for every product that shares a pinout, so a pad row does not mean this part has the peripheral. Use the product comparison table above for what a given part number contains.
 
 ### CH32X305 pin map
 
 Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305) [ADC](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=ADC) [I2C](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=I2C) [SPI](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=SPI) [SYS](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=SYS) [TIM](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=TIM) [UART](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=UART) [USB](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305&features=USB)
+
+<details><summary><b>CH32X305 pin map</b> (62 pads x 1 products)</summary>
 
 | Pin name | Type | [CH32X305&#8203;RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305RCT6)&#8203;(LQFP64) | Notes |
 |---|---|---|---|
@@ -136,6 +158,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | XI | I/A | 1 |  |
 | XO | O/A | 2 |  |
 
+</details>
+
 <details><summary><b>CH32X305 alternate functions</b></summary>
 
 | Pad | default | af-0 | af-1 | af-2 | af-3 | af-4 | af-5 | af-6 | af-7 |
@@ -201,6 +225,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 ### CH32X315 pin map
 
 Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315) [ADC](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=ADC) [I2C](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=I2C) [SPI](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=SPI) [SYS](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=SYS) [TIM](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=TIM) [UART](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=UART) [USB](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315&features=USB)
+
+<details><summary><b>CH32X315 pin map</b> (74 pads x 3 products)</summary>
 
 | Pin name | Type | [CH32X315&#8203;CCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315CCU6)&#8203;(QFN48) | [CH32X315&#8203;MCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315MCU6)&#8203;(QFN76) | [CH32X315&#8203;WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315WCU6)&#8203;(QFN68X7) | Notes |
 |---|---|---|---|---|---|
@@ -278,6 +304,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | VSS | P | EP | EP | EP |  |
 | XI | I/A | 1 | 1 | 1 |  |
 | XO | O/A | 2 | 2 | 2 |  |
+
+</details>
 
 <details><summary><b>CH32X315 alternate functions</b></summary>
 

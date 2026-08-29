@@ -148,6 +148,12 @@ class Data:
 
 
 def operating_summary(data: Data, series: str) -> tuple[str, str]:
+    """後方互換のまま (クロック, VDD)。記号まで要るときは operating_detail。"""
+    clock, vdd, _ = operating_detail(data, series)
+    return clock, vdd
+
+
+def operating_detail(data: Data, series: str) -> tuple[str, str, str]:
     """(クロック, VDD範囲) -- evidence/operating_conditions.csv のシリーズ行から。
 
     クロックはデータシート1ページ目が謳う系統主頻(F_MAIN)を最優先する。
@@ -158,13 +164,14 @@ def operating_summary(data: Data, series: str) -> tuple[str, str]:
     """
     rows = [r for r in data.operating
             if series in r["series"].split(";")]
-    clock = "-"
+    clock, symbol = "-", ""
     for prefix in ("F_MAIN", "F_HCLK", "F_SYSCLK", "F_CORE"):
         hits = [r for r in rows if r["symbol"].startswith(prefix)
                 and r["max"] and r["max"][0].isdigit()]
         if hits:
             values = list(dict.fromkeys(r["max"] for r in hits))
             clock = "/".join(values) + " " + hits[0]["unit"]
+            symbol = prefix
             break
     vdd = "-"
     vdd_rows = [r for r in rows if r["symbol"] == "V_DD" and r["min"] and r["max"]]
@@ -172,16 +179,23 @@ def operating_summary(data: Data, series: str) -> tuple[str, str]:
         lo = min(vdd_rows, key=lambda r: float(r["min"]))["min"]
         hi = max(vdd_rows, key=lambda r: float(r["max"]))["max"]
         vdd = f"{lo}-{hi}V"
-    return clock, vdd
+    return clock, vdd, symbol
 
 
 def series_section(data: Data, family: str) -> list[str]:
     if not data.family_series(family):
         return []
-    rows, varies = [], False
+    rows, varies, electrical = [], False, False
     for s in data.family_series(family):
         official = (f"[en]({s['product_url_en']}) / [zh]({s['product_url_zh']})")
-        clock, vdd = operating_summary(data, s["series"])
+        clock, vdd, symbol = operating_detail(data, s["series"])
+        # **「主頻」と「電気的上限」は別のもの。** 22 series は datasheet が謳う
+        # 系統主頻（F_MAIN）を持つが、5 series は持たず電気的特性表の上限で
+        # 埋めている（CH32V003 は本文 48MHz・上限 50MHz）。列名ひとつでは
+        # どちらとも言えないので、代替した series に印を付ける（worklist G10）。
+        if symbol and symbol != "F_MAIN":
+            clock += "\\*"
+            electrical = True
         flash, sram = series_bytes(data, s, "flash_bytes"), series_bytes(data, s, "sram_bytes")
         varies = varies or "/" in flash or "/" in sram
         rows.append(
@@ -193,9 +207,13 @@ def series_section(data: Data, family: str) -> list[str]:
         out += ["Flash and SRAM list every value the series has; more than one "
                 "means it varies by part number, and the per-part values are in "
                 "the comparison table below.", ""]
-    out += ["| Series | Core | ISA | Flash | SRAM | Clock | VDD "
+    out += ["| Series | Core | ISA | Flash | SRAM | Main clock | VDD "
             "| Packages | Products | Official |",
             "|---|---|---|---|---|---|---|---|---|---|"] + rows + [""]
+    if electrical:
+        out += ["\\* the datasheet states no nominal system main frequency for "
+                "this series, so the figure is the electrical maximum (HCLK) "
+                "from the characteristics table -- a limit, not a rating.", ""]
     return out
 
 
@@ -325,6 +343,24 @@ def roles_section(data: Data, family: str, level: str = "##") -> list[str]:
 # （`ADC/TKey Unit` の `Unit`、`3-phase gate drive Voltage` の `Voltage`）。
 NAMES_ITSELF = re.compile(r"[A-Z]{2,}|\d")
 
+# **群の名前自体が分類語でしかない群**は、葉が普通の英単語1つでも剥がしてよい。
+# `Communication interfaces Ethernet` の葉は `Ethernet` で、大文字が1つしかない
+# ので NAMES_ITSELF に当たらないが、この群の葉は全部が周辺の名前
+# （CAN・I2C・SPI・USART/UART・SDIO・DVP・BLE 5.3 …）なので、群を残すと
+# 「Ethernet」だけが他と違う体裁になる（worklist G5）。
+CLASSIFYING_GROUPS = ("Communication interface", "Communication interfaces",
+                      "Communication Interface")
+
+# **資料の見出しは PDF の折り返しでハイフンが割れる**（`General- purpose I/O`）。
+# 証拠（`evidence/product_attributes.label`）は資料の綴りのまま持つのが規則なので、
+# 直すのは表示のここだけ。`Three-phase` のように割れていないものは触らない。
+SPLIT_HYPHEN = re.compile(r"(?<=[A-Za-z])-\s+(?=[a-z])")
+
+
+def tidy_label(label: str) -> str:
+    """表示用に見出しを整える。**意味は変えず、資料側の崩れだけ畳む。**"""
+    return re.sub(r"\s{2,}", " ", SPLIT_HYPHEN.sub("-", label)).strip()
+
 
 def leaf_of(label: str, group: str) -> str:
     """群の名前を剥がした見出し。剥がすと分からなくなるものは剥がさない。
@@ -332,10 +368,21 @@ def leaf_of(label: str, group: str) -> str:
     比較表の見出し列は2段組みで、同じ群の行が固まって並ぶ。`Communication
     interface` が全行に付くのは読みにくいだけなので落とす（worklist の F-20）。
     """
+    label, group = tidy_label(label), tidy_label(group)
     if not group or not label.startswith(group):
         return label
     leaf = label[len(group):].strip()
-    return leaf if leaf and NAMES_ITSELF.search(leaf) else label
+    if not leaf:
+        return label
+    return leaf if NAMES_ITSELF.search(leaf) or group in CLASSIFYING_GROUPS else label
+
+
+# **固定列と同じ事実を言い直しているだけの属性。** 比較表の見出しは版で綴りが
+# 違い、中文版の `通用IO` は `gpio_count` に昇格するのに英語版の
+# `General- purpose I/O` は同義語表に無くて昇格しない（F-58）。結果、比較表に
+# `GPIO` と `General-purpose I/O` が同じ値で2行並ぶ。**値が全型番で一致する
+# ときだけ**落とす——違っていればそれは見せるべき差なので残す。
+RESTATES = {"general_purpose_i_o": "gpio_count"}
 
 
 # この表に並べる USART の数。全部は要らない——SWD と USART1 が分かれば足り、
@@ -423,23 +470,61 @@ def comparison_section(data: Data, series: dict) -> list[str]:
 
     def head(part: str) -> str:
         pkg = next(p["package"] for p in products if p["part_number"] == part)
-        return f"{part[:8]}&#8203;{part[8:]}&#8203;({pkg})"
+        # **型番から、その型番の pin map へ。** ここは「どれにするか」を決める表で、
+        # 決めた次の問いは必ず「その足はどうなっているか」になる（worklist G6）。
+        return (f"[{part[:8]}&#8203;{part[8:]}]({VIEWER}?chip={part})"
+                f"&#8203;({pkg})")
 
-    out = [f"### {series['series']} product comparison", "",
-           "| | " + " | ".join(head(p) for p in parts) + " |",
-           "|---|" + "---|" * len(parts)]
-    fixed = [("Flash", "flash_bytes"), ("SRAM", "sram_bytes"),
+    header = ["| | " + " | ".join(head(p) for p in parts) + " |",
+              "|---|" + "---|" * len(parts)]
+    # **`Flash` と `Code FLASH (bytes)` は別の事実。** 比較表が両方を書く family
+    # では、`catalog/products.flash_bytes` は**零等待領域**で、比較表の
+    # `Code FLASH` が総容量（CH32V307 は 256K と 480K。F-14）。同じ表に数字だけ
+    # 並ぶと矛盾に見えるので、両方が出るときだけ何のことか名前に足す（G10）。
+    total_flash = any(a.startswith("code_flash") for a in seen)
+    fixed = [("Flash (zero-wait)" if total_flash else "Flash", "flash_bytes"),
+             ("SRAM", "sram_bytes"),
              ("GPIO", "gpio_count"), ("Temperature", "temperature")]
     prod_by_part = {p["part_number"]: p for p in products}
+    shown_fixed: dict[str, list[str]] = {}
+    body: list[tuple[str, list[str]]] = []
     for title, field in fixed:
         values = [human_bytes(prod_by_part[p].get(field, "")) if "bytes" in field
                   else (prod_by_part[p].get(field, "") or "-") for p in parts]
         if any(v not in ("", "-") for v in values):
-            out.append(f"| **{title}** | " + " | ".join(values) + " |")
+            shown_fixed[field] = values
+            body.append((f"**{title}**", values))
     for attr in order:
         values = [md_escape(by_part[p].get(attr, "-") or "-") for p in parts]
-        label = md_escape(display.get(attr, labels.get(attr, attr)))
-        out.append(f"| {label} | " + " | ".join(values) + " |")
+        restated = shown_fixed.get(RESTATES.get(attr, ""))
+        if restated is not None and [md_escape(v) for v in restated] == values:
+            continue
+        label = tidy_label(display.get(attr, labels.get(attr, attr)))
+        if attr.startswith("code_flash"):
+            label = "Code FLASH, total (bytes)"
+        body.append((md_escape(label), values))
+
+    def table(rows: list[tuple[str, list[str]]]) -> list[str]:
+        return header + [f"| {label} | " + " | ".join(values) + " |"
+                         for label, values in rows]
+
+    # **選ぶために要るのは、型番どうしで違う行だけ。** 同じ値が並ぶ行は
+    # 「この series は何か」であって「どれにするか」ではないので、差のある行を
+    # 先に出し、全仕様は畳んでおく（worklist G6。CH32V307 の比較表は29行あって
+    # 差があるのは3行）。差が無い series では畳まずそのまま出す。
+    differing = [row for row in body if len(set(row[1])) > 1]
+    out = [f"### {series['series']} product comparison", ""]
+    if differing and len(differing) < len(body):
+        out += [f"Only the {len(differing)} rows that differ between these "
+                f"{len(parts)} products; the other {len(body) - len(differing)} "
+                "are the same for all of them.", ""]
+        out += table(differing)
+        out += ["",
+                f"<details><summary>All {len(body)} rows</summary>", ""]
+        out += table(body)
+        out += ["", "</details>"]
+    else:
+        out += table(body)
     out.append("")
     return out
 FEATURES = ("ADC", "I2C", "SPI", "SYS", "TIM", "UART", "USB")
@@ -452,7 +537,7 @@ def filter_links(series: str) -> str:
     return "Pin functions (filterable): " + " ".join(links)
 
 
-def pin_map_section(data: Data, series: dict) -> list[str]:
+def pin_map_section(data: Data, series: dict, collapse: bool = False) -> list[str]:
     products = data.series_products(series["series"])
     parts = [p["part_number"] for p in products if data.pins_by_part[p["part_number"]]]
     if not parts:
@@ -480,20 +565,29 @@ def pin_map_section(data: Data, series: dict) -> list[str]:
         return (f"[{part[:8]}&#8203;{part[8:]}]({VIEWER}?chip={part})"
                 f"&#8203;({package})")
 
-    out = [f"### {series['series']} pin map", "",
-           filter_links(series["series"]), "",
-           "| Pin name | Type | " + " | ".join(head(p) for p in parts)
-           + " | Notes |",
-           "|---|---|" + "---|" * len(parts) + "---|"]
+    rows = ["| Pin name | Type | " + " | ".join(head(p) for p in parts)
+            + " | Notes |",
+            "|---|---|" + "---|" * len(parts) + "---|"]
     for pad in pads:
         type_counter = types.get(pad)
         pin_type = type_counter.most_common(1)[0][0] if type_counter else ""
         cells = [per_part[p].get(pad, "-") for p in parts]
         shown = f"{pad} ({alias[pad]})" if pad in alias else pad
-        out.append(f"| {md_escape(shown)} | {md_escape(pin_type)} | "
-                   + " | ".join(cells)
-                   + f" | {notes_for(pad, defaults, everything)} |")
-    out.append("")
+        rows.append(f"| {md_escape(shown)} | {md_escape(pin_type)} | "
+                    + " | ".join(cells)
+                    + f" | {notes_for(pad, defaults, everything)} |")
+    out = [f"### {series['series']} pin map", "", filter_links(series["series"]), ""]
+    # **series が複数ある family では pin map を畳む。** CH32V307 の README は
+    # 1,064行のうち 818行（77%）が4つの pin map で、目次代わりに読める長さでは
+    # なかった。畳めば「どの型番か」までが1画面に収まり、足の話は viewer が
+    # 主導線になる（上の filter links はたたまない。worklist G6）。
+    if collapse:
+        out += [f"<details><summary><b>{series['series']} pin map</b> "
+                f"({len(pads)} pads x {len(parts)} products)</summary>", ""]
+        out += rows
+        out += ["", "</details>", ""]
+    else:
+        out += rows + [""]
     return out
 
 
@@ -606,7 +700,10 @@ def pinout_reference(data: Data, family: str) -> list[str]:
               in check_images.pinout_groups().items() if fam == family]
     if not groups:
         return []
-    out = ["## Pinouts", "",
+    # **節名は中身を言う。** `Pinouts` は「pin 配置」全般に読めるが、この節が
+    # 持っているのは封装ごとの外形図と datasheet へのリンクだけで、
+    # どの足が何かは下の `Pin maps & alternate functions`（worklist G6）。
+    out = ["## Packages & pinout drawings", "",
            "Pinout drawings are in the datasheet (chapter *Pinouts*):", "",
            "| Package | Products | Datasheet | Outline |", "|---|---|---|---|"]
     documents = {d["document"]: d for d in data.documents}
@@ -737,12 +834,46 @@ def synced_line(data: Data, family: str) -> list[str]:
             f"({date}). Newer PDFs may exist upstream; see Documents below.*", ""]
 
 
+# 冒頭のジャンプ行に出す節。(見出し文, 出す名前)。**その README に実際に
+# ある見出しだけ**を出すので、Errata の無い family には Errata が出ない。
+NAV = (("Product comparison", "Choose a part"),
+       ("Pin maps & alternate functions", "Pin maps"),
+       ("Errata", "Errata"),
+       ("EVT examples", "Examples"),
+       ("Documents", "Documents"),
+       ("Address map", "Address map"))
+
+
+def anchor(heading: str) -> str:
+    """GitHub が見出しに振る id。小文字化し、英数と `-`・`_` 以外を落として空白を `-` に。"""
+    kept = "".join(c for c in heading.lower() if c.isalnum() or c in " -_")
+    return kept.replace(" ", "-")
+
+
+def nav_line(body: list[str], family: str, data: Data) -> list[str]:
+    """節へのジャンプ行。長い README で、上から読まずに済むようにするもの。
+
+    **見出しの一覧から作る。** 節を足したり名前を変えたりしたときに、ここだけ
+    古くなるのを避けるため（worklist G6）。
+    """
+    present = {line.lstrip("#").strip() for line in body if line.startswith("#")}
+    links = [f"[{shown}](#{anchor(heading)})"
+             for heading, shown in NAV if heading in present]
+    series = data.family_series(family)
+    if series:
+        links.insert(1, f"[Pin viewer]({VIEWER}?chip={series[0]['series']})")
+    # 1つしか行き先が無いなら案内にならない（WCH-common は Documents だけ）。
+    return [" &middot; ".join(links), ""] if len(links) > 1 else []
+
+
 def render(data: Data, family: str) -> str:
     # **節の順は U1（初めて触る人）→ U2 → U3。** 以前は U3（開発中の人）向けに
     # Series・Debug defaults・Documents が先に来ていた。最初に触る人が要るのは
     # 「どう書き込むか」と「どの型番か」で、資料の一覧はその後（worklist の B4）。
     lines = [f"# {family}", "", NOTICE, ""]
     lines += synced_line(data, family)
+    body: list[str] = []
+    lines, out = body, lines  # 以降は body に積み、最後に nav を挟んで戻す
     lines += quick_start_section(data, family)
     lines += series_section(data, family)
     if data.family_series(family):
@@ -751,9 +882,21 @@ def render(data: Data, family: str) -> str:
             lines += comparison_section(data, s)
     lines += pinout_reference(data, family)
     if data.family_series(family):
-        lines += ["## Pin definitions", ""]
+        # **pin 表は silicon の機能の和で、型番の周辺一覧ではない。** datasheet が
+        # 表の直前でそう断っている（`所有功能，不涉及具体型号产品`）——同じ pinout を
+        # 共有する型番は同じ pad 行を読むので、USART を3つしか持たない CH32V303CBT6 の
+        # 欄にも UART8 の pad が並ぶ。`tools/check_counts.py` は表とpinの数を
+        # 突き合わせているが、**読む人にはどこにも書いていなかった**（worklist G2）。
+        lines += ["## Pin maps & alternate functions", "",
+                  "> [!NOTE]",
+                  "> These are the **pin-table superset**: the datasheet prints one "
+                  "pad table for every product that shares a pinout, so a pad row "
+                  "does not mean this part has the peripheral. Use the product "
+                  "comparison table above for what a given part number contains.",
+                  ""]
+    collapse = len(data.family_series(family)) > 1
     for s in data.family_series(family):
-        lines += pin_map_section(data, s)
+        lines += pin_map_section(data, s, collapse)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
     lines += block_diagrams(data, family)
@@ -767,7 +910,7 @@ def render(data: Data, family: str) -> str:
               "Data: [ch32-device-data](https://github.com/ch32-riscv-ug/"
               "ch32-device-data) (evidence/ and index/ -- each value carries its evidence "
               "and confidence there).", ""]
-    return "\n".join(lines)
+    return "\n".join(out + nav_line(body, family, data) + body)
 
 
 ORG_INTRO = """# CH32 RISC-V User Group
@@ -789,6 +932,24 @@ ORG_STATIC = """## Toolchain mirror
 """
 
 
+# 「Find by feature」の分類。**選ぶときに効く軸**でまとめる。
+# ここに無いタグが現れたら生成を落とす（分類の穴を黙って作らないため）。
+FEATURE_CATEGORIES = (
+    ("Connectivity", ("USB", "USBD", "USBFS", "USBHS", "USBSS", "USB-PD",
+                      "CAN", "ETHERNET", "USART", "UART", "I2C", "I3C", "SPI",
+                      "I2S", "SWPMI", "SIDO", "SERDES", "UHSIF", "PIOC")),
+    ("Analog", ("ADC", "TKey", "HSADC", "DAC", "OPA", "CMP", "DFSDM")),
+    ("Motor and power drive", ("GATE-DRIVER", "ISP", "ISINK", "ISOURCE", "QII")),
+    ("Display, audio and camera", ("LTDC", "DVP", "ARGB", "GPHA", "SAI")),
+    ("Memory and storage", ("MEMORY", "PSRAM", "FMC", "FSMC", "QSPI", "SDIO",
+                            "SDMMC")),
+    ("Timers", ("TIM", "LPTIM", "SYSTICK", "RTC", "WDG", "IWDG", "WWDG")),
+    ("Security", ("RNG", "CRC", "ECDC")),
+    ("System", ("CLOCK", "DMA", "EXTI", "GPIO", "PFIC", "SDI", "RESET",
+                "POWER", "LDO", "LOW-POWER", "PVD")),
+)
+
+
 def org_profile(data: Data) -> str:
     """The organisation landing page: which series live in which repository.
 
@@ -796,9 +957,14 @@ def org_profile(data: Data) -> str:
     V203, V205 and V208), which hides what is inside; this table states it.
     """
     families = load("families")
-    lines = [ORG_INTRO, NOTICE, "", "## Device documentation mirrors", "",
-             "| Repository | Series inside | Cores | Products | Documents |",
-             "|---|---|---|---|---|"]
+    # **節の順は用途の順**（worklist G4）。以前は「文書 mirror の一覧」が先頭で、
+    # いちばん多い用いられ方である「自分の型番はどこか」がその下にあった。
+    # 資料の置き場所は、探しているものが見つかったあとに要るもの。
+    mirrors = ["## Device documentation mirrors", "",
+               "Where each document family is mirrored. "
+               "Repository names follow the document family, not the part number.", "",
+               "| Repository | Series inside | Cores | Products | Documents |",
+               "|---|---|---|---|---|"]
     for f in families:
         url = f"https://github.com/{f['repository']}"
         series = ", ".join(f["series"].split(";"))
@@ -811,52 +977,116 @@ def org_profile(data: Data) -> str:
             docs.append("RM")
         if f["evt"]:
             docs.append("EVT")
-        lines.append(f"| [{f['family']}]({url}) | {series} | {cores} "
-                     f"| {f['part_number_count']} | {' '.join(docs)} |")
+        mirrors.append(f"| [{f['family']}]({url}) | {series} | {cores} "
+                       f"| {f['part_number_count']} | {' '.join(docs)} |")
     # 型番から辿れるように。リポジトリ名は文書ファミリーの名前なので、
     # CH32M007がCH32V006に、CH32M103がCH32L103に入っている等は
     # 型番を知っているだけでは辿り着けない。
-    lines += ["", "## Find your part", "",
-              "Repository names follow the document family, not the part "
-              "number. Look up the series (the first 8 characters of a part "
-              "number) here:", "",
-              "| Series | Repository | Products | Example part numbers |",
-              "|---|---|---|---|"]
+    # **型番は viewer への直リンクにする**（G4）——例示だけして行き先が無いと、
+    # 読む人はここから型番名をコピーして別の場所を探すことになる。
+    find = ["## Find your part", "",
+            "Look up the series (the first 8 characters of a part number). "
+            "The example part numbers open that part's pin map.", "",
+            "| Series | Repository | Products | Example part numbers |",
+            "|---|---|---|---|"]
     for s in data.series:
         parts = [p["part_number"] for p in data.products
                  if p["series"] == s["series"]]
-        shown = ", ".join(parts[:3]) + (", …" if len(parts) > 3 else "")
+        shown = ", ".join(f"[{n}]({VIEWER}?chip={n})" for n in parts[:3])
+        if len(parts) > 3:
+            shown += f", [… all {len(parts)}]({VIEWER}?chip={s['series']})"
         url = f"https://github.com/ch32-riscv-ug/{s['family']}"
-        lines.append(f"| **{s['series']}** | [{s['family']}]({url}) "
-                     f"| {len(parts)} | {shown} |")
+        find.append(f"| **{s['series']}** | [{s['family']}]({url}) "
+                    f"| {len(parts)} | {shown} |")
+
+    viewer = ["## Pin-function viewer", "",
+              f"**[Pin and alternate-function viewer]({VIEWER})** -- every part "
+              "and every series in one page: pad x function matrix, remap "
+              "selector values and AF numbers, filterable by function and "
+              "shareable by URL.", "",
+              f"- by series: `{VIEWER}?chip=CH32V307`",
+              f"- by part: `{VIEWER}?chip=CH32V307VCT6`",
+              f"- one function: `{VIEWER}?chip=CH32V307&features=UART`", ""]
 
     # 機能から辿れるように（worklist の B5）。`feature_tags.csv` は datasheet の
     # 機能説明章の節見出しから作ったタグ（A6）で、series 単位。比較表が型番単位で
     # 裏付けるものは precision=part、節見出しだけのものは precision=datasheet。
+    # **印は series ごと。** `precision` は (tag, series) の性質で、tag の性質では
+    # ない。tag 名に付けていたときは「1つでも datasheet 粒度なら feature 全体に印」
+    # になり、**どの series が型番単位で裏付けられているのか読み取れなかった**
+    # （55タグ中23に印が付き、うち7タグは part と datasheet が混在。worklist G3）。
+    #
+    # **子タグは親にも足す。** `curated/feature-tags.json` の註が言うとおり
+    # 「USB が使えるか」で探す人と「USBHS が要る」人の両方に答えるための親子だが、
+    # 以前は子を `continue` で落とすだけで親に足しておらず、**`USB` は
+    # `parent` が自分自身なので表から丸ごと消えていた**（worklist G7）。
     by_tag: dict[str, dict[str, set[str]]] = collections.defaultdict(
         lambda: collections.defaultdict(set))
-    loose: set[str] = set()
+    confirmed: set[tuple[str, str]] = set()
+    stated: set[tuple[str, str]] = set()
     for r in data.feature_tags:
-        if r["parent"]:
-            continue  # 子タグ（USB の下の USBFS 等）は親の行で数える
-        by_tag[r["tag"]][r["family"]].add(r["series"])
-        if r["precision"] != "part":
-            loose.add(r["tag"])
+        for tag in {r["tag"], r["parent"] or r["tag"]}:
+            by_tag[tag][r["family"]].add(r["series"])
+            stated.add((tag, r["series"]))
+            if r["precision"] == "part":
+                confirmed.add((tag, r["series"]))
+    child_of = {r["tag"]: r["parent"] for r in data.feature_tags
+                if r["parent"] and r["parent"] != r["tag"]}
+    every = {r["series"] for r in data.series}
+
+    feature: list[str] = []
     if by_tag:
-        lines += ["", "## Find by feature", "",
-                  "Which series have a given peripheral, from the feature "
-                  "chapter of each datasheet. Series marked \\* are tagged at "
-                  "datasheet granularity (the whole datasheet lists the feature; "
-                  "the comparison table does not confirm it per part).", "",
-                  "| Feature | Series (repository) |", "|---|---|"]
-        for tag in sorted(by_tag):
+        uncategorised = sorted(set(by_tag) - {t for _, tags in FEATURE_CATEGORIES
+                                              for t in tags})
+        if uncategorised:
+            raise SystemExit(
+                f"build_readme: 分類の無い feature タグ {uncategorised}"
+                " -- FEATURE_CATEGORIES に足すこと")
+
+        def row(tag: str) -> str:
+            shown = f"{child_of[tag]} / {tag}" if tag in child_of else tag
+            if by_tag[tag].keys() and {s for f in by_tag[tag]
+                                       for s in by_tag[tag][f]} == every:
+                return f"| **{shown}** | every series |"
             cells = []
             for family in sorted(by_tag[tag]):
-                names = ", ".join(sorted(by_tag[tag][family]))
+                names = ", ".join(
+                    name + ("" if (tag, name) in confirmed else "\\*")
+                    for name in sorted(by_tag[tag][family]))
                 url = f"https://github.com/ch32-riscv-ug/{family}"
                 cells.append(f"{names} ([{family}]({url}))")
-            mark = "\\*" if tag in loose else ""
-            lines.append(f"| **{tag}**{mark} | {'; '.join(cells)} |")
+            return f"| **{shown}** | {'; '.join(cells)} |"
+
+        # **選定に効く順。** 全 series が持つ機能は「どれを選ぶか」を決めないので
+        # 畳み、少数の series にしかない機能を上に出す（worklist G7）。
+        def covers(tag: str) -> int:
+            return len({s for f in by_tag[tag] for s in by_tag[tag][f]})
+        common = sorted(t for t in by_tag if covers(t) == len(every))
+        feature += ["## Find by feature", "",
+                    "Which series have a given peripheral, from the feature "
+                    "chapter of each datasheet, grouped by what a choice usually "
+                    "turns on. A series marked \\* is tagged at datasheet "
+                    "granularity (the whole datasheet lists the feature; the "
+                    "comparison table does not confirm it for that series' "
+                    "parts); an unmarked series is confirmed per part. "
+                    "Counts per part number are in "
+                    "[`index/capabilities.csv`](https://github.com/ch32-riscv-ug/"
+                    "ch32-device-data/blob/main/index/capabilities.csv).", ""]
+        for name, tags in FEATURE_CATEGORIES:
+            listed = sorted((t for t in tags if t in by_tag and t not in common),
+                            key=lambda t: (covers(t), t))
+            if not listed:
+                continue
+            feature += [f"### {name}", "", "| Feature | Series (repository) |",
+                        "|---|---|"] + [row(t) for t in listed] + [""]
+        if common:
+            feature += [f"<details><summary>On every series "
+                        f"({len(common)} features)</summary>", "",
+                        "| Feature | Series (repository) |", "|---|---|"]
+            feature += [row(t) for t in common]
+            feature += ["", "</details>", ""]
+
+    lines = [ORG_INTRO, NOTICE, ""] + find + [""] + feature + viewer + mirrors
 
     common = sorted(d["document"] for d in data.documents
                     if "WCH-common" in d["repositories"].split(";")

@@ -28,6 +28,27 @@ Every table is **one combined file** (every part, every family) and generators r
 CSV is for programs; people filter by part or feature in the viewer ([`pins.html`](../pins.html),
 served from GitHub Pages). There are no per-part copies -- they would only duplicate the file.
 
+## The viewer
+
+`pins.html` reads `catalog/products`, `index/pinout`, `index/capabilities` and two evidence
+tables (`product_attributes`, `remap_fields`) -- 3.5 MB, 218 KB over the wire, parsed in about
+a quarter of a second. It has no per-series build output on purpose: a display cache would be a
+second copy of the index to keep in step.
+
+| Parameter | Meaning |
+|---|---|
+| `?chip=CH32V307` | series view: pad x function matrix and the product comparison |
+| `?chip=CH32V307VCT6` | product view: that part's lead numbers, its series' remap selectors, and the instances its comparison table does **not** give it greyed out |
+| `&features=ADC,TIM` | show only these function columns (`UART` accepted for `USART`) |
+| `&routes=default,remap,af,unstated` | show only these routes |
+| `&q=USART1` | search: pad, the datasheet's spelling, or the normalised peripheral/role |
+| `&tim=split` | one column per timer instance instead of one `TIM` column |
+
+With no `?chip=` it lists every series and part to choose from. Cells carry the evidence's
+confidence: `~` one source only, `!` the two editions disagree, `?` after a remap value means
+no selector field could be tied to it. Clicking a remap value jumps to the selector's register
+row.
+
 ## Rules
 
 - Names are normalised through `tools/signal_vocabulary.py` (`peripheral`, `role`, `port`, `gpio`).

@@ -4,6 +4,8 @@
 
 *Generated from the mirror at commit [`d26bb85`](https://github.com/ch32-riscv-ug/CH32M030/tree/d26bb85061e306ebae5fed8048b52633d8d4e5cd) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
 
+[Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
+
 ## Quick start
 
 ### Debug / serial defaults
@@ -16,7 +18,7 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
+| Series | Core | ISA | Flash | SRAM | Main clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
 | **CH32M030** | QingKe V3B | RV32IMCB | 64K | 12K | 72 MHz | - | LQFP48,QFN32,QFN48,QFN48X7_A,QSOP28 | 5 | [en](https://www.wch-ic.com/products/CH32M030.html) / [zh](https://www.wch.cn/products/CH32M030.html) |
 
@@ -24,7 +26,28 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ### CH32M030 product comparison
 
-| | CH32M030&#8203;C8T7&#8203;(LQFP48) | CH32M030&#8203;C8U3&#8203;(QFN48X7_A) | CH32M030&#8203;C8U7&#8203;(QFN48) | CH32M030&#8203;G8R7&#8203;(QSOP28) | CH32M030&#8203;K8U7&#8203;(QFN32) |
+Only the 14 rows that differ between these 5 products; the other 15 are the same for all of them.
+
+| | [CH32M030&#8203;C8T7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8T7)&#8203;(LQFP48) | [CH32M030&#8203;C8U3](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U3)&#8203;(QFN48X7_A) | [CH32M030&#8203;C8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U7)&#8203;(QFN48) | [CH32M030&#8203;G8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030G8R7)&#8203;(QSOP28) | [CH32M030&#8203;K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030K8U7)&#8203;(QFN32) |
+|---|---|---|---|---|---|
+| **GPIO** | 35 | 36 | 36 | 17 | 24 |
+| **Temperature** | -40..105C | - | -40..105C | -40..105C | -40..105C |
+| Half-bridge gate driver | 4 | 4 | 4 | 3 | 2 |
+| Pre-drive I/O (MV I/0) | 8 | 8 | 8 | 6 | 6 |
+| High voltage I/O（HV I/0） | - | 2 | 1 | - | 1 |
+| ADC | 20 | 20 | 20 | 11 | 16 |
+| OPA1 | 1 | 1 | 1 | - | - |
+| CMP1 | 1 | 1 | 1 | - | - |
+| Current sampling ISP, ISN | Differential *2 | Differential*2 | Differential *2 | Differential *2 | Differential *1 Single end*1 |
+| Signal decoding QII | 2 | 2 | 2 | 1 | 1 |
+| Programmable current injection module ISINK | 2 | 2 | 2 | 1 | 2 |
+| Source current module ISOURCE | 2 | 2 | 2 | - | 1 |
+| SPI | 1 | 1 | 1 | - | 1 |
+| USB PD Type-C | (CC1, CC2) (CC3, CC4) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) | (CC3, CC4) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) |
+
+<details><summary>All 29 rows</summary>
+
+| | [CH32M030&#8203;C8T7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8T7)&#8203;(LQFP48) | [CH32M030&#8203;C8U3](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U3)&#8203;(QFN48X7_A) | [CH32M030&#8203;C8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U7)&#8203;(QFN48) | [CH32M030&#8203;G8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030G8R7)&#8203;(QSOP28) | [CH32M030&#8203;K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030K8U7)&#8203;(QFN32) |
 |---|---|---|---|---|---|
 | **Flash** | 64K | 64K | 64K | 64K | 64K |
 | **SRAM** | 12K | 12K | 12K | 12K | 12K |
@@ -56,7 +79,9 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 | SPI | 1 | 1 | 1 | - | 1 |
 | USB PD Type-C | (CC1, CC2) (CC3, CC4) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) | (CC3, CC4) | (CC1R, CC2R) (CC3, CC4) Built-in Rd(1) |
 
-## Pinouts
+</details>
+
+## Packages & pinout drawings
 
 Pinout drawings are in the datasheet (chapter *Pinouts*):
 
@@ -68,7 +93,10 @@ Pinout drawings are in the datasheet (chapter *Pinouts*):
 | QSOP28 | CH32M030G8R7 | [en](https://ch32-riscv-ug.github.io/CH32M030/datasheet_en/CH32M030DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32M030/datasheet_zh/CH32M030DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QSOP28.png) |
 | QFN32 | CH32M030K8U7 | [en](https://ch32-riscv-ug.github.io/CH32M030/datasheet_en/CH32M030DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32M030/datasheet_zh/CH32M030DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN32.png) |
 
-## Pin definitions
+## Pin maps & alternate functions
+
+> [!NOTE]
+> These are the **pin-table superset**: the datasheet prints one pad table for every product that shares a pinout, so a pad row does not mean this part has the peripheral. Use the product comparison table above for what a given part number contains.
 
 ### CH32M030 pin map
 

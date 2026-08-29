@@ -27,6 +27,25 @@
 CSV は機械が読むもので、人が型番や機能で絞り込んで見るのは viewer（[`pins.html`](../pins.html)。
 GitHub Pages で配る）の仕事です。型番ごとに切ったコピーは持ちません（正本と重複するだけなので）。
 
+## viewer
+
+`pins.html` が読むのは `catalog/products`・`index/pinout`・`index/capabilities` と、証拠2表
+（`product_attributes`・`remap_fields`）です。raw 3.5MB・転送 218KB・解析 0.25秒ほど。
+**series 別の表示用キャッシュは意図的に置きません**——索引の複製をもう1つ抱えることになるためです。
+
+| パラメータ | 中身 |
+|---|---|
+| `?chip=CH32V307` | series view: pad × 機能の格子と比較表 |
+| `?chip=CH32V307VCT6` | product view: lead 番号・その series の remap selector・**比較表がその型番に与えていない instance は薄表示** |
+| `&features=ADC,TIM` | その機能の列だけ（`UART` は `USART` として受ける） |
+| `&routes=default,remap,af,unstated` | その経路だけ |
+| `&q=USART1` | 検索。pad・資料の綴り・正規化した peripheral/role のどれでも当たる |
+| `&tim=split` | TIM を1列にまとめず instance ごとに出す |
+
+`?chip=` が無ければ series と型番の一覧を出します。セルには証拠の確度が付きます——
+`~` は単一出所、`!` は両版の食い違い、remap 値のあとの `?` は selector を決められないもの。
+remap 値をクリックするとその selector のレジスタ行へ飛びます。
+
 ## 共通の規則
 
 - 名前は `tools/signal_vocabulary.py` の語彙で揃えてあります（`peripheral`・`role`・`port`・`gpio`）。

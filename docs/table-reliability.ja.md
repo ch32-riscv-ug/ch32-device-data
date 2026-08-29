@@ -36,6 +36,7 @@
 | `remap_selector_coverage` | `remap-N` 行が selector まで辿れているか | index 側の数を誰も持っていなかった（監査の指摘） |
 | CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
 | `check_docs.py` | **文書が書いている行数と穴の状態**が、表と worklist の台帳と合っているか | 解決済みの F-11 を3つの文書が古いまま説明していた・この資料の pinout 行数が5行古かった（2026-08-29 の監査） |
+| `check_viewer.js` | **`pins.html` の表示**が壊れていないか（DOM 無しで関数を評価して出力を見る） | series view の Defaults が先頭型番だけを見ていた（G1。CH32V006 の SWCLK と UART が全部 `-` になっていた） |
 
 **中身の鮮度は PDF が要るので CI では見られません。** そこは `catalog/sources.csv`（読んだミラーの commit）と手動のフル実行が担当です。`column_drift` は「中身は見られなくても列なら見られる」という割り切りで、実際に F-54 の2件はこれで捕まりました。
 

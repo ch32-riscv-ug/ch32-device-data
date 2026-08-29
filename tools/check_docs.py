@@ -112,9 +112,12 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("docs/handoff.ja.md", r"目録(?P<n>\d+)表", "catalog_tables"),
     ("docs/handoff.ja.md", r"証拠(?P<n>\d+)表", "evidence_tables"),
     ("docs/handoff.ja.md", r"索引(?P<n>\d+)表", "index_tables"),
-    # 進捗の要約と、下の F 台帳。**要約のほうが先に古くなる**ので台帳から数え直す。
+    # 進捗の要約と、下の台帳（F＝既知の穴、G＝表示）。**要約のほうが先に古くなる**ので
+    # 台帳から数え直す。
     ("docs/worklist.ja.md", r"\| 既知の穴（F系） \| (?P<n>\d+) \|", "holes_resolved"),
     ("docs/worklist.ja.md", r"\| 既知の穴（F系） \| \d+ \| (?P<n>\d+)（", "holes_open"),
+    ("docs/worklist.ja.md", r"\| 表示（G系） \| (?P<n>\d+) \|", "display_done"),
+    ("docs/worklist.ja.md", r"\| 表示（G系） \| \d+ \| (?P<n>\d+) \|", "display_open"),
 )
 
 # 「この穴はまだ開いている／閉じた」と読める書き方。**節単位で見る**——
@@ -156,6 +159,9 @@ def quantities() -> dict[str, int]:
     holes = ledger()
     out["holes_resolved"] = sum(1 for done in holes.values() if done)
     out["holes_open"] = sum(1 for done in holes.values() if not done)
+    display = ledger(r"G-?\d+", column=3)
+    out["display_done"] = sum(1 for done in display.values() if done)
+    out["display_open"] = sum(1 for done in display.values() if not done)
     return out
 
 
@@ -226,13 +232,16 @@ def check_prose(known: dict[str, int]) -> list[str]:
     return bad
 
 
-def ledger() -> dict[str, bool]:
-    """worklist の F 台帳: 番号 → 解決済みか（判断の欄が ✅ で始まる）。"""
+def ledger(numbering: str = r"F-\d+", column: int = 4) -> dict[str, bool]:
+    """worklist の台帳: 番号 → 済みか（判断の欄が ✅ で始まる）。
+
+    F 台帳（既知の穴）は5列で判断が4番目、G 台帳（表示）は4列で状態が3番目。
+    """
     out: dict[str, bool] = {}
     for _, cells, _ in tables_of(WORKLIST.read_text(encoding="utf-8")):
-        if len(cells) < 5 or not re.fullmatch(r"F-\d+", cells[0]):
+        if len(cells) <= column or not re.fullmatch(numbering, cells[0]):
             continue
-        out.setdefault(cells[0], cells[4].startswith("✅"))
+        out.setdefault(cells[0], cells[column].startswith("✅"))
     return out
 
 

@@ -4,6 +4,8 @@
 
 *Generated from the mirror at commit [`9ac8654`](https://github.com/ch32-riscv-ug/CH32V205/tree/9ac8654b4cde88ffe78da34358ab000178846c62) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
 
+[Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Errata](#errata) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
+
 ## Quick start
 
 ### Debug / serial defaults
@@ -18,7 +20,7 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
+| Series | Core | ISA | Flash | SRAM | Main clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
 | **CH32V205** | QingKe V3B | RV32ICBM-X | 256K | 32K | 192 MHz | 1.8-3.6V | LQFP100,LQFP48,LQFP64 | 3 | [en](https://www.wch-ic.com/products/CH32V205.html) / [zh](https://www.wch.cn/products/CH32V205.html) |
 
@@ -26,7 +28,16 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ### CH32V205 product comparison
 
-| | CH32V205&#8203;CCT6&#8203;(LQFP48) | CH32V205&#8203;RCT6&#8203;(LQFP64) | CH32V205&#8203;VCT6&#8203;(LQFP100) |
+Only the 2 rows that differ between these 3 products; the other 24 are the same for all of them.
+
+| | [CH32V205&#8203;CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205CCT6)&#8203;(LQFP48) | [CH32V205&#8203;RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205RCT6)&#8203;(LQFP64) | [CH32V205&#8203;VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205VCT6)&#8203;(LQFP100) |
+|---|---|---|---|
+| **GPIO** | 41 | 51 | 80 |
+| FSMC | - | - | 1 |
+
+<details><summary>All 26 rows</summary>
+
+| | [CH32V205&#8203;CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205CCT6)&#8203;(LQFP48) | [CH32V205&#8203;RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205RCT6)&#8203;(LQFP64) | [CH32V205&#8203;VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205VCT6)&#8203;(LQFP100) |
 |---|---|---|---|
 | **Flash** | 256K | 256K | 256K |
 | **SRAM** | 32K | 32K | 32K |
@@ -55,7 +66,9 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 | CPU main frequency | 40MHz@Zero-wait; Max: 192MHz@Non-zero wait | 40MHz@Zero-wait; Max: 192MHz@Non-zero wait | 40MHz@Zero-wait; Max: 192MHz@Non-zero wait |
 | Rated voltage | 3.3V | 3.3V | 3.3V |
 
-## Pinouts
+</details>
+
+## Packages & pinout drawings
 
 Pinout drawings are in the datasheet (chapter *Pinouts*):
 
@@ -66,7 +79,10 @@ Pinout drawings are in the datasheet (chapter *Pinouts*):
 | LQFP64 | CH32V205RCT6 | [en](https://ch32-riscv-ug.github.io/CH32V205/datasheet_en/CH32V205DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V205/datasheet_zh/CH32V205DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
 | LQFP100 | CH32V205VCT6 | [en](https://ch32-riscv-ug.github.io/CH32V205/datasheet_en/CH32V205DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V205/datasheet_zh/CH32V205DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
 
-## Pin definitions
+## Pin maps & alternate functions
+
+> [!NOTE]
+> These are the **pin-table superset**: the datasheet prints one pad table for every product that shares a pinout, so a pad row does not mean this part has the peripheral. Use the product comparison table above for what a given part number contains.
 
 ### CH32V205 pin map
 

@@ -20,6 +20,7 @@ on:
       # them against the tables, so editing a document has to run this too.
       - "docs/**"
       - "README*.md"
+      - "pins.html"
   pull_request:
     paths:
       - "catalog/**"
@@ -30,6 +31,7 @@ on:
       - "manifests/**"
       - "docs/**"
       - "README*.md"
+      - "pins.html"
 
 permissions:
   contents: read
@@ -56,6 +58,14 @@ jobs:
       # Standard library only.
       - name: Check document claims
         run: python tools/check_docs.py
+
+      # pins.html holds real logic now (which columns, what a search matches,
+      # which instances a part number does not have) and it used to be the one
+      # thing nothing checked: its series view read only the first part number
+      # of a series for months, which left CH32V006's debug and UART defaults
+      # blank. Evaluated headlessly against the committed tables -- no browser.
+      - name: Check the viewer
+        run: node tools/check_viewer.js
 
       # The vocabulary rules are documented by their doctests, so nothing else
       # notices when a rule is added and the examples are not. `AETR2` had gone
