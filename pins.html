@@ -12,8 +12,11 @@
                                            and the remap selectors that switch them
      Cells follow the original PinAlternateFunctions notation: NAME = default,
      NAME_n = AFIO remap value n, NAME(AFn) = alternate-function number.
+     With no ?chip= the page lists every series and part to choose from.
      Other parameters: &features=ADC,TIM (ART accepted for UART)
-                       &routes=default,remap,af,unstated -->
+                       &routes=default,remap,af,unstated
+                       &q=<text> (pad, spelling, or normalised USART1 / TX)
+                       &tim=split (one column per timer instead of one TIM column) -->
 <style>
   :root { color-scheme: light dark; }
   body { font-family: system-ui, sans-serif; margin: 1rem; }
@@ -39,7 +42,19 @@
   tbody tr:nth-child(even) td.pad,
   tbody tr:nth-child(even) td.label { background: color-mix(in srgb, Canvas 92%, gray); }
   .remap { color: #a05a00; } .af { color: #205a9e; } .noroute { color: #888; }
+  .jump { color: inherit; text-decoration: none; }
+  .jump:hover { text-decoration: underline; }
+  abbr.bad, abbr.weak { border: 0; font-weight: 700; margin-left: .1em; }
+  abbr.bad { color: #c0392b; } abbr.weak { color: #999; }
+  abbr.absent { opacity: .38; border-bottom: 1px dotted currentColor; }
+  tr:target td { outline: 2px solid #c8901e; }
+  button { font-size: .92rem; padding: .15rem .5rem; }
+  .chooser td, .chooser th { padding: .25rem .6rem; }
   .count, footer, .crumb { color: #777; font-size: .85rem; margin: .4rem 0; }
+  .note { font-style: italic; }
+  .warn { font-size: .85rem; margin: .4rem 0; padding: .35rem .55rem;
+          border-left: 3px solid #c8901e; background: #c8901e18; }
+  abbr { text-decoration: none; border-bottom: 1px dotted currentColor; cursor: help; }
   .crumb a, footer a { color: inherit; }
 </style>
 </head>
@@ -47,26 +62,31 @@
 <h1 id="title">CH32 Pin Alternate Functions</h1>
 <div class="crumb" id="crumb"></div>
 <div class="controls">
-  <label>Chip <select id="chip"></select></label>
-  <input type="search" id="search" placeholder="pad / signal...">
+  <label>Chip <input id="chip" list="chips" size="22" autocomplete="off" spellcheck="false"
+                     placeholder="CH32V307 or CH32V307VCT6"></label>
+  <datalist id="chips"></datalist>
+  <input type="search" id="search" size="22" placeholder="pad, signal, USART1, TX...">
   <span class="set" id="features"><b>Functions:</b></span>
   <span class="set" id="routes"><b>Routes:</b></span>
+  <span class="set"><label><input type="checkbox" id="splittim"> split TIM</label></span>
+  <button type="button" id="clear">Clear filters</button>
 </div>
 <div id="content"></div>
 <footer>
-Cell notation: <b>NAME</b> = default function, <b>NAME<span class="remap">_n</span></b> = AFIO remap value n,
-<b>NAME<span class="af">(AFn)</span></b> = alternate-function number n,
+Cell notation: <b>NAME</b> = default function, <b>NAME<span class="remap">_n</span></b> = AFIO remap value n
+(click it for the register bits that select it), <b>NAME<span class="af">(AFn)</span></b> = alternate-function number n,
 <b><span class="noroute">NAME?</span></b> = route not stated by the datasheet.
+Confidence: <abbr class="weak">~</abbr> = one source only, <abbr class="bad">!</abbr> = the two datasheet
+editions disagree, <abbr class="bad">?</abbr> after a remap value = no selector field could be tied to it.
 Data: <a href="https://github.com/ch32-riscv-ug/ch32-device-data">ch32-device-data</a> tables
 (each value carries its evidence and confidence there).
 </footer>
 <script>
 "use strict";
-// Column groups, in display order. TIM instances get their own columns, the way
-// the original page split TIM1 from TIM2; everything else groups by family.
+// Column groups. **This order is the matching order** -- groupOf takes the first
+// regex that fits -- and is deliberately not the display order: see COLUMN_ORDER.
 const GROUPS = [
   ["ADC/DAC", /^(ADC|A\d|AETR|ETRGIN|DAC|HSADC|TKEY)/i],
-  // TIM columns are inserted here dynamically.
   ["USART",   /^(US?ART|U\d?(TX|RX|CK|CTS|RTS)|TXD?\d*$|RXD?\d*$|LIN)/i],
   ["I2C",     /^(I2C|SDA|SCL|SMBA)/i],
   ["SPI/I2S", /^(Q?SPI|I2S|MOSI|MISO|SCK|NSS)/i],
@@ -81,6 +101,15 @@ const GROUPS = [
   ["PIOC",    /^PIOC/i],
 ];
 const TIM = /^(?:T|TIM|LPTIM)(\d+)/i;
+// **Display order, from what a board bring-up asks in order:** how do I debug
+// it, how do I talk to it, what buses, what radio/network, then timers and
+// analogue, then the specialised blocks. The page used to lead with ADC/DAC and
+// every TIM instance, which pushed USART past a dozen columns and left SWD and
+// SYS at the far right (worklist G8). "TIM" stands for the collapsed column and
+// for wherever the split TIM1..TIMn columns go.
+const COLUMN_ORDER = ["SWD", "SYS", "USART", "I2C", "SPI/I2S", "CAN", "USB/PD",
+                      "ETH", "TIM", "ADC/DAC", "FSMC/SDIO", "DVP", "OPA/CMP",
+                      "PIOC", "Other"];
 const FEATURE_ALIAS = { ART: "USART", UART: "USART", ADC: "ADC/DAC",
                         SPI: "SPI/I2S", USB: "USB/PD", OPA: "OPA/CMP",
                         FSMC: "FSMC/SDIO", SDIO: "FSMC/SDIO", DAC: "ADC/DAC" };
@@ -107,6 +136,24 @@ function groupOf(signal) {
   return "Other";
 }
 const isTimGroup = g => /^(LP)?TIM\d/.test(g);
+const splitTim = () => $("splittim").checked;
+// A TIM instance falls into the single "TIM" column unless the reader asks for
+// one column per instance. A part can have ten of them, and until you know
+// which timer you want they are ten columns of the same thing (worklist G8).
+const columnOf = g => (!splitTim() && isTimGroup(g)) ? "TIM" : g;
+
+// Present groups, in COLUMN_ORDER; split TIM instances sit where "TIM" does.
+function columnsFor(present) {
+  const tims = [...present].filter(isTimGroup).sort(
+    (a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, ""))
+              || a.localeCompare(b));
+  const out = [];
+  for (const name of COLUMN_ORDER) {
+    if (name === "TIM") out.push(...(splitTim() ? tims : (tims.length ? ["TIM"] : [])));
+    else if (present.has(name)) out.push(name);
+  }
+  return out;
+}
 const routeKind = route =>
   route.startsWith("remap") ? "remap" : route.startsWith("af") ? "af"
   : route === "" ? "unstated" : "default";
@@ -150,21 +197,122 @@ const human = v => { const n = parseInt(v, 10);
                      return Number.isFinite(n) && n >= 1024 && n % 1024 === 0
                        ? (n / 1024) + "K" : (v || "-"); };
 
-function decorate(signal, route) {
-  if (route.startsWith("remap-"))
-    return `${signal}<span class="remap">_${route.slice(6)}</span>`;
+// How sure the row is, shown where the value is rather than in a footnote.
+// index/pinout.csv carries the evidence's own confidence: 24,118 confirmed,
+// 136 reference (one edition only), 12 conflict (the editions disagree, and the
+// index takes the reference manual's remap grid -- see index/README.md).
+function mark(r) {
+  if (r.confidence === "conflict")
+    return `<abbr class="bad" title="the two datasheet editions disagree here; `
+         + `index/pinout.csv takes the reference manual's remap grid">!</abbr>`;
+  if (r.confidence === "reference")
+    return `<abbr class="weak" title="stated by one source only (not `
+         + `cross-checked against the other edition)">~</abbr>`;
+  return "";
+}
+
+// **Which instances this exact part number does not have.** The pin table is
+// the shared superset (see SUPERSET_NOTE); index/capabilities.csv states, per
+// part, how many of a peripheral the datasheet's comparison table gives it.
+// The reading is deliberately narrow: only peripherals whose pin-table instance
+// numbers line up with the counted units (the same set tools/check_counts.py
+// reconciles), only when the table states a plain integer, and only when the
+// pin table shows MORE instances than the count -- then the lowest N are the
+// ones the part has. Nothing is hidden; the row is greyed with a reason, because
+// the datasheet never says outright "this part has no USART8".
+const COUNTABLE = { USART: "usart", SPI: "spi", I2C: "i2c", CAN: "can", I2S: "i2s" };
+const INSTANCE = /^([A-Z0-9]*[A-Z])(\d+)$/;
+
+function absentInstances(part) {
+  const seen = {};
+  for (const r of state.roles) {
+    if (r.part_number !== part || !r.peripheral) continue;
+    const m = INSTANCE.exec(r.peripheral);
+    if (m && COUNTABLE[m[1]]) (seen[m[1]] ??= new Set()).add(+m[2]);
+  }
+  const counted = {};
+  for (const c of state.caps)
+    if (c.part_number === part && c.stated === "count" && !c.qualifier)
+      counted[c.capability] = +c.count;
+  const absent = new Map();
+  for (const [name, set] of Object.entries(seen)) {
+    const n = counted[COUNTABLE[name]];
+    if (n === undefined || set.size <= n) continue;
+    const sorted = [...set].sort((a, b) => a - b);
+    for (const i of sorted.slice(n))
+      absent.set(name + i, `the comparison table gives ${part} ${n} x ${name}; `
+                         + `this row comes from the pin table shared by the series`);
+  }
+  return absent;
+}
+
+function decorate(r) {
+  const why = state.absent && state.absent.get(r.peripheral);
+  if (why) return `<abbr class="absent" title="${why}">${plain(r)}</abbr>`;
+  return plain(r);
+}
+
+function plain(r) {
+  const signal = r.signal, route = r.route;
+  if (route.startsWith("remap-")) {
+    const value = `${signal}<span class="remap">_${route.slice(6)}</span>${mark(r)}`;
+    // The remap value is only half the answer; the other half is which register
+    // bits select it. Jump straight to that row of the selector table.
+    if (r.selector) return `<a class="jump" href="#sel-${r.selector}">${value}</a>`;
+    return value + `<abbr class="bad" title="the datasheet states this remap `
+         + `value but no selector field could be tied to it">?</abbr>`;
+  }
   if (route.startsWith("af-"))
-    return `${signal}<span class="af">(AF${route.slice(3)})</span>`;
-  if (route === "") return `<span class="noroute">${signal}?</span>`;
-  return signal;
+    return `${signal}<span class="af">(AF${route.slice(3)})</span>${mark(r)}`;
+  if (route === "") return `<span class="noroute">${signal}?</span>${mark(r)}`;
+  return signal + mark(r);
 }
 
 function selection() {
-  const chip = $("chip").value;
+  const chip = $("chip").value.trim().toUpperCase();
   const exact = state.products.filter(p => p.part_number === chip);
   if (exact.length) return { mode: "product", parts: exact, series: exact[0].series };
-  return { mode: "series", parts: state.products.filter(p => p.series === chip),
-           series: chip };
+  const series = state.products.filter(p => p.series === chip);
+  // **Nothing named, nothing to show.** The page used to fall back on the first
+  // series alphabetically (CH32H415), which reads as "this is the chip" to
+  // anyone who arrives without a ?chip= (worklist G8).
+  if (!series.length) return { mode: "chooser", parts: [], series: "" };
+  return { mode: "series", parts: series, series: chip };
+}
+
+// The landing panel: every series, with how many products it has.
+function chooserHTML(typed) {
+  const bySeries = {};
+  for (const p of state.products) (bySeries[p.series] ??= []).push(p);
+  const rows = Object.keys(bySeries).sort().map(s => {
+    const parts = bySeries[s].map(p => p.part_number).sort();
+    return `<tr><td class="label"><a href="${chipLink(s)}">${s}</a></td>`
+      + `<td>${parts.length}</td><td>`
+      + parts.map(n => `<a href="${chipLink(n)}">${n}</a>`).join(", ")
+      + "</td></tr>";
+  });
+  const miss = typed
+    ? `<div class="warn">No series or part number matches <b>${typed}</b>.</div>` : "";
+  return miss + "<h2>Pick a chip</h2>"
+    + "<div class=\"count\">A <b>series</b> gives the pad x function matrix "
+    + "without per-package noise and the product comparison; a <b>part number</b> "
+    + "adds its lead numbers and the remap selectors of its series.</div>"
+    + "<div class=\"wrap\"><table class=\"chooser\"><thead><tr><th>Series</th>"
+    + "<th>Products</th><th>Part numbers</th></tr></thead>"
+    + `<tbody>${rows.join("")}</tbody></table></div>`;
+}
+
+// **One table, not two.** The page used to read evidence/pin_functions.csv and
+// evidence/pins.csv for the matrix while the defaults line read index/pinout.csv
+// -- 6.2 MB, most of it the same facts twice. index/pinout.csv carries the lead
+// number, the pad, the datasheet's spelling and the normalised (peripheral,
+// role) in one row, so it answers both, and the normalised pair is what makes
+// searching for "USART1 TX" work regardless of how a datasheet spells it.
+// Rows with no signal are leads without a function; they still carry a pin
+// number, so the product view lists the lead.
+function functionRows(partNames) {
+  return state.roles.filter(r => partNames.includes(r.part_number) && r.signal
+                                 && !(r.route === "main" && r.signal === r.pad));
 }
 
 // ---- The pad x function-group matrix, shared by both views. -----------------
@@ -176,33 +324,28 @@ function matrixHTML(partNames, withPins) {
   const needle = $("search").value.trim().toUpperCase();
 
   const matrix = {}; const present = new Set(); const seen = new Set();
-  for (const r of state.fns) {
-    if (!partNames.includes(r.part_number)) continue;
-    if (r.route === "main" && r.signal === r.pad) continue;
-    if (r.route === "alias") continue;  // GPIO alias written after the pad name (LO1 (PA0)); not a function
+  for (const r of functionRows(partNames)) {
     if (routeSel.length && !routeSel.includes(routeKind(r.route))) continue;
     const key = r.pad + "|" + r.signal + "|" + r.route;
     if (seen.has(key)) continue;
     seen.add(key);
     const g = groupOf(r.signal);
-    ((matrix[r.pad] ??= {})[g] ??= []).push([r.signal, r.route]);
+    ((matrix[r.pad] ??= {})[columnOf(g)] ??= []).push(r);
     present.add(g);
   }
-  const timCols = [...present].filter(isTimGroup)
-    .sort((a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, ""))
-                    || a.localeCompare(b));
-  let columns = ["ADC/DAC", ...timCols,
-                 ...GROUPS.map(g => g[0]).filter(g => g !== "ADC/DAC"), "Other"]
-    .filter(g => present.has(g));
+  let columns = columnsFor(present);
   if (features.length) {
     const wantTim = features.includes("TIM");
-    columns = columns.filter(g => features.includes(g) || (wantTim && isTimGroup(g)));
+    columns = columns.filter(g => features.includes(g)
+                                  || (wantTim && (g === "TIM" || isTimGroup(g))));
   }
 
+  // The same pad appears once per function, so the lead numbers need de-duping
+  // (a pad can still sit on two leads, and then both are listed).
   const pinsOf = {};
-  if (withPins) for (const r of state.pins) {
-    if (!partNames.includes(r.part_number)) continue;
-    pinsOf[r.pad] = pinsOf[r.pad] ? pinsOf[r.pad] + "/" + r.pin : r.pin;
+  if (withPins) for (const r of state.roles) {
+    if (!partNames.includes(r.part_number) || !r.pin) continue;
+    (pinsOf[r.pad] ??= new Set()).add(r.pin);
   }
 
   const pads = [...new Set([...Object.keys(matrix), ...Object.keys(pinsOf)])]
@@ -211,15 +354,22 @@ function matrixHTML(partNames, withPins) {
   const rows = [];
   for (const pad of pads) {
     const cells = columns.map(g => ((matrix[pad] || {})[g] || [])
-      .sort((x, y) => (x[1] + x[0]).localeCompare(y[1] + y[0]))
-      .map(([s, r]) => decorate(s, r)));
+      .sort((x, y) => (x.route + x.signal).localeCompare(y.route + y.signal))
+      .map(r => decorate(r)));
     if ((features.length || routeSel.length) && cells.every(c => c.length === 0))
       continue;
-    const rowText = (pad + " " + cells.flat().join(" ")).toUpperCase();
+    // **Search the normalised names too.** The matrix shows the datasheet's
+    // spelling (TX1 / UTX / USART1_TX for the same thing), so a search over the
+    // rendered cells alone answers "UTX" and not "USART1" (worklist G8).
+    const named = columns.flatMap(g => ((matrix[pad] || {})[g] || [])
+      .map(r => r.peripheral + " " + r.role));
+    const rowText = (pad + " " + cells.flat().join(" ") + " "
+                     + named.join(" ")).toUpperCase();
     if (needle && !rowText.includes(needle)) continue;
     shown++;
     rows.push(`<tr><td class="pad">${pad}</td>`
-      + (withPins ? `<td class="pin">${pinsOf[pad] || "-"}</td>` : "")
+      + (withPins ? `<td class="pin">${pinsOf[pad]
+          ? [...pinsOf[pad]].sort((a, b) => a - b).join("/") : "-"}</td>` : "")
       + cells.map(c => `<td>${c.join("<br>")}</td>`).join("") + "</tr>");
   }
   const head = `<tr><th class="pad">Pin</th>`
@@ -234,12 +384,28 @@ function matrixHTML(partNames, withPins) {
 // A heading still names something once the row-group prefix is gone if it holds
 // an acronym or a number ("CAN", "Basic (16-bit)"). A plain English word does
 // not -- "Unit" needs its "ADC/TKey", "Voltage" its "3-phase gate drive".
+// The exception is a group whose own name is only a classification: every leaf
+// under "Communication interface(s)" is a bus name, so keeping the prefix would
+// single out "Ethernet" (one capital, so NAMES_ITSELF misses it).
+// Same rules as tools/build_readme.py's leaf_of / tidy_label.
 const NAMES_ITSELF = /[A-Z]{2,}|\d/;
-const leafOf = (label, group) => {
+const CLASSIFYING_GROUPS = ["Communication interface", "Communication interfaces",
+                            "Communication Interface"];
+// Headings break across a line in the PDF and keep the split ("General- purpose
+// I/O"). The evidence holds the document's spelling; only the display tidies it.
+const tidyLabel = label =>
+  label.replace(/([A-Za-z])-\s+(?=[a-z])/g, "$1-").replace(/\s{2,}/g, " ").trim();
+const leafOf = (rawLabel, rawGroup) => {
+  const label = tidyLabel(rawLabel), group = tidyLabel(rawGroup || "");
   if (!group || !label.startsWith(group)) return label;
   const leaf = label.slice(group.length).trim();
-  return leaf && NAMES_ITSELF.test(leaf) ? leaf : label;
+  if (!leaf) return label;
+  return NAMES_ITSELF.test(leaf) || CLASSIFYING_GROUPS.includes(group) ? leaf : label;
 };
+// A comparison-table row that only restates a fixed column (the Chinese heading
+// 通用IO is promoted to gpio_count, the English "General- purpose I/O" is not --
+// worklist F-58). Dropped only when every value matches; a difference is news.
+const RESTATES = { general_purpose_i_o: "gpio_count" };
 
 function comparisonHTML(parts) {
   const names = parts.map(p => p.part_number);
@@ -264,24 +430,31 @@ function comparisonHTML(parts) {
   }
   const clashes = new Set(Object.values(leaves).filter(
     (leaf, i, all) => all.indexOf(leaf) !== i));
-  const shown = a => (clashes.has(leaves[a]) ? labels[a] : leaves[a]);
+  const shown = a => tidyLabel(clashes.has(leaves[a]) ? labels[a] : leaves[a]);
   const order = [...seen].sort(
     (a, b) => rank[a] - rank[b] || seen.indexOf(a) - seen.indexOf(b));
   const head = "<tr><th class=\"pad\"></th>" + parts.map(p =>
     `<th class="part"><a href="${chipLink(p.part_number)}">`
     + breakable(p.part_number, p.package) + "</a></th>").join("") + "</tr>";
-  const fixed = [["Flash", p => human(p.flash_bytes)], ["SRAM", p => human(p.sram_bytes)],
-                 ["GPIO", p => p.gpio_count || "-"], ["Temp", p => p.temperature || "-"]];
-  const rows = [];
-  for (const [label, fn] of fixed) {
+  const fixed = [["Flash", "flash_bytes", p => human(p.flash_bytes)],
+                 ["SRAM", "sram_bytes", p => human(p.sram_bytes)],
+                 ["GPIO", "gpio_count", p => p.gpio_count || "-"],
+                 ["Temp", "temperature", p => p.temperature || "-"]];
+  const rows = []; const shownFixed = {};
+  for (const [label, field, fn] of fixed) {
     const values = parts.map(fn);
-    if (values.some(v => v !== "-"))
+    if (values.some(v => v !== "-")) {
+      shownFixed[field] = values;
       rows.push(`<tr><td class="label">${label}</td>`
         + values.map(v => `<td>${v}</td>`).join("") + "</tr>");
+    }
   }
   for (const attr of order) {
+    const values = names.map(n => byPart[n][attr] || "-");
+    const restated = shownFixed[RESTATES[attr] || ""];
+    if (restated && restated.join("\u0000") === values.join("\u0000")) continue;
     rows.push(`<tr><td class="label">${shown(attr)}</td>`
-      + names.map(n => `<td>${byPart[n][attr] || "-"}</td>`).join("") + "</tr>");
+      + values.map(v => `<td>${v}</td>`).join("") + "</tr>");
   }
   return `<div class="wrap"><table><thead>${head}</thead>`
        + `<tbody>${rows.join("")}</tbody></table></div>`;
@@ -292,7 +465,7 @@ function remapHTML(series) {
   const rows = state.remap.filter(r => r.series === series);
   if (!rows.length) return "";
   const body = rows.map(r =>
-    `<tr><td class="label">${r.field}</td><td>${r.register}</td>`
+    `<tr id="sel-${r.selector}"><td class="label">${r.field}</td><td>${r.register}</td>`
     + `<td>${r.bits}</td><td>${r.valid_values}</td><td>${r.reset_value}</td></tr>`)
     .join("");
   return "<h2>Remap selectors (AFIO)</h2><div class=\"wrap\"><table>"
@@ -303,16 +476,10 @@ function remapHTML(series) {
 
 function rebuildFeatureBoxes(partNames) {
   const present = new Set();
-  for (const r of state.fns) {
-    if (!partNames.includes(r.part_number)) continue;
-    if (r.route === "main" && r.signal === r.pad) continue;
-    if (r.route === "alias") continue;
-    present.add(groupOf(r.signal));
-  }
+  for (const r of functionRows(partNames)) present.add(groupOf(r.signal));
   const hasTim = [...present].some(isTimGroup);
-  const names = ["ADC/DAC", ...(hasTim ? ["TIM"] : []),
-                 ...GROUPS.map(g => g[0]).filter(g => g !== "ADC/DAC"), "Other"]
-    .filter(g => g === "TIM" || present.has(g));
+  const names = COLUMN_ORDER.filter(
+    g => g === "TIM" ? hasTim : present.has(g));
   const checked = new Set([...document.querySelectorAll("#features input:checked")]
                           .map(e => e.value));
   const box = $("features");
@@ -328,16 +495,44 @@ function rebuildFeatureBoxes(partNames) {
   }
 }
 
+// **Every product of the selection, not the first one.** A smaller package can
+// simply not have the pad: CH32V006's first part (D8U7) reaches USART1 only
+// through a remap, so reading partNames[0] left the series line all but empty.
+// 21 of the 27 series have a per-part default set. tools/build_readme.py's
+// `debug_defaults` already reads it this way ("**1型番だけ見ない**"); this is
+// the same reading, with a mark on what only some products have.
+// **The pin table is the silicon's superset, not this part's peripheral list.**
+// The datasheet says so itself in front of the table ("所有功能，不涉及具体型号
+// 产品"): products sharing a pinout read the same pad rows, so CH32V303CBT6
+// shows UART8 pads while its comparison table gives it three USARTs.
+// tools/check_counts.py reconciles the two directions; this line says it to the
+// reader, who would otherwise take a pad row for a peripheral the part has.
+const SUPERSET_NOTE =
+  "<div class=\"warn\">Pin functions are the <b>pin-table superset</b>: the "
+  + "datasheet prints one pad table for every product sharing this pinout. "
+  + "Check the product comparison table above (or "
+  + "<code>index/capabilities.csv</code>) for whether this exact part has the "
+  + "peripheral.</div>";
+
 function defaultsLine(partNames) {
-  // USART instance -> pads, per role, so the line can say which USART it is.
+  // role slot -> peripheral -> pad -> the products that route it there.
   const found = DEFAULT_ROLES.map(() => new Map());
+  const afOnly = DEFAULT_ROLES.map(() => false);
   for (const r of state.roles) {
-    if (r.part_number !== partNames[0] || !r.peripheral) continue;
-    if (r.route !== "default" && r.route !== "main") continue;
+    if (!partNames.includes(r.part_number) || !r.peripheral) continue;
+    const isDefault = r.route === "default" || r.route === "main";
+    // AF-number families (V205, X315, H41x) have no default at all: every
+    // function is picked through GPIOx_AFLR/AFHR, so "-" would read as
+    // "not available" when the truth is "nothing is routed until you pick".
+    const isAf = r.route.startsWith("af-");
+    if (!isDefault && !isAf) continue;
     DEFAULT_ROLES.forEach(([_, wantPeripheral, wantRole], i) => {
       if (!wantPeripheral(r.peripheral) || !wantRole(r.role)) return;
-      if (!found[i].has(r.peripheral)) found[i].set(r.peripheral, new Set());
-      found[i].get(r.peripheral).add(r.pad);
+      if (isAf) { afOnly[i] = true; return; }
+      if (!found[i].has(r.peripheral)) found[i].set(r.peripheral, new Map());
+      const pads = found[i].get(r.peripheral);
+      if (!pads.has(r.pad)) pads.set(r.pad, new Set());
+      pads.get(r.pad).add(r.part_number);
     });
   }
   // USART1 first, then the lowest-numbered, and at most two -- the point of
@@ -346,22 +541,45 @@ function defaultsLine(partNames) {
     const n = parseInt(name.replace(/\D+/g, ""), 10);
     return (n === 1 ? 0 : 1) * 1000 + (isNaN(n) ? 0 : n);
   };
+  let partial = false;
+  const padList = pads => [...pads.keys()]
+    .sort((a, b) => padKey(a).localeCompare(padKey(b)))
+    .map(pad => {
+      const on = pads.get(pad);
+      if (on.size === partNames.length) return pad;
+      partial = true;
+      const missing = partNames.filter(n => !on.has(n));
+      return `<abbr title="not on ${missing.join(", ")}">${pad}*</abbr>`;
+    }).join(",");
   const cell = i => {
     const names = [...found[i].keys()].sort((a, b) => rank(a) - rank(b));
-    if (!names.length) return "-";
+    if (!names.length) return afOnly[i] ? "<i>none by default</i>" : "-";
     if (names.length === 1 && !/^USART/.test(names[0]))
-      return [...found[i].get(names[0])].sort().join(",");
-    return names.slice(0, 2).map(n =>
-      `${[...found[i].get(n)].sort().join(",")} (${n})`).join("; ");
+      return padList(found[i].get(names[0]));
+    return names.slice(0, 2).map(n => `${padList(found[i].get(n))} (${n})`).join("; ");
   };
-  return "<div class=\"count\"><b>Defaults:</b> " + DEFAULT_ROLES.map(([name], i) =>
-    `${name} = ${cell(i)}`).join(" &middot; ") + "</div>";
+  const cells = DEFAULT_ROLES.map(([name], i) => `${name} = ${cell(i)}`).join(" &middot; ");
+  const legend = partial
+    ? " <span class=\"note\">(* not on every product of the series &mdash; "
+      + "hover, or open one product)</span>" : "";
+  const af = afOnly.some(Boolean) && DEFAULT_ROLES.some((_, i) => !found[i].size)
+    ? " <span class=\"note\">(this family picks every function through "
+      + "GPIOx_AFLR/AFHR, so nothing is routed until software chooses)</span>" : "";
+  return "<div class=\"count\"><b>Defaults:</b> " + cells + legend + af + "</div>";
 }
 
 function render() {
   const sel = selection();
   const partNames = sel.parts.map(p => p.part_number);
   let html = "";
+  if (sel.mode === "chooser") {
+    $("title").textContent = "CH32 Pin Alternate Functions";
+    $("crumb").textContent = "";
+    $("content").innerHTML = chooserHTML($("chip").value.trim());
+    history.replaceState(null, "", location.pathname);
+    return;
+  }
+  state.absent = null;
   if (sel.mode === "series") {
     $("title").textContent = sel.series + " - series view";
     $("crumb").innerHTML = "Pick a product column to open its pin map.";
@@ -377,37 +595,46 @@ function render() {
     $("crumb").innerHTML =
       `Series: <a href="${chipLink(p.series)}">${p.series}</a>`;
     html += defaultsLine(partNames);
+    state.absent = absentInstances(p.part_number);
+    html += SUPERSET_NOTE + (state.absent.size
+      ? `<div class="count">${state.absent.size} function groups are greyed `
+        + "out: the comparison table does not give this part number that many "
+        + "of the peripheral. Hover for which.</div>" : "");
     const m = matrixHTML(partNames, true);
     html += `<h2>Pin map <span class="count">(${m.note})</span></h2>` + m.html;
     html += remapHTML(p.series);
   }
   $("content").innerHTML = html;
 
+  // **Everything the reader set goes in the URL**, so a filtered view is a link
+  // -- the search box used to be the one control that did not survive sharing.
   const params = new URLSearchParams();
-  params.set("chip", $("chip").value);
+  params.set("chip", $("chip").value.trim().toUpperCase());
   const features = [...document.querySelectorAll("#features input:checked")]
     .map(e => e.value);
   const routes = [...document.querySelectorAll("#routes input:checked")]
     .map(e => e.value);
   if (features.length) params.set("features", features.join(","));
   if (routes.length) params.set("routes", routes.join(","));
+  if ($("search").value.trim()) params.set("q", $("search").value.trim());
+  if (splitTim()) params.set("tim", "split");
   history.replaceState(null, "", "?" + params.toString());
 }
 
-Promise.all([load("catalog", "products"), load("evidence", "pins"),
-             load("evidence", "pin_functions"), load("evidence", "product_attributes"),
-             load("evidence", "remap_fields"), load("index", "pinout")])
-.then(([products, pins, fns, attrs, remap, roles]) => {
-  Object.assign(state, { products, pins, fns, attrs, remap, roles });
+Promise.all([load("catalog", "products"), load("index", "pinout"),
+             load("index", "capabilities"), load("evidence", "product_attributes"),
+             load("evidence", "remap_fields")])
+.then(([products, roles, caps, attrs, remap]) => {
+  Object.assign(state, { products, roles, caps, attrs, remap });
   const series = [...new Set(products.map(p => p.series))].sort();
   const chipSel = $("chip");
-  const gs = document.createElement("optgroup"); gs.label = "Series";
-  for (const s of series) gs.appendChild(new Option(s, s));
-  chipSel.appendChild(gs);
-  const gp = document.createElement("optgroup"); gp.label = "Products";
+  // **A text box with a datalist, not a 130-option select.** Typing "V307"
+  // narrows to the four things that contain it; a native select only jumps to
+  // what starts with what you type (worklist G8).
+  const list = $("chips");
+  for (const s of series) list.appendChild(new Option(`${s} (series)`, s));
   for (const p of products.map(p => p.part_number).sort())
-    gp.appendChild(new Option(p, p));
-  chipSel.appendChild(gp);
+    list.appendChild(new Option(p, p));
 
   const routeBox = $("routes");
   for (const [value, text] of ROUTES) {
@@ -420,9 +647,9 @@ Promise.all([load("catalog", "products"), load("evidence", "pins"),
   }
 
   const params = new URLSearchParams(location.search);
-  const chip = params.get("chip");
-  chipSel.value = chip && [...chipSel.options].some(o => o.value === chip)
-    ? chip : series[0];
+  chipSel.value = params.get("chip") || "";
+  $("search").value = params.get("q") || "";
+  $("splittim").checked = params.get("tim") === "split";
   rebuildFeatureBoxes(selection().parts.map(p => p.part_number));
   for (let f of (params.get("features") || "").split(",")) {
     f = f.trim().toUpperCase();
@@ -435,11 +662,22 @@ Promise.all([load("catalog", "products"), load("evidence", "pins"),
     const cb = document.querySelector(`#routes input[value="${r.trim()}"]`);
     if (cb) cb.checked = true;
   }
-  chipSel.addEventListener("change", () => {
+  const rechip = () => {
     rebuildFeatureBoxes(selection().parts.map(p => p.part_number));
     render();
-  });
+  };
+  // "change" alone misses a datalist pick in some browsers until blur.
+  chipSel.addEventListener("change", rechip);
+  chipSel.addEventListener("input", rechip);
+  $("splittim").addEventListener("change", render);
   $("search").addEventListener("input", render);
+  $("clear").addEventListener("click", () => {
+    $("search").value = "";
+    $("splittim").checked = false;
+    for (const cb of document.querySelectorAll("#features input, #routes input"))
+      cb.checked = false;
+    render();
+  });
   // Column-header product links keep the page state; re-render on back/forward.
   window.addEventListener("popstate", () => location.reload());
   document.addEventListener("click", e => {
@@ -447,9 +685,8 @@ Promise.all([load("catalog", "products"), load("evidence", "pins"),
     if (!a) return;
     e.preventDefault();
     history.pushState(null, "", a.getAttribute("href"));
-    const c = new URLSearchParams(location.search).get("chip");
-    if (c) { chipSel.value = c;
-             rebuildFeatureBoxes(selection().parts.map(p => p.part_number)); }
+    chipSel.value = new URLSearchParams(location.search).get("chip") || "";
+    rebuildFeatureBoxes(selection().parts.map(p => p.part_number));
     render();
   });
   render();

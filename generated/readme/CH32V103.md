@@ -4,6 +4,8 @@
 
 *Generated from the mirror at commit [`11b5e2a`](https://github.com/ch32-riscv-ug/CH32V103/tree/11b5e2a3f13ab77284576f9fa467c64bb0f303a5) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
 
+[Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
+
 ## Quick start
 
 Programming and debug: **2-wire SDI** (WCH-Link, `Serial Debug Interface`).
@@ -20,7 +22,7 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 Flash and SRAM list every value the series has; more than one means it varies by part number, and the per-part values are in the comparison table below.
 
-| Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
+| Series | Core | ISA | Flash | SRAM | Main clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
 | **CH32V103** | QingKe V3A | RV32IMAC | 32K/64K | 10K/20K | 80 MHz | 2.7-5.5V | LQFP48,LQFP64M,QFN48X7 | 4 | [en](https://www.wch-ic.com/products/CH32V103.html) / [zh](https://www.wch.cn/products/CH32V103.html) |
 
@@ -28,7 +30,22 @@ Flash and SRAM list every value the series has; more than one means it varies by
 
 ### CH32V103 product comparison
 
-| | CH32V103&#8203;C6T6&#8203;(LQFP48) | CH32V103&#8203;C8T6&#8203;(LQFP48) | CH32V103&#8203;C8U6&#8203;(QFN48X7) | CH32V103&#8203;R8T6&#8203;(LQFP64M) |
+Only the 8 rows that differ between these 4 products; the other 7 are the same for all of them.
+
+| | [CH32V103&#8203;C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C6T6)&#8203;(LQFP48) | [CH32V103&#8203;C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8T6)&#8203;(LQFP48) | [CH32V103&#8203;C8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8U6)&#8203;(QFN48X7) | [CH32V103&#8203;R8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103R8T6)&#8203;(LQFP64M) |
+|---|---|---|---|---|
+| **Flash** | 32K | 64K | 64K | 64K |
+| **SRAM** | 10K | 20K | 20K | 20K |
+| **GPIO** | 37 | 37 | 37 | 51 |
+| Timer General-purpose | 2 | 3 | 3 | 3 |
+| ADC/TKey (Number of channels) | 10 | 10 | 10 | 16 |
+| SPI | 1 | 2 | 2 | 2 |
+| I2C | 1 | 2 | 2 | 2 |
+| USART | 2 | 3 | 3 | 3 |
+
+<details><summary>All 15 rows</summary>
+
+| | [CH32V103&#8203;C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C6T6)&#8203;(LQFP48) | [CH32V103&#8203;C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8T6)&#8203;(LQFP48) | [CH32V103&#8203;C8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8U6)&#8203;(QFN48X7) | [CH32V103&#8203;R8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103R8T6)&#8203;(LQFP64M) |
 |---|---|---|---|---|
 | **Flash** | 32K | 64K | 64K | 64K |
 | **SRAM** | 10K | 20K | 20K | 20K |
@@ -46,7 +63,9 @@ Flash and SRAM list every value the series has; more than one means it varies by
 | CPU clock frequency | Typical: 72MHz | Typical: 72MHz | Typical: 72MHz | Typical: 72MHz |
 | Operating voltage | 2.7V~5.5V | 2.7V~5.5V | 2.7V~5.5V | 2.7V~5.5V |
 
-## Pinouts
+</details>
+
+## Packages & pinout drawings
 
 Pinout drawings are in the datasheet (chapter *Pinouts*):
 
@@ -57,7 +76,10 @@ Pinout drawings are in the datasheet (chapter *Pinouts*):
 | QFN48X7 | CH32V103C8U6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN48X7.png) |
 | LQFP64M | CH32V103R8T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64M.png) |
 
-## Pin definitions
+## Pin maps & alternate functions
+
+> [!NOTE]
+> These are the **pin-table superset**: the datasheet prints one pad table for every product that shares a pinout, so a pad row does not mean this part has the peripheral. Use the product comparison table above for what a given part number contains.
 
 ### CH32V103 pin map
 

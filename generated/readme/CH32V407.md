@@ -4,6 +4,8 @@
 
 *Generated from the mirror at commit [`dde5b46`](https://github.com/ch32-riscv-ug/CH32V407/tree/dde5b4611b49cf031c3e5b93bf559a794a930db0) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
 
+[Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Errata](#errata) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
+
 ## Quick start
 
 ### Debug / serial defaults
@@ -17,7 +19,7 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ## Series
 
-| Series | Core | ISA | Flash | SRAM | Clock | VDD | Packages | Products | Official |
+| Series | Core | ISA | Flash | SRAM | Main clock | VDD | Packages | Products | Official |
 |---|---|---|---|---|---|---|---|---|---|
 | **CH32V407** | QingKe V3V | RV32IMABCV-X | 512K | 200K | 200 MHz | 2.9-3.6V | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V407.html) / [zh](https://www.wch.cn/products/CH32V407.html) |
 | **CH32V467** | QingKe V3V | RV32IMABCV-X | 512K | 200K | 200 MHz | 2.9-3.6V | LQFP100,LQFP64,QFN68 | 3 | [en](https://www.wch-ic.com/products/CH32V467.html) / [zh](https://www.wch.cn/products/CH32V467.html) |
@@ -26,7 +28,17 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 
 ### CH32V407 product comparison
 
-| | CH32V407&#8203;RET6&#8203;(LQFP64) | CH32V407&#8203;VET6&#8203;(LQFP100) | CH32V407&#8203;WEU6&#8203;(QFN68) |
+Only the 3 rows that differ between these 3 products; the other 25 are the same for all of them.
+
+| | [CH32V407&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6)&#8203;(LQFP64) | [CH32V407&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6)&#8203;(LQFP100) | [CH32V407&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6)&#8203;(QFN68) |
+|---|---|---|---|
+| **GPIO** | 49 | 77 | 55 |
+| USBHS (Include PHY) | 1 (USBHS1) | 2 | 2 |
+| FSMC | - | 1 | - |
+
+<details><summary>All 28 rows</summary>
+
+| | [CH32V407&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6)&#8203;(LQFP64) | [CH32V407&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6)&#8203;(LQFP100) | [CH32V407&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6)&#8203;(QFN68) |
 |---|---|---|---|
 | **Flash** | 512K | 512K | 512K |
 | **SRAM** | 200K | 200K | 200K |
@@ -57,9 +69,22 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 | ARGB | 1 | 1 | 1 |
 | CPU main frequency | Max: 200MHz | Max: 200MHz | Max: 200MHz |
 
+</details>
+
 ### CH32V467 product comparison
 
-| | CH32V467&#8203;RET6&#8203;(LQFP64) | CH32V467&#8203;VET6&#8203;(LQFP100) | CH32V467&#8203;WEU6&#8203;(QFN68) |
+Only the 4 rows that differ between these 3 products; the other 25 are the same for all of them.
+
+| | [CH32V467&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6)&#8203;(LQFP64) | [CH32V467&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6)&#8203;(LQFP100) | [CH32V467&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6)&#8203;(QFN68) |
+|---|---|---|---|
+| **GPIO** | 48 | 76 | 54 |
+| Extended PSRAM (Bytes) | 4M | 8M | 8M |
+| USBHS (Include PHY) | 1 (USBHS1) | 2 | 2 |
+| FSMC | - | 1 | - |
+
+<details><summary>All 29 rows</summary>
+
+| | [CH32V467&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6)&#8203;(LQFP64) | [CH32V467&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6)&#8203;(LQFP100) | [CH32V467&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6)&#8203;(QFN68) |
 |---|---|---|---|
 | **Flash** | 512K | 512K | 512K |
 | **SRAM** | 200K | 200K | 200K |
@@ -91,7 +116,9 @@ Where these land **without writing a remap register**. SWD is live at reset; the
 | ARGB | 1 | 1 | 1 |
 | CPU main frequency | Max: 200MHz | Max: 200MHz | Max: 200MHz |
 
-## Pinouts
+</details>
+
+## Packages & pinout drawings
 
 Pinout drawings are in the datasheet (chapter *Pinouts*):
 
@@ -104,11 +131,16 @@ Pinout drawings are in the datasheet (chapter *Pinouts*):
 | LQFP100 | CH32V467VET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
 | QFN68 | CH32V467WEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68.png) |
 
-## Pin definitions
+## Pin maps & alternate functions
+
+> [!NOTE]
+> These are the **pin-table superset**: the datasheet prints one pad table for every product that shares a pinout, so a pad row does not mean this part has the peripheral. Use the product comparison table above for what a given part number contains.
 
 ### CH32V407 pin map
 
 Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407) [ADC](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=ADC) [I2C](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=I2C) [SPI](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=SPI) [SYS](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=SYS) [TIM](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=TIM) [UART](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=UART) [USB](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407&features=USB)
+
+<details><summary><b>CH32V407 pin map</b> (92 pads x 3 products)</summary>
 
 | Pin name | Type | [CH32V407&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6)&#8203;(LQFP64) | [CH32V407&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6)&#8203;(LQFP100) | [CH32V407&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6)&#8203;(QFN68) | Notes |
 |---|---|---|---|---|---|
@@ -205,6 +237,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | VSS | P | 33/63 | 10/27/41/47/99 | EP |  |
 | VSSA | P | 12 | 19 | 12 |  |
 
+</details>
+
 <details><summary><b>CH32V407 alternate functions</b></summary>
 
 | Pad | default | (no route stated) | remap-1 | remap-2 | remap-3 |
@@ -294,6 +328,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 ### CH32V467 pin map
 
 Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467) [ADC](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=ADC) [I2C](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=I2C) [SPI](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=SPI) [SYS](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=SYS) [TIM](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=TIM) [UART](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=UART) [USB](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467&features=USB)
+
+<details><summary><b>CH32V467 pin map</b> (92 pads x 3 products)</summary>
 
 | Pin name | Type | [CH32V467&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6)&#8203;(LQFP64) | [CH32V467&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6)&#8203;(LQFP100) | [CH32V467&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6)&#8203;(QFN68) | Notes |
 |---|---|---|---|---|---|
@@ -389,6 +425,8 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | VREF- | P | 12 | 20 | 12 |  |
 | VSS | P | 33/63 | 10/27/41/47/99 | EP |  |
 | VSSA | P | 12 | 19 | 12 |  |
+
+</details>
 
 <details><summary><b>CH32V467 alternate functions</b></summary>
 
