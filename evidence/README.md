@@ -432,12 +432,14 @@ reads `WCH-LinkUtility.ZIP` (or the same directory bundled with MounRiver Studio
 **The `.bin` files themselves are not placed in this repository** -- that would be redistribution; only
 sha256, size and source URL are listed.
 
-**This table cannot yet say "your Link is old".** The `wcfg_version` column is WCH's own
-number (`CH32V307Ver=42` etc. in `wchlink.wcfg`), and **its correspondence to the `major.minor` such as `2.12`
-that the real device reports over USB has not been established**. Details and the procedure for a retry are in
-[docs/link-firmware-survey.ja.md](../docs/link-firmware-survey.ja.md) (Japanese).
-What is reliably usable now is **sha256**: "is my local file the same as what is being distributed now"
-can be answered with it.
+**This table can say "your Link is old"** (2026-08-29, F-11 resolved). The `wcfg_version` column is
+WCH's own number (`CH32V307Ver=42` etc. in `wchlink.wcfg`); its correspondence to the `major.minor`
+the device reports over USB is **`wcfg = major*10 + minor`** (major is 2 on every unit observed).
+`reported_version` is that number decoded, and `measured_version` is what `tools/read_link_version.py`
+read from a real device. **A row where the two disagree is marked `conflict`**; today they all agree
+(only the two device kinds on hand are filled in, the other eight rows are empty). The derivation and
+the measurements are in [docs/link-firmware-survey.ja.md](../docs/link-firmware-survey.ja.md) (Japanese).
+"Is my local file the same as what is being distributed now" is answered by **sha256**.
 
 The MCU assignment is not a guess but derived from the first instruction (`02` = 8051 `LJMP`,
 `6f` = RISC-V `jal`). The 10 files in the Windows ZIP and in the Linux MounRiver Studio
@@ -763,6 +765,7 @@ uv run tools/build_registers.py --rm-cache .cache/rm   # register_blocks/registe
 uv run tools/build_dma_requests.py              # dma_requests (DMA chapter grids of the RM zh/en. Scans all pages; about 15 minutes)
 uv run tools/build_eval_boards.py               # eval_boards (from EVT's PUB/)
 uv run tools/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
+uv run tools/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)
 uv run tools/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
 uv run tools/build_evt_variants.py              # evt_variants (from the EVT device headers)
 uv run tools/build_link_firmware.py             # link_firmware (from WCH's distribution)
@@ -773,6 +776,7 @@ uv run tools/extract_images.py                  # image/ in each repo (takes a f
 uv run tools/check_images.py [--missing|--prune] # list of required images and check
 uv run tools/check_tables.py                    # reference joins of all tables, index ⊆ evidence, manifest
 uv run tools/check_counts.py                    # peripheral counts of the comparison table vs pin instance counts
+uv run tools/check_docs.py                      # row counts and hole states claimed by the documents vs the tables
 uv run tools/scan_errata.py                     # incremental errata check (exit code 1 on NEW)
 uv run tools/build_tables.py --family CH32V006  # one family only
 ```

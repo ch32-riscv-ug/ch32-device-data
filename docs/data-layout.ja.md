@@ -90,7 +90,8 @@ CSV の規約（継続）: data 列は英語（CJK 検査）、`*_zh` 列だけ�
 catalog/     目録  families / series / products(識別だけ) / packages / cores / documents / sources
 evidence/    証拠  いまの tables/ の大半（名前は変えない）
 index/       索引  parts.csv, pinout.csv, routes.csv, registers.csv, register_map.csv,
-                   dma.csv, timers.csv, features.csv, register_layouts.csv, manifest.csv
+                   dma.csv, timers.csv, features.csv, capabilities.csv,
+                   register_layouts.csv, manifest.csv
 curated/     人手の入力（変更なし。errata・core-facts は「人が確認した証拠」、他は抽出規則）
 generated/   表示（mirror README）。pins.html は index/ を読む
 .cache/      中間生成物（RM の読み取り、candidates/）。commit しない

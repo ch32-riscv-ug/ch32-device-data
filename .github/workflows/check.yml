@@ -16,6 +16,10 @@ on:
       - "tools/**"
       - "curated/**"
       - "manifests/**"
+      # The documents claim row counts and hole states; check_docs.py verifies
+      # them against the tables, so editing a document has to run this too.
+      - "docs/**"
+      - "README*.md"
   pull_request:
     paths:
       - "catalog/**"
@@ -24,6 +28,8 @@ on:
       - "tools/**"
       - "curated/**"
       - "manifests/**"
+      - "docs/**"
+      - "README*.md"
 
 permissions:
   contents: read
@@ -42,6 +48,15 @@ jobs:
       - name: Check table joins
         run: python tools/check_tables.py
 
+      # Data can be right while the prose that explains it is stale, and the
+      # prose is what a reader sees. Found 2026-08-29: seven documents and a
+      # tool's docstring still called the WCH-Link version numbering unresolved
+      # after it had been settled, and table-reliability's pinout row count was
+      # five rows behind.
+      # Standard library only.
+      - name: Check document claims
+        run: python tools/check_docs.py
+
       # The vocabulary rules are documented by their doctests, so nothing else
       # notices when a rule is added and the examples are not. `AETR2` had gone
       # on asserting it was undecided for as long as it took someone to run the
@@ -58,9 +73,10 @@ jobs:
       # ROUTE_COLUMNS -- the tool and the file were two days apart.
       #
       # The order is the dependency order: documents.csv feeds the READMEs,
-      # index/features.csv is hashed into index/manifest.csv, and the READMEs
-      # read index/. All four generators are standard library only and take
-      # seconds, which is why they can run here at all.
+      # index/features.csv and index/capabilities.csv are hashed into
+      # index/manifest.csv, and the READMEs read index/. All five generators are
+      # standard library only and take seconds, which is why they can run here
+      # at all.
       #
       # **evidence/ is out of reach on purpose.** Those tables come from the
       # datasheets and the EVT trees, which this job does not have; their
@@ -69,6 +85,7 @@ jobs:
         run: |
           python tools/build_documents.py
           python tools/build_feature_tags.py
+          python tools/build_capabilities.py
           python tools/build_index.py
           python tools/build_readme.py
           git diff --exit-code -- catalog/documents.csv index/ generated/readme/ \

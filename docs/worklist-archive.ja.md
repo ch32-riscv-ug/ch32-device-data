@@ -151,7 +151,7 @@ B3の項に「`curated/readme-extras/CH32V20x.md`を削除して特殊処理ゼ�
 | 表 | 区分 | 確認 |
 |---|---|---|
 | `interrupts` / `memory_map` / `systick` / `clock_*`（5表） | **A** | ✓ EVTの名前のまま。`clock_init`の`step`順もEVTの順。`clock_symbols.role`はこちらの分類（列で分かれている） |
-| `link_firmware` | **A** | △ 版番号が未確定（F-11） |
+| `link_firmware` | **A** | ✓ 配布物の写し。版番号の読み方は F-11 で決着（2026-08-29。この行は当時の記録） |
 
 ### 確認結果のまとめ
 

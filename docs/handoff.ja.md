@@ -6,7 +6,7 @@
 
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
-このrepositoryの成果物は **`catalog/`（目録7表）・`evidence/`（証拠33表）・`index/`（索引10表）と、そこから生成する各family
+このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠33表）・`index/`（索引11表）と、そこから生成する各family
 リポジトリのREADME**。一次資料（datasheet zh/en・reference manual・EVT）を
 `/home/mt/dev_wch/<FAMILY>/` のmirrorから機械抽出し、出所を`basis`、確度を
 `confidence`に残す。
@@ -30,6 +30,7 @@ cd /home/mt/dev_wch/ch32-device-data
 git status --short                      # 未commitの変更（commitはユーザーが行う）
 uv run tools/check_tables.py            # 全表の参照結合・書式・索引⊆証拠・manifest
 uv run tools/check_counts.py            # 比較表の数 vs pin側の数
+uv run tools/check_docs.py              # 文書が書いている行数・穴の状態 vs 実際の表と台帳
 ```
 
 全生成は `evidence/README.ja.md` の「生成」どおり（`build_all` → `build_tables` →
@@ -48,8 +49,11 @@ uv run tools/check_counts.py            # 比較表の数 vs pin側の数
   [data-layout.ja.md](data-layout.ja.md)
 - 資料どうしが食い違ったら**片方に寄せず`conflict`＋両論を`basis`に**。
   RMが書いていない値を推測で埋めない
-- 穴は**名前と数で固定**する（`KNOWN_ROLE_GAPS`・`KNOWN_SHARED_LEADS`・`check_counts.KNOWN`）。
-  増減はどちらも検査で落とす
+- 穴は**名前と数で固定**する（`KNOWN_ROLE_GAPS`・`KNOWN_SHARED_LEADS`・`check_counts.KNOWN`・
+  `build_capabilities.KNOWN_DOUBLED`）。増減はどちらも検査で落とす
+- **文書に書いた数と状態も生成物と合わせる**（`check_docs.py`）。データを直したら、それを説明して
+  いる文章も同じ commit で直す。数の綴りを変えたときは `check_docs.py` の `ROW_COUNTS`／`PROSE`
+  も直す（当たらなくなったら失敗する）
 - 旧Arduino core・EVT tree・公式PDFをこのrepositoryへコピーしない。
   `ch32_riscv_tools/PinAlternateFunctions`の手製表を根拠にしない
 - 生成物に「Arduinoコアの対応状況」を載せない（上流の状態は陳腐化する）

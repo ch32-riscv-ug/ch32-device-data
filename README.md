@@ -28,6 +28,7 @@ trusted) and [docs/worklist.ja.md](docs/worklist.ja.md) (work in progress).
 - `curated/`: the few hand-verified overrides (pin-table column headers, errata, series facts)
 - `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it ([manifests/README.md](manifests/README.md))
 - `tools/check_tables.py`, `tools/check_counts.py`: joins, formats and count invariants across the tables
+- `tools/check_docs.py`: the row counts and hole states the documents claim, checked against the tables and the work list -- data can be right while the prose that explains it is stale
 - `tools/extract_*.py`, `tools/build_*.py`: extraction from EVT headers, datasheets and reference manuals, and table generation (run order in `evidence/README.md`); `tools/build_index.py` derives the index
 - `docs/`: Japanese notes -- work list (`worklist.ja.md`), per-table reliability (`table-reliability.ja.md`), handoff, extraction survey, and the archive of resolved items
 
@@ -36,6 +37,7 @@ trusted) and [docs/worklist.ja.md](docs/worklist.ja.md) (work in progress).
 ```sh
 uv run tools/check_tables.py
 uv run tools/check_counts.py
+uv run tools/check_docs.py
 ```
 
 The tools need third-party packages (pdfplumber) and run through uv, which resolves
