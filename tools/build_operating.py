@@ -1,10 +1,25 @@
 #!/usr/bin/env python3
-"""データシートの一般動作条件表 → tables/operating_conditions.csv
+"""データシートの電気的特性の表 → tables/operating_conditions.csv
 
-各データシートの「General operating conditions / 一般工作条件」表から
-クロック上限(F_*)と動作電圧(V_DD)の行だけを抽出する。表示テキストは
-英語版から取り、最小値/典型値/最大値/単位は中英で照合して一致すれば confirmed。
-シリーズはproducts.csvの(datasheet→series)結合で展開する。
+各データシートの「General operating conditions / 一般工作条件」表と、
+同じ章に並ぶ電気的特性の表（発振器・ADC・Flash・I/O・リセット）から、
+**記号のある行**を抽出する。表示テキストは英語版から取り、最小値/典型値/
+最大値/単位は中英で照合して一致すれば confirmed。シリーズは products.csv の
+(datasheet→series) 結合で展開する。
+
+**採る／採らないは記号の一覧では決めない。** 記号は頭字で物理量を名乗る
+（`V_*` は電圧、`I_*` は電流、`t_*` は時間）ので、「その量に単位が合っているか」
+で決める（`UNIT_FOR`）。データシートの記法は決まっているので、記号の一覧を
+持つより崩れにくく、新しい family の記号も取りこぼさない。
+
+**取れていないもの**（2026-08-29 時点）:
+
+    消費電流の条件つきの行   I_DD は動作条件（`F_HCLK = 48MHz`・`开启`）が
+                             min の欄に流れ込む表で書かれていて、値として
+                             読めない。表の形の問題で、記号の問題ではない
+    添字が `*` に化けた式     `0.45*V+*0.41` は `0.45*V_DD+0.41` のはずだが、
+                             文字層に `DD` が残っていないので復元できない
+                             （`LOST_SUBSCRIPT` で落とす。推測で埋めない）
 
 典型値の列が必要な理由。発振器は「公称値 + 確度」で規定されていて、
 上下限を持たない。HSIは F_HSI の typ が 8MHz や 24MHz で、ばらつきは
@@ -59,26 +74,78 @@ HEADER_MAP = {
     "unit": "unit", "单位": "unit",
 }
 FOOTNOTE = re.compile(r"[（(]\d+[）)]")
-# クロック上限と主電源電圧、そして発振器の周波数・確度・デューティ。
-# 起動時間や消費電流（t_SU、I_DD）は同じ表にあるが、クロックの事実ではない
-# ので採らない。
-# ADCのクロック上限だけは記号が小文字 f で始まる（"f ADC"）。
-KEEP = re.compile(r"^F_|^f_ADC$|^V_?DD$"
-                  r"|^ACC_(?:HSI|LSI|HSE|LSE)|^DuCy_(?:HSI|LSI|HSE|LSE)")
-# 継承した記号が行の中身と合わないことがある。発振器の表はデューティ比の行が
-# 記号セル空で続くため、F_* の行に単位 % が付く。単位で弾ける。
-UNIT_FOR = [(re.compile(r"^[Ff]_"), re.compile(r"^(?:[MmKk]?Hz)$")),
-            (re.compile(r"^V_"), re.compile(r"^m?V$")),
-            (re.compile(r"^ACC_"), re.compile(r"^(?:%|ppm)$")),
-            (re.compile(r"^DuCy_"), re.compile(r"^%$"))]
+# **記号は頭字で物理量を名乗る。** 採る／採らないを記号の一覧で決めるのではなく、
+# 「その頭字が言う量に単位が合っているか」で決める（元からある `UNIT_FOR` の
+# 考えを、対象を広げたぶん量も増やして引き継いだもの）。データシートの電気的
+# 特性表が使う記法は決まっているので、一覧を持つより崩れにくい。
+KEEP = re.compile(r"^(?:[FfTtVIiRCEN]_|C$|E[DLOT0]|ACC_|Du[CT]y_|g_m$|Avg_Slope$|f_|F_)")
+# **記号セルが2つの記号を畳んでしまった行は採らない。** `t_/t_r(SCK)_f(SCK)` は
+# `t_r(SCK)` と `t_f(SCK)` の2行が、サブスクリプトの折返しで1つになったもので、
+# 値がどちらのものか決められない（`f_/t_SCK_SCK`・`C_/C_L1_L2` も同型）。
+MERGED_SYMBOL = re.compile(r"^[A-Za-z]+_/")
+# 表の見出しが本文の行として読まれることがある（記号欄が `Symbol`、単位欄が
+# `Unit`）。ページ内で表が続くときに起きる。
+HEADER_ROW = frozenset({"Symbol", "符号", "Parameter", "参数"})
+# 頭字 → その量の単位。**上から順に、最初に当たった規則だけを見る**——
+# `T_S_vrefint`（ADC のサンプリング時間）は `T_*`（温度）ではなく時間、
+# `t_RET`（保持期間）は年、`N_END`（書換回数）は回数で、いずれも一般の
+# 規則より先に置かないと弾かれる。単位の大小文字は資料で揺れる（`ms`/`mS`、
+# `kΩ`/`KΩ`、`Times`/`times`）ので、比較は大小を無視する。
+UNIT_FOR = [
+    (re.compile(r"^T_S_"), re.compile(r"^(?:[munp]?s|1/f[A-Za-z]+)$", re.I)),
+    (re.compile(r"^t_RET$"), re.compile(r"^years?$", re.I)),
+    (re.compile(r"^N_"), re.compile(r"^times?$", re.I)),
+    (re.compile(r"^t_VDDA?$"), re.compile(r"^[munp]?s/V$", re.I)),
+    (re.compile(r"^[Ff]_"), re.compile(r"^[MmKk]?Hz$")),
+    (re.compile(r"^[Tt]_"), re.compile(r"^(?:[munp]?s|1/f[A-Za-z]+|℃)$", re.I)),
+    (re.compile(r"^V_|^V$"), re.compile(r"^m?V$")),
+    (re.compile(r"^[Ii]_"), re.compile(r"^[munp]?A$", re.I)),
+    (re.compile(r"^R_"), re.compile(r"^[kKM]?Ω$")),
+    (re.compile(r"^C"), re.compile(r"^[munp]?F$", re.I)),
+    (re.compile(r"^E"), re.compile(r"^LSB$", re.I)),
+    (re.compile(r"^ACC_"), re.compile(r"^(?:%|ppm)$")),
+    (re.compile(r"^Du[CT]y_"), re.compile(r"^%$")),
+    (re.compile(r"^g_m$"), re.compile(r"^[munp]?A/V$", re.I)),
+    (re.compile(r"^Avg_Slope$"), re.compile(r"^mV/℃$")),
+]
 # 値の欄に条件文が流れ込むことがある（CH32M007の ACC_HSI は min に
 # "HSI_LP = 0 TA = -10℃~70℃" が入る）。一方で上限が別の記号で書かれることは
 # 正当で、"F_PCLK1 の max は F_HCLK" はC-5が求めているバス上限そのもの。
-# 数値か、空白を含まない短い記号なら採る。
 # 確度の典型値は符号が ± で書かれる（CH32M030の ACC_LSI は typ が "±500"）。
 NUMERIC = re.compile(r"^[-+±]?(?:\d+(?:\.\d+)?|\.\d+)$")
-SYMBOLIC = re.compile(r"^[0-9.]*[A-Za-z][A-Za-z0-9_.+]{0,15}$")
+# 式に使ってよい字。空白・`=`・全角はここに無いので、条件文は自動的に外れる。
+FORMULA_CHARS = re.compile(r"^[0-9A-Za-z._+\-*/()]+$")
+# **`*` が演算子の隣か末尾にあるのは、添字が文字層で `*` に化けた跡。**
+# `0.45*V+*0.41` は `0.45*VDD+0.41` のはずで、`*` から `DD` は復元できない
+# （兄弟の行を見れば人には分かるが、それは推測になる）。採らずに落とす。
+LOST_SUBSCRIPT = re.compile(r"[*][-+*/)]|[-+*/(][*]|[*]$")
+
+
+def reads_as_value(text: str) -> bool:
+    """min/typ/max の欄として採ってよい値か。
+
+    数のほかに、**別の記号で書かれた上限**（`F_HCLK`）と、記号を含む式
+    （`0.8*VDD`・`VDD-0.4`・`0.22*(VDD-2.7)+1.55`）を採る。条件文や見出しは
+    採らない。
+
+    >>> [reads_as_value(v) for v in ("3.6", "±500", "∞", "0.8*VDD", "VDD-0.4")]
+    [True, True, True, True, True]
+    >>> [reads_as_value(v) for v in ("F_HCLK", "VREF-", "2*tHCLK")]
+    [True, True, True]
+    >>> [reads_as_value(v) for v in ("F=8MHzHCLK", "HSI_LP = 0", "关闭", "6～24")]
+    [False, False, False, False]
+    >>> [reads_as_value(v) for v in ("Enableallperipherals", "0.7*V*", "0.45*V+*0.41")]
+    [False, False, False]
+    """
+    if NUMERIC.match(text) or text == "∞":
+        return True
+    if not FORMULA_CHARS.match(text) or LOST_SUBSCRIPT.search(text):
+        return False
+    if any(c.isdigit() for c in text):
+        return len(text) <= 24          # 式（数と記号が混じる）
+    return len(text) <= 8               # 記号そのもの（`VREFP`・`F_HCLK`）
 # 抽出時に潰れた表記の修繕（サブスクリプト割り込み・原文の詰まり）
+WIDE_PARENS = str.maketrans({"（": "(", "）": ")"})
 SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK"}
 VALUE_FIX = {"FHCLK": "F_HCLK"}
 TEXT_REPAIRS = [
@@ -118,6 +185,8 @@ def norm_symbol(cell):
     # 脚注を落とした跡が空白として残るので（"V (6)\nDD" → "V _DD"）、
     # 連続したアンダースコアは1つに畳む。
     sym = re.sub(r"[\s_]+", "_", sym).strip("_")
+    # 添字の括弧は版で全角になる（`C_in（LSE）`）。同じ記号として引けるように揃える。
+    sym = sym.translate(WIDE_PARENS)
     sym = SYMBOL_FIX.get(sym, sym)
     # 「F_HCLK or F_SYS」のような複合表記（orは英語版、或は中国語版）は、
     # サブスクリプトの折返しで語順が壊れるため HCLK を含めば F_HCLK に畳む。
@@ -154,9 +223,59 @@ def norm_text(cell):
     return attach_subscript(text)
 
 
+# 値の欄でも添字は離れて出る。条件欄の `attach_subscript` と同じ壊れ方で、
+# `V_DD-0.4` が `V-0.4DD`、`0.45*V_DD+0.41` が `0.45*V+DD0.41` になる。
+# **添字を、離れた場所から裸の記号のうしろへ戻す。**
+VALUE_SUBSCRIPTS = ("DD33", "DDIO", "DDA", "DD8", "CC12V", "HCLK", "SCK", "DD", "IO")
+BARE_BASE = re.compile(r"(?<![A-Za-z])([VtIfCRT])(?![A-Za-z])")
+# 小数点のあとに数が続かない＝添字を数の途中から抜いてしまった跡。
+BROKEN_NUMBER = re.compile(r"\d\.(?!\d)|\.\.")
+
+
+def attach_value_subscript(value: str) -> str:
+    """離れて出た添字を、裸の記号のうしろへ戻す。
+
+    >>> attach_value_subscript("V-0.4DD")
+    'VDD-0.4'
+    >>> attach_value_subscript("0.45*V+DD0.41")
+    '0.45*VDD+0.41'
+    >>> attach_value_subscript("0.22*(V-DD2.7)+1.55")
+    '0.22*(VDD-2.7)+1.55'
+    >>> attach_value_subscript("V-0.5DD33"), attach_value_subscript("0.5t-4SCK")
+    ('VDD33-0.5', '0.5tSCK-4')
+
+    すでに記号に付いているものは動かさない。
+
+    >>> attach_value_subscript("0.8*VDD"), attach_value_subscript("15-0.5tSCK")
+    ('0.8*VDD', '15-0.5tSCK')
+
+    **添字が数の途中に落ちることがある。** `0.41*(V-1.DD8)+1.3` の `DD` は
+    `1.8` を割って入っている。長いほうから当てると `DD8` を添字と読んで
+    `(VDD8-1.)` という壊れた数が残るので、**数が壊れない読みだけを採る**。
+
+    >>> attach_value_subscript("0.41*(V-1.DD8)+1.3")
+    '0.41*(VDD-1.8)+1.3'
+    """
+    for sub in VALUE_SUBSCRIPTS:
+        at = value.find(sub)
+        if at <= 0 or value[at - 1].isalpha():
+            continue
+        bare = None
+        for m in BARE_BASE.finditer(value[:at]):
+            bare = m
+        if bare is None:
+            continue
+        rest = value[:at] + value[at + len(sub):]
+        candidate = rest[:bare.end(1)] + sub + rest[bare.end(1):]
+        if BROKEN_NUMBER.search(candidate):
+            continue          # この添字の読みは数を割ってしまう。次を試す
+        return candidate
+    return value
+
+
 def norm_value(cell):
     value = FOOTNOTE.sub("", norm_text(cell)).replace(" ", "")
-    return VALUE_FIX.get(value, value)
+    return VALUE_FIX.get(value, attach_value_subscript(value))
 
 
 DROPPED: list[str] = []
@@ -169,16 +288,27 @@ def keep_row(row, lang, page_no):
     続いている場合は記号を取り違える。単位と値で弾けるので弾く。
     """
     symbol = row["symbol"]
+    if symbol in HEADER_ROW:
+        return False          # 表の見出しが本文として読まれたもの。黙って落とす
     if not KEEP.match(symbol):
         return False
+    if MERGED_SYMBOL.match(symbol):
+        DROPPED.append(f"{lang} p.{page_no} {symbol}: 2つの記号が1行に畳まれている")
+        return False
     unit = row.get("unit") or ""
+    # **最初に当たった規則だけを見る。** 具体的なものを上に置いてあるので、
+    # `T_S_vrefint` は `T_*`（温度）ではなく `T_S_*`（時間）として見られる。
     for name, want in UNIT_FOR:
-        if name.match(symbol) and unit and not want.match(unit):
-            DROPPED.append(f"{lang} p.{page_no} {symbol}: 単位が {unit!r} なので別の行の続き")
+        if not name.match(symbol):
+            continue
+        if unit and not want.match(unit):
+            DROPPED.append(f"{lang} p.{page_no} {symbol}: 単位が {unit!r} "
+                           "なので別の行の続き")
             return False
+        break
     for key in ("min", "typ", "max"):
         value = row.get(key) or ""
-        if value and not (NUMERIC.match(value) or SYMBOLIC.match(value)):
+        if value and not reads_as_value(value):
             DROPPED.append(f"{lang} p.{page_no} {symbol}: {key} が {value[:28]!r}")
             return False
     return True
