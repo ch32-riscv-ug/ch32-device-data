@@ -46,6 +46,12 @@ jobs:
         with:
           python-version: "3.x"
 
+      # Only tools/check_viewer.js needs it. The runner image ships node, but
+      # pinning it here means the check does not depend on that staying true.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       # Standard library only.
       - name: Check table joins
         run: python tools/check_tables.py
