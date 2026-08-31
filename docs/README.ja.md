@@ -7,6 +7,8 @@
 - [データの区分・形式・置き場所の定義](data-layout.ja.md): 目録 `catalog/`・証拠 `evidence/`・索引 `index/` の3区分と、その規則・形式・consumer の契約（2026-08-26 実施）。確認の記録は [worklist-archive](worklist-archive.ja.md) の「表の役割の確認」
 - [作業引継ぎ](handoff.ja.md): 正本の所在、再開手順、守ること
 - [用語集](glossary.ja.md)
+- [PDF構造化ワークフロー](structured-document-workflow.ja.md): datasheet全体＋RM全体を、検証可能な構造化bundle経由へ移す目的・精度評価・URL参照・legacy凍結・新pipeline構成・移行手順
+- [PDF→構造化文書→抽出 先行PoC](structured-extraction-poc.ja.md): 電気特性を回帰標本にした変換器比較と値一致の記録
 - [evidence/README.ja.md](../evidence/README.ja.md): 表の意味・列・生成順（データ構造の正本）
 
 ## 記録（判断の根拠。読み返す用）

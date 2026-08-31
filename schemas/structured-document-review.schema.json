@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ch32-riscv-ug.github.io/ch32-device-data/schemas/structured-document-review.schema.json",
+  "title": "CH32 structured PDF document review sidecar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_sha256", "status", "decisions"],
+  "properties": {
+    "schema_version": {"const": "0.2"},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["unreviewed", "partial", "approved", "rejected"]},
+    "decisions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "status": {"enum": ["approved", "rejected"]},
+          "canonical_table_number": {"type": "string"},
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}
