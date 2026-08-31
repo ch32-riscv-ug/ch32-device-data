@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ch32-riscv-ug.github.io/ch32-device-data/schemas/structured-document-manifest.schema.json",
+  "title": "CH32 structured PDF document bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "conversion", "pages"],
+  "properties": {
+    "schema_version": {"const": "0.2"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "document_type", "language", "sha256", "page_count"],
+      "properties": {
+        "document": {"type": "string", "minLength": 1},
+        "document_type": {"enum": ["datasheet", "reference-manual", "core-manual", "package-drawing", "other", "unknown"]},
+        "language": {"enum": ["zh", "en"]},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "page_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "engine_version", "coordinates", "scope", "table_settings"],
+      "properties": {
+        "engine": {"const": "pdfplumber"},
+        "engine_version": {"type": "string", "minLength": 1},
+        "coordinates": {"const": "PDF points, origin at top-left"},
+        "scope": {"enum": ["all-pages", "excerpt"]},
+        "table_settings": {"type": "object"}
+      }
+    },
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["number", "file", "sha256", "geometry_file", "geometry_sha256", "width", "height"],
+        "properties": {
+          "number": {"type": "integer", "minimum": 1},
+          "file": {"type": "string", "pattern": "^pages/[0-9]{4}\\.json$"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "geometry_file": {"type": "string", "pattern": "^geometry/[0-9]{4}\\.json\\.gz$"},
+          "geometry_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "width": {"type": "number", "exclusiveMinimum": 0},
+          "height": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    }
+  }
+}

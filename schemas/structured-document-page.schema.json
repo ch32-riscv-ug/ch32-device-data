@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ch32-riscv-ug.github.io/ch32-device-data/schemas/structured-document-page.schema.json",
+  "title": "CH32 structured PDF document page",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_sha256", "number", "width", "height", "rotation", "text", "lines", "words", "images", "tables", "reading_order"],
+  "properties": {
+    "schema_version": {"const": "0.2"},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "number": {"type": "integer", "minimum": 1},
+    "width": {"type": "number", "exclusiveMinimum": 0},
+    "height": {"type": "number", "exclusiveMinimum": 0},
+    "rotation": {"type": "integer"},
+    "text": {"type": "string"},
+    "lines": {"type": "array", "items": {"$ref": "#/$defs/text_item"}},
+    "words": {"type": "array", "items": {"$ref": "#/$defs/text_item"}},
+    "images": {"type": "array", "items": {"$ref": "#/$defs/drawing"}},
+    "tables": {"type": "array", "items": {"$ref": "#/$defs/table"}},
+    "reading_order": {"type": "array", "items": {"$ref": "#/$defs/block_ref"}}
+  },
+  "$defs": {
+    "bbox": {
+      "type": "array",
+      "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}, {"type": "number"}],
+      "items": false
+    },
+    "text_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "bbox"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "role": {"enum": ["heading", "paragraph", "list-item", "header", "footer"]},
+        "level": {"type": "integer", "minimum": 1, "maximum": 6},
+        "font_size": {"type": "number", "minimum": 0},
+        "bold": {"type": "boolean"}
+      }
+    },
+    "drawing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "bbox"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["line", "rect", "curve", "image"]},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "name": {"type": "string"},
+        "source_size": {
+          "type": "array",
+          "prefixItems": [{"type": "integer"}, {"type": "integer"}],
+          "items": false
+        }
+      }
+    },
+    "caption": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["line_id", "source_number", "text"],
+      "properties": {
+        "line_id": {"type": "string"},
+        "source_number": {"type": "string"},
+        "text": {"type": "string"}
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "row_start", "row_end", "column_start", "column_end", "bbox", "text"],
+      "properties": {
+        "id": {"type": "string"},
+        "row_start": {"type": "integer", "minimum": 0},
+        "row_end": {"type": "integer", "minimum": 1},
+        "column_start": {"type": "integer", "minimum": 0},
+        "column_end": {"type": "integer", "minimum": 1},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "text": {"type": "string"}
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "logical_id", "bbox", "caption", "continues_from_previous", "row_count", "column_count", "extracted_rows", "row_cells", "cells", "issues"],
+      "properties": {
+        "id": {"type": "string"},
+        "logical_id": {"type": "string"},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "caption": {"$ref": "#/$defs/caption"},
+        "continues_from_previous": {"type": "boolean"},
+        "row_count": {"type": "integer", "minimum": 1},
+        "column_count": {"type": "integer", "minimum": 1},
+        "extracted_rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"type": ["string", "null"]}
+          }
+        },
+        "row_cells": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"anyOf": [{"$ref": "#/$defs/bbox"}, {"type": "null"}]}
+          }
+        },
+        "cells": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/cell"}},
+        "issues": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "block_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "bbox"],
+      "properties": {
+        "id": {"type": "string"},
+        "type": {"enum": ["line", "table", "image"]},
+        "bbox": {"$ref": "#/$defs/bbox"}
+      }
+    }
+  }
+}

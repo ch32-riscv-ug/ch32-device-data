@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ch32-riscv-ug.github.io/ch32-device-data/schemas/structured-document-geometry.schema.json",
+  "title": "CH32 structured document precision geometry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_sha256", "number", "chars", "drawings"],
+  "properties": {
+    "schema_version": {"const": "0.2"},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "number": {"type": "integer", "minimum": 1},
+    "chars": {"type": "array", "items": {"$ref": "#/$defs/char"}},
+    "drawings": {"type": "array", "items": {"$ref": "#/$defs/drawing"}}
+  },
+  "$defs": {
+    "bbox": {
+      "type": "array",
+      "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}, {"type": "number"}],
+      "items": false
+    },
+    "char": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "bbox", "font", "size", "upright"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "font": {"type": "string"},
+        "size": {"type": "number"},
+        "upright": {"type": "boolean"}
+      }
+    },
+    "drawing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "bbox"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["line", "rect", "curve", "image"]},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "name": {"type": "string"},
+        "source_size": {
+          "type": "array",
+          "prefixItems": [{"type": "integer"}, {"type": "integer"}],
+          "items": false
+        }
+      }
+    }
+  }
+}
