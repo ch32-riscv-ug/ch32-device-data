@@ -1,8 +1,10 @@
 # PDF構造化 本番移行の事前調査（D17）
 
-作成: 2026-09-01。**進行中の調査報告**。[D16最終報告](structured-document-workflow.ja.md)が
-定めた再調査8項目を、その時点の原本・tool・consumer要件でやり直す。範囲は調査のみで、
-converter・`pipeline/`の実装はしない。前提となる4つの方針決定
+作成: 2026-09-01。**同日に全8項目を完了した調査報告**。[D16最終報告](structured-document-workflow.ja.md)が
+定めた再調査8項目を、その時点の原本・tool・consumer要件でやり直した。範囲は調査のみで、
+converter・`pipeline/`の実装はしない。**設計案（項目6）と受入条件（項目7）は2026-09-01に
+ユーザーが「いまの方針のまま」で暫定承認した**——実装（D18）で前提が崩れたら
+この報告へ戻って更新する。前提となる4つの方針決定
 （最初の移行CSV＝`operating_conditions.csv`、bundle保存は成立条件の実測後に決める、
 **engine選定は白紙からの全面比較でやり直す**、zh/en対応付けの独立項目化）は
 [worklist](worklist.ja.md)のD17に記録した。
@@ -16,8 +18,8 @@ converter・`pipeline/`の実装はしない。前提となる4つの方針決�
 | 3 | 難易度別fixture選定 | ✅ 2026-09-01 確定 | 11難所×7文書を第一版として確定（下表）。監査で新しい難所が出たら追加する |
 | 4 | 変換engine比較 | ✅ 2026-09-01 決着 | **現行pdfplumberを本線とし、限界が出たら候補から追加**（ユーザー決定）。追加トリガーを明文化。基準線実測: 速度0.31s/p・容量125KB/p・検査50ms/p。**唯一の非決定性（inline imageのid()由来name）を特定、正規化で潰せる** |
 | 5 | 難所の標本監査 | 🔧 第一回 2026-09-01 | fixture 7文書をbundle化し既知難所8種＋role精度を検査。**全難所がL0に材料を残す**。RMは表の85%がページ継続でL1結合が主戦場。zh/en対応はcaption番号だけでV003 30/30・H417 104/104の1:1（衝突0）。header/footer roleは**擬陽性0だがzh版footerを系統的に取りこぼす**（本番は反復ベース検出を要件に） |
-| 6 | L0/L1/L2・無効化規則の設計 | 🔧 設計案起草 | 実測を入力に、artifact分割・保存・stable ID・L2 key・結合候補・無効化規則の案を起草（本文末尾）。review待ち |
-| 7 | 受入条件・移行単位の合意 | 🔧 一部決定 | 最初の移行CSVは`operating_conditions.csv`（2026-09-01決定）。5完了条件はD16案を本番で批准する |
+| 6 | L0/L1/L2・無効化規則の設計 | ✅ 2026-09-01 暫定承認 | 本文末尾の設計案を「いまの方針のまま」で承認（ユーザー）。実装で矛盾が出たらこの報告に戻って更新する |
+| 7 | 受入条件・移行単位の合意 | ✅ 2026-09-01 批准 | 最初の移行CSVは`operating_conditions.csv`。完了条件はD16の5点をそのまま採用（同日ユーザー承認） |
 | 8 | 人間向け表示の用途確認 | ✅ 2026-09-01 確認 | **PDFと同じ内容をMarkdown/HTMLでそのまま読む**。第一歩はheader/footerの除去だけ、分割は後。主課題は図の扱い |
 
 ## 1. 文書inventory再棚卸し（✅）
@@ -32,7 +34,8 @@ converter・`pipeline/`の実装はしない。前提となる4つの方針決�
 | **移行対象 計** | **55** | **10,363** | **122.9 MB** |
 | core-manual（将来） | 8 | — | — |
 | package-drawing（将来） | 2 | — | — |
-| 総計 | 65 | 10,963 | 128.9 MB |
+| WCH-Link manual（将来。2026-09-01追加） | 2 | — | — |
+| 総計 | 67 | 11,016 | 133.9 MB |
 
 - **欠落0**。全65版がmirrorに存在する
 - **複数repositoryが持つ写しは全一致**（例: `CH32FV2x_V3xRM.PDF`はCH32V20xとCH32V307の
@@ -47,6 +50,10 @@ converter・`pipeline/`の実装はしない。前提となる4つの方針決�
   RMがページ数の81%を占める
 - 版番号は`documents.csv`（WCH APIのメタデータ）の写しで、表紙との既知の食い違いは
   F-33の1件（`CH32V20x_30xDS0.PDF` API 3.5 / 表紙V3.9）のみ
+- **`WCH-LinkUserManual.PDF`（kind=other・assigned・WCH-commonにmirror済み）を
+  将来対象に追加した**（2026-09-01、ユーザー判断）。動機はR-29（debug配線の対応表と
+  両対応の注記を持つ——変換して実在を確認済み）とR-28（attach手順）。これも
+  zh 2.8 / en 2.7 と**版番号が言語間でずれる**文書に当たる
 
 全65版の文書・言語・版・ページ数・SHA-256の一覧は付録Aに固定した。
 
@@ -250,7 +257,7 @@ caption付きが1割なので、L1結合後に章構造・register名で対応�
   コミット（項目4）、決定性の正規化要件（項目4）、L1結合が列構造一致を要すること・
   RMでは結合が主戦場であること（項目5）、zh/en対応の候補生成の初期値（項目5）。
   これらからartifact分割・stable ID・結合候補・review粒度・原本更新時の無効化規則を
-  設計する。**設計案を下に起草した（review待ち）**
+  設計する。**設計案を下に起草し、2026-09-01にユーザーが暫定承認した**
 - **7 受入条件・移行単位**: 最初の移行CSVは`operating_conditions.csv`（決定済み）。
   完了条件はD16の5点（schema互換・説明できない欠落0・追加変更行の原文リンク・
   consumer検査合格・再実行で同一結果）を本番用に批准する
@@ -267,10 +274,10 @@ caption付きが1割なので、L1結合後に章構造・register名で対応�
     代替する。pixel cropは原本hashを固定した別のasset renderer（D16の次工程）で
     生成し、表示はそのassetを参照する形に寄せる
 
-### 項目6の設計案（2026-09-01 起草・review待ち）
+### 項目6の設計案（2026-09-01 起草・同日ユーザー暫定承認）
 
-この調査の実測から導いた案。本番schema・architecture decisionの出発点であり、
-reviewで変えてよい。
+この調査の実測から導いた案。**「いまの方針のまま」で暫定承認済み**——本番schema・
+architecture decisionの出発点であり、実装で前提が崩れたらここへ戻って更新する。
 
 #### artifactと保存の分割
 
@@ -371,4 +378,6 @@ mirror写しが複数ある文書はSHA-256の一致を確認済み（代表path
 | QingKeV5_Processor_Manual.PDF | core-manual | zh | 1.0 | 47 | 704,001 | WCH-common | `0a849c719d1358856f0a5cf6409060a6fa8c3b7f501e0986cea0485b26a22a1b` |
 | PACKAGE.PDF | package-drawing | en | 4.0 | 119 | 706,949 | WCH-common | `2a1037853831632510e2e1a0cd6b7a43b0004f0a63ff947ab52544c580726669` |
 | PACKAGE.PDF | package-drawing | zh | 4.0 | 117 | 616,307 | WCH-common | `62af4259cdde0a1f6daa2aa28c9950f6e6b150c7b9ddf0eb5bda2b6501b2c96c` |
+| WCH-LinkUserManual.PDF | other | en | 2.7 | 29 | 1,377,280 | WCH-common | `cf54329bc5f9f8879a5c6f3fcb1db869c6f624631a4f12f27b4dd52da387a375` |
+| WCH-LinkUserManual.PDF | other | zh | 2.8 | 24 | 3,581,840 | WCH-common | `1ca6897d1a22224c165acdd287450fbbd016782c350ac274b179789e9d16dc47` |
 
