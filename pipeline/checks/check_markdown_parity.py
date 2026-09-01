@@ -10,6 +10,8 @@
 2. header/footerの行もコメントとして残っていること（表示から消えるが監査に残る）
 3. 図のcaption行の直後に「再現していない」の印があること（既知の取りこぼしを
    隠さない、の検査）
+4. 添字が`*`に化けたglyph（壊れたToUnicode。`pipeline/common/lost_subscripts`）を
+   持つページの冒頭に、その旨の警告があること
 
 実行:
     uv run pipeline/checks/check_markdown_parity.py --all
@@ -19,6 +21,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import html
 import json
@@ -30,10 +33,12 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 import figure_captions  # noqa: E402
 import logical_tables  # noqa: E402
+import lost_subscripts  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
 NOT_REPRODUCED = "The figure itself is not reproduced"
+LOST_SUBSCRIPT = "subscript glyph(s) on this page appear as `*`"
 CONTINUED = "**Table continued** — rendered in full at"
 EMBEDDED = re.compile(r"\]\((\.\./assets/[^)]+)\)")
 
@@ -99,18 +104,31 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     return bad
 
 
+def lost_glyphs(bundle: Path, entry: dict, page: dict) -> int:
+    """添字が`*`に化けたglyphの数（`*`が無いページはgeometryを開かない）。"""
+    if "*" not in page["text"]:
+        return 0
+    payload = gzip.decompress((bundle / entry["geometry_file"]).read_bytes())
+    if hashlib.sha256(payload).hexdigest() != entry["geometry_sha256"]:
+        raise SystemExit(f"{bundle}/{entry['geometry_file']}: hash differs from manifest")
+    return lost_subscripts.lost_subscript_count(json.loads(payload)["chars"])
+
+
 def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
     chains = logical_tables.document_chains(pages)
     bad: list[str] = []
-    for page in pages:
+    for entry, page in zip(manifest["pages"], pages):
         md = markdown / "pages" / f"{page['number']:04d}.md"
         if not md.exists():
             bad.append(f"p{page['number']}: markdown page missing")
             continue
-        bad.extend(check_page(page, md.read_text(encoding="utf-8"), chains,
-                              markdown / "pages"))
+        text = md.read_text(encoding="utf-8")
+        bad.extend(check_page(page, text, chains, markdown / "pages"))
+        if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
+            bad.append(f"p{page['number']}: lost-subscript glyphs without a "
+                       "visible notice")
     if bad:
         print(f"[{bundle.name}] {len(bad)} parity issue(s):", file=sys.stderr)
         for line in bad[:limit]:

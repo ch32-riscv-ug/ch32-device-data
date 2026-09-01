@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import gzip
 import hashlib
 import html
 import json
@@ -42,6 +43,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 import figure_captions  # noqa: E402
 import logical_tables  # noqa: E402
+import lost_subscripts  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_OUT = REPO / ".cache" / "structured-markdown"
@@ -71,6 +73,16 @@ def load_page(bundle: Path, entry: dict) -> dict:
     if hashlib.sha256(payload).hexdigest() != entry["sha256"]:
         raise SystemExit(f"{bundle}/{entry['file']}: page hash differs from manifest")
     return json.loads(payload)
+
+
+def page_lost_subscripts(bundle: Path, entry: dict, page: dict) -> int:
+    """このページで`*`に化けた添字glyphの数。`*`が無いページはgeometryを開かない。"""
+    if "*" not in page["text"]:
+        return 0
+    payload = gzip.decompress((bundle / entry["geometry_file"]).read_bytes())
+    if hashlib.sha256(payload).hexdigest() != entry["geometry_sha256"]:
+        raise SystemExit(f"{bundle}/{entry['geometry_file']}: hash differs from manifest")
+    return lost_subscripts.lost_subscript_count(json.loads(payload)["chars"])
 
 
 def table_html(table: dict, url: str | None, number: int) -> str:
@@ -104,7 +116,8 @@ def table_html(table: dict, url: str | None, number: int) -> str:
 
 
 def render_page(page: dict, url: str | None, chains: dict[str, dict],
-                assets: dict[str, dict], page_count: int) -> str:
+                assets: dict[str, dict], page_count: int,
+                lost_glyphs: int = 0) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
@@ -131,6 +144,11 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     if cids:
         output += [f"> ⚠ {cids} glyph(s) on this page could not be decoded to text "
                    f"(they appear as `(cid:N)`); read "
+                   f"{page_link(url, number, f'the PDF, p.{number}')}.", ""]
+    if lost_glyphs:
+        output += [f"> ⚠ {lost_glyphs} subscript glyph(s) on this page appear as `*` "
+                   "because the PDF's text layer maps them to `*` (broken ToUnicode); "
+                   "the printed page shows the real subscripts -- read "
                    f"{page_link(url, number, f'the PDF, p.{number}')}.", ""]
     # 描画済みの図領域の**中**にある行・表・画像は、図の下へそのまま流すと
     # 「同じ内容が画像と文字で二重に出る」（preview初公開でユーザーが発見）。
@@ -237,10 +255,12 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
             print(f"{assets_path}: stale (different original); ignoring -- "
                   "re-run pipeline/review/render_assets.py", file=sys.stderr)
     links = []
-    for page in pages:
+    for entry, page in zip(manifest["pages"], pages):
         name = f"{page['number']:04d}.md"
         (pages_dir / name).write_text(
-            render_page(page, url, chains, assets, len(pages)), encoding="utf-8")
+            render_page(page, url, chains, assets, len(pages),
+                        page_lost_subscripts(bundle, entry, page)),
+            encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(
         f"# {source['document']} ({source['language']})\n\n"

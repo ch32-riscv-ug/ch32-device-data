@@ -54,7 +54,11 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
            可視ポインタ**（67文書で3,770表を結合）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
-           ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告）
+           ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、
+           **添字が`*`に化けたglyphの警告**（壊れたToUnicode。pdfplumberでも
+           pypdfium2でも同一＝文字層では復元不能——806 glyph／14文書を実測。
+           判定は`pipeline/common/lost_subscripts.py`に一本化し、parity検査が
+           印を必須にする））
 checks/    compare_manifest.py（環境差の検証）
            check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
            全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**）
