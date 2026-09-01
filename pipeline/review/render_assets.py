@@ -13,8 +13,11 @@ rendererが**原本PDFのhashをmanifestと照合してから**（入口ゲー�
 
 1. 表の外にあるgeometry層の描画要素（line/rect/curve/image）に、
    **無captionで面積が小さい「表」**（波形図の箱がmicro-tableとして誤検出される
-   ——FV2x RM p173で実測: 2×2・24×23ptの"表"）を図の部品として合流させ、
-   縦に走査して15ptを超える空隙でクラスタに分ける
+   ——FV2x RM p173で実測: 2×2・24×23ptの"表"）と、**図captionの直下
+   （NEAR以内）にある無caption表**（図全体が1つの"表"として誤検出される——
+   过滤器编号の示例は2セルで97,759pt²、Sinc3滤波器の応答グラフは35セル。
+   本物の継続断片はページ先頭が定位置なのでcaptionの下には来ない）を
+   図の部品として合流させ、縦に走査して15ptを超える空隙でクラスタに分ける
 2. 重み8以上（micro-tableはセル数で重む）、または高さ40pt以上のクラスタだけを
    図の候補にする（文の下線などの小さな飾りを弾く）
 3. 図のcaption行（`Figure N-N`／`图N-N`。**本文の参照文は除く**——判定は
@@ -75,11 +78,18 @@ def load_page(bundle: Path, entry: dict) -> tuple[dict, dict]:
 
 
 def graphic_clusters(page: dict, geometry: dict) -> list[dict]:
+    caption_bottoms = [line["bbox"][3] for line in page_captions(page)]
+
+    def below_caption(bbox: list[float]) -> bool:
+        return any(0 <= bbox[1] - bottom <= NEAR for bottom in caption_bottoms)
+
     real_boxes: list[list[float]] = []
     items: list[dict] = []
     for table in page["tables"]:
         x0, top, x1, bottom = table["bbox"]
-        if table.get("caption") is None and (x1 - x0) * (bottom - top) < SUSPECT_TABLE_AREA:
+        if table.get("caption") is None and (
+                (x1 - x0) * (bottom - top) < SUSPECT_TABLE_AREA
+                or below_caption(table["bbox"])):
             items.append({"bbox": table["bbox"], "weight": max(len(table["cells"]), 4)})
         else:
             real_boxes.append(table["bbox"])

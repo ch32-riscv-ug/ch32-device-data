@@ -78,6 +78,9 @@ KEYS: dict[str, tuple[str, ...]] = {
     "clock_init": ("family", "function", "step"),
     "evt_variants": ("family", "macro"),
     "debug_data": ("family", "core"),
+    "debug_wiring": ("series",),
+    "option_bytes": ("family", "address"),
+    "option_byte_fields": ("family", "byte", "bits"),
 }
 
 # `basis` の DSL。異を唱える出所は `!` で始まり、その出所が言う値は `(=…)`。
@@ -130,9 +133,12 @@ ASSERTS: dict[str, str] = {
 # 名指ししている）。1つの列を決め打つと、min の食い違いを max の話として書く。
 
 
-# 相手の値の書き方は表で2通りある。1つの値を争う表は `(=<値>)`、欄ごとに
-# 争う表（`operating_conditions`）は `(min=…,typ=…,max=…,unit=…)`。
-STATED = re.compile(r"\((?==|(?:min|typ|max|unit)=)")
+# 相手の値の書き方は表で3通りある。1つの値を争う表は `(=<値>)`、欄ごとに
+# 争う表（`operating_conditions`）は `(min=…,typ=…,max=…,unit=…)`、
+# 新経路の抽出器は列名を名指す `(address=…)`・`(field=…)`・`(default=…)`。
+# どの `<列名>=` でも「相手の値」として中身ごと写す（`(p.614)` のような
+# ページ参照は `=` を含まないので巻き込まれない）。
+STATED = re.compile(r"\((?==|[a-z_][a-z0-9_]*=)")
 
 
 def stated_value(token: str) -> str:

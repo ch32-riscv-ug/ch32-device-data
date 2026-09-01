@@ -9,6 +9,9 @@ byte一致で再現できることを生成器ごとに証明する**こと（`o
 
 multiprocessingを使うtool（`build_all`系）と、pixelを読むtool（`extract_images`）は
 対象外（前者は子processへのpatchが要る＝別実装、後者はasset rendererが後継）。
+`--out`を持たない別型CLIも対象外——`extract_package_dims`の`extract()`は
+`build_tables`が呼ぶのでpackages.csvのパリティで証明済み、`scan_errata`は
+`run_scan_errata.py`が同じ差し替えで走らせる（旧新の出力byte一致を実測済み）。
 
 実行:
     uv run pipeline/extract/run_frozen.py build_features build_timers ...
@@ -33,7 +36,7 @@ CANDIDATES = REPO / ".cache" / "pipeline-candidates" / "frozen"
 
 # 単一プロセスでPDFを読む凍結tool。--out（D15）を持つものだけ。
 BATCH = ("build_features", "build_adc_internal", "build_memory", "build_timers",
-         "build_flash_geometry", "build_debug_data", "extract_package_dims")
+         "build_flash_geometry", "build_debug_data")
 
 
 def patch_all_modules() -> int:

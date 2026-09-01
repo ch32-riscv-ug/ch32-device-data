@@ -6,7 +6,7 @@
 
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
-このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠34表）・`index/`（索引13表）と、そこから生成する各family
+このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠36表）・`index/`（索引13表）と、そこから生成する各family
 リポジトリのREADME**。一次資料（datasheet zh/en・reference manual・EVT）を
 `/home/mt/dev_wch/<FAMILY>/` のmirrorから機械抽出し、出所を`basis`、確度を
 `confidence`に残す。
@@ -32,6 +32,7 @@ uv run tools/check_tables.py            # 全表の参照結合・書式・索�
 uv run tools/check_counts.py            # 比較表の数 vs pin側の数
 uv run tools/check_docs.py              # 文書が書いている行数・穴の状態 vs 実際の表と台帳
 node tools/check_viewer.js              # pins.html の表示（node が要る唯一の検査）
+uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle→切替済みevidence→index→検査）
 ```
 
 全生成は `evidence/README.ja.md` の「生成」どおり（`build_all` → `build_tables` →

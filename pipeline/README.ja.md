@@ -33,29 +33,41 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            caption選定＋断片結合＋表番号スコープの2段階zh/en照合。偽conflict 0）
            datasheet/build_operating_conditions.py（**operating_conditions.csvの正本生成器**。
            基礎行＋A11行。2026-09-01に受入・**最初に切替が完了したCSV**——2,796行）
+           manual/extract_debug_wiring.py（**debug_wiring.csvの正本生成器**——新経路が
+           初めて正本に足した新規evidence表。WCH-Link manualの配線表＋両対応注記）
+           run_frozen.py（凍結toolをコード不変のままbundle入力で走らせ、出力を
+           凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
+           run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
+           対象選定は凍結toolのまま）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
 review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
            paragraph行として写るので文字を境界にすると領域が潰れる。67文書で
-           3,307 asset・図caption 2,884のうち**2,837に実画像（98.4%）**。
-           本文の参照文（「图19-2是…」等）はcaption扱いしない——判定は
-           `pipeline/common/figure_captions.py`に一本化）
+           3,337 asset・**図caption 2,871の全部に実画像（100%・警告0）**——
+           図全体が1つの無caption表として誤検出される場合（過滤器編号の示例・
+           波形図・応答グラフ）もcaption直下ならクラスタへ算入する。
+           本文の参照文（「图19-2是…」「figure 21-1.」等）はcaption扱いしない
+           ——判定は`pipeline/common/figure_captions.py`に一本化）
            export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
-           可視ポインタ**（67文書で3,759表を結合）、
+           可視ポインタ**（67文書で3,770表を結合）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告）
 checks/    compare_manifest.py（環境差の検証）
            check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
            全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**）
-publish/   （予定）candidate → 承認済み正本
+publish/   regenerate.py（**一括再生成のentry point**。bundle再変換→切替済み
+           evidenceの再生成→下流indexの再導出→検査、の順で既存CLIを呼ぶ。
+           `--verify`で凍結パリティ＋エラッタ増分検査、`--human`で図の描画→
+           人向けMarkdown→差ゼロ検査も。失敗した段で止まる。全段成功＋
+           `git status`が空＝冪等を実測——2026-09-01）
 ```
 
 candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍結CSVへ直接書く
-toolはこの経路に無い（**切替済みのCSVは例外**——`operating_conditions.csv`の正本
-生成元は2026-09-01からこの経路）。
+toolはこの経路に無い（**切替済み・新設のCSVは例外**——`operating_conditions.csv`
+（切替）と`debug_wiring.csv`（新設）の正本生成元は2026-09-01からこの経路）。
 
 ## ingestがPoCと違う点（3つの修正。1と2はD17の実測、3はCIの実戦検出）
 
@@ -66,7 +78,14 @@ toolはこの経路に無い（**切替済みのCSVは例外**——`operating_c
    「数字を`#`に畳んだ同じ綴りが**ページの縁から同じ距離**に、全ページの25%以上
    （最低3ページ）繰り返す」行を拾う。y閾値だけのPoCはzh版footer（下端比93.8%）を
    系統的に取りこぼした。反復判定はheading判定より先（TOC等の小フォントページで
-   footerがheadingに化ける実測があったため）。縁距離なので横向きページにも効く
+   footerがheadingに化ける実測があったため）。縁距離なので横向きページにも効く。
+   **1.2.0で規則を2つ追加**（R-30の抽出が「footer未分類→表結合が切れる」を発見、
+   全コーパス実測で67行の取りこぼしを確認）: 厳格帯（6%）では同綴り同距離
+   **3ページ以上**で合格（章ごとに綴りが変わるheaderの変種、途中でfooterの
+   位置が変わった文書——V00X RM zhはp198以降の32ページ＝14%が別距離）、
+   合格した**綴りは距離が違っても余白扱い**（横向きpin表ページのfooter）。
+   ページ番号だけの行（畳んで`#`）は新規則から除外——数字だけの本文を
+   巻き込まない
 
 3. **manifestのgeometry_sha256は非圧縮のJSONに対するhash**（converter 1.1.0）。
    gzipの圧縮バイト列はzlibの版で変わり、GitHub Actions上の再変換が
@@ -79,6 +98,8 @@ roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこ
 ## 実行
 
 ```sh
+uv run pipeline/publish/regenerate.py                   # 一括再生成（bundles→evidence→index→checks）
+uv run pipeline/publish/regenerate.py --verify --human  # ＋凍結パリティ・エラッタ・図・Markdown・差ゼロ検査
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
 uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの67版。incremental
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \

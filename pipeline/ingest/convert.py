@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.1.0"
+CONVERTER_VERSION = "1.2.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -113,23 +113,49 @@ def margin_key(text: str, edge_distance: float) -> tuple[str, float]:
             round(edge_distance, 1))
 
 
-def margin_repeats(pdf) -> tuple[set, set]:
-    """第1パス: 上下の帯で全ページの25%以上に同位置・同形で繰り返す行を集める。"""
+def margin_repeats(pdf) -> tuple[set, set, set, set]:
+    """第1パス: 上下の帯で繰り返す行を集める（1.2.0で規則を3つに）。
+
+    (a) 同綴り・同縁距離が全ページの25%以上（従来の規則）
+    (b) 同綴り・同縁距離が**厳格帯（6%）の中で3ページ以上**——章ごとに変わる
+        headerの変種（V20x DS enの3ページだけの别綴り）や、途中でfooterの
+        位置が変わった文書（V00X RM zhはp198以降の32ページ＝14%が別距離）
+    (c) (a)(b)で合格した**綴りは距離が違っても余白扱い**（綴りspillover）——
+        横向きページのfooterは縁距離まで変わる（V407 DS enのpin表5ページ）
+
+    ページ番号だけの行（畳んで`#`）は(b)(c)から除く——数字だけの本文行を
+    巻き込まないため。(a)の完全一致規則だけで扱う。
+    """
     top_pages: dict[tuple, set[int]] = defaultdict(set)
     bottom_pages: dict[tuple, set[int]] = defaultdict(set)
+    strict_top: dict[tuple, set[int]] = defaultdict(set)
+    strict_bottom: dict[tuple, set[int]] = defaultdict(set)
     for page in pdf.pages:
         height = float(page.height)
         for line in page.extract_text_lines(return_chars=False) or []:
             if line["top"] < height * REPEAT_BAND:
-                top_pages[margin_key(line["text"], line["top"])].add(page.page_number)
+                key = margin_key(line["text"], line["top"])
+                top_pages[key].add(page.page_number)
+                if line["top"] < height * STRICT_BAND:
+                    strict_top[key].add(page.page_number)
             if line["bottom"] > height * (1 - REPEAT_BAND):
-                bottom_pages[margin_key(line["text"], height - line["bottom"])].add(
-                    page.page_number)
+                key = margin_key(line["text"], height - line["bottom"])
+                bottom_pages[key].add(page.page_number)
+                if line["bottom"] > height * (1 - STRICT_BAND):
+                    strict_bottom[key].add(page.page_number)
         page.flush_cache()
     threshold = max(REPEAT_FLOOR, int(len(pdf.pages) * REPEAT_RATIO))
-    repeated_top = {key for key, pages in top_pages.items() if len(pages) >= threshold}
-    repeated_bottom = {key for key, pages in bottom_pages.items() if len(pages) >= threshold}
-    return repeated_top, repeated_bottom
+
+    def qualify(band: dict, strict: dict) -> tuple[set, set]:
+        keys = {key for key, pages in band.items() if len(pages) >= threshold}
+        keys |= {key for key, pages in strict.items()
+                 if len(pages) >= REPEAT_FLOOR and key[0] != "#"}
+        texts = {key[0] for key in keys if key[0] != "#"}
+        return keys, texts
+
+    repeated_top, top_texts = qualify(top_pages, strict_top)
+    repeated_bottom, bottom_texts = qualify(bottom_pages, strict_bottom)
+    return repeated_top, repeated_bottom, top_texts, bottom_texts
 
 
 def text_items(page, kind: str) -> list[dict]:
@@ -160,7 +186,8 @@ def chars(page) -> list[dict]:
 
 
 def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
-                   repeated_top: set, repeated_bottom: set) -> None:
+                   repeated_top: set, repeated_bottom: set,
+                   top_texts: set = frozenset(), bottom_texts: set = frozenset()) -> None:
     sizes = [item["size"] for item in page_chars
              if item["text"].strip() and item["size"] > 0]
     body_size = statistics.median(sizes) if sizes else 0
@@ -181,10 +208,12 @@ def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
         # 化けることがある（D18実装時にV003 zhの3ページで実測）。全ページの
         # 25%以上で同じ縁距離に繰り返す行が見出しであることはない。
         if (top < height * REPEAT_BAND
-                and margin_key(line["text"], top) in repeated_top):
+                and (margin_key(line["text"], top) in repeated_top
+                     or margin_key(line["text"], top)[0] in top_texts)):
             line["role"] = "header"
         elif (bottom > height * (1 - REPEAT_BAND)
-                and margin_key(line["text"], height - bottom) in repeated_bottom):
+                and (margin_key(line["text"], height - bottom) in repeated_bottom
+                     or margin_key(line["text"], height - bottom)[0] in bottom_texts)):
             line["role"] = "footer"
         elif CHAPTER_HEADING.match(text) or numbered or (
                 len(text) <= 120 and body_size and line["font_size"] >= body_size * 1.25):
@@ -280,10 +309,12 @@ def page_record(page, lang: str, source_sha256: str,
                 previous_logical_id: str | None,
                 previous_page: int | None,
                 number_occurrences: dict[str, int],
-                repeated_top: set, repeated_bottom: set) -> tuple[dict, dict, str | None]:
+                repeated_top: set, repeated_bottom: set,
+                top_texts: set, bottom_texts: set) -> tuple[dict, dict, str | None]:
     page_chars = chars(page)
     lines = text_items(page, "line")
-    classify_lines(lines, page_chars, float(page.height), repeated_top, repeated_bottom)
+    classify_lines(lines, page_chars, float(page.height), repeated_top, repeated_bottom,
+                   top_texts, bottom_texts)
     words = text_items(page, "word")
     page_drawings = drawings(page)
     page_captions = captions(lines, lang)
@@ -403,11 +434,12 @@ def convert(pdf_path: Path, lang: str, document_type: str,
     previous_logical_id = None
     previous_page = None
     with pdfplumber.open(pdf_path) as pdf:
-        repeated_top, repeated_bottom = margin_repeats(pdf)
+        repeated_top, repeated_bottom, top_texts, bottom_texts = margin_repeats(pdf)
         for page in pdf.pages:
             record, geometry, previous_logical_id = page_record(
                 page, lang, source_sha256, previous_logical_id,
-                previous_page, number_occurrences, repeated_top, repeated_bottom)
+                previous_page, number_occurrences, repeated_top, repeated_bottom,
+                top_texts, bottom_texts)
             validate(record, PAGE_SCHEMA)
             validate_geometry(geometry)
             payload = dump_bytes(record)

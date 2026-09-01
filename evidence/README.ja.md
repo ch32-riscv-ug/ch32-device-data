@@ -442,6 +442,40 @@ pin表が裏付けない箇所が2つ**（V002/V004——manualはV00x群を両�
 pin表にSWCLKが無くdatasheetの見出しも1-wire）——証拠はmanualの綴りのまま残し、
 裁定は`index/debug_interfaces`側（見出しを採り、manualの異議をbasisに記録）。
 
+### `option_bytes.csv`
+
+**ユーザー選択字（option bytes）領域の書き込みレイアウト**（consumer依頼R-30——
+構造化した`target option get/set`と工場値書き戻しには、各バイトの意味・補数
+バイトの配置・書込単位が要る）。RMのoption bytes章「用户选择字信息结构」表から
+family×バイトごとに1行。全11 RMが同じcaptionでこの表を持つ（2026-09-01実測）。
+新経路の抽出（`pipeline/extract/rm/extract_option_bytes.py`・bundle入力・
+ページ跨ぎ断片はL1で結合）。
+
+- `address`／`offset`: バイトの絶対番地と、OB base（領域の最小番地）からの
+  距離。baseは`register_blocks.csv`の`OB` blockと`check_tables`が突き合わせる
+  ——RMの表とEVTヘッダという独立な2ソースの相互検査
+- `byte`: 記載どおりのバイト名（RDPR／USER／Data0／WRPR0／Reserved…）
+- `complement_address`: 補数バイト（`nRDPR`…）の位置。表が対にしていない
+  バイト（Reservedの語）は空
+- `write_unit`: 領域の書込方式。「用户选择字编程」手順が名指す制御bitで分類
+  ——`half-word (OBPG)`（V003系）か`fast page, 32-bit buffer writes (FTPG)`
+  （L103/M030系）。RMが「高バイトはFPECが自動で反码を計算する」と書いていれば
+  `; complement auto-computed`を足す。ちょうど1方式に当たらなければ生成が落ちる
+
+zh/enの両版が一致した行がconfirmed。CH32V407（RMがzh単独）はreference。
+
+### `option_byte_fields.csv`
+
+**option bytesのbit割当とRM記載の復位値**（構造表の直後にある無captionの
+「名称/字节」表から）。記載されたfieldまたはbyte群ごとに1行: `byte`（RDPR／
+USER／Data0-Data1／WRPR0-WRPR3）・`bits`・`field`・`default`。復位値は**RMが
+述べる粒度のまま**残す——工場出荷の生バイト列への合成は導出なのでしない
+（consumer側が新品実測との突き合わせに使う）。両版の比較は復位値セルの
+**値トークンの列**で行う（周りの散文は言語で違い、文字層では句読点がセルに
+漂着する）。識別子・値は空白とdashだけ畳んで資料どおり。本物のzh/en齟齬は
+conflictで残る——X315はUSERのbitをzhが`USBHSDLEN`・enが`USBFSDLEN`と綴り、
+FV2x/V3xのen版はzhが`RAM_CODE_MOD`と呼ぶSRAM分割fieldを無名のままにしている。
+
 ### `link_firmware.csv`
 
 WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/build_link_firmware.py`で、
@@ -638,7 +672,9 @@ schematic-pdf  family単位の回路図PDF                      12
 ### `operating_conditions.csv`
 
 **電気的特性の章を series ごとに**——クロック・電源電圧・発振器・ADC・Flash・I/O レベル・
-リセットのタイミング。生成は `tools/build_operating.py`。
+リセットのタイミング。生成は `pipeline/extract/datasheet/build_operating_conditions.py`
+（新経路——凍結した抽出ロジックをbundle入力で走らせた基礎行＋消費電流・ウェイクアップ
+時間の行。`tools/build_operating.py` は凍結された参照実装として残る）。
 
 **採る行を記号の一覧では決めません。** 記号は頭字で物理量を名乗る（`V_*` は電圧、`I_*` は電流、
 `t_*` は時間）ので、「その量に単位が合っているか」で採ります（`UNIT_FOR`）。資料の記法は決まって
@@ -656,7 +692,7 @@ schematic-pdf  family単位の回路図PDF                      12
   見れば人には分かりますが推測なので、埋めずに落とします
 - **2つの記号が1行に畳まれた行**（`t_/t_r(SCK)_f(SCK)`）。値をどちらのものとも決められません
 
-シリーズごとのクロックと動作電圧です。生成は`tools/build_operating.py`。
+シリーズごとのクロックと動作電圧です。
 
 - **`F_MAIN`**: datasheet 1ページ目の特徴リストが謳う**系統主頻**。製品として語られる周波数がこれです
 - `F_HCLK`/`F_PCLK*`/`F_CORE*`: 電気的特性章「一般動作条件」表の**上限値**。F_MAINとは別の事実で、値も食い違います（CH32V003は本文48MHz・電気的特性の上限50MHz）。README の Clock 列は F_MAIN を優先し、無いシリーズ（CH32X035・CH32H41x）だけ F_HCLK / F_CORE に落とします
@@ -783,7 +819,7 @@ uv run tools/build_all.py                       # .cache/candidates/（型番ご
 uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
 uv run tools/build_pins.py                      # pins/pin_functions（数分かかる）
 uv run tools/build_remap.py                     # remap_fields/remap_routes（candidates から）
-uv run tools/build_operating.py                 # operating_conditions（数分かかる）
+uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
 uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
 uv run tools/build_systick.py                   # systick（EVTのcore_riscv.hから）
@@ -809,6 +845,7 @@ uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice he
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
 uv run tools/build_debug_data.py                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
+uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run tools/extract_images.py                  # 各repoのimage/（数分かかる）
