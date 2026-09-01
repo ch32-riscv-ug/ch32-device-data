@@ -80,6 +80,14 @@ jobs:
       - name: Signal vocabulary doctests
         run: python -m doctest tools/signal_vocabulary.py -o FAIL_FAST
 
+      # The structured-path classifiers (which lines are figure captions, which
+      # `*` glyphs are lost subscripts) are likewise documented only by their
+      # doctests -- run them so a changed rule without a changed example fails.
+      - name: Structured-path classifier doctests
+        run: |
+          python -m doctest pipeline/common/figure_captions.py -o FAIL_FAST
+          python -m doctest pipeline/common/lost_subscripts.py -o FAIL_FAST
+
       # Everything derivable without a PDF must already be committed in its
       # regenerated form. This used to cover catalog/documents.csv only, and the
       # two things it did not cover both went stale unnoticed (found 2026-08-28):
