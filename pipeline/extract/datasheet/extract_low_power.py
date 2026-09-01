@@ -416,12 +416,8 @@ def merge_editions(datasheet: str, series: str, en_rows: list[dict],
     return out
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--out", type=Path, default=CANDIDATES,
-                    help="candidateの出力先の上書き（試験用）")
-    args = ap.parse_args()
-
+def collect_rows() -> list[dict]:
+    """全datasheetからA11の行を集める（正本生成器も使う入口）。"""
     with (REPO / "catalog" / "products.csv").open(newline="", encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     ds_series: dict[str, set] = {}
@@ -435,7 +431,7 @@ def main() -> int:
         stem = job["name"].rsplit(".", 1)[0]
         jobs.setdefault(stem, {})[job["lang"]] = job
 
-    new_rows: list[dict] = []
+    rows: list[dict] = []
     for stem, langs in sorted(jobs.items()):
         datasheet = f"{stem}.PDF"
         if datasheet not in ds_series:
@@ -459,7 +455,17 @@ def main() -> int:
         print(f"  {datasheet}: tables {len(numbers)}  en {len(editions.get('en', []))}"
               f" / zh {len(editions.get('zh', []))} -> {len(merged)} rows",
               file=sys.stderr)
-        new_rows.extend(merged)
+        rows.extend(merged)
+    return rows
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--out", type=Path, default=CANDIDATES,
+                    help="candidateの出力先の上書き（試験用）")
+    args = ap.parse_args()
+
+    new_rows = collect_rows()
 
     # 凍結CSVに新しい行を足した candidate を作る（正本には書かない）。
     frozen_path = REPO / "evidence" / "operating_conditions.csv"

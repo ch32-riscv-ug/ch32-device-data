@@ -29,8 +29,10 @@ common/    logical_tables.py（**L1: ページを跨ぐ表の断片を1つの論
 extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDFへのsilent fallbackなし）
            datasheet/run_operating.py（凍結ロジックをbundle入力で走らせる。
            evidence/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
-           datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間のcandidate。
-           caption選定＋断片結合＋表番号スコープの2段階zh/en照合。1,208行・偽conflict 0）
+           datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間。
+           caption選定＋断片結合＋表番号スコープの2段階zh/en照合。偽conflict 0）
+           datasheet/build_operating_conditions.py（**operating_conditions.csvの正本生成器**。
+           基礎行＋A11行。2026-09-01に受入・**最初に切替が完了したCSV**——2,796行）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
 review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
@@ -52,7 +54,8 @@ publish/   （予定）candidate → 承認済み正本
 ```
 
 candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍結CSVへ直接書く
-toolはこの経路に無い。
+toolはこの経路に無い（**切替済みのCSVは例外**——`operating_conditions.csv`の正本
+生成元は2026-09-01からこの経路）。
 
 ## ingestがPoCと違う点（3つの修正。1と2はD17の実測、3はCIの実戦検出）
 
