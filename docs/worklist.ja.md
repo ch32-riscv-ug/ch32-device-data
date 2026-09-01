@@ -19,7 +19,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 画像 | 0 | 3（保留） |
 | 検査・運用 | 16 | 1（D7） |
 | PDF構造化PoC・計画 | 1 | 1（D17） |
-| consumerからの依頼 | 9 | 3（**R-28〜R-30を2026-09-01にch32rvから受領**。R-29は既存データで大部分可・R-28/R-30は新ソース要。R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
+| consumerからの依頼 | 10 | 2（**R-28〜R-30を2026-09-01にch32rvから受領**、R-29の既存データぶんは同日実装。R-28/R-30と、R-29の未記載11 seriesは新ソース（実機実測・RM debug章）要。R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
 | 表示（G系） | 12 | 0 |
 | 既知の穴（F系） | 50 | 7（下の F 台帳で ✅ が付いていない行の数。**すべて資料側の記録**で、F-7・F-33・F-43〜46・F-51。F-4 と F-24 は残りだけが資料側で実害なし。**ツール側の穴は0**——F-57・F-58 を 2026-08-29 に解決した） |
 
@@ -181,7 +181,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-26 | 追加テーブル4件＋参考1件 | ✅ **全5件実装**（2026-08-25）。`flash_geometry`・`opa_cmp_registers`・`adc_internal`・`usbpd_plumbing`・`clock_enables` |
 | R-27 | debug module の DATA0/DATA1 レジスタの hart 側アドレス（family別） | ✅ **実装**（2026-08-26）。`evidence/debug_data.csv` 12 family（confirmed 7・reference 4・missing 1=H417）。`tools/build_debug_data.py`。下の「R-27」参照 |
 | R-28 | chip ID（device_id）のevidence表新設（ch32rv 0001・優先度高） | ⬜ **既存データだけでは出せない**（2026-09-01判定）。このrepoが持つのはCHIPIDの番地2 family分（`memory_map.csv`のL103/V205）のみで**値は0件**。主ソースは (1) `ch32-rs/ch32-data`の`data/chips/*.yaml`取込＋照合（cloneは手元にあり、`crosscheck_ch32data.py`の流儀に合う）、(2) gap 7 series（V205/V407/V467/X305/X315/M030/M103）の**実機実測**（ch32rv側がboard群と測定を提供可と依頼書に明記——測定依頼を出すこと）。`memory`と`attach`の値の同一性・番地のfamily差・package別[19:16]も行として残す |
-| R-29 | debug interface種別（1線SWIO/2線RVSWD）の明示列（ch32rv 0002・優先度中） | 🔜 **既存データで大部分出せる**（2026-09-01判定・納品はこれから）。`evidence/features.csv`が**datasheet自身の節見出し**として持つ——1-wire明記: V002/V003/V004/V007(+M007)。2-wire明記: V103/V203/L103(+M103)/V303/V305/V307/V317/X033/X035（V208はzh版のみ=reference）。**見出しがwire数を言わない**: V005/V006/V205/M030/H41x/V407/V467/X305/X315——**gap 7のうちM103以外はここに入る**ので、確定にはRM debug章かWCH-Link manualの読取りが要る（両対応系V00X/M030の切替条件も同様）。実装時はA10と同型のindex表（features＋pinoutのpad結合）として切る |
+| R-29 | debug interface種別（1線SWIO/2線RVSWD）の明示列（ch32rv 0002・優先度中） | ✅ **既存データぶんを実装**（2026-09-01。**新しいPDFは読んでいない**）。`index/debug_interfaces.csv`新設（27 series・swio 5／rvswd 11／未記載11）。`tools/build_debug_interfaces.py`が`evidence/features.csv`の**datasheet節見出しの綴り**（`1-wire`/`单线`→swio、`2-wire`/`2线`→rvswd）と`index/pinout.csv`のSWDIO/SWCLK padから作る。**見出しがwire数を言わないseriesは`debug_if`を空にして推測しない**——V005/V006/V205/M030/H41x/V407/V467/X305/X315（gap 7のうちM103以外が該当。**確定にはRM debug章かWCH-Link manualの読取りが要り、それがこの依頼の残り**。両対応系V00X/M030の切替条件も同様）。V208はzh版のみの見出し=reference。V007(+M007)は見出しが1-wireだがpin表はSWDIO+SWCLK両方を持つ（V00X両対応の示唆。見出しの綴りを`wording`に保つ）。見方は[index/README](../index/README.ja.md) |
 | R-30 | option bytesの書き込みレイアウトと工場出荷値（ch32rv 0003・優先度中） | ⬜ **既存データだけでは出せない**（2026-09-01判定）。あるのはOB base番地（`register_blocks.csv`）・OBR読み出し側bit（`register_fields.csv`）・分割組合せ（`memory_configs.csv`）で、**書き込みレイアウト（補数バイト配置・書込単位）と工場出荷値が未収録**。RMのoption bytes章の新規抽出が必要——D17後の構造化bundle経路での抽出候補に合う（凍結方針により旧経路への抽出器追加はしない）。工場値はRM記載と新品実測の突き合わせを依頼書どおり残す |
 
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）

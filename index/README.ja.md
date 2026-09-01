@@ -16,6 +16,7 @@
 | 資料どうしが食い違っている箇所を全部見る | [`conflicts.csv`](conflicts.csv) |
 | 機能から series を探す | [`features.csv`](features.csv) |
 | この型番のこの足は何か・この機能はどの足に出るか（U1/U3） | [`pinout.csv`](pinout.csv) |
+| debug 配線は1線（SWIO）か2線（SWDIO+SWCLK）か | [`debug_interfaces.csv`](debug_interfaces.csv) |
 | remap の値をどれにするか（U3） | [`routes.csv`](routes.csv) |
 | レジスタとビット（ヘッダ生成。U4） | [`registers.csv`](registers.csv) |
 | レジスタの絶対番地 | [`register_map.csv`](register_map.csv) |
@@ -223,6 +224,22 @@ family をまたいで「X を持たない型番」を数えないこと。
 
 `operating_conditions` は1行で min/typ/max/unit の4つを主張していて、争っているのがどれかは
 行ごとに違うので、`field` は空にして `alternative` の側が欄を名指しします（`min=60,typ=82,max=110`）。
+
+### `debug_interfaces.csv` — debug 配線は1線か2線か
+
+`tools/build_debug_interfaces.py` が作ります（書き込みツール向け。R-29）。1行1 series。
+`evidence/features.csv` が持つ **datasheet の debug 節見出しの綴り**から `debug_if` を
+決めます——`1-wire`／`单线` なら `swio`、`2-wire`／`2线` なら `rvswd`。
+**見出しが wire 数を言わない series は `debug_if` が空**です（V005/V006/V205/M030/
+H41x/V407/V467/X305/X315 の11 series。2026-09-01時点）。core 名や pad 数からの推測は
+しません——実際 CH32V007(+M007) は見出しが 1-wire なのに pin 表は SWDIO と SWCLK の
+両方を持ちます（V00X 系の両対応の示唆。`wording` に見出しの綴りをそのまま残します）。
+
+| 列 | 中身 |
+|---|---|
+| `debug_if` | `swio`（1線）／`rvswd`（2線）／空（見出しが言わない） |
+| `wording` `section` | 決め手にした節見出しの英語の綴りと節番号（CH32V208 は英語版に見出しが無く空。zh のみ＝`reference`） |
+| `swdio_pads` `swclk_pads` | `index/pinout.csv` の正規化 role（SWDIO/SWCLK）の pad（`;`区切り。照合用の写し） |
 
 ### `features.csv` — 機能から series を探す
 

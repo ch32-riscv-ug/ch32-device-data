@@ -186,6 +186,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "usbpd_plumbing": ("build_usbpd_plumbing.py", "COLUMNS"),
     "index:capabilities": ("build_capabilities.py", "CAPABILITY_COLUMNS"),
     "index:conflicts": ("build_conflicts.py", "COLUMNS"),
+    "index:debug_interfaces": ("build_debug_interfaces.py", "COLUMNS"),
     "index:dma": ("build_index.py", "DMA_COLUMNS"),
     "index:features": ("build_feature_tags.py", "COLUMNS"),
     "index:parts": ("build_index.py", "PARTS_COLUMNS"),
@@ -543,6 +544,43 @@ def index_checks(t: dict) -> list[str]:
             bad.append(f"capabilities: {r['part_number']} {r['attribute']} の count と stated が食い違う")
         if r["count"] and r["count"] != r["value"]:
             bad.append(f"capabilities: {r['part_number']} {r['attribute']} の count が値そのままでない")
+
+    # debug_interfaces: series ごと1行・features の debug 節見出しに戻せること・
+    # pads は pinout の正規化 role（SWDIO/SWCLK）の写しそのものであること。
+    # debug_if は**見出しが wire 数を言うときだけ**入る（推測を足さない）。
+    series_family = {r["series"]: r["family"] for r in t["series"]}
+    heads = {}
+    for r in t["features"]:
+        for s in r["series"].split(";"):
+            heads[(s, r["section"], r["basis"])] = r
+    swd_pads: dict[tuple[str, str], set[str]] = {}
+    for r in t["index:pinout"]:
+        if r["role"] in ("SWDIO", "SWCLK"):
+            swd_pads.setdefault((r["series"], r["role"]), set()).add(r["pad"])
+    if {r["series"] for r in t["index:debug_interfaces"]} != set(series_family):
+        bad.append("debug_interfaces: series の集合が catalog/series と違う")
+    for r in t["index:debug_interfaces"]:
+        who = f"debug_interfaces: {r['series']}"
+        if series_family.get(r["series"]) != r["family"]:
+            bad.append(f"{who} の family {r['family']!r} が series.csv と違う")
+        if r["debug_if"] not in ("", "swio", "rvswd"):
+            bad.append(f"{who} の debug_if {r['debug_if']!r}")
+        src = heads.get((r["series"], r["section"], r["basis"]))
+        if src is None:
+            bad.append(f"{who} を features の節見出しに戻せない（{r['section']} / {r['basis']}）")
+        else:
+            if r["wording"] != src["feature"]:
+                bad.append(f"{who} の wording {r['wording']!r} が features の綴りと違う")
+            # debug_if は見出しの綴りから再導出できること（推測を足していない証明）
+            text = src["feature"] + src["feature_zh"]
+            derived = ("swio" if re.search(r"1-wire|single-wire|单线", text, re.IGNORECASE)
+                       else "rvswd" if re.search(r"2-wire|2线|两线|二线", text) else "")
+            if r["debug_if"] != derived:
+                bad.append(f"{who} の debug_if {r['debug_if']!r} が見出しの綴り（{derived!r}）と違う")
+        for column, role in (("swdio_pads", "SWDIO"), ("swclk_pads", "SWCLK")):
+            have = set(r[column].split(";")) - {""}
+            if have != swd_pads.get((r["series"], role), set()):
+                bad.append(f"{who} の {column} が pinout の {role} と違う")
 
     # manifest: index/ の全ファイルと sha256 が一致
     import hashlib  # noqa: PLC0415

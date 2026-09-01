@@ -79,6 +79,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "features（旧 feature_tags）": ("index:features",),
     "capabilities（`index/`）": ("index:capabilities",),
     "conflicts（`index/`）": ("index:conflicts",),
+    "debug_interfaces（`index/`）": ("index:debug_interfaces",),
     "sources": ("sources",),
     "series / families / cores / documents": ("series", "families", "cores", "documents"),
     "toolchains": ("toolchains",),
