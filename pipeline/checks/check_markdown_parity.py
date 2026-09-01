@@ -35,6 +35,7 @@ MARKDOWN = REPO / ".cache" / "structured-markdown"
 FIGURE_CAPTION = re.compile(r"^(?:Figure|图)\s*\d+(?:-\d+)*", re.IGNORECASE)
 NOT_REPRODUCED = "The figure itself is not reproduced"
 CONTINUED = "**Table continued** — rendered in full at"
+EMBEDDED = re.compile(r"\]\((\.\./assets/[^)]+)\)")
 
 
 def load_page(bundle: Path, entry: dict) -> dict:
@@ -44,7 +45,8 @@ def load_page(bundle: Path, entry: dict) -> dict:
     return json.loads(payload)
 
 
-def check_page(page: dict, text: str, chains: dict[str, dict]) -> list[str]:
+def check_page(page: dict, text: str, chains: dict[str, dict],
+               pages_dir: Path) -> list[str]:
     bad = []
     position = 0
     tables = {item["id"]: item for item in page["tables"]}
@@ -75,10 +77,18 @@ def check_page(page: dict, text: str, chains: dict[str, dict]) -> list[str]:
             line = lines[item["id"]]
             expect(html.escape(line["text"]), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
-                    and FIGURE_CAPTION.match(line["text"].strip())
-                    and NOT_REPRODUCED not in text[position:position + 300]):
-                bad.append(f"p{page['number']} {item['id']}: figure caption without "
-                           "a not-reproduced notice")
+                    and FIGURE_CAPTION.match(line["text"].strip())):
+                # captionの直後には、描画済みの図（実ファイルがあること）か、
+                # 「再現していない」の可視の印のどちらかが要る。
+                window = text[position:position + 400]
+                embed = EMBEDDED.search(window)
+                if embed:
+                    if not (pages_dir / embed.group(1)).resolve().exists():
+                        bad.append(f"p{page['number']} {item['id']}: embedded asset "
+                                   f"missing on disk: {embed.group(1)}")
+                elif NOT_REPRODUCED not in window:
+                    bad.append(f"p{page['number']} {item['id']}: figure caption with "
+                               "neither a rendered image nor a notice")
     return bad
 
 
@@ -92,7 +102,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
         if not md.exists():
             bad.append(f"p{page['number']}: markdown page missing")
             continue
-        bad.extend(check_page(page, md.read_text(encoding="utf-8"), chains))
+        bad.extend(check_page(page, md.read_text(encoding="utf-8"), chains,
+                              markdown / "pages"))
     if bad:
         print(f"[{bundle.name}] {len(bad)} parity issue(s):", file=sys.stderr)
         for line in bad[:limit]:

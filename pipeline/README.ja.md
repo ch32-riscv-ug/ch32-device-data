@@ -32,7 +32,12 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間のcandidate。
            caption選定＋断片結合＋表番号スコープの2段階zh/en照合。1,208行・偽conflict 0）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
-review/    export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
+review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
+           150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
+           図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
+           paragraph行として写るので文字を境界にすると領域が潰れる。67文書で
+           3,195 asset・図caption 2,943のうち**2,725に実画像（92.6%）**）
+           export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
            可視ポインタ**（67文書で3,759表を結合）、
