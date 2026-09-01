@@ -163,12 +163,16 @@ def main() -> int:
         manual: dict = {}
         manual_name = ""
         if phy:
-            paths = sorted((args.mirrors / family / "datasheet_zh").glob("*RM.PDF"))
-            if paths:
-                fields, _ = extract_registers.extract(paths[0], None)
+            # ローカル変数が module import の `paths` を shadow して、main() 冒頭の
+            # `paths.table(...)` が常に UnboundLocalError で落ちていた（凍結後の
+            # 2026-09-01 に旧新パリティ実行で発覚。CSV を再生成しない限り誰も
+            # 踏まない F-54 型の潜在バグ）。凍結の明示的な例外として改名だけ直す。
+            manuals = sorted((args.mirrors / family / "datasheet_zh").glob("*RM.PDF"))
+            if manuals:
+                fields, _ = extract_registers.extract(manuals[0], None)
                 manual = {(f["register"], f["field"]): (f["bit_offset"], f["bit_width"])
                           for f in fields if f["register"].startswith(("AFIO_", "EXTEN_"))}
-                manual_name = paths[0].name
+                manual_name = manuals[0].name
         for en in enables[family]:
             rcc = {"family": family, "peripheral": en["peripheral"],
                    "rcc_register": en["register"], "rcc_bit": en["bit"],

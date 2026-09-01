@@ -406,6 +406,7 @@ CH32X315,RCC_PLLDIV2,value,RCC->CFGR0,0x40021004,131072,#,reference,evt(device-h
 CH32X315,RCC_PLLGATE,mask,RCC->CTLR,0x40021000,2147483648,#,reference,evt(device-header+system_ch32*.c)
 CH32X315,RCC_PLLHS_SRC,mask,RCC->CFGR0,0x40021004,805306368,#,reference,evt(device-header)
 CH32X315,RCC_PLLHS_SRC_USBHSPLL_480M,value,RCC->CFGR0,0x40021004,805306368,#,reference,evt(device-header+system_ch32*.c)
+CH32X315,RCC_PLLHS_SRC_USBSSPLL_625M,value,RCC->CFGR0,0x40021004,536870912,#,reference,evt(device-header+system_ch32*.c)
 CH32X315,RCC_PLLSRC,mask,RCC->CFGR0,0x40021004,6291456,#,reference,evt(device-header)
 CH32X315,RCC_PLLSRC_HS,value,RCC->CFGR0,0x40021004,6291456,#,reference,evt(device-header+system_ch32*.c)
 CH32X315,RCC_PLLSRC_USBHSPLL_480M,value,RCC->CFGR0,0x40021004,0,#,reference,evt(device-header+system_ch32*.c)

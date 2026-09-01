@@ -4835,4 +4835,5 @@ CH32X035,afio-usart4-remap,PCFR1,PCFR1:12;PCFR1:13;PCFR1:14,5,USART4,CTS,CTS4,PB
 CH32X035,afio-usart4-remap,PCFR1,PCFR1:12;PCFR1:13;PCFR1:14,5,USART4,RTS,RTS4,PA8,A,8,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
 CH32X035,afio-usart4-remap,PCFR1,PCFR1:12;PCFR1:13;PCFR1:14,5,USART4,RX,RX4,PC16,C,16,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
 CH32X035,afio-usart4-remap,PCFR1,PCFR1:12;PCFR1:13;PCFR1:14,5,USART4,TX,TX4,PC17,C,17,#,reference,candidates(datasheet-pin-table+rm-remap-grid:en)
+CH32X305,afio-pd0-1-remap,PCFR1,PCFR1:15,0,,,PD0,XI,,,#,reference,candidates(datasheet-pin-table-default:en)
 CH32X315,afio-pd0-1-remap,PCFR1,PCFR1:15,0,,,PD0,XI,,,#,reference,candidates(datasheet-pin-table-default:en)

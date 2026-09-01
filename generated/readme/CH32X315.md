@@ -2,7 +2,7 @@
 
 <!-- This file is generated from ch32-riscv-ug/ch32-device-data (index/ + evidence/ + tools/build_readme.py). Edit there, not here. -->
 
-*Generated from the mirror at commit [`31b865f`](https://github.com/ch32-riscv-ug/CH32X315/tree/31b865fc9138011a3f6e5b067afb9a2db7c5abad) (2026-08-24). Newer PDFs may exist upstream; see Documents below.*
+*Generated from the mirror at commit [`50f9885`](https://github.com/ch32-riscv-ug/CH32X315/tree/50f9885e0dc17ec793bdad6c2aa13f9bec4fccd3) (2026-08-29). Newer PDFs may exist upstream; see Documents below.*
 
 [Choose a part](#product-comparison) &middot; [Pin viewer](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305) &middot; [Pin maps](#pin-maps--alternate-functions) &middot; [Errata](#errata) &middot; [Examples](#evt-examples) &middot; [Documents](#documents) &middot; [Address map](#address-map)
 
@@ -382,6 +382,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 
 | Series | Field | Register | Bits | Values | Reset |
 |---|---|---|---|---|---|
+| CH32X305 | PD0_1_REMAP | PCFR1 | PCFR1:15 | 0 |  |
 | CH32X315 | PD0_1_REMAP | PCFR1 | PCFR1:15 | 0 |  |
 
 </details>
@@ -400,9 +401,9 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 
 ## EVT examples
 
-100 routines in [EVT/EXAM](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM):
+101 routines in [EVT/EXAM](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM):
 
-[ADC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/ADC) 14 · [APPLICATION](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/APPLICATION) 1 · [ARGB](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/ARGB) 1 · [BKP](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/BKP) 1 · [CPU](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/CPU) 9 · [CRC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/CRC) 1 · [DMA](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/DMA) 2 · [EXTI](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/EXTI) 1 · [FLASH](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/FLASH) 1 · [GPIO](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/GPIO) 1 · [I2C](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/I2C) 6 · [IAP](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/IAP) 1 · [IWDG](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/IWDG) 1 · [PWR](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/PWR) 5 · [RCC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/RCC) 2 · [RTC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/RTC) 2 · [SDI_Printf](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SDI_Printf) 1 · [SPI](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SPI) 5 · [SYSTICK](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SYSTICK) 1 · [TIM](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/TIM) 13 · [USART](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USART) 9 · [USB](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USB) 19 · [USBPD](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USBPD) 2 · [WWDG](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/WWDG) 1
+[ADC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/ADC) 14 · [APPLICATION](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/APPLICATION) 1 · [ARGB](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/ARGB) 2 · [BKP](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/BKP) 1 · [CPU](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/CPU) 9 · [CRC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/CRC) 1 · [DMA](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/DMA) 2 · [EXTI](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/EXTI) 1 · [FLASH](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/FLASH) 1 · [GPIO](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/GPIO) 1 · [I2C](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/I2C) 6 · [IAP](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/IAP) 1 · [IWDG](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/IWDG) 1 · [PWR](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/PWR) 5 · [RCC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/RCC) 2 · [RTC](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/RTC) 2 · [SDI_Printf](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SDI_Printf) 1 · [SPI](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SPI) 5 · [SYSTICK](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/SYSTICK) 1 · [TIM](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/TIM) 13 · [USART](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USART) 9 · [USB](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USB) 19 · [USBPD](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/USBPD) 2 · [WWDG](https://github.com/ch32-riscv-ug/CH32X315/tree/main/EVT/EXAM/WWDG) 1
 
 ## Documents
 
