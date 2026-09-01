@@ -468,13 +468,38 @@ zh/enの両版が一致した行がconfirmed。CH32V407（RMがzh単独）はref
 
 **option bytesのbit割当とRM記載の復位値**（構造表の直後にある無captionの
 「名称/字节」表から）。記載されたfieldまたはbyte群ごとに1行: `byte`（RDPR／
-USER／Data0-Data1／WRPR0-WRPR3）・`bits`・`field`・`default`。復位値は**RMが
-述べる粒度のまま**残す——工場出荷の生バイト列への合成は導出なのでしない
+USER／Data0-Data1／WRPR0-WRPR3）・`bits`・`field`・`default`、WRPR群の行には
+`wrpr_bit_protects`——**1bitが保護する範囲**をWRPR群の説明文から（「N個扇区×
+サイズ」・「4K字节」・DBMODE条件つき、の3形。どれにも当たらなければ生成が
+落ちる）。復位値は**RMが述べる粒度のまま**残す——工場出荷の生バイト列への合成は導出なのでしない
 （consumer側が新品実測との突き合わせに使う）。両版の比較は復位値セルの
 **値トークンの列**で行う（周りの散文は言語で違い、文字層では句読点がセルに
 漂着する）。識別子・値は空白とdashだけ畳んで資料どおり。本物のzh/en齟齬は
 conflictで残る——X315はUSERのbitをzhが`USBHSDLEN`・enが`USBFSDLEN`と綴り、
 FV2x/V3xのen版はzhが`RAM_CODE_MOD`と呼ぶSRAM分割fieldを無名のままにしている。
+
+### `device_id_addresses.csv`
+
+**32bit chip識別子（device_id）の読み出し番地をfamilyごとに**（consumer依頼
+R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_GetCHIPID()`——
+`*_dbgmcu.c`の即値、またはdevice headerの`CHIPID_BASE`で解決する`CHIPID`
+マクロ（L103/V205）。全12 familyに行がある——**第三者DBに無いfamilyも含む**
+（V205/V407/X315は`0x1ffff704`、M030だけ独自の`0x1ffff384`）。`check_tables`が
+`memory_map.csv`のCHIPID領域（ある家系）と、`device_ids.csv`全行の`id_addr`と
+突き合わせる。
+
+### `device_ids.csv`
+
+**型番ごとの32bit device_id**（packageの違いはbit[19:16]に出る）。
+**ch32-rs/ch32-data**（`data/chips/*.yaml`。cloneのcommitとfileをbasisに記録）
+から取り込んだ値は`reference`——第三者の機械可読DBは一次資料ではない。
+confirmedへ上がるのは実機読み（WCH-LinkE。basisは`device-id:wch-linke`——
+`debug_data`の`hartinfo:wch-linke`と同じ流儀）と突き合わせた行だけ。
+`id_source`は測定経路（`memory`＝番地読み／`attach`＝probe応答）で、取り込み
+行は空。`dont_care_bits`は`[7:4]`（silicon revision。ch32-dataのbit割り文書と
+probe-rsの照合maskが根拠）。目録に無いch32-dataの型番は**対応付けせずに見える
+形で落とす**——末尾のグレード桁だけ違うニアミスが複数ある
+（ch32-dataの`CH32V006F8P6` vs 目録の`CH32V006F8P7`等）。
 
 ### `link_firmware.csv`
 
@@ -846,6 +871,7 @@ uv run tools/build_link_firmware.py             # link_firmware（WCHの配布�
 uv run tools/build_debug_data.py                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
+uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run tools/extract_images.py                  # 各repoのimage/（数分かかる）

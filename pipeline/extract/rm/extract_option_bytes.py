@@ -48,7 +48,7 @@ BUNDLES = REPO / ".cache" / "structured-bundles"
 BYTE_COLUMNS = ["family", "address", "offset", "byte", "complement_address",
                 "write_unit", "#", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "byte", "bits", "field", "default",
-                 "#", "confidence", "basis"]
+                 "wrpr_bit_protects", "#", "confidence", "basis"]
 
 STRUCTURE_CAPTION = re.compile(r"用户选择字信息结构|User option bytes? information structure")
 FIELDS_HEADER = re.compile(r"^(?:名称/字节|Name/Byte)$", re.IGNORECASE)
@@ -73,6 +73,36 @@ COMPLEMENT_AUTO = {
     "zh": re.compile(r"自动计算出高字节"),
     "en": re.compile(r"automatically calculates? the high byte", re.IGNORECASE),
 }
+
+# WRPRの粒度（1bitが保護する範囲）。WRPR群の説明文（空白を全部除いた形）から
+# 取る。書き方は3種で全RMを覆う（2026-09-02実測）——(1) DBMODEで扇区サイズが
+# 変わる（H417とX315 en）、(2) N個扇区×サイズ、(3) 扇区を言わずKバイトだけ
+# （M030・CH32xRM）。どれにも当たらなければ生成が落ちる。
+WRPR_DBMODE = re.compile(
+    r"(\d+)(?:个扇区|sectors?)[（(](?:当|When)DBMODE=1[时]?[:：](\d+)K[^;；]*"
+    r"[;；](?:当|When)DBMODE=0[时]?[:：](\d+)K", re.IGNORECASE)
+WRPR_SECTORS = {
+    "zh": re.compile(r"(\d+)个扇区[（(](\d+)K字节/扇区[)）]"),
+    "en": re.compile(r"(\d+)sectors?\((\d+)Kbytes?/sector\)", re.IGNORECASE),
+}
+WRPR_PLAIN = {
+    "zh": re.compile(r"(\d+)K字节的写保护状态"),
+    "en": re.compile(r"(\d+)Kbytesinthemainmemory", re.IGNORECASE),
+}
+
+
+def wrpr_granularity(desc: str, lang: str) -> str:
+    m = WRPR_DBMODE.search(desc)
+    if m:
+        return (f"{m.group(1)} sector ({m.group(2)}KB/sector when DBMODE=1, "
+                f"{m.group(3)}KB/sector when DBMODE=0)")
+    m = WRPR_SECTORS[lang].search(desc)
+    if m:
+        return f"{m.group(1)} sector ({m.group(2)}KB/sector)"
+    m = WRPR_PLAIN[lang].search(desc)
+    if m:
+        return f"{m.group(1)}KB"
+    raise SystemExit(f"WRPRの粒度が説明文から読めない（{lang}）: {desc[:120]!r}")
 
 
 def squeeze(cell) -> str:
@@ -175,7 +205,8 @@ def parse_structure(grid: list[list], row_pages: list[int]) -> list[dict]:
 
 
 def parse_fields(grid: list[list], row_pages: list[int]) -> list[dict]:
-    """bit割当表 → byte群・bits・field・復位値。説明の折り返し行は読み飛ばす。"""
+    """bit割当表 → byte群・bits・field・復位値。説明の折り返し行は読み飛ばす
+    （ただし説明の本文は`desc`へ連結して保つ——WRPRの粒度がそこに書いてある）。"""
     if len(grid[0]) != 5:
         raise SystemExit(f"bit割当表の列数が想定外: {len(grid[0])}")
     out: list[dict] = []
@@ -183,7 +214,9 @@ def parse_fields(grid: list[list], row_pages: list[int]) -> list[dict]:
     for cells, page in zip(grid[1:], row_pages[1:]):
         name, bits, field = squeeze(cells[0]), squeeze(cells[1]), squeeze(cells[2])
         default = squeeze(cells[-1])
+        desc = squeeze(cells[3])
         if not name and not bits and out:
+            out[-1]["desc"] += desc
             if field and not default and out[-1]["bits"]:
                 # ページ跨ぎで識別子が行ごと割れた続き（M030 enの STANDYR + ST）
                 out[-1]["field"] += field
@@ -197,14 +230,14 @@ def parse_fields(grid: list[list], row_pages: list[int]) -> list[dict]:
             current = name
             if not bits and not field:   # byte群ぐるみの行（RDPR・Data・WRPR）
                 out.append({"byte": current, "bits": "", "field": "",
-                            "default": default, "page": page})
+                            "default": default, "desc": desc, "page": page})
                 continue
-        if not bits and not field:       # 説明の折り返し
+        if not bits and not field:       # 説明の折り返し（descは上で連結済み）
             continue
         if current is None:
             raise SystemExit(f"bit割当表がbyte名より先にbit行を持つ: {cells!r}")
         out.append({"byte": current, "bits": bits, "field": field,
-                    "default": default, "page": page})
+                    "default": default, "desc": desc, "page": page})
     return out
 
 
@@ -228,6 +261,10 @@ def read_edition(document: str, lang: str) -> dict:
     write_unit = units[0]
     if COMPLEMENT_AUTO[lang].search(window):
         write_unit += "; complement auto-computed"
+    fields = parse_fields(f_grid, f_pages)
+    for row in fields:
+        row["wrpr_bit_protects"] = (wrpr_granularity(row["desc"], lang)
+                                    if row["byte"].startswith("WRPR") else "")
     entries = parse_structure(s_grid, s_pages)
     # 表内の相対offset。**zh/enの照合はこのoffsetで対にする**——base番地そのものが
     # 版間で食い違うことがある（M030: zh 0x1FFFF300 / en 0x1FFFF800）
@@ -236,8 +273,7 @@ def read_edition(document: str, lang: str) -> dict:
         e["offset"] = e["address"] - base
         e["complement_offset"] = (e["complement_address"] - base
                                   if e["complement_address"] else None)
-    return {"bytes": entries,
-            "fields": parse_fields(f_grid, f_pages),
+    return {"bytes": entries, "fields": fields,
             "write_unit": write_unit, "write_page": heading_page}
 
 
@@ -327,7 +363,8 @@ def main() -> int:
             rm["document"], editions, "fields",
             key_of=lambda e: (e["byte"], e["bits"]),
             value_of=lambda e: {"field": e["field"],
-                                "default": default_key(e["default"])})
+                                "default": default_key(e["default"]),
+                                "wrpr_bit_protects": e["wrpr_bit_protects"]})
 
         for family in rm["families"]:
             for e in merged_bytes:
@@ -348,6 +385,7 @@ def main() -> int:
                     # 中国語を入れない。ASCIIならセルの綴りのまま
                     "default": (e["default"] if e["default"].isascii()
                                 else default_key(e["default"])),
+                    "wrpr_bit_protects": e["wrpr_bit_protects"],
                     "confidence": e["confidence"], "basis": e["basis"]})
 
     byte_rows.sort(key=lambda r: (r["family"], r["address"]))
