@@ -168,6 +168,8 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "memory_map": ("build_memory_map.py", "COLUMNS"),
     "opa_cmp_registers": ("build_opa_cmp_registers.py", "COLUMNS"),
     "operating_conditions": ("build_operating.py", "COLUMNS"),
+    "option_bytes": ("extract_option_bytes.py", "BYTE_COLUMNS"),
+    "option_byte_fields": ("extract_option_bytes.py", "FIELD_COLUMNS"),
     "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
     "pin_alternate": ("build_pin_alternate.py", "COLUMNS"),
     "pin_functions": ("build_pins.py", "FUNCTION_COLUMNS"),
@@ -569,6 +571,51 @@ def index_checks(t: dict) -> list[str]:
             bad.append(f"{who} の swdio_pad {r['swdio_pad']!r} が pinout に無い")
         # swclk_padがpinoutに無いのは資料間の齟齬（V002/V004で実在）で、証拠は
         # manualの綴りのまま持つ。裁定はdebug_interfaces側（採らずに異議を記録）。
+
+    # option_bytes: family ごとの最小 address が register_blocks の OB base と
+    # 一致すること（RM の選択字表 vs EVT ヘッダの相互検査）・offset は base からの
+    # 距離・補数 byte は常に value byte の隣（+1）。
+    families = {r["family"] for r in t["families"]}
+    ob_base = {r["family"]: int(r["base_address"], 16) for r in t["register_blocks"]
+               if r["block"] == "OB"}
+    ob_by_family: dict[str, list[dict]] = {}
+    for r in t["option_bytes"]:
+        ob_by_family.setdefault(r["family"], []).append(r)
+        if r["family"] not in families:
+            bad.append(f"option_bytes: {r['family']} が families.csv に無い")
+    for family, rows in sorted(ob_by_family.items()):
+        base = min(int(r["address"], 16) for r in rows)
+        if family not in ob_base:
+            bad.append(f"option_bytes: {family} の OB block が register_blocks に無い")
+        elif base != ob_base[family]:
+            bad.append(f"option_bytes: {family} の base 0x{base:08X} が "
+                       f"register_blocks の 0x{ob_base[family]:08X} と違う")
+        seen_addr: set[int] = set()
+        for r in rows:
+            addr = int(r["address"], 16)
+            if addr in seen_addr:
+                bad.append(f"option_bytes: {family} 0x{addr:08X} が2行ある")
+            seen_addr.add(addr)
+            if int(r["offset"], 16) != addr - base:
+                bad.append(f"option_bytes: {family} 0x{addr:08X} の offset "
+                           f"{r['offset']} が base からの距離でない")
+            if (r["complement_address"]
+                    and int(r["complement_address"], 16) != addr + 1):
+                bad.append(f"option_bytes: {family} 0x{addr:08X} の補数が隣でない")
+
+    # option_byte_fields: family は option_bytes にもあること・(byte,bits) が
+    # family 内で一意・どの family にも RDPR の行があること。
+    field_keys: dict[str, set[tuple]] = {}
+    for r in t["option_byte_fields"]:
+        if r["family"] not in ob_by_family:
+            bad.append(f"option_byte_fields: {r['family']} が option_bytes に無い")
+        key = (r["byte"], r["bits"])
+        if key in field_keys.setdefault(r["family"], set()):
+            bad.append(f"option_byte_fields: {r['family']} {key} が2行ある")
+        field_keys[r["family"]].add(key)
+    for family in ob_by_family:
+        if not any(b == "RDPR" for b, _ in field_keys.get(family, set())):
+            bad.append(f"option_byte_fields: {family} に RDPR の行が無い")
 
     # debug_interfaces: series ごと1行・features の debug 節見出しに戻せること・
     # debug_if が2つの証拠（見出しの綴り＋manualの配線）から再導出できること・
