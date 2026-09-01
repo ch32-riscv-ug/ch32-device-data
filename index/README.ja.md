@@ -228,18 +228,20 @@ family をまたいで「X を持たない型番」を数えないこと。
 ### `debug_interfaces.csv` — debug 配線は1線か2線か
 
 `tools/build_debug_interfaces.py` が作ります（書き込みツール向け。R-29）。1行1 series。
-`evidence/features.csv` が持つ **datasheet の debug 節見出しの綴り**から `debug_if` を
-決めます——`1-wire`／`单线` なら `swio`、`2-wire`／`2线` なら `rvswd`。
-**見出しが wire 数を言わない series は `debug_if` が空**です（V005/V006/V205/M030/
-H41x/V407/V467/X305/X315 の11 series。2026-09-01時点）。core 名や pad 数からの推測は
-しません——実際 CH32V007(+M007) は見出しが 1-wire なのに pin 表は SWDIO と SWCLK の
-両方を持ちます（V00X 系の両対応の示唆。`wording` に見出しの綴りをそのまま残します）。
+2つの証拠の突き合わせで `debug_if` を決めます——**datasheet の debug 節見出しの綴り**
+（`evidence/features.csv`。`1-wire`／`单线`→`swio`、`2-wire`／`2线`→`rvswd`）と、
+**WCH-Link manual の配線表＋両対応の注記**（`evidence/debug_wiring.csv`）。manual が
+両対応と言えば `both`、見出しが wire 数を言う場合は manual と矛盾しないことを確かめます
+（`swio` は `both` の部分集合として整合）。**全27 series が確定**（swio 3・rvswd 11・
+both 13）。例外が2つ——manual は V002/V004 を両対応（SWCLK=PB3）と括りますが、両者の
+pin 表に SWCLK が無く見出しも 1-wire なので、**見出しを採り manual の異議を basis に
+記録**しています（`!WCH-LinkUserManual.PDF(...)`）。
 
 | 列 | 中身 |
 |---|---|
-| `debug_if` | `swio`（1線）／`rvswd`（2線）／空（見出しが言わない） |
-| `wording` `section` | 決め手にした節見出しの英語の綴りと節番号（CH32V208 は英語版に見出しが無く空。zh のみ＝`reference`） |
-| `swdio_pads` `swclk_pads` | `index/pinout.csv` の正規化 role（SWDIO/SWCLK）の pad（`;`区切り。照合用の写し） |
+| `debug_if` | `swio`（1線）／`rvswd`（2線）／`both`（両対応。manual の注記） |
+| `wording` `section` | datasheet 側の節見出しの英語の綴りと節番号（CH32V208 は英語版に見出しが無く空） |
+| `swdio_pads` `swclk_pads` | `index/pinout.csv` の正規化 role（SWDIO/SWCLK）の pad（`;`区切り。manual の pad が実在することも生成が確かめる） |
 
 ### `features.csv` — 機能から series を探す
 

@@ -44,6 +44,7 @@ EVIDENCE_TABLES = (
     "opa_cmp_registers", "clock_enables", "usbpd_plumbing",
     "interrupts", "memory_map", "systick", "clock_configs", "clock_prescalers",
     "clock_sources", "clock_symbols", "clock_init", "evt_variants", "debug_data",
+    "debug_wiring",
 )
 
 # Evidence tables copied from EVT headers, whose names are already the machine

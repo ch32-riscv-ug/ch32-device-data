@@ -424,6 +424,24 @@ CH32H417 は EVT に define が無く（SDI_Printf 例が無い）、V5/V3 の�
 行は残して番地は空・`missing`。埋めるには hartinfo の実測が要る。`dm_data1_addr` は常に `dm_data0_addr + 4`
 （`check_tables` が見る）。生成は `tools/build_debug_data.py`。
 
+### `debug_wiring.csv`
+
+**debug配線（1線SWIO／2線SWDIO+SWCLK）のWCH-Link manual側の証拠**（consumerのR-29）。
+1行1 series（26行——manualに載らないM103は行なし。M103のwire数はdatasheetの節見出しが持つ）。
+出所は`WCH-LinkUserManual.PDF`（zh 2.8／en 2.7、WCH-commonにmirror）の2箇所で、zh/enが
+一致した行がconfirmed:
+
+- **配線表**（常用芯片型号／SWDIO／SWCLK）→ `swdio_pad`・`swclk_pad`。SWCLK欄が`-`の
+  chip（V003・CH641）は`swclk_pad`空＝1線のみ
+- **両対応の注記**（「…支持单线（SWDIO）和两线（SWDIO-SWCLK）调试接口」）→ `dual_support=yes`
+
+抽出は新経路（`pipeline/extract/manual/extract_debug_wiring.py`。構造化bundle入力で、
+zh版のページを跨ぐ配線表はL1結合層で結合してから読む）。chip群のtoken→seriesは
+総当たりの辞書で、辞書に無いCH32系tokenが現れたら生成が落ちる。**manualの主張を
+pin表が裏付けない箇所が2つ**（V002/V004——manualはV00x群を両対応と括るが、両者の
+pin表にSWCLKが無くdatasheetの見出しも1-wire）——証拠はmanualの綴りのまま残し、
+裁定は`index/debug_interfaces`側（見出しを採り、manualの異議をbasisに記録）。
+
 ### `link_firmware.csv`
 
 WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/build_link_firmware.py`で、
@@ -790,6 +808,7 @@ uv run tools/build_sources.py                   # catalog/sources（読んだmir
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
 uv run tools/build_debug_data.py                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
+uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run tools/extract_images.py                  # 各repoのimage/（数分かかる）
