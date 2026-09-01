@@ -106,6 +106,25 @@ original's SHA-256 and both tool versions (`--force` reconverts everything).
 The engine is pdfplumber, pinned by `uv.lock`. Cross-environment reproducibility
 is checked by `.github/workflows/structured-repro.yml`.
 
+
+## Preview repository (reviewing the human-readable Markdown)
+
+`structured-markdown` is large (11k files, ~95 MB), so it is published to a
+**disposable preview repository** as a single commit and read through GitHub
+Pages. Recommended name: **`ch32-device-data-preview`** (in the org).
+
+```sh
+uv run pipeline/review/export_markdown.py --all   # also writes the root index
+pipeline/review/publish_preview.sh ../ch32-device-data-preview
+# -> https://ch32-riscv-ug.github.io/ch32-device-data-preview/
+```
+
+The script recreates an orphan branch and force-pushes it, so the repository
+always holds exactly one commit and never grows. Pages' default Jekyll rewrites
+relative `.md` links and serves README.md as the directory index (the output
+contains no Liquid-breaking `{{`/`{%` -- verified). If the 11k-file Pages build
+ever times out, github.com's file view renders the same Markdown as a fallback.
+
 ## Baseline freeze
 
 `baseline/tables.csv` records rows and SHA-256 of every canonical CSV (catalog
