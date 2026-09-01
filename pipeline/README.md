@@ -43,8 +43,10 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            hash, then renders each figure region to a 150-dpi PNG recorded in
            assets.json with its bbox and SHA-256. Regions come from **vertical
            clusters of graphics**, not text -- in-figure labels arrive as paragraph
-           lines and collapse any text-based boundary. 3,195 assets across the 67
-           documents; 2,725 of the 2,943 figure captions carry a real image, 92.6%)
+           lines and collapse any text-based boundary. 3,307 assets across the 67
+           documents; 2,837 of the 2,884 figure captions carry a real image, 98.4%.
+           Prose references such as "Figure 22-17 illustrates ..." are not captions --
+           the shared classifier lives in pipeline/common/figure_captions.py)
            export_markdown.py (the human-readable Markdown -- the end goal is zero
            difference against the PDF. Headers/footers fold into HTML comments, tables
            keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
@@ -63,7 +65,7 @@ publish/   (planned) candidate -> approved canonical CSVs
 Candidates live in `.cache/pipeline-candidates/` (not committed). No tool on this
 path writes to the frozen CSVs directly.
 
-## What ingest fixes over the PoC (the two defects D17 pinned)
+## What ingest fixes over the PoC (three fixes: 1-2 measured in D17, 3 caught live by CI)
 
 1. **Determinism**: pdfminer names anonymous inline images after `id()` (a
    memory address); those digit names are dropped -- the converter's own stable
