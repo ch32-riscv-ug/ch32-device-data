@@ -22,12 +22,17 @@
 
 ```text
 ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの67版）
+extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDFへのsilent fallbackなし）
+           datasheet/run_operating.py（凍結ロジックをbundle入力で走らせる。
+           evidence/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
+reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
+checks/    compare_manifest.py（環境差の検証）。fixture回帰は今後
 review/    （予定）検査・annotation・人間向け表示
-extract/   （予定）領域別抽出。最初の移行CSVは operating_conditions
-reconcile/ （予定）zh/en照合・旧新差分
 publish/   （予定）candidate → 承認済み正本
-checks/    （予定）unit・fixture・旧新回帰
 ```
+
+candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍結CSVへ直接書く
+toolはこの経路に無い。
 
 ## ingestがPoCと違う点（D17が特定した2欠陥の修正）
 

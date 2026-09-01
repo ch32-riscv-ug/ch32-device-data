@@ -23,12 +23,20 @@ them one CSV at a time, only after old-vs-new comparison.
 
 ```text
 ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 67 catalogued versions)
+extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate;
+           no silent fallback to the PDF)
+           datasheet/run_operating.py (runs the frozen extraction logic on bundle
+           input; reproduces evidence/operating_conditions.csv **byte-identically**,
+           all 1,588 rows -- measured 2026-09-01)
+reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
+           zh/en pairing comes later
+checks/    compare_manifest.py (cross-environment reproducibility); fixture regression comes later
 review/    (planned) inspection, annotation, human-readable rendering
-extract/   (planned) per-domain extraction; first CSV to migrate: operating_conditions
-reconcile/ (planned) zh/en pairing, old-vs-new diffs
 publish/   (planned) candidate -> approved canonical CSVs
-checks/    (planned) unit, fixture, old-vs-new regression
 ```
+
+Candidates live in `.cache/pipeline-candidates/` (not committed). No tool on this
+path writes to the frozen CSVs directly.
 
 ## What ingest fixes over the PoC (the two defects D17 pinned)
 

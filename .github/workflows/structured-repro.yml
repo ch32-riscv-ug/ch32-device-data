@@ -16,9 +16,18 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "40 13 * * 1"   # weekly, after the Monday toolchain job
+  push:
+    branches: [main]
+    paths:
+      - "pipeline/**"
+      - "structured/**"
+      - "schemas/**"
+      - "uv.lock"
+      - ".github/workflows/structured-repro.yml"
   pull_request:
     paths:
       - "pipeline/**"
+      - "structured/**"
       - "schemas/**"
       - "uv.lock"
       - ".github/workflows/structured-repro.yml"
