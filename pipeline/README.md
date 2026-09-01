@@ -28,6 +28,9 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            datasheet/run_operating.py (runs the frozen extraction logic on bundle
            input; reproduces evidence/operating_conditions.csv **byte-identically**,
            all 1,588 rows -- measured 2026-09-01)
+           datasheet/extract_low_power.py (A11: consumption-current and wake-up-time
+           candidate rows; caption-scoped table selection, fragment joining, two-phase
+           zh/en pairing scoped by table number -- 1,208 rows, zero false conflicts)
 reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
            zh/en pairing comes later
 checks/    compare_manifest.py (cross-environment reproducibility); fixture regression comes later
