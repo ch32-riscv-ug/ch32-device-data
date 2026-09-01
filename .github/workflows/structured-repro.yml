@@ -1,0 +1,56 @@
+name: Structured conversion reproducibility
+
+# The structured bundles are NOT committed: pipeline/ regenerates them from the
+# mirrored PDFs, and only the manifests (per-page SHA-256) live in structured/.
+# That design holds only while the conversion is byte-reproducible across
+# environments -- same original + pinned pdfplumber + pinned converter must
+# yield the same hashes here as on the machine that committed the manifest.
+# D17 proved same-machine determinism; this job watches the cross-environment
+# half. It converts the smallest fixture pair (CH32V003 datasheet, zh+en,
+# fetched from the mirror's GitHub Pages) and compares page hashes against the
+# committed manifests.
+# bundleは非保存・manifestだけコミットする設計の前提（環境をまたいだ再現性）を
+# 週次で見張る。原本が変わった失敗と、環境で再現しない失敗は別の出口で報告する。
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 13 * * 1"   # weekly, after the Monday toolchain job
+  pull_request:
+    paths:
+      - "pipeline/**"
+      - "schemas/**"
+      - "uv.lock"
+      - ".github/workflows/structured-repro.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Fetch the fixture PDFs from the mirror
+        run: |
+          mkdir -p /tmp/pdfs/en /tmp/pdfs/zh
+          curl -fsSL -o /tmp/pdfs/en/CH32V003DS0.PDF \
+            https://ch32-riscv-ug.github.io/CH32V003/datasheet_en/CH32V003DS0.PDF
+          curl -fsSL -o /tmp/pdfs/zh/CH32V003DS0.PDF \
+            https://ch32-riscv-ug.github.io/CH32V003/datasheet_zh/CH32V003DS0.PDF
+
+      - name: Convert and compare page hashes against the committed manifests
+        run: |
+          uv run pipeline/ingest/convert.py /tmp/pdfs/en/CH32V003DS0.PDF \
+            --lang en --document-type datasheet \
+            --out /tmp/bundles --structured /tmp/structured
+          uv run pipeline/ingest/convert.py /tmp/pdfs/zh/CH32V003DS0.PDF \
+            --lang zh --document-type datasheet \
+            --out /tmp/bundles --structured /tmp/structured
+          uv run pipeline/checks/compare_manifest.py \
+            structured/CH32V003DS0.en/manifest.json /tmp/structured/CH32V003DS0.en/manifest.json
+          uv run pipeline/checks/compare_manifest.py \
+            structured/CH32V003DS0.zh/manifest.json /tmp/structured/CH32V003DS0.zh/manifest.json

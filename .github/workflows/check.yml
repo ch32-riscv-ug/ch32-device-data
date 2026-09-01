@@ -103,6 +103,7 @@ jobs:
           python tools/build_feature_tags.py
           python tools/build_capabilities.py
           python tools/build_conflicts.py
+          python tools/build_debug_interfaces.py
           python tools/build_index.py
           python tools/build_readme.py
           git diff --exit-code -- catalog/documents.csv index/ generated/readme/ \
