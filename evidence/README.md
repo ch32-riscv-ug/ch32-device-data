@@ -479,8 +479,11 @@ stays `reference`.
 **Bit assignments and RM-stated reset values of the option bytes** (the
 uncaptioned "Name/Byte" table that follows the structure table). One row per
 stated field or byte group: `byte` (RDPR / USER / Data0-Data1 / WRPR0-WRPR3),
-`bits`, `field`, `default`. The reset values are kept **at the granularity the
-RM states** -- a full factory byte string would be a derivation, so composing
+`bits`, `field`, `default`, and on the WRPR group row `wrpr_bit_protects` --
+what one WRPR bit write-protects, from the group's description ("N sectors of
+SIZE", plain "4KB", or the DBMODE-conditional sector size; a description
+matching none of the three stops the build). The reset values are kept **at
+the granularity the RM states** -- a full factory byte string would be a derivation, so composing
 one is left to the consumer (who also holds factory-fresh dumps to compare).
 Editions are compared on the **sequence of value tokens** in the reset cell
 (the prose around them differs by language, and stray punctuation drifts into
@@ -489,6 +492,32 @@ with whitespace and dashes folded. Genuine zh/en discrepancies stay as
 `conflict` -- e.g. X315 names one USER bit `USBHSDLEN` (zh) vs `USBFSDLEN`
 (en), and the FV2x/V3x en edition leaves the SRAM-split field unnamed where
 the zh edition calls it `RAM_CODE_MOD`.
+
+### `device_id_addresses.csv`
+
+**Where the 32-bit chip identifier is read from, per family** (consumer request
+R-28: chip-ID based target detection). The primary source is the EVT's
+`DBGMCU_GetCHIPID()` -- the literal address in `*_dbgmcu.c`, or the `CHIPID`
+macro resolved through the device header's `CHIPID_BASE` (L103/V205). All 12
+families have a row, **including the ones third-party databases lack** (V205 /
+V407 / X315 at `0x1ffff704`, and M030 at its own `0x1ffff384`). `check_tables`
+cross-checks the address against `memory_map.csv`'s CHIPID region where one
+exists, and against every `device_ids.csv` row's `id_addr`.
+
+### `device_ids.csv`
+
+**The 32-bit device_id per part number** (package variants differ in bits
+[19:16]). Values imported from **ch32-rs/ch32-data** (`data/chips/*.yaml`; the
+clone's commit and file are in `basis`) are `reference` -- a third-party
+machine-readable database is not a primary source. A row becomes `confirmed`
+only against a real-silicon read (WCH-LinkE; basis `device-id:wch-linke`, the
+same style as `debug_data`'s `hartinfo:wch-linke`); `id_source` records the
+measurement channel (`memory` address read / `attach` probe response) and is
+empty for imported values. `dont_care_bits` is `[7:4]` (silicon revision, per
+ch32-data's bit layout and probe-rs's match mask). ch32-data part numbers that
+are not in `catalog/products.csv` are dropped visibly, not remapped -- several
+differ from WCH's current catalog only in the trailing grade digit
+(`CH32V006F8P6` vs our `CH32V006F8P7`).
 
 ### `link_firmware.csv`
 
@@ -862,6 +891,7 @@ uv run tools/build_link_firmware.py             # link_firmware (from WCH's dist
 uv run tools/build_debug_data.py                # debug_data (defines in EVT debug.c + QingKe manual hartinfo table + measurements)
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
+uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)
 uv run tools/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
 uv run tools/build_readme.py                    # generated/readme/*.md (README for each family)
 uv run tools/extract_images.py                  # image/ in each repo (takes a few minutes)

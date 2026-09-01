@@ -9,7 +9,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 | | 何か | 読む人 |
 |---|---|---|
 | [`catalog/`](catalog/README.ja.md) 目録 8表 | 何が存在し何と呼ぶか（family・series・型番・package・core・文書・mirror版・上流ツールの版） | 全表の鍵 |
-| [`evidence/`](evidence/README.ja.md) 証拠 36表 | 資料は何と書いているか。**綴りは原典のまま**、行ごとに出所（`basis`）と確度（`confidence`） | 正しさを確かめる人 |
+| [`evidence/`](evidence/README.ja.md) 証拠 38表 | 資料は何と書いているか。**綴りは原典のまま**、行ごとに出所（`basis`）と確度（`confidence`） | 正しさを確かめる人 |
 | [`index/`](index/README.ja.md) 索引 | 証拠から語彙で揃えて組み直した、**引くための表**。1表1ファイル。型番や機能で絞って見るのは viewer（`pins.html`）で | 利用者・generator |
 
 > [!IMPORTANT]

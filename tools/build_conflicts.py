@@ -81,6 +81,8 @@ KEYS: dict[str, tuple[str, ...]] = {
     "debug_wiring": ("series",),
     "option_bytes": ("family", "address"),
     "option_byte_fields": ("family", "byte", "bits"),
+    "device_id_addresses": ("family",),
+    "device_ids": ("part_number", "id_source"),
 }
 
 # `basis` の DSL。異を唱える出所は `!` で始まり、その出所が言う値は `(=…)`。

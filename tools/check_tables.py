@@ -153,6 +153,8 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "cores": ("build_tables.py", "CORE_COLUMNS"),
     "debug_data": ("build_debug_data.py", "COLUMNS"),
     "debug_wiring": ("extract_debug_wiring.py", "COLUMNS"),
+    "device_id_addresses": ("build_device_ids.py", "ADDRESS_COLUMNS"),
+    "device_ids": ("build_device_ids.py", "ID_COLUMNS"),
     "dma_requests": ("build_dma_requests.py", "COLUMNS"),
     "documents": ("build_documents.py", "DOCUMENT_COLUMNS"),
     "errata": ("build_tables.py", "ERRATA_COLUMNS"),
@@ -602,6 +604,43 @@ def index_checks(t: dict) -> list[str]:
             if (r["complement_address"]
                     and int(r["complement_address"], 16) != addr + 1):
                 bad.append(f"option_bytes: {family} 0x{addr:08X} の補数が隣でない")
+
+    # device_id_addresses: **全familyに1行**（gap familyの読み出し番地こそR-28の
+    # 依頼内容）・memory_mapがCHIPID行を持つfamilyとは番地一致（EVTの別ファイル
+    # どうしの相互検査）。
+    id_addr_of: dict[str, str] = {}
+    for r in t["device_id_addresses"]:
+        if r["family"] in id_addr_of:
+            bad.append(f"device_id_addresses: {r['family']} が2行ある")
+        id_addr_of[r["family"]] = r["address"]
+    for family in families - set(id_addr_of):
+        bad.append(f"device_id_addresses: {family} の行が無い")
+    for family in set(id_addr_of) - families:
+        bad.append(f"device_id_addresses: {family} が families.csv に無い")
+    chipid_map = {r["family"]: r["base_address"] for r in t["memory_map"]
+                  if r["region"] == "CHIPID"}
+    for family, addr in chipid_map.items():
+        if family in id_addr_of and int(id_addr_of[family], 16) != int(addr, 16):
+            bad.append(f"device_id_addresses: {family} {id_addr_of[family]} が "
+                       f"memory_map の CHIPID {addr} と違う")
+
+    # device_ids: 型番が products にあること・id_addr がその family の番地である
+    # こと・device_id の形・dont_care の語彙。
+    product_family = {r["part_number"]: r["family"] for r in t["products"]}
+    for r in t["device_ids"]:
+        who = f"device_ids: {r['part_number']}"
+        family = product_family.get(r["part_number"])
+        if family is None:
+            bad.append(f"{who} が products.csv に無い")
+        elif int(r["id_addr"], 16) != int(id_addr_of.get(family, "0"), 16):
+            bad.append(f"{who} の id_addr {r['id_addr']} が "
+                       f"device_id_addresses（{family}）と違う")
+        if not re.fullmatch(r"0x[0-9A-Fa-f]{8}", r["device_id"]):
+            bad.append(f"{who} の device_id {r['device_id']!r} が32bit hexでない")
+        if r["dont_care_bits"] != "[7:4]":
+            bad.append(f"{who} の dont_care_bits {r['dont_care_bits']!r}")
+        if r["id_source"] not in ("", "memory", "attach"):
+            bad.append(f"{who} の id_source {r['id_source']!r}")
 
     # option_byte_fields: family は option_bytes にもあること・(byte,bits) が
     # family 内で一意・どの family にも RDPR の行があること。

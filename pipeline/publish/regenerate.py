@@ -52,6 +52,8 @@ def plan(args: argparse.Namespace) -> list[tuple[str, list[Step]]]:
              ["pipeline/extract/manual/extract_debug_wiring.py"]),
             ("option_bytes + option_byte_fields",
              ["pipeline/extract/rm/extract_option_bytes.py"]),
+            ("device_id_addresses + device_ids",
+             ["tools/build_device_ids.py"]),
         ]),
         ("index", [
             ("debug_interfaces", ["tools/build_debug_interfaces.py"]),
