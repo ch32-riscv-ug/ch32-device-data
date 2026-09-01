@@ -182,6 +182,7 @@ manifestに記録、全page・geometryのSHA-256をmanifestが台帳として持
 | CH32V003DS0 en（datasheet） | 37 | **byte一致** |
 | CH32V003DS0 zh（CJK） | 31 | **byte一致** |
 | CH32H417RM en（最大文書） | 1,042 | **14ページのみ差分**（原因特定済み・下記） |
+| CH32H417RM en（**本番converter 1.0.0**・D18） | 1,042 | **byte一致**——id()由来nameの正規化で非決定が消えたことを実証（2026-09-01） |
 
 **非決定性の源を1つ特定した。** pdfminerは、点線や網掛けをinline image
 （3×1pxなどの断片）として描くPDFに対し、無名のimageへ`id()`（メモリアドレス）由来の
@@ -304,8 +305,9 @@ architecture decisionの出発点であり、実装で前提が崩れたらこ�
    RMはL1結合後に章番号・register名で対応付ける。対応の記録は両言語の原本hashを
    固定した版対に付ける
 6. **開いた設計点**——L1を別ファイルにするか同bundle内の別sectionにするか／L2の承認粒度
-   （表単位か章単位か）／manifestのコミット先（既存`manifests/`はWCH APIの写しなので
-   別の置き場が要る）
+   （表単位か章単位か）。manifestのコミット先は**`structured/<stem>.<lang>/`に決めた**
+   （D18実装、2026-09-01。既存`manifests/`はWCH APIの写しなので使わない。
+   review sidecarも同じ場所に置く）
 
 ## 付録A: 対象文書の実測台帳（2026-09-01）
 
