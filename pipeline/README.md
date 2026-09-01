@@ -23,6 +23,12 @@ them one CSV at a time, only after old-vs-new comparison.
 
 ```text
 ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 67 catalogued versions)
+common/    logical_tables.py (**L1: joins the physical fragments of a page-spanning
+           table into one logical table**. The decision is structural, independent of
+           the converter's continuation flag: no caption, first content on its page,
+           the previous page ends in a table, vertical continuity, compatible column
+           structure. Columns align positionally when the fragment column counts
+           match, else by the union of x-edges. Shared by review and extract)
 extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate;
            no silent fallback to the PDF)
            datasheet/run_operating.py (runs the frozen extraction logic on bundle
@@ -35,9 +41,12 @@ reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/ch
            zh/en pairing comes later
 review/    export_markdown.py (the human-readable Markdown -- the end goal is zero
            difference against the PDF. Headers/footers fold into HTML comments, tables
-           keep rowspan/colspan as HTML, and **every known gap is marked visibly in
-           place**: a notice with a PDF page link after each figure caption, placeholders
-           for large images, table-issue warnings, undecodable-glyph warnings)
+           keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
+           and rendered in full where they start, with a visible pointer on the
+           following pages** (3,759 tables joined across the 67 documents), and
+           **every known gap is marked visibly in place**: a notice with a PDF page
+           link after each figure caption, placeholders for large images, table-issue
+           warnings, undecodable-glyph warnings)
 checks/    compare_manifest.py (cross-environment reproducibility)
            check_markdown_parity.py (machine check that every body line and table cell
            reaches the Markdown in reading order and that gap notices are present --

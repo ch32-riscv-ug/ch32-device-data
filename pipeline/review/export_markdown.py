@@ -40,6 +40,9 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import logical_tables  # noqa: E402
+
 BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_OUT = REPO / ".cache" / "structured-markdown"
 
@@ -72,7 +75,8 @@ def load_page(bundle: Path, entry: dict) -> dict:
 
 
 def table_html(table: dict, url: str | None, number: int) -> str:
-    grid: list[list[str | None]] = [[None for _ in range(table["column_count"])]
+    columns = table.get("width") or table["column_count"]
+    grid: list[list[str | None]] = [[None for _ in range(columns)]
                                     for _ in range(table["row_count"])]
     for cell in table["cells"]:
         attrs = []
@@ -85,17 +89,22 @@ def table_html(table: dict, url: str | None, number: int) -> str:
             + html.escape(cell["text"]) + "</td>")
     rows = ["<tr>" + "".join(cell or "" for cell in row) + "</tr>" for row in grid]
     caption = table["caption"]["text"] if table["caption"] else table["logical_id"]
+    span = table.get("parts")
     parts = []
     if table["issues"]:
+        where = (f"the PDF, pp.{span[0][0]}-{span[-1][0]}" if span
+                 else f"the PDF, p.{number}")
         parts.append(f"> ⚠ Table extraction recorded {len(table['issues'])} issue(s) "
                      f"(overlapping merged cells); verify against "
-                     f"{page_link(url, number, f'the PDF, p.{number}')}.\n")
-    parts.append(f"<!-- {table['id']} -->\n"
+                     f"{page_link(url, number, where)}.\n")
+    origin = (f"<!-- {table['id']} pages {span[0][0]}-{span[-1][0]} -->" if span
+              else f"<!-- {table['id']} -->")
+    parts.append(f"{origin}\n"
                  f"<table><caption>{html.escape(caption)}</caption>{''.join(rows)}</table>")
     return "\n".join(parts)
 
 
-def render_page(page: dict, url: str | None) -> str:
+def render_page(page: dict, url: str | None, chains: dict[str, dict]) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
@@ -109,7 +118,16 @@ def render_page(page: dict, url: str | None) -> str:
                    f"{page_link(url, number, f'the PDF, p.{number}')}.", ""]
     for item in page["reading_order"]:
         if item["type"] == "table":
-            output.extend(("", table_html(tables[item["id"]], url, number), ""))
+            info = chains[item["id"]]
+            if not info["start"]:
+                # 表はページを跨ぐが、人向けには開始ページで結合済みの全体を描く。
+                # このページの断片の場所には可視のポインタを置く（黙って消さない）。
+                output.extend(("", f"> ⬆ **Table continued** — rendered in full at "
+                               f"[page {info['start_page']}]"
+                               f"({info['start_page']:04d}.md). <!-- {item['id']} -->", ""))
+                continue
+            record = info["merged"] or tables[item["id"]]
+            output.extend(("", table_html(record, url, number), ""))
             continue
         if item["type"] == "image":
             image = images[item["id"]]
@@ -148,21 +166,24 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
     source = manifest["source"]
     url = urls.get((source["document"], source["language"]))
     out = out_root / bundle.name
-    pages = out / "pages"
-    pages.mkdir(parents=True, exist_ok=True)
+    pages_dir = out / "pages"
+    pages_dir.mkdir(parents=True, exist_ok=True)
+    pages = [load_page(bundle, entry) for entry in manifest["pages"]]
+    chains = logical_tables.document_chains(pages)
     links = []
-    for entry in manifest["pages"]:
-        page = load_page(bundle, entry)
-        name = f"{entry['number']:04d}.md"
-        (pages / name).write_text(render_page(page, url), encoding="utf-8")
-        links.append(f"- [page {entry['number']}](pages/{name})")
+    for page in pages:
+        name = f"{page['number']:04d}.md"
+        (pages_dir / name).write_text(render_page(page, url, chains), encoding="utf-8")
+        links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(
         f"# {source['document']} ({source['language']})\n\n"
         f"- type: `{source['document_type']}`\n"
         f"- source SHA-256: `{source['sha256']}`\n"
         + (f"- original: <{url}>\n" if url else "")
         + "\nHeaders and footers are folded into HTML comments. Figures are not\n"
-        "reproduced; every figure caption and every page links back to the PDF.\n\n"
+        "reproduced; every figure caption and every page links back to the PDF.\n"
+        "A table that spans pages is rendered in full on the page where it starts;\n"
+        "the following pages carry a visible pointer instead of a fragment.\n\n"
         + "\n".join(links) + "\n", encoding="utf-8")
     return out
 

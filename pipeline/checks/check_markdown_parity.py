@@ -27,10 +27,14 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import logical_tables  # noqa: E402
+
 BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
 FIGURE_CAPTION = re.compile(r"^(?:Figure|图)\s*\d+(?:-\d+)*", re.IGNORECASE)
 NOT_REPRODUCED = "The figure itself is not reproduced"
+CONTINUED = "**Table continued** — rendered in full at"
 
 
 def load_page(bundle: Path, entry: dict) -> dict:
@@ -40,7 +44,7 @@ def load_page(bundle: Path, entry: dict) -> dict:
     return json.loads(payload)
 
 
-def check_page(page: dict, text: str) -> list[str]:
+def check_page(page: dict, text: str, chains: dict[str, dict]) -> list[str]:
     bad = []
     position = 0
     tables = {item["id"]: item for item in page["tables"]}
@@ -59,7 +63,13 @@ def check_page(page: dict, text: str) -> list[str]:
 
     for item in page["reading_order"]:
         if item["type"] == "table":
-            for cell in tables[item["id"]]["cells"]:
+            info = chains[item["id"]]
+            if not info["start"]:
+                # 続き断片は開始ページで結合済み。ここには可視のポインタが要る。
+                expect(CONTINUED, f"table {item['id']} continuation pointer")
+                continue
+            record = info["merged"] or tables[item["id"]]
+            for cell in record["cells"]:
                 expect(html.escape(cell["text"]), f"table {item['id']} cell")
         elif item["type"] == "line":
             line = lines[item["id"]]
@@ -74,13 +84,15 @@ def check_page(page: dict, text: str) -> list[str]:
 
 def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
+    pages = [load_page(bundle, entry) for entry in manifest["pages"]]
+    chains = logical_tables.document_chains(pages)
     bad: list[str] = []
-    for entry in manifest["pages"]:
-        md = markdown / "pages" / f"{entry['number']:04d}.md"
+    for page in pages:
+        md = markdown / "pages" / f"{page['number']:04d}.md"
         if not md.exists():
-            bad.append(f"p{entry['number']}: markdown page missing")
+            bad.append(f"p{page['number']}: markdown page missing")
             continue
-        bad.extend(check_page(load_page(bundle, entry), md.read_text(encoding="utf-8")))
+        bad.extend(check_page(page, md.read_text(encoding="utf-8"), chains))
     if bad:
         print(f"[{bundle.name}] {len(bad)} parity issue(s):", file=sys.stderr)
         for line in bad[:limit]:

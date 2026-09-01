@@ -22,6 +22,10 @@
 
 ```text
 ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの67版）
+common/    logical_tables.py（**L1: ページを跨ぐ表の断片を1つの論理表に結合**。
+           変換器の継続flagに依存せず構造で判定——無caption・ページ先頭・前ページ
+           末尾が表・縦位置の連続・列構造互換。列の対応付けは列数が同じなら位置、
+           違えばx座標の和集合。reviewとextractが同じ部品を使う）
 extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDFへのsilent fallbackなし）
            datasheet/run_operating.py（凍結ロジックをbundle入力で走らせる。
            evidence/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
@@ -30,6 +34,8 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
 review/    export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
+           **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
+           可視ポインタ**（67文書で3,759表を結合）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告）
 checks/    compare_manifest.py（環境差の検証）
