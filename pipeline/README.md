@@ -39,7 +39,13 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            zh/en pairing scoped by table number -- 1,208 rows, zero false conflicts)
 reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
            zh/en pairing comes later
-review/    export_markdown.py (the human-readable Markdown -- the end goal is zero
+review/    render_assets.py (**pixel rendering of figures**: verifies the original's
+           hash, then renders each figure region to a 150-dpi PNG recorded in
+           assets.json with its bbox and SHA-256. Regions come from **vertical
+           clusters of graphics**, not text -- in-figure labels arrive as paragraph
+           lines and collapse any text-based boundary. 3,195 assets across the 67
+           documents; 2,725 of the 2,943 figure captions carry a real image, 92.6%)
+           export_markdown.py (the human-readable Markdown -- the end goal is zero
            difference against the PDF. Headers/footers fold into HTML comments, tables
            keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
            and rendered in full where they start, with a visible pointer on the

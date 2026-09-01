@@ -104,7 +104,8 @@ def table_html(table: dict, url: str | None, number: int) -> str:
     return "\n".join(parts)
 
 
-def render_page(page: dict, url: str | None, chains: dict[str, dict]) -> str:
+def render_page(page: dict, url: str | None, chains: dict[str, dict],
+                assets: dict[str, dict]) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
@@ -131,8 +132,20 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict]) -> str:
             continue
         if item["type"] == "image":
             image = images[item["id"]]
+            asset = assets.get(image["id"])
             x0, top, x1, bottom = image["bbox"]
-            if x1 - x0 >= LARGE_IMAGE and bottom - top >= LARGE_IMAGE:
+            cx, cy = (x0 + x1) / 2, (top + bottom) / 2
+            covered = any(a["page"] == number
+                          and a["bbox"][0] <= cx <= a["bbox"][2]
+                          and a["bbox"][1] <= cy <= a["bbox"][3]
+                          for a in assets.values())
+            if asset:
+                output.extend(("", f"![image p.{number}](../{asset['file']}) "
+                               f"<!-- {image['id']} rendered from the PDF -->", ""))
+            elif covered:
+                # 描画済みの図領域の中の画像。図の埋め込みが既に見せている。
+                output.append(f"<!-- image: {image['id']} inside a rendered figure -->")
+            elif x1 - x0 >= LARGE_IMAGE and bottom - top >= LARGE_IMAGE:
                 output.extend(("", f"> 🖼 **Image not reproduced** "
                                f"({x1 - x0:.0f}×{bottom - top:.0f} pt) — see "
                                f"{page_link(url, number, f'the PDF, p.{number}')}."
@@ -147,10 +160,19 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict]) -> str:
             output.append(f"<!-- {role}: {text} -->")
             continue
         if FIGURE_CAPTION.match(line["text"].strip()):
-            # 図そのものは再現していない。captionの場所で見えるように言う。
-            output.extend(("", text + "  ",
-                           f"> ⚠ **The figure itself is not reproduced** — see "
-                           f"{page_link(url, number, f'the PDF, p.{number}')}.", ""))
+            asset = assets.get(line["id"])
+            if asset:
+                # asset rendererが図領域を描画済み。captionの下に埋め込む。
+                output.extend(("", text + "  ",
+                               f"![{html.escape(FIGURE_CAPTION.match(line['text'].strip()).group(0))}]"
+                               f"(../{asset['file']}) "
+                               f"<!-- rendered from the PDF; verify at "
+                               f"{url or 'the PDF'}#page={number} -->", ""))
+            else:
+                # 図そのものは再現していない。captionの場所で見えるように言う。
+                output.extend(("", text + "  ",
+                               f"> ⚠ **The figure itself is not reproduced** — see "
+                               f"{page_link(url, number, f'the PDF, p.{number}')}.", ""))
             continue
         if role == "heading":
             output.extend(("", "#" * min(6, line.get("level", 2)) + " " + text, ""))
@@ -170,20 +192,31 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
     pages_dir.mkdir(parents=True, exist_ok=True)
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
     chains = logical_tables.document_chains(pages)
+    assets: dict[str, dict] = {}
+    assets_path = out / "assets.json"
+    if assets_path.exists():
+        record = json.loads(assets_path.read_text(encoding="utf-8"))
+        if record["source_sha256"] == source["sha256"]:
+            assets = record["assets"]
+        else:
+            print(f"{assets_path}: stale (different original); ignoring -- "
+                  "re-run pipeline/review/render_assets.py", file=sys.stderr)
     links = []
     for page in pages:
         name = f"{page['number']:04d}.md"
-        (pages_dir / name).write_text(render_page(page, url, chains), encoding="utf-8")
+        (pages_dir / name).write_text(render_page(page, url, chains, assets),
+                                      encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(
         f"# {source['document']} ({source['language']})\n\n"
         f"- type: `{source['document_type']}`\n"
         f"- source SHA-256: `{source['sha256']}`\n"
         + (f"- original: <{url}>\n" if url else "")
-        + "\nHeaders and footers are folded into HTML comments. Figures are not\n"
-        "reproduced; every figure caption and every page links back to the PDF.\n"
-        "A table that spans pages is rendered in full on the page where it starts;\n"
-        "the following pages carry a visible pointer instead of a fragment.\n\n"
+        + "\nHeaders and footers are folded into HTML comments. Figures are rendered\n"
+        "from the PDF where the asset renderer found their region; a caption whose\n"
+        "figure could not be located carries a visible notice instead, and every\n"
+        "page links back to the PDF. A table that spans pages is rendered in full\n"
+        "on the page where it starts; the following pages carry a visible pointer.\n\n"
         + "\n".join(links) + "\n", encoding="utf-8")
     return out
 
