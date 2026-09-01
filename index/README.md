@@ -206,15 +206,16 @@ disputed varies, so those rows leave `field` empty and name the columns inside `
 ### `debug_interfaces.csv` -- is the debug wiring 1-wire or 2-wire?
 
 By `tools/build_debug_interfaces.py` (for flashing tools; request R-29). One row per series.
-`debug_if` is decided by **the wording of the datasheet's debug section heading** held in
-`evidence/features.csv`: `1-wire` gives `swio`, `2-wire` gives `rvswd`. **Series whose heading
-does not state a wire count keep `debug_if` empty** (11 series as of 2026-09-01: V005/V006/
-V205/M030/H41x/V407/V467/X305/X315) -- nothing is inferred from core names or pad counts.
-CH32V007(+M007) shows why: its heading says 1-wire, yet the pin table carries both SWDIO and
-SWCLK pads (suggesting the V00X dual support); `wording` keeps the heading as printed.
-`swdio_pads`/`swclk_pads` copy the normalised SWDIO/SWCLK pads from `index/pinout.csv` for
-cross-checking. CH32V208 has the heading only in the Chinese edition (`reference`, empty
-`wording`).
+`debug_if` comes from crossing two pieces of evidence: **the datasheet's debug section
+heading** (`evidence/features.csv`: `1-wire` -> `swio`, `2-wire` -> `rvswd`) and **the
+WCH-Link manual's wiring table plus its dual-support note** (`evidence/debug_wiring.csv`);
+`both` means the manual lists the series as supporting 1-wire and 2-wire. A stated heading
+must not contradict the manual (`swio` is consistent with `both` as a subset). **All 27
+series are decided** (swio 3, rvswd 11, both 13). Two exceptions: the manual lumps
+V002/V004 into the dual-support group (SWCLK=PB3), but their pin tables carry no SWCLK and
+the headings say 1-wire -- the heading wins and the manual's dissent is recorded in basis
+(`!WCH-LinkUserManual.PDF(...)`). `swdio_pads`/`swclk_pads` copy the normalised pads from
+`index/pinout.csv`; the build also verifies the manual's pads exist there.
 
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 

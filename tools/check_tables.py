@@ -152,6 +152,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "clock_symbols": ("build_clock.py", "SYMBOL_COLUMNS"),
     "cores": ("build_tables.py", "CORE_COLUMNS"),
     "debug_data": ("build_debug_data.py", "COLUMNS"),
+    "debug_wiring": ("extract_debug_wiring.py", "COLUMNS"),
     "dma_requests": ("build_dma_requests.py", "COLUMNS"),
     "documents": ("build_documents.py", "DOCUMENT_COLUMNS"),
     "errata": ("build_tables.py", "ERRATA_COLUMNS"),
@@ -213,7 +214,10 @@ def column_definitions() -> dict[str, list[str]]:
     import ast  # noqa: PLC0415
 
     out: dict[str, list[str]] = {}
-    for path in sorted((paths.REPO / "tools").glob("build_*.py")):
+    generators = (list((paths.REPO / "tools").glob("build_*.py"))
+                  # 新経路（D18）の生成器。ファイル名はtools側と衝突しない
+                  + list((paths.REPO / "pipeline" / "extract").rglob("*.py")))
+    for path in sorted(generators):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
         except SyntaxError:
@@ -545,38 +549,63 @@ def index_checks(t: dict) -> list[str]:
         if r["count"] and r["count"] != r["value"]:
             bad.append(f"capabilities: {r['part_number']} {r['attribute']} の count が値そのままでない")
 
-    # debug_interfaces: series ごと1行・features の debug 節見出しに戻せること・
-    # pads は pinout の正規化 role（SWDIO/SWCLK）の写しそのものであること。
-    # debug_if は**見出しが wire 数を言うときだけ**入る（推測を足さない）。
+    # debug_wiring: series ごと高々1行・padがpinoutの正規化roleに実在すること。
     series_family = {r["series"]: r["family"] for r in t["series"]}
-    heads = {}
-    for r in t["features"]:
-        for s in r["series"].split(";"):
-            heads[(s, r["section"], r["basis"])] = r
     swd_pads: dict[tuple[str, str], set[str]] = {}
     for r in t["index:pinout"]:
         if r["role"] in ("SWDIO", "SWCLK"):
             swd_pads.setdefault((r["series"], r["role"]), set()).add(r["pad"])
+    wiring: dict[str, dict] = {}
+    for r in t["debug_wiring"]:
+        who = f"debug_wiring: {r['series']}"
+        if r["series"] in wiring:
+            bad.append(f"{who} が2行ある")
+        wiring[r["series"]] = r
+        if r["series"] not in series_family:
+            bad.append(f"{who} が series.csv に無い")
+        if r["dual_support"] not in ("", "yes"):
+            bad.append(f"{who} の dual_support {r['dual_support']!r}")
+        if not r["swdio_pad"] or r["swdio_pad"] not in swd_pads.get((r["series"], "SWDIO"), set()):
+            bad.append(f"{who} の swdio_pad {r['swdio_pad']!r} が pinout に無い")
+        # swclk_padがpinoutに無いのは資料間の齟齬（V002/V004で実在）で、証拠は
+        # manualの綴りのまま持つ。裁定はdebug_interfaces側（採らずに異議を記録）。
+
+    # debug_interfaces: series ごと1行・features の debug 節見出しに戻せること・
+    # debug_if が2つの証拠（見出しの綴り＋manualの配線）から再導出できること・
+    # pads は pinout の正規化 role（SWDIO/SWCLK）の写しそのものであること。
+    heads = {}
+    for r in t["features"]:
+        for s in r["series"].split(";"):
+            heads[(s, r["section"])] = r
     if {r["series"] for r in t["index:debug_interfaces"]} != set(series_family):
         bad.append("debug_interfaces: series の集合が catalog/series と違う")
     for r in t["index:debug_interfaces"]:
         who = f"debug_interfaces: {r['series']}"
         if series_family.get(r["series"]) != r["family"]:
             bad.append(f"{who} の family {r['family']!r} が series.csv と違う")
-        if r["debug_if"] not in ("", "swio", "rvswd"):
+        if r["debug_if"] not in ("swio", "rvswd", "both"):
             bad.append(f"{who} の debug_if {r['debug_if']!r}")
-        src = heads.get((r["series"], r["section"], r["basis"]))
+        src = heads.get((r["series"], r["section"]))
         if src is None:
-            bad.append(f"{who} を features の節見出しに戻せない（{r['section']} / {r['basis']}）")
+            bad.append(f"{who} を features の節見出しに戻せない（{r['section']}）")
         else:
             if r["wording"] != src["feature"]:
                 bad.append(f"{who} の wording {r['wording']!r} が features の綴りと違う")
-            # debug_if は見出しの綴りから再導出できること（推測を足していない証明）
             text = src["feature"] + src["feature_zh"]
-            derived = ("swio" if re.search(r"1-wire|single-wire|单线", text, re.IGNORECASE)
+            heading = ("swio" if re.search(r"1-wire|single-wire|单线", text, re.IGNORECASE)
                        else "rvswd" if re.search(r"2-wire|2线|两线|二线", text) else "")
+            w = wiring.get(r["series"])
+            if w and w["swclk_pad"] and w["swclk_pad"] not in swd_pads.get(
+                    (r["series"], "SWCLK"), set()):
+                w = None          # manualのSWCLKをpin表が裏付けない→見出し側を採る
+            if w:
+                derived = ("both" if w["dual_support"] == "yes"
+                           else "swio" if not w["swclk_pad"] else "rvswd")
+            else:
+                derived = heading
             if r["debug_if"] != derived:
-                bad.append(f"{who} の debug_if {r['debug_if']!r} が見出しの綴り（{derived!r}）と違う")
+                bad.append(f"{who} の debug_if {r['debug_if']!r} が証拠からの導出"
+                           f"（{derived!r}）と違う")
         for column, role in (("swdio_pads", "SWDIO"), ("swclk_pads", "SWCLK")):
             have = set(r[column].split(";")) - {""}
             if have != swd_pads.get((r["series"], role), set()):
