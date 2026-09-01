@@ -33,8 +33,15 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            zh/en pairing scoped by table number -- 1,208 rows, zero false conflicts)
 reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
            zh/en pairing comes later
-checks/    compare_manifest.py (cross-environment reproducibility); fixture regression comes later
-review/    (planned) inspection, annotation, human-readable rendering
+review/    export_markdown.py (the human-readable Markdown -- the end goal is zero
+           difference against the PDF. Headers/footers fold into HTML comments, tables
+           keep rowspan/colspan as HTML, and **every known gap is marked visibly in
+           place**: a notice with a PDF page link after each figure caption, placeholders
+           for large images, table-issue warnings, undecodable-glyph warnings)
+checks/    compare_manifest.py (cross-environment reproducibility)
+           check_markdown_parity.py (machine check that every body line and table cell
+           reaches the Markdown in reading order and that gap notices are present --
+           **all 67 documents pass**)
 publish/   (planned) candidate -> approved canonical CSVs
 ```
 

@@ -28,8 +28,13 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間のcandidate。
            caption選定＋断片結合＋表番号スコープの2段階zh/en照合。1,208行・偽conflict 0）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
-checks/    compare_manifest.py（環境差の検証）。fixture回帰は今後
-review/    （予定）検査・annotation・人間向け表示
+review/    export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
+           header/footerはコメント化、表はrowspan/colspan保持のHTML、
+           **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
+           ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告）
+checks/    compare_manifest.py（環境差の検証）
+           check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
+           全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**）
 publish/   （予定）candidate → 承認済み正本
 ```
 
