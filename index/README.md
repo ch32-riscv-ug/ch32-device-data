@@ -17,6 +17,7 @@ split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanes
 | Where do the sources disagree with each other? | [`conflicts.csv`](conflicts.csv) |
 | Which series have feature X? | [`features.csv`](features.csv) |
 | What is this lead of this part? Which lead carries USART1 TX? | [`pinout.csv`](pinout.csv) |
+| Is the debug wiring 1-wire (SWIO) or 2-wire (SWDIO+SWCLK)? | [`debug_interfaces.csv`](debug_interfaces.csv) |
 | Which remap value routes the signal where I want it? | [`routes.csv`](routes.csv) |
 | Registers and bit fields (header generation) | [`registers.csv`](registers.csv) |
 | Absolute register addresses | [`register_map.csv`](register_map.csv) |
@@ -201,6 +202,19 @@ against `ms`, `0.8VDD` against `0.8*VDD`, `VI/O` against `VIO`). For a Chinese d
 `operating_conditions` states four values per row (`min`/`typ`/`max`/`unit`) and which one is
 disputed varies, so those rows leave `field` empty and name the columns inside `alternative`
 (`min=60,typ=82,max=110`).
+
+### `debug_interfaces.csv` -- is the debug wiring 1-wire or 2-wire?
+
+By `tools/build_debug_interfaces.py` (for flashing tools; request R-29). One row per series.
+`debug_if` is decided by **the wording of the datasheet's debug section heading** held in
+`evidence/features.csv`: `1-wire` gives `swio`, `2-wire` gives `rvswd`. **Series whose heading
+does not state a wire count keep `debug_if` empty** (11 series as of 2026-09-01: V005/V006/
+V205/M030/H41x/V407/V467/X305/X315) -- nothing is inferred from core names or pad counts.
+CH32V007(+M007) shows why: its heading says 1-wire, yet the pin table carries both SWDIO and
+SWCLK pads (suggesting the V00X dual support); `wording` keeps the heading as printed.
+`swdio_pads`/`swclk_pads` copy the normalised SWDIO/SWCLK pads from `index/pinout.csv` for
+cross-checking. CH32V208 has the heading only in the Chinese edition (`reference`, empty
+`wording`).
 
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 

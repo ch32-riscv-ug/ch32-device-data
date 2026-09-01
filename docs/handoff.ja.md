@@ -6,7 +6,7 @@
 
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
-このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠33表）・`index/`（索引12表）と、そこから生成する各family
+このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠33表）・`index/`（索引13表）と、そこから生成する各family
 リポジトリのREADME**。一次資料（datasheet zh/en・reference manual・EVT）を
 `/home/mt/dev_wch/<FAMILY>/` のmirrorから機械抽出し、出所を`basis`、確度を
 `confidence`に残す。
