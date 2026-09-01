@@ -122,7 +122,8 @@ pipeline/review/publish_preview.sh ../ch32-device-data-preview
 The script recreates an orphan branch and force-pushes it, so the repository
 always holds exactly one commit and never grows. Pages' default Jekyll rewrites
 relative `.md` links and serves README.md as the directory index (the output
-contains no Liquid-breaking `{{`/`{%` -- verified). If the 11k-file Pages build
+contains none of the sequences Liquid treats specially -- double open-brace and
+open-brace-percent -- verified). If the 11k-file Pages build
 ever times out, github.com's file view renders the same Markdown as a fallback.
 
 ## Baseline freeze

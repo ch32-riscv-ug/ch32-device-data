@@ -295,13 +295,39 @@ def check_holes(open_or_not: dict[str, bool]) -> list[str]:
     return bad
 
 
+def check_liquid() -> list[str]:
+    """コミットするMarkdownにLiquidが特別扱いする並びが無いこと。
+
+    このrepositoryはGitHub Pagesで配信され、PagesのJekyllはmarkdown処理の前に
+    **全.mdへLiquidを走らせる**。波括弧2連や波括弧+percentが生で書いてあると
+    Pagesのビルドごと落ちる——バッククォートでは保護されない。実際に
+    pipeline/README.ja.mdの「Liquid危険文字の説明」自身がビルドを壊した
+    （2026-09-01、ユーザーがPagesのエラーで発見）。
+    """
+    dangerous = ("{" + "{", "{" + "%")
+    bad = []
+    for path in Path(".").rglob("*.md"):
+        parts = path.parts
+        if parts[0].startswith(".") or parts[0] in ("node_modules",):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for sequence in dangerous:
+            at = text.find(sequence)
+            if at >= 0:
+                line = text[:at].count("\n") + 1
+                bad.append(f"{path}:{line}: Liquidが特別扱いする並び {sequence!r} "
+                           "——GitHub PagesのJekyllビルドが落ちる。言い換えること")
+    return bad
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.parse_args()
 
     known = quantities()
     holes = ledger()
-    bad = check_row_counts(known) + check_prose(known) + check_holes(holes)
+    bad = (check_row_counts(known) + check_prose(known) + check_holes(holes)
+           + check_liquid())
     if bad:
         seen: list[str] = []
         for b in bad:

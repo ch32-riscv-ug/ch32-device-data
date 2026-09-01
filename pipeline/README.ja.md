@@ -104,7 +104,8 @@ pipeline/review/publish_preview.sh ../ch32-device-data-preview
 
 スクリプトは毎回orphan branchを作り直してforce pushするので、**リポジトリは
 常に最新の1コミットだけ**を持ち、履歴が育たない。PagesのJekyllは既定で
-`.md`相対リンクの変換とREADMEのindex化をやる（Liquid危険文字`{{`/`{%`は
+`.md`相対リンクの変換とREADMEのindex化をやる（Liquidが特別扱いする並び——
+波括弧の2連続と「波括弧＋percent」——は
 全出力でゼロを確認済み）。11kファイルでPagesのビルドが時間切れになる場合でも、
 github.comのファイルビューが同じMarkdownを描画する。
 
