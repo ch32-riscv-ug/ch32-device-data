@@ -284,4 +284,5 @@ CH32X035,afio-usart1-remap,afio,PCFR1,USART1_REMAP,PCFR1:5;PCFR1:6,0;1;2;3,0,#,r
 CH32X035,afio-usart2-remap,afio,PCFR1,USART2_REMAP,PCFR1:7;PCFR1:8;PCFR1:9,0;1;2;3;4;5;6;7,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32X035,afio-usart3-remap,afio,PCFR1,USART3_REMAP,PCFR1:10;PCFR1:11,0;1;2;3,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32X035,afio-usart4-remap,afio,PCFR1,USART4_REMAP,PCFR1:12;PCFR1:13;PCFR1:14,0;1;2;3;4;5;6;7,0,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
+CH32X305,afio-pd0-1-remap,afio,PCFR1,PD0_1_REMAP,PCFR1:15,0,,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)
 CH32X315,afio-pd0-1-remap,afio,PCFR1,PD0_1_REMAP,PCFR1:15,0,,#,reference,candidates(evt-header+rm-register-table+rm-remap-grid:en)

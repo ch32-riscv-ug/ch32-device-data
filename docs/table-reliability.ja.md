@@ -67,8 +67,8 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| remap_fields | 286 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた）。F-47 で V407/V467 の `ETHPHY_LED_REMAP` が入った | 🔵 |
-| remap_routes | 4,837 | 全行 reference | fields と結合・valid_values・**pin_functions に (pad, signal) があること**（`routes_backed_by_pins`。2026-08-28 に実装） | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。F-8（V003 の ADC 規則転換トリガ PD3/PC2）と F-47（V407/V467 の LED0/LED1）の経路が入り、F-6（V30x の I2S3。2026-08-28）も入って **`candidates` の未解決は 0** になった（**index 側の数は別**——`index/pinout.csv` で selector を決められない `remap-N` 行は **3行**で、F-51 だけ。`KNOWN_SELECTOR_GAPS` が持つ。worklist の「未解決の数は2つあり、単位が違う」）。F-50 は**修正済み**（2026-08-28。CH32X033 の candidate が CH32X035 の pin 表を読んでいた——series CH32X033 の経路が別の pad 由来だった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
+| remap_fields | 287 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた）。F-47 で V407/V467 の `ETHPHY_LED_REMAP` が入った | 🔵 |
+| remap_routes | 4,838 | 全行 reference | fields と結合・valid_values・**pin_functions に (pad, signal) があること**（`routes_backed_by_pins`。2026-08-28 に実装） | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。F-8（V003 の ADC 規則転換トリガ PD3/PC2）と F-47（V407/V467 の LED0/LED1）の経路が入り、F-6（V30x の I2S3。2026-08-28）も入って **`candidates` の未解決は 0** になった（**index 側の数は別**——`index/pinout.csv` で selector を決められない `remap-N` 行は **3行**で、F-51 だけ。`KNOWN_SELECTOR_GAPS` が持つ。worklist の「未解決の数は2つあり、単位が違う」）。F-50 は**修正済み**（2026-08-28。CH32X033 の candidate が CH32X035 の pin 表を読んでいた——series CH32X033 の経路が別の pad 由来だった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
 | flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
 | opa_cmp_registers | 293 | confirmed 199 / ref 89 / conflict 5 | 結合・address=base+offset・bits=mask | EVT ヘッダ×RM レジスタ表。conflict 5 は**EVT ヘッダ側の誤り**と判断できるもの（F-44 X035 CMP_LOCK bit13→RM bit31 / F-45 L103 ITRIM 幅・V205 HYS_H 位置）。V20x/V103/X315 は bit define が無く行なし | 🟡 |
@@ -83,15 +83,15 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | interrupts | 791 | 全行 reference | 結合・condition の macro・境界不変量 | F-37 は**修正済み**（OR条件を`\|`区切りで全部持つ） | 🔵 |
-| memory_map | 799 | 全行 reference | 結合 | F-38 は**修正済み**（基準リンカを式評価で読む。H417 はコア別2行）。ヘッダ由来の行は検証で全一致 | 🔵 |
+| memory_map | 797 | 全行 reference | 結合 | F-38 は**修正済み**（基準リンカを式評価で読む。H417 はコア別2行）。ヘッダ由来の行は検証で全一致 | 🔵 |
 | systick | 53 | 全行 reference | 結合 | — | 🔵 |
 | evt_variants | 56 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
-| clock_configs 他 clock_* 5表 | 1,067 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
-| evt_examples | 1,593 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
+| clock_configs 他 clock_* 5表 | 1,070 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
+| evt_examples | 1,604 | confirmed 1,556 / ref 37 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 | register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |
-| registers | 4,995 | confirmed 2,762 / ref 2,229 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |
+| registers | 4,932 | confirmed 2,762 / ref 2,229 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |
 | register_fields | 33,365 | field 24,792（confirmed 6,831 / conflict 38）・value 8,573（全 reference） | 結合・bits/mask/kind 書式 | **`member` が空な行は 1,591 → 911**（2026-08-28〜29。R-20。banner が型を名乗らないだけの343行と、**名前では引けないが RM の絶対番地なら引ける**337行を結んだ——FMC/FSMC は BCR と BTR が1つの配列に交互に入り、`OPA_KEY` は header が `OPAKEY` と綴る。残り911行は header に構造体が無く、`member` は header の概念なので埋めようがない）。RM と綴りが一致した field だけ照合。**conflict 38 は本物の食い違い**（M030 `ADC_STATR` の `MULT_CMP1`/`MULT_CMP3` が EVT と RM で bit 入れ替わり、V407 `RCC_CFGR2` の `UTMI1ON`/`UTMI2ON` も入れ替わり、V003/V006 `GPIO_LCKR.LCKK` bit8 vs 16、L103 `CAN_BTIMR` の幅、X035 TIM `CCR3/4` 16 vs 32bit、ほか F-44/F-45 と `FLASH_OBR.USER` の RM 側の行の切り方） | 🟡 |
 | register_layouts（`index/`） | 353 | 全行 reference | (family, type) 一意 | ハッシュなので同じか違うかだけを言う。header の版が変われば変わる | 🔵 |
 
