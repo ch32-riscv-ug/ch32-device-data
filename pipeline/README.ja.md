@@ -36,7 +36,9 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
            paragraph行として写るので文字を境界にすると領域が潰れる。67文書で
-           3,195 asset・図caption 2,943のうち**2,725に実画像（92.6%）**）
+           3,307 asset・図caption 2,884のうち**2,837に実画像（98.4%）**。
+           本文の参照文（「图19-2是…」等）はcaption扱いしない——判定は
+           `pipeline/common/figure_captions.py`に一本化）
            export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
@@ -52,7 +54,7 @@ publish/   （予定）candidate → 承認済み正本
 candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍結CSVへ直接書く
 toolはこの経路に無い。
 
-## ingestがPoCと違う点（D17が特定した2欠陥の修正）
+## ingestがPoCと違う点（3つの修正。1と2はD17の実測、3はCIの実戦検出）
 
 1. **決定性**: pdfminerがinline imageへ付ける`id()`由来の数字名を捨てる
    （converter自身の`p66-draw-image-00002`形式が識別子）。同一原本＋同一版なら
