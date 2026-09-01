@@ -35,18 +35,17 @@ import csv
 import hashlib
 import html
 import json
-import re
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import figure_captions  # noqa: E402
 import logical_tables  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_OUT = REPO / ".cache" / "structured-markdown"
 
-FIGURE_CAPTION = re.compile(r"^(?:Figure|图)\s*\d+(?:-\d+)*", re.IGNORECASE)
 LARGE_IMAGE = 40.0   # pt。これ以上の幅と高さを持つ画像は個別の占位を出す
 
 
@@ -159,12 +158,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
         if role in ("header", "footer"):
             output.append(f"<!-- {role}: {text} -->")
             continue
-        if FIGURE_CAPTION.match(line["text"].strip()):
+        caption = figure_captions.caption_match(line["text"])
+        if caption:
             asset = assets.get(line["id"])
             if asset:
                 # asset rendererが図領域を描画済み。captionの下に埋め込む。
                 output.extend(("", text + "  ",
-                               f"![{html.escape(FIGURE_CAPTION.match(line['text'].strip()).group(0))}]"
+                               f"![{html.escape(caption.group(0))}]"
                                f"(../{asset['file']}) "
                                f"<!-- rendered from the PDF; verify at "
                                f"{url or 'the PDF'}#page={number} -->", ""))

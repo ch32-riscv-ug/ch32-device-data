@@ -76,6 +76,12 @@ path writes to the frozen CSVs directly.
    page height). The repetition check runs before the heading heuristic, and
    edge distance makes it work on rotated pages too.
 
+3. **The manifest's geometry_sha256 hashes the uncompressed JSON** (converter
+   1.1.0). gzip bytes vary with the zlib build, and a GitHub Actions
+   reconversion differed in geometry_sha256 alone on every page (2026-09-01 --
+   the first real catch by `structured-repro.yml`, doing exactly what it was
+   built for). Compression is storage, not content.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
@@ -85,8 +91,8 @@ version+page footers are caught 35/35 (en) and 30/30 (zh).
 ```sh
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
 uv run pipeline/ingest/convert_all.py --jobs 4    # all 67 versions, incremental
-uv run tools/check_document_bundle.py .cache/structured-bundles/<stem>.<lang> \
-  --source <PDF>                                  # independent verification gate
+uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
+  --source <PDF>                          # independent verification gate (1.1.0+)
 ```
 
 `convert_all` skips documents whose committed manifest already matches the

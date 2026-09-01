@@ -46,7 +46,11 @@ import pdfplumber
 
 REPO = Path(__file__).resolve().parents[2]
 SCHEMA_VERSION = "0.2"
-CONVERTER_VERSION = "1.0.0"
+# 1.1.0: manifestのgeometry_sha256を**非圧縮のJSON**のhashに変更。gzipの圧縮
+# バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
+# 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
+# 保存の都合であって内容ではないので、hashは内容に対して取る。
+CONVERTER_VERSION = "1.1.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -407,7 +411,8 @@ def convert(pdf_path: Path, lang: str, document_type: str,
             validate(record, PAGE_SCHEMA)
             validate_geometry(geometry)
             payload = dump_bytes(record)
-            geometry_payload = gzip.compress(dump_bytes(geometry), compresslevel=9, mtime=0)
+            geometry_raw = dump_bytes(geometry)
+            geometry_payload = gzip.compress(geometry_raw, compresslevel=9, mtime=0)
             relative = Path("pages") / f"{page.page_number:04d}.json"
             geometry_relative = Path("geometry") / f"{page.page_number:04d}.json.gz"
             (bundle / relative).write_bytes(payload)
@@ -417,7 +422,8 @@ def convert(pdf_path: Path, lang: str, document_type: str,
                 "file": relative.as_posix(),
                 "sha256": hashlib.sha256(payload).hexdigest(),
                 "geometry_file": geometry_relative.as_posix(),
-                "geometry_sha256": hashlib.sha256(geometry_payload).hexdigest(),
+                # 非圧縮のJSONに対するhash。gzipのバイト列はzlibの版で変わる
+                "geometry_sha256": hashlib.sha256(geometry_raw).hexdigest(),
                 "width": record["width"],
                 "height": record["height"],
             })

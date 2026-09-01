@@ -28,11 +28,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import figure_captions  # noqa: E402
 import logical_tables  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
-FIGURE_CAPTION = re.compile(r"^(?:Figure|图)\s*\d+(?:-\d+)*", re.IGNORECASE)
 NOT_REPRODUCED = "The figure itself is not reproduced"
 CONTINUED = "**Table continued** — rendered in full at"
 EMBEDDED = re.compile(r"\]\((\.\./assets/[^)]+)\)")
@@ -77,7 +77,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             line = lines[item["id"]]
             expect(html.escape(line["text"]), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
-                    and FIGURE_CAPTION.match(line["text"].strip())):
+                    and figure_captions.caption_match(line["text"])):
                 # captionの直後には、描画済みの図（実ファイルがあること）か、
                 # 「再現していない」の可視の印のどちらかが要る。
                 window = text[position:position + 400]

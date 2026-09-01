@@ -63,6 +63,11 @@ toolはこの経路に無い。
    系統的に取りこぼした。反復判定はheading判定より先（TOC等の小フォントページで
    footerがheadingに化ける実測があったため）。縁距離なので横向きページにも効く
 
+3. **manifestのgeometry_sha256は非圧縮のJSONに対するhash**（converter 1.1.0）。
+   gzipの圧縮バイト列はzlibの版で変わり、GitHub Actions上の再変換が
+   geometry_sha256だけ全ページ不一致になった（2026-09-01、`structured-repro.yml`が
+   **設計どおり環境差を検出**した初の実戦）。圧縮は保存の都合であって内容ではない
+
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。
 
@@ -71,8 +76,8 @@ roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこ
 ```sh
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
 uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの67版。incremental
-uv run tools/check_document_bundle.py .cache/structured-bundles/<stem>.<lang> \
-  --source <PDF>                                        # 独立検証ゲート
+uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
+  --source <PDF>                                        # 独立検証ゲート（1.1.0以降）
 ```
 
 `convert_all`は`structured/`のmanifestと原本SHA-256・engine版・converter版が

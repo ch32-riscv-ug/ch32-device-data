@@ -77,11 +77,13 @@ class Page:
 
     def _load_geometry(self) -> dict:
         if self._geometry is None:
-            payload = (self._bundle / self._entry["geometry_file"]).read_bytes()
+            payload = gzip.decompress(
+                (self._bundle / self._entry["geometry_file"]).read_bytes())
+            # hashは非圧縮のJSONに対して（gzipのバイト列はzlibの版で変わる）
             actual = hashlib.sha256(payload).hexdigest()
             if actual != self._entry["geometry_sha256"]:
                 raise ValueError(f"{self._entry['geometry_file']}: sha256 differs from manifest")
-            self._geometry = json.loads(gzip.decompress(payload))
+            self._geometry = json.loads(payload)
         return self._geometry
 
     @property
