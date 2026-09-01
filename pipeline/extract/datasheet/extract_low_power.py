@@ -60,9 +60,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "tools"))
 sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
 
 import build_operating as operating  # noqa: E402  凍結ロジック（読むだけ）
 import convert_all  # noqa: E402
+import logical_tables  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 CANDIDATES = REPO / ".cache" / "pipeline-candidates"
@@ -262,52 +264,12 @@ def parse_table(table: list[list[str | None]], schema: dict,
 
 def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[list[list[str | None]],
                                                                list[int]]:
-    """同じ論理表の物理断片を1つの格子に結合する。
+    """同じ論理表の物理断片を1つの格子に結合する（共通L1層の部品を使う）。
 
-    列の対応付けは2段構え:
-
-    - **全断片の列数が同じ**なら位置（何列目か）で対応付ける。続きページで
-      表の列幅が引き直されてxが数ptずれることがある（V20x/30xの表4-9で実測:
-      typ列がずれて許容2ptを超えた）ので、xでは対応付けない
-    - **列数が違う**（空の列は罫線が引かれるまで物理セルにならないので、
-      header-only断片では消える——V203 4-6-1のzh版で実測）なら、全断片の
-      セルのx0/x1を束ねた辺の和集合を作り、最も近い辺（許容2pt）に割り当てる
+    列の対応付け規則（列数が同じなら位置・違えばx和集合）と、その根拠の実測は
+    `pipeline/common/logical_tables.py`に移した。
     """
-    per: list[tuple[int, dict, list[float]]] = []
-    for page, table in fragments:
-        edges = sorted({round(v, 2) for cell in table["cells"]
-                        for v in (cell["bbox"][0], cell["bbox"][2])})
-        per.append((page, table, edges))
-
-    if len({len(edges) for _, _, edges in per}) == 1:
-        index_of = [{edge: i for i, edge in enumerate(edges)} for _, _, edges in per]
-        width = len(per[0][2]) - 1
-
-        def column(fragment: int, x: float) -> int:
-            return index_of[fragment][x]
-    else:
-        merged: list[float] = []
-        for _, _, edges in per:
-            for x in edges:
-                if not any(abs(x - edge) <= 2.0 for edge in merged):
-                    merged.append(x)
-        merged.sort()
-        width = len(merged) - 1
-
-        def column(fragment: int, x: float) -> int:
-            return min(range(len(merged)), key=lambda i: abs(merged[i] - x))
-
-    rows: list[list[str | None]] = []
-    row_pages: list[int] = []
-    for fragment, (page, table, _) in enumerate(per):
-        offset = len(rows)
-        for _ in range(table["row_count"]):
-            rows.append([None] * width)
-            row_pages.append(page)
-        for cell in table["cells"]:
-            rows[offset + cell["row_start"]][
-                column(fragment, round(cell["bbox"][0], 2))] = cell["text"]
-    return rows, row_pages
+    return logical_tables.text_grid(logical_tables.merge_cells(fragments))
 
 
 def caption_context(table: dict) -> str:
