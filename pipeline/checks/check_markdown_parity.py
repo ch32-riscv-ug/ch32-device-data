@@ -48,6 +48,13 @@ def load_page(bundle: Path, entry: dict) -> dict:
 def check_page(page: dict, text: str, chains: dict[str, dict],
                pages_dir: Path) -> list[str]:
     bad = []
+    # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
+    # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
+    # ので、出た時点でここで捕まえる（本体repo側は check_docs.py が見る）。
+    for sequence in ("{" + "{", "{" + "%"):
+        if sequence in text:
+            bad.append(f"p{page['number']}: Liquid-breaking sequence {sequence!r} "
+                       "in the markdown -- Pages build would fail")
     position = 0
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
