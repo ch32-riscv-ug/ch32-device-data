@@ -1,0 +1,178 @@
+{
+ "schema_version": "0.2",
+ "source_sha256": "ec734cc2092c8174e6c27518a39ae1bcb27031c9cfdeae687eaf867195816f18",
+ "status": "partial",
+ "decisions": {
+  "p164-table-003": {
+   "status": "approved",
+   "canonical_table_number": "9-35"
+  },
+  "p170-table-002": {
+   "status": "approved",
+   "canonical_table_number": "9-36"
+  },
+  "p209-table-001": {
+   "status": "approved",
+   "canonical_table_number": "11-5"
+  },
+  "p209-table-002": {
+   "status": "approved",
+   "canonical_table_number": "11-6",
+   "note": "caption printed as 11-5/ADC1; the table lists R32_ADC2_* registers"
+  },
+  "p397-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p398-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p399-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p401-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p402-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p403-table-001": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p403-table-006": {
+   "status": "approved",
+   "note": "en-only I3C CCC table; the zh edition does not caption it; the printed 22-x number collides with the later FIFO/error/register series"
+  },
+  "p410-table-006": {
+   "status": "approved",
+   "canonical_table_number": "22-2",
+   "note": "the printed number collides with the en-only I3C CCC series"
+  },
+  "p422-table-001": {
+   "status": "approved",
+   "canonical_table_number": "22-3"
+  },
+  "p424-table-002": {
+   "status": "approved",
+   "canonical_table_number": "22-4"
+  },
+  "p426-table-001": {
+   "status": "approved",
+   "canonical_table_number": "22-5"
+  },
+  "p427-table-002": {
+   "status": "approved",
+   "canonical_table_number": "22-6"
+  },
+  "p557-table-002": {
+   "status": "approved",
+   "canonical_table_number": "27-12"
+  },
+  "p557-table-003": {
+   "status": "approved",
+   "canonical_table_number": "27-13"
+  },
+  "p558-table-001": {
+   "status": "approved",
+   "canonical_table_number": "27-14"
+  },
+  "p645-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-7",
+   "note": "printed as 31-5"
+  },
+  "p648-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-8",
+   "note": "printed as 31-7"
+  },
+  "p654-table-006": {
+   "status": "approved",
+   "canonical_table_number": "31-11",
+   "note": "printed as 31-9"
+  },
+  "p655-table-001": {
+   "status": "approved",
+   "canonical_table_number": "31-12",
+   "note": "printed as 31-10"
+  },
+  "p655-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-13",
+   "note": "printed as 31-11"
+  },
+  "p658-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-14",
+   "note": "printed as 27-12"
+  },
+  "p658-table-005": {
+   "status": "approved",
+   "canonical_table_number": "31-15",
+   "note": "printed as 27-13"
+  },
+  "p659-table-003": {
+   "status": "approved",
+   "canonical_table_number": "31-16",
+   "note": "printed as 27-14"
+  },
+  "p659-table-006": {
+   "status": "approved",
+   "canonical_table_number": "31-17",
+   "note": "printed as 31-15"
+  },
+  "p659-table-007": {
+   "status": "approved",
+   "canonical_table_number": "31-18",
+   "note": "printed as 31-16"
+  },
+  "p660-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-19",
+   "note": "printed as 31-17"
+  },
+  "p662-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-20",
+   "note": "printed as 31-18"
+  },
+  "p663-table-002": {
+   "status": "approved",
+   "canonical_table_number": "31-21",
+   "note": "printed as 31-19"
+  },
+  "p663-table-005": {
+   "status": "approved",
+   "canonical_table_number": "31-22",
+   "note": "printed as 31-20"
+  },
+  "p663-table-008": {
+   "status": "approved",
+   "canonical_table_number": "31-23",
+   "note": "printed as 31-21"
+  },
+  "p668-table-001": {
+   "status": "approved",
+   "canonical_table_number": "31-24",
+   "note": "printed as 31-22"
+  },
+  "p766-table-001": {
+   "status": "approved",
+   "canonical_table_number": "35-4"
+  },
+  "p795-table-002": {
+   "status": "approved",
+   "canonical_table_number": "36-7",
+   "note": "printed as 35-4"
+  },
+  "p984-table-001": {
+   "status": "approved",
+   "canonical_table_number": "43-9"
+  }
+ }
+}

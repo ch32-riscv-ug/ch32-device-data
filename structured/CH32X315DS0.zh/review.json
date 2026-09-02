@@ -1,0 +1,24 @@
+{
+ "schema_version": "0.2",
+ "source_sha256": "1c1de49233ff3a881ca3b147b9194156d00b8e67e5adb218cb201b39c61d1ea3",
+ "status": "partial",
+ "decisions": {
+  "p16-table-001": {
+   "status": "approved",
+   "canonical_table_number": "2-1-1"
+  },
+  "p19-table-003": {
+   "status": "approved",
+   "canonical_table_number": "2-1-2"
+  },
+  "p32-table-001": {
+   "status": "approved",
+   "canonical_table_number": "3-6-1"
+  },
+  "p32-table-002": {
+   "status": "approved",
+   "canonical_table_number": "3-6-2",
+   "note": "the en edition lacks the USB 3.0 incremental consumption table"
+  }
+ }
+}

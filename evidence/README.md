@@ -488,10 +488,14 @@ one is left to the consumer (who also holds factory-fresh dumps to compare).
 Editions are compared on the **sequence of value tokens** in the reset cell
 (the prose around them differs by language, and stray punctuation drifts into
 the cell in the text layer); identifiers and values keep the source spelling
-with whitespace and dashes folded. Genuine zh/en discrepancies stay as
-`conflict` -- e.g. X315 names one USER bit `USBHSDLEN` (zh) vs `USBFSDLEN`
-(en), and the FV2x/V3x en edition leaves the SRAM-split field unnamed where
-the zh edition calls it `RAM_CODE_MOD`.
+with whitespace and dashes folded. zh/en discrepancies backed by third
+evidence are adjudicated (2026-09-02): X315's bit is `USBHSDLEN` (the EVT's
+`ch32x3x5_flash.h` agrees with zh, not en's `USBFSDLEN`), FV2x/V3x's SRAM-split
+field is `RAM_CODE_MOD` (the OBR readout side agrees; the en edition leaves it
+unnamed), X035's reset value is `xxxb` (`rule:bit-width` -- [7:5] is 3 bits) --
+each confirmed with the other edition's dissent kept in basis. Discrepancies
+without third evidence stay `conflict` (the IWDG_SW/IWDGSW spelling, which
+flips per document, and X315's WRPR granularity).
 
 ### `device_id_addresses.csv`
 

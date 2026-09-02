@@ -127,6 +127,21 @@ def default_key(value: str) -> str:
     return "/".join(VALUE_TOKEN.findall(value))
 
 
+# zh/en齟齬の裁定（2026-09-02、ユーザー委任で実施）。鍵は(document, byte, bits)、
+# 値は(採る側, 確度, 根拠token)。**第三の証拠で決められたものだけ**をここに
+# 置く——EVTヘッダのOB定義（X315: ch32x3x5_flash.hが`Option_Bytes_USBHSDLEN`）、
+# OBR読み出し側のfield名（FV2x: register_fieldsのRAM_CODE_MOD＝evtヘッダ由来。
+# en版はこのfieldを無名のまま第3列に復位値`xx1b`を置く）、bit幅の算術
+# （X035: [7:5]は3bitなので復位値はzhの`xxxb`——enの`xxb`は2bit分）。
+# 証拠が無い綴りの齟齬（IWDG_SW/IWDGSW——OBR読み出し側は第三の綴りWDG_SWを
+# 使う——やM030のRST_MODE[1:0]/RST_MODE）は入れず、conflictのまま残す。
+FIELD_VERDICTS: dict[tuple[str, str, str], tuple[str, str, str]] = {
+    ("CH32X315RM.PDF", "USER", "6"): ("zh", "confirmed", "evt(ch32x3x5_flash.h)"),
+    ("CH32FV2x_V3xRM.PDF", "USER", "[7:5]"): ("zh", "confirmed", "evt(ch32v30x.h)"),
+    ("CH32X035RM.PDF", "USER", "[7:5]"): ("zh", "confirmed", "rule:bit-width"),
+}
+
+
 def load_pages(name: str) -> list[dict]:
     bundle = BUNDLES / name
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
@@ -285,13 +300,14 @@ def read_edition(document: str, lang: str) -> dict:
 
 def merge(document: str, editions: dict[str, dict], kind: str,
           key_of, value_of, extra_pages: dict[str, int] | None = None,
-          prefer=None) -> list[dict]:
+          adjudicate=None) -> list[dict]:
     """zh/enを突き合わせ、confirmed/reference/conflictの行にする。
 
     ``extra_pages``は表のページに加えてbasisへ載せるページ（書込方式の節）。
-    ``prefer``は食い違ったときにどちらの版を採るか（``(z, e) -> "zh"|"en"``。
-    既定はen。もう片方は`!`の異議としてbasisへ）。
-    """
+    ``adjudicate``は食い違いの裁定（``(key, z, e) -> (side, confidence, support)
+    | None``）。**第三の証拠（EVTヘッダ・OBR読み出し側・bit幅の算術）がある
+    ときだけ**採る側と確度を決め、supportの根拠tokenをbasisへ足す。Noneなら
+    既定（enを採りzhを`!`の異議に、confidence=conflict）。"""
     keyed = {lang: {key_of(e): e for e in editions[lang][kind]}
              for lang in editions}
     tail = {lang: (f",p.{extra_pages[lang]}" if extra_pages else "")
@@ -311,14 +327,15 @@ def merge(document: str, editions: dict[str, dict], kind: str,
             basis = (f"{document}:zh(p.{z['page']}{tail['zh']})"
                      f"+{document}:en(p.{e['page']}{tail['en']})")
         elif z and e:
-            confidence = "conflict"
-            side = prefer(z, e) if prefer else "en"
+            ruling = adjudicate(key, z, e) if adjudicate else None
+            side, confidence, support = ruling if ruling else ("en", "conflict", None)
             record = e if side == "en" else z
             other, other_lang = ((z, "zh") if side == "en" else (e, "en"))
             diff = ",".join(f"{k}={v}" for k, v in value_of(other).items()
                             if value_of(record).get(k) != v)
             basis = (f"{document}:{side}(p.{record['page']}{tail[side]})"
-                     f"+!{document}:{other_lang}({diff})")
+                     + (f"+{support}" if support else "")
+                     + f"+!{document}:{other_lang}({diff})")
         else:
             lang = "zh" if z else "en"
             confidence = "reference"
@@ -335,6 +352,8 @@ def main() -> int:
 
     ob_bases = {r["family"]: int(r["base_address"], 16)
                 for r in paths.load("register_blocks") if r["block"] == "OB"}
+    ob_basis = {r["family"]: r["basis"]
+                for r in paths.load("register_blocks") if r["block"] == "OB"}
     byte_rows: list[dict] = []
     field_rows: list[dict] = []
     for rm in rm_documents():
@@ -346,16 +365,26 @@ def main() -> int:
         write_unit = units.pop()
 
         # base番地が版間で食い違ったら、EVTヘッダ（register_blocksのOB block）が
-        # 支持する側を採る——第三の証拠による裁定（debug_interfacesのV002/V004と
-        # 同じ型）。どちらでもなければ既定（en）。
+        # 支持する側を採る——**2つの独立した根拠の一致なのでconfirmed**、もう片方は
+        # `!`の異議としてbasisへ（debug_interfacesのV002/V004と同じ型）。
+        # どちらでもなければ既定（en・conflict）。
         evt_bases = {ob_bases[f] for f in rm["families"] if f in ob_bases}
         evt_base = evt_bases.pop() if len(evt_bases) == 1 else None
+        evt_token = next((ob_basis[f] for f in rm["families"] if f in ob_basis), None)
 
-        def prefer_evt(z: dict, e: dict) -> str:
+        def adjudicate_bytes(key, z: dict, e: dict):
             zb, eb = (z["address"] - z["offset"]), (e["address"] - e["offset"])
-            if evt_base is not None and zb == evt_base and eb != evt_base:
-                return "zh"
-            return "en"
+            if evt_base is None or zb == eb:
+                return None
+            if zb == evt_base:
+                return ("zh", "confirmed", evt_token)
+            if eb == evt_base:
+                return ("en", "confirmed", evt_token)
+            return None
+
+        def adjudicate_fields(key, z: dict, e: dict):
+            verdict = FIELD_VERDICTS.get((rm["document"], *key))
+            return verdict
 
         merged_bytes = merge(
             rm["document"], editions, "bytes",
@@ -364,13 +393,14 @@ def main() -> int:
                                 "complement_offset": e["complement_offset"],
                                 "address": f"0x{e['address']:08X}"},
             extra_pages={lang: editions[lang]["write_page"] for lang in editions},
-            prefer=prefer_evt)
+            adjudicate=adjudicate_bytes)
         merged_fields = merge(
             rm["document"], editions, "fields",
             key_of=lambda e: (e["byte"], e["bits"]),
             value_of=lambda e: {"field": e["field"],
                                 "default": default_key(e["default"]),
-                                "wrpr_bit_protects": e["wrpr_bit_protects"]})
+                                "wrpr_bit_protects": e["wrpr_bit_protects"]},
+            adjudicate=adjudicate_fields)
 
         for family in rm["families"]:
             for e in merged_bytes:

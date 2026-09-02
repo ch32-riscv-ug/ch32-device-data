@@ -474,9 +474,12 @@ USER／Data0-Data1／WRPR0-WRPR3）・`bits`・`field`・`default`、WRPR群の�
 落ちる）。復位値は**RMが述べる粒度のまま**残す——工場出荷の生バイト列への合成は導出なのでしない
 （consumer側が新品実測との突き合わせに使う）。両版の比較は復位値セルの
 **値トークンの列**で行う（周りの散文は言語で違い、文字層では句読点がセルに
-漂着する）。識別子・値は空白とdashだけ畳んで資料どおり。本物のzh/en齟齬は
-conflictで残る——X315はUSERのbitをzhが`USBHSDLEN`・enが`USBFSDLEN`と綴り、
-FV2x/V3xのen版はzhが`RAM_CODE_MOD`と呼ぶSRAM分割fieldを無名のままにしている。
+漂着する）。識別子・値は空白とdashだけ畳んで資料どおり。**第三の証拠があるzh/en齟齬は
+裁定済み**（2026-09-02）——X315のbitは`USBHSDLEN`（EVTの`ch32x3x5_flash.h`が
+zhを支持）、FV2x/V3xのSRAM分割fieldは`RAM_CODE_MOD`（OBR読み出し側が支持。
+en版は無名のまま）、X035の復位値は`xxxb`（`rule:bit-width`——[7:5]は3bit）——
+いずれもconfirmedで、もう片方の版の異議はbasisに残る。証拠の無い齟齬は
+conflictのまま（文書ごとに逆転するIWDG_SW/IWDGSWの綴り、X315のWRPR粒度）。
 
 ### `device_id_addresses.csv`
 
