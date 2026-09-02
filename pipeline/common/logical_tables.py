@@ -161,6 +161,169 @@ def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
     return rows, merged["row_pages"]
 
 
+# ---- レジスタのbit-field図 -------------------------------------------------
+# RMのレジスタは「31 30 … 16」の1行（bit番号）＋直下のフィールド箱で描かれる。抽出は
+# 版によって列数がまちまち（空の16列箱の版もあれば、同じフィールドの箱仕切りが消えて
+# 8〜9列に潰れ名前がそのまま入る版もある）。列構造に頼らず、**bit番号のx中心を列の
+# 真実**として（bitは等幅でない——比例配分は不可）、各フィールドが跨ぐbit数を中心の
+# 包含で数え、16等幅へ組み直す。番号はヘッダ行、狭い列で縦に割れた名前は連結、TIMの
+# CCMRのような出力名/入力名の2段は残す。**人向け出力専用**（exporterとparity検査
+# だけが呼ぶ。凍結CSVの抽出器は触らない）。冪等。
+
+def bit_numbers(text: str) -> list[int] | None:
+    """行が「N N-1 … 」のbit番号列ならintの並びを返す（でなければNone）。
+
+    1ずつ厳密に降順・長さ8/16/32・全て0..31——bit図に固有の並びで、本文中の
+    数字列と衝突しない。
+    """
+    tokens = text.split()
+    if len(tokens) not in (8, 16, 32) or not all(t.isdigit() for t in tokens):
+        return None
+    nums = [int(t) for t in tokens]
+    if any(a - b != 1 for a, b in zip(nums, nums[1:])):
+        return None
+    if not all(0 <= n <= 31 for n in nums):
+        return None
+    return nums
+
+
+def bit_number_centers(chars: list[dict], number_line: dict) -> list[tuple[str, float]] | None:
+    """geometryのcharから、bit番号行の各数字のx中心を得る（[(番号, x)…]）。
+
+    各bit列の中心を与える——列幅がまちまちでも、フィールドの跨ぐbit数を数える基準に
+    なる。行の帯（y中心が行bbox内）にあるdigitをx空白で束ね、綴りが本当に降順bit列
+    かを検証する（帯に別文字が混ざったら諦めてNone＝この表は変換しない）。
+    """
+    x0, top, _, bottom = number_line["bbox"]
+    x1 = number_line["bbox"][2]
+
+    def cy(char: dict) -> float:
+        box = char["bbox"]
+        return (box[1] + box[3]) / 2
+
+    band = sorted((c for c in chars
+                   if top - 1 <= cy(c) <= bottom + 1 and (c.get("text") or "").strip()
+                   and x0 - 2 <= c["bbox"][0] and c["bbox"][2] <= x1 + 2),
+                  key=lambda c: c["bbox"][0])
+    if not band:
+        return None
+    groups: list[list[dict]] = [[band[0]]]
+    for prev, cur in zip(band, band[1:]):
+        if cur["bbox"][0] - prev["bbox"][2] > 2.5:
+            groups.append([])
+        groups[-1].append(cur)
+    out: list[tuple[str, float]] = []
+    for group in groups:
+        token = "".join(c["text"] for c in group)
+        if not token.isdigit():
+            return None
+        out.append((token, (group[0]["bbox"][0] + group[-1]["bbox"][2]) / 2))
+    nums = [int(t) for t, _ in out]
+    if len(nums) not in (8, 16, 32) or any(a - b != 1 for a, b in zip(nums, nums[1:])):
+        return None
+    if not all(0 <= n <= 31 for n in nums):
+        return None
+    return out
+
+
+def _diagram_like(table: dict) -> bool:
+    """bit図らしい表か（背が低く・短いセルだけ）。説明表（Bit/Name/Access…長文）を
+    番号行の直下と誤って掴まないためのガード。"""
+    x0, top, x1, bottom = table["bbox"]
+    if bottom - top > 80:                       # 説明表は背が高い（数百pt）
+        return False
+    return all(len(c.get("text") or "") <= 40 for c in table["cells"])
+
+
+def bitfield_pairs(page: dict) -> dict[str, str]:
+    """{table_id: bit番号line_id}。番号行の直下（gap≤14pt・x重なり）の最寄り図。"""
+    out: dict[str, str] = {}
+    numlines = [l for l in page["lines"] if bit_numbers(l["text"])]
+    for line in numlines:
+        lx0, _, lx1, lbottom = line["bbox"]
+        best, best_gap = None, 1e9
+        for table in page["tables"]:
+            tx0, top, tx1, _ = table["bbox"]
+            gap = top - lbottom
+            overlap = min(lx1, tx1) - max(lx0, tx0)
+            if (0 <= gap <= 14 and gap < best_gap and overlap > 0.6 * (lx1 - lx0)
+                    and _diagram_like(table)):
+                best, best_gap = table["id"], gap
+        if best is not None:
+            out[best] = line["id"]
+    return out
+
+
+def apply_bitfield(table: dict, number_line: dict,
+                   centers: list[tuple[str, float]]) -> None:
+    """フィールドをbit番号のx中心で16等幅へ組み直す（in-place）。
+
+    番号のx中心が「跨ぐbit数」を決める。空の箱は捨て、名前を持つセルだけを中心の
+    包含で列に割り当て、番号のヘッダ行を上に足す。同じ列spanで縦に割れた名前は連結、
+    どのセルも開始しない空き行は詰める（TIMの出力/入力2段は残る）。
+    """
+    if table.get("_bitfield"):
+        return
+    xs = [x for _, x in centers]
+    width = len(centers)
+
+    def bit_span(cell: dict) -> tuple[int, int] | None:
+        cx0, cx1 = cell["bbox"][0], cell["bbox"][2]
+        idx = [i for i, x in enumerate(xs) if cx0 - 1 <= x <= cx1 + 1]
+        if idx:
+            return idx[0], idx[-1] + 1
+        # どの中心も含まないほど狭い/ずれたセルは、中点に最も近い1列へ寄せる
+        mid = (cx0 + cx1) / 2
+        near = min(range(width), key=lambda i: abs(xs[i] - mid))
+        return near, near + 1
+
+    fields = [c for c in table["cells"] if (c.get("text") or "").strip()]
+    if not fields:
+        return
+    field_min = min(c["row_start"] for c in fields)
+    cells: list[dict] = []
+    for cell in fields:
+        start, end = bit_span(cell)
+        cells.append({**cell, "column_start": start, "column_end": end,
+                      "row_start": cell["row_start"] - field_min + 1,
+                      "row_end": cell["row_end"] - field_min + 1})
+    for i, (num, _) in enumerate(centers):
+        cells.append({"id": f"{table['id']}-bit{i}", "row_start": 0, "row_end": 1,
+                      "column_start": i, "column_end": i + 1, "text": num,
+                      "bbox": table["bbox"], "bold": False, "italic": False})
+    # 同じ列span（狭い列）で縦に割れた名前を上のセルへ連結（`Reser`+`ved`＝Reserved）。
+    groups: dict[tuple[int, int], list[dict]] = {}
+    for cell in cells:
+        if cell["row_start"] >= 1:
+            groups.setdefault((cell["column_start"], cell["column_end"]), []).append(cell)
+    drop: list[dict] = []
+    for group in groups.values():
+        if len(group) == 1:
+            continue
+        group.sort(key=lambda c: c["row_start"])
+        head = group[0]
+        head["text"] = "".join((c.get("text") or "") for c in group)
+        head["row_end"] = max(c["row_end"] for c in group)
+        drop.extend(group[1:])
+    for cell in drop:
+        cells.remove(cell)
+    # どのセルも開始しない行（縦割れが消えて空いた行）を詰める。開始行の集合で番号を
+    # 振り直す——単純レジスタは1データ行に、TIMの出力名/入力名の2段は2行のまま残り、
+    # CC1S[1:0]のような両モード共有名は両行にまたがる。
+    starts = sorted({0} | {c["row_start"] for c in cells})
+    remap = {orig: i for i, orig in enumerate(starts)}
+    for cell in cells:
+        cell["row_end"] = sum(1 for s in starts if s < cell["row_end"])
+        cell["row_start"] = remap[cell["row_start"]]
+    # 描画順（行→列）に並べる。parityはセルのリスト順に読み進めるので、ヘッダ行を
+    # 先頭に置かないと番号が「順序外」に見える。
+    cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+    table["cells"] = cells
+    table["column_count"] = width
+    table["row_count"] = len(starts)
+    table["_bitfield"] = True
+
+
 def _body_lines(page: dict) -> list[dict]:
     return [line for line in page["lines"]
             if line.get("role") not in ("header", "footer")]

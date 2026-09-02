@@ -79,6 +79,14 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            **caption行を持つ表だけが`<caption>`を出す**（無caption表が
            continuation継承で前ページの表番号を借りて名乗るのを止めた。内部IDは
            コメントへ）、
+           **レジスタのbit図を組み直す**（`31 30 … 16`のbit番号行を表のヘッダ行へ
+           畳み、bitを等幅の折り返し列で描く。各フィールドはbit番号glyphのx中心
+           （geometry由来）で列へ割り当てるので、抽出が16列の空箱でも8〜9列に潰れて
+           名前入りでも同じように扱える。狭い列で縦に割れた名前（`Reser`+`ved`→
+           `Reserved`）は連結し、TIMのCCMRのような出力名/入力名の2段は2行で残す。
+           変換は`pipeline/common/logical_tables.apply_bitfield`に共通化し
+           exporterとparity検査が呼ぶ）、
+           **表セルは既定で中央寄せ・長い/複数行セルは左寄せ**（PDFに寄せる）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、
            **添字が`*`に化けたglyphの警告**（壊れたToUnicode。pdfplumberでも

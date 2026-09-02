@@ -50,6 +50,18 @@ DEFAULT_OUT = REPO / ".cache" / "structured-markdown"
 
 LARGE_IMAGE = 40.0   # pt。これ以上の幅と高さを持つ画像は個別の占位を出す
 
+# 各ページ冒頭に置く表の見た目。既定でセル中央寄せ（PDFに寄せる。ユーザー要望）、
+# bit図は16列を等幅fixed＋自動折り返し。CSSに`{{`/`{%`が出ないよう1行1規則で書く
+# （JekyllのLiquidが壊れる並びをparity検査が禁じている）。
+PAGE_STYLE = "\n".join((
+    "<style>",
+    "table{border-collapse:collapse;margin:.6em 0}",
+    "td,th{border:1px solid #bbb;padding:2px 7px;text-align:center;vertical-align:top}",
+    "table.bitfield{table-layout:fixed;width:100%}",
+    "table.bitfield td,table.bitfield th{word-break:break-word;font-size:.8em;padding:2px}",
+    "</style>",
+))
+
 
 def mirror_urls() -> dict[tuple[str, str], str]:
     """(document, lang) → mirrorのGitHub Pages URL（原本ページへのリンク用）。"""
@@ -75,14 +87,33 @@ def load_page(bundle: Path, entry: dict) -> dict:
     return json.loads(payload)
 
 
+def load_geometry(bundle: Path, entry: dict) -> dict:
+    payload = gzip.decompress((bundle / entry["geometry_file"]).read_bytes())
+    if hashlib.sha256(payload).hexdigest() != entry["geometry_sha256"]:
+        raise SystemExit(f"{bundle}/{entry['geometry_file']}: hash differs from manifest")
+    return json.loads(payload)
+
+
 def page_lost_subscripts(bundle: Path, entry: dict, page: dict) -> int:
     """このページで`*`に化けた添字glyphの数。`*`が無いページはgeometryを開かない。"""
     if "*" not in page["text"]:
         return 0
-    payload = gzip.decompress((bundle / entry["geometry_file"]).read_bytes())
-    if hashlib.sha256(payload).hexdigest() != entry["geometry_sha256"]:
-        raise SystemExit(f"{bundle}/{entry['geometry_file']}: hash differs from manifest")
-    return lost_subscripts.lost_subscript_count(json.loads(payload)["chars"])
+    return lost_subscripts.lost_subscript_count(load_geometry(bundle, entry)["chars"])
+
+
+def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict[str, tuple[str, list]]:
+    """{table_id: (bit番号line_id, bit中心)}。番号行のある表だけgeometryを開く。"""
+    pairs = logical_tables.bitfield_pairs(page)
+    if not pairs:
+        return {}
+    chars = load_geometry(bundle, entry)["chars"]
+    lines = {l["id"]: l for l in page["lines"]}
+    plan: dict[str, tuple[str, list]] = {}
+    for table_id, line_id in pairs.items():
+        centers = logical_tables.bit_number_centers(chars, lines[line_id])
+        if centers:
+            plan[table_id] = (line_id, centers)
+    return plan
 
 
 # Wingdings/Symbolフォントの記号がPUA（私用領域）のまま本文に出ている
@@ -156,6 +187,11 @@ def table_html(table: dict, url: str | None, number: int) -> str:
             inner = f"<em>{inner}</em>"
         if cell.get("bold"):
             inner = f"<strong>{inner}</strong>"
+        # セルは既定で中央寄せ（PDFに寄せる。ユーザー要望）だが、長い/複数行の
+        # 説明セルは中央寄せだと逆に読みにくくPDFとも違うので左寄せに戻す。
+        cell_text = cell["text"] or ""
+        if len(cell_text) > 40 or "\n" in cell_text:
+            attrs.append('style="text-align:left"')
         # 表の1行目はヘッダ（<th>。ブラウザが太字＋中央寄せ）。原本の見出し行
         # （Bit/Name/Access…）がそのまま見出しになる。ヘッダの無い表（ビット図）
         # でも実害は小さい。continuation断片はrow_start>0なので<td>のまま。
@@ -189,17 +225,32 @@ def table_html(table: dict, url: str | None, number: int) -> str:
     lid = table["logical_id"]
     origin = (f"<!-- {table['id']} ({lid}) pages {span[0][0]}-{span[-1][0]} -->" if span
               else f"<!-- {table['id']} ({lid}) -->")
-    parts.append(f"{origin}\n<table>{cap_html}{''.join(rows)}</table>")
+    # レジスタのbit図は16列を等幅にして、狭い1-bit列で名前が自動折り返しになるよう
+    # table-layout:fixed（class="bitfield"）＋等幅colgroupを付ける。
+    if table.get("_bitfield"):
+        colgroup = ("<colgroup>"
+                    + f'<col style="width:{100 / columns:.4f}%">' * columns
+                    + "</colgroup>")
+        open_tag = '<table class="bitfield">'
+    else:
+        colgroup = ""
+        open_tag = "<table>"
+    parts.append(f"{origin}\n{open_tag}{cap_html}{colgroup}{''.join(rows)}</table>")
     return "\n".join(parts)
 
 
 def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 assets: dict[str, dict], page_count: int,
-                lost_glyphs: int = 0) -> str:
+                lost_glyphs: int = 0,
+                bitfields: dict[str, tuple[str, list]] | None = None) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
     number = page["number"]
+    # レジスタのbit図: 「31 30 … 16」の番号行を次表のヘッダへ畳む。番号行は
+    # 表に吸収されるので本文からは消す（parity検査も同じ集合を消す）。
+    bitfields = bitfields or {}
+    consumed_lines = {line_id for line_id, _ in bitfields.values()}
     # このページで画像として描画済みの図領域。中にある行・表は、画像が既に
     # 見せているので**可視出力から畳んでコメントに落とす**（図中ラベルが
     # 本文として図の下に重複して出ていた——preview初公開でユーザーが発見）。
@@ -235,7 +286,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     nav.append(page_link(url, number, f"PDF p.{number}"))
     if number < page_count:
         nav.append(f"[p.{number + 1} →]({number + 1:04d}.md)")
-    output = [f"<!-- source-page: {number} -->",
+    output = [f"<!-- source-page: {number} -->", PAGE_STYLE,
               f"<sub>{' · '.join(nav)}</sub>", ""]
     cids = page["text"].count("(cid:")
     if cids:
@@ -278,6 +329,9 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             record = info["merged"] or tables[item["id"]]
             if info["merged"]:
                 logical_tables.fold_boundary_spills(record)
+            if item["id"] in bitfields:
+                line_id, centers = bitfields[item["id"]]
+                logical_tables.apply_bitfield(record, lines[line_id], centers)
             (figure_text if inside else output).extend(
                 ("", table_html(record, url, number), ""))
             continue
@@ -299,6 +353,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             else:
                 output.append(f"<!-- image: {image['id']} bbox={image['bbox']} -->")
             continue
+        if item["id"] in consumed_lines:
+            continue   # bit番号行は次表のヘッダへ畳んだ（bitfield）
         line = lines[item["id"]]
         role = line.get("role", "paragraph")
         text = html.escape(pua_normalize(line["text"]))
@@ -366,7 +422,8 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
         name = f"{page['number']:04d}.md"
         (pages_dir / name).write_text(
             render_page(page, url, chains, assets, len(pages),
-                        page_lost_subscripts(bundle, entry, page)),
+                        page_lost_subscripts(bundle, entry, page),
+                        bitfield_plan(bundle, entry, page)),
             encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(

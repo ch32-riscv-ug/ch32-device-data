@@ -104,7 +104,20 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            **only a table with a real caption
            line emits a `<caption>`** (an uncaptioned table used to borrow the
            previous page's table number through continuation inheritance; the
-           internal id moves to a comment), and
+           internal id moves to a comment),
+           **register bit-field diagrams are rebuilt** (the `31 30 … 16`
+           bit-number line becomes the table's header row and the bits render as
+           equal-width wrapping columns; field cells are mapped to bit columns by the
+           x-centres of the number glyphs -- from the geometry, so the varied
+           extraction is handled uniformly whether the boxes come out as 16 empty
+           columns or collapse to 8-9 with the names inside; a field name split
+           vertically by a narrow column -- `Reser`+`ved` -> `Reserved` -- is
+           rejoined, while a two-mode TIM CCMR keeps its output-name row above its
+           input-name row; the shared transform is
+           pipeline/common/logical_tables.apply_bitfield, used by the exporter and
+           the parity check),
+           **table cells are centre-aligned by default with long/multi-line cells
+           left-aligned** (closer to the PDF), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
