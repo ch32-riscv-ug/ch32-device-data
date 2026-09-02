@@ -85,10 +85,20 @@ def page_lost_subscripts(bundle: Path, entry: dict, page: dict) -> int:
     return lost_subscripts.lost_subscript_count(json.loads(payload)["chars"])
 
 
+def cell_html(text: str) -> str:
+    """セルの中身。PDFの物理行の切れ目（`\\n`）を`<br>`で残す——`<td>`は改行を
+    空白に潰すので、そのままだと段落が消える（原本は複数行）。折り返しか意図的な
+    改行かの区別はpdfminerに情報が無く不可能だが、原本も同じ位置で折り返して
+    いるので物理行をそのまま出すのが「差ゼロ」に最も近い。"""
+    return html.escape(text).replace("\n", "<br>")
+
+
 def table_html(table: dict, url: str | None, number: int) -> str:
     columns = table.get("width") or table["column_count"]
+    row_count = table["row_count"]
     grid: list[list[str | None]] = [[None for _ in range(columns)]
-                                    for _ in range(table["row_count"])]
+                                    for _ in range(row_count)]
+    covered = [False] * row_count   # 上の行からrowspanで覆われている行
     for cell in table["cells"]:
         attrs = []
         if cell["row_end"] - cell["row_start"] > 1:
@@ -97,8 +107,16 @@ def table_html(table: dict, url: str | None, number: int) -> str:
             attrs.append(f'colspan="{cell["column_end"] - cell["column_start"]}"')
         grid[cell["row_start"]][cell["column_start"]] = (
             "<td" + ("".join(" " + a for a in attrs)) + ">"
-            + html.escape(cell["text"]) + "</td>")
-    rows = ["<tr>" + "".join(cell or "" for cell in row) + "</tr>" for row in grid]
+            + cell_html(cell["text"]) + "</td>")
+        for r in range(cell["row_start"] + 1, cell["row_end"]):
+            covered[r] = True
+    # fold_boundary_spillsが継続セルを消した行は、他の列の空セルだけが残る。
+    # rowspanに覆われていなければ落とす（跨ぐrowspanがあれば高さがずれるので
+    # 残す。安全側）。元から空の行には触れない——消したと分かっている行だけ。
+    folded_rows = set(table.get("_folded_rows", ()))
+    rows = ["<tr>" + "".join(cell or "" for cell in row) + "</tr>"
+            for r, row in enumerate(grid)
+            if covered[r] or r not in folded_rows]
     caption = table["caption"]["text"] if table["caption"] else table["logical_id"]
     span = table.get("parts")
     parts = []

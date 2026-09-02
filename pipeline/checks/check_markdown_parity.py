@@ -89,7 +89,9 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # expect("")がスキップ、前セルには連結後textが入る。
                 logical_tables.fold_boundary_spills(record)
             for cell in record["cells"]:
-                expect(html.escape(cell["text"]), f"table {item['id']} cell")
+                # exporterと同じ表示（物理行は<br>）で検査する
+                expect(html.escape(cell["text"]).replace("\n", "<br>"),
+                       f"table {item['id']} cell")
         elif item["type"] == "line":
             line = lines[item["id"]]
             expect(html.escape(line["text"]), f"{line.get('role')} {item['id']}")

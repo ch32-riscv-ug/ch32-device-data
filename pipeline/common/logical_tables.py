@@ -130,7 +130,7 @@ def fold_boundary_spills(merged: dict) -> int:
             simple[(cell["row_start"], cell["column_start"])] = cell
         if cell["text"].strip():
             by_row.setdefault(cell["row_start"], []).append((cell, single))
-    folded = 0
+    removed: list[dict] = []
     for row in sorted(by_row):
         if row == 0 or row >= len(row_pages) or row_pages[row] == row_pages[row - 1]:
             continue
@@ -144,9 +144,12 @@ def fold_boundary_spills(merged: dict) -> int:
         if prev is None or not prev["text"].strip():
             continue
         prev["text"] = prev["text"] + "\n" + cell["text"]
-        cell["text"] = ""
-        folded += 1
-    return folded
+        removed.append(cell)   # 継続セルはグリッドから消す（空行を残さない）
+    for cell in removed:
+        merged["cells"].remove(cell)
+    # 継続セルを消した行番号（他の列の空セルだけが残る＝描画時に落とす行）。
+    merged["_folded_rows"] = sorted(c["row_start"] for c in removed)
+    return len(removed)
 
 
 def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
