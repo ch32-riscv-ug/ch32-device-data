@@ -198,6 +198,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 (figure_text if inside else output).extend(("", pointer, ""))
                 continue
             record = info["merged"] or tables[item["id"]]
+            if info["merged"]:
+                logical_tables.fold_boundary_spills(record)
             (figure_text if inside else output).extend(
                 ("", table_html(record, url, number), ""))
             continue
@@ -303,12 +305,14 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
 def viewer_html(docs: list[dict]) -> str:
     """目視確認用の左右同期ビュアー（previewリポジトリのGitHub Pages専用）。
 
-    左に原本PDF（brタウザ内蔵viewer・`#page=N`で頭出し）、右にこの出力の
+    左に原本PDF（ブラウザ内蔵viewer・`#page=N`で頭出し）、右にこの出力の
     同じページ（Jekyllが`pages/NNNN.md`→`.html`に描画したもの）。ページ移動は
     両側へ同時に効く（ボタン・数字入力・←→キー）。状態はURLのhashに残るので、
-    気になったページをそのまま共有できる。PDF側はページ移動のたびにiframeを
-    読み直す（fragmentだけの変更では内蔵viewerが動かないため。PDF本体は
-    ブラウザがcacheする）。
+    気になったページをそのまま共有できる。PDF側はページ移動のたびに**iframe
+    要素ごと作り直す**——fragmentだけの変更では内蔵viewerが動かず、かつ
+    `about:blank`を挟む二段セットはナビゲーションが競合してページの偶奇で
+    交互に失敗した（ユーザー報告）。要素の差し替えなら必ず新規ナビゲーションに
+    なる。PDF本体はブラウザがcacheする。
     """
     payload = json.dumps(
         [{"name": d["name"], "pages": d["pages"], "pdf": d["pdf"]} for d in docs],
@@ -324,7 +328,9 @@ def viewer_html(docs: list[dict]) -> str:
   header select, header input, header button { font: inherit; }
   #page { width: 5em; }
   main { display: flex; height: calc(100vh - 44px); }
-  main iframe { border: 0; flex: 1 1 50%; height: 100%; }
+  main > * { border: 0; flex: 1 1 50%; height: 100%; }
+  #pdfpane { display: flex; }
+  #pdfpane iframe { border: 0; flex: 1 1 100%; height: 100%; }
   a { color: #9cf; }
 </style>
 <header>
@@ -338,7 +344,7 @@ def viewer_html(docs: list[dict]) -> str:
   <a href="./">index</a>
 </header>
 <main id="panes">
-  <iframe id="pdf" title="original PDF"></iframe>
+  <div id="pdfpane" title="original PDF"></div>
   <iframe id="md" title="structured rendering"></iframe>
 </main>
 <script>
@@ -346,7 +352,7 @@ const DOCS = __DOCS__;
 const sel = document.getElementById("doc");
 const pageBox = document.getElementById("page");
 const total = document.getElementById("total");
-const pdf = document.getElementById("pdf");
+const pdfpane = document.getElementById("pdfpane");
 const md = document.getElementById("md");
 const mdlink = document.getElementById("mdlink");
 for (const d of DOCS) {
@@ -364,9 +370,13 @@ function update(pushHash = true) {
   pageBox.value = p; pageBox.max = d.pages; total.textContent = d.pages;
   const mdUrl = d.name + "/pages/" + String(p).padStart(4, "0") + ".html";
   md.src = mdUrl; mdlink.href = mdUrl;
-  // 内蔵PDF viewerはfragmentだけの変更では動かないので読み直す
-  pdf.src = "about:blank";
-  requestAnimationFrame(() => { pdf.src = d.pdf + "#page=" + p; });
+  // 内蔵PDF viewerはfragmentだけの変更では動かず、about:blankトグルは
+  // ナビゲーションが競合してページの偶奇で交互に失敗する。iframe要素を
+  // 毎回作り直せば必ず新規ナビゲーションになる。
+  const frame = document.createElement("iframe");
+  frame.title = "original PDF";
+  frame.src = d.pdf + "#page=" + p;
+  pdfpane.replaceChildren(frame);
   if (pushHash)
     history.replaceState(null, "", "#doc=" + encodeURIComponent(d.name) + "&p=" + p);
 }

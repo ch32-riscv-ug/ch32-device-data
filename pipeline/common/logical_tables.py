@@ -101,6 +101,54 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
     }
 
 
+def fold_boundary_spills(merged: dict) -> int:
+    """ページ境界でセルの中身が割れた「宙ぶらりん行」を直前セルへ畳む。
+
+    レジスタのbitfield説明などが長いと、PDFはページの切れ目でそのセルを
+    物理的に割る——結合表では「1列だけ非空・他は全部空の行」になる
+    （X035RM 3-1のMCO[2:0]説明の続き`Other: No clock output.`が実例）。
+    その非空セルを、直前の行の同じ列のセルへ改行連結し、継続セルは空にする。
+
+    **ページ境界（`row_pages`が変わる行）だけ**を対象にする——同一ページ内の
+    「1列だけ非空の行」は比較表の縦並び等の正当な独立セルで、畳むと壊れる
+    （全コーパス実測: 境界限定1,937件は全て本物、境界を外すと9,527件になり
+    製品比較表を誤結合）。**人向け出力専用**——exporterとparity検査だけが呼び、
+    切替済みの抽出器（凍結CSV）は呼ばない。冪等（`_folded`で二重適用を防ぐ）。
+    """
+    if merged.get("_folded"):
+        return 0
+    merged["_folded"] = True
+    row_pages = merged.get("row_pages")
+    if not row_pages:
+        return 0
+    simple: dict[tuple[int, int], dict] = {}
+    by_row: dict[int, list[dict]] = {}
+    for cell in merged["cells"]:
+        single = (cell["row_end"] - cell["row_start"] == 1
+                  and cell["column_end"] - cell["column_start"] == 1)
+        if single:
+            simple[(cell["row_start"], cell["column_start"])] = cell
+        if cell["text"].strip():
+            by_row.setdefault(cell["row_start"], []).append((cell, single))
+    folded = 0
+    for row in sorted(by_row):
+        if row == 0 or row >= len(row_pages) or row_pages[row] == row_pages[row - 1]:
+            continue
+        occupied = by_row[row]
+        if len(occupied) != 1:
+            continue
+        cell, single = occupied[0]
+        if not single:
+            continue
+        prev = simple.get((row - 1, cell["column_start"]))
+        if prev is None or not prev["text"].strip():
+            continue
+        prev["text"] = prev["text"] + "\n" + cell["text"]
+        cell["text"] = ""
+        folded += 1
+    return folded
+
+
 def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
     """結合済み論理表 → 文字の格子（抽出器向け。spanの先頭位置に文字を置く）。"""
     rows: list[list[str | None]] = [[None] * merged["width"]

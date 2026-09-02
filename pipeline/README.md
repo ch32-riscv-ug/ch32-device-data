@@ -82,7 +82,14 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            difference against the PDF. Headers/footers fold into HTML comments, tables
            keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
            and rendered in full where they start, with a visible pointer on the
-           following pages** (3,770 tables joined across the 67 documents), and
+           following pages** (3,770 tables joined across the 67 documents),
+           **a cell whose content was split at a page break is folded back into
+           the cell above it** (`fold_boundary_spills` -- e.g. the MCO
+           description's trailing `Other: No clock output.`; 1,937 cells across
+           50 documents. Only rows at a page boundary qualify, since an in-page
+           "one non-empty cell" row is usually a real standalone cell in a
+           comparison table; exporter and parity share it, the frozen CSVs never
+           see it), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
@@ -142,7 +149,10 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    merge into one "line". The fix splits by x0 into columns and orders each
    column by the glyph matrix direction (b=+1 reads bottom-to-top = descending
    top). Rotated lines are also excluded from the heading heuristic (a
-   large-font in-figure label used to become a level-1 heading). The same
+   large-font in-figure label used to become a level-1 heading). **1.3.1
+   applies the same rebuild to table cells** -- the vertical part-number
+   headers of the pin-definition tables were mirror-reversed inside cells
+   (`6UEW714H` = H417WEU6; 322 tables across 43 documents). The same
    version anchors the **table-caption number regex to the line start** --
    prose like "Note: the options in Table 21-4 ..." had become captions (6
    measured). page["text"] is untouched, so the frozen tools' byte-identity

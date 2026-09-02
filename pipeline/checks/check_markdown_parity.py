@@ -83,6 +83,11 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 expect(CONTINUED, f"table {item['id']} continuation pointer")
                 continue
             record = info["merged"] or tables[item["id"]]
+            if info["merged"]:
+                # exporterと同じ畳み込みを見る（境界で割れたセルは前セルへ連結
+                # 済み・継続セルは空）。continuationセルは`_folded`で空になり
+                # expect("")がスキップ、前セルには連結後textが入る。
+                logical_tables.fold_boundary_spills(record)
             for cell in record["cells"]:
                 expect(html.escape(cell["text"]), f"table {item['id']} cell")
         elif item["type"] == "line":

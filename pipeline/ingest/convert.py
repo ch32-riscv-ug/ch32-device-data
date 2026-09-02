@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.3.0"
+CONVERTER_VERSION = "1.3.1"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -201,6 +201,44 @@ def rotated_line_text(chars_list: list[dict]) -> str | None:
             parts.append(c["text"])
         labels.append("".join(parts))
     return " ".join(labels)
+
+
+def fix_rotated_cells(page, record: dict) -> None:
+    """回転文字が過半の**表セル**の文字を読める順に置き換える（1.3.1）。
+
+    引脚定义表の型番ヘッダ等は縦書きで、`table.extract()`のセル文字は行と同じく
+    鏡順になる（`6UEW714H`＝H417WEU6。322表／43文書で実測）。行（1.3.0）と同じ
+    組み直しをセルにも適用する——`cells[].text`と`extracted_rows`の両方。
+    旧toolも同じ鏡順を読んで正規化していたので正本CSVは無事だが、人向け出力の
+    表セルには裸で出ていた。
+    """
+    rotated_centers = [((c["x0"] + c["x1"]) / 2, (c["top"] + c["bottom"]) / 2)
+                       for c in page.chars
+                       if str(c.get("text", "")).strip() and not c.get("upright", True)]
+    if not rotated_centers:
+        return
+
+    def rebuild(bbox) -> str | None:
+        x0, top, x1, bottom = bbox
+        if sum(1 for cx, cy in rotated_centers
+               if x0 <= cx <= x1 and top <= cy <= bottom) < 2:
+            return None
+        inside = [c for c in page.chars
+                  if x0 <= (c["x0"] + c["x1"]) / 2 <= x1
+                  and top <= (c["top"] + c["bottom"]) / 2 <= bottom]
+        return rotated_line_text(inside)
+
+    for cell in record["cells"]:
+        fixed = rebuild(cell["bbox"])
+        if fixed is not None:
+            cell["text"] = fixed
+    for row_texts, row_boxes in zip(record["extracted_rows"], record["row_cells"]):
+        for index, bbox in enumerate(row_boxes):
+            if bbox is None or index >= len(row_texts) or row_texts[index] is None:
+                continue
+            fixed = rebuild(bbox)
+            if fixed is not None:
+                row_texts[index] = fixed
 
 
 def text_items(page, kind: str) -> list[dict]:
@@ -415,6 +453,7 @@ def page_record(page, lang: str, source_sha256: str,
             "cells": cells,
             "issues": overlap_issues(cells),
         })
+        fix_rotated_cells(page, tables[-1])
         previous_bottom = table.bbox[3]
 
     def outside_tables(line: dict) -> bool:
