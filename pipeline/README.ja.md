@@ -45,7 +45,11 @@ common/    review_sidecar.py（**L2: 人の判断の読み手**。正本は
            原本SHA-256にpin。新経路の抽出器はrejectedのblockを正本生成から外し、
            必須の表が拒否されたら黙って劣化せず停止する。原本が変わった
            sidecarは流用せず止まる——converterの再変換ゲートと同じ判定を
-           読む側でも行う。判断の記録は`review/record_decision.py`）
+           読む側でも行う。判断の記録は`review/record_decision.py`。
+           **zh/enの表対応はcaption番号一致で自動**（2026-09-02実測: 32文書
+           ペア中16ペアは完全一致、非対称の残差は**全コーパスで83番号**だけ）
+           ——残差は`review/propose_pairs.py`が両版のcaption原文つきで並べ、
+           人が対を決めたら両blockへ同じ`canonical_table_number`を記録する）
 review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
