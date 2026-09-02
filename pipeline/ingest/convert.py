@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.5.1"
+CONVERTER_VERSION = "1.6.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -284,6 +284,113 @@ def column_boundary(page, lines: list[dict]):
     return (best_x, y_start)
 
 
+def _line_median_size(line: dict) -> float:
+    sizes = [c["size"] for c in line.get("chars", []) if str(c.get("text") or "").strip()]
+    return statistics.median(sizes) if sizes else 0.0
+
+
+def _subscript_clusters(chars: list[dict]) -> list[list[dict]]:
+    """小フォント行のcharを内部のx空白で束ねる。
+
+    `V_DD ... V_PVD`のように離れた複数の下付き語がtopで同じ行にまとまることが
+    あり、その場合は`DD`と`PVD`を別クラスタに割って、それぞれ対応する`V`へ入れる。
+    連続する綴り（`POR/PDR`）は空白が詰まっているので1クラスタのまま。
+    """
+    sc = sorted(chars, key=lambda c: c["x0"])
+    groups: list[list[dict]] = [[sc[0]]]
+    for prev, cur in zip(sc, sc[1:]):
+        if cur["x0"] - prev["x1"] > 8:
+            groups.append([])
+        groups[-1].append(cur)
+    return groups
+
+
+def _insert_subscript(base_text: str, base_chars: list[dict],
+                      sub_chars: list[dict]) -> str:
+    """下付き/上付きの文字列を、ベース行のtextの該当位置へ挿入する。
+
+    ベースのtext（正しい単語間空白入り）はそのまま保ち、下付きを`V`の直後へ
+    差し込む——下付きが別行へ抜けた跡の空白（`(V )`の` `）は消す。char再構成に
+    すると本文の単語空白が壊れる（charに空白が無く、gap判定では再現できない）。
+    複数クラスタは右（x0大）から入れるので、左側のtext位置はずれない。
+    """
+    sub_text = "".join(c["text"] for c in sorted(sub_chars, key=lambda c: c["x0"]))
+    sub_x0 = min(c["x0"] for c in sub_chars)
+    k = sum(1 for c in base_chars if c["x0"] < sub_x0)   # 下付きより前のbase char数
+    if k == 0:
+        return base_text
+    count, pos = 0, len(base_text)
+    for idx, ch in enumerate(base_text):
+        if not ch.isspace():
+            count += 1
+            if count == k:
+                pos = idx + 1
+                break
+    rest = base_text[pos:]
+    # 下付きの後の空白は、次が記号（`)`,`,`等）なら下付きが抜けた跡なので消し、
+    # 英数字なら`VDD is`のような正規の単語間空白なので残す。
+    if rest.startswith(" ") and (len(rest) < 2 or not rest[1].isalnum()):
+        rest = rest[1:]
+    return base_text[:pos] + sub_text + rest
+
+
+def merge_subscript_lines(lines: list[dict]) -> list[dict]:
+    """下付き・上付きが独立行に分かれたものを、ベースラインが揃う本文行へ統合する。
+
+    pdfplumberの行抽出はtopでグループ化するので、`V`（top=102）の下付き`DD`
+    （top=106・size 7pt・**bottomはVと揃う**）が別行になり、`V`と`DD`が離れて
+    `V_DD`が読めなくなる（全datasheetで4600件）。本文の0.72倍以下の小フォント行を
+    クラスタに割り、各クラスタをbottom（ベースライン）±2.5pt揃い・x的に含む本文行の
+    該当位置へ差し込む（右のクラスタから入れるので左の位置はずれない）。図中の極小
+    ラベル（bottomが揃う本文行が無い）は統合されず残る。
+    """
+    if not lines:
+        return lines
+    sizes = [s for s in (_line_median_size(l) for l in lines) if s > 0]
+    if not sizes:
+        return lines
+    body = statistics.median(sizes)
+
+    def baseline(chars: list[dict]) -> float:
+        return statistics.median([c["bottom"] for c in chars
+                                  if str(c.get("text") or "").strip()])
+
+    bases = [j for j, b in enumerate(lines)
+             if _line_median_size(b) > body * 0.72 and b.get("chars")]
+    consumed = [False] * len(lines)
+    subs_for: dict[int, list[list[dict]]] = {}
+    for i, small in enumerate(lines):
+        size = _line_median_size(small)
+        if size == 0 or size > body * 0.72 or not small.get("chars"):
+            continue
+        sb = baseline(small["chars"])
+        matches = []
+        for cl in _subscript_clusters(small["chars"]):
+            cx = min(c["x0"] for c in cl)
+            hit = next((j for j in bases if abs(sb - baseline(lines[j]["chars"])) <= 2.5
+                        and lines[j]["x0"] - 5 <= cx <= lines[j]["x1"] + 5), None)
+            matches.append((cl, hit))
+        # 全クラスタが本文行に着地したときだけ小行を統合する。1つでも外れたら
+        # 一部挿入でglyphを落とすことになるので小行は丸ごと残す（欠落回避）。
+        if matches and all(j is not None for _, j in matches):
+            for cl, j in matches:
+                subs_for.setdefault(j, []).append(cl)
+            consumed[i] = True
+
+    out = []
+    for i, line in enumerate(lines):
+        if consumed[i]:
+            continue
+        if i in subs_for:
+            line = dict(line)
+            text = line["text"]
+            for cl in sorted(subs_for[i], key=lambda c: -min(ch["x0"] for ch in c)):
+                text = _insert_subscript(text, line["chars"], cl)
+            line["text"] = text
+        out.append(line)
+    return out
+
+
 def text_items(page, kind: str, boundary=None) -> list[dict]:
     if kind == "line" and boundary:
         # 2カラム: タイトル帯（y_start より上）は全幅、その下を左カラム→右カラム
@@ -297,6 +404,8 @@ def text_items(page, kind: str, boundary=None) -> list[dict]:
     else:
         source = (page.extract_text_lines(return_chars=True) if kind == "line"
                   else page.extract_words())
+    if kind == "line":
+        source = merge_subscript_lines(list(source or []))
     out = []
     for index, item in enumerate(source or [], 1):
         entry = {

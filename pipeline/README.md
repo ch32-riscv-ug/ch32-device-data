@@ -190,6 +190,24 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    diagrams and pin tables out (all 51 target pages are overview-type,
    zero false hits); pages with no clear boundary are left as is.
 
+6. **Subscripts/superscripts are merged back into the body line**
+   (converter 1.6.0). pdfplumber groups lines by top, so the `DD` subscript
+   of `V` (top≈106, 7pt, **bottom aligned with the V**) drops onto its own
+   line, leaving `V` and `DD` apart and `V_DD` unreadable (~4,600 across all
+   datasheets). Small-font lines (<0.72x body) are split into clusters by
+   internal x-gap, and each cluster is inserted into the body line whose
+   baseline (bottom) it matches within 2.5pt and whose x-range contains it.
+   The insertion **keeps the base line's own text** and drops the subscript
+   in by position -- the chars carry no spaces (`itputs`), so a gap rule
+   cannot rebuild word spacing. The vacated space is closed before a symbol
+   but kept before a word (so both `(VPOR/PDR)` and `VDD is` come out right).
+   Multiple subscripts on one line (`V...V` with `DD`/`PVD`) are inserted
+   right-to-left per cluster so positions do not drift (`VDD...VPVD`). A
+   small line is merged only when every cluster lands on a body line;
+   otherwise it is kept whole (no dropped glyphs). Figure micro-labels with
+   no baseline-aligned body line are left separate. page["text"] is built
+   by extract_text() independently, so the frozen tools' byte-identity holds.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
