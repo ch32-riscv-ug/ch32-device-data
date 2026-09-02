@@ -117,7 +117,12 @@ def table_html(table: dict, url: str | None, number: int) -> str:
     rows = ["<tr>" + "".join(cell or "" for cell in row) + "</tr>"
             for r, row in enumerate(grid)
             if covered[r] or r not in folded_rows]
-    caption = table["caption"]["text"] if table["caption"] else table["logical_id"]
+    # captionを持つ表だけが`<caption>`を出す。caption行の無い表（レジスタの
+    # ビット図・説明表）は、原本でも表番号が振られていない——continuation継承で
+    # 前ページの表番号（logical_id）を借りて名乗ると、無関係な`table-3-1@1`が
+    # 6つ並ぶ（ユーザー指摘）。内部IDは追跡用にコメントへ残す。
+    caption = table["caption"]["text"] if table["caption"] else None
+    cap_html = f"<caption>{html.escape(caption)}</caption>" if caption else ""
     span = table.get("parts")
     parts = []
     if table["issues"]:
@@ -126,10 +131,10 @@ def table_html(table: dict, url: str | None, number: int) -> str:
         parts.append(f"> ⚠ Table extraction recorded {len(table['issues'])} issue(s) "
                      f"(overlapping merged cells); verify against "
                      f"{page_link(url, number, where)}.\n")
-    origin = (f"<!-- {table['id']} pages {span[0][0]}-{span[-1][0]} -->" if span
-              else f"<!-- {table['id']} -->")
-    parts.append(f"{origin}\n"
-                 f"<table><caption>{html.escape(caption)}</caption>{''.join(rows)}</table>")
+    lid = table["logical_id"]
+    origin = (f"<!-- {table['id']} ({lid}) pages {span[0][0]}-{span[-1][0]} -->" if span
+              else f"<!-- {table['id']} ({lid}) -->")
+    parts.append(f"{origin}\n<table>{cap_html}{''.join(rows)}</table>")
     return "\n".join(parts)
 
 

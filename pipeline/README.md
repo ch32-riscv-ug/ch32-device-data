@@ -93,7 +93,10 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            see it), **a cell's internal line breaks are kept as `<br>`** (a `<td>`
            collapses newlines to spaces; this preserves the original's paragraphs
            -- wrap vs. intentional break is unknowable from pdfminer, but the
-           original wraps at the same points), and
+           original wraps at the same points), **only a table with a real caption
+           line emits a `<caption>`** (an uncaptioned table used to borrow the
+           previous page's table number through continuation inheritance; the
+           internal id moves to a comment), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
