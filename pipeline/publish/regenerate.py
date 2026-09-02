@@ -52,10 +52,14 @@ FULL_PLAIN_1 = ["build_evt_examples", "build_clock", "build_systick",
                 "build_pin_alternate"]
 FULL_PATCHED_2 = ["build_memory"]
 FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
+# build_registersに--rm-cacheを渡さない——cacheは原本更新後も**無検証で再利用され、
+# 正本を古い読みへ戻す**（2026-09-02の初回--fullで実際に踏んだ: 08-26製のcacheが
+# X315 RM改版前のARGB番地0x40023400を返し、registers 9行が偽conflictになった。
+# check_docsが捕捉→revert）。bundle入力ならcache無しでも数分で済む。
 FULL_PATCHED_3 = ["build_features", "build_timers", "build_flash_geometry",
                   "build_opa_cmp_registers", "build_clock_enables",
                   "build_adc_internal", "build_usbpd_plumbing",
-                  "build_registers --rm-cache .cache/rm", "build_dma_requests",
+                  "build_registers", "build_dma_requests",
                   "build_debug_data"]
 FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
                 "build_link_firmware"]

@@ -837,30 +837,36 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 
 ## 生成
 
-出力先は各ツールが `tools/paths.py` で決めます（`--out <dir>` は試験用の上書き）。上から順に。
+**正面玄関は `uv run pipeline/publish/regenerate.py --full`**——以下の全部を
+依存順に構造化bundle入力で回し、検査まで進む（1時間強。`--full`なしは新経路
+だけの速い再生成）。下の一覧は1表ずつ回すときのもの。PDFを読むtoolは
+`pipeline/extract/run_patched.py`経由で回す（入力層だけをbundleへ差し替える。
+toolのコードは不変）——素の`tools/<name>.py`で回すとPDF直読みになり、切替後は
+実行経路の外。出力先は各ツールが `tools/paths.py` で決めます（`--out <dir>` は
+試験用の上書き）。上から順に。
 
 ```sh
-uv run tools/build_all.py                       # .cache/candidates/（型番ごとの抽出候補。family並列。--jobs で本数、既定2）
-uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
-uv run tools/build_pins.py                      # pins/pin_functions（数分かかる）
-uv run tools/build_remap.py                     # remap_fields/remap_routes（candidates から）
+uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/（型番ごとの抽出候補。直列——patchはworker子プロセスに効かない）
+uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run pipeline/extract/run_patched.py build_pins                      # pins/pin_functions（数分かかる）
+uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes（candidates から）
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
 uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
 uv run tools/build_systick.py                   # systick（EVTのcore_riscv.hから）
 uv run tools/build_pin_alternate.py             # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
-uv run tools/build_memory.py                    # memory_configs（RMとEVTのLink.ldから・数分かかる）
+uv run pipeline/extract/run_patched.py build_memory                    # memory_configs（RMとEVTのLink.ldから・数分かかる）
 uv run tools/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
-uv run tools/build_features.py                  # features（datasheetの機能説明章から・数分かかる）
-uv run tools/build_timers.py                    # timers（RMのTIMx_CNT見出しから・数分かかる）
-uv run tools/build_flash_geometry.py            # flash_geometry（EVTのflash driver＋RMの闪存章）
-uv run tools/build_opa_cmp_registers.py         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
-uv run tools/build_clock_enables.py             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
-uv run tools/build_adc_internal.py              # adc_internal（datasheet両言語の散文と電気的特性表）
-uv run tools/build_usbpd_plumbing.py            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
-uv run tools/build_registers.py --rm-cache .cache/rm   # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読み。10分以上）
-uv run tools/build_dma_requests.py              # dma_requests（RM zh/en のDMA章の格子。全ページ走査で15分前後）
+uv run pipeline/extract/run_patched.py build_features                  # features（datasheetの機能説明章から・数分かかる）
+uv run pipeline/extract/run_patched.py build_timers                    # timers（RMのTIMx_CNT見出しから・数分かかる）
+uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry（EVTのflash driver＋RMの闪存章）
+uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
+uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
+uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal（datasheet両言語の散文と電気的特性表）
+uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
+uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読み。bundleで約19分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
+uv run pipeline/extract/run_patched.py build_dma_requests              # dma_requests（RM zh/en のDMA章の格子。全ページ走査で15分前後）
 uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
 uv run tools/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）
@@ -868,7 +874,7 @@ uv run tools/build_conflicts.py                 # index/conflicts（catalog/・e
 uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
-uv run tools/build_debug_data.py                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
+uv run pipeline/extract/run_patched.py build_debug_data                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）
@@ -880,6 +886,6 @@ uv run tools/check_tables.py                    # 全テーブルの参照結合
 uv run tools/check_counts.py                    # 比較表の周辺数 vs pinのinstance数
 uv run tools/check_docs.py                      # 文書が書いている行数・穴の状態 vs 実際の表
 node tools/check_viewer.js                      # pins.html の表示（script を DOM 無しで評価）
-uv run tools/scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
+uv run pipeline/extract/run_scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --family CH32V006  # 1familyだけ
 ```

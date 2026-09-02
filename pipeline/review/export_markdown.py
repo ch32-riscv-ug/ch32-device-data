@@ -271,7 +271,10 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
         "from the PDF where the asset renderer found their region; a caption whose\n"
         "figure could not be located carries a visible notice instead, and every\n"
         "page links back to the PDF. A table that spans pages is rendered in full\n"
-        "on the page where it starts; the following pages carry a visible pointer.\n\n"
+        "on the page where it starts; the following pages carry a visible pointer.\n"
+        "Where the PDF's own text layer maps subscript glyphs to `*` (broken\n"
+        "ToUnicode), the page starts with a notice -- the printed page shows the\n"
+        "real subscripts.\n\n"
         + "\n".join(links) + "\n", encoding="utf-8")
     return out
 

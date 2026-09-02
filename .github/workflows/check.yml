@@ -87,6 +87,7 @@ jobs:
         run: |
           python -m doctest pipeline/common/figure_captions.py -o FAIL_FAST
           python -m doctest pipeline/common/lost_subscripts.py -o FAIL_FAST
+          python -m doctest pipeline/common/review_sidecar.py -o FAIL_FAST
 
       # Everything derivable without a PDF must already be committed in its
       # regenerated form. This used to cover catalog/documents.csv only, and the

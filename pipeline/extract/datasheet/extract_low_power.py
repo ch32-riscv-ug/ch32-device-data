@@ -64,6 +64,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "common"))
 
 import build_operating as operating  # noqa: E402  凍結ロジック（読むだけ）
 import convert_all  # noqa: E402
+import review_sidecar  # noqa: E402
 import logical_tables  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
@@ -282,20 +283,28 @@ def caption_context(table: dict) -> str:
 
 
 def bundle_tables(name: str, pdf: Path):
-    """bundleの表を文書順に返す。入口ゲート: 原本SHA-256とmanifestを照合。"""
+    """bundleの表を文書順に返す。入口ゲート: 原本SHA-256とmanifestを照合。
+    L2 sidecarでrejectedのblockは正本生成に使わない（黙って跳ばさず数を言う）。"""
     bundle = BUNDLES / name
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     actual = hashlib.sha256(pdf.read_bytes()).hexdigest()
     if manifest["source"]["sha256"] != actual:
         raise SystemExit(f"{bundle}: bundle was converted from a different original "
                          "-- run pipeline/ingest/convert_all.py first")
+    rejected = review_sidecar.rejected_ids(name)
+    skipped = 0
     for entry in manifest["pages"]:
         payload = (bundle / entry["file"]).read_bytes()
         if hashlib.sha256(payload).hexdigest() != entry["sha256"]:
             raise SystemExit(f"{bundle}/{entry['file']}: page hash differs from manifest")
         page = json.loads(payload)
         for table in page["tables"]:
+            if table["id"] in rejected:
+                skipped += 1
+                continue
             yield page["number"], table
+    if skipped:
+        print(f"    {name}: reviewでrejectedの表 {skipped} 個を外した", file=sys.stderr)
 
 
 def read_edition(name: str, pdf: Path, lang: str,

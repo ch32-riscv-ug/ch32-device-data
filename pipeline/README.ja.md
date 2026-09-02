@@ -40,6 +40,12 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
            対象選定は凍結toolのまま）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
+common/    review_sidecar.py（**L2: 人の判断の読み手**。正本は
+           `structured/<stem>.<lang>/review.json`——block IDごとのapproved/rejected、
+           原本SHA-256にpin。新経路の抽出器はrejectedのblockを正本生成から外し、
+           必須の表が拒否されたら黙って劣化せず停止する。原本が変わった
+           sidecarは流用せず止まる——converterの再変換ゲートと同じ判定を
+           読む側でも行う。判断の記録は`review/record_decision.py`）
 review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
@@ -103,6 +109,7 @@ roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこ
 
 ```sh
 uv run pipeline/publish/regenerate.py                   # 一括再生成（bundles→evidence→index→checks）
+uv run pipeline/publish/regenerate.py --full            # 全CSVの再生成（旧tool群をbundle入力で。約1.5時間）
 uv run pipeline/publish/regenerate.py --verify --human  # ＋凍結パリティ・エラッタ・図・Markdown・差ゼロ検査
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
 uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの67版。incremental

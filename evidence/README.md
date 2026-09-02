@@ -857,30 +857,39 @@ The series block diagrams (`system_*.png`) are not in the original datasheets; t
 
 ## Generation
 
-Each tool decides its output location in `tools/paths.py` (`--out <dir>` is an override for testing). In order from the top.
+**The front door is `uv run pipeline/publish/regenerate.py --full`** — it runs
+everything below in dependency order on structured-bundle input and finishes
+with the checks (about an hour; `regenerate.py` without `--full` is the fast
+new-path-only variant). The list below is for regenerating one table at a time.
+PDF-reading tools run through `pipeline/extract/run_patched.py`, which swaps
+their input layer to the structured bundles (the tool's own code is unchanged);
+running them as plain `tools/<name>.py` would read the PDFs directly, which is
+off the execution path since the switchover. Each tool decides its output
+location in `tools/paths.py` (`--out <dir>` is an override for testing). In
+order from the top.
 
 ```sh
-uv run tools/build_all.py                       # .cache/candidates/ (extraction candidates per part number. Parallel per family. --jobs for the count, default 2)
-uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
-uv run tools/build_pins.py                      # pins/pin_functions (takes a few minutes)
-uv run tools/build_remap.py                     # remap_fields/remap_routes (from candidates)
+uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/ (extraction candidates per part number; serial -- the patch does not survive worker processes)
+uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run pipeline/extract/run_patched.py build_pins                      # pins/pin_functions (takes a few minutes)
+uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes (from candidates)
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions (new path, bundle input; frozen base rows + A11 rows)
 uv run tools/build_evt_examples.py              # evt_examples (from the EVT tree and catalog)
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init (from EVT)
 uv run tools/build_systick.py                   # systick (from EVT's core_riscv.h)
 uv run tools/build_pin_alternate.py             # pin_alternate (from EVT's AFIO structure and GPIO driver)
-uv run tools/build_memory.py                    # memory_configs (from the RM and EVT's Link.ld; takes a few minutes)
+uv run pipeline/extract/run_patched.py build_memory                    # memory_configs (from the RM and EVT's Link.ld; takes a few minutes)
 uv run tools/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
 uv run tools/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
-uv run tools/build_features.py                  # features (from the datasheet functional description chapter; takes a few minutes)
-uv run tools/build_timers.py                    # timers (from the RM's TIMx_CNT headings; takes a few minutes)
-uv run tools/build_flash_geometry.py            # flash_geometry (EVT flash driver + RM 闪存 (flash) chapter)
-uv run tools/build_opa_cmp_registers.py         # opa_cmp_registers (EVT headers + RM register tables. Reads the whole RM; slow)
-uv run tools/build_clock_enables.py             # clock_enables (EVT rcc.h + RM register tables. Reads the whole RM; slow)
-uv run tools/build_adc_internal.py              # adc_internal (prose and electrical characteristics tables of both datasheet editions)
-uv run tools/build_usbpd_plumbing.py            # usbpd_plumbing (after clock_enables. EVT headers + RM)
-uv run tools/build_registers.py --rm-cache .cache/rm   # register_blocks/registers/register_fields + index/register_layouts (EVT headers + whole RM. 10+ minutes)
-uv run tools/build_dma_requests.py              # dma_requests (DMA chapter grids of the RM zh/en. Scans all pages; about 15 minutes)
+uv run pipeline/extract/run_patched.py build_features                  # features (from the datasheet functional description chapter; takes a few minutes)
+uv run pipeline/extract/run_patched.py build_timers                    # timers (from the RM's TIMx_CNT headings; takes a few minutes)
+uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry (EVT flash driver + RM 闪存 (flash) chapter)
+uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers (EVT headers + RM register tables. Reads the whole RM; slow)
+uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables (EVT rcc.h + RM register tables. Reads the whole RM; slow)
+uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal (prose and electrical characteristics tables of both datasheet editions)
+uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing (after clock_enables. EVT headers + RM)
+uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields + index/register_layouts (EVT headers + whole RM; about 19 minutes on bundles. No cache -- a stale --rm-cache once rolled the canonical back to a pre-revision RM reading)
+uv run pipeline/extract/run_patched.py build_dma_requests              # dma_requests (DMA chapter grids of the RM zh/en. Scans all pages; about 15 minutes)
 uv run tools/build_eval_boards.py               # eval_boards (from EVT's PUB/)
 uv run tools/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
 uv run tools/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)
@@ -888,7 +897,7 @@ uv run tools/build_conflicts.py                 # index/conflicts (every conflic
 uv run tools/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
 uv run tools/build_evt_variants.py              # evt_variants (from the EVT device headers)
 uv run tools/build_link_firmware.py             # link_firmware (from WCH's distribution)
-uv run tools/build_debug_data.py                # debug_data (defines in EVT debug.c + QingKe manual hartinfo table + measurements)
+uv run pipeline/extract/run_patched.py build_debug_data                # debug_data (defines in EVT debug.c + QingKe manual hartinfo table + measurements)
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)
@@ -900,6 +909,6 @@ uv run tools/check_tables.py                    # reference joins of all tables,
 uv run tools/check_counts.py                    # peripheral counts of the comparison table vs pin instance counts
 uv run tools/check_docs.py                      # row counts and hole states claimed by the documents vs the tables
 node tools/check_viewer.js                      # what pins.html shows (its script evaluated without a DOM)
-uv run tools/scan_errata.py                     # incremental errata check (exit code 1 on NEW)
+uv run pipeline/extract/run_scan_errata.py                     # incremental errata check (exit code 1 on NEW)
 uv run tools/build_tables.py --family CH32V006  # one family only
 ```
