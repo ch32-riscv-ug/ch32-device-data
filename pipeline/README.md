@@ -109,6 +109,13 @@ checks/    compare_manifest.py (cross-environment reproducibility)
            check_markdown_parity.py (machine check that every body line and table cell
            reaches the Markdown in reading order and that gap notices are present --
            **all 67 documents pass**)
+           cross_engine.py (**independent verification of the text ingestion**:
+           compares the bundle's character multiset against a second PDF engine,
+           pypdfium2 -- order is ignored, only the set of characters. pypdfium2's
+           hyphen misread (`-` -> `\x02`) is normalized. Measured across all 67
+           versions: **0 characters missed** apart from 14 known math/unit-glyph
+           ToUnicode breakages (garbled in both engines), pinned by name and
+           count. Manual: `uv run --with pypdfium2`)
 publish/   regenerate.py (**the single regeneration entry point**: bundle
            reconversion -> switched-over evidence -> derived index tables ->
            checks, calling the existing CLIs in order. --verify adds the frozen

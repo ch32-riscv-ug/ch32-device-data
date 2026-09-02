@@ -82,6 +82,11 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
 checks/    compare_manifest.py（環境差の検証）
            check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
            全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**）
+           cross_engine.py（**取り込み正しさの独立検証**。bundleの文字集合を別実装の
+           pypdfium2と突き合わせる——順序でなく文字マルチセットを比べ、pypdfium2が
+           取れてbundleが落とした文字を報告。pypdfium2のハイフン誤読（`-`→`\x02`）は
+           正規化。全67版で**取りこぼし0**を実測——独立エンジンが取る文字を
+           bundleは一文字残らず取る。手動運用: `uv run --with pypdfium2`）
 publish/   regenerate.py（**一括再生成のentry point**。bundle再変換→切替済み
            evidenceの再生成→下流indexの再導出→検査、の順で既存CLIを呼ぶ。
            `--verify`で凍結パリティ＋エラッタ増分検査、`--human`で図の描画→
