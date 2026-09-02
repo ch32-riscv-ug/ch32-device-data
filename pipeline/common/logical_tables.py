@@ -173,14 +173,16 @@ def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
 def bit_numbers(text: str) -> list[int] | None:
     """行が「N N-1 … 」のbit番号列ならintの並びを返す（でなければNone）。
 
-    1ずつ厳密に降順・長さ8/16/32・全て0..31——bit図に固有の並びで、本文中の
-    数字列と衝突しない。
+    厳密に降順（a>b）・長さ≥8・全て0..31。これで3形をまとめて拾う——16bitの
+    `15 14 … 0`、幅が半端な`11 10 … 0`（12bit）、byte境界の`31 24 23 16 15 8 7 0`。
+    横並びレジスタが混ざった非降順（`8 7 5 3 0 9 8 7`）や、bit>31（`96 … 65`）は弾く。
+    列マップはbit番号のx中心が担うので、間隔が一定でなくても構わない。
     """
     tokens = text.split()
-    if len(tokens) not in (8, 16, 32) or not all(t.isdigit() for t in tokens):
+    if len(tokens) < 8 or not all(t.isdigit() for t in tokens):
         return None
     nums = [int(t) for t in tokens]
-    if any(a - b != 1 for a, b in zip(nums, nums[1:])):
+    if any(a <= b for a, b in zip(nums, nums[1:])):
         return None
     if not all(0 <= n <= 31 for n in nums):
         return None
@@ -219,7 +221,7 @@ def bit_number_centers(chars: list[dict], number_line: dict) -> list[tuple[str, 
             return None
         out.append((token, (group[0]["bbox"][0] + group[-1]["bbox"][2]) / 2))
     nums = [int(t) for t, _ in out]
-    if len(nums) not in (8, 16, 32) or any(a - b != 1 for a, b in zip(nums, nums[1:])):
+    if len(nums) < 8 or any(a <= b for a, b in zip(nums, nums[1:])):
         return None
     if not all(0 <= n <= 31 for n in nums):
         return None
