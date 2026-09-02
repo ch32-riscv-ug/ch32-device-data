@@ -53,7 +53,8 @@ def load_page(bundle: Path, entry: dict) -> dict:
 
 
 def check_page(page: dict, text: str, chains: dict[str, dict],
-               pages_dir: Path) -> list[str]:
+               pages_dir: Path,
+               bitfields: dict[str, tuple[str, list]] | None = None) -> list[str]:
     bad = []
     # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
     # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
@@ -65,6 +66,9 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     position = 0
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
+    # bit図: 番号行は次表のヘッダへ畳まれるので、exporterと同じ集合を消す。
+    bitfields = bitfields or {}
+    consumed_lines = {line_id for line_id, _ in bitfields.values()}
 
     def expect(needle: str, what: str) -> None:
         nonlocal position
@@ -90,11 +94,17 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # 済み・継続セルは空）。continuationセルは`_folded`で空になり
                 # expect("")がスキップ、前セルには連結後textが入る。
                 logical_tables.fold_boundary_spills(record)
+            if item["id"] in bitfields:
+                # bit番号をヘッダへ、縦割れ名を連結——exporterと同じ表を見る。
+                line_id, centers = bitfields[item["id"]]
+                logical_tables.apply_bitfield(record, lines[line_id], centers)
             for cell in record["cells"]:
                 # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
                 expect(export_markdown.cell_html(cell["text"]),
                        f"table {item['id']} cell")
         elif item["type"] == "line":
+            if item["id"] in consumed_lines:
+                continue   # bit番号行は表ヘッダへ畳んだ
             line = lines[item["id"]]
             expect(html.escape(export_markdown.pua_normalize(line["text"])),
                    f"{line.get('role')} {item['id']}")
@@ -135,7 +145,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
             bad.append(f"p{page['number']}: markdown page missing")
             continue
         text = md.read_text(encoding="utf-8")
-        bad.extend(check_page(page, text, chains, markdown / "pages"))
+        plan = export_markdown.bitfield_plan(bundle, entry, page)
+        bad.extend(check_page(page, text, chains, markdown / "pages", plan))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")
