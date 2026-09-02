@@ -54,7 +54,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
            paragraph行として写るので文字を境界にすると領域が潰れる。67文書で
-           3,337 asset・**図caption 2,871の全部に実画像（100%・警告0）**——
+           3,676 asset・**図caption 2,871の全部に実画像（100%・警告0）**——caption無しでも回転文字入りの大クラスタ（封装図・引脚配置図）は独立assetとして描画——
            図全体が1つの無caption表として誤検出される場合（過滤器編号の示例・
            波形図・応答グラフ）もcaption直下ならクラスタへ算入する。
            本文の参照文（「图19-2是…」「figure 21-1.」等）はcaption扱いしない
@@ -83,7 +83,7 @@ candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍
 toolはこの経路に無い（**切替済み・新設のCSVは例外**——`operating_conditions.csv`
 （切替）と`debug_wiring.csv`（新設）の正本生成元は2026-09-01からこの経路）。
 
-## ingestがPoCと違う点（3つの修正。1と2はD17の実測、3はCIの実戦検出）
+## ingestがPoCと違う点（4つの修正。1と2はD17の実測、3はCIの実戦検出、4は人向け出力の精査）
 
 1. **決定性**: pdfminerがinline imageへ付ける`id()`由来の数字名を捨てる
    （converter自身の`p66-draw-image-00002`形式が識別子）。同一原本＋同一版なら
@@ -105,6 +105,15 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    gzipの圧縮バイト列はzlibの版で変わり、GitHub Actions上の再変換が
    geometry_sha256だけ全ページ不一致になった（2026-09-01、`structured-repro.yml`が
    **設計どおり環境差を検出**した初の実戦）。圧縮は保存の都合であって内容ではない
+
+4. **90°回転の縦ラベルを読める順に組み直す**（converter 1.3.0）。封装図・
+   引脚配置図のpin名はpdfplumberの行組みだと**鏡順**になり（`33DDV`＝VDD33）、
+   さらに複数の縦ラベルが1行に混ざる。x0で列に分割し、列内はglyphのmatrixの
+   向きで並べ替える（b=+1は下から上へ読む＝top降順）。回転行はheading判定から
+   も外す（大フォントの図中ラベルがlevel-1見出しに化けていた）。あわせて
+   **表captionの番号regexを行頭にanchor**——「注：表21-4的…」のような参照文が
+   captionに化けていた6件を除去。`page["text"]`は触らないので凍結toolのbyte
+   一致は崩れない
 
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。

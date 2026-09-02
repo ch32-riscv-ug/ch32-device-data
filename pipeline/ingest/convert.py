@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.2.0"
+CONVERTER_VERSION = "1.3.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -60,9 +60,11 @@ REVIEW_SCHEMA = REPO / "schemas" / "structured-document-review.schema.json"
 HEADING_NUMBER = re.compile(r"^(?P<number>\d+(?:\.\d+)+)\s+\S")
 CHAPTER_HEADING = re.compile(r"^(?:第\s*\d+\s*章|Chapter\s+\d+)", re.I)
 LIST_ITEM = re.compile(r"^(?:[•●▪◆◇*-]|\(\d+\)|[a-z]\))\s*")
+# 行頭にanchorする（1.3.0）——「注：表21-4的配置选择…」のような**参照文が
+# captionに化けていた**（FV2x RM等で6件実測）。本物のcaptionは表/Tableで始まる。
 TABLE_NUMBER = {
-    "en": re.compile(r"Table\s+(\d+(?:-\d+)+)", re.I),
-    "zh": re.compile(r"表\s*(\d+(?:-\d+)+)"),
+    "en": re.compile(r"^\s*Table\s+(\d+(?:-\d+)+)", re.I),
+    "zh": re.compile(r"^\s*表\s*(\d+(?:-\d+)+)"),
 }
 
 # 反復ベースのheader/footer判定の帯と敷居。厳格帯（6%/94%）はPoCと同じで、
@@ -158,16 +160,65 @@ def margin_repeats(pdf) -> tuple[set, set, set, set]:
     return repeated_top, repeated_bottom, top_texts, bottom_texts
 
 
+def rotated_line_text(chars_list: list[dict]) -> str | None:
+    """90°回転の文字が過半の行を、読める順に組み直す（1.3.0）。
+
+    封装図・引脚配置図の縦ラベルは、pdfplumberの行組みだと**鏡順**になり
+    （`33DDV`＝VDD33）、さらに**複数の縦ラベルが1行に混ざる**（x0が違う列の
+    集まり）。x0で列に分割し、列の中はmatrixの向きで並べ替える——
+    matrix b=+1（反時計回り・下から上へ読む）はtop降順、b=-1はtop昇順。
+    向きが混在して決められなければNone（元の綴りのまま）。
+    """
+    named = [c for c in chars_list if str(c.get("text", "")).strip()]
+    rotated = [c for c in named if not c.get("upright", True)]
+    if len(named) < 2 or len(rotated) <= len(named) / 2:
+        return None
+    signs = {1 if c["matrix"][1] > 0 else -1 for c in rotated
+             if abs(c["matrix"][1]) > 0.1}
+    if len(signs) != 1:
+        return None
+    descending = signs.pop() > 0
+    columns: list[list[dict]] = []
+    for c in sorted(named, key=lambda c: c["x0"]):
+        # 回転charの`size`はグリフ幅寄りで不安定なので、列分割は固定の許容で
+        if columns and c["x0"] - columns[-1][-1]["x0"] <= 2.0:
+            columns[-1].append(c)
+        else:
+            columns.append([c])
+    labels = []
+    for column in columns:
+        column.sort(key=lambda c: c["top"], reverse=descending)
+        pitches = [abs(b["top"] - a["top"])
+                   for a, b in zip(column, column[1:])]
+        positive = sorted(p for p in pitches if p > 0.1)
+        median = positive[len(positive) // 2] if positive else 0.0
+        parts = []
+        for prev, c in zip([None] + column, column):
+            if prev is not None and median:
+                # 語の切れ目は「文字ピッチの中央値を大きく超える隙間」で見る
+                if abs(c["top"] - prev["top"]) > median * 1.9:
+                    parts.append(" ")
+            parts.append(c["text"])
+        labels.append("".join(parts))
+    return " ".join(labels)
+
+
 def text_items(page, kind: str) -> list[dict]:
-    source = (page.extract_text_lines(return_chars=False) if kind == "line"
+    source = (page.extract_text_lines(return_chars=True) if kind == "line"
               else page.extract_words())
     out = []
     for index, item in enumerate(source or [], 1):
-        out.append({
+        entry = {
             "id": f"p{page.page_number}-{kind}-{index:05d}",
             "text": item["text"],
             "bbox": rounded_box((item["x0"], item["top"], item["x1"], item["bottom"])),
-        })
+        }
+        if kind == "line":
+            fixed = rotated_line_text(item.get("chars") or [])
+            if fixed is not None:
+                entry["text"] = fixed
+                entry["_rotated"] = True   # 内部flag。書き出す前に落とす
+        out.append(entry)
     return out
 
 
@@ -192,6 +243,7 @@ def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
              if item["text"].strip() and item["size"] > 0]
     body_size = statistics.median(sizes) if sizes else 0
     for line in lines:
+        rotated = line.pop("_rotated", False)   # どの分岐でもJSONへは残さない
         x0, top, x1, bottom = line["bbox"]
         members = [item for item in page_chars
                    if item["bbox"][2] >= x0 and item["bbox"][0] <= x1
@@ -215,6 +267,11 @@ def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
                 and (margin_key(line["text"], height - bottom) in repeated_bottom
                      or margin_key(line["text"], height - bottom)[0] in bottom_texts)):
             line["role"] = "footer"
+        elif rotated:
+            # 90°回転の縦ラベル（封装図のpin名等）。図の部品であって見出しでは
+            # ない——大きめのフォントだとheading判定に化けていた（H417 DS p26の
+            # 「@VDD33 power」がlevel-1見出しになった実測）。
+            line["role"] = "paragraph"
         elif CHAPTER_HEADING.match(text) or numbered or (
                 len(text) <= 120 and body_size and line["font_size"] >= body_size * 1.25):
             line["role"] = "heading"

@@ -126,11 +126,30 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     # 見せているので**可視出力から畳んでコメントに落とす**（図中ラベルが
     # 本文として図の下に重複して出ていた——preview初公開でユーザーが発見）。
     figure_regions = [a["bbox"] for a in assets.values() if a["page"] == number]
+    # captionを持たない独立asset（回転文字入りのgraphicsクラスタ＝封装図・
+    # 引脚配置図）。領域に最初に入った時点で画像を先に出す——折りたたみの
+    # 「figure above」が成立するように。
+    standalone = {key: a for key, a in assets.items()
+                  if a["page"] == number and "-cluster-" in key}
+    emitted: set[str] = set()
 
     def in_figure(bbox: list[float]) -> bool:
         cx, cy = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
         return any(b[0] <= cx <= b[2] and b[1] <= cy <= b[3]
                    for b in figure_regions)
+
+    def emit_standalone(bbox: list[float], sink: list[str]) -> None:
+        cx, cy = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
+        for key, a in standalone.items():
+            if key in emitted:
+                continue
+            b = a["bbox"]
+            if b[0] <= cx <= b[2] and b[1] <= cy <= b[3]:
+                emitted.add(key)
+                sink.extend(("", f"![figure p.{number}](../{a['file']}) "
+                             f"<!-- {key} uncaptioned graphics, rendered from "
+                             f"the PDF; verify at {url or 'the PDF'}#page={number} -->",
+                             ""))
     # 前後ページのリンク。GitHub Pagesにはファイル一覧が無いので、これが
     # 唯一の移動手段になる（github.comのファイルビューでは左のリストでも動ける）。
     nav = ([f"[← p.{number - 1}]({number - 1:04d}.md)"] if number > 1 else [])
@@ -168,6 +187,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
         inside = in_figure(item["bbox"])
         if not inside:
             flush_figure_text()
+        else:
+            emit_standalone(item["bbox"], output)
         if item["type"] == "table":
             info = chains[item["id"]]
             if not info["start"]:
@@ -279,6 +300,104 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
     return out
 
 
+def viewer_html(docs: list[dict]) -> str:
+    """目視確認用の左右同期ビュアー（previewリポジトリのGitHub Pages専用）。
+
+    左に原本PDF（brタウザ内蔵viewer・`#page=N`で頭出し）、右にこの出力の
+    同じページ（Jekyllが`pages/NNNN.md`→`.html`に描画したもの）。ページ移動は
+    両側へ同時に効く（ボタン・数字入力・←→キー）。状態はURLのhashに残るので、
+    気になったページをそのまま共有できる。PDF側はページ移動のたびにiframeを
+    読み直す（fragmentだけの変更では内蔵viewerが動かないため。PDF本体は
+    ブラウザがcacheする）。
+    """
+    payload = json.dumps(
+        [{"name": d["name"], "pages": d["pages"], "pdf": d["pdf"]} for d in docs],
+        ensure_ascii=False)
+    return """<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF × rendering — side-by-side viewer</title>
+<style>
+  body { margin: 0; font: 14px system-ui, sans-serif; }
+  header { display: flex; gap: .5em; align-items: center; padding: 6px 8px;
+           background: #222; color: #eee; flex-wrap: wrap; }
+  header select, header input, header button { font: inherit; }
+  #page { width: 5em; }
+  main { display: flex; height: calc(100vh - 44px); }
+  main iframe { border: 0; flex: 1 1 50%; height: 100%; }
+  a { color: #9cf; }
+</style>
+<header>
+  <select id="doc"></select>
+  <button id="prev" title="PageUp / ←">◀</button>
+  <input id="page" type="number" min="1" value="1">
+  <span>/ <span id="total">?</span></span>
+  <button id="next" title="PageDown / →">▶</button>
+  <label><input type="checkbox" id="swap"> swap</label>
+  <a id="mdlink" href="#" target="_blank">open page</a>
+  <a href="./">index</a>
+</header>
+<main id="panes">
+  <iframe id="pdf" title="original PDF"></iframe>
+  <iframe id="md" title="structured rendering"></iframe>
+</main>
+<script>
+const DOCS = __DOCS__;
+const sel = document.getElementById("doc");
+const pageBox = document.getElementById("page");
+const total = document.getElementById("total");
+const pdf = document.getElementById("pdf");
+const md = document.getElementById("md");
+const mdlink = document.getElementById("mdlink");
+for (const d of DOCS) {
+  const o = document.createElement("option");
+  o.value = d.name; o.textContent = d.name + " (" + d.pages + "p)";
+  sel.appendChild(o);
+}
+function state() {
+  const d = DOCS[sel.selectedIndex];
+  const p = Math.min(Math.max(1, pageBox.valueAsNumber || 1), d.pages);
+  return { d, p };
+}
+function update(pushHash = true) {
+  const { d, p } = state();
+  pageBox.value = p; pageBox.max = d.pages; total.textContent = d.pages;
+  const mdUrl = d.name + "/pages/" + String(p).padStart(4, "0") + ".html";
+  md.src = mdUrl; mdlink.href = mdUrl;
+  // 内蔵PDF viewerはfragmentだけの変更では動かないので読み直す
+  pdf.src = "about:blank";
+  requestAnimationFrame(() => { pdf.src = d.pdf + "#page=" + p; });
+  if (pushHash)
+    history.replaceState(null, "", "#doc=" + encodeURIComponent(d.name) + "&p=" + p);
+}
+function move(delta) {
+  pageBox.value = (pageBox.valueAsNumber || 1) + delta;
+  update();
+}
+sel.addEventListener("change", () => { pageBox.value = 1; update(); });
+pageBox.addEventListener("change", () => update());
+document.getElementById("prev").addEventListener("click", () => move(-1));
+document.getElementById("next").addEventListener("click", () => move(1));
+document.getElementById("swap").addEventListener("change", (e) => {
+  document.getElementById("panes").style.flexDirection =
+    e.target.checked ? "row-reverse" : "row";
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.key === "ArrowLeft" || e.key === "PageUp") { move(-1); e.preventDefault(); }
+  if (e.key === "ArrowRight" || e.key === "PageDown") { move(1); e.preventDefault(); }
+});
+const hash = new URLSearchParams(location.hash.slice(1));
+const wanted = hash.get("doc");
+if (wanted) {
+  const at = DOCS.findIndex((d) => d.name === wanted);
+  if (at >= 0) { sel.selectedIndex = at; pageBox.value = +(hash.get("p") || 1); }
+}
+update(false);
+</script>
+""".replace("__DOCS__", payload)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("bundle", type=Path, nargs="?")
@@ -291,12 +410,19 @@ def main() -> int:
         sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
         import convert_all  # noqa: PLC0415
         done = []
+        viewer_docs = []
         for job in convert_all.targets():
             export(BUNDLES / job["name"], args.out, urls)
             manifest = json.loads((BUNDLES / job["name"] / "manifest.json")
                                   .read_text(encoding="utf-8"))
             done.append((job["document_type"], job["name"],
                          manifest["source"]["page_count"]))
+            source = manifest["source"]
+            viewer_docs.append({
+                "name": job["name"],
+                "pages": manifest["source"]["page_count"],
+                "pdf": urls.get((source["document"], source["language"]), ""),
+            })
         # previewリポジトリ（GitHub Pages）のトップになるindex。
         kinds = ("datasheet", "reference-manual", "core-manual",
                  "package-drawing", "other")
@@ -305,7 +431,10 @@ def main() -> int:
                  "[ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data)",
                  "`pipeline/review/`. Headers/footers are folded into comments,",
                  "page-spanning tables are joined, figures are rendered from the PDF,",
-                 "and every known gap is marked in place.", ""]
+                 "and every known gap is marked in place.", "",
+                 "**[Side-by-side viewer](viewer.html)** -- the original PDF and this",
+                 "rendering on the same page, with synchronized page navigation",
+                 "(GitHub Pages only).", ""]
         for kind in kinds:
             docs = sorted(name for k, name, _ in done if k == kind)
             if not docs:
@@ -316,6 +445,8 @@ def main() -> int:
                       for name in docs]
             lines.append("")
         (args.out / "README.md").write_text("\n".join(lines), encoding="utf-8")
+        (args.out / "viewer.html").write_text(
+            viewer_html(viewer_docs), encoding="utf-8")
         print(f"{len(done)} documents -> {args.out}", file=sys.stderr)
         return 0
     if not args.bundle:
