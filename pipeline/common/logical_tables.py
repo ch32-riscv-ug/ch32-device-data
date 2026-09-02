@@ -267,9 +267,11 @@ def apply_bitfield(table: dict, number_line: dict,
     xs = [x for _, x in centers]
     width = len(centers)
 
-    def bit_span(cell: dict) -> tuple[int, int] | None:
+    def bit_span(cell: dict) -> tuple[int, int]:
+        # 半開区間[cx0, cx1)で中心を拾う——境界に載った中心は右隣のセルだけが取り、
+        # 隣接セルが同じ列を二重に主張してグリッドが壊れるのを防ぐ。
         cx0, cx1 = cell["bbox"][0], cell["bbox"][2]
-        idx = [i for i, x in enumerate(xs) if cx0 - 1 <= x <= cx1 + 1]
+        idx = [i for i, x in enumerate(xs) if cx0 <= x < cx1]
         if idx:
             return idx[0], idx[-1] + 1
         # どの中心も含まないほど狭い/ずれたセルは、中点に最も近い1列へ寄せる
@@ -277,7 +279,7 @@ def apply_bitfield(table: dict, number_line: dict,
         near = min(range(width), key=lambda i: abs(xs[i] - mid))
         return near, near + 1
 
-    fields = [c for c in table["cells"] if (c.get("text") or "").strip()]
+    fields = [c for c in table["cells"] if (c.get("text") or "").strip() and "bbox" in c]
     if not fields:
         return
     field_min = min(c["row_start"] for c in fields)
@@ -324,6 +326,53 @@ def apply_bitfield(table: dict, number_line: dict,
     table["_bitfield"] = True
 
 
+def bitfield_singletons(page: dict) -> dict[str, str]:
+    """{bit番号line_id: フィールドline_id}。直下に図テーブルが無く、帯にフィールド行が
+    ちょうど1本だけある番号行（罫線の無い箱——全Reservedや単一フィールドの半分）。
+
+    その1本は半分全体（全bit）を張る（中央寄せの短いテキストで、x範囲では列を張れない
+    ——1本しか無いことが「全列」の根拠）。番号行〜次の番号行/表/40ptまでを帯とする。
+    """
+    paired = set(bitfield_pairs(page).values())
+    numlines = [l for l in page["lines"] if bit_numbers(l["text"])]
+    tops = sorted([l["bbox"][1] for l in numlines]
+                  + [t["bbox"][1] for t in page["tables"]])
+    out: dict[str, str] = {}
+    for line in numlines:
+        if line["id"] in paired:
+            continue
+        lx0, ltop, lx1, lbottom = line["bbox"]
+        nexts = [t for t in tops if t > ltop + 2]
+        band_end = min(min(nexts) if nexts else lbottom + 40, lbottom + 40)
+        fields = [x for x in page["lines"]
+                  if lbottom <= x["bbox"][1] < band_end and x["id"] != line["id"]
+                  and x.get("role") in ("paragraph", "list-item")
+                  and (x["text"] or "").strip() and not bit_numbers(x["text"])
+                  and len(x["text"]) <= 40
+                  and min(lx1, x["bbox"][2]) - max(lx0, x["bbox"][0]) > 0]
+        if len(fields) == 1:
+            out[line["id"]] = fields[0]["id"]
+    return out
+
+
+def build_bitfield_singleton(number_line: dict, field_line: dict,
+                             centers: list[tuple[str, float]]) -> dict:
+    """番号行＋全幅の単一フィールド行から、描画用のbit図テーブルを組み立てる。"""
+    width = len(centers)
+    cells = [{"id": f"{number_line['id']}-bit{i}", "row_start": 0, "row_end": 1,
+              "column_start": i, "column_end": i + 1, "text": num,
+              "bbox": number_line["bbox"], "bold": False, "italic": False}
+             for i, (num, _) in enumerate(centers)]
+    cells.append({"id": f"{number_line['id']}-field", "row_start": 1, "row_end": 2,
+                  "column_start": 0, "column_end": width, "text": field_line["text"],
+                  "bbox": field_line["bbox"],
+                  "bold": bool(field_line.get("bold")),
+                  "italic": bool(field_line.get("italic"))})
+    return {"id": f"{number_line['id']}-bitfield", "cells": cells,
+            "column_count": width, "row_count": 2, "caption": None, "issues": [],
+            "logical_id": f"{number_line['id']}-bitfield", "_bitfield": True}
+
+
 def _body_lines(page: dict) -> list[dict]:
     return [line for line in page["lines"]
             if line.get("role") not in ("header", "footer")]
@@ -355,6 +404,13 @@ def document_chains(pages: list[dict]) -> dict[str, dict]:
     出会ったとき、start=Trueなら結合表を描き、Falseなら「前のページで描画済み」
     のポインタを置く。
     """
+    # bit図（番号行の直下の図）はページ跨ぎで結合しない——1〜3行で自己完結し、
+    # 背中合わせに並ぶと誤結合しやすい（結合セルはbboxを持たずbit図の組み直しが
+    # 壊れる）。連結の開始側・継続側の両方から外す。
+    bitfield_ids: set[str] = set()
+    for page in pages:
+        bitfield_ids |= set(bitfield_pairs(page).keys())
+
     chains: list[list[tuple[int, dict]]] = []
     open_chain: list[tuple[int, dict]] | None = None
     previous_page: dict | None = None
@@ -364,6 +420,8 @@ def document_chains(pages: list[dict]) -> dict[str, dict]:
         for index, table in enumerate(tables):
             if (index == 0 and open_chain is not None and previous_page is not None
                     and page["number"] == previous_page["number"] + 1
+                    and table["id"] not in bitfield_ids
+                    and open_chain[-1][1]["id"] not in bitfield_ids
                     and _continues(previous_page, page, open_chain[-1][1], table)):
                 open_chain.append((page["number"], table))
             else:

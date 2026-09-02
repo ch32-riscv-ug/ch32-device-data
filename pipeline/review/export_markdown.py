@@ -101,19 +101,37 @@ def page_lost_subscripts(bundle: Path, entry: dict, page: dict) -> int:
     return lost_subscripts.lost_subscript_count(load_geometry(bundle, entry)["chars"])
 
 
-def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict[str, tuple[str, list]]:
-    """{table_id: (bit番号line_id, bit中心)}。番号行のある表だけgeometryを開く。"""
+def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
+    """レジスタbit図の描画計画。番号行のあるページだけgeometryを開く。
+
+    返すもの:
+      tables {table_id: (番号line_id, bit中心)}   直下に図テーブルがある版
+      synth  {番号line_id: 描画用テーブル}          罫線が無く単一フィールドの版
+      skip   set(line_id)                          本文から消す行（番号行・吸収した
+                                                    フィールド行）。synthの番号行は
+                                                    描画trigger（skipには入れない）
+    """
     pairs = logical_tables.bitfield_pairs(page)
-    if not pairs:
-        return {}
+    singletons = logical_tables.bitfield_singletons(page)
+    if not pairs and not singletons:
+        return {"tables": {}, "synth": {}, "skip": set()}
     chars = load_geometry(bundle, entry)["chars"]
     lines = {l["id"]: l for l in page["lines"]}
-    plan: dict[str, tuple[str, list]] = {}
+    tables: dict[str, tuple[str, list]] = {}
+    skip: set[str] = set()
     for table_id, line_id in pairs.items():
         centers = logical_tables.bit_number_centers(chars, lines[line_id])
         if centers:
-            plan[table_id] = (line_id, centers)
-    return plan
+            tables[table_id] = (line_id, centers)
+            skip.add(line_id)
+    synth: dict[str, dict] = {}
+    for number_id, field_id in singletons.items():
+        centers = logical_tables.bit_number_centers(chars, lines[number_id])
+        if centers:
+            synth[number_id] = logical_tables.build_bitfield_singleton(
+                lines[number_id], lines[field_id], centers)
+            skip.add(field_id)
+    return {"tables": tables, "synth": synth, "skip": skip}
 
 
 # Wingdings/Symbolフォントの記号がPUA（私用領域）のまま本文に出ている
@@ -241,16 +259,17 @@ def table_html(table: dict, url: str | None, number: int) -> str:
 
 def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 assets: dict[str, dict], page_count: int,
-                lost_glyphs: int = 0,
-                bitfields: dict[str, tuple[str, list]] | None = None) -> str:
+                lost_glyphs: int = 0, plan: dict | None = None) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
     number = page["number"]
-    # レジスタのbit図: 「31 30 … 16」の番号行を次表のヘッダへ畳む。番号行は
-    # 表に吸収されるので本文からは消す（parity検査も同じ集合を消す）。
-    bitfields = bitfields or {}
-    consumed_lines = {line_id for line_id, _ in bitfields.values()}
+    # レジスタのbit図: 番号行を図テーブルのヘッダへ畳む（tables）か、罫線が無い版は
+    # 番号行の位置で合成テーブルを描く（synth）。畳んだ行は本文から消す（skip）。
+    plan = plan or {"tables": {}, "synth": {}, "skip": set()}
+    bitfields = plan["tables"]
+    synth = plan["synth"]
+    consumed_lines = plan["skip"]
     # このページで画像として描画済みの図領域。中にある行・表は、画像が既に
     # 見せているので**可視出力から畳んでコメントに落とす**（図中ラベルが
     # 本文として図の下に重複して出ていた——preview初公開でユーザーが発見）。
@@ -353,8 +372,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             else:
                 output.append(f"<!-- image: {image['id']} bbox={image['bbox']} -->")
             continue
+        if item["id"] in synth:
+            # 罫線の無いbit図: 番号行の位置で合成テーブルを描く。
+            (figure_text if inside else output).extend(
+                ("", table_html(synth[item["id"]], url, number), ""))
+            continue
         if item["id"] in consumed_lines:
-            continue   # bit番号行は次表のヘッダへ畳んだ（bitfield）
+            continue   # bit番号行/フィールド行は表へ畳んだ（bitfield）
         line = lines[item["id"]]
         role = line.get("role", "paragraph")
         text = html.escape(pua_normalize(line["text"]))

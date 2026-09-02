@@ -39,12 +39,12 @@ BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
 VIEWER = "https://ch32-riscv-ug.github.io/ch32-device-data-preview/viewer.html"
 
-WEIGHTS = {"bitnum_leftover": 5, "split_bitcell": 4, "cid": 3, "pua": 3,
+WEIGHTS = {"bitnum_leftover": 5, "nonstd_bitdiagram": 3, "cid": 3, "pua": 3,
            "subscript_orphan": 2, "long_line": 1, "table_issue": 1}
 COMMENT = re.compile(r"<!--.*?-->", re.S)
 STYLE = re.compile(r"<style>.*?</style>", re.S)
 PUA = re.compile(r"[-]")
-BITNUM = re.compile(r"(?m)^\s*(?:3[01]|[12]?\d)(?: \d+){7,}\s*(?:  )?$")
+BITNUM = re.compile(r"\d+(?: \d+){7,}")   # 8個以上の空白区切り整数（fullmatch用）
 ORPHAN = re.compile(r"(?:DD|SS|SSA|DDA|BAT|PVD|REF|OUT|CC|IN)"
                     r"(?:\s+(?:DD|SS|SSA|DDA|BAT|PVD|REF|OUT|CC|IN))*")
 
@@ -56,9 +56,19 @@ def visible(md_text: str) -> str:
 def page_signals(page: dict, md_text: str) -> dict[str, int]:
     text = visible(md_text)
     sig: dict[str, int] = {}
-    n = len(BITNUM.findall(text))
-    if n:
-        sig["bitnum_leftover"] = n
+    # bit図として組み直せていない番号行（表にもsynthにも載らなかった標準の降順列）。
+    handled = (set(logical_tables.bitfield_pairs(page).values())
+               | set(logical_tables.bitfield_singletons(page).keys()))
+    leftover = sum(1 for l in page["lines"]
+                   if logical_tables.bit_numbers(l["text"]) and l["id"] not in handled)
+    # 降順でない特殊な並び（`31 24 23 16 …`のbyte境界図）は別枠で拾う（要目視）。
+    nonstd = sum(1 for l in page["lines"]
+                 if logical_tables.bit_numbers(l["text"]) is None
+                 and BITNUM.fullmatch(l["text"].strip()))
+    if leftover:
+        sig["bitnum_leftover"] = leftover
+    if nonstd:
+        sig["nonstd_bitdiagram"] = nonstd
     if "(cid:" in text:
         sig["cid"] = text.count("(cid:")
     if PUA.search(text):
