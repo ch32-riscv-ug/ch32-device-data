@@ -122,17 +122,7 @@ operating_conditions,,CH32X305;CH32X315,,series=CH32X305;CH32X315 symbol=t_prog_
 option_byte_fields,CH32M030,,,family=CH32M030 byte=USER bits=[4:3],,,CH32M030RM.PDF:zh,field=RST_MODE[1:0],#,CH32M030RM.PDF:en(p.261)+!CH32M030RM.PDF:zh(field=RST_MODE[1:0])
 option_byte_fields,CH32V003,,,family=CH32V003 byte=USER bits=0,,,CH32V003RM.PDF:zh,field=IWDG_SW,#,CH32V003RM.PDF:en(p.183)+!CH32V003RM.PDF:zh(field=IWDG_SW)
 option_byte_fields,CH32V205,,,family=CH32V205 byte=USER bits=0,,,CH32V205RM.PDF:zh,field=IWDGSW,#,CH32V205RM.PDF:en(p.451)+!CH32V205RM.PDF:zh(field=IWDGSW)
-option_byte_fields,CH32V20x,,,family=CH32V20x byte=USER bits=[7:5],,,CH32FV2x_V3xRM.PDF:zh,field=RAM_CODE_MOD,#,CH32FV2x_V3xRM.PDF:en(p.614)+!CH32FV2x_V3xRM.PDF:zh(field=RAM_CODE_MOD)
-option_byte_fields,CH32V307,,,family=CH32V307 byte=USER bits=[7:5],,,CH32FV2x_V3xRM.PDF:zh,field=RAM_CODE_MOD,#,CH32FV2x_V3xRM.PDF:en(p.614)+!CH32FV2x_V3xRM.PDF:zh(field=RAM_CODE_MOD)
-option_byte_fields,CH32X035,,,family=CH32X035 byte=USER bits=[7:5],,,CH32X035RM.PDF:zh,default=xxxb,#,CH32X035RM.PDF:en(p.248)+!CH32X035RM.PDF:zh(default=xxxb)
-option_byte_fields,CH32X315,,,family=CH32X315 byte=USER bits=6,,,CH32X315RM.PDF:zh,field=USBHSDLEN,#,CH32X315RM.PDF:en(p.361)+!CH32X315RM.PDF:zh(field=USBHSDLEN)
 option_byte_fields,CH32X315,,,family=CH32X315 byte=WRPR0-WRPR3,,,CH32X315RM.PDF:zh,wrpr_bit_protects=1 sector (4KB/sector),#,CH32X315RM.PDF:en(p.361)+!CH32X315RM.PDF:zh(wrpr_bit_protects=1 sector (4KB/sector))
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF300,,,CH32M030RM.PDF:en,address=0x1FFFF800,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF800)"
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF302,,,CH32M030RM.PDF:en,address=0x1FFFF802,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF802)"
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF304,,,CH32M030RM.PDF:en,address=0x1FFFF804,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF804)"
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF306,,,CH32M030RM.PDF:en,address=0x1FFFF806,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF806)"
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF308,,,CH32M030RM.PDF:en,address=0x1FFFF808,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF808)"
-option_bytes,CH32M030,,,family=CH32M030 address=0x1FFFF30A,,,CH32M030RM.PDF:en,address=0x1FFFF80A,#,"CH32M030RM.PDF:zh(p.240,p.241)+!CH32M030RM.PDF:en(address=0x1FFFF80A)"
 pin_functions,,,CH32V103C6T6,part_number=CH32V103C6T6 pad=PB4 signal=TIM3_CH1 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)
 pin_functions,,,CH32V103C6T6,part_number=CH32V103C6T6 pad=PB5 signal=TIM3_CH2 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)
 pin_functions,,,CH32V103C8T6,part_number=CH32V103C8T6 pad=PB4 signal=TIM3_CH1 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)

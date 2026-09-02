@@ -1,0 +1,35 @@
+{
+ "schema_version": "0.2",
+ "source_sha256": "6bdc58b159a95c40e815eb9973df1f7e7309b08e8018bad1991a71c792cefb95",
+ "status": "partial",
+ "decisions": {
+  "p324-table-002": {
+   "status": "approved",
+   "canonical_table_number": "21-2",
+   "note": "the en edition's double-buffered bulk endpoint table carries no caption"
+  },
+  "p326-table-001": {
+   "status": "approved",
+   "canonical_table_number": "21-4"
+  },
+  "p363-table-002": {
+   "status": "approved",
+   "note": "the caption is a prose note referencing Table 21-4, not this table's caption"
+  },
+  "p366-table-003": {
+   "status": "approved",
+   "canonical_table_number": "23-7",
+   "note": "the en edition lacks the host receive buffer mode table"
+  },
+  "p419-table-001": {
+   "status": "approved",
+   "canonical_table_number": "26-19",
+   "note": "the en edition lacks the Mode D FSMC_BCR1 bit-field table"
+  },
+  "p455-table-002": {
+   "status": "approved",
+   "canonical_table_number": "27-16",
+   "note": "the en edition's receive descriptor structure table carries no caption"
+  }
+ }
+}

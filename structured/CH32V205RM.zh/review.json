@@ -1,0 +1,25 @@
+{
+ "schema_version": "0.2",
+ "source_sha256": "b1ed9ef040455a1f9a32f1ab9f9be0e9d3391709bc0b6fa141b2f581593b6c59",
+ "status": "partial",
+ "decisions": {
+  "p263-table-001": {
+   "status": "approved",
+   "canonical_table_number": "22-1"
+  },
+  "p275-table-002": {
+   "status": "approved",
+   "canonical_table_number": "22-2"
+  },
+  "p310-table-001": {
+   "status": "approved",
+   "canonical_table_number": "24-19",
+   "note": "the en edition lacks the Mode D FSMC_BCR1 bit-field table"
+  },
+  "p83-table-005": {
+   "status": "approved",
+   "canonical_table_number": "10-10",
+   "note": "printed as 9-10"
+  }
+ }
+}

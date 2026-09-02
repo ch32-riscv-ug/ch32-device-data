@@ -28,6 +28,9 @@ from collections import defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import review_sidecar  # noqa: E402
+
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
 
@@ -61,16 +64,29 @@ def chapter(number: str) -> str:
 
 
 def report(stem: str) -> int:
-    """非対称の数を返す（0なら全表が番号で自動対応）。"""
-    zh = captioned_tables(f"{stem}.zh")
-    en = captioned_tables(f"{stem}.en")
+    """非対称の数を返す（0なら全表が番号かreview済みの判断で対応済み）。
+
+    review sidecar（`record_decision.py`で記録した判断）を持つ表は残差から
+    外す——canonical付きは対応済み、canonical無しのapprovedは「偽caption・
+    単独の表」と人が確かめた印。
+    """
+    decided = {lang: set(review_sidecar.load(f"{stem}.{lang}")["decisions"])
+               for lang in ("zh", "en")}
+    zh = {n: [t for t in v if t["id"] not in decided["zh"]]
+          for n, v in captioned_tables(f"{stem}.zh").items()}
+    en = {n: [t for t in v if t["id"] not in decided["en"]]
+          for n, v in captioned_tables(f"{stem}.en").items()}
+    zh = {n: v for n, v in zh.items() if v}
+    en = {n: v for n, v in en.items() if v}
+    reviewed = len(decided["zh"]) + len(decided["en"])
     only_zh = {n: v for n, v in zh.items()
                if len(v) != len(en.get(n, []))}
     only_en = {n: v for n, v in en.items()
                if len(v) != len(zh.get(n, []))}
     matched = sum(min(len(v), len(en.get(n, []))) for n, v in zh.items())
     if not only_zh and not only_en:
-        print(f"{stem}: 表{matched}対が番号で1:1——review不要")
+        note = f"＋review済み{reviewed}" if reviewed else ""
+        print(f"{stem}: 表{matched}対が番号で1:1{note}——review不要")
         return 0
     print(f"##### {stem}: 番号一致 {matched} 対、残差 zh {len(only_zh)} / en {len(only_en)} 番号")
     for number in sorted(only_zh):
