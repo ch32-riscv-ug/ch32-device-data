@@ -144,8 +144,9 @@ def page_captions(page: dict) -> list[dict]:
 
 def assign_regions(pages: list[dict],
                    clusters: list[list[dict]]) -> tuple[list[tuple[str, int, list[float]]],
-                                                        int]:
-    """caption → (caption line id, 領域のページ番号, bbox)。次ページfallback込み。"""
+                                                        int, list[set[int]]]:
+    """caption → (caption line id, 領域のページ番号, bbox)。次ページfallback込み。
+    3つ目の戻りは「ページごとに使われたクラスタ番号」（独立asset化の判定に使う）。"""
     taken: list[set[int]] = [set() for _ in pages]
     found: list[tuple[str, int, list[float]]] = []
     missed = 0
@@ -198,7 +199,7 @@ def assign_regions(pages: list[dict],
                     missed += 1
                 continue
             missed += 1
-    return found, missed
+    return found, missed, taken
 
 
 def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
@@ -209,15 +210,38 @@ def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
 
     pages: list[dict] = []
     clusters: list[list[dict]] = []
+    rotated_boxes: list[list[list[float]]] = []   # ページごとの回転文字のbbox
     for entry in manifest["pages"]:
         page, geometry = load_page(bundle, entry)
         pages.append(page)
         clusters.append(graphic_clusters(page, geometry))
+        rotated_boxes.append([c["bbox"] for c in geometry["chars"]
+                              if c["text"].strip() and not c["upright"]])
 
-    regions, missed = assign_regions(pages, clusters)
+    regions, missed, taken = assign_regions(pages, clusters)
     by_page: dict[int, list[tuple[str, list[float]]]] = {}
     for key, number, bbox in regions:
         by_page.setdefault(number, []).append((key, bbox))
+
+    # captionと対にならなかったクラスタでも、**回転文字を含むもの**は独立assetに
+    # する。封装図・引脚配置図はcaptionを持たず（節見出しで導入される）、図中の
+    # pin番号・pad名が90°回転の文字として本文へ流出していた（2026-09-02に全DSで
+    # 3,515行を実測——RMは0）。描画すればexporterが領域内の行を折りたたみへ移す。
+    for index, page in enumerate(pages):
+        counter = 0
+        for ci, cluster in enumerate(clusters[index]):
+            if ci in taken[index]:
+                continue
+            bbox = cluster["bbox"]
+            rotated = sum(1 for rb in rotated_boxes[index]
+                          if bbox[0] <= (rb[0] + rb[2]) / 2 <= bbox[2]
+                          and bbox[1] <= (rb[1] + rb[3]) / 2 <= bbox[3])
+            if rotated < 10:
+                continue
+            counter += 1
+            expanded = expand_with_labels(page, list(bbox))
+            by_page.setdefault(page["number"], []).append(
+                (f"p{page['number']}-cluster-{counter:02d}", expanded))
 
     # captionの無い大きめのraster画像。図領域が既に含むものは除く。
     for page in pages:

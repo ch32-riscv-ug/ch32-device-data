@@ -10,7 +10,7 @@
   "conversion": {
     "engine": "pdfplumber",
     "engine_version": "0.11.10",
-    "converter_version": "1.2.0",
+    "converter_version": "1.3.0",
     "coordinates": "PDF points, origin at top-left",
     "scope": "all-pages",
     "table_settings": {}
@@ -73,7 +73,7 @@
     {
       "number": 7,
       "file": "pages/0007.json",
-      "sha256": "9b08988b23cc12c535cd4257f418793183633e236097c88bb6b7884a3b3a2cf3",
+      "sha256": "1e48ba94adae2579affaf0b43260d827c4f5cf14df057fbde66f33e3c849afbc",
       "geometry_file": "geometry/0007.json.gz",
       "geometry_sha256": "fab2e9ec5da144d1647fed4f40f1ee7639297bd873a7b972a4b2cbe3d2cf8fc7",
       "width": 595.32,
@@ -82,7 +82,7 @@
     {
       "number": 8,
       "file": "pages/0008.json",
-      "sha256": "a6617c7c5144cb9771190e6341cae8a9c7ee9d1d99dc9393313a39dfc0c060b7",
+      "sha256": "fae89ceab823dd34d82d5f6d6bf4d0b276cad9774cb17f40dd5f57fd11d8eb12",
       "geometry_file": "geometry/0008.json.gz",
       "geometry_sha256": "0cf9813f15215c3ccde5376468fdba5c26a9e65d65472e1e54e9b70d8e9f819a",
       "width": 595.32,
@@ -190,7 +190,7 @@
     {
       "number": 20,
       "file": "pages/0020.json",
-      "sha256": "14d17deea80d334cb86e9dbc189b35aab8d5abda18baf91c49f903179ff2e92e",
+      "sha256": "144676b0f8790ffeee4102c21444307afd08992f6bef1bf0a83bcb6c136af978",
       "geometry_file": "geometry/0020.json.gz",
       "geometry_sha256": "aa2632591036641e0a17e4b611f2de187ba548c8f3f01d667e580f6f74bc7c83",
       "width": 595.32,
@@ -199,7 +199,7 @@
     {
       "number": 21,
       "file": "pages/0021.json",
-      "sha256": "3aa8a4d590059d34df2069a1998c7c1b442089c05b656a2e4f457bd982dd0f86",
+      "sha256": "d7ec4fd47e3392b4d866cbc5ebce66314552eae3e8c49e268b7d3051dca538d7",
       "geometry_file": "geometry/0021.json.gz",
       "geometry_sha256": "c6e563b4b1cbf2c4153be30ca3c8f88bfd7460e800aef405233f4e08fa831759",
       "width": 595.32,
@@ -208,7 +208,7 @@
     {
       "number": 22,
       "file": "pages/0022.json",
-      "sha256": "8ae227d7b7be701ab2c78d5cf46c6063d22d60d16161b820a044e6807eb54ed4",
+      "sha256": "5e9872e809c59ade43ab992d53d834571433f1a663c14216bde3f0a7b45fd427",
       "geometry_file": "geometry/0022.json.gz",
       "geometry_sha256": "ee2227fc3ab3c6fb7c7eefd9f67d3ab5a28ab9e3af8ea4d91a5a7d3f648b6eba",
       "width": 595.32,
@@ -217,7 +217,7 @@
     {
       "number": 23,
       "file": "pages/0023.json",
-      "sha256": "4f349329855b5614d6cb0884af176bb104868c96533f04d51dd53363a4ae1699",
+      "sha256": "0937704e99d4387aed977871b0f063b50c9578a5d946a271c165635aa2d6d7ac",
       "geometry_file": "geometry/0023.json.gz",
       "geometry_sha256": "4614002347b8601be6d4c2c6388da5ccf59b98edba7ab3d3c5bd462a4f580bce",
       "width": 595.32,
@@ -226,7 +226,7 @@
     {
       "number": 24,
       "file": "pages/0024.json",
-      "sha256": "6f97397a9c78aa392992df277e785440f3e66684f2de051b6d994cf7db74b664",
+      "sha256": "ed353c58e8aa1dc3f5c3192845a44dd8ca657625a5c8b9128e0fef181924ad83",
       "geometry_file": "geometry/0024.json.gz",
       "geometry_sha256": "9199dfc9f9f20f0e103eef735ac69a2f2acdbc4fff5c92bbe3c94a1dea5b4a43",
       "width": 595.32,
@@ -235,7 +235,7 @@
     {
       "number": 25,
       "file": "pages/0025.json",
-      "sha256": "53aa242dfc9ec3dc309246e39b73542ea3bb5a10d1a7c34d4b94b2457104a309",
+      "sha256": "ad36aadd8b468af369e9c1ec318060954b21e961d373e37a1ed0435f1a8f509f",
       "geometry_file": "geometry/0025.json.gz",
       "geometry_sha256": "1c4f73766f07c5e5b07c2f72d87e387889434339d94a9610f8f810f5ac86ddeb",
       "width": 595.32,
@@ -244,7 +244,7 @@
     {
       "number": 26,
       "file": "pages/0026.json",
-      "sha256": "d5437d89ee5b2463671af3ce31bde944c762a6dd60f47b31201828f9abebb092",
+      "sha256": "e93eeff2008d3eb3f3e42529f17ce83f2219b4189b7ac8dc177b988b50da96c6",
       "geometry_file": "geometry/0026.json.gz",
       "geometry_sha256": "e03d2f1a92a1c8ee5560a52d01ed37c6b300bbf96cff2d31a1e9da15d4df1f4b",
       "width": 595.32,
@@ -253,7 +253,7 @@
     {
       "number": 27,
       "file": "pages/0027.json",
-      "sha256": "f8d3e9e768af0162de09374fb4cccb3edf07a17cebf8c6b3f697e1bbd6eaae8a",
+      "sha256": "1b1cbb9aee1f9a2debacd47472948acb9052df5b1416b45a18aa70abd5e2c83a",
       "geometry_file": "geometry/0027.json.gz",
       "geometry_sha256": "c57a8da202eea39f4f9836f3bff90257137b538da069ebbc11e051ff374e9bd6",
       "width": 595.32,
@@ -262,7 +262,7 @@
     {
       "number": 28,
       "file": "pages/0028.json",
-      "sha256": "77da29e9532b20e376b9a06de9c850b696b319a15f17dcf95694d697b199fdc4",
+      "sha256": "a2ac9b5a97b5213799e4045b7bf539a394384da380a1b04813a3367256bbfdef",
       "geometry_file": "geometry/0028.json.gz",
       "geometry_sha256": "21e6199262e6c6738ef811a70bf4af47050e903492efd0fae7575c77ab55ddc6",
       "width": 595.32,
@@ -271,7 +271,7 @@
     {
       "number": 29,
       "file": "pages/0029.json",
-      "sha256": "6edebf9bf4b59381aa48e21a31da775e5fecbcde054c92886a4cb45adebfea93",
+      "sha256": "a1aa372e971604cfb5c30c7354f2799be0356bd1adb1b252ad43f76adb49dea9",
       "geometry_file": "geometry/0029.json.gz",
       "geometry_sha256": "af2b95a833c89be3f0567d0489512c655f5910aed307825bf2bf9cfcdea1a71c",
       "width": 595.32,
@@ -280,7 +280,7 @@
     {
       "number": 30,
       "file": "pages/0030.json",
-      "sha256": "6bc63190d144e833ee6696f1e042e3ce9e8161d879ba2895c5ce62e64bc669d9",
+      "sha256": "939f90e283908dc721baf71787f9bb01989cb80518a6299c03e7d6d77e083e52",
       "geometry_file": "geometry/0030.json.gz",
       "geometry_sha256": "b121dd889e236350d1ff749c255a373a93131694d3f5e9e59d62e31a99c71c64",
       "width": 595.32,
@@ -289,7 +289,7 @@
     {
       "number": 31,
       "file": "pages/0031.json",
-      "sha256": "e9cc2e18b96cc626d304e569467e51a31b386317f7c5e1c091789144e8307e5b",
+      "sha256": "b1276a22be3426b4989eb6324f68ed90bb70590870a8dad27284368c03c4b4d3",
       "geometry_file": "geometry/0031.json.gz",
       "geometry_sha256": "157ae0013da7a1fc5fb45de0bca9f00c98e5d186e7225a0a0b1ca93ddc53e4a4",
       "width": 595.32,
@@ -298,7 +298,7 @@
     {
       "number": 32,
       "file": "pages/0032.json",
-      "sha256": "db732b9c069c3bd963fa0f5edaaeaf62b4c5f5de76676dbf6e71029abb60a38d",
+      "sha256": "25941c01c8f7aa85b398a46a5543b72553a2c88451a316db0ee6e50694d1487f",
       "geometry_file": "geometry/0032.json.gz",
       "geometry_sha256": "c3fc03996366e829f4419b0cd6e21b380a2ea9de4119d1ee993264cd1a35c864",
       "width": 595.32,
@@ -307,7 +307,7 @@
     {
       "number": 33,
       "file": "pages/0033.json",
-      "sha256": "fe287c19f8d1309a132ce117041196bbd33eefe99c0c84ef8bc3f2c2c614c51c",
+      "sha256": "f2694f57e34e166eb4129cf09b3a66f1ffb41f6648a11f15f59724936f301b3c",
       "geometry_file": "geometry/0033.json.gz",
       "geometry_sha256": "e3fb9fdddf44da5561c9e8c98650f4aea57935137d1e9af8b29bf5b59c687f4b",
       "width": 595.32,
@@ -316,7 +316,7 @@
     {
       "number": 34,
       "file": "pages/0034.json",
-      "sha256": "bd740bb7baa780706b016bc41987eda0388ae56f27d84fbdc08cfc0ec939369d",
+      "sha256": "0230f38829e48a5441d40bed4e6d53f5ac2982e3fc89bd0cae6055ae036c677a",
       "geometry_file": "geometry/0034.json.gz",
       "geometry_sha256": "596018586eb011ef9aabbe25e0ae9d0a41119ec5edae414d5aa0eaf500ba2741",
       "width": 595.32,
@@ -325,7 +325,7 @@
     {
       "number": 35,
       "file": "pages/0035.json",
-      "sha256": "6de2906e89ce7fa3febb51ac06c18b612c9ef8cad3ab64f545b5a3322bffaeb3",
+      "sha256": "997e702ff9e19bd33ea5863e85774f6a67f2d64c379ba149221f5fec9ae5ac69",
       "geometry_file": "geometry/0035.json.gz",
       "geometry_sha256": "d2cbba4cf71d72a828bcda75d71af4ac545b6478b64370036ab42c97bc03164c",
       "width": 595.32,
@@ -334,7 +334,7 @@
     {
       "number": 36,
       "file": "pages/0036.json",
-      "sha256": "04ce19dd87236157b5fecd75f7ac7c8104d49cc8d528c4203246d1f1ba132534",
+      "sha256": "af01944171b80e38320694f56d196f2b35f41c506f9c3c7d783b0ee6519fa649",
       "geometry_file": "geometry/0036.json.gz",
       "geometry_sha256": "c55118cefcc55be325c1ed88960868a5cd3ccaad7bd1a1be497999376b96daab",
       "width": 595.32,
@@ -343,7 +343,7 @@
     {
       "number": 37,
       "file": "pages/0037.json",
-      "sha256": "80186a02d255b975cf1de62db70f1a674e7ecdaf93287a2d37d7d97845d7d49e",
+      "sha256": "79b4eac3f6c5983869f16811f87695770411333baa3e90bd869527b17fe76e83",
       "geometry_file": "geometry/0037.json.gz",
       "geometry_sha256": "5cbc43e60707493d0430bc17ec3e9b0fd4e77fc2c97e7763543bd6939dfe2606",
       "width": 595.32,
@@ -352,7 +352,7 @@
     {
       "number": 38,
       "file": "pages/0038.json",
-      "sha256": "271dfdfedf96932cc92db9e9afd8beb94133f891db2ecdf9501ab4a71011669d",
+      "sha256": "90db5b016b9dac82b05e1bb5bdbd0d7b05d9005bbfe6f531f5488f847a036090",
       "geometry_file": "geometry/0038.json.gz",
       "geometry_sha256": "12831783608e865d22bae45e53d3cf1b237c516d7530b81eabb1a6a25b8d5b2e",
       "width": 595.32,
@@ -361,7 +361,7 @@
     {
       "number": 39,
       "file": "pages/0039.json",
-      "sha256": "ab54728b33e4d1a74b671d0b22749fbf3a20c71666271f9d64681c14206f61a0",
+      "sha256": "d4540de768ab8c97d08e956a830f660f643c78cc054caf8e308347eea2a6d161",
       "geometry_file": "geometry/0039.json.gz",
       "geometry_sha256": "0dcc117b265bf553ff37b9fcca6627152ef6bc1551c74e1419b7f4bcae8e996d",
       "width": 595.32,
@@ -370,7 +370,7 @@
     {
       "number": 40,
       "file": "pages/0040.json",
-      "sha256": "11c6a15243cc0976aea1056522543e7398c01b1e04589e70405a93adaf750fb8",
+      "sha256": "f6e07f9521f4305dbc267c571cf5f2b0559b49f6b3a76d91837d3361ab613dbf",
       "geometry_file": "geometry/0040.json.gz",
       "geometry_sha256": "1413f000165e78629b284cdb334eec53024f8d3dc45fb7b6c761a93c000811a6",
       "width": 595.32,
@@ -379,7 +379,7 @@
     {
       "number": 41,
       "file": "pages/0041.json",
-      "sha256": "6c4ada032bcae3b4c84c7f48c9c5cd3bcda3517678286e519bed030f3edace49",
+      "sha256": "979ee8a2dab7d71b496f06399e4d3e62371f1051972838cbfcdfcb14f0735ae2",
       "geometry_file": "geometry/0041.json.gz",
       "geometry_sha256": "754b595d1e805401e42a016d004fb05587661d9458f1a8d2a6cb0aa90f15e009",
       "width": 595.32,
@@ -388,7 +388,7 @@
     {
       "number": 42,
       "file": "pages/0042.json",
-      "sha256": "49430d2ab1570a3d48a14696cd75cff0c1eee4f6bebb5125a5ea819348256d55",
+      "sha256": "b24ce98f10a0f5c4e3618b3d80e85bb18b4803ab19b031771ebc0aab177c29dd",
       "geometry_file": "geometry/0042.json.gz",
       "geometry_sha256": "b39e1fd07ba22c40297397a9dfff244d0f602023fba25fccf49b6cbc0a31a6f4",
       "width": 595.32,
@@ -397,7 +397,7 @@
     {
       "number": 43,
       "file": "pages/0043.json",
-      "sha256": "049728e3ce77b76e7885775eb4752bd62fb10aee50dcdf672f64c2b3c814f289",
+      "sha256": "c66d6ee945e7b6e37872f5b630caf3ad07dc25a9c93361e74ab048a1c5ff6873",
       "geometry_file": "geometry/0043.json.gz",
       "geometry_sha256": "9d70c51c3f6f1a7072206d470fa7740bcb9752a8e161b1ac9c7c89aad2a0f0e7",
       "width": 595.32,
