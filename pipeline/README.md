@@ -110,10 +110,18 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            equal-width wrapping columns; field cells are mapped to bit columns by the
            x-centres of the number glyphs -- from the geometry, so the varied
            extraction is handled uniformly whether the boxes come out as 16 empty
-           columns or collapse to 8-9 with the names inside; a field name split
+           columns or collapse to 8-9 with the names inside; the number line is
+           taken as any strictly-descending run of >=8 values in 0..31, so
+           byte-boundary diagrams (`31 24 23 16 15 8 7 0`) and non-16-wide ones
+           (`11 10 … 0`) are handled too, while a side-by-side mix
+           (`8 7 5 3 0 9 8 7`) is rejected; where the diagram has no ruled box a
+           single full-width field line is synthesised into a header+field table;
+           a field name split
            vertically by a narrow column -- `Reser`+`ved` -> `Reserved` -- is
            rejoined, while a two-mode TIM CCMR keeps its output-name row above its
-           input-name row; the shared transform is
+           input-name row; bit-field diagrams are also kept out of the page-spanning
+           table chaining (a back-to-back pair used to merge, losing the cell
+           geometry the rebuild needs); the shared transform is
            pipeline/common/logical_tables.apply_bitfield, used by the exporter and
            the parity check),
            **table cells are centre-aligned by default with long/multi-line cells
