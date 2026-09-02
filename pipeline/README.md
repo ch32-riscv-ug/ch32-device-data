@@ -215,7 +215,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    (converter 1.6.0). pdfplumber groups lines by top, so the `DD` subscript
    of `V` (top≈106, 7pt, **bottom aligned with the V**) drops onto its own
    line, leaving `V` and `DD` apart and `V_DD` unreadable (~4,600 across all
-   datasheets). Small-font lines (<0.72x body) are split into clusters by
+   datasheets). Lines smaller than the body are split into clusters by
    internal x-gap, and each cluster is inserted into the body line whose
    baseline (bottom) it matches within 2.5pt and whose x-range contains it.
    The insertion **keeps the base line's own text** and drops the subscript
@@ -226,7 +226,12 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    right-to-left per cluster so positions do not drift (`VDD...VPVD`). A
    small line is merged only when every cluster lands on a body line;
    otherwise it is kept whole (no dropped glyphs). Figure micro-labels with
-   no baseline-aligned body line are left separate. page["text"] is built
+   no baseline-aligned body line are left separate. **Whether a line is a
+   subscript is judged against the neighbouring base, not the page median**
+   (`small < base * 0.82`, converter 1.6.1): a figure voltage label's `BAT`
+   subscript is 8.2pt (77% of the 10.6 body -- above the global 0.72 gate) yet
+   is clearly smaller than its base `V` at 11.9 (L103DS0 p36 orphans 18 -> 0).
+   page["text"] is built
    by extract_text() independently, so the frozen tools' byte-identity holds.
 
 Measured on CH32V003 (zh/en): text, words, tables and characters are

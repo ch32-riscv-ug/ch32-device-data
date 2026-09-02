@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.6.0"
+CONVERTER_VERSION = "1.6.1"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -338,11 +338,13 @@ def merge_subscript_lines(lines: list[dict]) -> list[dict]:
     """下付き・上付きが独立行に分かれたものを、ベースラインが揃う本文行へ統合する。
 
     pdfplumberの行抽出はtopでグループ化するので、`V`（top=102）の下付き`DD`
-    （top=106・size 7pt・**bottomはVと揃う**）が別行になり、`V`と`DD`が離れて
-    `V_DD`が読めなくなる（全datasheetで4600件）。本文の0.72倍以下の小フォント行を
-    クラスタに割り、各クラスタをbottom（ベースライン）±2.5pt揃い・x的に含む本文行の
-    該当位置へ差し込む（右のクラスタから入れるので左の位置はずれない）。図中の極小
-    ラベル（bottomが揃う本文行が無い）は統合されず残る。
+    （top=106・**bottomはVと揃う**）が別行になり、`V`と`DD`が離れて`V_DD`が読めなく
+    なる（全datasheetで数千件）。本文より小さい行をクラスタに割り、各クラスタを
+    bottom（ベースライン）±2.5pt揃い・x的に隣接する行のうち、**その基底より一回り
+    小さい**（相対サイズ<0.82）ものへ差し込む。下付き判定はページ全体の中央値でなく
+    **隣接する基底との相対**で見る——図中の電圧ラベル`V_BAT`の下付きは8.2pt（body
+    10.6の77%）とグローバル閾値には収まらないが、基底`V`11.9に対しては明確に小さい。
+    右のクラスタから入れるので左の位置はずれない。基底の無い極小ラベルは残る。
     """
     if not lines:
         return lines
@@ -357,17 +359,20 @@ def merge_subscript_lines(lines: list[dict]) -> list[dict]:
 
     bases = [j for j, b in enumerate(lines)
              if _line_median_size(b) > body * 0.72 and b.get("chars")]
+    base_size = {j: _line_median_size(lines[j]) for j in bases}
     consumed = [False] * len(lines)
     subs_for: dict[int, list[list[dict]]] = {}
     for i, small in enumerate(lines):
         size = _line_median_size(small)
-        if size == 0 or size > body * 0.72 or not small.get("chars"):
+        if size == 0 or size >= body * 0.90 or not small.get("chars"):
             continue
         sb = baseline(small["chars"])
         matches = []
         for cl in _subscript_clusters(small["chars"]):
             cx = min(c["x0"] for c in cl)
-            hit = next((j for j in bases if abs(sb - baseline(lines[j]["chars"])) <= 2.5
+            hit = next((j for j in bases
+                        if size < base_size[j] * 0.82
+                        and abs(sb - baseline(lines[j]["chars"])) <= 2.5
                         and lines[j]["x0"] - 5 <= cx <= lines[j]["x1"] + 5), None)
             matches.append((cl, hit))
         # 全クラスタが本文行に着地したときだけ小行を統合する。1つでも外れたら
