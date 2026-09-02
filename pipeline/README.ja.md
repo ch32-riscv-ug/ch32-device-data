@@ -39,6 +39,10 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
            run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
            対象選定は凍結toolのまま）
+           images/run_extract_images.py（family repoのimage/を作る凍結
+           `extract_images`を、**`pdfplumber.open`だけ原本hashゲート経由**で走らせる。
+           pixelのcropは原本PDFが要りpdfcompatでは差し替えられないので、openで
+           hash照合だけ挟む＝**最後のPDF直読みも実行経路の要件（ずれ検出）を満たす**）
 reconcile/ compare_csv.py（凍結CSVとcandidateの unchanged/added/changed/missing）。zh/en照合は今後
 common/    review_sidecar.py（**L2: 人の判断の読み手**。正本は
            `structured/<stem>.<lang>/review.json`——block IDごとのapproved/rejected、

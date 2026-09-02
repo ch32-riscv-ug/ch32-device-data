@@ -907,7 +907,7 @@ uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)
 uv run tools/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
 uv run tools/build_readme.py                    # generated/readme/*.md (README for each family)
-uv run tools/extract_images.py                  # image/ in each repo (takes a few minutes)
+uv run pipeline/extract/images/run_extract_images.py  # image/ in each repo (frozen tool via the source-hash gate; takes a few minutes)
 uv run tools/check_images.py [--missing|--prune] # list of required images and check
 uv run tools/check_tables.py                    # reference joins of all tables, index ⊆ evidence, manifest
 uv run tools/check_counts.py                    # peripheral counts of the comparison table vs pin instance counts

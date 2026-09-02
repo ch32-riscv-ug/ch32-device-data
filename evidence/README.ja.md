@@ -883,7 +883,7 @@ uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
-uv run tools/extract_images.py                  # 各repoのimage/（数分かかる）
+uv run pipeline/extract/images/run_extract_images.py  # 各repoのimage/（凍結toolを原本hashゲート経由で。数分かかる）
 uv run tools/check_images.py [--missing|--prune] # 画像の必要一覧と検査
 uv run tools/check_tables.py                    # 全テーブルの参照結合・索引⊆証拠・manifest
 uv run tools/check_counts.py                    # 比較表の周辺数 vs pinのinstance数

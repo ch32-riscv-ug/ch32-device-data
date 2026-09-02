@@ -48,6 +48,11 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            parity harness; the ledger is in the worklist under D18)
            run_scan_errata.py (the incremental errata scan (KNOWN/NEW) on bundle
            input; target selection stays the frozen tool's)
+           images/run_extract_images.py (runs the frozen `extract_images` -- which
+           builds each family repo's image/ -- with **only `pdfplumber.open`
+           wrapped in the source-hash gate**. Pixel crops need the original PDF and
+           pdfcompat cannot stand in, so the gate just checks the hash on open --
+           the last direct-PDF read now meets the execution-path requirement too)
 reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
            zh/en pairing comes later
 common/    review_sidecar.py (**L2: the reader of human decisions**. The committed
