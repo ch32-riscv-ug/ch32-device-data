@@ -88,8 +88,12 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            description's trailing `Other: No clock output.`; 1,937 cells across
            50 documents. Only rows at a page boundary qualify, since an in-page
            "one non-empty cell" row is usually a real standalone cell in a
-           comparison table; exporter and parity share it, the frozen CSVs never
-           see it), and
+           comparison table; the continuation cell is dropped from the grid so no
+           empty row is left; exporter and parity share it, the frozen CSVs never
+           see it), **a cell's internal line breaks are kept as `<br>`** (a `<td>`
+           collapses newlines to spaces; this preserves the original's paragraphs
+           -- wrap vs. intentional break is unknowable from pdfminer, but the
+           original wraps at the same points), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
