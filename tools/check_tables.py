@@ -281,6 +281,27 @@ def out_option(t: dict) -> list[str]:
     return out
 
 
+def conflict_keys(t: dict) -> list[str]:
+    """正本の全表（catalog＋evidence）が build_conflicts.KEYS に居るか。
+
+    KEYS 漏れは build_conflicts を**回したときにしか**落ちず、R-29 の新表では
+    翌日の update.yml（CI）まで気づかれなかった。表を足した commit の
+    check_tables で即死させる。
+    """
+    import build_conflicts  # noqa: PLC0415  importだけ（生成はしない）
+    canonical = paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+    out = []
+    for name in canonical:
+        if name not in build_conflicts.KEYS:
+            out.append(f"{name}: build_conflicts.KEYS に行を名指す鍵が無い"
+                       "——表を足したら KEYS も足すこと")
+    for name in build_conflicts.KEYS:
+        if name not in canonical:
+            out.append(f"build_conflicts.KEYS の {name} が正本の表に無い"
+                       "——表を消したら KEYS からも消すこと")
+    return out
+
+
 def column_drift(t: dict) -> list[str]:
     """表のヘッダが、その列を決めている生成器の定数と合っているか。
 
@@ -829,6 +850,7 @@ def main() -> int:
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
     bad += out_option(t)
+    bad += conflict_keys(t)
     bad += shared_leads(t)
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)

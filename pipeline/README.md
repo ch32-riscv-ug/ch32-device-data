@@ -57,7 +57,13 @@ common/    review_sidecar.py (**L2: the reader of human decisions**. The committ
            required table is rejected instead of degrading silently. A sidecar
            whose original changed is never reused -- the same gate the converter
            applies on reconversion, enforced on the reading side too. Decisions
-           are recorded with review/record_decision.py)
+           are recorded with review/record_decision.py.
+           **zh/en table pairing is automatic where caption numbers match**
+           (measured 2026-09-02: 16 of 32 document pairs match completely; the
+           asymmetric residue is **83 caption numbers corpus-wide**) -- the
+           residue is laid out side by side with original captions by
+           review/propose_pairs.py, and an approved pair gets the same
+           canonical_table_number recorded on both blocks)
 review/    render_assets.py (**pixel rendering of figures**: verifies the original's
            hash, then renders each figure region to a 150-dpi PNG recorded in
            assets.json with its bbox and SHA-256. Regions come from **vertical

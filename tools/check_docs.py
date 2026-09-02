@@ -236,6 +236,15 @@ def check_row_counts(known: dict[str, int]) -> list[str]:
         if label not in seen:
             bad.append(f"check_docs.py: ROW_COUNTS の「{label}」が "
                        "table-reliability.ja.md に無い——文書側の綴りが変わった")
+    # 登録儀式の閉じ込め: 正本の全表（catalog＋evidence）がROW_COUNTSのどれかに
+    # 覆われていること。表を足してreliabilityの行とROW_COUNTSを忘れても、
+    # ここまでは黙って通ってしまっていた（R-29でconflictsのKEYS漏れが翌日の
+    # CIまで気づかれなかったのと同型の穴）。
+    covered = {name for names in ROW_COUNTS.values() for name in names}
+    for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+        if name not in covered:
+            bad.append(f"check_docs.py: 表 {name} が ROW_COUNTS のどの行にも無い"
+                       "——表を足したら table-reliability の行と ROW_COUNTS を足すこと")
     return bad
 
 
