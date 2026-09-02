@@ -42,6 +42,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "common"))
 
 import logical_tables  # noqa: E402
 import paths  # noqa: E402
+import review_sidecar  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
@@ -151,12 +152,16 @@ def rm_documents() -> list[dict]:
     return out
 
 
-def find_grids(pages: list[dict]) -> tuple[tuple, tuple]:
-    """(structure, fields)の(grid, row_pages)。無ければ落ちる。"""
+def find_grids(pages: list[dict],
+               rejected: frozenset[str] = frozenset()) -> tuple[tuple, tuple]:
+    """(structure, fields)の(grid, row_pages)。無ければ落ちる。
+    L2 sidecarでrejectedのblockは候補にしない。"""
     chains = logical_tables.document_chains(pages)
     structure = fields = None
     for page in pages:
         for t in page["tables"]:
+            if t["id"] in rejected:
+                continue
             info = chains[t["id"]]
             if not info["start"]:
                 continue
@@ -244,7 +249,8 @@ def parse_fields(grid: list[list], row_pages: list[int]) -> list[dict]:
 def read_edition(document: str, lang: str) -> dict:
     name = f"{Path(document).stem}.{lang}"
     pages = load_pages(name)
-    (s_grid, s_pages), (f_grid, f_pages) = find_grids(pages)
+    (s_grid, s_pages), (f_grid, f_pages) = find_grids(
+        pages, frozenset(review_sidecar.rejected_ids(name)))
     joined = {p["number"]: " ".join(line["text"] for line in p["lines"])
               for p in pages}
     anchor = s_pages[0]

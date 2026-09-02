@@ -37,6 +37,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 
 import logical_tables  # noqa: E402
 import paths  # noqa: E402
+import review_sidecar  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
@@ -108,11 +109,14 @@ def read_edition(lang: str) -> tuple[dict[str, dict], set[str], dict[str, int]]:
     name = f"WCH-LinkUserManual.{lang}"
     pages, _ = load_pages(name)
     chains = logical_tables.document_chains(pages)
+    rejected = review_sidecar.rejected_ids(name)
 
     table = None
     row_pages: list[int] = []
     for page in pages:
         for t in page["tables"]:
+            if t["id"] in rejected:
+                continue
             info = chains[t["id"]]
             if not info["start"]:
                 continue

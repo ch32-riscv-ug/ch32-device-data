@@ -50,6 +50,14 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            input; target selection stays the frozen tool's)
 reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
            zh/en pairing comes later
+common/    review_sidecar.py (**L2: the reader of human decisions**. The committed
+           record is structured/<stem>.<lang>/review.json -- approved/rejected per
+           block ID, pinned to the original's SHA-256. The new-path extractors
+           drop rejected blocks from canonical generation, and stop loudly when a
+           required table is rejected instead of degrading silently. A sidecar
+           whose original changed is never reused -- the same gate the converter
+           applies on reconversion, enforced on the reading side too. Decisions
+           are recorded with review/record_decision.py)
 review/    render_assets.py (**pixel rendering of figures**: verifies the original's
            hash, then renders each figure region to a 150-dpi PNG recorded in
            assets.json with its bbox and SHA-256. Regions come from **vertical
@@ -128,6 +136,7 @@ version+page footers are caught 35/35 (en) and 30/30 (zh).
 
 ```sh
 uv run pipeline/publish/regenerate.py             # bundles -> evidence -> index -> checks
+uv run pipeline/publish/regenerate.py --full      # regenerate every CSV (frozen tools on bundle input; ~1.5h)
 uv run pipeline/publish/regenerate.py --verify --human  # + parity, errata, figures, Markdown
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
 uv run pipeline/ingest/convert_all.py --jobs 4    # all 67 versions, incremental
