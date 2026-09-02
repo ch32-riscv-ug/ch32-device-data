@@ -31,6 +31,8 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "review"))
+import export_markdown  # noqa: E402  cell_htmlの表示を検査と揃える
 import figure_captions  # noqa: E402
 import logical_tables  # noqa: E402
 import lost_subscripts  # noqa: E402
@@ -89,12 +91,13 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # expect("")がスキップ、前セルには連結後textが入る。
                 logical_tables.fold_boundary_spills(record)
             for cell in record["cells"]:
-                # exporterと同じ表示（物理行は<br>）で検査する
-                expect(html.escape(cell["text"]).replace("\n", "<br>"),
+                # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
+                expect(export_markdown.cell_html(cell["text"]),
                        f"table {item['id']} cell")
         elif item["type"] == "line":
             line = lines[item["id"]]
-            expect(html.escape(line["text"]), f"{line.get('role')} {item['id']}")
+            expect(html.escape(export_markdown.pua_normalize(line["text"])),
+                   f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):
                 # captionの直後には、描画済みの図（実ファイルがあること）か、

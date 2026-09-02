@@ -36,7 +36,8 @@
         "role": {"enum": ["heading", "paragraph", "list-item", "header", "footer"]},
         "level": {"type": "integer", "minimum": 1, "maximum": 6},
         "font_size": {"type": "number", "minimum": 0},
-        "bold": {"type": "boolean"}
+        "bold": {"type": "boolean"},
+        "italic": {"type": "boolean"}
       }
     },
     "drawing": {
@@ -76,7 +77,9 @@
         "column_start": {"type": "integer", "minimum": 0},
         "column_end": {"type": "integer", "minimum": 1},
         "bbox": {"$ref": "#/$defs/bbox"},
-        "text": {"type": "string"}
+        "text": {"type": "string"},
+        "bold": {"type": "boolean"},
+        "italic": {"type": "boolean"}
       }
     },
     "table": {

@@ -85,12 +85,58 @@ def page_lost_subscripts(bundle: Path, entry: dict, page: dict) -> int:
     return lost_subscripts.lost_subscript_count(json.loads(payload)["chars"])
 
 
+# Wingdings/Symbolフォントの記号がPUA（私用領域）のまま本文に出ている
+# （fontで●等に見えるが文字コードは意味不明）。全コーパスで実測した5種を
+# 対応する記号へ。原本の見た目に合わせる＝「差ゼロ」に近づく。
+PUA_REPLACEMENTS = {
+    "\uf06c": "●",   # Wingdings 0x6C: bullet (8824)
+    "\uf06e": "■",   # Wingdings 0x6E: black square
+    "\uf0b7": "•",   # Symbol 0xB7: bullet
+    "\uf0b4": "×",   # Symbol 0xB4: multiply
+    "\uf0b1": "±",   # Symbol 0xB1: plus-minus
+}
+
+
+def pua_normalize(text: str) -> str:
+    for pua, real in PUA_REPLACEMENTS.items():
+        if pua in text:
+            text = text.replace(pua, real)
+    return text
+
+
+_JOIN_PUNCT = ":;.。；：,，、"
+
+
 def cell_html(text: str) -> str:
-    """セルの中身。PDFの物理行の切れ目（`\\n`）を`<br>`で残す——`<td>`は改行を
-    空白に潰すので、そのままだと段落が消える（原本は複数行）。折り返しか意図的な
-    改行かの区別はpdfminerに情報が無く不可能だが、原本も同じ位置で折り返して
-    いるので物理行をそのまま出すのが「差ゼロ」に最も近い。"""
-    return html.escape(text).replace("\n", "<br>")
+    """セルの中身。物理行の切れ目（`\\n`）を、**折り返しか意図的な改行か**で
+    出し分ける（前者は繋ぎ、後者は`<br>`）。完全な区別は原理的に不可能だが、
+    行末・行頭の文字種で実用的に分けられる（狭いregisterセルで`USART1RST`が
+    `USAR`/`T1`/`RST`に折り返される一方、MCO説明の`control:`/`100:…`は項目改行）:
+
+    - 前行が句読点（`:;.,`等）で終わる → 意図的な改行（`<br>`）
+    - 英字（小文字が絡む＝英単語）の折り返し → 空白で繋ぐ（`source is`+`greater`）
+    - 識別子（大文字・数字）の折り返し → そのまま繋ぐ（`USAR`+`T1`=`USART1`）
+    - それ以外は保守的に`<br>`
+    """
+    text = pua_normalize(text)
+    parts = text.split("\n")
+    if len(parts) == 1:
+        return html.escape(text)
+    result = html.escape(parts[0])
+    for prev, cur in zip(parts, parts[1:]):
+        pe = prev.rstrip()
+        if not pe or not cur:
+            sep = "<br>"
+        elif pe[-1] in _JOIN_PUNCT:
+            sep = "<br>"
+        elif (pe[-1].isalpha() and pe[-1].islower()) or (cur[0].isalpha() and cur[0].islower()):
+            sep = " "
+        elif pe[-1].isalnum() and cur[0].isalnum():
+            sep = ""
+        else:
+            sep = "<br>"
+        result += sep + html.escape(cur)
+    return result
 
 
 def table_html(table: dict, url: str | None, number: int) -> str:
@@ -105,9 +151,18 @@ def table_html(table: dict, url: str | None, number: int) -> str:
             attrs.append(f'rowspan="{cell["row_end"] - cell["row_start"]}"')
         if cell["column_end"] - cell["column_start"] > 1:
             attrs.append(f'colspan="{cell["column_end"] - cell["column_start"]}"')
+        inner = cell_html(cell["text"])
+        if cell.get("italic"):
+            inner = f"<em>{inner}</em>"
+        if cell.get("bold"):
+            inner = f"<strong>{inner}</strong>"
+        # 表の1行目はヘッダ（<th>。ブラウザが太字＋中央寄せ）。原本の見出し行
+        # （Bit/Name/Access…）がそのまま見出しになる。ヘッダの無い表（ビット図）
+        # でも実害は小さい。continuation断片はrow_start>0なので<td>のまま。
+        tag = "th" if cell["row_start"] == 0 else "td"
         grid[cell["row_start"]][cell["column_start"]] = (
-            "<td" + ("".join(" " + a for a in attrs)) + ">"
-            + cell_html(cell["text"]) + "</td>")
+            f"<{tag}" + ("".join(" " + a for a in attrs)) + ">"
+            + inner + f"</{tag}>")
         for r in range(cell["row_start"] + 1, cell["row_end"]):
             covered[r] = True
     # fold_boundary_spillsが継続セルを消した行は、他の列の空セルだけが残る。
@@ -246,7 +301,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             continue
         line = lines[item["id"]]
         role = line.get("role", "paragraph")
-        text = html.escape(line["text"])
+        text = html.escape(pua_normalize(line["text"]))
+        # 本文・箇条書きの強調（原本のfontから。見出しは`#`で既に強調済み）。
+        if role in ("paragraph", "list-item"):
+            if line.get("italic"):
+                text = f"<em>{text}</em>"
+            if line.get("bold"):
+                text = f"<strong>{text}</strong>"
         if role in ("header", "footer"):
             # 図領域がページ下端に届くとfooterが領域内に入る。順序を保つため
             # コメントも同じ入れ物へ。

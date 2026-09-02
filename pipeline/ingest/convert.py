@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.3.1"
+CONVERTER_VERSION = "1.5.1"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -241,9 +241,62 @@ def fix_rotated_cells(page, record: dict) -> None:
                 row_texts[index] = fixed
 
 
-def text_items(page, kind: str) -> list[dict]:
-    source = (page.extract_text_lines(return_chars=True) if kind == "line"
-              else page.extract_words())
+# 2カラムが始まる見出し。**Overview/概述は含めない**——overviewの散文は全幅1行で
+# （`…microcontroller based on the QingKe RISC-V core`が1行・実測）、これを境界で
+# 割ると`ba`と`d`に裂ける。2カラムなのはFeatures（箇条書き）以降。
+COLUMN_START_HEADINGS = ("Features", "主要特性", "功能概述")
+
+
+def column_boundary(page, lines: list[dict]):
+    """2カラム（datasheetのfeaturesリスト）なら(列境界x, 開始y)、なければNone。
+
+    pdfplumberの行抽出は左カラムと右カラムを同じy行として1行に結合してしまう
+    （`- QingKe…core ● 3-group…`のように左右が混ざる）。Features見出しのある
+    datasheetページに限り、**見出しの下**の表外wordのx0を見て、中央域（幅の
+    35〜60%）で最大のx0ギャップ（左カラム右端と右カラム左端の間）を列境界に。
+    見出しで絞るので製品比較表・register bit図・pin表・overview散文は対象外。
+    """
+    starts = [line for line in lines if line.get("role") == "heading"
+              and any(k in line["text"] for k in COLUMN_START_HEADINGS)]
+    if not starts:
+        return None
+    y_start = min(starts, key=lambda l: l["bbox"][1])["bbox"][3]
+    width = float(page.width)
+    tables = [t.bbox for t in page.find_tables()]
+
+    def in_table(word) -> bool:
+        cx, cy = (word["x0"] + word["x1"]) / 2, (word["top"] + word["bottom"]) / 2
+        return any(t[0] <= cx <= t[2] and t[1] <= cy <= t[3] for t in tables)
+
+    x0s = sorted(w["x0"] for w in (page.extract_words() or [])
+                 if not in_table(w) and w["top"] >= y_start)
+    x0s = [x for x in x0s if width * 0.35 <= x <= width * 0.60]
+    if len(x0s) < 3:
+        return None
+    best_gap, best_x = 0.0, None
+    for a, b in zip(x0s, x0s[1:]):
+        if b - a > best_gap:
+            # ギャップの中点を境界に——右カラム語の x0 ちょうどにすると、その語
+            # （bullet等）が左cropにも intersect して左行末に紛れ込む。
+            best_gap, best_x = b - a, (a + b) / 2
+    if best_gap < 15:
+        return None
+    return (best_x, y_start)
+
+
+def text_items(page, kind: str, boundary=None) -> list[dict]:
+    if kind == "line" and boundary:
+        # 2カラム: タイトル帯（y_start より上）は全幅、その下を左カラム→右カラム
+        x_split, y_start = boundary
+        source = ((page.crop((0, 0, page.width, y_start))
+                   .extract_text_lines(return_chars=True) or [])
+                  + (page.crop((0, y_start, x_split, page.height))
+                     .extract_text_lines(return_chars=True) or [])
+                  + (page.crop((x_split, y_start, page.width, page.height))
+                     .extract_text_lines(return_chars=True) or []))
+    else:
+        source = (page.extract_text_lines(return_chars=True) if kind == "line"
+                  else page.extract_words())
     out = []
     for index, item in enumerate(source or [], 1):
         entry = {
@@ -289,8 +342,7 @@ def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
         line_sizes = [item["size"] for item in members if item["text"].strip()]
         line["font_size"] = round(statistics.median(line_sizes), 3) if line_sizes else 0
         named = [item for item in members if item["text"].strip()]
-        line["bold"] = bool(named) and sum(
-            "bold" in item["font"].lower() for item in named) >= len(named) / 2
+        line["bold"], line["italic"] = emphasis(named)
         text = line["text"].strip()
         numbered = HEADING_NUMBER.match(text)
         # 反復する余白行はheading判定より先に決める——TOC等の小さい本文フォントの
@@ -366,14 +418,42 @@ def cell_text(page, bbox) -> str:
     return (page.crop(bbox).extract_text(x_tolerance=3, y_tolerance=3) or "").strip()
 
 
+def emphasis(chars_list) -> tuple[bool, bool]:
+    """(太字, 斜体)。過半の文字のfontnameが bold / italic(oblique)なら真。
+
+    lineのchar（`font`キー）とpage.chars（`fontname`キー）の両方を受ける。
+    見た目の強調（太字＝BoldMT・斜体＝ItalicMT。全コーパスで各3%）は本文の
+    テキストには出ないので、これを拾わないと原本の強調が消える。"""
+    named = [c for c in chars_list
+             if str(c.get("text") or "").strip()]
+    if not named:
+        return False, False
+    def font(c):
+        return str(c.get("font") or c.get("fontname") or "").lower()
+    n = len(named)
+    bold = sum("bold" in font(c) for c in named) >= n / 2
+    italic = sum(("italic" in font(c) or "oblique" in font(c))
+                 for c in named) >= n / 2
+    return bold, italic
+
+
 def physical_cells(page, table, table_id: str) -> tuple[list[dict], int, int]:
     xs = sorted({round(value, 6) for cell in table.cells for value in (cell[0], cell[2])})
     ys = sorted({round(value, 6) for cell in table.cells for value in (cell[1], cell[3])})
     x_index = {value: index for index, value in enumerate(xs)}
     y_index = {value: index for index, value in enumerate(ys)}
+    tb = table.bbox
+    table_chars = [c for c in page.chars
+                   if str(c.get("text") or "").strip()
+                   and tb[0] <= (c["x0"] + c["x1"]) / 2 <= tb[2]
+                   and tb[1] <= (c["top"] + c["bottom"]) / 2 <= tb[3]]
     cells = []
     for index, bbox in enumerate(sorted(table.cells, key=lambda box: (box[1], box[0])), 1):
         x0, top, x1, bottom = (round(value, 6) for value in bbox)
+        in_cell = [c for c in table_chars
+                   if x0 <= (c["x0"] + c["x1"]) / 2 <= x1
+                   and top <= (c["top"] + c["bottom"]) / 2 <= bottom]
+        bold, italic = emphasis(in_cell)
         cells.append({
             "id": f"{table_id}-cell-{index:04d}",
             "row_start": y_index[top],
@@ -382,6 +462,8 @@ def physical_cells(page, table, table_id: str) -> tuple[list[dict], int, int]:
             "column_end": x_index[x1],
             "bbox": rounded_box(bbox),
             "text": cell_text(page, bbox),
+            "bold": bold,
+            "italic": italic,
         })
     return cells, len(ys) - 1, len(xs) - 1
 
@@ -405,11 +487,21 @@ def page_record(page, lang: str, source_sha256: str,
                 previous_page: int | None,
                 number_occurrences: dict[str, int],
                 repeated_top: set, repeated_bottom: set,
-                top_texts: set, bottom_texts: set) -> tuple[dict, dict, str | None]:
+                top_texts: set, bottom_texts: set,
+                document_type: str = "") -> tuple[dict, dict, str | None]:
     page_chars = chars(page)
     lines = text_items(page, "line")
     classify_lines(lines, page_chars, float(page.height), repeated_top, repeated_bottom,
                    top_texts, bottom_texts)
+    # datasheetのoverview/featuresページは2カラム——pdfplumberが左右を1行に
+    # 結合するので、列境界が見つかれば左右別々に行を組み直す（左カラム全行→
+    # 右カラム全行の読み順）。見出しで絞るので他ページは触らない。
+    if document_type == "datasheet":
+        boundary = column_boundary(page, lines)
+        if boundary:
+            lines = text_items(page, "line", boundary=boundary)
+            classify_lines(lines, page_chars, float(page.height),
+                           repeated_top, repeated_bottom, top_texts, bottom_texts)
     words = text_items(page, "word")
     page_drawings = drawings(page)
     page_captions = captions(lines, lang)
@@ -535,7 +627,7 @@ def convert(pdf_path: Path, lang: str, document_type: str,
             record, geometry, previous_logical_id = page_record(
                 page, lang, source_sha256, previous_logical_id,
                 previous_page, number_occurrences, repeated_top, repeated_bottom,
-                top_texts, bottom_texts)
+                top_texts, bottom_texts, document_type)
             validate(record, PAGE_SCHEMA)
             validate_geometry(geometry)
             payload = dump_bytes(record)
