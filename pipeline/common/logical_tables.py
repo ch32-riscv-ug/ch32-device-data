@@ -152,6 +152,47 @@ def fold_boundary_spills(merged: dict) -> int:
     return len(removed)
 
 
+def strip_boundary_dupes(table: dict) -> int:
+    """セル境界に載ったグリフをpdfplumberが左右両セルへ二重取りしたぶんを落とす。
+
+    `[31:12] R`（右隣`Reserved`の先頭`R`が末尾に重複）・`RO R`・`s Description`
+    （左隣`Access`の末尾`s`が先頭に重複）・`。 0`（左隣説明文の末尾句点が
+    reset値へ重複）等。行内で列順に見て、`空白＋1文字`の**末尾**がその文字＝右隣
+    セルの先頭非空白文字、または`1文字＋空白`の**先頭**がその文字＝左隣セルの末尾
+    非空白文字なら、その1文字を落とす。**短いセル（本文≤14字）に限る**——長い
+    説明文が偶然隣と一致して末尾語を失うのを防ぐ。geometry実測: 末尾は誤検出0/60、
+    先頭の誤検出は既に文字交錯で崩れた図セルのみ（無害）。exporter・parity検査だけが
+    呼ぶ**人向け専用**。凍結CSVの抽出器は呼ばない（canonicalはEVTヘッダ基準で無関係）。
+    冪等（`_deduped`）。
+    """
+    if table.get("_deduped"):
+        return 0
+    table["_deduped"] = True
+    by_row: dict[int, list[dict]] = {}
+    for cell in table["cells"]:
+        if (cell.get("text") or "").strip():
+            by_row.setdefault(cell["row_start"], []).append(cell)
+    removed = 0
+    for cells in by_row.values():
+        cells.sort(key=lambda c: c["column_start"])
+        for index, cell in enumerate(cells):
+            text = cell.get("text") or ""
+            if (len(text) >= 3 and text[-2] == " " and text[-1].strip()
+                    and index + 1 < len(cells)):
+                right = (cells[index + 1].get("text") or "").lstrip()
+                body = text[:-2]
+                if right[:1] == text[-1] and 0 < len(body) <= 14 and body.strip():
+                    cell["text"] = text = body
+                    removed += 1
+            if len(text) >= 3 and text[1] == " " and text[0].strip() and index > 0:
+                left = (cells[index - 1].get("text") or "").rstrip()
+                body = text[2:]
+                if left[-1:] == text[0] and 0 < len(body) <= 14 and body.strip():
+                    cell["text"] = body
+                    removed += 1
+    return removed
+
+
 def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
     """結合済み論理表 → 文字の格子（抽出器向け。spanの先頭位置に文字を置く）。"""
     rows: list[list[str | None]] = [[None] * merged["width"]
@@ -295,14 +336,37 @@ def apply_bitfield(table: dict, number_line: dict,
         cells.append({"id": f"{table['id']}-bit{i}", "row_start": 0, "row_end": 1,
                       "column_start": i, "column_end": i + 1, "text": num,
                       "bbox": table["bbox"], "bold": False, "italic": False})
+    # セル境界に載った1文字が隣のセルへ二重取りされる（`INTRSET14`の末尾`E`が右隣の
+    # `Reserved`断片に入り`E Rese`／`USART`の`U`が左隣に入り`U\nRese…`）。**縦連結の前・
+    # 行ごとに**、断片の先頭が「1文字＋空白/改行」でその文字が同じ行の左隣末尾2字か右隣
+    # 先頭2字に重複するなら落とす——連結後だと`E`が識別子の内部に埋もれて捕まえられない。
+    by_row: dict[int, list[dict]] = {}
+    for cell in cells:
+        if cell["row_start"] >= 1:
+            by_row.setdefault(cell["row_start"], []).append(cell)
+    for row_cells in by_row.values():
+        row_cells.sort(key=lambda c: c["column_start"])
+        for index, cell in enumerate(row_cells):
+            text = cell.get("text") or ""
+            if len(text) >= 2 and text[1] in " \n" and text[0].strip():
+                left = (row_cells[index - 1]["text"] if index else "").rstrip()[-2:]
+                right = (row_cells[index + 1]["text"]
+                         if index + 1 < len(row_cells) else "").lstrip()[:2]
+                if text[0] in left or text[0] in right:
+                    cell["text"] = text[2:]
     # 同じ列span（狭い列）で縦に割れた名前を上のセルへ連結（`Reser`+`ved`＝Reserved）。
+    # ただし連結するのは「1行レジスタで狭い列の名前が折り返した」ときだけ——広い
+    # フィールドが両行に跨る（rowspan）のがその印。跨るセルが無ければ本当に2段の
+    # フィールド行（byte境界PFICの`Reserved`行と`PRIO_*`行）なので連結せず2行で残す。
+    has_span = any(c["row_end"] - c["row_start"] > 1
+                   for c in cells if c["row_start"] >= 1)
     groups: dict[tuple[int, int], list[dict]] = {}
     for cell in cells:
         if cell["row_start"] >= 1:
             groups.setdefault((cell["column_start"], cell["column_end"]), []).append(cell)
     drop: list[dict] = []
     for group in groups.values():
-        if len(group) == 1:
+        if len(group) == 1 or not has_span:
             continue
         group.sort(key=lambda c: c["row_start"])
         head = group[0]
@@ -319,29 +383,24 @@ def apply_bitfield(table: dict, number_line: dict,
     for cell in cells:
         cell["row_end"] = sum(1 for s in starts if s < cell["row_end"])
         cell["row_start"] = remap[cell["row_start"]]
-    # セル境界に載った1文字が隣のセルへ二重取りされることがある（`USART`の`U`が左隣の
-    # `Reserved`セルに入り`U\nRese\nrved`→`URese rved`）。データセルを列順に見て、先頭が
-    # 「1文字＋改行」でその文字が左隣の末尾2文字か右隣の先頭2文字に重複するなら落とす。
-    # 残った折り返し行は空白なしで繋ぐ——bit名は1個の識別子で、cell_htmlの英単語スペース
-    # 判定が`Rese`+`rved`を`Rese rved`にするのを防ぐ。
-    by_row: dict[int, list[dict]] = {}
+    # 折り返し行は空白なしで繋ぐ——bit名は1個の識別子で、cell_htmlの英単語スペース判定が
+    # `Rese`+`rved`を`Rese rved`にするのを防ぐ（境界の二重取りは連結前に落とし済み）。
     for cell in cells:
         if cell["row_start"] >= 1:
-            by_row.setdefault(cell["row_start"], []).append(cell)
-    for row_cells in by_row.values():
-        row_cells.sort(key=lambda c: c["column_start"])
-        for index, cell in enumerate(row_cells):
-            text = cell.get("text") or ""
-            if len(text) >= 2 and text[1] == "\n" and text[0].strip():
-                left = (row_cells[index - 1]["text"] if index else "").rstrip()[-2:]
-                right = (row_cells[index + 1]["text"]
-                         if index + 1 < len(row_cells) else "").lstrip()[:2]
-                if text[0] in left or text[0] in right:
-                    text = text[2:]
-            cell["text"] = text.replace("\n", "")
+            cell["text"] = (cell.get("text") or "").replace("\n", "")
     # 描画順（行→列）に並べる。parityはセルのリスト順に読み進めるので、ヘッダ行を
     # 先頭に置かないと番号が「順序外」に見える。
     cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+    # 同じ(row_start,column_start)へ複数セルが落ちることがある——ページ跨ぎで番号中心が
+    # 実列数より少ない（27..16の12個に16列を詰める等）と、bit_spanのnearフォールバックが
+    # 複数セルを端の1列へ束ねる。table_htmlのgridは`grid[r][c]=…`で後勝ちに上書きし可視は
+    # 1つだが、parityはcells全部を読むため衝突セルが「順序外」に化ける。gridと同じく後勝ちで
+    # 1つに畳み、描画とparityが必ず同じセル列を見るようにする（衝突の無い通常図には無影響）。
+    deduped: dict[tuple[int, int], dict] = {}
+    for cell in cells:
+        deduped[(cell["row_start"], cell["column_start"])] = cell
+    cells = sorted(deduped.values(),
+                   key=lambda c: (c["row_start"], c["column_start"]))
     table["cells"] = cells
     table["column_count"] = width
     table["row_count"] = len(starts)

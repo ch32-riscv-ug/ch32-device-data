@@ -116,15 +116,20 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
                                                     フィールド行）。synthの番号行は
                                                     描画trigger（skipには入れない）
     """
+    # 表のcaption行は`<caption>`として描かれる。同じ行がreading_orderにも残ると本文
+    # 段落として二重に出る（「Table 4-1 …」が表の上と表内captionで2回。ユーザー指摘）。
+    # caption行を本文から消す——parityも同じskipを読むので整合する。
+    caption_skip = {t["caption"]["line_id"] for t in page["tables"]
+                    if t.get("caption") and t["caption"].get("line_id")}
     pairs = logical_tables.bitfield_pairs(page)
     singletons = logical_tables.bitfield_singletons(page)
     if not pairs and not singletons:
-        return {"tables": {}, "synth": {}, "skip": set(),
+        return {"tables": {}, "synth": {}, "skip": set(caption_skip),
                 "cross": {}, "cross_note": set()}
     chars = load_geometry(bundle, entry)["chars"]
     lines = {l["id"]: l for l in page["lines"]}
     tables: dict[str, tuple[str, list]] = {}
-    skip: set[str] = set()
+    skip: set[str] = set(caption_skip)
     for table_id, line_id in pairs.items():
         centers = logical_tables.bit_number_centers(chars, lines[line_id])
         if centers:
@@ -410,6 +415,9 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             elif item["id"] in cross:
                 # 前ページ末尾の番号行で組み直す箱（bit図のページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
+            else:
+                # 通常表: 境界グリフの二重取り（`[31:12] R`等）を落とす。
+                logical_tables.strip_boundary_dupes(record)
             (figure_text if inside else output).extend(
                 ("", table_html(record, url, number), ""))
             continue

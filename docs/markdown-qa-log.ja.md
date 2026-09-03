@@ -32,6 +32,15 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
 - **サブエージェント指摘の誤検出の検証** — `APB1_DIV&amp;gt;`（二重エスケープ）は実際は
   `&gt;`で正しい単一エスケープ。`Overivew`はPDF原文の誤植（当方バグでない）。haikuは
   false positiveを出すので、指摘は必ず実地確認してから着手する。
+- **層化巡回3本（sonnet・cross/bitfield/caption各12±ページ、2026-09-03）** — 中国語=正当・
+  原典誤植=対象外を明示。成果: (1)通常表の境界二重取りを多数発見→strip_boundary_dupesで
+  1,902文字修正、(2)caption二重描画fixを別レーンが「across sample solid」と検証、(3)既知の
+  未解決を再確認（bit図フィールド名の**文字交錯** `SMBALERT→SMBSAMLEBARLTE`/`ENDUAL→ENDUENADL U`
+  ＝下記⛔撤退の再確認、bit図内境界bleed＝上記保留）。新規で記録した2件: **FV2x_V3xRM p166
+  「Table 11-2 DMA2 request mapping」がtable抽出に失敗し見出し＋バラけた本文に**（表番号11-2が
+  直後の別表と衝突）＝抽出失敗系で複雑・保留。**V205RM.zh p110のbit図ヘッダ`D5 D4 D4 D2`**
+  （D3欠落・D4重複）＝near衝突でD3がdedup後勝ちに上書きされた残り（cross/図の中心数<列数系）。
+  bit-range微修正（`[31:29]`→`[30:29]`, `WAVE2[2:0]`→`[1:0]`）は説明表権威付け＝⛔撤退のため対象外。
 
 ### ✅ 完了（続き）
 
@@ -44,6 +53,42 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   折り返し行は空白なしで繋ぐ（bit名は識別子）。全67本parity 0・`Port E Reserved`等の正当な
   文は誤検出せず。**表セルの中身がCSVに効く可能性**があるが、これはbit図ダイアグラム専用で
   凍結canonical（説明表由来）には非依存。
+
+- **cross-page bit図のグリッド衝突→parity退行**（H417RM.en p620ほか）— apply_bitfield
+  （2026-09-03）。番号中心が実列数より少ないページ跨ぎ図（例: 27..16の**12中心**に16列の
+  `FBM`フィールドと番号行を詰める）で、`bit_span`のnearフォールバックが複数セルを端の1列へ
+  束ね、**同じ(row,column)に複数セルが落ちる**。`table_html`のgridは`grid[r][c]=…`で後勝ちに
+  上書きし可視は12セルだが、**parityはrecordの全16セルを読む**ため、はみ出た4つの`FBM`が
+  後方の`FBMx`（説明表）へ食い込んで「順序外」——H417で146件のparity失敗。以前は縦連結
+  （has_span導入前）が`FBM`+番号を1セルに畳んで衝突を偶然隠していた（`FBM15`等の誤ラベルだが
+  parity的には一意で通過）。**根治**: apply_bitfield最後で`(row_start,column_start)`衝突セルを
+  gridと同じ後勝ちで1つに畳み、**描画とparityが必ず同じセル列を見る**ことを保証。has_span
+  ガード（L103のPRIO誤連結対策）には非依存で両立、全67本parity 0復帰。※図そのものの再構成は
+  ページ跨ぎで中心数<列数のとき依然不完全（別項の調査保留）だが、少なくとも整合は保証。
+
+- **表captionの二重描画**（`Table 4-1 … list`が表の上と表内で2回。X035RM p23、ユーザー報告）—
+  bitfield_plan（2026-09-03）。表の`caption.line_id`が`<caption>`として描かれるのに、同じ行が
+  reading_orderにも残り本文段落としても出ていた。**コーパス全体で4225件・63本**が該当（全table
+  captionが重複）。修正: caption行を`plan["skip"]`（export/parity共有）へ入れて本文から消す。
+  継続テーブルが自ページにcaption行を持つ危険ケースは全corpus走査で**0件**と確認。全67本
+  parity 0維持。
+
+- **通常表の境界グリフ二重取り**（`[31:12] R`・`RO R`・`RW A`・`s Description`・reset値の
+  `。 0`等。サブエージェント巡回が多数報告）— logical_tables.strip_boundary_dupes
+  （2026-09-03）。セル境界に跨るグリフをpdfplumberが**左右両セルへ二重に割当**。geometry実測で
+  確定（H417RM p218-005の`[31:12] R`の`R`はx0=112.8/x1=119.9の**1グリフ**が境界113.5を跨ぎ、
+  右隣`Reserved`の先頭Rが左セル末尾へ重複）。`register_fields.csv`等のcanonicalは**EVTヘッダ
+  基準**なので無関係（bleedは人向けmarkdownの可読性のみ）。修正: 行内で列順に見て、`空白+1文字`の
+  末尾がその文字＝右隣の先頭文字／`1文字+空白`の先頭が左隣の末尾文字なら落とす。**短いセル
+  （本文≤14字）限定**で長い説明文を守る。誤検出をgeometryで実測: **末尾0/60・先頭は既に文字
+  交錯で崩れた図セルのみ**（無害）。export/parity共有ヘルパー・通常表のみ適用（bitfield/crossは
+  apply_bitfield側）。**全corpusで1,902文字/1,059表を除去**・全67本parity 0維持。
+  **残り（保留）**: bitfield**図内**のbleed（`ReservedR`＝空白なし・`Reserved F`＝apply_bitfield
+  経路・`。<br>0`＝改行境界）は別クラス。空白区切りが無い版は`ADDR`等の正当な連結と区別できず
+  高リスク、かつ図は2-5%の難所。直近でグリッド衝突dedupを入れて67/67を安定させた直後なので
+  apply_bitfieldの追加改変は退行リスクが高い。「崩しそうなら撤退」に従い見送り、記録に留める。
+  **再挑戦の条件**: apply_bitfield内でgeometryのstraddling判定を使い、空白有無に依らず真の重複
+  グリフだけを落とせるようにしたとき。
 
 ### テーブル表示
 
@@ -89,6 +134,20 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   **evt_examples 6（`description`列の`sleep，shutdown`＝zh作者のEVTコメント由来）・dma_requests 6
   （`note`列の脚注記号`（1）（2）`＝zh RM由来）程度で軽微**。各生成器（build_evt_examples/
   build_dma_requests）の個別修正＋--full検証に見合わないので保留。やるならその2列だけ半角化。
+
+- **converter 1.6.3（Feature 2列マージ）— コード投入済み・全reconvert保留** — `convert.py`の
+  `COLUMN_START_HEADINGS`を`"Features"`→`"Feature"`（単数で"Feature"も"Features"も部分一致）に。
+  狙い: H417DS0.en p1でOverview本文とFeature列が2列マージで交錯していたのを分離。
+  **CONVERTER_VERSIONを1.6.3へbump済みだが、cached bundleは全67本が1.6.2のまま**（＝修正は未反映）。
+  スクラッチで`convert_all --only CH32H417DS0.en --force`して検証: **p1のOverviewが単一列で綺麗に
+  復元**を確認（2026-09-03）。**保留理由**: 反映には全reconvert（`convert_all --force`）が要り、
+  その後にfrozen canonical検証（features/product_attributes/operating_conditionsのbyte一致or良性drift）が
+  必須。1本1ページの改善に対し長時間・高リスクのバッチなので、publish前の意図的なバッチとして
+  実施するのが妥当。**再開手順**: (1)`uv run pipeline/ingest/convert_all.py --force --jobs 4`、
+  (2)`export_markdown --all`＋`check_markdown_parity --all`で67/67、(3)`regenerate.py --full`相当で
+  frozen canonicalのdrift確認（"Feature"見出しはfeature列ページのみ発火＝電気表のoperating_conditionsは
+  不変の見込み、featuresはH417が改善drift見込み）。driftが非良性なら撤退（版を戻す）。
+  ※export側の修正（caption/boundary-dup/grid-dedup）は既存bundleに即反映済みでreconvert不要。
 - **`√`（チェックマーク）** — product_attributes/capabilitiesのyes標識（source由来）。76件。意図的とみて保持。
 
 ### 🔧 調査中 / 進行中
