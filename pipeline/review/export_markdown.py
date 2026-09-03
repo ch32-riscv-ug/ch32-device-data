@@ -54,9 +54,13 @@ LARGE_IMAGE = 40.0   # pt。これ以上の幅と高さを持つ画像は個別�
 # ユーザー要望——レジスタごとに幅が変わるのを揃える）、既定でセル中央寄せ（PDFに寄せる）、
 # bit図は16列を等幅fixed＋自動折り返し。CSSに`{{`/`{%`が出ないよう1行1規則で書く
 # （JekyllのLiquidが壊れる並びをparity検査が禁じている）。
+# GitHub Pagesのテーマが`.markdown-body table{display:block;width:100%;overflow:auto}`
+# （詳細度0,1,1）で素の`table`規則に勝ち、tableをblock化する。blockのtableは中身が内容幅に
+# 縮むので、内容の広い表だけ100%に見えた。`display:table`＋`width`を`!important`で取り戻す。
 PAGE_STYLE = "\n".join((
     "<style>",
-    "table{border-collapse:collapse;margin:.6em 0;width:100%;max-width:960px}",
+    "table{border-collapse:collapse;margin:.6em 0;"
+    "display:table!important;width:100%!important;max-width:960px!important}",
     "td,th{border:1px solid #bbb;padding:2px 7px;text-align:center;vertical-align:top}",
     "table.bitfield{table-layout:fixed}",
     "table.bitfield td,table.bitfield th{word-break:break-word;font-size:.8em;padding:2px}",
