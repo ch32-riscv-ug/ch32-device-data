@@ -319,6 +319,26 @@ def apply_bitfield(table: dict, number_line: dict,
     for cell in cells:
         cell["row_end"] = sum(1 for s in starts if s < cell["row_end"])
         cell["row_start"] = remap[cell["row_start"]]
+    # セル境界に載った1文字が隣のセルへ二重取りされることがある（`USART`の`U`が左隣の
+    # `Reserved`セルに入り`U\nRese\nrved`→`URese rved`）。データセルを列順に見て、先頭が
+    # 「1文字＋改行」でその文字が左隣の末尾2文字か右隣の先頭2文字に重複するなら落とす。
+    # 残った折り返し行は空白なしで繋ぐ——bit名は1個の識別子で、cell_htmlの英単語スペース
+    # 判定が`Rese`+`rved`を`Rese rved`にするのを防ぐ。
+    by_row: dict[int, list[dict]] = {}
+    for cell in cells:
+        if cell["row_start"] >= 1:
+            by_row.setdefault(cell["row_start"], []).append(cell)
+    for row_cells in by_row.values():
+        row_cells.sort(key=lambda c: c["column_start"])
+        for index, cell in enumerate(row_cells):
+            text = cell.get("text") or ""
+            if len(text) >= 2 and text[1] == "\n" and text[0].strip():
+                left = (row_cells[index - 1]["text"] if index else "").rstrip()[-2:]
+                right = (row_cells[index + 1]["text"]
+                         if index + 1 < len(row_cells) else "").lstrip()[:2]
+                if text[0] in left or text[0] in right:
+                    text = text[2:]
+            cell["text"] = text.replace("\n", "")
     # 描画順（行→列）に並べる。parityはセルのリスト順に読み進めるので、ヘッダ行を
     # 先頭に置かないと番号が「順序外」に見える。
     cells.sort(key=lambda c: (c["row_start"], c["column_start"]))

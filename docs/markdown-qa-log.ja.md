@@ -33,6 +33,44 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   `&gt;`で正しい単一エスケープ。`Overivew`はPDF原文の誤植（当方バグでない）。haikuは
   false positiveを出すので、指摘は必ず実地確認してから着手する。
 
+### ✅ 完了（続き）
+
+- **bit図セルの境界重複＋折り返し**（`EReserved`/`URese rved`）— export側apply_bitfield
+  （2026-09-03、ユーザー報告）。セル境界に載った1文字がpdfplumberで**隣のセルにも二重
+  取り**され、`LP_REG`の`E`が右隣に入り`E\nReserved`→`EReserved`（X035RM p11）、`USART`の
+  `U`が左隣に入り`U\nRese\nrved`→`URese rved`（X035RM p19。`Rese`+`rved`はcell_htmlが英単語と
+  みて空白挿入）。geometryのcharに`E`/`U`は無く重複と確定。修正: データセルを列順に見て、
+  先頭「1文字＋改行」がその文字が**左隣末尾2文字か右隣先頭2文字**に重複するなら落とし、残りの
+  折り返し行は空白なしで繋ぐ（bit名は識別子）。全67本parity 0・`Port E Reserved`等の正当な
+  文は誤検出せず。**表セルの中身がCSVに効く可能性**があるが、これはbit図ダイアグラム専用で
+  凍結canonical（説明表由来）には非依存。
+
+### テーブル表示
+
+- **全テーブル同幅**（2026-09-03、ユーザー要望）— レジスタごとに幅が変わっていたのを、
+  PAGE_STYLEの`table{width:100%;max-width:960px}`で統一（bit図は`table-layout:fixed`維持）。
+  CSSのみ・parity非影響。
+
+## CSVに効く抽出アーティファクト（ユーザー重点）
+
+コミット済みCSVを直接スキャンして、抽出の崩れが正本データに残っているものを探す。人向け
+Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽出器は生セルを読むので
+別に崩れが残りうる。
+
+- **下付き分離71件**（`V DDK`/`V DD12A`/`V BAT`等・operating_conditions.csv）— 🔧 **主要**。
+  セル`In operating\nmode, V\nDDK\n…`の`V\nDDK`が空白繋ぎで`V DDK`に。49件はA11追加行
+  （extract_low_power・新規＝安全に直せる）、残りは凍結base（build_operating・byte一致必須）に
+  あるか要確認。**凍結canonical（registers/pins/products）には0件**（既にクリーン）。
+  → `--full --verify`（1.6.2検証）完了後にextract_low_power側へ後処理の下付き結合を実装予定。
+- **日本語（ひらがな/カタカナ）: 全CSVで0件** — ✅ 「日本語禁止」違反なし。
+- **中国語（CJK漢字）** — features/product_attributes等の**対訳列**（zh datasheetのfeature名）で、
+  英語列と併記の**正当なデータ**。全角`（）`もその中国語文の正しい句読点。ルール「日本語禁止」は
+  維持者の作業言語のことで、source言語の中国語は対象外。
+- **全角句読点のアーティファクト**（英語列の`～`6・`，`9・`：`3・`＜`1）— 英語の範囲値
+  `2.7V～5.5V`等に混入。僅少。operating_conditions等。半角化が望ましいが、凍結base側なら触れない。
+  A11側にあるものは下付き修正と一緒に直す。
+- **`√`（チェックマーク）** — product_attributes/capabilitiesのyes標識（source由来）。76件。意図的とみて保持。
+
 ### 🔧 調査中 / 進行中
 
 - **cross-page bit図** — export側（2026-09-03）。番号行がページ末尾（y>高さ80%）で箱が
@@ -72,10 +110,33 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
 
 ### ⬜ 次に着手（調査済み・方針あり）
 
+- **bit図のnarrow列 縦書き名の文字交錯**（mid-word-space 104・leading-lowercase 70・
+  single-letter 24。先回りスキャンで発見・2026-09-03） — 狭い1-bit列で縦に書かれた
+  フィールド名がpdfplumberで文字レベルに交錯（`Reser`上段は綺麗だが下段`ved`が
+  `Rveesde r`にjumble＝FV2x.en p41）。`pmp3cfg`（先頭Cが落ちてる）・単独`M`等も。
+  **bit図ダイアグラム専用の表示崩れで、同ページの説明表（Bit/Name/Access）には正しい
+  名前があり、CSV（registers等）は説明表由来なので非影響**。正しい直し方: **説明表の
+  (bit範囲→名前)を参照して図のフィールド名を上書き**する（図の列span→bit番号→説明表の
+  行を引く）。export側で安全だが、説明表の隣接検出とbit範囲パースが要り中程度の実装量。
+  ユーザーのCSV優先方針では後回し。着手時は「図名は常に説明表で置換」か「崩れた時だけ」かを
+  決める（前者は一貫するが説明表パース失敗のリスク、後者は崩れ検出が要る）。
+
 - **mid-page 57 / bottom-no-box 5** — 番号行が中央付近にあり近傍に箱が無い（図中埋め込み
   等）。cross-page対応後の残り。調査保留。
 
 ### ⛔ 撤退（理由つき）
+
+- **bit図の名前を説明表で権威付け**（`ReserRveesde r`等の縦書き文字交錯104件）— 2026-09-03に
+  実装→撤退。狙い: 図のフィールド名を、同レジスタの説明表（Bit/Name/…幅広で正しい）の
+  (bit範囲→名前)で上書き。**撤退理由**: 図↔説明表の対応付けが信頼できない——(1)説明表が
+  ページを跨ぐ（p41のtable-003はbit31-25だけ、残りは次ページ）、(2)1ページに複数レジスタが
+  交錯し「図の直下の最寄り説明表」が別レジスタのものになる、(3)**単一bitフィールドは別
+  レジスタの説明表と偶然bit範囲一致して誤置換する**（bit2がreg Aは`X`・reg Bは`Y`）。exact
+  bit範囲一致に絞っても(3)が残り、正しい図を壊すリスクがある。**「崩しそうなら撤退」に従い
+  全変更をrevert**（apply_bitfieldのnames引数・document_bitfieldsのnames引き当て等）。
+  **再挑戦の条件**: reading_orderで「番号行→図→…→説明表」をレジスタ単位に区切り、図と説明表を
+  レジスタIDで結ぶ（bit範囲でなく構造で対応づける）ようにできたとき。ページ跨ぎの説明表の
+  結合（document_chains）も要る。境界重複修正（`EReserved`）は別物で有効なまま。
 
 - **caption無しの複雑図の検出**（`long_line 17`・`table_issue`の可視73・図中下付きの一部・
   mid-page bit図の一部の**共通の根**） — 2026-09-03に撤退。I3Cタイミング図・比較器/DACの
