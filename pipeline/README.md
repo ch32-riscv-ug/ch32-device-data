@@ -121,9 +121,14 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            rejoined, while a two-mode TIM CCMR keeps its output-name row above its
            input-name row; bit-field diagrams are also kept out of the page-spanning
            table chaining (a back-to-back pair used to merge, losing the cell
-           geometry the rebuild needs); the shared transform is
-           pipeline/common/logical_tables.apply_bitfield, used by the exporter and
-           the parity check),
+           geometry the rebuild needs). A diagram **split across a page break** --
+           its number line at the foot of one page, its boxes at the head of the
+           next -- is paired across the break (export_markdown.document_bitfields):
+           the boxes are rebuilt with the previous page's number centres and the
+           number line leaves a visible "diagram on the next page" pointer. The
+           shared transforms are pipeline/common/logical_tables.apply_bitfield and
+           export_markdown.document_bitfields, used by the exporter, the parity
+           check and the audit),
            **table cells are centre-aligned by default with long/multi-line cells
            left-aligned** (closer to the PDF), and
            **every known gap is marked visibly in place**: a notice with a PDF page
