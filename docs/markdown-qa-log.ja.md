@@ -49,7 +49,12 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
 
 - **全テーブル同幅**（2026-09-03、ユーザー要望）— レジスタごとに幅が変わっていたのを、
   PAGE_STYLEの`table{width:100%;max-width:960px}`で統一（bit図は`table-layout:fixed`維持）。
-  CSSのみ・parity非影響。
+  - **一部で100%が効かない件を修正**（ユーザー報告・liveのHTML/テーマCSSを取得して原因特定）:
+    GitHub Pagesのテーマが`.markdown-body table{display:block;width:100%;overflow:auto}`（詳細度
+    0,1,1）を持ち、素の`table{width:100%}`（0,0,1）に勝ってtableを**block化**していた。blockの
+    tableは中身の実テーブルが内容幅に縮むため、内容の広い多fieldのbit図は100%に見え、Reserved
+    単独や説明表は狭く見えた。修正: `display:table!important;width:100%!important;max-width:960px
+    !important`でテーマに勝たせる。全67本parity 0・Liquid非破壊。**反映にはpreview再公開が必要**。
 
 ## CSVに効く抽出アーティファクト（ユーザー重点）
 
