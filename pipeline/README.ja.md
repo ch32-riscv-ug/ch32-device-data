@@ -88,9 +88,12 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            フィールド行が1本だけなら全幅の合成テーブルにする。狭い列で縦に割れた名前
            （`Reser`+`ved`→`Reserved`）は連結し、TIMのCCMRのような出力名/入力名の
            2段は2行で残す。bit図はページ跨ぎの表結合からも外す（背中合わせの2図が
-           誤結合すると組み直しに要るセルのbboxが失われる）。変換は
-           `pipeline/common/logical_tables.apply_bitfield`に共通化しexporterとparity
-           検査が呼ぶ）、
+           誤結合すると組み直しに要るセルのbboxが失われる）。**ページ跨ぎで割れた図**
+           （番号行がページ末尾・箱が次ページ先頭）は`document_bitfields`が跨いで対応づけ、
+           前ページの番号中心で箱を組み直し、番号行ページには「次ページの図へ」の印を置く。
+           変換は`pipeline/common/logical_tables.apply_bitfield`と
+           `export_markdown.document_bitfields`に共通化し、exporter・parity検査・auditが
+           同じものを呼ぶ）、
            **表セルは既定で中央寄せ・長い/複数行セルは左寄せ**（PDFに寄せる）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、

@@ -34,6 +34,8 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 import logical_tables  # noqa: E402
+sys.path.insert(0, str(REPO / "pipeline" / "review"))
+import export_markdown  # noqa: E402  cross-pageまで含めた消費集合を得る
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
@@ -53,14 +55,16 @@ def visible(md_text: str) -> str:
     return STYLE.sub("", COMMENT.sub("", md_text))
 
 
-def page_signals(page: dict, md_text: str) -> dict[str, int]:
+def page_signals(page: dict, md_text: str, consumed: set[str] | None = None,
+                 figure_regions: list[list[float]] | None = None) -> dict[str, int]:
     text = visible(md_text)
     sig: dict[str, int] = {}
-    # bit図として組み直せていない番号行（表にもsynthにも載らなかった標準の降順列）。
-    handled = (set(logical_tables.bitfield_pairs(page).values())
-               | set(logical_tables.bitfield_singletons(page).keys()))
+    # bit図として組み直せていない番号行（表・synth・cross-pageのどれにも載らなかった
+    # 標準の降順列）。consumedはdocument_bitfieldsのskip（cross_note行込み）。
+    consumed = consumed or (set(logical_tables.bitfield_pairs(page).values())
+                            | set(logical_tables.bitfield_singletons(page).keys()))
     leftover = sum(1 for l in page["lines"]
-                   if logical_tables.bit_numbers(l["text"]) and l["id"] not in handled)
+                   if logical_tables.bit_numbers(l["text"]) and l["id"] not in consumed)
     # 降順でない特殊な並び（`31 24 23 16 …`のbyte境界図）は別枠で拾う（要目視）。
     nonstd = sum(1 for l in page["lines"]
                  if logical_tables.bit_numbers(l["text"]) is None
@@ -83,9 +87,19 @@ def page_signals(page: dict, md_text: str) -> dict[str, int]:
                 if l.get("role") in ("paragraph", "list-item") and len(l["text"]) > 300)
     if longs:
         sig["long_line"] = longs
-    issues = sum(len(t.get("issues") or []) for t in page["tables"])
-    if issues:
-        sig["table_issue"] = issues
+    # 重なりissueのある表のうち、**図領域に畳まれていない**もの（本文で崩れて見える
+    # もの）だけ数える。clock tree等の図をtable抽出したものは大半が図の<details>へ畳まれ
+    # 表示は綺麗なので、それは除く。
+    regions = figure_regions or []
+
+    def in_figure(bb: list[float]) -> bool:
+        cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
+        return any(r[0] <= cx <= r[2] and r[1] <= cy <= r[3] for r in regions)
+
+    broken = sum(1 for t in page["tables"]
+                 if t.get("issues") and not in_figure(t["bbox"]))
+    if broken:
+        sig["table_issue"] = broken
     return sig
 
 
@@ -96,14 +110,22 @@ def score(sig: dict[str, int]) -> int:
 def audit(doc: str) -> list[dict]:
     bundle = BUNDLES / doc
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
+    pages = [json.loads((bundle / entry["file"]).read_bytes())
+             for entry in manifest["pages"]]
+    plans = export_markdown.document_bitfields(bundle, manifest, pages)
+    assets_path = MARKDOWN / doc / "assets.json"
+    assets = (json.loads(assets_path.read_text(encoding="utf-8"))["assets"]
+              if assets_path.exists() else {})
     out = []
-    for entry in manifest["pages"]:
-        number = entry["number"]
+    for page in pages:
+        number = page["number"]
         md = MARKDOWN / doc / "pages" / f"{number:04d}.md"
         if not md.exists():
             continue
-        page = json.loads((bundle / entry["file"]).read_bytes())
-        sig = page_signals(page, md.read_text(encoding="utf-8"))
+        # 消費された番号行 = skip（表ペア・cross_note）＋synthの番号行（描画trigger）。
+        consumed = plans[number]["skip"] | set(plans[number]["synth"])
+        regions = [a["bbox"] for a in assets.values() if a["page"] == number]
+        sig = page_signals(page, md.read_text(encoding="utf-8"), consumed, regions)
         if sig:
             out.append({"doc": doc, "page": number, "score": score(sig),
                         "signals": sig,

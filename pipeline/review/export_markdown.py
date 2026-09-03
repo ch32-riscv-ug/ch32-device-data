@@ -114,7 +114,8 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
     pairs = logical_tables.bitfield_pairs(page)
     singletons = logical_tables.bitfield_singletons(page)
     if not pairs and not singletons:
-        return {"tables": {}, "synth": {}, "skip": set()}
+        return {"tables": {}, "synth": {}, "skip": set(),
+                "cross": {}, "cross_note": set()}
     chars = load_geometry(bundle, entry)["chars"]
     lines = {l["id"]: l for l in page["lines"]}
     tables: dict[str, tuple[str, list]] = {}
@@ -131,7 +132,55 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
             synth[number_id] = logical_tables.build_bitfield_singleton(
                 lines[number_id], lines[field_id], centers)
             skip.add(field_id)
-    return {"tables": tables, "synth": synth, "skip": skip}
+    return {"tables": tables, "synth": synth, "skip": skip,
+            "cross": {}, "cross_note": set()}
+
+
+def document_bitfields(bundle: Path, manifest: dict, pages: list[dict]) -> dict[int, dict]:
+    """ページごとのbit図計画に、ページ跨ぎの分割（番号行がページ末尾・箱が次ページ
+    先頭）を足す。番号行のx中心は同一レジスタなので、ページを跨いでも箱のx配置に合う。
+
+    箱ページ側の計画に`cross {box_id: 中心}`、番号行ページ側に`cross_note {line_id}`
+    （消費して「次ページへ」の印を出す行）を積む。exporterとparityが同じ計画を使う。
+    """
+    plans = {page["number"]: bitfield_plan(bundle, entry, page)
+             for entry, page in zip(manifest["pages"], pages)}
+    entry_of = {page["number"]: entry
+                for entry, page in zip(manifest["pages"], pages)}
+    for prev, page in zip(pages, pages[1:]):
+        if prev["number"] + 1 != page["number"]:
+            continue
+        plan_prev, plan_here = plans[prev["number"]], plans[page["number"]]
+        hp = float(prev.get("height") or 792)
+        hh = float(page.get("height") or 792)
+        num_lines = sorted(
+            (l for l in prev["lines"]
+             if logical_tables.bit_numbers(l["text"]) and l["id"] not in plan_prev["skip"]
+             and l["bbox"][3] > hp * 0.80),
+            key=lambda l: l["bbox"][1])
+        if not num_lines:
+            continue
+        used = set(plan_here["tables"]) | set(plan_here["cross"])
+        top_boxes = sorted(
+            (t for t in page["tables"]
+             if t["bbox"][1] < hh * 0.20 and logical_tables._diagram_like(t)
+             and t["id"] not in used),
+            key=lambda t: t["bbox"][1])
+        chars_prev = None
+        for line, box in zip(num_lines, top_boxes):
+            lx0, _, lx1, _ = line["bbox"]
+            bx0, _, bx1, _ = box["bbox"]
+            if min(lx1, bx1) - max(lx0, bx0) <= 0.6 * (lx1 - lx0):
+                continue   # 同じレジスタなら横幅が重なる（別物への誤接続を防ぐ）
+            if chars_prev is None:
+                chars_prev = load_geometry(bundle, entry_of[prev["number"]])["chars"]
+            centers = logical_tables.bit_number_centers(chars_prev, line)
+            if not centers:
+                continue
+            plan_here["cross"][box["id"]] = centers
+            plan_prev["skip"].add(line["id"])
+            plan_prev["cross_note"].add(line["id"])
+    return plans
 
 
 # Wingdings/Symbolフォントの記号がPUA（私用領域）のまま本文に出ている
@@ -270,6 +319,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     bitfields = plan["tables"]
     synth = plan["synth"]
     consumed_lines = plan["skip"]
+    cross = plan.get("cross", {})            # {box_id: 中心} 前ページの番号行で組み直す箱
+    cross_note = plan.get("cross_note", set())  # 次ページの箱へ番号を送った番号行
     # このページで画像として描画済みの図領域。中にある行・表は、画像が既に
     # 見せているので**可視出力から畳んでコメントに落とす**（図中ラベルが
     # 本文として図の下に重複して出ていた——preview初公開でユーザーが発見）。
@@ -351,6 +402,9 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             if item["id"] in bitfields:
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
+            elif item["id"] in cross:
+                # 前ページ末尾の番号行で組み直す箱（bit図のページ跨ぎ分割）。
+                logical_tables.apply_bitfield(record, None, cross[item["id"]])
             (figure_text if inside else output).extend(
                 ("", table_html(record, url, number), ""))
             continue
@@ -376,6 +430,12 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             # 罫線の無いbit図: 番号行の位置で合成テーブルを描く。
             (figure_text if inside else output).extend(
                 ("", table_html(synth[item["id"]], url, number), ""))
+            continue
+        if item["id"] in cross_note:
+            # 番号は次ページの箱のヘッダへ送った。ここには可視のポインタを置く。
+            (figure_text if inside else output).extend(
+                ("", f"> ⬇ **Bit numbers for the register diagram at the top of "
+                 f"[page {number + 1}]({number + 1:04d}.md)**. <!-- {item['id']} -->", ""))
             continue
         if item["id"] in consumed_lines:
             continue   # bit番号行/フィールド行は表へ畳んだ（bitfield）
@@ -432,6 +492,7 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
     pages_dir.mkdir(parents=True, exist_ok=True)
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
     chains = logical_tables.document_chains(pages)
+    plans = document_bitfields(bundle, manifest, pages)
     assets: dict[str, dict] = {}
     assets_path = out / "assets.json"
     if assets_path.exists():
@@ -447,7 +508,7 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
         (pages_dir / name).write_text(
             render_page(page, url, chains, assets, len(pages),
                         page_lost_subscripts(bundle, entry, page),
-                        bitfield_plan(bundle, entry, page)),
+                        plans[page["number"]]),
             encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(

@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.6.1"
+CONVERTER_VERSION = "1.6.2"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -364,7 +364,11 @@ def merge_subscript_lines(lines: list[dict]) -> list[dict]:
     subs_for: dict[int, list[list[dict]]] = {}
     for i, small in enumerate(lines):
         size = _line_median_size(small)
-        if size == 0 or size >= body * 0.90 or not small.get("chars"):
+        # 候補は中央値以下の行だけ（本文どうしの結合を避ける粗い枠）。下付きかどうかの
+        # 実判定は下の「隣接する基底との相対サイズ<0.82」が担う——小さいCJKラベルが
+        # 多くbody中央値が低いページ（H417DS0 zh p121: body 8.6）で、基底V 11.9に対する
+        # 下付きSSA 8.2が中央値比0.95で候補から漏れていた。
+        if size == 0 or size > body or not small.get("chars"):
             continue
         sb = baseline(small["chars"])
         matches = []

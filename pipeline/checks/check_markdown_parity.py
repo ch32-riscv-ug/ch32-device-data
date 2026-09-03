@@ -70,7 +70,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     plan = plan or {"tables": {}, "synth": {}, "skip": set()}
     bitfields = plan["tables"]
     synth = plan["synth"]
-    consumed_lines = plan["skip"]
+    consumed_lines = plan["skip"]   # cross_note行もskipに入る（本文からは番号→次ページ印）
+    cross = plan.get("cross", {})
 
     def expect(needle: str, what: str) -> None:
         nonlocal position
@@ -100,6 +101,9 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # bit番号をヘッダへ、縦割れ名を連結——exporterと同じ表を見る。
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
+            elif item["id"] in cross:
+                # 前ページの番号行で組み直した箱（ページ跨ぎ分割）。
+                logical_tables.apply_bitfield(record, None, cross[item["id"]])
             for cell in record["cells"]:
                 # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
                 expect(export_markdown.cell_html(cell["text"]),
@@ -146,6 +150,7 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
     chains = logical_tables.document_chains(pages)
+    plans = export_markdown.document_bitfields(bundle, manifest, pages)
     bad: list[str] = []
     for entry, page in zip(manifest["pages"], pages):
         md = markdown / "pages" / f"{page['number']:04d}.md"
@@ -153,8 +158,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
             bad.append(f"p{page['number']}: markdown page missing")
             continue
         text = md.read_text(encoding="utf-8")
-        bitfields = export_markdown.bitfield_plan(bundle, entry, page)
-        bad.extend(check_page(page, text, chains, markdown / "pages", bitfields))
+        bad.extend(check_page(page, text, chains, markdown / "pages",
+                              plans[page["number"]]))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")
