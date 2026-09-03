@@ -57,11 +57,16 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
 Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽出器は生セルを読むので
 別に崩れが残りうる。
 
-- **下付き分離71件**（`V DDK`/`V DD12A`/`V BAT`等・operating_conditions.csv）— 🔧 **主要**。
-  セル`In operating\nmode, V\nDDK\n…`の`V\nDDK`が空白繋ぎで`V DDK`に。49件はA11追加行
-  （extract_low_power・新規＝安全に直せる）、残りは凍結base（build_operating・byte一致必須）に
-  あるか要確認。**凍結canonical（registers/pins/products）には0件**（既にクリーン）。
-  → `--full --verify`（1.6.2検証）完了後にextract_low_power側へ後処理の下付き結合を実装予定。
+- **下付き分離（operating_conditions.csv）** — ✅ **A11の49件を修正**（2026-09-03）。
+  セル`In operating\nmode, V\nDDK\n…`の`V\nDDK`が空白繋ぎで`V DDK`に。`norm_text`は凍結
+  `build_operating`と共有していて触れないので、A11追加行（extract_low_power）の
+  parameter/condition **だけ**を後処理で結合（`_merge_subscripts`。凍結baseは通らない）。
+  結果: `V DDK`→`VDDK`・`V DD12A`→`VDD12A`等、diff 49挿入/49削除で**A11行だけ変更**、
+  凍結base 1,588行は不変（byte一致保持）。build_conflicts/build_index再生成＋check_tables/
+  counts/docs全合格。**凍結canonical（registers/pins/products）は不変**。
+  - **残り: 凍結base 31件**（`V ＜ V REFP DDIO`等）は`build_operating`（凍結・byte一致必須）
+    にあり触れない。直すには frozen baseline の更新（build_operatingへ同じ後処理を入れて
+    再凍結）が要る＝ユーザー判断。人向けMarkdownの表示は`cell_html`が既に`VDDK`に結合済み。
 - **日本語（ひらがな/カタカナ）: 全CSVで0件** — ✅ 「日本語禁止」違反なし。
 - **中国語（CJK漢字）** — features/product_attributes等の**対訳列**（zh datasheetのfeature名）で、
   英語列と併記の**正当なデータ**。全角`（）`もその中国語文の正しい句読点。ルール「日本語禁止」は

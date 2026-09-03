@@ -81,6 +81,18 @@ CAPTION_PAT = {
 }
 TABLE_PREFIX = re.compile(r"^(?:Table|表)\s*\d+(?:-\d+)*\s*", re.IGNORECASE)
 
+# 電源レール名の下付きが、セル内の折り返し（`In operating\nmode, V\nDDK\n…`）で
+# `V DDK`と割れて出る。norm_textを`operating`（凍結）と共有していて触れないので、
+# A11の追加行の parameter/condition だけを後処理で結合する（凍結baseは通らない）。
+# 人向けMarkdownの`cell_html`は既に大文字連結で`VDDK`にしている（表示との一致）。
+_SUBSCRIPT = re.compile(
+    r"\b([VIF])[ \n]+"
+    r"(DD12A|DD33A|DDA33|DDIO|DD33|DDK|DDA|DD|SSA|SS|BAT|PVD|REFP|REFN|REF|IO18|IO)\b")
+
+
+def _merge_subscripts(text: str | None) -> str:
+    return _SUBSCRIPT.sub(r"\1\2", text or "")
+
 
 def norm_header(cell: str | None) -> str | None:
     """headerの正規化。多段headerの`Condition:`型見出しも受ける（PoCと同じ）。"""
@@ -253,8 +265,9 @@ def parse_table(table: list[list[str | None]], schema: dict,
                 continue          # 条件だけの継続行。値の主張が無いので採らない
             row = {
                 "symbol": state["symbol"],
-                "parameter": state["parameter"],
-                "condition": _condition_text(state, schema, value_column, table_context),
+                "parameter": _merge_subscripts(state["parameter"]),
+                "condition": _merge_subscripts(
+                    _condition_text(state, schema, value_column, table_context)),
                 **row_values,
                 "unit": state["unit"],
             }
