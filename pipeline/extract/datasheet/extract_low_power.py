@@ -94,6 +94,16 @@ def _merge_subscripts(text: str | None) -> str:
     return _SUBSCRIPT.sub(r"\1\2", text or "")
 
 
+# zh原本の全角ASCII約物が英語の説明文に混じる（範囲`2.7V～5.5V`・比較`V ＜ V`）。
+# 英語CSVでは半角が正しいので、説明列だけ半角へ直す（値列 min/typ/max は触らない）。
+_HALFWIDTH = str.maketrans("～，．：；＜＞（）％＋／＝！", "~,.:;<>()%+/=!")
+
+
+def _clean_text(text: str | None) -> str:
+    """説明列の後処理: 下付き結合＋全角約物の半角化。"""
+    return _merge_subscripts(text).translate(_HALFWIDTH)
+
+
 def norm_header(cell: str | None) -> str | None:
     """headerの正規化。多段headerの`Condition:`型見出しも受ける（PoCと同じ）。"""
     text = operating.FOOTNOTE.sub("", cell or "")
@@ -265,8 +275,8 @@ def parse_table(table: list[list[str | None]], schema: dict,
                 continue          # 条件だけの継続行。値の主張が無いので採らない
             row = {
                 "symbol": state["symbol"],
-                "parameter": _merge_subscripts(state["parameter"]),
-                "condition": _merge_subscripts(
+                "parameter": _clean_text(state["parameter"]),
+                "condition": _clean_text(
                     _condition_text(state, schema, value_column, table_context)),
                 **row_values,
                 "unit": state["unit"],

@@ -64,16 +64,26 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   結果: `V DDK`→`VDDK`・`V DD12A`→`VDD12A`等、diff 49挿入/49削除で**A11行だけ変更**、
   凍結base 1,588行は不変（byte一致保持）。build_conflicts/build_index再生成＋check_tables/
   counts/docs全合格。**凍結canonical（registers/pins/products）は不変**。
-  - **残り: 凍結base 31件**（`V ＜ V REFP DDIO`等）は`build_operating`（凍結・byte一致必須）
-    にあり触れない。直すには frozen baseline の更新（build_operatingへ同じ後処理を入れて
-    再凍結）が要る＝ユーザー判断。人向けMarkdownの表示は`cell_html`が既に`VDDK`に結合済み。
+  - **凍結base 31件も修正済み**（2026-09-03、ユーザー「良くなることは全部」）。`build_operating`
+    （凍結・byte再現の参照実装）は触れず、**合成層`build_operating_conditions`でbase行の
+    parameter/conditionに`_clean_text`を後処理**（build_operatingの旧出力byte再現は保ったまま
+    正本CSVだけ綺麗にする層）。`V_DDIO < V REFP`→`V_DDIO < VREFP`。残subscriptアーティファクト0。
+  - **説明列の全角約物も半角化**（`_clean_text`＝下付き結合＋`～，．：；＜＞（）％＋／＝！`→半角）。
+    `V ＜ V REFP DDIO`→`V < VREFP DDIO`。**値列 min/typ/max は触らない**（範囲`6～24`等はそのまま）。
+    説明列の全角0に。ただし`V < VREFP DDIO`の`DDIO`は抽出が語順ごと崩したもの（下付き結合では
+    直せない・部分改善）。全検証合格（check_tables/counts/docs）・**凍結canonical不変**。
 - **日本語（ひらがな/カタカナ）: 全CSVで0件** — ✅ 「日本語禁止」違反なし。
 - **中国語（CJK漢字）** — features/product_attributes等の**対訳列**（zh datasheetのfeature名）で、
   英語列と併記の**正当なデータ**。全角`（）`もその中国語文の正しい句読点。ルール「日本語禁止」は
   維持者の作業言語のことで、source言語の中国語は対象外。
-- **全角句読点のアーティファクト**（英語列の`～`6・`，`9・`：`3・`＜`1）— 英語の範囲値
-  `2.7V～5.5V`等に混入。僅少。operating_conditions等。半角化が望ましいが、凍結base側なら触れない。
-  A11側にあるものは下付き修正と一緒に直す。
+- **全角句読点のアーティファクト**（英語列）— ✅ operating_conditionsは`_clean_text`で半角化済み
+  （説明列のみ・値列は不変）。**他CSVにも英語列の全角が残る**（CJKを含まないセルで判定）:
+  列構造で精査したら大半は**正しい全角**だった: product_attributes 31（`GPHA（5）`）は
+  **`label_zh`（中国語ラベル列）**にあり正しい（`label_en`は半角）。ヒューリスティック
+  「CJK文字を含まないセル」がLatin名＋全角約物を誤判定していた。真の英語列アーティファクトは
+  **evt_examples 6（`description`列の`sleep，shutdown`＝zh作者のEVTコメント由来）・dma_requests 6
+  （`note`列の脚注記号`（1）（2）`＝zh RM由来）程度で軽微**。各生成器（build_evt_examples/
+  build_dma_requests）の個別修正＋--full検証に見合わないので保留。やるならその2列だけ半角化。
 - **`√`（チェックマーク）** — product_attributes/capabilitiesのyes標識（source由来）。76件。意図的とみて保持。
 
 ### 🔧 調査中 / 進行中
