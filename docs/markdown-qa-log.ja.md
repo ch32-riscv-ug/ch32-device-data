@@ -161,19 +161,18 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   （`note`列の脚注記号`（1）（2）`＝zh RM由来）程度で軽微**。各生成器（build_evt_examples/
   build_dma_requests）の個別修正＋--full検証に見合わないので保留。やるならその2列だけ半角化。
 
-- **converter 1.6.3（Feature 2列マージ）— コード投入済み・全reconvert保留** — `convert.py`の
-  `COLUMN_START_HEADINGS`を`"Features"`→`"Feature"`（単数で"Feature"も"Features"も部分一致）に。
-  狙い: H417DS0.en p1でOverview本文とFeature列が2列マージで交錯していたのを分離。
-  **CONVERTER_VERSIONを1.6.3へbump済みだが、cached bundleは全67本が1.6.2のまま**（＝修正は未反映）。
-  スクラッチで`convert_all --only CH32H417DS0.en --force`して検証: **p1のOverviewが単一列で綺麗に
-  復元**を確認（2026-09-03）。**保留理由**: 反映には全reconvert（`convert_all --force`）が要り、
-  その後にfrozen canonical検証（features/product_attributes/operating_conditionsのbyte一致or良性drift）が
-  必須。1本1ページの改善に対し長時間・高リスクのバッチなので、publish前の意図的なバッチとして
-  実施するのが妥当。**再開手順**: (1)`uv run pipeline/ingest/convert_all.py --force --jobs 4`、
-  (2)`export_markdown --all`＋`check_markdown_parity --all`で67/67、(3)`regenerate.py --full`相当で
-  frozen canonicalのdrift確認（"Feature"見出しはfeature列ページのみ発火＝電気表のoperating_conditionsは
-  不変の見込み、featuresはH417が改善drift見込み）。driftが非良性なら撤退（版を戻す）。
-  ※export側の修正（caption/boundary-dup/grid-dedup）は既存bundleに即反映済みでreconvert不要。
+- **converter 1.6.3（Feature 2列マージ）— 完了・全reconvert＆canonical byte一致確認済み** —
+  `convert.py`の`COLUMN_START_HEADINGS`を`"Features"`→`"Feature"`（単数で"Feature"も"Features"も
+  部分一致）に。狙い: H417DS0.en p1でOverview本文とFeature列が2列マージで交錯していたのを分離。
+  **全67本を1.6.3へreconvert完了**（VSCode再起動で2回中断したが、`convert_all`は増分方式で
+  各docが原子的なので再開で継続・破損なし、最終的に67/67完了）。**検証（2026-09-03）**: (1)export+parity
+  **67/67 clean**、(2)`run_frozen --batch`＝**6/6 byte-identical**（build_features/adc_internal/memory/
+  timers/flash_geometry/debug_data）——**canonical完全不変を確定**。理由: build_featuresは
+  `page.extract_text()`（pdfplumber native・lines[]復元と独立）を使い、1.6.3が変えるのは
+  lines[]の2列検出だけなので、text/cell由来のcanonicalは無影響。**効果**: H417DS0.en p1で
+  「# Overview」直後にOverview本文が単一列段落で分離（達成）。※Feature**一覧**自体の2列交錯は
+  別の細かい課題として残存（1.6.3スコープ外）。export側修正（caption/boundary-dup/grid-dedup/straddling）は
+  1.6.3 bundleでもcells/text/geometry不変なのでそのまま動作・parity 0維持。
 - **`√`（チェックマーク）** — product_attributes/capabilitiesのyes標識（source由来）。76件。意図的とみて保持。
 
 ### 🔧 調査中 / 進行中
