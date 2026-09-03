@@ -36,6 +36,7 @@ import gzip
 import hashlib
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -215,6 +216,55 @@ def pua_normalize(text: str) -> str:
     return text
 
 
+# convert.pyの見出し判定と同じ——番号見出し（`20.1 …`）・章見出し（`第N章`/`Chapter N`）は
+# 本物なので降格しない。フォントサイズだけで見出しになった行の連続runを段落へ戻すのに使う。
+_HEADING_NUMBER = re.compile(r"^(?:\d+(?:\.\d+)+)\s+\S")
+_CHAPTER_HEADING = re.compile(r"^(?:第\s*\d+\s*章|Chapter\s+\d+)", re.I)
+# 傍注の書き出し——これで始まる大フォント行は見出しでなく段落（`注：…`が5つのH1に化けた）。
+_NOTE_MARKER = re.compile(r"^(?:注意|注|说明|說明|備考|备注|Note|NOTE|Notes)\s*[:：]")
+
+
+def demoted_heading_lines(page: dict) -> set[str]:
+    """フォントサイズ由来のheadingが3つ以上連続するrunのline idを返す。
+
+    Overview本文・`注：…`傍注・mode説明などが**本文中央値の1.25倍**のフォントで組まれると、
+    converterが各物理行をlevel-1見出しに化けさせる（H417RM.en p357の`(SerDes)`、L103RM.zhの
+    注が5つのH1に。全corpus 359 run/272ページ）。本物の見出しは1-2行で連続しない一方、
+    番号/章見出しは正当に連続しうるので**番号・章見出しは除外**。exporterだけがこれを段落へ
+    戻す（parityは`#`接頭辞を見ず本文textだけ照合するので、heading↔paragraphの切替に非依存）。
+    """
+    lines = {l["id"]: l for l in page["lines"]}
+    demote: set[str] = set()
+    run: list[str] = []
+
+    def flush() -> None:
+        # 3行以上のrunは段落ブロック。短いrunでも注記マーカー（`注：`/`Note:`等）で
+        # 始まる行を含むなら傍注が見出しに化けたもの——長さに依らず段落へ戻す（`(SerDes)`の
+        # ような題の折り返しはマーカーが無いので据え置き）。
+        has_note = any(_NOTE_MARKER.match(lines[i]["text"].strip()) for i in run)
+        if len(run) >= 3 or has_note:
+            demote.update(run)
+        run.clear()
+
+    for item in page["reading_order"]:
+        line = lines.get(item["id"]) if item["type"] == "line" else None
+        text = (line or {}).get("text", "").strip()
+        if (line and line.get("role") == "heading" and text
+                and not _HEADING_NUMBER.match(text) and not _CHAPTER_HEADING.match(text)):
+            run.append(item["id"])
+            # 見出し（番号・章以外）が50字超なら、それだけで段落——本物の節見出しは
+            # 短い。実測: >50字の非caption見出し645件は全て文/傍注（実在の長い見出しは無し）。
+            # 図caption（`Figure N-M …`）はcaption_matchが先に描くのでここで拾っても無害。
+            # CJKの文末/節句読点（。，；：、）で終わる行も段落——節見出しはこれで終わらない
+            # （ページ跨ぎの文末断片`除BTF位。`や本文`…実現交互。`。実測536件は全て段落）。
+            if len(text) > 50 or text[-1] in "。，；：、":
+                demote.add(item["id"])
+        else:
+            flush()
+    flush()
+    return demote
+
+
 _BULLETS = "-–—•●○▪·*‣◦"
 
 
@@ -343,6 +393,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
     number = page["number"]
+    # 大フォントの段落ブロック（Overview・注記・mode説明）が複数の見出しに化けた行を段落へ戻す。
+    demote_headings = demoted_heading_lines(page)
     # レジスタのbit図: 番号行を図テーブルのヘッダへ畳む（tables）か、罫線が無い版は
     # 番号行の位置で合成テーブルを描く（synth）。畳んだ行は本文から消す（skip）。
     plan = plan or {"tables": {}, "synth": {}, "skip": set()}
@@ -530,7 +582,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                                f"> ⚠ **The figure itself is not reproduced** — see "
                                f"{page_link(url, number, f'the PDF, p.{number}')}.", ""))
             continue
-        if role == "heading":
+        if role == "heading" and item["id"] not in demote_headings:
             output.extend(("", "#" * min(6, line.get("level", 2)) + " " + text, ""))
         elif role == "list-item":
             output.append("- " + text)
