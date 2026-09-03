@@ -46,6 +46,9 @@ import sys
 from pathlib import Path
 
 import pdfplumber
+from io import BytesIO
+
+from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
@@ -202,6 +205,90 @@ def assign_regions(pages: list[dict],
     return found, missed, taken
 
 
+def _looks_blank(path: Path) -> bool:
+    """描いたPNGが（ほぼ）真っ白か。暗号化PDFの埋め込みJPEG（DCTDecode）をpdfiumが描けず
+    白紙になる図がある（M030RM p103の図9-1＝ブロック図とNoteが丸ごと消える。PDF↔MD突合
+    サブエージェントが発見、2026-09-03）。暗い画素が全体の0.05%未満なら白紙とみる。"""
+    with Image.open(path) as im:
+        gray = im.convert("L")
+        dark = sum(gray.histogram()[:128])
+        return dark < max(1, gray.width * gray.height) * 0.0005
+
+
+def _decode_indexed(img: dict) -> Image.Image | None:
+    """FlateDecodeの生サンプル（Indexed/DeviceRGB・8bit）をパレットで復元する。PILはPDFの
+    生サンプル列を開けないので、幅×高さの1byte indexにcolorspaceのlookupを当てる
+    （V103DS0 p38/p39・WCH-Link p11/p15の図はこの形。JPEGでなくpdfiumも白紙にした）。"""
+    try:
+        bits = img.get("bits")
+        cs = img.get("colorspace")
+        if not (isinstance(cs, list) and len(cs) >= 4
+                and str(cs[0]).strip("/'") == "Indexed"):
+            return None
+        lookup = cs[3]
+        if hasattr(lookup, "get_data"):
+            lookup = lookup.get_data()
+        if not isinstance(lookup, bytes):
+            return None
+        width, height = img["srcsize"]
+        data = img["stream"].get_data()
+        if bits == 8:
+            if len(data) < width * height:
+                return None
+            paletted = Image.frombytes("P", (width, height), data[:width * height])
+            paletted.putpalette(lookup[:768].ljust(768, b"\x00"))
+            return paletted.convert("RGB")
+        if bits == 1:
+            # 2色パレット（V103DS0 p39の図）。PDFの1bit行は byte 境界で詰められ、PILの
+            # "1"モードと同じ並び。0/255のLへ変換してindex 0/255にパレット2色を当てる。
+            stride = (width + 7) // 8
+            if len(data) < stride * height:
+                return None
+            gray = Image.frombytes("1", (width, height), data[:stride * height]).convert("L")
+            paletted = Image.frombytes("P", (width, height), gray.tobytes())
+            palette = bytearray(768)
+            palette[0:3] = lookup[0:3].ljust(3, b"\x00")
+            palette[765:768] = lookup[3:6].ljust(3, b"\x00")
+            paletted.putpalette(bytes(palette))
+            return paletted.convert("RGB")
+        return None
+    except Exception:
+        return None
+
+
+def _paste_embedded_rasters(pdf_page, crop: tuple[float, float, float, float],
+                            path: Path) -> int:
+    """白紙になった描画へ、領域内の埋め込みrasterをpdfminerのstreamから直接復号して
+    貼る（`stream.get_data()`は暗号を解いた生JPEGを返す——pdfiumが失敗しても中身は
+    健在）。150dpiの座標系へ位置・大きさを合わせる。貼れた枚数を返す。"""
+    x0, top, x1, bottom = crop
+    scale = RESOLUTION / 72.0
+    canvas = None
+    pasted = 0
+    for img in pdf_page.images:
+        cx = (img["x0"] + img["x1"]) / 2
+        cy = (img["top"] + img["bottom"]) / 2
+        if not (x0 <= cx <= x1 and top <= cy <= bottom):
+            continue
+        try:
+            raster = Image.open(BytesIO(img["stream"].get_data()))
+            raster.load()
+        except Exception:
+            raster = _decode_indexed(img)   # 生のIndexedサンプルはパレットで復元
+            if raster is None:
+                continue
+        if canvas is None:
+            canvas = Image.open(path).convert("RGB")
+        left, upper = int((img["x0"] - x0) * scale), int((img["top"] - top) * scale)
+        width = max(1, int((img["x1"] - img["x0"]) * scale))
+        height = max(1, int((img["bottom"] - img["top"]) * scale))
+        canvas.paste(raster.convert("RGB").resize((width, height)), (left, upper))
+        pasted += 1
+    if canvas is not None:
+        canvas.save(path)
+    return pasted
+
+
 def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     source_sha = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
@@ -273,6 +360,9 @@ def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
                 image = pdf_page.crop((x0, top, x1, bottom)).to_image(
                     resolution=RESOLUTION)
                 image.save(assets_dir / name)
+                if _looks_blank(assets_dir / name):
+                    # pdfiumが白紙を返した——埋め込みJPEGを直接復号して貼り直す。
+                    _paste_embedded_rasters(pdf_page, (x0, top, x1, bottom), assets_dir / name)
                 payload = (assets_dir / name).read_bytes()
                 entries[key] = {
                     "file": f"assets/{name}",

@@ -90,8 +90,19 @@ _SUBSCRIPT = re.compile(
     r"(DD12A|DD33A|DDA33|DDIO|DD33|DDK|DDA|DD|SSA|SS|BAT|PVD|REFP|REFN|REF|IO18|IO)\b")
 
 
+# セル内で下付きだけが別の物理行に落ち、norm_textの空白連結で**値の後ろ**へ移ったもの:
+# `R_S < 70kΩ`→`R <70kΩ S`（条件列18行）、`…impedance R_S`→`…impedance R S`（parameter列15行）。
+# 基底1文字＋既知の下付きtokenに限り、基底の直後へ戻す（PDF↔MD突合サブエージェントが発見、
+# 2026-09-03。`(1)`等の脚注記号はそのまま）。
+_TAIL_SUBSCRIPT = re.compile(
+    r"^([RTCVL])\s*([<>=≤≥≈][^\n]*?)\s+(S|A|L|L1|L2|IN|OUT|DD|SS|J)$")
+_END_SUBSCRIPT = re.compile(r"\b([RTCVL]) (S|A|L|L1|L2|IN|OUT|J)$")
+
+
 def _merge_subscripts(text: str | None) -> str:
-    return _SUBSCRIPT.sub(r"\1\2", text or "")
+    text = _SUBSCRIPT.sub(r"\1\2", text or "")
+    text = _TAIL_SUBSCRIPT.sub(r"\1\3 \2", text)
+    return _END_SUBSCRIPT.sub(r"\1\2", text)
 
 
 # zh原本の全角ASCII約物が英語の説明文に混じる（範囲`2.7V～5.5V`・比較`V ＜ V`）。
@@ -296,13 +307,95 @@ def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[list[list[str | N
     return logical_tables.text_grid(logical_tables.merge_cells(fragments))
 
 
+def _unbalanced(text: str) -> bool:
+    """開き括弧が閉じ括弧より多いか（半角/全角）。折り返しで切れた表題・セルの印。"""
+    return (text.count("(") + text.count("（")) > (text.count(")") + text.count("）"))
+
+
+def _caption_full(page: dict, table: dict) -> str | None:
+    """表題が2行に折り返して括弧が閉じていないとき、後続のparagraph行を括弧が閉じるまで
+    繋いだ全文を返す。bundleの`caption.text`は1行目だけ（`…SRAM (RISC-V5F`＋次行
+    `+ RISC-V3F)`。H417DS0.en p99。全corpusで11表題）。"""
+    if not table.get("caption"):
+        return None
+    return logical_tables.caption_full(page, table)[0]   # exporterと同じ全文（共通L1層）
+
+
 def caption_context(table: dict) -> str:
     caption = table.get("caption")
     if not caption:
         return ""
     # 表題の設定条件（V=3.3V・LDOTRIM=…・対象chip名）はその表全体の条件。
-    # 原文の綴りのまま条件の先頭に残す（意味づけはreviewの仕事）。
-    return TABLE_PREFIX.sub("", caption["text"]).strip()
+    # 原文の綴りのまま条件の先頭に残す（意味づけはreviewの仕事）。折り返しで
+    # 切れた表題はbundle_tablesが繋いだ全文（`_caption_full`）を使う。
+    return TABLE_PREFIX.sub("", table.get("_caption_full") or caption["text"]).strip()
+
+
+def _continues(prev: str | None, nxt: str | None, strict: bool = False) -> bool:
+    """非空セルが、上のrowspanセルの**続き**か。上が括弧未閉じなら続き、上が文末記号で
+    終わっていれば別物、それ以外は下の先頭が小文字/`+`等なら続き（CJK始まりはページ境界
+    でだけ続きとみる——同一ページ内のCJKの条件行は新しい小見出しでもありうる）。"""
+    prev = (prev or "").strip()
+    nxt = (nxt or "").strip()
+    if not prev or not nxt:
+        return False
+    if _unbalanced(prev):
+        return True
+    if prev[-1] in ".。;；:：)）":
+        return False
+    first = nxt[0]
+    if first.islower() or first in "+&/(（":
+        return True
+    return (not strict) and "一" <= first <= "鿿"
+
+
+def fold_page_continuations(grid: list[list[str | None]], row_pages: list[int],
+                            schema: dict) -> int:
+    """ページ境界で割れたrowspanセル（Parameter・Condition列）の続きを上のセルへ繋ぐ。
+
+    `Total current supplied by the chip in sleep mode (when`（p99）＋`peripherals are
+    powered and clock is held)`（p100先頭行）のように、続きが次ページ断片の先頭行に
+    独立したセルとして現れ、parse_tableのstateを**置き換えて**しまう——p99の行は`(when`で
+    切れ、p100の行は`…held)`だけになる（operating_conditionsで101行の括弧不対応）。
+    記号列が空（同じ記号ブロックの継続）で、上の直近の非空セルから`_continues`と
+    判定できる列だけ繋ぐ。繋いだ数を返す。
+    """
+    columns = [schema["parameter"], *schema["conditions"]]
+    symbol = schema["symbol"]
+    value_columns = list(schema["values"])
+    folded = 0
+    pending = False   # ページ先頭がheaderの繰り返しだったら、その次の行を境界として扱う
+    for r in range(1, len(grid)):
+        row = grid[r]
+        boundary = row_pages[r] != row_pages[r - 1] or pending
+        symbol_text = (row[symbol] or "").strip() if symbol < len(row) else ""
+        if symbol_text:
+            # headerの繰り返し（`Symbol`）なら境界を次の行へ持ち越す。新しい記号の行なら続きではない。
+            pending = boundary and operating.norm_text(symbol_text) in operating.HEADER_ROW
+            continue
+        pending = False
+        has_values = any((row[c] or "").strip() for c in value_columns if c < len(row))
+        # 同一ページ内で値を主張する行は、条件は行ごとに独立（繋がない）。ただしParameter
+        # 列は、pdfplumberがrowspanセルを行ごとに割ると`Accuracy of HSI oscillator (after`＋
+        # `calibration)`のように値のある行へ続きが落ちるので、**上が括弧未閉じのときだけ**繋ぐ。
+        targets = columns if (boundary or not has_values) else [schema["parameter"]]
+        for c in targets:
+            if c >= len(row) or not (row[c] or "").strip():
+                continue
+            s = r - 1
+            while s >= 0 and not ((grid[s][c] if c < len(grid[s]) else None) or "").strip():
+                s -= 1
+            if s < 0:
+                continue
+            if not boundary and has_values:
+                if not (_unbalanced(grid[s][c] or "") and not (row[c] or "").strip()[:1].isupper()):
+                    continue
+            elif not _continues(grid[s][c], row[c], strict=not boundary):
+                continue
+            grid[s][c] = (grid[s][c] or "").rstrip() + "\n" + (row[c] or "").strip()
+            row[c] = None
+            folded += 1
+    return folded
 
 
 def bundle_tables(name: str, pdf: Path):
@@ -325,6 +418,8 @@ def bundle_tables(name: str, pdf: Path):
             if table["id"] in rejected:
                 skipped += 1
                 continue
+            if table.get("caption"):
+                table["_caption_full"] = _caption_full(page, table)
             yield page["number"], table
     if skipped:
         print(f"    {name}: reviewでrejectedの表 {skipped} 個を外した", file=sys.stderr)
@@ -359,6 +454,7 @@ def read_edition(name: str, pdf: Path, lang: str,
             print(f"    {name} {logical_id}: 列割り当てを決められない"
                   f"（{len(parts)}断片）", file=sys.stderr)
             continue
+        fold_page_continuations(joined, row_pages, schema)
         context = next((caption_context(t) for _, t in parts if t.get("caption")), "")
         for row in parse_table(joined, schema, lang, row_pages, context):
             rows.append({**row, "_table": logical_id})

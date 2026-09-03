@@ -51,7 +51,25 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   （caption無し図＝⛔撤退中の既知の根）。無空白の単発glyph重複を安全に直すにはgeometry判定が要り
   費用対効果薄のため記録に留める。
 
+- **PDF原本↔Markdown直接突合（opus・10ページ×2本、2026-09-03）** — **最も収穫の大きい切り口**。
+  サブエージェントにPDFページをReadさせ（`pages=`指定）、生成Markdownと突き合わせる。markdownだけ
+  を見る巡回では見えない「原本にあるのに無い/違う」を拾う。成果: (1)**CSVに効く**下付き移動
+  （`R_S<70kΩ`→`R <70kΩ S`、operating_conditions 19行）、(2)**図が丸ごと白紙**（11枚、下記）、
+  (3)zh reset値へのCJK汚染622セル、(4)図ラベルの全グリフ二重化（`OOSSCC__IINN`）、(5)結合表の
+  rowspanが継続行に届かない（保留）。加えて**register意味監査**（bit範囲の連続性・行のセル数・
+  Access/Reset値の妥当性・図↔表の名前一致）が「Reset value」ヘッダ折り返し由来の3系統
+  （文字降下127セル・偽`value`行104ページ・列ごと排出）を精密に切り出した。
+
 ### ✅ 完了（続き）
+
+- **図が白紙で出力される**（M030RM p103 図9-1のブロック図＋Noteが丸ごと消失。全corpus 5-11枚。
+  PDF↔MD突合が発見）— render_assets（2026-09-03）。暗号化PDFの埋め込みraster（DCTDecode JPEG、
+  およびFlateDecodeのIndexedパレット生サンプル）をpdfiumが描けず、150dpiの切り出しが真っ白に。
+  修正: 描いたPNGの暗い画素が0.05%未満なら白紙とみて、領域内の埋め込み画像をpdfminerの
+  `stream.get_data()`（復号済み）で取り、JPEGはPILで、Indexedは`srcsize`×1byte indexに
+  colorspaceのlookupを当てて復元し、座標を150dpiに合わせて貼る。単体テスト: M030RM p16
+  978B白紙→18KB、V103DS0 p38→594×457、WCH-Link p11→653×148。M030RM.en/.zhは再描画済み、
+  V103DS0.en/WCH-Link.zhはparity確認後に再描画。canonical無関係。
 
 - **bit図セルの境界重複＋折り返し**（`EReserved`/`URese rved`）— export側apply_bitfield
   （2026-09-03、ユーザー報告）。セル境界に載った1文字がpdfplumberで**隣のセルにも二重
@@ -80,6 +98,86 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   `- `を足して`- - `に。**全corpusで1,224件/121ページ**。修正: 行頭の`bullet+空白`（`- `/`● `等）を
   落としてから`- `を足す。**`-0.5`/`-40℃`等のマイナス符号（空白が続かない）は剥がさない**（値を
   壊さないため`bullet+空白`限定）。export/parity共有関数で処理。全67本parity 0・二重bullet 0。
+
+- **セル境界を跨いだグリフの二重取り（通常表・結合表・bit図を統一）**（zhのreset値`0对`/`，\n0`/
+  `0通<br>，`622セル超・`Reserved L`・`BIDI\nC\nOE`・`e 0`。PDF↔MD突合とregister意味監査が発見）—
+  logical_tables.strip_straddling_dupes 全面改修（2026-09-03）。判定を「グリフ中心がセル外＋改行
+  分離」から次の3段へ: (1)**値セル前処理**（短いASCII値の端の非ASCII文字は、隣セルの**行端**に
+  同じ文字があれば落とす——全角文字のグリフ箱は広く面積では決まらない）、(2)`own`＝**面積の半分
+  以上がセル内**のグリフの綴り（中心判定は端の実グリフを漏らし`Reserved`→`eserved`を生んだ）、
+  (3)余剰の**具体的なグリフ**が自セルに半分未満・別セルに半分以上入り・そのセルの行端に同じ文字が
+  あるときだけ落とす。さらに2つの過剰除去を単体テストで潰した: 相手が1文字だけの人工セルなら
+  除去しない（`PB14`の`4`が幅17ptからあふれ、隣は`4`のみ）、**自セルで語に融合・相手で空白分離
+  なら融合側が本物**（`INTEN1`｜`1 INTE`）。さらに値セル前処理で**datasheet製品比較表の単位/助数詞
+  （`8路`・`105℃`・`2组`）を落とす過剰除去**を除去サンプルの目視で発見——同列の兄弟セルが皆`…路`
+  で終わるため「隣の行端に同じ文字」が単位でも満たされる。真のbleedは値と別行/空白で切れ
+  （`0\n对`・`，\n0`・`00b 次`）、単位は値と地続きなので、**地続きなら本物**として触らない。
+  加えて、説明文の行末句読点が**単独で隣の空セルに降りた**もの（reset列が`。`だけ。V003RM.zh p16
+  の名称空行）は、隣の行端に同じ文字があれば空にする（全corpus 136セル、全てzhの`、，；。`）。
+  ページ跨ぎ結合表は`merge_cells`がセルに`src_bbox`と
+  `page`を持たせ、export/parityが**ページ番号でgeometryを引く関数**を渡す（結合セルにbboxが
+  無くて素通りしていた——zh説明表はほぼ結合表）。geometryは候補セル（`has_edge_newline`／
+  `has_short_edge`）があるページだけ遅延ロード（export 1m26→約4m）。**単体テスト14/14**
+  （除去: `Reserved L`/`BIDI\nC\nOE`/`Reserve\nd\nR`/`，\n0`/`0\n；`/`15:0]`←隣`ddr[1`と両取り/
+  `TIM7 T`/`Reserved C`、保持: `INTEN1`/`Reserved`/`CC1P`/`PB14`/`R 22`/`DATAL`）。**全corpusで
+  2,823グリフ除去**（bit図668・通常表683・結合表1,472、うち値セルのCJK端1,758。単位融合ガード前は
+  3,602で、差の約780が`8路`型の誤除去だった）・ヘッダ畳み278。
+  全67本parity 0。**過剰除去のサブエージェント検証（sonnet・除去上位14ページ/58表）: 実文字の損失
+  ゼロ**（zh USBHS一覧の`0x0`→`0x`はbit定義`[16:0]=X`＝8桁と整合し正しい除去と裏取り）。未除去の
+  残り3件（`HTIF4 T`、`0 x`/`00b x`＝説明文中`CH32V31x`の`x`で行端でない）は幾何が半々の端例。
+
+- **表題の折り返し2行目が別の段落に**（`<caption>…SRAM (RISC-V5F</caption>`の後に`+ RISC-V3F)`が
+  本文段落として漏れる。H417DS0.en p99等、括弧未閉じの表題11件＋接続詞終わり）— 共有
+  `logical_tables.caption_full`（2026-09-03）。bundleの`caption.text`は1行目だけ。**括弧が閉じて
+  いない／接続詞・前置詞・読点で終わる**間、後続のparagraph行を最大3行繋いで全文とし、
+  exporterは`<caption>`に全文を出して続き行を`plan["skip"]`で本文から消す（parityも同じskip）。
+  同じ全文をoperating_conditionsの抽出器（`caption_context`）も使う——CSVの条件prefixが
+  `…(RISC-`で切れていた原因の半分がこれ（下記CSV項参照）。
+  - **落とし穴（2026-09-04、自前の検証で発見）**: 全文は`bitfield_plan`が**ページ表dict**に付けるが、
+    ページ跨ぎの結合表は`record = info["merged"]`の別dictなので載らず、**続き行はskipで本文から消えた
+    うえ表題も1行目だけ**——`+ RISC-V3F)`が文書から消えていた（まさにH417DS0.en p99）。parityは
+    skip行を見ないので**67/67 cleanのまま検出できず**（parityの盲点、記憶済み）。修正: render_pageで
+    結合recordへ`_caption_full`を載せ替え＋**parityに「続き行のテキストが`<caption>`の中に在ること」
+    の存在検査**を追加（`plan["caption_cont"]`。順序は問わない）。
+  - **誤連結1件を撤退的にガード**: V407RM.zh p106 `表10-4 串行外设接口（（SPI1/2/3）模块`は原本の
+    `（（`重複で括弧が永久に閉じず、後続の**表10-5〜10-7の表題3行を飲み込んだ**。`_looks_like_caption`
+    （`Table`/`Figure`/`表`/`图`＋数字で始まる行）で止める。連結26→25件（他25件は不変）。
+  - 結果: 連結25件（括弧11・接続詞/読点14。14文書）、corpusの不対応`<caption>` 6→1（残1はその`（（`＝
+    資料側）。**PDF直接突合サブエージェント（opus）: 25件全てEXACT**（過剰連結0・不足0。どの続き行の
+    直後も表のヘッダ行で、3行上限に達した例も無し）。指摘2点: (A) CJKの折り返し（H417RM.zh p795
+    `…数据值），`＋`基于某些IOSR值…`）で区切りのASCII空白が1文字余分——両側CJK/全角なら区切り無しに
+    修正（`_cjk`）。(B) `SRAM (VDD= 3.3V)`の空白位置（V003DS0.en p19/20）はconverterの下付き統合
+    （`V`＋`DD`）由来で連結とは無関係——既知の下付き課題として残置。
+
+- **空スロットの`<td>`省略で列がずれる**（FV2x_V3xRM.zh p63 CRC一覧: 継続ページで名称列を
+  pdfplumberが取り漏らし、`0x40023004`が名称列に見えた。PDF↔MD突合/register監査が発見）—
+  table_html（2026-09-03）。gridのNoneを「span被覆」と「本当に空」で区別せず両方とも省略して
+  いたため、後続セルが左へ詰まっていた。**結合表650件**（61本）に幅へ届かない行があった。修正:
+  スロット単位の被覆行列を持ち、**中身のある行**の被覆されていない空スロットだけ`<td></td>`
+  （row 0は`<th></th>`）で埋める（全行空の行は従来どおり空`<tr>`）。parityはtext無しのtdを
+  見ないので不変。※取り漏らした名称そのもの（`R8_CRC_IDATAR`）はbundle段階で表外の行に
+  なっており未回収（converter側の表領域検出、保留）。
+
+- **章題の折り返し2行目が別見出し**（`# Chapter 20 …Transceiver`＋`# (SerDes)`。#6）— export側
+  title_continuations（2026-09-03）。**章見出し（第N章/Chapter N）の直後・同フォントサイズ・
+  40字以下・番号/章見出しでも図表captionでもない・文末句読点で終わらない**行を1行目へ空白で
+  繋ぎ、本文から消す。全corpus実測: 該当5件（`Transmitter (USART)`×3・`(SerDes)`・
+  `(USBFS/OTG_FS)`）は全て題の折り返し、番号見出し直後の`图22-3 …`caption等23件は条件で除外。
+  parityは1行目→2行目のtextを順に探すので繋いだ1行で通る。
+
+- **`Reset value`ヘッダの折り返しが偽データ行に**（`<th>Reset</th></tr><tr><td>value</td>`。
+  全corpus 104ページ。register意味監査が発見）— logical_tables.fold_header_wrap（2026-09-03）。
+  row 1に中身が**ちょうど1つ**・短い小文字1語・同列のrow 0が短いヘッダなら、ヘッダへ繋いで
+  行を詰める（export/parity共有）。**⚠ 踏んだ穴**: 行を繰り上げた際に`fold_boundary_spills`が
+  記録した`_folded_rows`（table_htmlが落とす継続行の番号）と`row_pages`を繰り上げ忘れ、
+  **1つ下の実データ行（V003RM.en p17 PLLON行）を捨てた**。parityはセルを個別にexpectするので
+  「missing」で気づけたが、列ずれ等は原理的に見えない（[[parity-blind-spots]]をmemoryに記録）。
+  行数を変える変換では行番号を持つ付帯情報を必ず一緒に更新する。約280表を畳んで全67本parity 0。
+
+- **図ラベルの全グリフ二重化**（`OOSSCC__IINN`→`OSC_IN`、`CCPPOOLL==00`→`CPOL=0`。PDF↔MD突合が
+  発見）— pua_normalize内`_undouble`（2026-09-03）。太字風の重ね描きをpdfplumberが2回拾う。
+  空白なし・6字以上・偶数長・全隣接ペア同一・**hex桁以外を含む**（`0000FF`のような16進値を
+  除外）行を畳む。全corpus 143件（本文108・セル35）。export/parity共有。
 
 - **段落・傍注・ピンラベルが見出しに化ける**（Overview本文が複数H1・`注：`が5つのH1・ピン名が
   97個のH1。収束巡回とプログラム走査が発見）— export側 demoted_heading_lines（2026-09-03）。
@@ -192,6 +290,36 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
     `V ＜ V REFP DDIO`→`V < VREFP DDIO`。**値列 min/typ/max は触らない**（範囲`6～24`等はそのまま）。
     説明列の全角0に。ただし`V < VREFP DDIO`の`DDIO`は抽出が語順ごと崩したもの（下付き結合では
     直せない・部分改善）。全検証合格（check_tables/counts/docs）・**凍結canonical不変**。
+- **下付きが値の後ろへ移動（operating_conditions.csv）** — ✅ **19行を修正**（2026-09-03、PDF↔MD突合
+  サブエージェント（opus）が発見）。セル内で下付きだけが別の物理行に落ち、`norm_text`の空白連結で
+  `R_S < 70kΩ`→`R <70kΩ S`（条件列）、`…impedance R_S`→`…impedance R S`（parameter列）、`V_S`→`V S`に。
+  凍結`build_operating`は触らず、合成層`_clean_text`（extract_low_power）に**基底1文字＋既知の下付き
+  token**（`R/T/C/V/L`＋`S/A/L/L1/L2/IN/OUT/DD/SS/J`）を基底の直後へ戻す2つの正規表現を追加
+  （`_TAIL_SUBSCRIPT`: 値の後ろの孤立token、`_END_SUBSCRIPT`: 末尾の`X YY`）。結果: `RS < 70kΩ`・
+  `…impedance RS`・`…ground VS`、diff 19挿入/19削除で**意図した行だけ**、凍結base 1,588行はbyte不変。
+  build_conflicts/build_index再生成＋check_tables/check_counts/check_docs**全合格**。
+- **括弧が閉じない parameter/condition（operating_conditions.csv）** — ✅ **101行→4行**（2026-09-04、
+  ユーザー指摘「`(when`とか閉じられていないのでなんかへん」）。原因は3種で、全て**凍結
+  `build_operating`に触れず**合成層で直した（凍結base 1,588行はbyte不変、消失value-key 0、行数2,796不変）:
+  1. **表題の折り返し**（A11の条件prefix）— bundleの`caption.text`は1行目だけで、`…SRAM (RISC-V5F`の
+     続き`+ RISC-V3F)`は次のparagraph行。共有`logical_tables.caption_full`（括弧未閉じ／接続詞・前置詞・
+     読点終わりの間、最大3行繋ぐ）を`caption_context`が使う（exporterの`<caption>`と同じ全文）。
+  2. **ページ跨ぎで割れたrowspanセル**（A11）— `…in sleep mode (when`（p99）＋`peripherals are powered
+     and clock is held)`（p100先頭行）が別セルになりparse_tableのstateを置き換えていた。
+     `extract_low_power.fold_page_continuations`: 記号列が空の行で、ページ境界（header繰り返し行を
+     跨いで持ち越す）または値の無い行の続きを、上の直近セルへ`_continues`判定で繋ぐ（上が括弧未閉じ
+     →続き／文末記号→別物／先頭小文字・`+&/(`→続き／CJK始まりは境界だけ）。値のある行では
+     Parameter列に限り、上が括弧未閉じのときだけ繋ぐ。
+  3. **凍結baseの行**（`Accuracy of HSI oscillator (after`＋次ページ`calibration)`×3、
+     `PLS[2:0] = 100 (falling`＋`edge)`×1）— ページ単位の`extract_text`は次ページ先頭行を拾えない。
+     `build_operating_conditions.FoldedCells`/`complete_truncated_cells`: basisのen頁からbundleの
+     結合grid（`fold_page_continuations`済み）を引き、「切れた文＋語境界＋括弧が閉じる」候補が
+     **1つだけ**のとき全文に差し替える（4欄）。
+  - **残4件は資料側**: `I_DD_VBAT` `Backup domain supply current (Remove V and DD V , only powered by
+    VDDA BAT`（V203×2/V208/V20x_30x）。原本セル`…only powered by V⏎DDA BAT`にそもそも`)`が無く
+    （text layer欠落）、下付きの語順も崩れている。補完元が無いので現状維持。features.csvにも1件
+    `(Not`（凍結build_features・別ツール）が残る。
+  - 検証: build_conflicts/build_index再生成、check_tables/check_counts/check_docs（下記）、日本語0。
 - **日本語（ひらがな/カタカナ）: 全CSVで0件** — ✅ 「日本語禁止」違反なし。
 - **中国語（CJK漢字）** — features/product_attributes等の**対訳列**（zh datasheetのfeature名）で、
   英語列と併記の**正当なデータ**。全角`（）`もその中国語文の正しい句読点。ルール「日本語禁止」は
@@ -274,8 +402,19 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
 
 ### ⛔ 撤退（理由つき）
 
-- **通常表へのstraddling除去の拡張**（reset値へのCJK/句読点bleed `0000b时、`・`0式过`等）—
-  2026-09-03に調査→撤退。strip_straddling_dupes（bit図で有効）を通常表にも掛ければreset値の
+- **表領域の外に落ちたグリフ／列（converter側・保留）** — 2026-09-03の巡回で3系統を確認。
+  (1)`LEVEL4`の`4`（H417RM.en p297: グリフ中心x=537.1が表右端532.8の外で、bundle段階で
+  どのセルにも入っていない——除去処理の副作用ではない）、(2)ページ跨ぎ継続断片で**先頭列を
+  表領域に含めず**（FV2x_V3xRM.zh p64: `R8_CRC_IDATAR …`の行がparagraph行として表外に残り、
+  表は3列で始まる。列ずれは`<td></td>`埋めで解消したが名称は未回収）、(3)「Reset value」列が
+  ヘッダごと本文へ排出（4列ヘッダ14表・Bit列も失う20ページ）。いずれもpdfplumberの表領域検出
+  （罫線ベース）が境界の無い列を取り漏らすもので、export側では復元できない。**再挑戦の条件**:
+  converterで、表bboxと同じy帯にある表外の行/グリフを列境界のx位置に合わせて取り込む後処理
+  （または該当列だけtext strategy）を作り、`run_frozen --batch`でcanonical byte一致を確かめたとき。
+
+- **通常表へのstraddling除去の拡張** — **→ 同日中に条件を作り直して達成**（✅「セル境界を跨いだ
+  グリフの二重取り」の面積・行端・値セル判定を参照。以下は当初撤退した経緯の記録として残す）。
+  （reset値へのCJK/句読点bleed `0000b时、`・`0式过`等）— 2026-09-03に調査→撤退。strip_straddling_dupes（bit図で有効）を通常表にも掛ければreset値の
   bled文字を消せるが、除去文字を分類すると**CJK 200・句読点 32は安全だが、Latin英数字 116が危険**。
   内訳に`t\nsu(SI)`→`su(SI)`（`tsu`=setup time）・`t\nd(CLKL_ADIV)`→`d(CLKL_ADIV)`（`td`=delay time）
   のように、**タイミングパラメータの実在する`t`接頭辞を別視覚行から降ってきた重複と誤認して除去**する

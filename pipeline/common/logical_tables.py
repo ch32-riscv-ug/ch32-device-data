@@ -83,6 +83,11 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
                 "column_start": c0,
                 "column_end": max(c1, c0 + 1),
                 "text": cell["text"],
+                # 元のページ座標と出自ページ。`bbox`という名前にしない——結合セルにbboxが
+                # 無いことをapply_bitfield等が「figure/bit図でない」印として使っている。
+                # strip_straddling_dupesだけがページ別geometryで境界重複を判定するのに使う。
+                "src_bbox": cell["bbox"],
+                "page": page,
             })
         row_pages.extend([page] * table["row_count"])
         offset += table["row_count"]
@@ -232,17 +237,313 @@ def _drop_edge_chars(text: str, n: int, tail: bool) -> str:
     return text[i:]
 
 
-def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
-    """図セルの端で**グリフ中心がセル外**にある1-2文字を落とす（境界を跨いで隣セルへ
-    二重取りされたグリフ）。
+def unbalanced_parens(text: str) -> bool:
+    """開き括弧が閉じ括弧より多いか（半角/全角）。折り返しで切れた表題・セルの印。"""
+    return (text.count("(") + text.count("（")) > (text.count(")") + text.count("）"))
 
-    `ReservedR`（`R`のグリフ中心が右隣の列に在る）や`Reserved\\nT`（`T`の中心が左隣に
-    在る）のように、末尾の重複文字が**テキスト隣接セルの境界文字と一致しない**——別の
-    行/列から跨いだ——ケースはstrip_boundary_dupesでは捕まらない。ここでは各セルに
-    実際に載っているグリフ（中心がbbox内）を綴り直し、textがそれより端に1-2文字だけ
-    多いぶんを重複とみて落とす。空白/改行の有無に依らずgeometryで判定するので安全。
-    レジスタbit図のセルにだけ効かせる（exporter・parity検査が同じ生セルへ適用＝整合）。
-    canonical抽出器は呼ばない（凍結CSVはEVTヘッダ基準で無関係）。冪等。
+
+def caption_full(page: dict, table: dict) -> tuple[str, list[str]]:
+    """表題が折り返して括弧が閉じていないとき、後続のparagraph行を括弧が閉じるまで繋いだ
+    全文と、繋いだ続き行のidを返す。bundleの`caption.text`は1行目だけ（`…SRAM (RISC-V5F`＋
+    次行`+ RISC-V3F)`。H417DS0.en p99。全corpusで11表題）。exporter（`<caption>`と本文skip）と
+    extract_low_power（条件prefix）が同じ全文を使う。"""
+    caption = table.get("caption")
+    if not caption:
+        return "", []
+    text = caption["text"].strip()
+    lines = {line["id"]: line for line in page["lines"]}
+    order = [item["id"] for item in page["reading_order"] if item["type"] == "line"]
+    if caption.get("line_id") not in order:
+        return text, []
+    index = order.index(caption["line_id"]) + 1
+    used: list[str] = []
+    # 括弧が閉じていない、または接続詞/前置詞で終わる（`…runs from internal Flash or`＋
+    # `SRAM (…)`。V003DS0 表3-x）間は折り返し。暴走防止で最大3行。
+    while (unbalanced_parens(text) or _dangling(text)) and index < len(order) and len(used) < 3:
+        nxt = lines[order[index]]
+        if nxt.get("role") not in ("paragraph", "list-item"):
+            break
+        if _looks_like_caption(nxt["text"]):
+            # 原本の表題に`（（`の重複があると括弧は永久に閉じない（V407RM.zh p106 `表10-4 串行外设
+            # 接口（（SPI1/2/3）模块`）。次の表の表題まで飲み込まないよう、表題らしい行で止める。
+            break
+        cont = nxt["text"].strip()
+        # CJKの行折り返しは印字に空白が無い（H417RM.zh p795 `…数据值），`＋`基于某些IOSR值…`。
+        # PDF突合サブエージェントの指摘）。両側がCJK/全角約物なら区切りを入れない。
+        sep = "" if (_cjk(text[-1:]) and _cjk(cont[:1])) else " "
+        text = text + sep + cont
+        used.append(nxt["id"])
+        index += 1
+    return text, used
+
+
+_DANGLING = {"or", "and", "with", "without", "of", "from", "in", "to", "for", "by", "at",
+             "on", "the", "a", "an", "+", "&", "/", "vs", "via", "under", "between"}
+
+
+def _cjk(ch: str) -> bool:
+    """CJK統合漢字・全角約物（`，（）`等）・CJK句読点か。"""
+    return bool(ch) and ("一" <= ch <= "鿿" or "＀" <= ch <= "￯" or "　" <= ch <= "〿")
+
+
+def _looks_like_caption(text: str) -> bool:
+    """`Table 3-7 …`／`表10-5 …`／`图2-1 …`／`Figure 4 …`で始まる行か（表題の続き行ではなく別の表題）。"""
+    text = text.strip()
+    for marker in ("Table", "Figure", "表", "图"):
+        if text.startswith(marker):
+            rest = text[len(marker):].lstrip()
+            return rest[:1].isdigit()
+    return False
+
+
+def _dangling(text: str) -> bool:
+    """表題が文の途中で切れているか——英語は末尾の語が接続詞/前置詞/冠詞、CJKは末尾が
+    読点・連結語（`，`・`、`・`与`・`或`・`和`・`及`・`及び`）。"""
+    stripped = text.rstrip()
+    if not stripped:
+        return False
+    if stripped[-1] in "，、与或和及＋/":
+        return True
+    last = stripped.split()[-1].strip("()（）[]「」,;:").lower()
+    return last in _DANGLING
+
+
+def fold_header_wrap(table: dict) -> int:
+    """`Reset value`のような狭いヘッダが2行に折り返し、2行目（`value`）がpdfplumberで
+    **独立したデータ行**になったものを、ヘッダセルへ戻して行を消す（全corpus 104ページで
+    `<tr><td>value</td></tr>`。register意味監査サブエージェントが発見、2026-09-03）。
+
+    条件: row 1 に中身のあるセルが**ちょうど1つ**、その中身が短い小文字1語（`value`等）、
+    同じ列の row 0 が短いヘッダ（`Reset`）。両方を空白で繋いでヘッダに、row 1 を詰める。
+    parityは`Reset`→`value`の順に探すので、繋いだ`Reset value`で通る。冪等。
+    """
+    if table.get("_header_folded") or table.get("row_count", 0) < 2:
+        return 0
+    table["_header_folded"] = True
+    row1 = [c for c in table["cells"] if c["row_start"] == 1 and (c.get("text") or "").strip()]
+    if len(row1) != 1:
+        return 0
+    tail = row1[0]
+    word = tail["text"].strip()
+    if not (word.isalpha() and word.islower() and len(word) <= 8
+            and tail["row_end"] - tail["row_start"] == 1):
+        return 0
+    head = next((c for c in table["cells"]
+                 if c["row_start"] == 0 and c["column_start"] == tail["column_start"]
+                 and c["row_end"] == 1 and (c.get("text") or "").strip()), None)
+    if head is None or len(head["text"].strip()) > 12 or "\n" in head["text"]:
+        return 0
+    head["text"] = head["text"].strip() + " " + word
+    # row 1 を消して以降の行を1つ繰り上げる（row 1 に他の空セルがあれば一緒に消える）
+    table["cells"] = [c for c in table["cells"] if c["row_start"] != 1]
+    for c in table["cells"]:
+        if c["row_start"] > 1:
+            c["row_start"] -= 1
+        if c["row_end"] > 1:
+            c["row_end"] -= 1
+    table["row_count"] -= 1
+    # 行番号を持つ付帯情報も一緒に繰り上げる。`_folded_rows`（fold_boundary_spillsが消した
+    # 継続行——table_htmlがその行を落とす）を繰り上げ忘れると**1つ下の実データ行を捨てる**
+    # （V003RM.en p17でPLLON行が消えた。parityはセル列を読むので検出できずmissingになる）。
+    if table.get("_folded_rows"):
+        table["_folded_rows"] = sorted(r - 1 if r > 1 else r
+                                       for r in table["_folded_rows"] if r != 1)
+    if table.get("row_pages") and len(table["row_pages"]) > 1:
+        del table["row_pages"][1]
+    return 1
+
+
+def has_short_edge(table: dict) -> bool:
+    """短いセル（値・reset値など≤12字）に、端の1文字が地続き/空白で付いた候補があるか
+    （`0对`・`e 0`・`Reserved L`）。geometryを開く前の安価な前判定。"""
+    for cell in table["cells"]:
+        text = (cell.get("text") or "").strip()
+        if 2 <= len(text) <= 12 and (text[1] == " " or text[-2] == " "
+                                      or not text.isascii()):
+            return True
+    return False
+
+
+def has_edge_newline(table: dict) -> bool:
+    """端に「1文字＋改行」または「改行＋1文字」を持つセルがあるか——strip_straddling_dupesの
+    候補。geometry（重い）を開く前の安価な前判定に使う。"""
+    for cell in table["cells"]:
+        text = cell.get("text") or ""
+        if len(text) >= 2 and (text[1] == "\n" or text[-2] == "\n"):
+            return True
+    return False
+
+
+def _overlap_frac(glyph_box: list[float], cell_box: list[float]) -> float:
+    """グリフ面積のうちセルbboxに入っている割合（0..1）。"""
+    gx0, gy0, gx1, gy1 = glyph_box
+    cx0, cy0, cx1, cy1 = cell_box
+    area = max(0.0, gx1 - gx0) * max(0.0, gy1 - gy0)
+    if area <= 0:
+        return 0.0
+    ix = max(0.0, min(gx1, cx1) - max(gx0, cx0))
+    iy = max(0.0, min(gy1, cy1) - max(gy0, cy0))
+    return ix * iy / area
+
+
+def _at_line_edge(text: str, ch: str) -> bool:
+    """chがtextのどこかの**行の先頭か末尾**にあるか。境界を跨いだグリフは相手セルでも
+    行の端に現れる（`LEVEL`の先頭L・説明文の行末`，`）。行の中程にある同じ文字
+    （`15:0]`の`1`が隣の`[15:0]`の中程に在る等）は根拠にしない。"""
+    for line in text.split("\n"):
+        line = line.strip()
+        if line and (line[0] == ch or line[-1] == ch):
+            return True
+    return False
+
+
+def _strip_value_edges(table: dict, cell: dict) -> bool:
+    """短いASCIIの値セル（reset値`0`/`0x…`/`00b`）の端に付いた非ASCII文字（`，\\n0`・`0对`・
+    `00b 次`）を、**隣セルの行端に同じ文字がある**ことを確認して落とす。zhの説明文の行末が
+    右の狭いreset列へ跨ぐ症状（全corpus zhで622セル）。全角文字のグリフ箱は広く、面積判定
+    では自セル側に半分以上入ることがあるため、ここはテキストで決める。値にCJKは含まれない
+    ので値セルに限れば安全。"""
+    text = cell.get("text") or ""
+    core = text.replace("\n", "").replace(" ", "")
+    if not core:
+        return False
+    lead = 0
+    while lead < len(core) and not core[lead].isascii():
+        lead += 1
+    tail = 0
+    while tail < len(core) - lead and not core[-1 - tail].isascii():
+        tail += 1
+    mid = core[lead:len(core) - tail]
+    if not mid and 1 <= len(core) <= 3 and not any(c.isalnum() for c in core):
+        # 句読点だけのセル（`。`）——説明文の行末句点が隣の空セルへ単独で降りたもの
+        # （V003RM.zh p16の名称空行）。隣の行端に同じ文字があれば空にする。
+        for ch in core:
+            if not any(_at_line_edge((o.get("text") or "").strip(), ch)
+                       for o in table["cells"]
+                       if o is not cell and len((o.get("text") or "").strip()) > 1
+                       and o.get("page") == cell.get("page")):
+                return False
+        cell["text"] = ""
+        return True
+    if not (lead or tail) or not mid or not mid.isascii() or len(mid) > 12 or lead + tail > 3:
+        return False
+    if not any(c.isalnum() for c in mid):
+        return False
+    # 値と**地続き**の非ASCIIは単位/助数詞（`8路`・`105℃`・`2组`——datasheetの製品比較表）で
+    # 本物。隣から降ってきた文字は別行か空白で切れている（`0\n对`・`，\n0`・`00b 次`）。
+    # 同列の兄弟セルが皆`…路`で終わるため「隣の行端に同じ文字」は単位でも満たされてしまう
+    # ——分離の有無で決める。
+    if lead and _fused_edge(text, lead, tail=False):
+        lead = 0
+    if tail and _fused_edge(text, tail, tail=True):
+        tail = 0
+    if not (lead or tail):
+        return False
+    edges = core[:lead] + (core[len(core) - tail:] if tail else "")
+    for ch in edges:
+        if not any(_at_line_edge((o.get("text") or "").strip(), ch)
+                   for o in table["cells"]
+                   if o is not cell and len((o.get("text") or "").strip()) > 1
+                   and o.get("page") == cell.get("page")):
+            return False
+    if tail:
+        text = _drop_edge_chars(text, tail, tail=True)
+    if lead:
+        text = _drop_edge_chars(text, lead, tail=False)
+    cell["text"] = text
+    return True
+
+
+def _edge_separated(text: str, ch: str) -> bool:
+    """chが行の端にあり、かつ隣の文字と**空白で切れている**か（`1 INTE`の`1`、`Reserved L`の
+    `L`、1文字だけの行）。語に融合している（`INTEN1`の`1`・`ddr[1`の`1`）なら偽。"""
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        if line[0] == ch and (len(line) == 1 or line[1].isspace()):
+            return True
+        if line[-1] == ch and (len(line) == 1 or line[-2].isspace()):
+            return True
+    return False
+
+
+def _fused_edge(text: str, n: int, tail: bool) -> bool:
+    """端のn個の非空白文字が、残りの文字と地続き（空白/改行なし）か。"""
+    s = text.rstrip() if tail else text.lstrip()
+    if tail:
+        i, dropped = len(s), 0
+        while i > 0 and dropped < n:
+            i -= 1
+            if not s[i].isspace():
+                dropped += 1
+        return i > 0 and not s[i - 1].isspace()
+    i, dropped = 0, 0
+    while i < len(s) and dropped < n:
+        if not s[i].isspace():
+            dropped += 1
+        i += 1
+    return i < len(s) and not s[i].isspace()
+
+
+def _owned_elsewhere(table: dict, cell: dict, ch: str, chars: list[dict],
+                     ours_fused: bool = False) -> bool:
+    """文字chの**具体的なグリフ**が「このセルに重なるが面積の半分未満しか入らず、別のセルに
+    半分以上入り、その別セルのtextにもchがある」か＝pdfplumberのcropが境界を跨ぐグリフを
+    両セルの文字列に入れた真の重複。自セルに半分以上入る端のグリフは自分の文字なので
+    対象外（`Reserved`の`R`・`PB14`の`4`）。近くの無関係な同じ文字（隣の`RW`の`R`）は自セルに
+    重ならないので数えない。`R 22`の`R`（どのセルにも半分以上入らないあふれ）も偽で守られる。"""
+    box = cell.get("bbox") or cell["src_bbox"]
+    # pdfplumberのcropは境界に**接している**だけのグリフも拾うので、自セルとの重なりは
+    # 0でもよい（`Reserved L`のLはx0がセル右端と一致）。2pt広げた箱に触れていれば候補。
+    near = [box[0] - 2.0, box[1] - 2.0, box[2] + 2.0, box[3] + 2.0]
+    for glyph in chars:
+        if glyph.get("text") != ch:
+            continue
+        if _overlap_frac(glyph["bbox"], near) <= 0.0:
+            continue   # 触れていない
+        if _overlap_frac(glyph["bbox"], box) >= 0.5:
+            continue   # 自分のもの
+        for other in table["cells"]:
+            obox = other.get("bbox") or other.get("src_bbox")
+            other_text = (other.get("text") or "").strip()
+            if (other is cell or not obox or not _at_line_edge(other_text, ch)
+                    or other.get("page") != cell.get("page")):   # 座標はページ内でしか比べられない
+                continue
+            if len(other_text) <= 1:
+                # 相手の中身がその1文字だけ＝自セルのテキストがあふれて隣に**人工セル**が
+                # できたもの（`PB14`の`4`が幅17ptのセルから隣へ40/60で跨ぎ、隣は`4`だけ）。
+                # 意味を持つのは`PB14`側なので、こちらの文字を重複扱いしない。
+                continue
+            if ours_fused and _edge_separated(other_text, ch):
+                # 自セルでは語に融合（`INTEN1`）、相手では空白で切れている（`1 INTE`）——
+                # 融合している側が本物で、切れている側がcropの拾いすぎ。幾何が相手寄りでも
+                # こちらの文字は残す（狭い列から名前があふれた典型）。
+                continue
+            if _overlap_frac(glyph["bbox"], obox) >= 0.5:
+                return True
+    return False
+
+
+def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
+    """セル境界を跨いだグリフをpdfplumberのcropが**両セル**の文字列に入れた重複を、
+    geometryで裏取りして落とす（bit図・通常表・ページ跨ぎ結合表に共通）。
+
+    手順（セルごと）:
+    1. 値セルの前処理 `_strip_value_edges`: 短いASCII値（`0`/`0x…`/`00b`）の端に付いた
+       非ASCII文字（`，\\n0`・`0对`）は、隣セルの行端に同じ文字があれば落とす（全角文字の
+       グリフ箱は広く面積では決まらないため、テキストで決める）。
+    2. `own`＝**面積の半分以上がbbox内**にあるグリフの綴り。textの端（または中間の1文字行）
+       がownより1-2文字多ければ余剰候補。中心判定ではなく面積で見るのは、狭い列で名前が
+       あふれると端の実グリフの中心がわずかに外へ出て `Reserved`→`eserved` と誤るため。
+    3. 余剰候補の**具体的なグリフ**が `_owned_elsewhere`——自セルに半分未満しか入らず、
+       別セルに半分以上入り、その別セルの**行端**にその文字がある（`LEVEL`の先頭L・説明文の
+       行末`，`）、かつ相手が1文字だけの人工セル（`PB14`の`4`）でない——なら落とす。
+       `R 22`のR（どのセルにも半分以上入らないあふれ）や`t\\nsu`の`t`は偽になり守られる。
+
+    charsはページのグリフ列か、`page番号→グリフ列`の関数（結合表はセルごとに出自ページが
+    違うので後者で渡す。結合セルは`src_bbox`/`page`を持つ）。exporterとparity検査が同じ
+    セルへ同じ順で適用するので整合する。canonical抽出器は呼ばない。冪等。
     """
     if table.get("_straddle_stripped"):
         return 0
@@ -250,14 +551,21 @@ def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
     removed = 0
     for cell in table["cells"]:
         text = cell.get("text") or ""
-        if "bbox" not in cell or not text.strip():
+        box = cell.get("bbox") or cell.get("src_bbox")
+        if not box or not text.strip():
             continue
-        x0, y0, x1, y1 = cell["bbox"]
+        if _strip_value_edges(table, cell):
+            removed += 1
+            continue
+        x0, y0, x1, y1 = box
+        # ページ跨ぎの結合表はセルごとに出自ページが違う——charsはpageを引く関数でも渡せる
+        page_chars = chars(cell.get("page")) if callable(chars) else chars
+        # 自セルの綴り＝**面積の半分以上がbbox内**にあるグリフ（中心判定だと端の実グリフが
+        # 中心わずか外で漏れ、`Reserved`→`eserved`のように実文字を「余剰」と誤認した）。
         own = "".join(
             g["text"] for g in sorted(
-                (g for g in chars if (g.get("text") or "").strip()
-                 and y0 - 0.5 <= (g["bbox"][1] + g["bbox"][3]) / 2 <= y1 + 0.5
-                 and x0 - 0.5 <= (g["bbox"][0] + g["bbox"][2]) / 2 <= x1 + 0.5),
+                (g for g in page_chars if (g.get("text") or "").strip()
+                 and _overlap_frac(g["bbox"], box) >= 0.5),
                 key=lambda g: (round(g["bbox"][1]), g["bbox"][0])))
         core = text.replace("\n", "").replace(" ", "")
         extra = len(core) - len(own)
@@ -267,12 +575,39 @@ def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
         # 超えてあふれると実文字の中心もセル外に落ちる（`SWIE`+`R 22`＝SWIER22の
         # `R`、`USART`の先頭`U`）——これは同じ視覚行なので触らない。真の二重取りは
         # 隣の**行**からグリフが降って来る（`Reserve\nd\nR`の`R`）ので改行で分かれる。
-        if core.startswith(own) and _edge_newline_separated(text, extra, tail=True):
-            cell["text"] = _drop_edge_chars(text, extra, tail=True)
-            removed += 1
-        elif core.endswith(own) and _edge_newline_separated(text, extra, tail=False):
-            cell["text"] = _drop_edge_chars(text, extra, tail=False)
-            removed += 1
+        # 端でなく**中間の行**に1文字だけ載っている重複（`BIDI\nC\nOE`——右隣`CRCEN`の`C`が
+        # 縦割れ名の行間へ降りた。V003RM.zh p172）: その1文字行を抜いた綴りがownと一致すれば
+        # それを落とす。geometryで裏取り済みなので安全。
+        parts = text.split("\n")
+        middle_done = False
+        for index in range(1, len(parts) - 1):
+            lone = parts[index].strip()
+            if len(lone) != 1 or not _owned_elsewhere(table, cell, lone, page_chars):
+                continue
+            candidate = "\n".join(parts[:index] + parts[index + 1:])
+            if candidate.replace("\n", "").replace(" ", "") == own:
+                cell["text"] = candidate
+                removed += 1
+                middle_done = True
+                break
+        if middle_done:
+            continue
+        if core.startswith(own):
+            dropped, tail = core[len(own):], True
+        elif core.endswith(own):
+            dropped, tail = core[:extra], False
+        else:
+            continue
+        # 落とす文字は**全て**「中心が別セル内にあり、そのセルのtextにも在る」グリフでなければ
+        # ならない（真の二重取り）。これで区切りの種類（空白/改行/地続き）に依らず、
+        # `Reserved L`（LEVELのL）・`e 0`（ヘッダ`Reset value`のe）・`0对`（説明列の对）は消え、
+        # `R 22`のR（あふれ・どのセルにも属さない）や`t\nsu(SI)`の`t`は守られる。
+        fused = _fused_edge(text, extra, tail)
+        if not all(_owned_elsewhere(table, cell, ch, page_chars, ours_fused=fused)
+                   for ch in dropped):
+            continue
+        cell["text"] = _drop_edge_chars(text, extra, tail=tail)
+        removed += 1
     return removed
 
 

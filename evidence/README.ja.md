@@ -702,7 +702,10 @@ schematic-pdf  family単位の回路図PDF                      12
 **電気的特性の章を series ごとに**——クロック・電源電圧・発振器・ADC・Flash・I/O レベル・
 リセットのタイミング。生成は `pipeline/extract/datasheet/build_operating_conditions.py`
 （新経路——凍結した抽出ロジックをbundle入力で走らせた基礎行＋消費電流・ウェイクアップ
-時間の行。`tools/build_operating.py` は凍結された参照実装として残る）。
+時間の行。`tools/build_operating.py` は凍結された参照実装として残る）。合成層は凍結ロジックに
+触れずに基礎行の `parameter`/`condition` の文字列だけ整えます——割れた下付きの結合（`V DD`→`VDD`）、
+説明列の全角約物の半角化、ページ跨ぎで切れたセル（`Accuracy of HSI oscillator (after`＋次ページの
+`calibration)`）を bundle の結合gridから補完（括弧が閉じる続きが1つだけのとき）。
 
 **採る行を記号の一覧では決めません。** 記号は頭字で物理量を名乗る（`V_*` は電圧、`I_*` は電流、
 `t_*` は時間）ので、「その量に単位が合っているか」で採ります（`UNIT_FOR`）。資料の記法は決まって
