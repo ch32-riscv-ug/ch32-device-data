@@ -50,7 +50,7 @@ SCHEMA_VERSION = "0.2"
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.6.2"
+CONVERTER_VERSION = "1.6.3"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -244,7 +244,7 @@ def fix_rotated_cells(page, record: dict) -> None:
 # 2カラムが始まる見出し。**Overview/概述は含めない**——overviewの散文は全幅1行で
 # （`…microcontroller based on the QingKe RISC-V core`が1行・実測）、これを境界で
 # 割ると`ba`と`d`に裂ける。2カラムなのはFeatures（箇条書き）以降。
-COLUMN_START_HEADINGS = ("Features", "主要特性", "功能概述")
+COLUMN_START_HEADINGS = ("Feature", "主要特性", "功能概述")
 
 
 def column_boundary(page, lines: list[dict]):

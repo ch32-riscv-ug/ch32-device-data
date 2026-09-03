@@ -104,6 +104,9 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             elif item["id"] in cross:
                 # 前ページの番号行で組み直した箱（ページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
+            else:
+                # 通常表: 境界グリフの二重取りを落とす——exporterと同じ表を見る。
+                logical_tables.strip_boundary_dupes(record)
             for cell in record["cells"]:
                 # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
                 expect(export_markdown.cell_html(cell["text"]),
