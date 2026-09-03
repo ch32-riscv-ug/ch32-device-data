@@ -128,6 +128,7 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
                 "cross": {}, "cross_note": set()}
     chars = load_geometry(bundle, entry)["chars"]
     lines = {l["id"]: l for l in page["lines"]}
+    tables_by_id = {t["id"]: t for t in page["tables"]}
     tables: dict[str, tuple[str, list]] = {}
     skip: set[str] = set(caption_skip)
     for table_id, line_id in pairs.items():
@@ -135,6 +136,8 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
         if centers:
             tables[table_id] = (line_id, centers)
             skip.add(line_id)
+            # 図セルの端で隣列へ二重取りされたグリフ（`ReservedR`等）をgeometryで落とす。
+            logical_tables.strip_straddling_dupes(tables_by_id[table_id], chars)
     synth: dict[str, dict] = {}
     for number_id, field_id in singletons.items():
         centers = logical_tables.bit_number_centers(chars, lines[number_id])

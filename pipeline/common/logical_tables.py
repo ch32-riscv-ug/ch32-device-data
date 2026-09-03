@@ -193,6 +193,89 @@ def strip_boundary_dupes(table: dict) -> int:
     return removed
 
 
+def _edge_newline_separated(text: str, n: int, tail: bool) -> bool:
+    """末尾/先頭のn個の非空白文字が、残りと**改行**で隔てられているか（空白や地続きは
+    別視覚行でない＝あふれた実文字なので除去しない）。"""
+    if tail:
+        i, dropped = len(text), 0
+        while i > 0 and dropped < n:
+            i -= 1
+            if text[i] not in " \n":
+                dropped += 1
+        return i > 0 and text[i - 1] == "\n"
+    i, dropped = 0, 0
+    while i < len(text) and dropped < n:
+        if text[i] not in " \n":
+            dropped += 1
+        i += 1
+    return i < len(text) and text[i] == "\n"
+
+
+def _drop_edge_chars(text: str, n: int, tail: bool) -> str:
+    """textの末尾（tail=True）または先頭からn個の非空白文字を、間の空白/改行ごと落とす。"""
+    if tail:
+        i, dropped = len(text), 0
+        while i > 0 and dropped < n:
+            i -= 1
+            if text[i] not in " \n":
+                dropped += 1
+        while i > 0 and text[i - 1] in " \n":
+            i -= 1
+        return text[:i]
+    i, dropped = 0, 0
+    while i < len(text) and dropped < n:
+        if text[i] not in " \n":
+            dropped += 1
+        i += 1
+    while i < len(text) and text[i] in " \n":
+        i += 1
+    return text[i:]
+
+
+def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
+    """図セルの端で**グリフ中心がセル外**にある1-2文字を落とす（境界を跨いで隣セルへ
+    二重取りされたグリフ）。
+
+    `ReservedR`（`R`のグリフ中心が右隣の列に在る）や`Reserved\\nT`（`T`の中心が左隣に
+    在る）のように、末尾の重複文字が**テキスト隣接セルの境界文字と一致しない**——別の
+    行/列から跨いだ——ケースはstrip_boundary_dupesでは捕まらない。ここでは各セルに
+    実際に載っているグリフ（中心がbbox内）を綴り直し、textがそれより端に1-2文字だけ
+    多いぶんを重複とみて落とす。空白/改行の有無に依らずgeometryで判定するので安全。
+    レジスタbit図のセルにだけ効かせる（exporter・parity検査が同じ生セルへ適用＝整合）。
+    canonical抽出器は呼ばない（凍結CSVはEVTヘッダ基準で無関係）。冪等。
+    """
+    if table.get("_straddle_stripped"):
+        return 0
+    table["_straddle_stripped"] = True
+    removed = 0
+    for cell in table["cells"]:
+        text = cell.get("text") or ""
+        if "bbox" not in cell or not text.strip():
+            continue
+        x0, y0, x1, y1 = cell["bbox"]
+        own = "".join(
+            g["text"] for g in sorted(
+                (g for g in chars if (g.get("text") or "").strip()
+                 and y0 - 0.5 <= (g["bbox"][1] + g["bbox"][3]) / 2 <= y1 + 0.5
+                 and x0 - 0.5 <= (g["bbox"][0] + g["bbox"][2]) / 2 <= x1 + 0.5),
+                key=lambda g: (round(g["bbox"][1]), g["bbox"][0])))
+        core = text.replace("\n", "").replace(" ", "")
+        extra = len(core) - len(own)
+        if len(own) < 2 or not 0 < extra <= 2:
+            continue
+        # **改行で別視覚行に分離された端文字だけ**落とす。狭い列で名前がセル幅を
+        # 超えてあふれると実文字の中心もセル外に落ちる（`SWIE`+`R 22`＝SWIER22の
+        # `R`、`USART`の先頭`U`）——これは同じ視覚行なので触らない。真の二重取りは
+        # 隣の**行**からグリフが降って来る（`Reserve\nd\nR`の`R`）ので改行で分かれる。
+        if core.startswith(own) and _edge_newline_separated(text, extra, tail=True):
+            cell["text"] = _drop_edge_chars(text, extra, tail=True)
+            removed += 1
+        elif core.endswith(own) and _edge_newline_separated(text, extra, tail=False):
+            cell["text"] = _drop_edge_chars(text, extra, tail=False)
+            removed += 1
+    return removed
+
+
 def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
     """結合済み論理表 → 文字の格子（抽出器向け。spanの先頭位置に文字を置く）。"""
     rows: list[list[str | None]] = [[None] * merged["width"]

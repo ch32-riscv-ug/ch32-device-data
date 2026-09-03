@@ -42,6 +42,15 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   （D3欠落・D4重複）＝near衝突でD3がdedup後勝ちに上書きされた残り（cross/図の中心数<列数系）。
   bit-range微修正（`[31:29]`→`[30:29]`, `WAVE2[2:0]`→`[1:0]`）は説明表権威付け＝⛔撤退のため対象外。
 
+- **ランダム探索巡回（sonnet・16ページ、2026-09-03）** — 層化とは別パターン。孤立した
+  converterアーティファクト3件を記録（いずれも単発・表示のみ・canonicalはEVT基準で無関係）:
+  (1)`0x000000000`（X315RM.zh p183・R32_TIM3_CH1CVRのreset値。0が9個、隣行TIM2は8個）＝
+  register一覧表セルのglyph重複だが**空白区切りが無い**ためstrip_boundary_dupes対象外、単発。
+  (2)`0次`（V205RM.zh p224・I2C reset値に説明文末の`次`が混入）＝bit図/interleave系。
+  (3)H417RM.en p224のburst転送タイミング図が画像/`<details>🖼`無しでラベルがバラけて本文に
+  （caption無し図＝⛔撤退中の既知の根）。無空白の単発glyph重複を安全に直すにはgeometry判定が要り
+  費用対効果薄のため記録に留める。
+
 ### ✅ 完了（続き）
 
 - **bit図セルの境界重複＋折り返し**（`EReserved`/`URese rved`）— export側apply_bitfield
@@ -83,12 +92,29 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   （本文≤14字）限定**で長い説明文を守る。誤検出をgeometryで実測: **末尾0/60・先頭は既に文字
   交錯で崩れた図セルのみ**（無害）。export/parity共有ヘルパー・通常表のみ適用（bitfield/crossは
   apply_bitfield側）。**全corpusで1,902文字/1,059表を除去**・全67本parity 0維持。
-  **残り（保留）**: bitfield**図内**のbleed（`ReservedR`＝空白なし・`Reserved F`＝apply_bitfield
-  経路・`。<br>0`＝改行境界）は別クラス。空白区切りが無い版は`ADDR`等の正当な連結と区別できず
-  高リスク、かつ図は2-5%の難所。直近でグリッド衝突dedupを入れて67/67を安定させた直後なので
-  apply_bitfieldの追加改変は退行リスクが高い。「崩しそうなら撤退」に従い見送り、記録に留める。
-  **再挑戦の条件**: apply_bitfield内でgeometryのstraddling判定を使い、空白有無に依らず真の重複
-  グリフだけを落とせるようにしたとき。
+  bitfield**図内**のbleed（`ReservedR`・`Reserved\nT`等、空白区切りが無く隣接テキストとも
+  一致しない版）は下記 strip_straddling_dupes（geometry版）で別途対応。
+
+- **bit図内の境界グリフ二重取り（geometry straddling判定・改行分離のみ）**（`ReservedR`→
+  `Reserved`・`Reserved\nT`→`Reserved`。サブエージェント巡回報告）— logical_tables.strip_straddling_dupes
+  （2026-09-03）。図セルの端の重複が**テキスト隣接セルの境界文字と一致しない**（別の行/列から
+  跨いだグリフ）ためstrip_boundary_dupesでは捕まらない。geometryで確定: CH32xRM.en p29の
+  `Reserve\nd\nR`の末尾`R`はグリフ中心100.9で**セル右端99.1の外**（右隣列に属す）。手法: 各セルに
+  中心が入るグリフを綴り直し、cell textがそれより端に1-2文字だけ多いぶんを重複とみて落とす。
+  bitfield_planで番号中心を得た**pairの図テーブルにだけ**適用（export・parity検査が同じ生セルへ）。
+  **⚠ 一度崩して撤退→厳格化して再導入した経緯**: 初版（空白/改行問わず端の余剰を落とす）は
+  **全corpus 651グリフ/481図**を除去したが、**strip検証サブエージェントが過剰除去を3件検出**——
+  `SWIER22`→`SWIE22`（`SWIE`+`R 22`の`R`）・`USART6RST`→`SART6RST`・`RGUFS`→`RGUF`。原因: **狭い列で
+  名前がセル幅を超えてあふれると実文字の中心もセル外**に落ち、dup（隣から跨いだ）と区別がつかない。
+  parityはexport=bundle変換で一貫するため**検出できない**（サブエージェント検証の価値）。**厳格化**:
+  余剰の端文字が残りと**改行で隔てられているときだけ**落とす（`Reserve\nd\nR`の`R`は別視覚行＝真dup、
+  `R 22`の`R`は同行のあふれ実文字＝保持）。ユニットテスト（ReservedR除去・`R 22`/`USART`保持）合格・
+  **厳格版で132グリフ/117図**を除去・全67本parity 0・**再検証サブエージェントで過剰除去0**（約42図/14ページ）。
+  canonicalはEVTヘッダ基準で無関係。**残り（別の既知問題として記録）**: (1)apply_bitfieldの**既存**leading
+  strip（`text[1] in " \n"`で空白も許容）は`R 20`→`20`のように**あふれ実文字を落とす**が、これは
+  vertical-interleaveで既に崩れた図セル（`SWIE SR23`等）に限られ、strip無効化しても同一＝当該fix由来でない。
+  \n限定に絞ると`E Reserved`（空白区切りの真dup）を取りこぼすので触らず記録に留める。(2)cross/synthの図は
+  当該ページcharsの引き回しが要るため未適用。(3)X315RM.en p351の`RSE`/`PGST`（多文字欠落）は別のより重い崩れ。
 
 ### テーブル表示
 
