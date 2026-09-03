@@ -24,8 +24,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 import tempfile
+from collections import defaultdict
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
@@ -53,6 +55,76 @@ def frozen_base_rows() -> list[dict]:
             return list(csv.DictReader(f))
 
 
+_BASIS_EN = re.compile(r"([^\s:+!]+)\.PDF:en\(p\.(\d+)\)")
+
+
+class FoldedCells:
+    """bundleごとに、ページ跨ぎの表を続き断片と結合して`fold_page_continuations`を掛け、
+    **折り返しで繋がったセル**の全文（正規化済み）をページ番号で引けるようにする（遅延）。
+
+    凍結`build_operating`はページ単位の`extract_text`なので、次ページ先頭行に落ちた
+    rowspanセルの続き（`Accuracy of HSI oscillator (after`＋`calibration)`、
+    `PLS[2:0] = 100 (falling`＋`edge)`）を拾えず、CSVの括弧が閉じない。続きは
+    bundle（L1）側の結合gridには在るので、この層で全文に差し替える。"""
+
+    def __init__(self) -> None:
+        self.jobs = {job["name"]: job for job in extract_low_power.convert_all.targets()
+                     if job["document_type"] == "datasheet"}
+        self._cells: dict[str, dict[int, list[str]]] = {}
+
+    def on_page(self, name: str, page: int) -> list[str]:
+        if name not in self._cells:
+            self._cells[name] = self._build(name)
+        return self._cells[name].get(page, [])
+
+    def _build(self, name: str) -> dict[int, list[str]]:
+        out: dict[int, list[str]] = defaultdict(list)
+        job = self.jobs.get(name)
+        if job is None:
+            return out
+        fragments: dict[str, list[tuple[int, dict]]] = defaultdict(list)
+        for page_number, table in extract_low_power.bundle_tables(name, job["pdf"]):
+            fragments[table["logical_id"]].append((page_number, table))
+        for parts in fragments.values():
+            if len(parts) < 2:
+                continue   # 続き断片が無い表は割れない
+            joined, row_pages = extract_low_power.join_fragments(parts)
+            schema = extract_low_power.infer_schema(joined)
+            if schema is None:
+                continue
+            if not extract_low_power.fold_page_continuations(joined, row_pages, schema):
+                continue
+            for row, page in zip(joined, row_pages):
+                for cell in row:
+                    if cell and "\n" in cell:   # 繋いだセルは改行を含む
+                        out[page].append(extract_low_power._clean_text(operating.norm_text(cell)))
+        return out
+
+
+def complete_truncated_cells(base: list[dict]) -> int:
+    """括弧が閉じていない基礎行の parameter/condition を、bundleの結合gridにある
+    同じセルの全文で置き換える。全文は「切れた文の直後が語境界で、括弧が閉じている」
+    候補が**1つだけ**のとき採る。置き換えた欄の数を返す。"""
+    folded = FoldedCells()
+    fixed = 0
+    for row in base:
+        match = _BASIS_EN.search(row.get("basis") or "")
+        if not match:
+            continue
+        name, page = f"{match.group(1)}.en", int(match.group(2))
+        for column in ("parameter", "condition"):
+            text = row.get(column) or ""
+            if not text or not extract_low_power._unbalanced(text):
+                continue
+            cands = {full for pg in (page, page + 1) for full in folded.on_page(name, pg)
+                     if full.startswith(text) and full[len(text):][:1] == " "
+                     and not extract_low_power._unbalanced(full)}
+            if len(cands) == 1:
+                row[column] = cands.pop()
+                fixed += 1
+    return fixed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=None,
@@ -69,6 +141,9 @@ def main() -> int:
     for row in base:
         row["parameter"] = extract_low_power._clean_text(row.get("parameter"))
         row["condition"] = extract_low_power._clean_text(row.get("condition"))
+    # ページ跨ぎで切れたセル（括弧未閉じ）はbundleの結合gridの全文で補う（同じ合成層の仕事）。
+    completed = complete_truncated_cells(base)
+    print(f"括弧未閉じの基礎行をbundleの結合gridで補完: {completed} 欄", file=sys.stderr)
 
     combined = base + added
     seen: set[tuple] = set()

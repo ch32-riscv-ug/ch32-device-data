@@ -53,7 +53,9 @@ def load_page(bundle: Path, entry: dict) -> dict:
 
 
 def check_page(page: dict, text: str, chains: dict[str, dict],
-               pages_dir: Path, plan: dict | None = None) -> list[str]:
+               pages_dir: Path, plan: dict | None = None,
+               bundle: Path | None = None,
+               entries: dict[int, dict] | None = None) -> list[str]:
     bad = []
     # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
     # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
@@ -72,6 +74,16 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     synth = plan["synth"]
     consumed_lines = plan["skip"]   # cross_note行もskipに入る（本文からは番号→次ページ印）
     cross = plan.get("cross", {})
+    # exporterと同じく、通常表の端に降ってきたCJK/句読点グリフをgeometryで落とす。
+    # 候補セルがあるときだけ開く（遅延）。
+    _geo: dict[int, list[dict]] = {}
+
+    def chars_for(page_number: int | None = None) -> list[dict]:
+        pg = page["number"] if page_number is None else page_number
+        if pg not in _geo:
+            _geo[pg] = (export_markdown.load_geometry(bundle, entries[pg])["chars"]
+                        if bundle is not None and entries and pg in entries else [])
+        return _geo[pg]
 
     def expect(needle: str, what: str) -> None:
         nonlocal position
@@ -105,8 +117,11 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # 前ページの番号行で組み直した箱（ページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
             else:
-                # 通常表: 境界グリフの二重取りを落とす——exporterと同じ表を見る。
+                # 通常表: exporterと同じ変換（ヘッダ折り返しの畳み込み・境界二重取り除去）を見る。
+                logical_tables.fold_header_wrap(record)
                 logical_tables.strip_boundary_dupes(record)
+                if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
+                    logical_tables.strip_straddling_dupes(record, chars_for)
             for cell in record["cells"]:
                 # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
                 expect(export_markdown.cell_html(cell["text"]),
@@ -119,6 +134,15 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                            f"bitfield {item['id']} cell")
                 continue
             if item["id"] in consumed_lines:
+                if item["id"] in plan.get("caption_cont", set()):
+                    # 折り返した表題の続き行（`+ RISC-V3F)`）は本文から消えるが、`<caption>`の
+                    # 中に全文として出ていなければならない。順序は問わず**存在だけ**見る——
+                    # skipにしただけでは「表題も1行目・本文からも消えた」を検出できなかった
+                    # （H417DS0.en p99、ページ跨ぎ結合表で_caption_fullが落ちていた）。
+                    body = html.escape(export_markdown.pua_normalize(lines[item["id"]]["text"]).strip())
+                    if body and text.find(body) < 0:
+                        bad.append(f"p{page['number']} caption continuation {item['id']}: "
+                                   f"missing from <caption>: {body[:60]!r}")
                 continue   # bit番号行/フィールド行は表へ畳んだ
             line = lines[item["id"]]
             if line["bbox"][3] - line["bbox"][1] < 0.5:
@@ -157,6 +181,7 @@ def lost_glyphs(bundle: Path, entry: dict, page: dict) -> int:
 def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
+    entry_of = {page["number"]: entry for entry, page in zip(manifest["pages"], pages)}
     chains = logical_tables.document_chains(pages)
     plans = export_markdown.document_bitfields(bundle, manifest, pages)
     bad: list[str] = []
@@ -167,7 +192,7 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
             continue
         text = md.read_text(encoding="utf-8")
         bad.extend(check_page(page, text, chains, markdown / "pages",
-                              plans[page["number"]]))
+                              plans[page["number"]], bundle, entry_of))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")

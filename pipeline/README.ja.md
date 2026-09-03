@@ -95,6 +95,28 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            `export_markdown.document_bitfields`に共通化し、exporter・parity検査・auditが
            同じものを呼ぶ）、
            **表セルは既定で中央寄せ・長い/複数行セルは左寄せ**（PDFに寄せる）、
+           **セル境界を跨いだグリフの二重取りを落とす**（pdfplumberのcropは境界に載った
+           グリフを両セルに入れる——`[31:12] R`・`RO R`・`ReservedR`・zh説明文の行末`，`が
+           reset値列へ。テキスト隣接で分かるものは`strip_boundary_dupes`、それ以外は
+           `strip_straddling_dupes`がgeometryで「その具体的なグリフが別セルに半分以上入り、
+           そのセルの行端に同じ文字がある」ことを確かめて落とす。自セルに半分以上入る
+           グリフは触らないので、狭い列からあふれた名前（`PB14`・`SWIER22`）の文字は
+           失われない。ページ跨ぎ結合表はセルごとに出自ページを持ち、そのページのグリフで
+           判定する）、**`Reset`/`value`に折り返したヘッダがpdfplumberで偽データ行になった
+           ものをヘッダへ畳む**（`fold_header_wrap`。`fold_boundary_spills`が持つ行番号も
+           一緒に繰り上げる）、**spanに覆われていない空スロットは`<td></td>`で埋める**
+           （先頭列を取り漏らした継続断片が左へ詰まらない）、**中身の無い表は出さず、
+           図領域内の表はプレーンテキストにする**（どちらも図のboxを表と誤検出したもの。
+           全corpusで1,115と3,758）、**大フォントの本文がheadingに化けたものを段落へ戻す**
+           （フォントサイズ由来のheadingが3連続以上・`注：`/`Note:`始まり・50字超・CJK文末
+           句読点終わり——2,390行。番号/章見出しは触らない）、**章題の折り返し2行目を1行目へ
+           繋ぐ**（`(SerDes)`）、**2行に折り返した表題は`<caption>`に全文を出し、続き行を本文から
+           消す**（括弧が閉じていない／`or`・`with`・読点で終わる表題。`logical_tables.caption_full`
+           をoperating_conditionsの抽出器と共有し、CSVの条件prefixも全文になる。
+           `…SRAM (RISC-V5F`＋`+ RISC-V3F)`）、**箇条書きのbulletを二重にしない**、**太字風の重ね描きで
+           2回拾われたグリフを畳む**（`OOSSCC__IINN`→`OSC_IN`。16進値は除外）、
+           **pdfiumが白紙にした図**（暗号化PDFの埋め込みJPEG/パレットraster）**は
+           render_assetsが画像streamを直接復号して貼る**（11枚が白紙だった）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、
            **添字が`*`に化けたglyphの警告**（壊れたToUnicode。pdfplumberでも
@@ -103,7 +125,10 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            印を必須にする））
 checks/    compare_manifest.py（環境差の検証）
            check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
-           全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**）
+           全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**。exporterが
+           畳んだ行は畳んだ先で見る——折り返し表題の2行目は`<caption>`の中に在ること。
+           この検査は存在と順序しか見ないので、export側の変換にはPDF↔Markdownの意味検証
+           （サブエージェント）を必ず対にする）
            cross_engine.py（**取り込み正しさの独立検証**。bundleの文字集合を別実装の
            pypdfium2と突き合わせる——順序でなく文字マルチセットを比べ、pypdfium2が
            取れてbundleが落とした文字を報告。pypdfium2のハイフン誤読（`-`→`\x02`）は

@@ -120,13 +120,22 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
     # 表のcaption行は`<caption>`として描かれる。同じ行がreading_orderにも残ると本文
     # 段落として二重に出る（「Table 4-1 …」が表の上と表内captionで2回。ユーザー指摘）。
     # caption行を本文から消す——parityも同じskipを読むので整合する。
-    caption_skip = {t["caption"]["line_id"] for t in page["tables"]
-                    if t.get("caption") and t["caption"].get("line_id")}
+    caption_skip: set[str] = set()
+    caption_cont: set[str] = set()   # 続き行のid。parityは「本文から消えたが<caption>に在る」ことを別途見る
+    for t in page["tables"]:
+        if t.get("caption") and t["caption"].get("line_id"):
+            caption_skip.add(t["caption"]["line_id"])
+            # 折り返した表題の2行目（`+ RISC-V3F)`）も`<caption>`へ入れて本文から消す。
+            full, used = logical_tables.caption_full(page, t)
+            if used:
+                t["_caption_full"] = full
+                caption_skip.update(used)
+                caption_cont.update(used)
     pairs = logical_tables.bitfield_pairs(page)
     singletons = logical_tables.bitfield_singletons(page)
     if not pairs and not singletons:
         return {"tables": {}, "synth": {}, "skip": set(caption_skip),
-                "cross": {}, "cross_note": set()}
+                "cross": {}, "cross_note": set(), "caption_cont": caption_cont}
     chars = load_geometry(bundle, entry)["chars"]
     lines = {l["id"]: l for l in page["lines"]}
     tables_by_id = {t["id"]: t for t in page["tables"]}
@@ -146,7 +155,7 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
             synth[number_id] = logical_tables.build_bitfield_singleton(
                 lines[number_id], lines[field_id], centers)
             skip.add(field_id)
-    return {"tables": tables, "synth": synth, "skip": skip,
+    return {"tables": tables, "synth": synth, "skip": skip, "caption_cont": caption_cont,
             "cross": {}, "cross_note": set()}
 
 
@@ -209,11 +218,27 @@ PUA_REPLACEMENTS = {
 }
 
 
+def _undouble(part: str) -> str:
+    """図ラベル等で全グリフが2回ずつ拾われた行（`OOSSCC__IINN`→`OSC_IN`、`CCPPOOLL==00`→
+    `CPOL=0`）を畳む。PDFが太字風に同じ文字を重ね描きし、pdfplumberが両方を拾ったもの。
+    条件: 空白なし・6文字以上・偶数長・全ての隣接ペアが同じ・**hex桁以外の文字を含む**
+    （`0000FF`のような正当な16進値は偶然ペアになるので除外）。全corpus実測143件。"""
+    s = part.strip()
+    if (len(s) < 6 or len(s) % 2 or " " in s
+            or any(s[i] != s[i + 1] for i in range(0, len(s), 2))
+            or len(set(s)) < 2
+            or all(ch in "0123456789abcdefABCDEF" for ch in s)):
+        return part
+    return part.replace(s, s[::2])
+
+
 def pua_normalize(text: str) -> str:
     for pua, real in PUA_REPLACEMENTS.items():
         if pua in text:
             text = text.replace(pua, real)
-    return text
+    if "\n" in text:
+        return "\n".join(_undouble(p) for p in text.split("\n"))
+    return _undouble(text)
 
 
 # convert.pyの見出し判定と同じ——番号見出し（`20.1 …`）・章見出し（`第N章`/`Chapter N`）は
@@ -263,6 +288,42 @@ def demoted_heading_lines(page: dict) -> set[str]:
             flush()
     flush()
     return demote
+
+
+def title_continuations(page: dict) -> tuple[dict[str, str], set[str]]:
+    """章見出しの折り返し2行目を1行目へ繋ぐ計画。`{章見出しline_id: 続きのtext}`と、
+    本文から消す続き行のidを返す。
+
+    `Chapter 20 Serial-parallel Interconversion Controller and Transceiver`＋`(SerDes)`のように
+    ページ幅いっぱいの章題が折り返すと、2行目も同フォントで短いのでconverterが独立の
+    level-1見出しにする（`# (SerDes)`）。条件を**章見出し（第N章/Chapter N）の直後・同フォント
+    サイズ・40字以下・番号/章見出しでも図表captionでもない・文末句読点で終わらない**に絞る
+    （全corpus実測: 該当5件は全て題の折り返し。番号見出し直後の`图22-3 …`caption等28件中23件は
+    この条件で除外される）。parityは1行目のtext→2行目のtextを順に探すので、繋いだ1行に
+    両方が並べば通る。
+    """
+    lines = {l["id"]: l for l in page["lines"]}
+    order = [lines[it["id"]] for it in page["reading_order"]
+             if it["type"] == "line" and it["id"] in lines]
+    merge: dict[str, str] = {}
+    skip: set[str] = set()
+    for a, b in zip(order, order[1:]):
+        ta, tb = a["text"].strip(), b["text"].strip()
+        if not (a.get("role") == "heading" and b.get("role") == "heading"):
+            continue
+        if not _CHAPTER_HEADING.match(ta):
+            continue
+        if _HEADING_NUMBER.match(tb) or _CHAPTER_HEADING.match(tb):
+            continue
+        if not tb or len(tb) > 40 or tb[-1] in "。.；;":
+            continue
+        if figure_captions.caption_match(tb):
+            continue
+        if abs((a.get("font_size") or 0) - (b.get("font_size") or 0)) > 0.6:
+            continue
+        merge[a["id"]] = tb
+        skip.add(b["id"])
+    return merge, skip
 
 
 _BULLETS = "-–—•●○▪·*‣◦"
@@ -323,6 +384,16 @@ def table_html(table: dict, url: str | None, number: int) -> str:
     grid: list[list[str | None]] = [[None for _ in range(columns)]
                                     for _ in range(row_count)]
     covered = [False] * row_count   # 上の行からrowspanで覆われている行
+    # スロット単位の被覆（colspan/rowspanが覆っている格子）。被覆されておらず中身も無い
+    # スロットは`<td></td>`で埋めないと、後続セルが左へ詰まって列がずれる——ページ跨ぎ
+    # 断片で先頭列だけpdfplumberが取り漏らした行（FV2x p63 CRC一覧の`0x40023004`が
+    # 名称列に見える）。全corpusで幅に届かない行を持つ結合表650件。
+    slot_covered = [[False] * columns for _ in range(row_count)]
+    for cell in table["cells"]:
+        for r in range(cell["row_start"], min(cell["row_end"], row_count)):
+            for c in range(cell["column_start"], min(cell["column_end"], columns)):
+                if (r, c) != (cell["row_start"], cell["column_start"]):
+                    slot_covered[r][c] = True
     for cell in table["cells"]:
         attrs = []
         if cell["row_end"] - cell["row_start"] > 1:
@@ -352,14 +423,24 @@ def table_html(table: dict, url: str | None, number: int) -> str:
     # rowspanに覆われていなければ落とす（跨ぐrowspanがあれば高さがずれるので
     # 残す。安全側）。元から空の行には触れない——消したと分かっている行だけ。
     folded_rows = set(table.get("_folded_rows", ()))
-    rows = ["<tr>" + "".join(cell or "" for cell in row) + "</tr>"
-            for r, row in enumerate(grid)
+
+    def row_html(r: int, row: list[str | None]) -> str:
+        # 中身のあるセルが1つも無い行は従来どおり空`<tr>`（見えない）のまま——被覆されて
+        # いない空スロットへ`<td></td>`を出すのは、**何かが入っている行**だけ（列ずれ防止）。
+        if not any(row):
+            return "<tr></tr>"
+        tag = "th" if r == 0 else "td"
+        return "<tr>" + "".join(
+            cell if cell else ("" if slot_covered[r][c] else f"<{tag}></{tag}>")
+            for c, cell in enumerate(row)) + "</tr>"
+
+    rows = [row_html(r, row) for r, row in enumerate(grid)
             if covered[r] or r not in folded_rows]
     # captionを持つ表だけが`<caption>`を出す。caption行の無い表（レジスタの
     # ビット図・説明表）は、原本でも表番号が振られていない——continuation継承で
     # 前ページの表番号（logical_id）を借りて名乗ると、無関係な`table-3-1@1`が
     # 6つ並ぶ（ユーザー指摘）。内部IDは追跡用にコメントへ残す。
-    caption = table["caption"]["text"] if table["caption"] else None
+    caption = (table.get("_caption_full") or table["caption"]["text"]) if table["caption"] else None
     cap_html = f"<caption>{html.escape(caption)}</caption>" if caption else ""
     span = table.get("parts")
     parts = []
@@ -388,13 +469,27 @@ def table_html(table: dict, url: str | None, number: int) -> str:
 
 def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 assets: dict[str, dict], page_count: int,
-                lost_glyphs: int = 0, plan: dict | None = None) -> str:
+                lost_glyphs: int = 0, plan: dict | None = None,
+                bundle: Path | None = None,
+                entries: dict[int, dict] | None = None) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
     number = page["number"]
     # 大フォントの段落ブロック（Overview・注記・mode説明）が複数の見出しに化けた行を段落へ戻す。
     demote_headings = demoted_heading_lines(page)
+    # 章題の折り返し2行目（`# (SerDes)`）は1行目の見出しへ繋ぐ。
+    title_merge, title_skip = title_continuations(page)
+    # geometryは要るときだけ開く（表の端に降ってきた重複グリフ除去に使う）。ページ跨ぎの
+    # 結合表はセルごとに出自ページが違うので、ページ番号で引ける関数として渡す。
+    _geo: dict[int, list[dict]] = {}
+
+    def chars_for(page_number: int | None = None) -> list[dict]:
+        pg = number if page_number is None else page_number
+        if pg not in _geo:
+            _geo[pg] = (load_geometry(bundle, entries[pg])["chars"]
+                        if bundle is not None and entries and pg in entries else [])
+        return _geo[pg]
     # レジスタのbit図: 番号行を図テーブルのヘッダへ畳む（tables）か、罫線が無い版は
     # 番号行の位置で合成テーブルを描く（synth）。畳んだ行は本文から消す（skip）。
     plan = plan or {"tables": {}, "synth": {}, "skip": set()}
@@ -479,6 +574,11 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 (figure_text if inside else output).extend(("", pointer, ""))
                 continue
             record = info["merged"] or tables[item["id"]]
+            if info["merged"] and tables[item["id"]].get("_caption_full"):
+                # 折り返し表題の全文はbitfield_planがページ表に付ける。ページ跨ぎの結合表は
+                # 別dictなので載せ替える——無いと続き行がskipされたうえ表題も1行目だけになり、
+                # `+ RISC-V3F)`が本文からも表題からも消える（H417DS0.en p99。parityは検出できない）。
+                record["_caption_full"] = tables[item["id"]]["_caption_full"]
             if (not record.get("caption")
                     and not any((c.get("text") or "").strip() for c in record["cells"])):
                 # 全セル空の偽table（図box由来。全corpus 1,115件）——空の枠は出さない。
@@ -495,8 +595,14 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # 前ページ末尾の番号行で組み直す箱（bit図のページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
             else:
-                # 通常表: 境界グリフの二重取り（`[31:12] R`等）を落とす。
+                # 通常表: `Reset`/`value`に割れたヘッダを戻し、境界グリフの二重取り（`[31:12] R`等）を落とす。
+                logical_tables.fold_header_wrap(record)
                 logical_tables.strip_boundary_dupes(record)
+                # 端に降ってきた別行のCJK/句読点グリフ（reset値の`0\n。`・`0000b\n时`）を
+                # geometryで確認して落とす。Latin英数字は`tsu`/`td`の実文字と区別できないので
+                # 触らない（latin_ok=False）。候補セルがあるページだけgeometryを開く。
+                if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
+                    logical_tables.strip_straddling_dupes(record, chars_for)
             if inside:
                 # 図領域内のtableは、図のbox/ラベルを罫線ありtableと誤抽出したもの
                 # （全corpus 3,758件）。枠付きboxが図テキストへ割り込むので、セルの中身を
@@ -544,6 +650,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
         if line["bbox"][3] - line["bbox"][1] < 0.5:
             continue   # 高さ0の退化行——2列見出し検出が生む重複見出しのghost（`# Feature`
                        # が2回。全corpusで28件全てこのパターン）。parityも同じくskip。
+        if item["id"] in title_skip:
+            continue   # 章題の折り返し2行目は直前の章見出しへ繋いだ
         role = line.get("role", "paragraph")
         raw = pua_normalize(line["text"])
         if role == "list-item":
@@ -583,6 +691,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                                f"{page_link(url, number, f'the PDF, p.{number}')}.", ""))
             continue
         if role == "heading" and item["id"] not in demote_headings:
+            if item["id"] in title_merge:
+                text += " " + html.escape(pua_normalize(title_merge[item["id"]]))
             output.extend(("", "#" * min(6, line.get("level", 2)) + " " + text, ""))
         elif role == "list-item":
             output.append("- " + text)
@@ -600,6 +710,7 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
     pages_dir = out / "pages"
     pages_dir.mkdir(parents=True, exist_ok=True)
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
+    entry_of = {page["number"]: entry for entry, page in zip(manifest["pages"], pages)}
     chains = logical_tables.document_chains(pages)
     plans = document_bitfields(bundle, manifest, pages)
     assets: dict[str, dict] = {}
@@ -617,7 +728,7 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
         (pages_dir / name).write_text(
             render_page(page, url, chains, assets, len(pages),
                         page_lost_subscripts(bundle, entry, page),
-                        plans[page["number"]]),
+                        plans[page["number"]], bundle, entry_of),
             encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(

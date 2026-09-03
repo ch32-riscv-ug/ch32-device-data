@@ -130,7 +130,39 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            export_markdown.document_bitfields, used by the exporter, the parity
            check and the audit),
            **table cells are centre-aligned by default with long/multi-line cells
-           left-aligned** (closer to the PDF), and
+           left-aligned** (closer to the PDF),
+           **cell-boundary glyph duplicates are removed** (pdfplumber's crop puts a
+           glyph that straddles a cell border into both cells -- `[31:12] R`, `RO R`,
+           `ReservedR`, a zh description's trailing `，` landing in the reset-value
+           column. `strip_boundary_dupes` handles the text-adjacent case; for the rest
+           `strip_straddling_dupes` confirms against the geometry that the specific
+           glyph sits mostly in another cell whose text has it at a line edge, and
+           never touches a glyph that is mostly inside its own cell -- so a name that
+           overflows a narrow column (`PB14`, `SWIER22`) keeps every letter; merged
+           page-spanning tables carry each cell's source page so the right page's
+           glyphs are consulted), **a wrapped header (`Reset` / `value`) that
+           pdfplumber split into a bogus data row is folded back into the header**
+           (`fold_header_wrap`; the row indices kept by `fold_boundary_spills` are
+           shifted with it), **empty grid slots not covered by a span are padded with
+           `<td></td>`** so a continuation fragment that lost its first column no
+           longer shifts left, **tables with no content are dropped and tables inside a
+           figure region are emitted as plain text** (both are diagram boxes that the
+           table finder mistook for tables; 1,115 and 3,758 across the corpus),
+           **large-font body blocks that the converter marked as headings are demoted
+           back to paragraphs** (a run of 3+ font-size-only headings, a `Note:`/`注：`
+           lead-in, >50 characters, or a CJK sentence-ending -- 2,390 lines; numbered
+           and chapter headings are never touched), **a chapter title's wrapped second
+           line is joined to the first** (`(SerDes)`), **a table caption that wrapped
+           onto a second line -- an unclosed parenthesis or a dangling `or`/`with` at
+           the line end -- is rendered whole in `<caption>` and the continuation line
+           leaves the body** (`logical_tables.caption_full`, shared with the
+           operating-conditions extractor so the CSV condition prefix is whole too;
+           `…SRAM (RISC-V5F` + `+ RISC-V3F)`), **a list item's own bullet is
+           not doubled**, **glyphs picked twice by a bold overprint are collapsed**
+           (`OOSSCC__IINN` -> `OSC_IN`; hex values are excluded), and **a figure that
+           pdfium rendered blank** (embedded JPEG or palette raster in an encrypted
+           PDF) **is recovered by decoding the image stream directly** in
+           render_assets (11 figures were blank), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
@@ -142,7 +174,11 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
 checks/    compare_manifest.py (cross-environment reproducibility)
            check_markdown_parity.py (machine check that every body line and table cell
            reaches the Markdown in reading order and that gap notices are present --
-           **all 67 documents pass**)
+           **all 67 documents pass**. Lines the exporter folds away are checked for
+           the place they were folded into: a wrapped caption's second line must
+           appear inside `<caption>`. The check sees existence and order only, so
+           an export-side transform is always paired with a semantic PDF-vs-Markdown
+           review as well)
            cross_engine.py (**independent verification of the text ingestion**:
            compares the bundle's character multiset against a second PDF engine,
            pypdfium2 -- order is ignored, only the set of characters. pypdfium2's
