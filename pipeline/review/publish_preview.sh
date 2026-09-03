@@ -15,11 +15,18 @@
 #        github.com のファイルビューが同じMarkdownをそのまま描画する）
 set -eu
 
-SRC="$(dirname "$0")/../../.cache/structured-markdown"
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"
+SRC="$REPO/.cache/structured-markdown"
 DST="${1:?usage: publish_preview.sh <path-to-preview-clone>}"
 
 [ -d "$DST/.git" ] || { echo "$DST is not a git clone" >&2; exit 1; }
-[ -f "$SRC/README.md" ] || { echo "run pipeline/review/export_markdown.py --all first" >&2; exit 1; }
+
+# 公開の直前に必ず最新へ再生成する（数十秒）。Pagesのデプロイは約15分かかるので
+# この数十秒は誤差で、古いMarkdownを公開してしまうデメリットの方が大きい（ユーザー要望）。
+echo "re-exporting structured-markdown before publish ..." >&2
+( cd "$REPO" && uv run pipeline/review/export_markdown.py --all )
+
+[ -f "$SRC/README.md" ] || { echo "export produced no $SRC/README.md" >&2; exit 1; }
 
 rsync -a --delete --exclude .git "$SRC"/ "$DST"/
 
