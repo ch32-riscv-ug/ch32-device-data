@@ -75,6 +75,35 @@ frozen parityで検証し、driftが良性（説明文の改善のみ）であ�
   ガード（L103のPRIO誤連結対策）には非依存で両立、全67本parity 0復帰。※図そのものの再構成は
   ページ跨ぎで中心数<列数のとき依然不完全（別項の調査保留）だが、少なくとも整合は保証。
 
+- **箇条書きの二重bullet**（`- - Dual-core…`。プログラム走査で発見）— export側
+  strip_leading_bullet（2026-09-03）。原本のlist-item行が既に`- `始まりで、exporterが更に
+  `- `を足して`- - `に。**全corpusで1,224件/121ページ**。修正: 行頭の`bullet+空白`（`- `/`● `等）を
+  落としてから`- `を足す。**`-0.5`/`-40℃`等のマイナス符号（空白が続かない）は剥がさない**（値を
+  壊さないため`bullet+空白`限定）。export/parity共有関数で処理。全67本parity 0・二重bullet 0。
+
+- **空table・図領域の偽table**（`<details>🖼`内に罫線boxが割り込む。図ブロック巡回が発見）—
+  export側render_page（2026-09-03）。converterが**図のbox/ラベルを罫線ありtableと誤抽出**する。
+  (1)**全セル空のtable 1,115件/455ページ**——空セルのcell_htmlは""でparityのexpectがno-opなので、
+  caption無し・非bitfield/crossの空tableをexportでskip（parity整合維持）。(2)**図領域内（in_figure）の
+  非空table 3,758件/1,255ページ**——枠付きboxが図テキストへ割り込むので、セルの中身を**プレーン
+  テキスト**で出す（`Text parsed from the figure`の趣旨に沿う）。transformは適用済みでparityは同じ
+  変換後セルを同順で読むため整合。結果: X315RM.zh p124が16個のboxから綺麗な図テキスト
+  （`1st 3rd 5th 7th`/`Sample`/`ADC1`…）へ。全67本parity 0・`<details>`内のtable 0。canonical無関係。
+
+- **cell_htmlのenum誤連結**（`…AVDD10: …AVDDOther:`。表構造巡回が発見）— export側cell_html
+  （2026-09-03）。セル内の物理改行を「折り返し（連結）か項目改行（`<br>`）か」で出し分ける際、
+  「前行末＝英大文字/数字 かつ 次行頭＝英大文字/数字」を識別子の折り返し（`USAR`+`T1`=`USART1`）と
+  みて地続きに連結していた。だがenumオプション行（`10: Calibration voltage 3/4 AVDD`、前行末`D`＋
+  次行頭`1`）も連結され`AVDD10`に。修正: **識別子の継続断片は空白を含まない1トークン**なので、
+  `次行に空白を含むなら折り返しでなく項目改行`として`<br>`。**全corpusで2,611セル**が変化（分類:
+  enum/ラベル・図ラベル・`TIM1_RM=00`/`Default Mapping`のenum対が大半で全て改善、旧の誤連結より悪化
+  するケースは無し）。識別子折り返し（`USART`+`1RST`）は連結維持。全67本parity 0。
+
+- **重複見出しのghost**（`# Feature`が2回。プログラム走査で発見）— export側（2026-09-03）。
+  2列見出し検出が**高さ0の退化bbox**を持つ重複heading行を生む。**全corpusで退化行はちょうど28件・
+  全て高さ0・全てrole=heading・全て直前の重複**（Feature/Features/功能概述等、datasheet先頭）と確定。
+  修正: `bbox高さ<0.5`の行をexport/parity両方でskip。全67本parity 0・連続重複見出し 0。
+
 - **表captionの二重描画**（`Table 4-1 … list`が表の上と表内で2回。X035RM p23、ユーザー報告）—
   bitfield_plan（2026-09-03）。表の`caption.line_id`が`<caption>`として描かれるのに、同じ行が
   reading_orderにも残り本文段落としても出ていた。**コーパス全体で4225件・63本**が該当（全table
@@ -229,6 +258,23 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   等）。cross-page対応後の残り。調査保留。
 
 ### ⛔ 撤退（理由つき）
+
+- **通常表へのstraddling除去の拡張**（reset値へのCJK/句読点bleed `0000b时、`・`0式过`等）—
+  2026-09-03に調査→撤退。strip_straddling_dupes（bit図で有効）を通常表にも掛ければreset値の
+  bled文字を消せるが、除去文字を分類すると**CJK 200・句読点 32は安全だが、Latin英数字 116が危険**。
+  内訳に`t\nsu(SI)`→`su(SI)`（`tsu`=setup time）・`t\nd(CLKL_ADIV)`→`d(CLKL_ADIV)`（`td`=delay time）
+  のように、**タイミングパラメータの実在する`t`接頭辞を別視覚行から降ってきた重複と誤認して除去**する
+  ケースがある。\n制約（bit図側の過剰除去を止めた条件）でもこれは守れない（`t`は別行にあるが実データ）。
+  さらに通常表全ページへgeometryを引き回す配線コストも要る。**再挑戦の条件**: 「除去文字がCJK/句読点の
+  ときだけ落とす（Latin英数字は触らない）」＋「reset値列と分かる列限定」にできたとき。CJK/句読点限定なら
+  232件は安全に消せる見込み。
+
+- **見出し検出のミス**（converter由来・記録のみ）— 2026-09-03の巡回で確認。(1)章題の折り返しが別見出しに
+  （H417RM.en p357: `# Chapter 20 …Transceiver`＋`# (SerDes)`）、(2)大フォントの傍注が複数H1に
+  （L103RM.zh p16/en p19: 「注：…」が5つのH1に分裂）。bundleのline roleがheadingに化けており、
+  export側で「継続っぽい見出し（`(`始まり・小文字始まり・文末が未完）を直前へ統合」する案は誤統合の
+  リスクが高い。zh/en両版に同じ崩れが出る＝converterのheading判定heuristicの取りこぼし。要reconvertか
+  慎重なheuristic。**保留**。
 
 - **bit図の名前を説明表で権威付け**（`ReserRveesde r`等の縦書き文字交錯104件）— 2026-09-03に
   実装→撤退。狙い: 図のフィールド名を、同レジスタの説明表（Bit/Name/…幅広で正しい）の

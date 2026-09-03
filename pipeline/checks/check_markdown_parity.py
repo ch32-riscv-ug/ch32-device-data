@@ -121,8 +121,13 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             if item["id"] in consumed_lines:
                 continue   # bit番号行/フィールド行は表へ畳んだ
             line = lines[item["id"]]
-            expect(html.escape(export_markdown.pua_normalize(line["text"])),
-                   f"{line.get('role')} {item['id']}")
+            if line["bbox"][3] - line["bbox"][1] < 0.5:
+                continue   # 高さ0の退化行（重複見出しのghost）——exporterと同じくskip。
+            body = export_markdown.pua_normalize(line["text"])
+            if line.get("role") == "list-item":
+                # exporterと同じく行頭bulletを落とす（`- `の二重を消す）。
+                body = export_markdown.strip_leading_bullet(body)
+            expect(html.escape(body), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):
                 # captionの直後には、描画済みの図（実ファイルがあること）か、

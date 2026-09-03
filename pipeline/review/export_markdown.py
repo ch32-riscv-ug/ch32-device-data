@@ -215,6 +215,20 @@ def pua_normalize(text: str) -> str:
     return text
 
 
+_BULLETS = "-–—•●○▪·*‣◦"
+
+
+def strip_leading_bullet(text: str) -> str:
+    """箇条書き行の行頭bullet（`bullet + 空白`）を落とす。exporterが`- `を足すので
+    残すと`- - Dual…`と二重になる。**bulletの直後が空白のときだけ**落とす——`-0.5`や
+    `-40℃`のようなマイナス符号（空白が続かない）を誤って剥がして値を壊さないため。
+    exporterとparity検査が同じ関数で処理して整合させる。"""
+    s = text.lstrip()
+    if len(s) >= 2 and s[0] in _BULLETS and s[1] in " \t":
+        return s[2:].lstrip()
+    return text
+
+
 _JOIN_PUNCT = ":;.。；：,，、"
 
 
@@ -242,7 +256,10 @@ def cell_html(text: str) -> str:
             sep = "<br>"
         elif (pe[-1].isalpha() and pe[-1].islower()) or (cur[0].isalpha() and cur[0].islower()):
             sep = " "
-        elif pe[-1].isalnum() and cur[0].isalnum():
+        elif pe[-1].isalnum() and cur[0].isalnum() and " " not in cur.strip():
+            # 識別子の折り返し（`USAR`+`T1`=`USART1`）だけ地続きに繋ぐ。継続断片は
+            # 空白を含まない1トークン。curが複数語（`10: Calibration voltage…`等の
+            # enum項目行）なら折り返しでなく項目改行なので`<br>`（`AVDD10`連結を防ぐ）。
             sep = ""
         else:
             sep = "<br>"
@@ -410,6 +427,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 (figure_text if inside else output).extend(("", pointer, ""))
                 continue
             record = info["merged"] or tables[item["id"]]
+            if (not record.get("caption")
+                    and not any((c.get("text") or "").strip() for c in record["cells"])):
+                # 全セル空の偽table（図box由来。全corpus 1,115件）——空の枠は出さない。
+                # 空セルのcell_htmlは""でparityのexpectはno-opなので整合は保たれる。
+                # bitfield/crossでもfieldが空ならapply_bitfieldは早期returnで内容を足さない
+                # （番号ヘッダも付かない）ので、空gridの`|||…|||`を出さずに済む。
+                continue
             if info["merged"]:
                 logical_tables.fold_boundary_spills(record)
             if item["id"] in bitfields:
@@ -421,8 +445,17 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             else:
                 # 通常表: 境界グリフの二重取り（`[31:12] R`等）を落とす。
                 logical_tables.strip_boundary_dupes(record)
-            (figure_text if inside else output).extend(
-                ("", table_html(record, url, number), ""))
+            if inside:
+                # 図領域内のtableは、図のbox/ラベルを罫線ありtableと誤抽出したもの
+                # （全corpus 3,758件）。枠付きboxが図テキストへ割り込むので、セルの中身を
+                # プレーンテキストで出す（`<details>🖼 Text parsed…`の趣旨に沿う）。transformは
+                # 上で適用済みなので、parityは同じ変換後セルをこの順で読んで整合する。
+                flat = "  ".join(cell_html(c["text"]) for c in record["cells"]
+                                 if (c.get("text") or "").strip())
+                if flat:
+                    figure_text.append(flat + "  ")
+            else:
+                output.extend(("", table_html(record, url, number), ""))
             continue
         if item["type"] == "image":
             image = images[item["id"]]
@@ -456,8 +489,16 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
         if item["id"] in consumed_lines:
             continue   # bit番号行/フィールド行は表へ畳んだ（bitfield）
         line = lines[item["id"]]
+        if line["bbox"][3] - line["bbox"][1] < 0.5:
+            continue   # 高さ0の退化行——2列見出し検出が生む重複見出しのghost（`# Feature`
+                       # が2回。全corpusで28件全てこのパターン）。parityも同じくskip。
         role = line.get("role", "paragraph")
-        text = html.escape(pua_normalize(line["text"]))
+        raw = pua_normalize(line["text"])
+        if role == "list-item":
+            # 原本の行頭bullet（`- `等）を落とす——exporterが`- `を足すので二重になる
+            # （`- - Dual…`。ユーザー指摘）。parityも同じ関数で落として整合させる。
+            raw = strip_leading_bullet(raw)
+        text = html.escape(raw)
         # 本文・箇条書きの強調（原本のfontから。見出しは`#`で既に強調済み）。
         if role in ("paragraph", "list-item"):
             if line.get("italic"):
