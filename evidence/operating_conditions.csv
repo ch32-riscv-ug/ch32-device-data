@@ -162,42 +162,42 @@ CH32H415;CH32H416;CH32H417,R_HSEXO_ext,Pull-down resistor externally connected t
 CH32H415;CH32H416;CH32H417,R_L,Load resistance when the buffer is open,,5,,,kΩ,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,T_A,Ambient temperature at work,,-40,,85,℃,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,T_J,Junction temperature,,-40,,105,℃,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V ＜ V REFP DDIO,0,,VREFP,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO < V REFP,0,,VREFP,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO ≥ V REFP,0,,VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO ≥ V REFP,0,,VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V < VREFP DDIO,0,,VREFP,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO < VREFP,0,,VREFP,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO ≥ VREFP,0,,VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_AIN,Conversion voltage range,V_DDIO ≥ VREFP,0,,VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_BAT,Working voltage of backup unit,,1.8,,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD12A,Working voltage of USB 3.0 module,,1.17,1.2,1.27,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33,Standard working voltage,USB or ETH not used,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33,Standard working voltage,Use USB or ETH or SerDes,3.15,3.3,3.45,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33A,Supply voltage,,3.0,3.3,3.6,V,#,reference,CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33A,Supply voltage,,2.4,3.3,3.6,V,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"ADCs, HSADCs and DACs not used, V cannot be DD33A lower than V DDIO",1.8,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use DAC, DAC output cannot be higher than V DDIO",2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use OPA, OPA output cannot be higher than V DDIO",1.8,3.3,3.6,V,#,conflict,"CH32H417DS0.PDF:en(p.94)+!CH32H417DS0.PDF:zh(min=2.7,typ=)",CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use the ADC, V cannot DD33A be lower than V and V DDIO REFP cannot be higher than V DD33A",2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use the HSADC, V DD33A cannot be lower than V DDIO and V cannot be higher REFP than V DD33A",3.0,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"ADCs, HSADCs and DACs not used, V cannot be DD33A lower than VDDIO",1.8,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use DAC, DAC output cannot be higher than VDDIO",2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use OPA, OPA output cannot be higher than VDDIO",1.8,3.3,3.6,V,#,conflict,"CH32H417DS0.PDF:en(p.94)+!CH32H417DS0.PDF:zh(min=2.7,typ=)",CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use the ADC, V cannot DD33A be lower than V and VDDIO REFP cannot be higher than VDD33A",2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33A,Analog part working voltage,"Use the HSADC, VDD33A cannot be lower than VDDIO and V cannot be higher REFP than VDD33A",3.0,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33A,Supply voltage,f_S < 2MHz,2.7,,3.6,V,#,conflict,CH32H417DS0.PDF:en(p.134)+!CH32H417DS0.PDF:zh(min=3),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DD33A,Supply voltage,f_S ≥ 2MHz,3,,3.6,V,#,reference,CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DDIO,I/O pin voltage when using HSADC,,VREFP,,,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_DDIO,Working voltage of some conventional I/O pins,V cannot be higher than DDIO V DD33,1.65,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DDIO,Working voltage of some conventional I/O pins,V cannot be higher than DDIO VDD33,1.65,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_DDK,Core operating voltage,,1.17,1.2,1.27,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_HSEH,XI input pin high voltage,,0.8*VDDIO,,VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_HSEL,XI input pin low voltage,,0,,0.2*VDDIO,V,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_IH,"FT I/O pin, input high voltage","V*_IO_HSLV = 0, And V = 3.3V *",1.9,,5.0,V,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_IH,"Standard I/O pin, input high voltage","V*_IO_HSLV = 0, and V = 3.3V *",1.9,,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_IL,"Standard I/O pin, input low level voltage","V*_IO_HSLV = 0, and V = 3.3V *",-0.3,,0.9,V,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_IO18,Working voltage of some high-speed I/O pins,V cannot be higher than IO18 V DDIO,1.1,,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IO18,Working voltage of some high-speed I/O pins,V cannot be higher than IO18 VDDIO,1.1,,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_LSEH,OSC32_IN input pin high level voltage,,0.8*VDD33,,VDD33,V,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_LSEL,OSC32_IN input pin low voltage,,0,,0.2*VDD33,V,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_OUT_MAX,,V = 3.3V REFP,3.29,,3.3,V,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_OUT_MAX,,V = 3.3V REFP,3.295,,3.3,V,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_OUT_MIN,"Buffer on, 12-bit DAC conversion",,0,,8,mV,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,V_OUT_MIN,"Buffer off, 12-bit DAC conversion",,0,,3,mV,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_REFP,"Positive reference voltage of ADC, HSADC and DAC modules",V cannot be higher than REFP V DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ V REFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ V REFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ V REFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_REFP,"Positive reference voltage of ADC, HSADC and DAC modules",V cannot be higher than REFP VDD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.82)+CH32H417DS0.PDF:en(p.94),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ VREFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ VREFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_REFP,Positive reference voltage,V ≤ VREFP DD33A,2.4,3.3,3.6,V,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_ADC,ADC clock frequency,,,14,80,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_HSADC,ADC clock frequency,,,100,,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_S,Sampling rate,,0.06,,5,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
@@ -274,7 +274,7 @@ CH32L103;CH32M103,F_PLL_IN,PLL input clock,,3,8,25,MHz,#,confirmed,CH32L103DS0.P
 CH32L103;CH32M103,F_PLL_OUT,PLL multiplier output clock,,18,,96,MHz,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32L103DS0.PDF:zh(p.11)+CH32L103DS0.PDF:en(p.16),CH32L103DS0.PDF
 CH32L103;CH32M103,I_2,HSE drive current,"Low-power, V_DD = 3.3V, 20p load",,0.55,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
-CH32L103;CH32M103,I_2,HSE drive current,V_DD = 3.3V，20p load,,1,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
+CH32L103;CH32M103,I_2,HSE drive current,"V_DD = 3.3V,20p load",,1,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD,Supply current in STANDBY mode,"Data processing code runs from FLASH, typical current consumption in Stop and Standby mode; HIS, HSE, LSI, LSE=All disabled; RAMLV=0; R18KS TY=1; R2KS TY=1; LDO_ EC=×; LPDS=×; PDDS=1; LDO=10",,2.82,,,#,confirmed,CH32L103DS0.PDF:zh(p.37)+CH32L103DS0.PDF:en(p.45),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD,Supply current in STOP mode3(2) (4),"Data processing code runs from FLASH, typical current consumption in Stop and Standby mode; HIS, HSE, LSI, LSE=All disabled; RAMLV=0; R18KS TY=×; R2KS TY=×; LDO_ EC=0; LPDS=1; PDDS=0; LDO=10",,4.55,,,#,confirmed,CH32L103DS0.PDF:zh(p.37)+CH32L103DS0.PDF:en(p.45),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD,Supply current in STANDBY mode,"Data processing code runs from FLASH, typical current consumption in Stop and Standby mode; HIS, HSE, LSI, LSE=All disabled; RAMLV=1; R18KS TY=0; R2KS TY=1; LDO_ EC=×; LPDS=×; PDDS=1; LDO=10",,0.59,,,#,confirmed,CH32L103DS0.PDF:zh(p.37)+CH32L103DS0.PDF:en(p.45),CH32L103DS0.PDF
@@ -914,8 +914,8 @@ CH32V002,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.2
 CH32V002,t_s,Sampling time,,3.5,,35.5,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,f = 16MHz ADC,0.218,,14.97,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,f = 48MHz ADC,0.073,,0.739,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
-CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃～85℃,-2.2,,2.2,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
-CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃～70℃,-1.2,,1.6,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
+CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
+CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃~70℃,-1.2,,1.6,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,C,Recommended load capacitance and corresponding crystal series impedance R S,R = 60Ω(1) S,,20,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,C_ADC,Internal sample and hold capacitor,,,3,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,C_I/O,I/O pin capacitance,,,5,,pF,#,reference,CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
@@ -928,7 +928,7 @@ CH32V003,F_HSI,Frequency (after calibration),,,24,,MHz,#,confirmed,CH32V003DS0.P
 CH32V003,F_LSI,Frequency,,100,128,150,KHz,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.1)+CH32V003DS0.PDF:en(p.1),CH32V003DS0.PDF
 CH32V003,F_OSC_IN,Resonator frequency,,4,24,25,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
-CH32V003,I_2,HSE drive current,V_DD = 3.3V，20p load,,0.32,,mA,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
+CH32V003,I_2,HSE drive current,"V_DD = 3.3V,20p load",,0.32,,mA,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,I_DD,Supply current,,,370,,uA,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, data processing code runs from the internal Flash; External clock; F = 16MHz HCLK; All peripherals disabled",,3.9,,mA,#,confirmed,CH32V003DS0.PDF:zh(p.16)+CH32V003DS0.PDF:en(p.19),CH32V003DS0.PDF
 CH32V003,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, data processing code runs from the internal Flash; External clock; F = 16MHz HCLK; All peripherals disabled",,5.1,,mA,#,confirmed,CH32V003DS0.PDF:zh(p.17)+CH32V003DS0.PDF:en(p.19),CH32V003DS0.PDF
@@ -1517,7 +1517,7 @@ CH32V103,T_S_temp,ADC sampling time when reading temperature,f = 14MHz ADC,,,17.
 CH32V103,T_S_vrefint,ADC sampling time when reading the internal reference voltage,Slow sampling recommended,0.107,,17.1,1/fADC,#,confirmed,CH32V103DS0.PDF:zh(p.21)+CH32V103DS0.PDF:en(p.23),CH32V103DS0.PDF
 CH32V103,V_25,Voltage at 25°C,,1.1,1.34,1.6,V,#,confirmed,CH32V103DS0.PDF:zh(p.32)+CH32V103DS0.PDF:en(p.36),CH32V103DS0.PDF
 CH32V103,V_AIN,Conversion voltage range,,0,,VDDA,V,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
-CH32V103,V_BAT,Backup operating voltage,Cannot be more than V DD,1.8,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
+CH32V103,V_BAT,Backup operating voltage,Cannot be more than VDD,1.8,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_DD,Standard operating voltage,,2.7,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_DDA,Analog operating voltage (ADC is used),,3.0,,,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_DDA,Supply voltage,,3.0,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
@@ -1793,7 +1793,7 @@ CH32V203,V_DD,Standard operating voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF
 CH32V203,V_DD,Standard operating voltage,Use USB,3.0,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DDA,Analog operating voltage (ADC is used),,,,,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DDA,Supply voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
-CH32V203,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to V SS.",2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to VSS.",2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_HSEH,OSC_IN input pin high level voltage,,0.8VI/O,,VIO,V,#,conflict,CH32V203DS0.PDF:en(p.45)+!CH32V203DS0.PDF:zh(min=0.8VIO),CH32V203DS0.PDF
 CH32V203,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2VIO,V,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
 CH32V203,V_I/O,Output voltage on most I/O pins,V cannot be more than V I/O DD,2.4,,3.6,V,#,reference,CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
@@ -1819,7 +1819,7 @@ CH32V203,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 110 (ris
 CH32V203,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (falling edge),,3.21,,V,#,reference,CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (rising edge),,3.31,,V,#,reference,CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,V_PVDhyst,PVD hysteresis,,,0.08,,V,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
-CH32V203,V_REF+,Positive reference voltage,V cannot be REF+ more than V DDA,2.4,,VDDA,V,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
+CH32V203,V_REF+,Positive reference voltage,V cannot be REF+ more than VDDA,2.4,,VDDA,V,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,V_REFINT,Internal reference voltage,T_A = The working environment temperature range shown in Table 4-2,1.17,1.2,1.23,V,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,V_hys,Standard I/O pin Schmitt trigger,,150,,,mV,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,V_prog,Programming voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
@@ -1936,16 +1936,16 @@ CH32V203;CH32V205,T_A,Ambient temperature,,-40,,85,℃,#,confirmed,CH32V205DS0.P
 CH32V203;CH32V205,T_J,Junction temperature range,,-40,,105,℃,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,T_S_vrefint,ADC sampling time when reading the internal reference voltage,Slow sampling is recommended.,,,20,us,#,confirmed,CH32V205DS0.PDF:zh(p.41)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,V_AIN,Conversion voltage range,,0,,VREF+,V,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
-CH32V203;CH32V205,V_BAT,Backup operating voltage,Cannot exceed V DD,1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,V_BAT,Backup operating voltage,Cannot exceed VDD,1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,V_BC_REF,BC CMP reference voltage,,,0.4,,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,V_BC_SRC,BC protocol output voltage,,,0.6,,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,V_DD,USB operating voltage,,3.15,,3.45,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,V_DD,Standard operating voltage,Unused USB,1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,V_DD,Standard operating voltage,Use USB,3.15,,3.45,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,V_DDA,Supply voltage,,2.4,3.3,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
-CH32V203;CH32V205,V_DDA,Analog operating voltage (V DDA = V ) DD,"When the ADC is not in use, V must not fall below V . DDA IO",1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
-CH32V203;CH32V205,V_DDA,Analog operating voltage (V DDA = V ) DD,"When using ADC or enabling TKEY, V must not be lower DDA than V , and V must not IO REF+ exceed V . DDA",2.4,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
-CH32V203;CH32V205,V_DDA,Analog operating voltage (V DDA = V ) DD,"When using an OPA, the op-amp output must not exceed V . IO",1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,V_DDA,Analog operating voltage (VDDA = V ) DD,"When the ADC is not in use, V must not fall below V . DDA IO",1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,V_DDA,Analog operating voltage (VDDA = V ) DD,"When using ADC or enabling TKEY, V must not be lower DDA than V , and V must not IO REF+ exceed V . DDA",2.4,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,V_DDA,Analog operating voltage (VDDA = V ) DD,"When using an OPA, the op-amp output must not exceed V . IO",1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,V_HSDSC,High-speed disconnection detection threshold,,500,,625,mV,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,V_HSEH,OSC_IN input pin high level voltage,,0.8*VDD,,VDD,V,#,confirmed,CH32V205DS0.PDF:zh(p.44)+CH32V205DS0.PDF:en(p.51),CH32V205DS0.PDF
 CH32V203;CH32V205,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2*VDD,V,#,confirmed,CH32V205DS0.PDF:zh(p.44)+CH32V205DS0.PDF:en(p.51),CH32V205DS0.PDF
@@ -1981,7 +1981,7 @@ CH32V203;CH32V205,V_PVD,Programmable voltage detector level selection,PLS[2:0] =
 CH32V203;CH32V205,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (falling edge),,2.97,,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (rising edge),,3.07,,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,V_PVDhyst,PVD hysteresis,,0.05,0.08,0.14,V,#,confirmed,CH32V205DS0.PDF:zh(p.41)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
-CH32V203;CH32V205,V_REF+,Positive reference voltage of ADC module,V cannot exceed V REF+ DDA,1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,V_REF+,Positive reference voltage of ADC module,V cannot exceed VREF+ DDA,1.8,,3.6,V,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
 CH32V203;CH32V205,V_REF+,Positive reference voltage,"V_DDA ≤ V , no less REF+ than 2.4V is recommended.",1.8,,VDDA,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.19,1.22,1.25,V,#,confirmed,CH32V205DS0.PDF:zh(p.41)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,V_SE,Single-ended receiver threshold,V_DD = 3.3V,1.2,,1.9,V,#,confirmed,CH32V205DS0.PDF:zh(p.54)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
@@ -2045,7 +2045,7 @@ CH32V208,F_PCLK2,Internal PB2 clock frequency,,,,144,MHz,#,confirmed,CH32V208DS0
 CH32V208,F_PLL_IN,PLL input clock,,4,8,25,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,F_PLL_OUT,PLL multiplier output clock,,40,,240,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.7)+CH32V208DS0.PDF:en(p.10),CH32V208DS0.PDF
-CH32V208,F_prog,Programming frequency(1),T_A = -40℃～85℃,,,60,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,F_prog,Programming frequency(1),T_A = -40℃~85℃,,,60,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,I_2,HSE drive current,,,0.53,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.27)+CH32V208DS0.PDF:en(p.32),CH32V208DS0.PDF
 CH32V208,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; External clock; F = 144MHz HCLK; All peripherals disabled(2)",,11.46,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.29),CH32V208DS0.PDF
 CH32V208,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; External clock; F = 144MHz HCLK; All peripherals enabled",,16.21,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.29),CH32V208DS0.PDF
@@ -2155,7 +2155,7 @@ CH32V208,V_DD,USB operating voltage,,3.0,,3.6,V,#,reference,CH32V208DS0.PDF:en(p
 CH32V208,V_DD,Standard operating voltage,Use USB or ETH,3.0,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,V_DDA,Analog operating voltage (ADC is used),,,,,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,V_DDA,Supply voltage,,2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
-CH32V208,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to V SS.",2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to VSS.",2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,V_HSDSC,High-speed disconnection detection threshold,,500,,625,mV,#,reference,CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,V_HSEH,OSC_IN input pin high level voltage,,0.8VIO,,VIO,V,#,confirmed,CH32V208DS0.PDF:zh(p.26)+CH32V208DS0.PDF:en(p.31),CH32V208DS0.PDF
 CH32V208,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2VIO,V,#,confirmed,CH32V208DS0.PDF:zh(p.26)+CH32V208DS0.PDF:en(p.31),CH32V208DS0.PDF
@@ -2188,7 +2188,7 @@ CH32V208,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 110 (ris
 CH32V208,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (falling edge),,3.21,,V,#,reference,CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
 CH32V208,V_PVD,Programmable voltage detector level selection,PLS[2:0] = 111 (rising edge),,3.31,,V,#,reference,CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
 CH32V208,V_PVDhyst,PVD hysteresis,,,0.08,,V,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
-CH32V208,V_REF+,Positive reference voltage,V cannot be REF+ more than V DDA,2.4,,VDDA,V,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
+CH32V208,V_REF+,Positive reference voltage,V cannot be REF+ more than VDDA,2.4,,VDDA,V,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.17,1.2,1.23,V,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
 CH32V208,V_SE,Single-ended receiver threshold,V_DD = 3.3V,1.2,,1.9,V,#,reference,CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,,150,,,mV,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
@@ -2216,9 +2216,9 @@ CH32V208,t_VDD,V fall time rate DD,,20,,∞,us/V,#,confirmed,CH32V208DS0.PDF:zh(
 CH32V208,t_VDDA,V fall time rate DDA,,20,,∞,us/V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,t_VDDA,V rise time rate DDA,V is powered DD,0,,10000,us/V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); LDO stabilization time + HSI RC clock wake up + code load time(2) (take 128K as example),,5.0,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
-CH32V208,t_erase_page,Page (256 bytes) erase time,T_A = -40℃～85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
-CH32V208,t_erase_sec,Sector (4K bytes) erase time,T_A = -40℃～85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
-CH32V208,t_prog_page,Page (256 bytes) programming time,T_A = -40℃～85℃,,2,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,t_erase_page,Page (256 bytes) erase time,T_A = -40℃~85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,t_erase_sec,Sector (4K bytes) erase time,T_A = -40℃~85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,t_prog_page,Page (256 bytes) programming time,T_A = -40℃~85℃,,2,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.42),CH32V208DS0.PDF
 CH32V208,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,2.6,,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,t_wustop,Wakeup from Stop mode (voltage regulator is in low-power mode),Wakeup time from low-power mode(1); Voltage regulator wakeup time from low-power mode + HSI RC clock wake up,,299,,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
@@ -2355,11 +2355,11 @@ CH32V303;CH32V305;CH32V307;CH32V317,V_DD,Standard operating voltage,USB or ETH n
 CH32V303;CH32V305;CH32V307;CH32V317,V_DD,Standard operating voltage,Use USB or ETH,3.0,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_DDA,Analog operating voltage (ADC is used),,2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_DDA,Supply voltage,,2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
-CH32V303;CH32V305;CH32V307;CH32V317,V_DDA,Analog operating voltage (ADC is not used),"V must be the same DDA as V , V cannot be I/O REF+ higher than V , V DDA REF- is equal to V SS.",2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_DDA,Analog operating voltage (ADC is not used),"V must be the same DDA as V , V cannot be I/O REF+ higher than V , VDDA REF- is equal to VSS.",2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_DD_ETH,Internal 10/100M Ethernet PHY power supply voltage,CH32V317,3.15,,3.45,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_HSEH,OSC_IN input pin high level voltage,,0.8*VIO,,VI/O,V,#,conflict,CH32V20x_30xDS0.PDF:en(p.65)+!CH32V20x_30xDS0.PDF:zh(max=VIO),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2*VIO,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.57)+CH32V20x_30xDS0.PDF:en(p.65),CH32V20x_30xDS0.PDF
-CH32V303;CH32V305;CH32V307;CH32V317,V_IO,Output voltage on most I/O pins,V cannot be more than I/O V DD,2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IO,Output voltage on most I/O pins,V cannot be more than I/O VDD,2.4,,3.6,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltage detector(2),PLS[2:0] = 000 (falling edge),,2.31,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltage detector(2),PLS[2:0] = 000 (rising edge),,2.39,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltage detector(2),PLS[2:0] = 001 (falling edge),,2.48,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
@@ -2377,7 +2377,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltag
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltage detector(2),PLS[2:0] = 111 (falling edge),,3.21,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVD,Level selection of programmable voltage detector(2),PLS[2:0] = 111 (rising edge),,3.31,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_PVDhyst,PVD hysteresis,,,0.08,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.53)+CH32V20x_30xDS0.PDF:en(p.60),CH32V20x_30xDS0.PDF
-CH32V303;CH32V305;CH32V307;CH32V317,V_REF+,Positive reference voltage,V cannot be REF+ more than V DDA,2.4,,VDDA,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_REF+,Positive reference voltage,V cannot be REF+ more than VDDA,2.4,,VDDA,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_prog,Programming voltage,,2.4,,3.6,V,#,reference,CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,f_S,Sampling rate,,0.05,,1,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
@@ -2527,7 +2527,7 @@ CH32V407;CH32V467,V_PVD,Programmable voltage detector level selection,PLS[1:0] =
 CH32V407;CH32V467,V_PVD,Programmable voltage detector level selection,PLS[1:0] = 11 (rising edge),,3.14,,V,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,V_PVDhyst,PVD hysteresis,,,0.04,,V,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,V_REF+,Positive reference voltage of ADC and DAC modules,V must not exceed V ; REF+ DD V is equal to V . REF- SS,2.4,3.3,3.6,V,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
-CH32V407;CH32V467,V_REF+,Positive reference voltage,V_DDA ≤ V REF+,2.4,,VDDA,V,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
+CH32V407;CH32V467,V_REF+,Positive reference voltage,V_DDA ≤ VREF+,2.4,,VDDA,V,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.17,1.2,1.23,V,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,,150,,,mV,#,confirmed,CH32V407DS0.PDF:zh(p.52)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,f_ADC,ADC clock frequency,,,,30,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
@@ -2739,7 +2739,7 @@ CH32X305;CH32X315,V_AIN,Conversion voltage range,,VREF-,,VREF+,V,#,confirmed,CH3
 CH32X305;CH32X315,V_DD,Standard working voltage,Not used USB 2.0,2.8,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
 CH32X305;CH32X315,V_DD,Standard working voltage,Use USB 2.0,3.15,3.3,3.45,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
 CH32X305;CH32X315,V_DDA,Supply voltage,,2.8,,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.41)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
-CH32X305;CH32X315,V_DDA,Analog part working voltage,"V should be the same as V , DDA DD V cannot be higher than V , REF+ DDA V is recommended to be equal REF- to V SS",2.8,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_DDA,Analog part working voltage,"V should be the same as V , DDA DD V cannot be higher than V , REF+ DDA V is recommended to be equal REF- to VSS",2.8,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
 CH32X305;CH32X315,V_DDK,"Core operating voltage, USB3.0 module operating voltage",,1.17,1.2,1.27,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
 CH32X305;CH32X315,V_HSEH,OSC_IN input pin high level voltage,,0.8*VDD,,VDD,V,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2*VDD,V,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
@@ -2761,8 +2761,8 @@ CH32X305;CH32X315,V_PVD,Programmable voltage detector level selection,PLS[1:0] =
 CH32X305;CH32X315,V_PVD,Programmable voltage detector level selection,PLS[1:0] = 11 (falling edge),,3.07,,V,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,V_PVD,Programmable voltage detector level selection,PLS[1:0] = 11 (rising edge),,3.09,,V,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,V_PVDhyst,PVD hysteresis,,,0.02,,V,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
-CH32X305;CH32X315,V_REF+,Positive reference voltage for ADC module,V must not exceed V ; V REF+ DDA REF- should be equal to V . SS,2.4,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
-CH32X305;CH32X315,V_REF+,Positive reference voltage,V_DDA ≤ V REF+,2.4,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
+CH32X305;CH32X315,V_REF+,Positive reference voltage for ADC module,V must not exceed V ; VREF+ DDA REF- should be equal to V . SS,2.4,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_REF+,Positive reference voltage,V_DDA ≤ VREF+,2.4,3.3,3.6,V,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,V_REF-,Negative reference voltage,,0,0,1.0,V,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.17,1.2,1.23,V,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,V_hys,FT I/O pin Schmitt trigger voltage hysteresis,,,220,,mV,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF

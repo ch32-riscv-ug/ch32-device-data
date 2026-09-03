@@ -62,6 +62,14 @@ def main() -> int:
     base = frozen_base_rows()
     added = extract_low_power.collect_rows()
 
+    # 電源レール名の下付きがセル内折り返しで`V DD`と割れる。凍結`build_operating`
+    # （byte再現の参照実装）は触れず、この合成層でbase行の parameter/condition にも
+    # 下付き結合を後処理として掛ける（addedはextract_low_power側で結合済み）。
+    # build_operatingの「旧出力をbyte再現」は保ったまま、正本CSVだけ綺麗にする層。
+    for row in base:
+        row["parameter"] = extract_low_power._clean_text(row.get("parameter"))
+        row["condition"] = extract_low_power._clean_text(row.get("condition"))
+
     combined = base + added
     seen: set[tuple] = set()
     rows = []
