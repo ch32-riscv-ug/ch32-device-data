@@ -55,7 +55,8 @@ def load_page(bundle: Path, entry: dict) -> dict:
 def check_page(page: dict, text: str, chains: dict[str, dict],
                pages_dir: Path, plan: dict | None = None,
                bundle: Path | None = None,
-               entries: dict[int, dict] | None = None) -> list[str]:
+               entries: dict[int, dict] | None = None,
+               figure_regions: list | tuple = ()) -> list[str]:
     bad = []
     # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
     # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
@@ -100,7 +101,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             position = at + len(needle)
 
     # exporterと同じ読み順（拾い直した図ラベルを含む`reading_stream`）を歩く。
-    for item in logical_tables.reading_stream(page):
+    for item in logical_tables.reading_stream(page, figure_regions):
         if item["type"] == "table":
             info = chains[item["id"]]
             if not info["start"]:
@@ -193,6 +194,15 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     entry_of = {page["number"]: entry for entry, page in zip(manifest["pages"], pages)}
     chains = logical_tables.document_chains(pages)
     plans = export_markdown.document_bitfields(bundle, manifest, pages)
+    # exporterと同じ図領域（描画済みassetのbbox）。拾い直す行は図の中だけなので、
+    # parityも同じ領域を見ないと「本文から消えた」と誤検出する。
+    regions: dict[int, list] = {}
+    assets_file = markdown / "assets.json"
+    if assets_file.exists():
+        payload = json.loads(assets_file.read_text(encoding="utf-8"))
+        items = payload.get("assets", payload) if isinstance(payload, dict) else payload
+        for asset in (items.values() if isinstance(items, dict) else items):
+            regions.setdefault(asset["page"], []).append(asset["bbox"])
     bad: list[str] = []
     for entry, page in zip(manifest["pages"], pages):
         md = markdown / "pages" / f"{page['number']:04d}.md"
@@ -201,7 +211,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
             continue
         text = md.read_text(encoding="utf-8")
         bad.extend(check_page(page, text, chains, markdown / "pages",
-                              plans[page["number"]], bundle, entry_of))
+                              plans[page["number"]], bundle, entry_of,
+                              regions.get(page["number"], [])))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")
