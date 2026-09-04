@@ -129,11 +129,16 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            single full-width field line is synthesised into a header+field table;
            a field name split
            vertically by a narrow column -- `Reser`+`ved` -> `Reserved` -- is
-           rejoined (a tail fragment the neighbouring cell also claimed is dropped
-           when the page's description table disagrees: `HSYNCSCS` -> `HSYNCS`,
-           `WWDG_STOPTOP` -> `WWDG_STOP`; the Name column of the table below the
-           diagram is the evidence, so legitimate names ending in a repeated digit --
-           `PB11`, `ODR11` -- are untouched; 44 cells), while a two-mode TIM CCMR keeps its output-name row above its
+           rejoined (a name mangled by fragments the neighbouring cell also
+           claimed is repaired from the page's description table: `HSYNCSCS` ->
+           `HSYNCS`, `PLLRPDLLY` -> `PLLRDY`, `ATACAMTADCMD` -> `ATACMD`. The Name
+           column of the table below the diagram is the evidence: a name that appears
+           there as a subsequence of the rendered text replaces it, but **only when
+           every dropped character occurs in that name** -- interleaved duplicates
+           drop the name's own glyphs, whereas `INTEN12`, `PENDSTA15` and
+           `HSICAL[7:0]` would lose an index or a bit range, so they stay. 943 cells
+           across 20 documents; legitimate names ending in a repeated digit are
+           untouched), while a two-mode TIM CCMR keeps its output-name row above its
            input-name row; bit-field diagrams are also kept out of the page-spanning
            table chaining (a back-to-back pair used to merge, losing the cell
            geometry the rebuild needs). A diagram **split across a page break** --

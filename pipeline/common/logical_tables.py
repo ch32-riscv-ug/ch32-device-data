@@ -403,6 +403,34 @@ def _undoubled_tail(text: str) -> str | None:
     return None
 
 
+def _only_duplicate_glyphs(text: str, name: str) -> bool:
+    """`text`から`name`へ縮めるとき、**落ちる文字が全て`name`自身に在る**か。
+
+    交錯した重複は名前のグリフが二度出る形なので、落ちるのは名前が持つ文字だけになる
+    （`PLLRPDLLY`→`PLLRDY`で落ちるのは`P,L,L`）。一方、図の`INTEN12`・`PENDSTA15`・
+    `HSICAL[7:0]`は**Name列が索引や範囲を書かないだけで図が正しい**——落ちる`1`/`2`/`[7:0]`は
+    名前に無い文字なので、この条件で弾ける（この歯止め無しでは905件が索引や範囲を失った）。
+    空白は版面の都合なので例外。
+    """
+    counts: dict[str, int] = {}
+    for ch in name:
+        counts[ch] = counts.get(ch, 0) + 1
+    for ch in text:
+        if ch.isspace():
+            continue
+        if counts.get(ch):
+            counts[ch] -= 1
+        elif ch not in name:
+            return False
+    return True
+
+
+def _is_subsequence(name: str, text: str) -> bool:
+    """`name`の文字が`text`に順番どおり現れるか（間に余分な文字があってよい）。"""
+    it = iter(text)
+    return all(ch in it for ch in name)
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -423,11 +451,27 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         # 判定は**描画後の形**で行う——`apply_bitfield`の連結は改行を残すことがあり
         # （`HSYNCS\nCS`）、`cell_html`が識別子として地続きに繋いで`HSYNCSCS`になる。
         flat = (cell.get("text") or "").replace("\n", "").strip()
-        if len(flat) < 4 or " " in flat or flat in names:
+        if len(flat) < 4 or flat in names:
             continue
-        short = _undoubled_tail(flat)
-        if short and len(short) >= 3 and short in names:
-            cell["text"] = short
+        if " " not in flat:
+            short = _undoubled_tail(flat)
+            if short and len(short) >= 3 and short in names:
+                cell["text"] = short
+                fixed += 1
+                continue
+        # 末尾の二重だけでなく、**縦割れの断片が交錯して混ざる**壊れ方もある
+        # （`ATACAMTADCMD`＝`ATACMD`、`CTBXBEF`＝`CTXBEF`、`Reser Cved`＝`Reserved`、
+        # `DBCDKEBNCKDEN`＝`DBCKEND`。PDF↔MD突合サブエージェントが1文書で107件を検出）。
+        # 正しい名前は記述表のName列に在り、**その文字が順番どおり含まれる**という関係が
+        # 成り立つ。候補が1つに決まるときだけ差し替える（長さは名前の2倍+2まで——
+        # `Reserved bits must be 0`のような説明文を名前へ潰さないための歯止め）。
+        candidates = [n for n in names
+                      if len(n) >= 3 and " " not in n and n != flat
+                      and len(flat) <= 2 * len(n) + 2
+                      and _only_duplicate_glyphs(flat, n)
+                      and _is_subsequence(n, flat)]
+        if len(candidates) == 1:
+            cell["text"] = candidates[0]
             fixed += 1
     return fixed
 
@@ -435,7 +479,7 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
 _RECOVER_TOKEN = re.compile(r"[A-Za-z0-9_\[\]:.]{2,}")
 
 
-def recovered_lines(page: dict) -> list[dict]:
+def recovered_lines(page: dict, figure_regions: list | tuple = ()) -> list[dict]:
     """変換器が`reading_order`から外した行のうち、**表のセルにも残った行にも中身が無い**もの。
 
     converterは表の領域に重なる行をreading_orderから外す（表のセルが同じ文字を持つはず、
@@ -448,7 +492,16 @@ def recovered_lines(page: dict) -> list[dict]:
     検索・コピーのために残す」なので、拾い直して`<details>`へ入れる。
     **重複を出さないため、語（2文字以上）が1つでも他所に在る行は拾わない**（部分的に
     セルへ入っている行を足すと同じ文字が二度出る）。
+
+    さらに**描画済みの図の領域に入る行だけ**を拾う（`figure_regions`）。図の外で拾った分は
+    PDF↔MD突合サブエージェント（zh版RM 6ページ）が「bit図の破片が本文へ重複して出る」と
+    判定した——`INTENINTENINTENINTEN`・`A15 A14 A13`（`STA15`等の再切り出し）・`# TDes0`が
+    本文の見出しに。図の中なら`<details>🖼 Text parsed from the figure above`の中に入り、
+    「図から読めた文字」として意味が通る。判定が一致した実測: 突合がOKと言った2ページは
+    全行が図の中、WRONGと言った4ページは図の中0行。
     """
+    if not figure_regions:
+        return []
     order = {item["id"] for item in page["reading_order"] if item["type"] == "line"}
     covered = " ".join((c.get("text") or "") for t in page["tables"] for c in t["cells"])
     kept = " ".join(l["text"] for l in page["lines"] if l["id"] in order)
@@ -460,14 +513,18 @@ def recovered_lines(page: dict) -> list[dict]:
         tokens = _RECOVER_TOKEN.findall(line["text"])
         if not tokens or any(token in haystack for token in tokens):
             continue
+        box = line["bbox"]
+        cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+        if not any(r[0] <= cx <= r[2] and r[1] <= cy <= r[3] for r in figure_regions):
+            continue
         out.append(line)
     return out
 
 
-def reading_stream(page: dict) -> list[dict]:
+def reading_stream(page: dict, figure_regions: list | tuple = ()) -> list[dict]:
     """`reading_order`に`recovered_lines`を縦位置で差し込んだ読み順。exporterとparityが
     同じ関数を使うので、拾い直した行も同じ位置・同じ順で検査される。"""
-    recovered = recovered_lines(page)
+    recovered = recovered_lines(page, figure_regions)
     if not recovered:
         return list(page["reading_order"])
     stream = list(page["reading_order"])
@@ -540,7 +597,9 @@ def fragment_tables(page: dict) -> set[str]:
     """
     out: set[str] = set()
     for table in page["tables"]:
-        if (table.get("column_count") or 0) > 1 or (table.get("row_count") or 0) > 2:
+        # 3行の断片スタック（`MA`/`XC`/`H`＝`EXMAXCH`）も同じ残骸——2行までに絞ると
+        # 30表が残った（PDF↔MD突合の指摘）。中身が本体表に在ることは下で必ず確かめる。
+        if (table.get("column_count") or 0) > 1 or (table.get("row_count") or 0) > 3:
             continue
         texts = [(c.get("text") or "").strip() for c in table["cells"]
                  if (c.get("text") or "").strip()]
@@ -577,10 +636,28 @@ def looks_ruled(table: dict) -> bool:
     filled = [c for c in table["cells"] if (c.get("text") or "").strip()]
     if len(filled) < 6:
         return False
+    # 図のラベル格子（タイミング図の`CH0 CH1 CH2 …`・流れ図の枠）は**穴が多く、1行目が
+    # 揃わない**。罫線表として描くと空セルばかりの格子になり読めない（zh版RM p175/600/678を
+    # PDF↔MD突合が指摘）。埋まり6割以上＋1行目が全部埋まっていることを要求する。
+    if len(filled) < 0.6 * rows * columns:
+        return False
     per_row: dict[int, int] = {}
     for cell in filled:
         per_row[cell["row_start"]] = per_row.get(cell["row_start"], 0) + 1
+    first = [c for c in table["cells"] if c["row_start"] == 0]
+    if not first or any(not (c.get("text") or "").strip() for c in first):
+        return False
+    # 波形図の数字格子（`7 6 5 4 …`が1文字ずつのセル）と、同じ語が2回並ぶ壊れたセル
+    # （`List filter List filter`）は表ではない（PDF↔MD突合の指摘。H417RM.en p594/p807）。
+    if sum(1 for c in filled if len((c.get("text") or "").strip()) <= 1) >= 0.6 * len(filled):
+        return False
+    for cell in filled:
+        words = (cell.get("text") or "").split()
+        half = len(words) // 2
+        if half and words[:half] == words[half:half * 2]:
+            return False
     return sum(1 for n in per_row.values() if n >= 2) >= 2
+
 
 
 def has_short_edge(table: dict) -> bool:

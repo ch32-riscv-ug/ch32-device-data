@@ -246,6 +246,8 @@ def pua_normalize(text: str) -> str:
 _HEADING_NUMBER = re.compile(r"^(?:\d+(?:\.\d+)+)\s+\S")
 _CHAPTER_HEADING = re.compile(r"^(?:第\s*\d+\s*章|Chapter\s+\d+)", re.I)
 # 傍注の書き出し——これで始まる大フォント行は見出しでなく段落（`注：…`が5つのH1に化けた）。
+# 枠の外に描かれた行/列見出しになりうる短い識別子（`TDes0`・`SRAM`・`CK`）。
+_ROW_LABEL = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,11}")
 _NOTE_MARKER = re.compile(r"^(?:注意|注|说明|說明|備考|备注|Note|NOTE|Notes)\s*[:：]")
 
 
@@ -291,7 +293,8 @@ def demoted_heading_lines(page: dict) -> set[str]:
     # `SPI1 SPI1_RX SPI1_TX`・`Peripheral Channel 1 …`）。文書の見出しが表の中に在ることは
     # ないので段落へ落とす——`#`が本文の目次を壊していた（全corpus 243行・16文書。
     # PDF↔MD突合が図中注記の`# RSTACT …`で気づかせた口。図領域内のラベルは既に段落）。
-    boxes = [t["bbox"] for t in page["tables"]]
+    boxes_all = [t["bbox"] for t in page["tables"]]
+    boxes = boxes_all
     if boxes:
         for line in page["lines"]:
             if line.get("role") != "heading" or line["id"] in demote:
@@ -303,6 +306,27 @@ def demoted_heading_lines(page: dict) -> set[str]:
             cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
             if any(b[0] <= cx <= b[2] and b[1] <= cy <= b[3] for b in boxes):
                 demote.add(line["id"])
+    # 表の**すぐ横**にある短い識別子のheadingは、枠の外に描かれた行/列見出し
+    # （`TDes0`・`SRAM`・`CK`/`SD`）。`# TDes0`が表の途中でH1になって目次を壊していた
+    # （PDF↔MD突合サブエージェントの指摘。全corpus 27行・13文書）。
+    for line in page["lines"]:
+        if line.get("role") != "heading" or line["id"] in demote:
+            continue
+        text = line["text"].strip()
+        if not _ROW_LABEL.fullmatch(text):
+            continue
+        if _HEADING_NUMBER.match(text) or _CHAPTER_HEADING.match(text):
+            continue
+        bb = line["bbox"]
+        middle = (bb[1] + bb[3]) / 2
+        for box in boxes_all:
+            if not box[1] <= middle <= box[3]:
+                continue
+            outside = bb[2] <= box[0] + 2 or bb[0] >= box[2] - 2
+            near = abs(bb[2] - box[0]) < 60 or abs(bb[0] - box[2]) < 60
+            if outside and near:
+                demote.add(line["id"])
+                break
     return demote
 
 
@@ -589,7 +613,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     # 読み順は`reading_stream`——変換器がreading_orderから外し、表のセルにも入らなかった
     # 図のラベル（`HB bus`・`Approx.`/`40mV`・`RDes2`）を縦位置で差し込んで拾い直す。
     # parityも同じ関数を歩くので、拾い直した行も同じ位置で検査される。
-    for item in logical_tables.reading_stream(page):
+    for item in logical_tables.reading_stream(page, figure_regions):
         inside = in_figure(item["bbox"])
         if not inside:
             flush_figure_text()
