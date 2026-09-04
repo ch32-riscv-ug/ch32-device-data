@@ -98,7 +98,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
         else:
             position = at + len(needle)
 
-    for item in page["reading_order"]:
+    # exporterと同じ読み順（拾い直した図ラベルを含む`reading_stream`）を歩く。
+    for item in logical_tables.reading_stream(page):
         if item["type"] == "table":
             info = chains[item["id"]]
             if not info["start"]:

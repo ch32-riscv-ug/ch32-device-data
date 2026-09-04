@@ -84,7 +84,14 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            are not captions -- the shared classifier lives in
            pipeline/common/figure_captions.py)
            export_markdown.py (the human-readable Markdown -- the end goal is zero
-           difference against the PDF. Headers/footers fold into HTML comments, tables
+           difference against the PDF. **Lines the converter dropped from
+           `reading_order` whose text is in no table cell either are put back**
+           (`logical_tables.recovered_lines`/`reading_stream`, shared with the parity
+           check): a figure's labels can land outside the box that the table finder
+           mistook for a table, so they were in neither stream and vanished silently
+           (`USBHS OSC32_OUT`, `1HCLK external memory`; 1,110 lines across 57
+           documents). Only a line whose every word is absent elsewhere is restored,
+           so nothing is duplicated. Headers/footers fold into HTML comments, tables
            keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
            and rendered in full where they start, with a visible pointer on the
            following pages** (3,914 tables joined across the 68 documents),
@@ -165,7 +172,9 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            **large-font body blocks that the converter marked as headings are demoted
            back to paragraphs** (a run of 3+ font-size-only headings, a `Note:`/`注：`
            lead-in, >50 characters, or a CJK sentence-ending -- 2,390 lines; numbered
-           and chapter headings are never touched), **a chapter title's wrapped second
+           and chapter headings are never touched; **a heading whose box sits inside a
+           table is table content, not a heading** -- bold rows of a DMA mapping table
+           were emitting `#` and breaking the outline, 243 lines across 16 documents), **a chapter title's wrapped second
            line is joined to the first** (`(SerDes)`), **a table caption that wrapped
            onto a second line -- an unclosed parenthesis or a dangling `or`/`with` at
            the line end -- is rendered whole in `<caption>` and the continuation line

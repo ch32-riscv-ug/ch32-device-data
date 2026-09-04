@@ -287,6 +287,22 @@ def demoted_heading_lines(page: dict) -> set[str]:
         else:
             flush()
     flush()
+    # 表の箱の中にあるheadingは、表の中身が太字/大フォントで組まれたもの（DMA映射表の
+    # `SPI1 SPI1_RX SPI1_TX`・`Peripheral Channel 1 …`）。文書の見出しが表の中に在ることは
+    # ないので段落へ落とす——`#`が本文の目次を壊していた（全corpus 243行・16文書。
+    # PDF↔MD突合が図中注記の`# RSTACT …`で気づかせた口。図領域内のラベルは既に段落）。
+    boxes = [t["bbox"] for t in page["tables"]]
+    if boxes:
+        for line in page["lines"]:
+            if line.get("role") != "heading" or line["id"] in demote:
+                continue
+            text = line["text"].strip()
+            if _HEADING_NUMBER.match(text) or _CHAPTER_HEADING.match(text):
+                continue
+            bb = line["bbox"]
+            cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
+            if any(b[0] <= cx <= b[2] and b[1] <= cy <= b[3] for b in boxes):
+                demote.add(line["id"])
     return demote
 
 
@@ -568,7 +584,10 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             output.extend(("", "</details>", ""))
             figure_text.clear()
 
-    for item in page["reading_order"]:
+    # 読み順は`reading_stream`——変換器がreading_orderから外し、表のセルにも入らなかった
+    # 図のラベル（`HB bus`・`Approx.`/`40mV`・`RDes2`）を縦位置で差し込んで拾い直す。
+    # parityも同じ関数を歩くので、拾い直した行も同じ位置で検査される。
+    for item in logical_tables.reading_stream(page):
         inside = in_figure(item["bbox"])
         if not inside:
             flush_figure_text()
