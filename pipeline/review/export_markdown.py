@@ -341,6 +341,8 @@ def strip_leading_bullet(text: str) -> str:
 
 
 _JOIN_PUNCT = ":;.。；：,，、"
+# 折り返しの続きでなく独立した英単語（`Remapping`）。先頭大文字＋小文字が3字以上。
+_WORD = re.compile(r"[A-Z][a-z]{2,}")
 
 
 def cell_html(text: str) -> str:
@@ -367,10 +369,15 @@ def cell_html(text: str) -> str:
             sep = "<br>"
         elif (pe[-1].isalpha() and pe[-1].islower()) or (cur[0].isalpha() and cur[0].islower()):
             sep = " "
-        elif pe[-1].isalnum() and cur[0].isalnum() and " " not in cur.strip():
+        elif (pe[-1].isalnum() and cur[0].isalnum() and " " not in cur.strip()
+              and not ("=" in pe and _WORD.fullmatch(cur.strip()))):
             # 識別子の折り返し（`USAR`+`T1`=`USART1`）だけ地続きに繋ぐ。継続断片は
             # 空白を含まない1トークン。curが複数語（`10: Calibration voltage…`等の
             # enum項目行）なら折り返しでなく項目改行なので`<br>`（`AVDD10`連結を防ぐ）。
+            # **代入を書き切った断片（`=`を含む）に英単語が続くのは折り返しではない**
+            # ——remap表のヘッダ`SPI3_RM=1`＋`Remapping`が`SPI3_RM=1Remapping`になり、
+            # `CAN1_RM=10Remapping`では設定値10が読めなかった（PDF↔MD突合が発見。
+            # 162セル・8文書）。`&RB_U…`のような式の続きは英単語でないので今までどおり繋ぐ。
             sep = ""
         else:
             sep = "<br>"
@@ -478,6 +485,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     number = page["number"]
     # 大フォントの段落ブロック（Overview・注記・mode説明）が複数の見出しに化けた行を段落へ戻す。
     demote_headings = demoted_heading_lines(page)
+    # bit図の検算に使う「そのページの正しいフィールド名」（記述表のName列）。
+    description_names = logical_tables.description_names(page, chains)
     # 章題の折り返し2行目（`# (SerDes)`）は1行目の見出しへ繋ぐ。
     title_merge, title_skip = title_continuations(page)
     # geometryは要るときだけ開く（表の端に降ってきた重複グリフ除去に使う）。ページ跨ぎの
@@ -591,9 +600,12 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             if item["id"] in bitfields:
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
+                # 縦割れ名の連結で末尾が二重になったものを、記述表のName列で検算して直す。
+                logical_tables.fix_doubled_names(record, description_names)
             elif item["id"] in cross:
                 # 前ページ末尾の番号行で組み直す箱（bit図のページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
+                logical_tables.fix_doubled_names(record, description_names)
             else:
                 # 通常表: `Reset`/`value`に割れたヘッダを戻し、境界グリフの二重取り（`[31:12] R`等）を落とす。
                 logical_tables.fold_header_wrap(record)
@@ -608,10 +620,17 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # （全corpus 3,758件）。枠付きboxが図テキストへ割り込むので、セルの中身を
                 # プレーンテキストで出す（`<details>🖼 Text parsed…`の趣旨に沿う）。transformは
                 # 上で適用済みなので、parityは同じ変換後セルをこの順で読んで整合する。
-                flat = "  ".join(cell_html(c["text"]) for c in record["cells"]
-                                 if (c.get("text") or "").strip())
-                if flat:
-                    figure_text.append(flat + "  ")
+                if logical_tables.looks_ruled(record):
+                    # 罫線表が図領域に入るのは、表題が`Figure`と名乗って罫線が図クラスタに
+                    # なった場合（原本の誤植。V407RM.en p475ほか全corpus 358表）。平文へ
+                    # 潰すと読めないので、折りたたみの中にHTML表として描く。セルの並び順は
+                    # 通常表と同じ`table_html`なのでparityの読み順は変わらない。
+                    figure_text.extend(("", table_html(record, url, number), ""))
+                else:
+                    flat = "  ".join(cell_html(c["text"]) for c in record["cells"]
+                                     if (c.get("text") or "").strip())
+                    if flat:
+                        figure_text.append(flat + "  ")
             else:
                 output.extend(("", table_html(record, url, number), ""))
             continue

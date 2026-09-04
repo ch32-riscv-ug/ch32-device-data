@@ -97,7 +97,11 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            empty row is left; exporter and parity share it, the frozen CSVs never
            see it), **a cell's internal line breaks are split by character class**
            (punctuation end -> `<br>`; identifier mid-word `USAR`+`T1` -> joined;
-           English words -> space -- preserving the original's paragraphs), **the
+           English words -> space -- preserving the original's paragraphs; a fragment
+           that already carries an assignment followed by a standalone English word is
+           **not** a wrapped identifier, so `SPI3_RM=1` + `Remapping` keeps its break
+           instead of reading `CAN1_RM=10Remapping`, which hid the register value --
+           162 cells across 8 documents), **the
            first table row becomes `<th>` and the original's bold/italic are
            reproduced as `<strong>`/`<em>`** (from the font; 3% bold, 3.5% italic
            measured; the text is unchanged so the frozen CSVs are untouched),
@@ -118,7 +122,11 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            single full-width field line is synthesised into a header+field table;
            a field name split
            vertically by a narrow column -- `Reser`+`ved` -> `Reserved` -- is
-           rejoined, while a two-mode TIM CCMR keeps its output-name row above its
+           rejoined (a tail fragment the neighbouring cell also claimed is dropped
+           when the page's description table disagrees: `HSYNCSCS` -> `HSYNCS`,
+           `WWDG_STOPTOP` -> `WWDG_STOP`; the Name column of the table below the
+           diagram is the evidence, so legitimate names ending in a repeated digit --
+           `PB11`, `ODR11` -- are untouched; 44 cells), while a two-mode TIM CCMR keeps its output-name row above its
            input-name row; bit-field diagrams are also kept out of the page-spanning
            table chaining (a back-to-back pair used to merge, losing the cell
            geometry the rebuild needs). A diagram **split across a page break** --
@@ -147,7 +155,13 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            `<td></td>`** so a continuation fragment that lost its first column no
            longer shifts left, **tables with no content are dropped and tables inside a
            figure region are emitted as plain text** (both are diagram boxes that the
-           table finder mistook for tables; 1,115 and 3,758 across the corpus),
+           table finder mistook for tables; 1,115 and 3,758 across the corpus)
+           -- **unless the "figure" is really a ruled table** (3+ rows, 2+ columns,
+           6+ filled cells), which happens when the source labels a table's caption
+           `Figure` so its ruling lines become the figure cluster (CH32V407RM.en
+           p475 `Figure 26-19 Mode D FSMC_BCR1 bit field`, a table in the Chinese
+           edition); those 229 tables across 48 documents keep their HTML table
+           inside the collapsible (`logical_tables.looks_ruled`),
            **large-font body blocks that the converter marked as headings are demoted
            back to paragraphs** (a run of 3+ font-size-only headings, a `Note:`/`注：`
            lead-in, >50 characters, or a CJK sentence-ending -- 2,390 lines; numbered

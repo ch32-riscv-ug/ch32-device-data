@@ -65,6 +65,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             bad.append(f"p{page['number']}: Liquid-breaking sequence {sequence!r} "
                        "in the markdown -- Pages build would fail")
     position = 0
+    # exporterと同じ「そのページの正しいフィールド名」（記述表のName列）。
+    description_names = logical_tables.description_names(page, chains)
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     # bit図: 番号行は表のヘッダへ畳むか合成テーブルの位置になる——exporterと
@@ -113,9 +115,11 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # bit番号をヘッダへ、縦割れ名を連結——exporterと同じ表を見る。
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
+                logical_tables.fix_doubled_names(record, description_names)
             elif item["id"] in cross:
                 # 前ページの番号行で組み直した箱（ページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
+                logical_tables.fix_doubled_names(record, description_names)
             else:
                 # 通常表: exporterと同じ変換（ヘッダ折り返しの畳み込み・境界二重取り除去）を見る。
                 logical_tables.fold_header_wrap(record)

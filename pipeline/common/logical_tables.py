@@ -353,6 +353,109 @@ def fold_header_wrap(table: dict) -> int:
     return 1
 
 
+_NAME_HEADERS = ("Name", "名称", "名字", "Field", "位域名")
+
+
+def description_names(page: dict, chains: dict[str, dict] | None = None) -> set[str]:
+    """このページの記述表の`Name`列（`名称`/`Field`/`位域名`）に並ぶ、**正しいフィールド名**。
+
+    レジスタのページは「bit図」＋「bitごとの説明表」の対で書かれるので、説明表の名称列が
+    そのページの正解表になる。bit図の組み直しの検算に使う（`fix_doubled_names`）。
+
+    `chains`（`document_chains`の結果）を渡すと、**ページ跨ぎの結合表**からも集める——
+    説明表が前ページから続いていると、このページの断片にはヘッダ行が無く名称列を
+    見つけられない（FV2x_V3xRM.en p622の`TIM1_STOP`等12件がそれで直せなかった）。
+    証拠は「このページに出ている表（とその続き）」に限る——文書全体から集めると
+    `PB11`の正解として別章の`PB1`を拾ってしまう。
+    """
+    names: set[str] = set()
+    tables = [((chains or {}).get(t["id"], {}).get("merged") or t)
+              for t in page["tables"]]
+    for table in tables:
+        by_row: dict[int, list[dict]] = {}
+        for cell in table["cells"]:
+            by_row.setdefault(cell["row_start"], []).append(cell)
+        header = by_row.get(0) or []
+        columns = [c["column_start"] for c in header
+                   if (c.get("text") or "").strip() in _NAME_HEADERS]
+        if not columns:
+            continue
+        for row, cells in by_row.items():
+            if row == 0:
+                continue
+            for cell in cells:
+                if cell["column_start"] in columns:
+                    text = (cell.get("text") or "").strip()
+                    if text:
+                        names.add(text)
+    return names
+
+
+def _undoubled_tail(text: str) -> str | None:
+    """末尾が同じブロックの2連なら1つ分を落とした綴り（`HSYNCSCS`→`HSYNCS`）。
+    ブロックに英字が要る——`PB11`型の数字末尾は正当な名前なので触らない。"""
+    for k in range(1, len(text) // 2 + 1):
+        block = text[-k:]
+        if text[-2 * k:-k] == block and any(ch.isalpha() for ch in block):
+            return text[:-k]
+    return None
+
+
+def fix_doubled_names(table: dict, names: set[str]) -> int:
+    """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
+
+    原因はこちら側——`apply_bitfield`が縦に割れた名前を繋ぐとき、隣のセルに二重取りされた
+    末尾断片も足してしまう（bundleのセルは`HSYNCS`と正しい）。結果、bit図と直下の説明表が
+    食い違った: `HSYNCSCS`/`VSYNCSCS`/`COLKENLKEN`/`VBRR`/`WWDG_STOPTOP`/`TIM1_STOPP`/
+    `Reservederved`/`BURST_ENDRST_END`/`PA1PA2_RMM`（PDF↔MD突合サブエージェントが発見。
+    全corpus44セル・6文書）。
+
+    直すのは**説明表が否定し、重複を外すと説明表と一致する**ときだけ——`PB11`・`ODR11`・
+    `DMA2_CH11`のような正当な数字末尾（説明表にその綴りが在る）は触らない。冪等。
+    """
+    if not names or table.get("_undoubled"):
+        return 0
+    table["_undoubled"] = True
+    fixed = 0
+    for cell in table["cells"]:
+        # 判定は**描画後の形**で行う——`apply_bitfield`の連結は改行を残すことがあり
+        # （`HSYNCS\nCS`）、`cell_html`が識別子として地続きに繋いで`HSYNCSCS`になる。
+        flat = (cell.get("text") or "").replace("\n", "").strip()
+        if len(flat) < 4 or " " in flat or flat in names:
+            continue
+        short = _undoubled_tail(flat)
+        if short and len(short) >= 3 and short in names:
+            cell["text"] = short
+            fixed += 1
+    return fixed
+
+
+def looks_ruled(table: dict) -> bool:
+    """図領域の中にあっても**本物の罫線表**か（行3以上・列2以上・非空セル6以上・
+    2行以上が2セル以上埋まっている）。
+
+    図領域は`render_assets`がgraphicsの縦クラスタで決めるが、**罫線表の罫線もgraphics**
+    なので、表題が図と名乗っていると表そのものが図領域になる。原本の誤植でそうなる例:
+    CH32V407RM.**en** p475 `Figure 26-19 Mode D FSMC_BCR1 bit field`（zh は`表26-19`、
+    同じ章の Mode 1/A/B/C は en でも`Table 26-8/26-10/26-13/26-16`）——18行のbit域表が
+    画像＋折りたたみの平文になり、表として読めなかった。全corpusで**229表・48文書**が該当
+    （図領域内の表5,146のうち。残り4,917は図のboxやラベルで、平文のままが正しい）。
+    exporterはこれをHTML表として折りたたみの中に描き、平文へ潰さない。
+    """
+    rows = table.get("row_count") or 0
+    # ページ跨ぎの結合表は`column_count`を持たず`width`を持つ（`merge_cells`）。
+    columns = table.get("column_count") or table.get("width") or 0
+    if rows < 3 or columns < 2:
+        return False
+    filled = [c for c in table["cells"] if (c.get("text") or "").strip()]
+    if len(filled) < 6:
+        return False
+    per_row: dict[int, int] = {}
+    for cell in filled:
+        per_row[cell["row_start"]] = per_row.get(cell["row_start"], 0) + 1
+    return sum(1 for n in per_row.values() if n >= 2) >= 2
+
+
 def has_short_edge(table: dict) -> bool:
     """短いセル（値・reset値など≤12字）に、端の1文字が地続き/空白で付いた候補があるか
     （`0对`・`e 0`・`Reserved L`）。geometryを開く前の安価な前判定。"""
