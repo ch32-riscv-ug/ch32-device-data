@@ -26,6 +26,8 @@ V20x/30x表4-9で実測）、違うときだけ**x座標の和集合**（許容2
 
 from __future__ import annotations
 
+import re
+
 TOLERANCE = 2.0        # pt。x辺の同一視
 BOTTOM_BAND = 0.75     # 前ページの表がこれより下で終わっていること（ページ高比）
 TOP_BAND = 0.25        # 続き断片がこれより上で始まっていること（ページ高比）
@@ -428,6 +430,53 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
             cell["text"] = short
             fixed += 1
     return fixed
+
+
+_RECOVER_TOKEN = re.compile(r"[A-Za-z0-9_\[\]:.]{2,}")
+
+
+def recovered_lines(page: dict) -> list[dict]:
+    """変換器が`reading_order`から外した行のうち、**表のセルにも残った行にも中身が無い**もの。
+
+    converterは表の領域に重なる行をreading_orderから外す（表のセルが同じ文字を持つはず、
+    という前提）。ところが図（クロックツリー・メモリマップ・プロトコル図）のラベルは
+    「図をtableと誤検出した箱」の外側に落ちることがあり、セルにもreading_orderにも無い
+    ——exporterもparityもreading_orderだけを歩くので、**黙って消える**（PDF↔MD突合が
+    V407RM.en p529の`RDes2`/`RDes3`、p11の`Approx.`/`40mV`、p406の`HB bus`で発見）。
+
+    図は画像として描かれるので人には見えているが、この文書の方針は「図から読めた文字も
+    検索・コピーのために残す」なので、拾い直して`<details>`へ入れる。
+    **重複を出さないため、語（2文字以上）が1つでも他所に在る行は拾わない**（部分的に
+    セルへ入っている行を足すと同じ文字が二度出る）。
+    """
+    order = {item["id"] for item in page["reading_order"] if item["type"] == "line"}
+    covered = " ".join((c.get("text") or "") for t in page["tables"] for c in t["cells"])
+    kept = " ".join(l["text"] for l in page["lines"] if l["id"] in order)
+    haystack = covered + " " + kept
+    out = []
+    for line in page["lines"]:
+        if line["id"] in order or line.get("role") in ("header", "footer"):
+            continue
+        tokens = _RECOVER_TOKEN.findall(line["text"])
+        if not tokens or any(token in haystack for token in tokens):
+            continue
+        out.append(line)
+    return out
+
+
+def reading_stream(page: dict) -> list[dict]:
+    """`reading_order`に`recovered_lines`を縦位置で差し込んだ読み順。exporterとparityが
+    同じ関数を使うので、拾い直した行も同じ位置・同じ順で検査される。"""
+    recovered = recovered_lines(page)
+    if not recovered:
+        return list(page["reading_order"])
+    stream = list(page["reading_order"])
+    for line in sorted(recovered, key=lambda l: (l["bbox"][1], l["bbox"][0])):
+        item = {"type": "line", "id": line["id"], "bbox": line["bbox"]}
+        index = next((i for i, existing in enumerate(stream)
+                      if existing["bbox"][1] > line["bbox"][1]), len(stream))
+        stream.insert(index, item)
+    return stream
 
 
 def looks_ruled(table: dict) -> bool:

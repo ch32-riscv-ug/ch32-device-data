@@ -64,6 +64,11 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            本文の参照文（「图19-2是…」「figure 21-1.」等）はcaption扱いしない
            ——判定は`pipeline/common/figure_captions.py`に一本化）
            export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
+           **変換器が`reading_order`から外し、表のセルにも入らなかった行を拾い直す**
+           （`logical_tables.recovered_lines`/`reading_stream`。parityと共有）——図のラベルは
+           「図をtableと誤検出した箱」の外側に落ちることがあり、どちらの流れにも無く黙って
+           消えていた（`USBHS OSC32_OUT`・`1HCLK external memory`。1,110行・57文書）。
+           語が1つも他所に無い行だけを拾うので二重には出ない。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
            可視ポインタ**（68文書で3,914表を結合）、**ページ境界でセルの中身が
@@ -117,7 +122,8 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            `Figure`と名乗ると罫線が図クラスタになる——V407RM.en p475
            `Figure 26-19 Mode D FSMC_BCR1 bit field`はzh版では`表26-19`。229表・48文書）、**大フォントの本文がheadingに化けたものを段落へ戻す**
            （フォントサイズ由来のheadingが3連続以上・`注：`/`Note:`始まり・50字超・CJK文末
-           句読点終わり——2,390行。番号/章見出しは触らない）、**章題の折り返し2行目を1行目へ
+           句読点終わり——2,390行。番号/章見出しは触らない）、**表の箱の中にある見出しは
+           表の中身なので段落へ**（DMA映射表の太字行が`#`になり目次を壊していた。243行・16文書）、**章題の折り返し2行目を1行目へ
            繋ぐ**（`(SerDes)`）、**2行に折り返した表題は`<caption>`に全文を出し、続き行を本文から
            消す**（括弧が閉じていない／`or`・`with`・読点で終わる表題。`logical_tables.caption_full`
            をoperating_conditionsの抽出器と共有し、CSVの条件prefixも全文になる。
