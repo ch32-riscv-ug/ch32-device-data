@@ -135,10 +135,19 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            column of the table below the diagram is the evidence: a name that appears
            there as a subsequence of the rendered text replaces it, but **only when
            every dropped character occurs in that name** -- interleaved duplicates
-           drop the name's own glyphs, whereas `INTEN12`, `PENDSTA15` and
-           `HSICAL[7:0]` would lose an index or a bit range, so they stay. 943 cells
-           across 20 documents; legitimate names ending in a repeated digit are
-           untouched), while a two-mode TIM CCMR keeps its output-name row above its
+           drop the name's own glyphs, whereas `HSICAL[7:0]` would lose a bit range,
+           so it stays. Indexed names are rebuilt as `<base><bit number>`, the index
+           taken from the cell's **own** bit-number column and the base from an intact
+           sibling cell of the same diagram, from a family name in the description
+           table (`SWIERx` -> `SWIER`), or from a range spelling the page prints
+           (`PENDSET[31:16]`): `PENPDESNTDAS1T5` -> `PENDSTA15`, `FBMFB27M` -> `FBM27`.
+           Four guards keep real names intact -- a cell already shaped `<base><its own
+           bit>` is left alone (`CTCIF1` in DMA_INTFCR, whose `C` means *clear*), a
+           leading character shared by three or more cells of the diagram is never
+           dropped, an index is never shortened (`ODR11` never becomes `ODR1`), and
+           the neighbour-bleed removal skips a leading character that repeats down the
+           row (`SWIE`+`R 14` had been losing its `R`, printing `SWIE14`). 1,158 cells
+           across 21 documents), while a two-mode TIM CCMR keeps its output-name row above its
            input-name row; bit-field diagrams are also kept out of the page-spanning
            table chaining (a back-to-back pair used to merge, losing the cell
            geometry the rebuild needs). A diagram **split across a page break** --
@@ -177,7 +186,7 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            6+ filled cells), which happens when the source labels a table's caption
            `Figure` so its ruling lines become the figure cluster (CH32V407RM.en
            p475 `Figure 26-19 Mode D FSMC_BCR1 bit field`, a table in the Chinese
-           edition); those 229 tables across 48 documents keep their HTML table
+           edition); those 106 tables across 37 documents keep their HTML table
            inside the collapsible (`logical_tables.looks_ruled`),
            **large-font body blocks that the converter marked as headings are demoted
            back to paragraphs** (a run of 3+ font-size-only headings, a `Note:`/`注：`

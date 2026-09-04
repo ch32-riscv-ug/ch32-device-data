@@ -12,7 +12,7 @@ PDFとの差ゼロは`check_markdown_parity.py`が「取りこぼし・順序」
   subscript_orphan `DD`/`VSS`等、添字だけの行が独立して残っている
   cid              復号できなかったglyph `(cid:N)`
   pua              私用領域の記号がそのまま出ている（本来は0）
-  long_line        200字を超える1行（折り返し/連結の作りそこね）
+  long_line        本文に実際に描かれる300字超の1行（折り返し/連結の作りそこね）
   split_bitcell    bit図セルに縦割れの断片が残っている（`Reser`等の途中切れ）
   table_issue      変換器が記録した表の重なり等
 
@@ -81,21 +81,33 @@ def page_signals(page: dict, md_text: str, consumed: set[str] | None = None,
                   if ORPHAN.fullmatch(ln.strip().rstrip()))
     if orphans:
         sig["subscript_orphan"] = orphans
-    # 長い本文行はbundleのparagraph/list-itemで測る（Markdownの1行には表HTMLが
-    # 丸ごと乗るので、そのまま数えると全表が誤検出になる）。
-    longs = sum(1 for l in page["lines"]
-                if l.get("role") in ("paragraph", "list-item") and len(l["text"]) > 300)
-    if longs:
-        sig["long_line"] = longs
-    # 重なりissueのある表のうち、**図領域に畳まれていない**もの（本文で崩れて見える
-    # もの）だけ数える。clock tree等の図をtable抽出したものは大半が図の<details>へ畳まれ
-    # 表示は綺麗なので、それは除く。
     regions = figure_regions or []
 
     def in_figure(bb: list[float]) -> bool:
         cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
         return any(r[0] <= cx <= r[2] and r[1] <= cy <= r[3] for r in regions)
 
+    # 長い本文行はbundleのparagraph/list-itemで測る（Markdownの1行には表HTMLが
+    # 丸ごと乗るので、そのまま数えると全表が誤検出になる）。**図領域の中は数えない**——
+    # 250字を超える行は全corpus35行すべてが画像化された図（pin配置図・I3Cプロトコル図・
+    # 充放電の波形図）のラベルが文字単位に交錯した塊で、exporterが既に
+    # `<details>🖼 Text parsed from the figure above`へ畳んでおり本文は崩れていない
+    # （2026-09-04に35行を1件ずつ出力位置まで追って確認）。図の外に出るものだけが手当て
+    # の要る信号。
+    # さらに**exporterが実際に描く行だけ**を数える（`reading_stream`にある行）。残った2件
+    # （H417RM.en p402/p408）は、変換器がreading_orderから外した図テキストの幽霊行で、
+    # 出力では同じ内容が綺麗な表として描かれていた——数えるべき崩れではない。
+    rendered = {item["id"] for item in logical_tables.reading_stream(page, regions)
+                if item["type"] == "line"} - set(consumed)
+    longs = sum(1 for l in page["lines"]
+                if l.get("role") in ("paragraph", "list-item")
+                and len(l["text"]) > 300 and l["id"] in rendered
+                and not in_figure(l["bbox"]))
+    if longs:
+        sig["long_line"] = longs
+    # 重なりissueのある表のうち、**図領域に畳まれていない**もの（本文で崩れて見える
+    # もの）だけ数える。clock tree等の図をtable抽出したものは大半が図の<details>へ畳まれ
+    # 表示は綺麗なので、それは除く。
     broken = sum(1 for t in page["tables"]
                  if t.get("issues") and not in_figure(t["bbox"]))
     if broken:
