@@ -161,7 +161,12 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            shifted with it), **empty grid slots not covered by a span are padded with
            `<td></td>`** so a continuation fragment that lost its first column no
            longer shifts left, **tables with no content are dropped and tables inside a
-           figure region are emitted as plain text** (both are diagram boxes that the
+           figure region are emitted as plain text** (a one-column
+           table that is only the debris of overlapping merged cells -- every word of
+           it is a line of a cell in the table it overlaps -- is dropped too, 559
+           across the corpus, and a fragment that also appears as its own row under
+           the tall cell holding the whole name (`RS` under `BU/RS/T_E/ND`) is dropped
+           from the grid, 64 rows) (both are diagram boxes that the
            table finder mistook for tables; 1,115 and 3,758 across the corpus)
            -- **unless the "figure" is really a ruled table** (3+ rows, 2+ columns,
            6+ filled cells), which happens when the source labels a table's caption

@@ -479,6 +479,84 @@ def reading_stream(page: dict) -> list[dict]:
     return stream
 
 
+def drop_phantom_fragment_rows(table: dict) -> int:
+    """縦に割れた名前の**断片が別の行としても現れる**ぶんを落とす（重なりセルの副産物）。
+
+    pdfplumberが重なった結合セルを記録したとき、`BU⏎RS⏎T_E⏎ND`（=BURST_END）を持つ縦長セルの
+    下に、`RS`・`T_E`・`ND`だけの1セル行が並ぶことがある。縦長セルが既に全文を持っているので、
+    その断片行は同じ文字の二重表示（H417RM.en p226/p461/p976/p988ほか、全corpus 64行・26文書）。
+
+    落とすのは**同じ列で、その行を覆う行span2以上のセルの物理行と完全一致する**セルだけ
+    ——値がたまたま一致する比較表（`2*DAC`が別列の値として在る等）は触らない。冪等。
+    """
+    if table.get("_phantom_dropped"):
+        return 0
+    table["_phantom_dropped"] = True
+    cells = table["cells"]
+    by_row: dict[int, list[dict]] = {}
+    for cell in cells:
+        if (cell.get("text") or "").strip():
+            by_row.setdefault(cell["row_start"], []).append(cell)
+    removed = []
+    for row, occupied in by_row.items():
+        if row == 0 or len(occupied) != 1:
+            continue
+        cell = occupied[0]
+        text = (cell["text"] or "").strip()
+        if not text:
+            continue
+        for other in cells:
+            if other is cell or other["column_start"] != cell["column_start"]:
+                continue
+            if not (other["row_start"] < row <= other["row_end"]
+                    and other["row_end"] - other["row_start"] >= 2):
+                continue
+            lines = [q.strip() for q in (other.get("text") or "").split("\n") if q.strip()]
+            if len(lines) > 1 and text in lines:
+                removed.append(cell)
+                break
+    for cell in removed:
+        cells.remove(cell)
+    return len(removed)
+
+
+def _box_overlap(inner: list[float], outer: list[float]) -> float:
+    ix = max(0.0, min(inner[2], outer[2]) - max(inner[0], outer[0]))
+    iy = max(0.0, min(inner[3], outer[3]) - max(inner[1], outer[1]))
+    area = (inner[2] - inner[0]) * (inner[3] - inner[1])
+    return (ix * iy) / area if area > 0 else 0.0
+
+
+def fragment_tables(page: dict) -> set[str]:
+    """**別の表の箱の中にある、断片だけの1列表**のid（描かない）。
+
+    重なった結合セルの残骸が独立した表として抽出される: `<table><tr><th>AL</th></tr>
+    <tr><td>LA</td></tr></table>`（V407RM.en p340の`STALLA`の破片）、`USART1_RM1=0(2)`＋
+    `Default Mapping`（FV2x_V3xRM.en p138）、`signal`＋`level`。全corpus 559表・41文書。
+
+    条件は厳しく: 1列・2行以下で、**すべてのセルの文字が、面積の6割以上を重ねる別の表の
+    セルの物理行と完全一致**すること——中身は必ずその表に出るので、消しても文字は失われない。
+    exporterとparityが同じ判定を使う。
+    """
+    out: set[str] = set()
+    for table in page["tables"]:
+        if (table.get("column_count") or 0) > 1 or (table.get("row_count") or 0) > 2:
+            continue
+        texts = [(c.get("text") or "").strip() for c in table["cells"]
+                 if (c.get("text") or "").strip()]
+        if not texts:
+            continue
+        for host in page["tables"]:
+            if host["id"] == table["id"] or _box_overlap(table["bbox"], host["bbox"]) < 0.6:
+                continue
+            lines = {q.strip() for c in host["cells"]
+                     for q in (c.get("text") or "").split("\n") if q.strip()}
+            if all(text in lines for text in texts):
+                out.add(table["id"])
+                break
+    return out
+
+
 def looks_ruled(table: dict) -> bool:
     """図領域の中にあっても**本物の罫線表**か（行3以上・列2以上・非空セル6以上・
     2行以上が2セル以上埋まっている）。

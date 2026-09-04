@@ -67,6 +67,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     position = 0
     # exporterと同じ「そのページの正しいフィールド名」（記述表のName列）。
     description_names = logical_tables.description_names(page, chains)
+    fragment_ids = logical_tables.fragment_tables(page)
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     # bit図: 番号行は表のヘッダへ畳むか合成テーブルの位置になる——exporterと
@@ -106,7 +107,10 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # 続き断片は開始ページで結合済み。ここには可視のポインタが要る。
                 expect(CONTINUED, f"table {item['id']} continuation pointer")
                 continue
+            if item["id"] in fragment_ids:
+                continue   # exporterと同じく、重なりセルの残骸だけの1列表は描かない
             record = info["merged"] or tables[item["id"]]
+            logical_tables.drop_phantom_fragment_rows(record)
             if info["merged"]:
                 # exporterと同じ畳み込みを見る（境界で割れたセルは前セルへ連結
                 # 済み・継続セルは空）。continuationセルは`_folded`で空になり
