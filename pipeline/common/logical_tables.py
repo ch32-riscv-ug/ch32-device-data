@@ -358,6 +358,9 @@ def fold_header_wrap(table: dict) -> int:
 _NAME_HEADERS = ("Name", "名称", "名字", "Field", "位域名")
 
 
+_RANGE_NAME = re.compile(r"([A-Za-z][A-Za-z_0-9]*)\s*\[\d+:\d+\]")
+
+
 def description_names(page: dict, chains: dict[str, dict] | None = None) -> set[str]:
     """このページの記述表の`Name`列（`名称`/`Field`/`位域名`）に並ぶ、**正しいフィールド名**。
 
@@ -390,6 +393,15 @@ def description_names(page: dict, chains: dict[str, dict] | None = None) -> set[
                     text = (cell.get("text") or "").strip()
                     if text:
                         names.add(text)
+    # このページのbit図が`PENDSET[31:16]`・`INTEN[63:48]`のように**範囲つきで書いた綴り**も
+    # 正解として採る。同じレジスタの上位半分がbaseを見せていることがあり、記述表が次ページに
+    # 送られているとそこだけが根拠になる（CH32V003RM.en p43のPFIC_IPSR1——説明表はp44に在り、
+    # 図の6セル全部が壊れていたのでpage内に他の手がかりが無かった。PDF↔MD突合の指摘）。
+    for table in tables:
+        for cell in table["cells"]:
+            match = _RANGE_NAME.fullmatch((cell.get("text") or "").strip())
+            if match:
+                names.add(match.group(1))
     return names
 
 
@@ -401,6 +413,18 @@ def _undoubled_tail(text: str) -> str | None:
         if text[-2 * k:-k] == block and any(ch.isalpha() for ch in block):
             return text[:-k]
     return None
+
+
+def _truncates_index(text: str, name: str) -> bool:
+    """`text`から`name`への差し替えが**索引を短くするだけ**か（`ODR11`→`ODR1`）。
+
+    `_only_duplicate_glyphs`は落ちる数字が名前にも在れば通してしまうので、
+    `ODR1`が記述表に在る一方で図の`ODR11`が正しい、という形を別に弾く。全corpusでは
+    この形の置き換えは0件（2026-09-04に943件を全数検査）だが、`ODR1`と`ODR11`が同じ
+    ページのName列に並ぶと踏む穴なので歯止めとして置く。
+    """
+    return (text.startswith(name) and text != name
+            and text[len(name):].strip().isdigit())
 
 
 def _only_duplicate_glyphs(text: str, name: str) -> bool:
@@ -431,6 +455,47 @@ def _is_subsequence(name: str, text: str) -> bool:
     return all(ch in it for ch in name)
 
 
+def _indexed_bases(table: dict, names: set[str]) -> tuple[set[str], dict[int, str]]:
+    """索引付きの名前を組むための（base集合, 列→bit番号）。
+
+    `PFIC_IPR1`・`PFIC_IENR1`・`PFIC_IPSR1`のように1bitずつ索引が付くレジスタでは、記述表の
+    Name列が`PENDSTA`・`INTEN`と索引を書かないので、記述表だけでは`PENDSTA15`を復元できない
+    （PDF↔MD突合が`PENPDESNTDAS1T5`・`INTENIN1T5E N`・`PENDPSEETN1D5SET15`で指摘）。索引は
+    **`apply_bitfield`が置いた0行目のbitヘッダ**が持っている。baseの根拠は2つ:
+
+    1. **同じ図の無傷の兄弟セル**が`INTEN12`のように綴りを見せ、その数字がその列のbit番号と
+       一致する（2つ以上一致すれば索引の付き方はそれだけで確かめられる。1つだけのときは
+       baseが記述表にも在ることを求める＝base＝記述表・索引＝兄弟とヘッダの二重の裏づけ）。
+    2. 兄弟が1つも無傷でない図（FV2x_V3xRM.en p106のPFIC_IPR1は6セル全部が壊れていた）では
+       **記述表のName列そのもの**をbaseにする。
+
+    どちらの経路でも、実際に差し替わるのは`fix_doubled_names`の歯止め（部分列・落ちる文字は
+    名前の中だけ・索引を短くしない・候補がただ1つ）を全て通ったときだけ。
+    """
+    bit_at = {c["column_start"]: (c.get("text") or "").strip()
+              for c in table["cells"] if c["row_start"] == 0}
+    confirmed: dict[str, int] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] < 1 or cell["column_end"] - cell["column_start"] != 1:
+            continue
+        text = (cell.get("text") or "").replace("\n", "").strip()
+        match = re.fullmatch(r"([A-Za-z][A-Za-z_]*)(\d+)", text)
+        if not match or bit_at.get(cell["column_start"]) != match.group(2):
+            continue
+        confirmed[match.group(1)] = confirmed.get(match.group(1), 0) + 1
+    bases = {base for base, count in confirmed.items()
+             if count >= 2 or (count >= 1 and base in names)}
+    bases |= {n for n in names
+              if len(n) >= 3 and not n[-1].isdigit()
+              and all(ch.isalnum() or ch == "_" for ch in n)}
+    # 記述表が族名を`SWIERx`・`MRx`・`FBMx`と書くことがある（`x`はbit索引の代わり）。
+    # 末尾の`x`を外した綴りもbaseにする——`SWIER`+bit14＝`SWIER14`（PDF↔MD突合の指摘）。
+    bases |= {n[:-1] for n in names
+              if len(n) >= 4 and n.endswith("x") and n[-2].isupper()
+              and all(ch.isalnum() or ch == "_" for ch in n)}
+    return bases, bit_at
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -446,6 +511,18 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
     if not names or table.get("_undoubled"):
         return 0
     table["_undoubled"] = True
+    bases, bit_at = _indexed_bases(table, names)
+    # 図の**他の名前セルも共有する頭文字**は、その図のフィールド命名の一部（DMA_INTFCRは
+    # 全セルが`C`＝clearで始まる）。en版RM p173の記述表は`TCIFx`と接頭辞なしで書くので、
+    # bit1に在る`CTCIF1`が偶然`TCIF`+bit1と一致して`TCIF1`へ縮みかけた（索引はチャネル番号で
+    # bit番号ではない）。3セル以上が同じ頭文字なら、その頭文字を落とす候補は認めない。
+    heads: dict[str, int] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] < 1:
+            continue
+        head = (cell.get("text") or "").replace("\n", "").strip()[:1]
+        if head.isalpha():
+            heads[head] = heads.get(head, 0) + 1
     fixed = 0
     for cell in table["cells"]:
         # 判定は**描画後の形**で行う——`apply_bitfield`の連結は改行を残すことがあり
@@ -465,9 +542,22 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         # 正しい名前は記述表のName列に在り、**その文字が順番どおり含まれる**という関係が
         # 成り立つ。候補が1つに決まるときだけ差し替える（長さは名前の2倍+2まで——
         # `Reserved bits must be 0`のような説明文を名前へ潰さないための歯止め）。
-        candidates = [n for n in names
+        # 索引付きの名前は記述表に無いので、base（記述表/無傷の兄弟）＋**そのセル自身の列の
+        # bit番号**で組む（`PENDSTA15`）。索引を隣のbitの値と取り違えないよう、候補は列ごと。
+        single = cell["column_end"] - cell["column_start"] == 1
+        bit = bit_at.get(cell["column_start"], "") if single else ""
+        # **そのセル自身が既に「base＋自分の列のbit番号」の形なら正しい**ので触らない。
+        # DMA_INTFCRの`CTCIF1`（bit1・記述表は族名`CTCIFx`）を、`TCIFx`由来の`TCIF1`へ
+        # 縮めるところだった——落ちる`C`が`TCIF1`にも在るため重複判定を通ってしまう
+        # （zh版4文書でPDF↔MD突合の抽出中に発見。中断標志清除レジスタのCは意味を持つ）。
+        if bit.isdigit() and any(flat == base + bit for base in bases):
+            continue
+        pool = names | ({base + bit for base in bases} if bit.isdigit() else set())
+        candidates = [n for n in pool
                       if len(n) >= 3 and " " not in n and n != flat
                       and len(flat) <= 2 * len(n) + 2
+                      and not (n[:1] != flat[:1] and heads.get(flat[:1], 0) >= 3)
+                      and not _truncates_index(flat, n)
                       and _only_duplicate_glyphs(flat, n)
                       and _is_subsequence(n, flat)]
         if len(candidates) == 1:
@@ -624,7 +714,7 @@ def looks_ruled(table: dict) -> bool:
     なので、表題が図と名乗っていると表そのものが図領域になる。原本の誤植でそうなる例:
     CH32V407RM.**en** p475 `Figure 26-19 Mode D FSMC_BCR1 bit field`（zh は`表26-19`、
     同じ章の Mode 1/A/B/C は en でも`Table 26-8/26-10/26-13/26-16`）——18行のbit域表が
-    画像＋折りたたみの平文になり、表として読めなかった。全corpusで**229表・48文書**が該当
+    画像＋折りたたみの平文になり、表として読めなかった。全corpusで**106表・37文書**が該当
     （図領域内の表5,146のうち。残り4,917は図のboxやラベルで、平文のままが正しい）。
     exporterはこれをHTML表として折りたたみの中に描き、平文へ潰さない。
     """
@@ -656,6 +746,12 @@ def looks_ruled(table: dict) -> bool:
         half = len(words) // 2
         if half and words[:half] == words[half:half * 2]:
             return False
+    # 図の箱の格子は**小さく、枠の隙間が完全な空行になる**（`Laye FI|er IFO|1`＝図中の
+    # `Layer 1 FIFO`の箱が縦割れしたもの。H417RM.en p979／zh p824をPDF↔MD突合が指摘）。
+    # 5行以下で空行を含むものは表でない——datasheetのpin表は80行の中に空行が混じるが
+    # 小さくないので残る（この条件に当たるのは全corpusで2表、いずれも同じ図のen/zh）。
+    if rows <= 5 and len({c["row_start"] for c in filled}) < rows:
+        return False
     return sum(1 for n in per_row.values() if n >= 2) >= 2
 
 
@@ -1071,9 +1167,20 @@ def apply_bitfield(table: dict, number_line: dict,
             by_row.setdefault(cell["row_start"], []).append(cell)
     for row_cells in by_row.values():
         row_cells.sort(key=lambda c: c["column_start"])
+        # 行の**3セル以上が同じ頭文字**で始まるなら、それは隣からのbleedではなく本物の綴り
+        # ——EXTI_SWIEVRの下段は`R15`/`R 14`/`R13`…と16列に同じ`R`が並ぶ。この歯止めが無いと
+        # `R 14`の`R`を右隣`R13`の`R`と見て落とし、上段と繋いで`SWIE14`になっていた（PDF↔MD
+        # 突合が11セルで指摘。parityは落ちない——bundleの文字が消えても順序は保たれるため）。
+        heads: dict[str, int] = {}
+        for cell in row_cells:
+            text = cell.get("text") or ""
+            if text[:1].strip():
+                heads[text[0]] = heads.get(text[0], 0) + 1
         for index, cell in enumerate(row_cells):
             text = cell.get("text") or ""
             if len(text) >= 2 and text[1] in " \n" and text[0].strip():
+                if heads.get(text[0], 0) >= 3:
+                    continue
                 left = (row_cells[index - 1]["text"] if index else "").rstrip()[-2:]
                 right = (row_cells[index + 1]["text"]
                          if index + 1 < len(row_cells) else "").lstrip()[:2]
