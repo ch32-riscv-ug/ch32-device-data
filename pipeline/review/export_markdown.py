@@ -503,6 +503,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     demote_headings = demoted_heading_lines(page)
     # bit図の検算に使う「そのページの正しいフィールド名」（記述表のName列）。
     description_names = logical_tables.description_names(page, chains)
+    # 重なりセルの残骸だけの1列表（描かない）。
+    fragment_ids = logical_tables.fragment_tables(page)
     # 章題の折り返し2行目（`# (SerDes)`）は1行目の見出しへ繋ぐ。
     title_merge, title_skip = title_continuations(page)
     # geometryは要るときだけ開く（表の端に降ってきた重複グリフ除去に使う）。ページ跨ぎの
@@ -601,7 +603,12 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                            f"({info['start_page']:04d}.md). <!-- {item['id']} -->")
                 (figure_text if inside else output).extend(("", pointer, ""))
                 continue
+            if item["id"] in fragment_ids:
+                # 重なりセルの残骸が独立した1列表として抽出されたもの（中身は重なっている
+                # 本体の表に必ず出るので、描かないことで文字は失われない）。parityも同じ判定。
+                continue
             record = info["merged"] or tables[item["id"]]
+            logical_tables.drop_phantom_fragment_rows(record)
             if info["merged"] and tables[item["id"]].get("_caption_full"):
                 # 折り返し表題の全文はbitfield_planがページ表に付ける。ページ跨ぎの結合表は
                 # 別dictなので載せ替える——無いと続き行がskipされたうえ表題も1行目だけになり、
