@@ -21,7 +21,7 @@
 ## 工程
 
 ```text
-ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの67版）
+ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの68版）
 common/    logical_tables.py（**L1: ページを跨ぐ表の断片を1つの論理表に結合**。
            変換器の継続flagに依存せず構造で判定——無caption・ページ先頭・前ページ
            末尾が表・縦位置の連続・列構造互換。列の対応付けは列数が同じなら位置、
@@ -57,8 +57,8 @@ common/    review_sidecar.py（**L2: 人の判断の読み手**。正本は
 review/    render_assets.py（**図のpixel描画**。原本hashを照合してから、図領域を
            150dpiのPNGに描いて`assets.json`（領域bbox・PNGのSHA-256）と置く。
            図領域は文字ではなく**graphicsの縦クラスタ**で決める——図中のラベルは
-           paragraph行として写るので文字を境界にすると領域が潰れる。67文書で
-           3,676 asset・**図caption 2,871の全部に実画像（100%・警告0）**——caption無しでも回転文字入りの大クラスタ（封装図・引脚配置図）は独立assetとして描画——
+           paragraph行として写るので文字を境界にすると領域が潰れる。68文書で
+           3,829 asset・**図caption 3,023の全部に実画像（100%・警告0）**——caption無しでも回転文字入りの大クラスタ（封装図・引脚配置図）は独立assetとして描画——
            図全体が1つの無caption表として誤検出される場合（過滤器編号の示例・
            波形図・応答グラフ）もcaption直下ならクラスタへ算入する。
            本文の参照文（「图19-2是…」「figure 21-1.」等）はcaption扱いしない
@@ -66,7 +66,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            header/footerはコメント化、表はrowspan/colspan保持のHTML、
            **ページを跨ぐ表はL1で結合して開始ページに全体を描き、続きページには
-           可視ポインタ**（67文書で3,770表を結合）、**ページ境界でセルの中身が
+           可視ポインタ**（68文書で3,914表を結合）、**ページ境界でセルの中身が
            割れた「宙ぶらりん行」は直前セルへ畳む**（`fold_boundary_spills`。
            MCO説明の続き`Other: No clock output.`等——1,937セル／50文書。
            同一ページ内は比較表の縦並びを誤結合するので境界行だけが対象。
@@ -125,14 +125,14 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            印を必須にする））
 checks/    compare_manifest.py（環境差の検証）
            check_markdown_parity.py（bundle→Markdownで本文行・表セルが読み順どおり
-           全部現れること＋取りこぼしの印があることの機械検査。**67文書全合格**。exporterが
+           全部現れること＋取りこぼしの印があることの機械検査。**68文書全合格**。exporterが
            畳んだ行は畳んだ先で見る——折り返し表題の2行目は`<caption>`の中に在ること。
            この検査は存在と順序しか見ないので、export側の変換にはPDF↔Markdownの意味検証
            （サブエージェント）を必ず対にする）
            cross_engine.py（**取り込み正しさの独立検証**。bundleの文字集合を別実装の
            pypdfium2と突き合わせる——順序でなく文字マルチセットを比べ、pypdfium2が
            取れてbundleが落とした文字を報告。pypdfium2のハイフン誤読（`-`→`\x02`）は
-           正規化。全67版で**取りこぼし0**を実測——独立エンジンが取る文字を
+           正規化。全68版で**取りこぼし0**を実測——独立エンジンが取る文字を
            bundleは一文字残らず取る。手動運用: `uv run --with pypdfium2`）
 publish/   regenerate.py（**一括再生成のentry point**。bundle再変換→切替済み
            evidenceの再生成→下流indexの再導出→検査、の順で既存CLIを呼ぶ。
@@ -212,7 +212,7 @@ uv run pipeline/publish/regenerate.py                   # 一括再生成（bund
 uv run pipeline/publish/regenerate.py --full            # 全CSVの再生成（旧tool群をbundle入力で。約1.5時間）
 uv run pipeline/publish/regenerate.py --verify --human  # ＋凍結パリティ・エラッタ・図・Markdown・差ゼロ検査
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの67版。incremental
+uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの68版。incremental
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                                        # 独立検証ゲート（1.1.0以降）
 ```

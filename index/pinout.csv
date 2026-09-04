@@ -20247,7 +20247,7 @@ CH32V407RET6,CH32V407,CH32V407,59,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V407RET6,CH32V407,CH32V407,59,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,59,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407RET6,CH32V407,CH32V407,60,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en
@@ -20802,7 +20802,7 @@ CH32V407VET6,CH32V407,CH32V407,92,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V407VET6,CH32V407,CH32V407,92,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,92,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407VET6,CH32V407,CH32V407,93,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en
@@ -21273,7 +21273,7 @@ CH32V407WEU6,CH32V407,CH32V407,61,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V407WEU6,CH32V407,CH32V407,61,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,61,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V407WEU6,CH32V407,CH32V407,62,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en
@@ -21717,7 +21717,7 @@ CH32V467RET6,CH32V467,CH32V407,59,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V467RET6,CH32V467,CH32V407,59,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,59,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467RET6,CH32V467,CH32V407,60,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en
@@ -22271,7 +22271,7 @@ CH32V467VET6,CH32V467,CH32V407,92,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V467VET6,CH32V467,CH32V407,92,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,92,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467VET6,CH32V467,CH32V407,93,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en
@@ -22737,7 +22737,7 @@ CH32V467WEU6,CH32V467,CH32V407,61,PB6,B,6,gpio,USART1,TX,USART1_TX,remap-1,afio-
 CH32V467WEU6,CH32V467,CH32V407,61,PB6,B,6,gpio,USART7,CTS,USART7_CTS,remap-2,afio-usart7-remap,2,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,61,PB6,B,6,gpio,USBHS2,DM,USBHS2_DM,default,,,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,default,afio-fsmc-remap,0,,#,confirmed,pin-table:zh+pin-table:en
-CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-1,afio-fsmc-remap,1,,#,confirmed,pin-table:zh+pin-table:en
+CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,FSMC,NADV,FSMC_NADV,remap-0,afio-fsmc-remap,0,,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,I2C1,SDA,I2C_SDA,default,afio-i2c1-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,TIM4,CH2,TIM4_CH2,default,afio-tim4-remap,0,,#,confirmed,pin-table:zh+pin-table:en
 CH32V467WEU6,CH32V467,CH32V407,62,PB7,B,7,gpio,TIM8,CH2,TIM8_CH2,remap-1,afio-tim8-remap,1,,#,confirmed,pin-table:zh+pin-table:en

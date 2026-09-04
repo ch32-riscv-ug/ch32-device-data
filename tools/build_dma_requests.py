@@ -59,7 +59,14 @@ COLUMNS = ["family", "variant", "dma", "channel", "request_id", "request", "requ
 HEAD_FIRST = re.compile(r"^(外设|Peripheral)s?$", re.IGNORECASE)
 HEAD_CHANNEL = re.compile(r"^(?:通道|Channel)\s*(\d+)$", re.IGNORECASE)
 HEAD_MUX = re.compile(r"(DMA\s*请求输入|DMA\s*request\s*input)", re.IGNORECASE)
-CAPTION = re.compile(r"(?:表|Table)\s*(?P<number>\d+-\d+)[^\n]*?(?P<dma>DMA\d?)", re.IGNORECASE)
+# `Figure|图` も受ける: CH32V407RM の en 版だけが表の題を `Figure 11-2 DMA1 peripheral mapping
+# table for each channel`／`Figure 11-3 DMA2 …` と誤植している（zh 版は `表11-2`/`表11-3`）。
+# 題を取れないと両表とも既定の DMA1 に落ち、DMA2 の 38 要求が en では DMA1、zh では DMA2 になって
+# 照合できず 76 行の reference になった（2026-09-04、en 版 RM 追加時）。図の題は下の
+# CAPTION_TABLE（「映射表」/「mapping table」）で弾くので、Figure を受けても図は表にならない。
+# 全 RM bundle を走査して `Figure … mapping table` はこの 2 件だけ——他 family の出力は変わらない。
+CAPTION = re.compile(r"(?:表|图|Table|Figure)\s*(?P<number>\d+-\d+)[^\n]*?(?P<dma>DMA\d?)",
+                     re.IGNORECASE)
 # 図の題（`Table 11-2 DMA2 request mapping`）は表ではない。表の題は「映射表」/「mapping table」。
 CAPTION_TABLE = re.compile(r"映射表|mapping\s+table", re.IGNORECASE)
 CAPTION_MUX = re.compile(r"(?:表|Table)\s*(?P<number>\d+-\d+)[^\n]*?(?:复用器|multiplexer)", re.IGNORECASE)

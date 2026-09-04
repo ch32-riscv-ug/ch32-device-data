@@ -8,6 +8,24 @@ byte一致や既存の描画を崩しそうなら撤退し、その経緯をこ�
 判定はしない（原典の誤りは原典のまま）。canonical（凍結CSV）に触れる変更は`--full`の
 frozen parityで検証し、driftが良性（説明文の改善のみ）であることを確かめてからにする。
 
+## 原本の追加（コーパスの変化）
+
+- **2026-09-04: CH32V407 の en 版 RM が mirror に追加**（`datasheet_en/CH32V407RM.PDF`・609ページ）。
+  コーパスは **67→68文書**。取り込みは handoff の「原本にPDFが追加・更新されたとき」の手順どおり
+  （convert_all 増分 → build_sources → `regenerate --full --verify --human`）。
+  - 検証: **parity 68/68 clean**、凍結tool **6/6 byte一致**（canonical不変）、エラッタ NEW 0、
+    cross_engine（pypdfium2 突合）で新文書も**取りこぼし0**（extra 27 は回転ラベル等）、
+    check_tables/check_counts/check_docs 合格。図は 3,829 asset・図caption 3,023 の全部に実画像。
+  - **効果**: `dma_requests` の V407 73行が reference → **confirmed**（zh/en 一致）。ただし
+    en 版が DMA 周辺映射表の題を `Figure 11-2/11-3 … peripheral mapping table` と誤植していて
+    （zh は `表11-2`/`表11-3`）、そのままでは両表が既定の DMA1 に落ちて対にならなかった——
+    `build_dma_requests.CAPTION` に `图|Figure` を追加（図の題は既存の「mapping table」判定で弾く。
+    全RM走査でこの綴りは V407 en の2件だけ・他familyの出力は byte 不変）。worklist **F-59**。
+  - **副作用（記録のみ）**: `FSMC_NADV` の remap 格子を zh は `remap 1→PB7`、en は `remap 0→PB7` と
+    読み、`remap_routes` 2行が落ちて `pin_functions` の PB7 6型番が confirmed → **conflict**。
+    資料は両版とも同じことを言っており（表10-40 は FSMCEN=0/1 とも PB7）、en 版で表がページ跨ぎの
+    見出し無し断片になるのを凍結 `build_all` が片方ずつ読んでいるのが原因。worklist **F-60**。
+
 ## 監査信号（`audit_pages.py`）と現況
 
 | 信号 | 直近数 | 意味 | 状態 |

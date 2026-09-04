@@ -22914,7 +22914,7 @@ CH32V407RET6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V407RET6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407RET6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407RET6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V407RET6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V407RET6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V407RET6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407RET6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407RET6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
@@ -23391,7 +23391,7 @@ CH32V407VET6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V407VET6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407VET6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407VET6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V407VET6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V407VET6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V407VET6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407VET6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407VET6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
@@ -24036,7 +24036,7 @@ CH32V407WEU6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V407WEU6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407WEU6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407WEU6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V407WEU6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V407WEU6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V407WEU6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407WEU6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V407WEU6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
@@ -24548,7 +24548,7 @@ CH32V467RET6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V467RET6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467RET6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467RET6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V467RET6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V467RET6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V467RET6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467RET6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467RET6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
@@ -25019,7 +25019,7 @@ CH32V467VET6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V467VET6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467VET6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467VET6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V467VET6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V467VET6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V467VET6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467VET6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467VET6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
@@ -25662,7 +25662,7 @@ CH32V467WEU6,PB6,USART1_TX,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH3
 CH32V467WEU6,PB6,USART7_CTS,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467WEU6,PB6,USBHS2_DM,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467WEU6,PB7,FSMC_NADV,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
-CH32V467WEU6,PB7,FSMC_NADV,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
+CH32V467WEU6,PB7,FSMC_NADV,remap-1,#,conflict,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0),2-1,CH32V407DS0.PDF
 CH32V467WEU6,PB7,I2C_SDA,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467WEU6,PB7,PB7,main,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF
 CH32V467WEU6,PB7,TIM4_CH2,default,#,confirmed,pin-table:zh+pin-table:en,2-1,CH32V407DS0.PDF

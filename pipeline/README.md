@@ -22,7 +22,7 @@ them one CSV at a time, only after old-vs-new comparison.
 ## Stages
 
 ```text
-ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 67 catalogued versions)
+ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 68 catalogued versions)
 common/    logical_tables.py (**L1: joins the physical fragments of a page-spanning
            table into one logical table**. The decision is structural, independent of
            the converter's continuation flag: no caption, first content on its page,
@@ -73,8 +73,8 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            hash, then renders each figure region to a 150-dpi PNG recorded in
            assets.json with its bbox and SHA-256. Regions come from **vertical
            clusters of graphics**, not text -- in-figure labels arrive as paragraph
-           lines and collapse any text-based boundary. 3,676 assets across the 67
-           documents; **all 2,871 figure captions carry a real image
+           lines and collapse any text-based boundary. 3,829 assets across the 68
+           documents; **all 3,023 figure captions carry a real image
            (100%, zero notices)**, and uncaptioned graphics clusters containing
            rotated text (package/pinout diagrams) are rendered as standalone
            assets -- a whole figure misdetected as one uncaptioned "table"
@@ -87,7 +87,7 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            difference against the PDF. Headers/footers fold into HTML comments, tables
            keep rowspan/colspan as HTML, **page-spanning tables are joined through L1
            and rendered in full where they start, with a visible pointer on the
-           following pages** (3,770 tables joined across the 67 documents),
+           following pages** (3,914 tables joined across the 68 documents),
            **a cell whose content was split at a page break is folded back into
            the cell above it** (`fold_boundary_spills` -- e.g. the MCO
            description's trailing `Other: No clock output.`; 1,937 cells across
@@ -174,7 +174,7 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
 checks/    compare_manifest.py (cross-environment reproducibility)
            check_markdown_parity.py (machine check that every body line and table cell
            reaches the Markdown in reading order and that gap notices are present --
-           **all 67 documents pass**. Lines the exporter folds away are checked for
+           **all 68 documents pass**. Lines the exporter folds away are checked for
            the place they were folded into: a wrapped caption's second line must
            appear inside `<caption>`. The check sees existence and order only, so
            an export-side transform is always paired with a semantic PDF-vs-Markdown
@@ -182,7 +182,7 @@ checks/    compare_manifest.py (cross-environment reproducibility)
            cross_engine.py (**independent verification of the text ingestion**:
            compares the bundle's character multiset against a second PDF engine,
            pypdfium2 -- order is ignored, only the set of characters. pypdfium2's
-           hyphen misread (`-` -> `\x02`) is normalized. Measured across all 67
+           hyphen misread (`-` -> `\x02`) is normalized. Measured across all 68
            versions: **0 characters missed** apart from 14 known math/unit-glyph
            ToUnicode breakages (garbled in both engines), pinned by name and
            count. Manual: `uv run --with pypdfium2`)
@@ -286,7 +286,7 @@ uv run pipeline/publish/regenerate.py             # bundles -> evidence -> index
 uv run pipeline/publish/regenerate.py --full      # regenerate every CSV (frozen tools on bundle input; ~1.5h)
 uv run pipeline/publish/regenerate.py --verify --human  # + parity, errata, figures, Markdown
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4    # all 67 versions, incremental
+uv run pipeline/ingest/convert_all.py --jobs 4    # all 68 versions, incremental
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                          # independent verification gate (1.1.0+)
 ```
