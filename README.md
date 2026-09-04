@@ -20,6 +20,9 @@ Start with [index/README.md](index/README.md) (what to look up where), then
 [evidence/README.md](evidence/README.md) (what each table and column means),
 [docs/table-reliability.ja.md](docs/table-reliability.ja.md) (how far each table can be
 trusted) and [docs/worklist.ja.md](docs/worklist.ja.md) (work in progress).
+Contributors -- people and AI agents alike -- read [docs/handoff.ja.md](docs/handoff.ja.md)
+(Japanese) first: where the sources of record are, how to resume, what to do when a mirror
+gains a PDF, the rules, and the working conventions for the structured-PDF pipeline.
 
 ## Layout
 

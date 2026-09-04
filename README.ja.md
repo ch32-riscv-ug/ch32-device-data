@@ -86,7 +86,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
 - `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）
-- `docs/handoff.ja.md`: 正本の所在、再開手順、守ること
+- `docs/handoff.ja.md`: **人もAIエージェントも最初に読む作業引継ぎ。** 正本の所在、再開手順、原本（mirror）更新時の手順、守ること、判断の指針、PDF構造化の作業規約
 - `docs/worklist-archive.ja.md`: 解決済みの穴・依頼の記録（何を直し、なぜそう判断したか）
 - `docs/extraction-survey.ja.md`: 機械抽出できる範囲の実測と、資料側の崩れの一覧
 
