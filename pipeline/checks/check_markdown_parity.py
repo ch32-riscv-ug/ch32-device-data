@@ -56,7 +56,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                pages_dir: Path, plan: dict | None = None,
                bundle: Path | None = None,
                entries: dict[int, dict] | None = None,
-               figure_regions: list | tuple = ()) -> list[str]:
+               figure_regions: list | tuple = (),
+               next_page: dict | None = None) -> list[str]:
     bad = []
     # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
     # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
@@ -67,8 +68,11 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                        "in the markdown -- Pages build would fail")
     position = 0
     # exporterと同じ「そのページの正しいフィールド名」（記述表のName列）。
-    description_names = logical_tables.description_names(page, chains)
+    description_names = logical_tables.description_names(page, chains, next_page)
     fragment_ids = logical_tables.fragment_tables(page)
+    # exporterが繋ぐ「境界で割れた視覚行」——右半分は先頭の重複文字を除いた残りが、左半分の
+    # 直後に出る。順序照合なので右半分の全文（重複文字込み）を探すと1文字ぶん前で外れる。
+    split_merge, split_skip = logical_tables.split_line_merges(page)
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     # bit図: 番号行は表のヘッダへ畳むか合成テーブルの位置になる——exporterと
@@ -116,6 +120,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # exporterと同じ畳み込みを見る（境界で割れたセルは前セルへ連結
                 # 済み・継続セルは空）。continuationセルは`_folded`で空になり
                 # expect("")がスキップ、前セルには連結後textが入る。
+                logical_tables.drop_repeated_headers(record)
                 logical_tables.fold_boundary_spills(record)
             if item["id"] in bitfields:
                 # bit番号をヘッダへ、縦割れ名を連結——exporterと同じ表を見る。
@@ -132,9 +137,17 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 logical_tables.strip_boundary_dupes(record)
                 if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
                     logical_tables.strip_straddling_dupes(record, chars_for)
-            for cell in record["cells"]:
-                # exporterと同じ表示（折り返し結合・改行は<br>）で検査する
-                expect(export_markdown.cell_html(cell["text"]),
+                logical_tables.clean_reset_column(record)
+                if logical_tables.has_subscript_shape(record):
+                    logical_tables.reattach_cell_subscripts(record, chars_for)
+            listy = logical_tables.is_list_table(record)
+            # exporterはグリッドを行→列の順に描く。bundleのセル列はrowspanセルが先に並ぶことが
+            # あり（繰り返し見出し行の`Pin name`が`H417WEU6`より前）、そのまま照合すると
+            # 「順序が違う」と誤検出した（H417DS0.en p34で1,037件）。
+            for cell in sorted(record["cells"], key=lambda c: (c["row_start"], c["column_start"])):
+                # exporterと同じ表示（折り返し結合・改行は<br>・一覧表は項目改行）で検査する
+                expect(export_markdown.cell_html(cell["text"],
+                                                 list_cell=listy and cell["row_start"] > 0),
                        f"table {item['id']} cell")
         elif item["type"] == "line":
             if item["id"] in synth:
@@ -161,6 +174,11 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             if line.get("role") == "list-item":
                 # exporterと同じく行頭bulletを落とす（`- `の二重を消す）。
                 body = export_markdown.strip_leading_bullet(body)
+            if item["id"] in split_skip:
+                continue   # 割れた視覚行の右半分は左半分へ繋いだ（exporterと同じ）
+            if item["id"] in split_merge:
+                # 左半分の直後に右半分（先頭の重複文字を除く）が続く1行として出ている。
+                body = body.rstrip() + export_markdown.pua_normalize(split_merge[item["id"]])
             expect(html.escape(body), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):
@@ -204,7 +222,7 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
         for asset in (items.values() if isinstance(items, dict) else items):
             regions.setdefault(asset["page"], []).append(asset["bbox"])
     bad: list[str] = []
-    for entry, page in zip(manifest["pages"], pages):
+    for index, (entry, page) in enumerate(zip(manifest["pages"], pages)):
         md = markdown / "pages" / f"{page['number']:04d}.md"
         if not md.exists():
             bad.append(f"p{page['number']}: markdown page missing")
@@ -212,7 +230,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
         text = md.read_text(encoding="utf-8")
         bad.extend(check_page(page, text, chains, markdown / "pages",
                               plans[page["number"]], bundle, entry_of,
-                              regions.get(page["number"], [])))
+                              regions.get(page["number"], []),
+                              pages[index + 1] if index + 1 < len(pages) else None))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")
