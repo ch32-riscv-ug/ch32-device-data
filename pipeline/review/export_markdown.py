@@ -248,6 +248,8 @@ _CHAPTER_HEADING = re.compile(r"^(?:第\s*\d+\s*章|Chapter\s+\d+)", re.I)
 # 傍注の書き出し——これで始まる大フォント行は見出しでなく段落（`注：…`が5つのH1に化けた）。
 # 枠の外に描かれた行/列見出しになりうる短い識別子（`TDes0`・`SRAM`・`CK`）。
 _ROW_LABEL = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,11}")
+# 封装名（`CH32V003F4P6`・`CH32H417WEU6`）: 大文字英字＋数字を含む1トークン。
+_PRODUCT_ID = re.compile(r"[A-Z]{2,}[0-9][A-Za-z0-9_\-]{2,20}(?:\s+[A-Z]{2,}[0-9][A-Za-z0-9_\-]{2,20})*")
 _NOTE_MARKER = re.compile(r"^(?:注意|注|说明|說明|備考|备注|Note|NOTE|Notes)\s*[:：]")
 
 
@@ -293,6 +295,12 @@ def demoted_heading_lines(page: dict) -> set[str]:
     # `SPI1 SPI1_RX SPI1_TX`・`Peripheral Channel 1 …`）。文書の見出しが表の中に在ることは
     # ないので段落へ落とす——`#`が本文の目次を壊していた（全corpus 243行・16文書。
     # PDF↔MD突合が図中注記の`# RSTACT …`で気づかせた口。図領域内のラベルは既に段落）。
+    # 封装名だけの見出し（`CH32V003F4P6`）: pinout図の題で、本文フォントの識別子が同じページに
+    # 2つ以上並ぶ。目次にH1として4つ出ていた（V003DS0.zh p9。全面見直しの指摘）。
+    idents = [l for l in page["lines"] if l.get("role") == "heading"
+              and _PRODUCT_ID.fullmatch(l["text"].strip())]
+    if len(idents) >= 2:
+        demote.update(l["id"] for l in idents)
     boxes_all = [t["bbox"] for t in page["tables"]]
     boxes = boxes_all
     if boxes:
@@ -349,9 +357,17 @@ def title_continuations(page: dict) -> tuple[dict[str, str], set[str]]:
     skip: set[str] = set()
     for a, b in zip(order, order[1:]):
         ta, tb = a["text"].strip(), b["text"].strip()
-        if not (a.get("role") == "heading" and b.get("role") == "heading"):
+        if a.get("role") != "heading":
             continue
-        if not _CHAPTER_HEADING.match(ta):
+        # 番号見出しでも、**括弧が開いたまま／読点で終わる**なら題が折り返している
+        # （`11.3.4 DMAy 通道 x …（DMAy_CNTRx）（x=1/2/3/4/5/6/7/8，`＋`y=1/2）`。FV2x_V3xRM.zh
+        # p159。全面見直しの指摘）。2行目は見出しでも段落でもよい（短く、括弧を閉じる）。
+        unclosed = (ta.count("（") + ta.count("(") > ta.count("）") + ta.count(")")
+                    or ta[-1:] in "，,、")
+        wrapped_number = bool(_HEADING_NUMBER.match(ta)) and unclosed
+        if not (_CHAPTER_HEADING.match(ta) or wrapped_number):
+            continue
+        if not wrapped_number and b.get("role") != "heading":
             continue
         if _HEADING_NUMBER.match(tb) or _CHAPTER_HEADING.match(tb):
             continue
@@ -359,7 +375,11 @@ def title_continuations(page: dict) -> tuple[dict[str, str], set[str]]:
             continue
         if figure_captions.caption_match(tb):
             continue
-        if abs((a.get("font_size") or 0) - (b.get("font_size") or 0)) > 0.6:
+        if wrapped_number:
+            if len(tb) > 24 or not (ta.count("（") + ta.count("(") == 0
+                                    or "）" in tb or ")" in tb or ta[-1:] in "，,、"):
+                continue
+        elif abs((a.get("font_size") or 0) - (b.get("font_size") or 0)) > 0.6:
             continue
         merge[a["id"]] = tb
         skip.add(b["id"])
@@ -383,9 +403,10 @@ def strip_leading_bullet(text: str) -> str:
 _JOIN_PUNCT = ":;.。；：,，、"
 # 折り返しの続きでなく独立した英単語（`Remapping`）。先頭大文字＋小文字が3字以上。
 _WORD = re.compile(r"[A-Z][a-z]{2,}")
+_REGISTER_NAME = re.compile(r"R(?:8|16|32)_[A-Z0-9_]{3,}")
 
 
-def cell_html(text: str) -> str:
+def cell_html(text: str, list_cell: bool = False) -> str:
     """セルの中身。物理行の切れ目（`\\n`）を、**折り返しか意図的な改行か**で
     出し分ける（前者は繋ぎ、後者は`<br>`）。完全な区別は原理的に不可能だが、
     行末・行頭の文字種で実用的に分けられる（狭いregisterセルで`USART1RST`が
@@ -409,6 +430,23 @@ def cell_html(text: str) -> str:
             sep = "<br>"
         elif (pe[-1].isalpha() and pe[-1].islower()) or (cur[0].isalpha() and cur[0].islower()):
             sep = " "
+        elif cur.startswith(("0x", "0X")) and pe[-1].isalnum() and not pe.endswith(("=", "/", "_")):
+            # `0x00/B1B0`＋`0x02/B3B2`のような転送一覧は1行1組。識別子が`0x`リテラルの直前で
+            # 折り返すことはない（V00XRM.en p92・V407RM.en p145。全面見直しの指摘）。
+            sep = "<br>"
+        elif _REGISTER_NAME.match(cur.strip()) and pe[-1].isalnum():
+            # 別名のレジスタ名が2行に並ぶ（`R32_UH_TX_DMA`／`R32_UEP0_TX_DMA`。X315RM.en p298）。
+            sep = "<br>"
+        elif (len(pe) <= 3 and pe.isupper() and pe.isalpha() and _WORD.fullmatch(cur.strip())):
+            # 短い大文字語＋英単語（`IN`+`Endpoint`・`OUT`+`Endpoint`）は2語（全面見直しの指摘）。
+            sep = " "
+        elif (list_cell and cur[0].isupper() and len(cur.strip()) >= 3
+              and pe[-1] not in "_-/"):
+            # pin定義表・remap表のセルは**1行に1機能**の一覧（`MCO`/`TIM1_CH1`/`USART1_CK`）。
+            # 識別子折り返しの規則で地続きに繋ぐと`MCOTIM1_CH1USART1_CK`になり機能名の境界が
+            # 消えていた（全面見直しの指摘。L103DS0/M030DS0/V002DS0で約100セル）。行末が
+            # `_`/`-`/`/`（識別子の途中）でなく、次行が大文字で始まる3字以上なら項目改行。
+            sep = "<br>"
         elif (pe[-1].isalnum() and cur[0].isalnum() and " " not in cur.strip()
               and not ("=" in pe and _WORD.fullmatch(cur.strip()))):
             # 識別子の折り返し（`USAR`+`T1`=`USART1`）だけ地続きに繋ぐ。継続断片は
@@ -447,7 +485,8 @@ def table_html(table: dict, url: str | None, number: int) -> str:
             attrs.append(f'rowspan="{cell["row_end"] - cell["row_start"]}"')
         if cell["column_end"] - cell["column_start"] > 1:
             attrs.append(f'colspan="{cell["column_end"] - cell["column_start"]}"')
-        inner = cell_html(cell["text"])
+        inner = cell_html(cell["text"],
+                          list_cell=cell["row_start"] > 0 and logical_tables.is_list_table(table))
         if cell.get("italic"):
             inner = f"<em>{inner}</em>"
         if cell.get("bold"):
@@ -518,7 +557,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 assets: dict[str, dict], page_count: int,
                 lost_glyphs: int = 0, plan: dict | None = None,
                 bundle: Path | None = None,
-                entries: dict[int, dict] | None = None) -> str:
+                entries: dict[int, dict] | None = None,
+                next_page: dict | None = None) -> str:
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     images = {item["id"]: item for item in page["images"]}
@@ -526,11 +566,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     # 大フォントの段落ブロック（Overview・注記・mode説明）が複数の見出しに化けた行を段落へ戻す。
     demote_headings = demoted_heading_lines(page)
     # bit図の検算に使う「そのページの正しいフィールド名」（記述表のName列）。
-    description_names = logical_tables.description_names(page, chains)
+    description_names = logical_tables.description_names(page, chains, next_page)
     # 重なりセルの残骸だけの1列表（描かない）。
     fragment_ids = logical_tables.fragment_tables(page)
     # 章題の折り返し2行目（`# (SerDes)`）は1行目の見出しへ繋ぐ。
     title_merge, title_skip = title_continuations(page)
+    # 同じ視覚行が境界で二つに割れ境目の文字が二重になった対を繋ぐ（zh版DSの本文）。
+    split_merge, split_skip = logical_tables.split_line_merges(page)
     # geometryは要るときだけ開く（表の端に降ってきた重複グリフ除去に使う）。ページ跨ぎの
     # 結合表はセルごとに出自ページが違うので、ページ番号で引ける関数として渡す。
     _geo: dict[int, list[dict]] = {}
@@ -646,6 +688,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # （番号ヘッダも付かない）ので、空gridの`|||…|||`を出さずに済む。
                 continue
             if info["merged"]:
+                logical_tables.drop_repeated_headers(record)
                 logical_tables.fold_boundary_spills(record)
             if item["id"] in bitfields:
                 line_id, centers = bitfields[item["id"]]
@@ -665,6 +708,11 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # 触らない（latin_ok=False）。候補セルがあるページだけgeometryを開く。
                 if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
                     logical_tables.strip_straddling_dupes(record, chars_for)
+                # reset値の列に降りた説明列の行末英字（`e 0 e`）は列が分かるので落とせる。
+                logical_tables.clean_reset_column(record)
+                # 基底から離れた下付き（`V *2-1.5DD5`）をgeometryで元の位置へ戻す。
+                if logical_tables.has_subscript_shape(record):
+                    logical_tables.reattach_cell_subscripts(record, chars_for)
             if inside:
                 # 図領域内のtableは、図のbox/ラベルを罫線ありtableと誤抽出したもの
                 # （全corpus 3,758件）。枠付きboxが図テキストへ割り込むので、セルの中身を
@@ -721,8 +769,12 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                        # が2回。全corpusで28件全てこのパターン）。parityも同じくskip。
         if item["id"] in title_skip:
             continue   # 章題の折り返し2行目は直前の章見出しへ繋いだ
+        if item["id"] in split_skip:
+            continue   # 割れた視覚行の右半分は左半分へ繋いだ
         role = line.get("role", "paragraph")
         raw = pua_normalize(line["text"])
+        if item["id"] in split_merge:
+            raw = raw.rstrip() + pua_normalize(split_merge[item["id"]])
         if role == "list-item":
             # 原本の行頭bullet（`- `等）を落とす——exporterが`- `を足すので二重になる
             # （`- - Dual…`。ユーザー指摘）。parityも同じ関数で落として整合させる。
@@ -792,12 +844,13 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
             print(f"{assets_path}: stale (different original); ignoring -- "
                   "re-run pipeline/review/render_assets.py", file=sys.stderr)
     links = []
-    for entry, page in zip(manifest["pages"], pages):
+    for index, (entry, page) in enumerate(zip(manifest["pages"], pages)):
         name = f"{page['number']:04d}.md"
         (pages_dir / name).write_text(
             render_page(page, url, chains, assets, len(pages),
                         page_lost_subscripts(bundle, entry, page),
-                        plans[page["number"]], bundle, entry_of),
+                        plans[page["number"]], bundle, entry_of,
+                        pages[index + 1] if index + 1 < len(pages) else None),
             encoding="utf-8")
         links.append(f"- [page {page['number']}](pages/{name})")
     (out / "README.md").write_text(

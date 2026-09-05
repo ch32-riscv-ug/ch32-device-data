@@ -80,6 +80,21 @@ def load_page(bundle: Path, entry: dict) -> tuple[dict, dict]:
     return json.loads(payload), json.loads(geometry_raw)
 
 
+def _table_covers(bbox: list[float], table: dict) -> bool:
+    """密な本物の表（8行×4列以上・6割以上のセルが非空）がクラスタ面積の6割以上を覆うか。"""
+    rows, cols = table.get("row_count") or 0, table.get("column_count") or 0
+    if rows < 8 or cols < 4:
+        return False
+    cells = table.get("cells") or []
+    if not cells or sum(1 for c in cells if (c.get("text") or "").strip()) < 0.6 * len(cells):
+        return False
+    tb = table["bbox"]
+    ix = max(0.0, min(bbox[2], tb[2]) - max(bbox[0], tb[0]))
+    iy = max(0.0, min(bbox[3], tb[3]) - max(bbox[1], tb[1]))
+    area = max(1e-6, (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+    return ix * iy >= 0.6 * area
+
+
 def graphic_clusters(page: dict, geometry: dict) -> list[dict]:
     caption_bottoms = [line["bbox"][3] for line in page_captions(page)]
 
@@ -324,6 +339,13 @@ def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
                           if bbox[0] <= (rb[0] + rb[2]) / 2 <= bbox[2]
                           and bbox[1] <= (rb[1] + rb[3]) / 2 <= bbox[3])
             if rotated < 10:
+                continue
+            # **本物の表**が領域の大半を占めるクラスタは図ではない。datasheetのpin定義表は
+            # 封装名を90°回転で書くので回転文字が多く、表全体が「captionの無い図」として
+            # 画像化され、中身の表が折りたたみの中へ隠れていた（L103DS0.en p24・V002DS0.en p16・
+            # H417DS0.zh p28。全面見直しの指摘）。図の中にpdfplumberが拾う格子は疎なので、
+            # 8行×4列以上・6割以上のセルに文字がある表に限る。
+            if any(_table_covers(bbox, table) for table in page["tables"]):
                 continue
             counter += 1
             expanded = expand_with_labels(page, list(bbox))

@@ -146,7 +146,7 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            leading character shared by three or more cells of the diagram is never
            dropped, an index is never shortened (`ODR11` never becomes `ODR1`), and
            the neighbour-bleed removal skips a leading character that repeats down the
-           row (`SWIE`+`R 14` had been losing its `R`, printing `SWIE14`). 1,158 cells
+           row (`SWIE`+`R 14` had been losing its `R`, printing `SWIE14`). 1,208 cells
            across 21 documents), while a two-mode TIM CCMR keeps its output-name row above its
            input-name row; bit-field diagrams are also kept out of the page-spanning
            table chaining (a back-to-back pair used to merge, losing the cell
@@ -194,7 +194,31 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            and chapter headings are never touched; **a heading whose box sits inside a
            table is table content, not a heading** -- bold rows of a DMA mapping table
            were emitting `#` and breaking the outline, 243 lines across 16 documents), **a chapter title's wrapped second
-           line is joined to the first** (`(SerDes)`), **a table caption that wrapped
+           line is joined to the first** (`(SerDes)`; a numbered heading that ends with
+           an open parenthesis or a comma takes its short next line too, `y=1/2）`),
+           **package names printed as figure titles are not headings** (`CH32V003F4P6`
+           ×4 above pinout drawings), **a dense pin table is never an "uncaptioned
+           figure"** even though its rotated package names look like one
+           (`render_assets`: a table of 8+ rows × 4+ columns, 60%+ filled, covering
+           60%+ of the cluster), **pin/remap tables break each function onto its own
+           line** (`MCO`/`TIM1_CH1`/`USART1_CK` were being run together; `0x…` transfer
+           lists and `R32_…` register aliases likewise), **subscripts and superscripts
+           that pdfplumber detached inside a cell are put back by glyph size and
+           position** (`V *2-1.5DD5` → `VDD5*2-1.5`, `f = 2.4MHz S` → `fS = 2.4MHz`,
+           `232` → `2^32`; `logical_tables.reattach_cell_subscripts`, geometry-backed,
+           refuses any change that alters the multiset of characters), **reset-value
+           and access columns drop the description column's stray line-end glyphs**
+           (`e 0 e` → `0`, `L<br>RO 10` → `RO`; a wrapped hex digit `0xFFFFFFF`+`F` is
+           joined, not dropped), **a digit is never removed as a boundary duplicate**
+           (`HSRXEN = 1`, `Page 0` had lost their value), **a page-spanning table drops
+           the column header the source reprints at the top of each continuation
+           page** and **folds a header that wrapped onto extra rows** (`Pin`/`name`,
+           `Main`/`function`/`(after`/`reset)`), **a text line the converter split at a
+           column boundary with the boundary glyph on both sides is rejoined**
+           (Chinese datasheets: `…对外`/`外多组…`, only when 3+ lines on the page split
+           at the same x), and **overlap-remnant one-column tables never anchor a
+           page-spanning chain** (a remnant on CH32V407RM.en p145 had swallowed the 11
+           continuation rows of Table 11-1, which then vanished from the output), **a table caption that wrapped
            onto a second line -- an unclosed parenthesis or a dangling `or`/`with` at
            the line end -- is rendered whole in `<caption>` and the continuation line
            leaves the body** (`logical_tables.caption_full`, shared with the

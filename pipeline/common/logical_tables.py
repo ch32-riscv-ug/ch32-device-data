@@ -108,6 +108,65 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
     }
 
 
+def drop_repeated_headers(merged: dict) -> int:
+    """ページ跨ぎの結合表で、**続き断片の先頭に印字し直された列見出し**を落とす。
+
+    datasheetのpin定義表は各ページの先頭に同じ見出し（`Pin No.`/`Pin name`/…、2〜6行に
+    折り返す）を刷り直す。結合表ではそれが本文行として途中に何度も現れていた（L103DS0・
+    V006DS0・V203DS0で各ページぶん。全面見直しの指摘）。断片の開始行から k 行（k≤8）の文字を
+    連結したものが、表の先頭 k 行の連結と一致するときだけ、その k 行を落として行番号を詰める。
+    exporterとparityが同じ順で呼ぶ。冪等。
+    """
+    if merged.get("_headers_dropped"):
+        return 0
+    merged["_headers_dropped"] = True
+    row_pages = merged.get("row_pages")
+    if not row_pages:
+        return 0
+    by_row: dict[int, list[tuple[int, str]]] = {}
+    for cell in merged["cells"]:
+        text = "".join((cell.get("text") or "").split())
+        if text:
+            by_row.setdefault(cell["row_start"], []).append((cell["column_start"], text))
+
+    def signature(start: int, k: int) -> tuple:
+        # 列ごとに文字を連結してから並べる——刷り直しの見出しは同じ語でも行の割れ方が違う
+        # （`主功能（复位后）`が1行のページと`主功能`/`（复位`/`后）`の3行のページ）。
+        cols: dict[int, str] = {}
+        for r in range(start, start + k):
+            for col, text in sorted(by_row.get(r, [])):
+                cols[col] = cols.get(col, "") + text
+        return tuple(sorted(cols.items()))
+
+    header_height = max([c["row_end"] for c in merged["cells"] if c["row_start"] == 0] or [1])
+    heads = {signature(0, h) for h in range(1, max(header_height, 1) + 1)}
+    heads.discard(())
+    starts = [i for i in range(1, len(row_pages)) if row_pages[i] != row_pages[i - 1]]
+    drop: set[int] = set()
+    for s in starts:
+        for k in range(8, 0, -1):
+            if s + k > len(row_pages) or any(r in drop for r in range(s, s + k)):
+                continue
+            if signature(s, k) in heads:
+                drop.update(range(s, s + k))
+                break
+    if not drop:
+        return 0
+    keep = [r for r in range(len(row_pages)) if r not in drop]
+    remap = {old: new for new, old in enumerate(keep)}
+    cells = []
+    for cell in merged["cells"]:
+        rows = [r for r in range(cell["row_start"], cell["row_end"]) if r not in drop]
+        if not rows:
+            continue
+        cell["row_start"], cell["row_end"] = remap[rows[0]], remap[rows[-1]] + 1
+        cells.append(cell)
+    merged["cells"] = cells
+    merged["row_pages"] = [row_pages[r] for r in keep]
+    merged["row_count"] = len(keep)
+    return len(drop)
+
+
 def fold_boundary_spills(merged: dict) -> int:
     """ページ境界でセルの中身が割れた「宙ぶらりん行」を直前セルへ畳む。
 
@@ -184,17 +243,33 @@ def strip_boundary_dupes(table: dict) -> int:
         cells.sort(key=lambda c: c["column_start"])
         for index, cell in enumerate(cells):
             text = cell.get("text") or ""
-            if (len(text) >= 3 and text[-2] == " " and text[-1].strip()
+            # セル全体が英字1文字で、左隣の長い文（4字以上）がその文字で終わる——隣の末尾グリフ
+            # が空セルへ跨いだもの（`Standard I/O port`→Min列に`t`。V208DS0.en p35・V003DS0.en
+            # p23。全面見直しの指摘。CSVならMin=`t`になる）。数字は値なので触らない。
+            if (len(text.strip()) == 1 and text.strip().isalpha() and index > 0):
+                left = (cells[index - 1].get("text") or "").rstrip()
+                if len(left) >= 4 and left[-1] == text.strip():
+                    cell["text"] = ""
+                    removed += 1
+                    continue
+            # 数字は落とさない——`HSRXEN = 1`の`1`が右隣`12`の先頭と一致して消え、`Page 0`の`0`が
+            # `0x0800…`と一致して消えた（全面見直しの指摘。値の欠落はCSVにも効く）。数字の二重取りは
+            # geometryで裏取りする`strip_straddling_dupes`に任せる。演算子で終わる本体（`HSRXEN =`）
+            # や演算子で始まる本体（`= 6V`）が残る除去も、右辺/左辺を奪っているので行わない。
+            if (len(text) >= 3 and text[-2] == " " and text[-1].strip() and not text[-1].isdigit()
                     and index + 1 < len(cells)):
                 right = (cells[index + 1].get("text") or "").lstrip()
                 body = text[:-2]
-                if right[:1] == text[-1] and 0 < len(body) <= 14 and body.strip():
+                if (right[:1] == text[-1] and 0 < len(body) <= 14 and body.strip()
+                        and body.rstrip()[-1:] not in "=<>≤≥+-*/~"):
                     cell["text"] = text = body
                     removed += 1
-            if len(text) >= 3 and text[1] == " " and text[0].strip() and index > 0:
+            if (len(text) >= 3 and text[1] == " " and text[0].strip() and not text[0].isdigit()
+                    and index > 0):
                 left = (cells[index - 1].get("text") or "").rstrip()
                 body = text[2:]
-                if left[-1:] == text[0] and 0 < len(body) <= 14 and body.strip():
+                if (left[-1:] == text[0] and 0 < len(body) <= 14 and body.strip()
+                        and body.lstrip()[:1] not in "=<>≤≥+-*/~"):
                     cell["text"] = body
                     removed += 1
     return removed
@@ -310,6 +385,318 @@ def _dangling(text: str) -> bool:
     return last in _DANGLING
 
 
+_LIST_HEADERS = ("pin name", "pin no", "pin type", "remap", "alternate", "default function",
+                 "引脚名称", "引脚名", "引脚编号", "引脚类型", "重映射", "复用", "默认功能")
+
+
+def is_list_table(table: dict) -> bool:
+    """pin定義表・remap表か（ヘッダ行の語で判定）。これらのセルは**1行に1機能**を並べる
+    一覧なので、物理行の切れ目は折り返しでなく項目の区切り（`MCO`/`TIM1_CH1`/`USART1_CK`）。
+    レジスタ表の識別子折り返し（`USAR`+`T1`）と同じ規則で地続きに繋ぐと`MCOTIM1_CH1USART1_CK`
+    になっていた（全面見直しがL103DS0/M030DS0で約100セルを指摘）。結果は`_list_table`に記憶。
+    """
+    if "_list_table" in table:
+        return table["_list_table"]
+    header = " ".join((c.get("text") or "").replace("\n", " ")
+                      for c in table["cells"] if c["row_start"] == 0).lower()
+    table["_list_table"] = any(word in header for word in _LIST_HEADERS)
+    return table["_list_table"]
+
+
+_RESET_HEADERS = ("reset value", "reset", "复位值", "复位", "初始值", "默认值", "default")
+_RESET_VALUE = re.compile(r"0x[0-9A-Fa-f]+|[01xX]+b?|[0-9A-Fa-f]{2,}|-|—|–|N/A|无|无效")
+# Access列（`RW`/`RO`/`WO`/`RC_W0`…）も語彙が決まっている。説明列の行端が降りて`L<br>RO 10`・
+# `E10<br>RW N m T h`になっていた（V205RM.en p37・M030RM.en p113。全面見直しの指摘）。
+_ACCESS_HEADERS = ("access", "访问", "读写", "读/写", "属性", "类型", "type", "r/w")
+_ACCESS_VALUE = re.compile(r"(?i)r|w|rw|ro|wo|rc|rs|rw1|rc_w0|rc_w1|rc_w|rw0|w1c|w0c|w1s|r/w|rw/ro|ro/rw|rwo|-|—")
+
+
+def clean_reset_column(table: dict) -> int:
+    """記述表の**reset値の列**に降ってきた、説明列の行末グリフを落とす。
+
+    説明文が右寄せ気味に組まれると各行の最後の1文字がreset列へ跨ぎ、`0`が`e 0 e`・
+    `e w . 0 t`・`n m k k 0 n y`になる（L103RM.en p49・H417RM.en p672・M030RM.zh p110。
+    全面見直しの指摘。CSVのreset値にも効く）。geometryの重複判定（`strip_straddling_dupes`）
+    はLatin文字を`tsu`の`t`と区別できず触らないが、**reset値の列**と分かっていれば話は別——
+    正当な値は`0`/`1`/`x`/`0x…`/`00b`/`-`の1トークンだけで、空白で切れた1文字の英字が並ぶ
+    ことはない。ヘッダが`Reset value`/`复位值`の列で、**値トークンがちょうど1つ・他が全部
+    1文字**のセルだけを値トークンに置き換える。地続きの`0M`や2文字以上の異物は触らない。
+    """
+    if table.get("_reset_cleaned"):
+        return 0
+    table["_reset_cleaned"] = True
+    kinds: dict[int, re.Pattern] = {}
+    for c in table["cells"]:
+        if c["row_start"] != 0:
+            continue
+        head = (c.get("text") or "").replace("\n", " ").strip().lower()
+        if head in _RESET_HEADERS:
+            kinds[c["column_start"]] = _RESET_VALUE
+        elif head in _ACCESS_HEADERS:
+            kinds[c["column_start"]] = _ACCESS_VALUE
+    if not kinds:
+        return 0
+    fixed = 0
+    for cell in table["cells"]:
+        pattern = kinds.get(cell["column_start"])
+        if cell["row_start"] == 0 or pattern is None:
+            continue
+        tokens = (cell.get("text") or "").split()
+        if len(tokens) < 2:
+            continue
+        values = [tok for tok in tokens if pattern.fullmatch(tok)]
+        strays = [tok for tok in tokens if not pattern.fullmatch(tok)]
+        if pattern is _RESET_VALUE:
+            # `0xFFFFFFF`＋改行＋`F`は折り返した16進1桁——異物ではなく続き（V407RM.en p551
+            # MACA3LR。全面見直しの指摘。落とすと32bit値が28bitになる）。値の後に16進1桁だけが
+            # 続くなら繋ぐ。
+            if (len(values) == 1 and strays and tokens[0] == values[0]
+                    and values[0].lower().startswith("0x")
+                    and all(re.fullmatch(r"[0-9A-Fa-f]", s) for s in strays)):
+                cell["text"] = values[0] + "".join(strays)
+                fixed += 1
+                continue
+            # 数字の値の隣の孤立した`x`は説明文の`channel x`の末尾（V407RM.en p155 `x 0`）。
+            digit_values = [v for v in values if v[0].isdigit()]
+            if len(digit_values) == 1 and all(v in ("x", "X") for v in values if v not in digit_values):
+                strays += [v for v in values if v not in digit_values]
+                values = digit_values
+        # reset列は1文字の異物だけ、Access列は3文字以下の英数字の異物まで（`E10`・`10`）。
+        limit = 1 if pattern is _RESET_VALUE else 3
+        if (len(values) == 1 and strays
+                and all(len(tok) <= limit and tok.isalnum() or len(tok) == 1 for tok in strays)):
+            cell["text"] = values[0]
+            fixed += 1
+    return fixed
+
+
+_LONE_LETTER = re.compile(r"(?<![A-Za-z0-9_])[A-Za-z](?=[ \n]|$)")
+# 上付きが潰れた冪（`232`＝2^32・`220`＝2^20）の疑い。geometryで上付きと確かめてから直す。
+_POWER_OF_TWO = re.compile(r"(?<![0-9.])2(?:16|20|24|32|64)(?![0-9])")
+
+
+def has_subscript_shape(table: dict) -> bool:
+    """下付きが基底から離れた疑いのあるセル（`V *2-1.5DD5`・`f = 2.4MHz S`・`V ,V\nS0 S1`）が
+    あるか——基底が**1文字だけで空白/改行/末尾の前に立つ**。geometryを開く前の安価な前判定。"""
+    return any(_LONE_LETTER.search(c.get("text") or "") or _POWER_OF_TWO.search(c.get("text") or "")
+               for c in table["cells"])
+
+
+def reattach_cell_subscripts(table: dict, chars) -> int:
+    """表セルの中で基底から離れた**下付き**を、geometryで元の位置へ戻す。
+
+    pdfplumberはセル内の下付き（小さいフォント・低い基線）を別の視覚行として拾い、
+    `VDD5*2-1.5`を`V *2-1.5DD5`、`fS < 200KHz`を`f < 200KHz S`、`VS0,VS1`を`V ,V\nS0 S1`にする
+    （datasheetの電気特性表に集中。全面見直しがM030DS2/L103DS0/V003DS0で50セル超を指摘。
+    値・条件の意味が変わるのでCSVにも効く）。converterの`merge_subscript_lines`は行しか見ない。
+
+    セルのグリフを大きさで**基底**と**下付き**（サイズ≤0.8×中央値、かつ基底より下）に分け、
+    下付きの連なりを、そのすぐ左にある基底グリフの直後へ挿し直す。textは組み直さず、
+    下付きの綴りを消して基底の後へ挿すだけ——挿す前後で**空白以外の文字列が一致**しなければ
+    何もしない（安全側）。下付きと次の文字の隙間が狭ければ間の空白も落とす（`VS0,VS1`）。
+    charsはグリフ列か`page番号→グリフ列`の関数（結合表）。exporterとparityが同じ順で呼ぶ。冪等。
+    """
+    if table.get("_subscripts_reattached"):
+        return 0
+    table["_subscripts_reattached"] = True
+    fixed = 0
+    for cell in table["cells"]:
+        text = cell.get("text") or ""
+        box = cell.get("bbox") or cell.get("src_bbox")
+        if not box or not (_LONE_LETTER.search(text) or _POWER_OF_TWO.search(text)):
+            continue
+        page_chars = chars(cell.get("page")) if callable(chars) else chars
+        glyphs = [g for g in page_chars if (g.get("text") or "").strip()
+                  and box[0] <= (g["bbox"][0] + g["bbox"][2]) / 2 <= box[2]
+                  and box[1] <= (g["bbox"][1] + g["bbox"][3]) / 2 <= box[3]]
+        if len(glyphs) < 2:
+            continue
+        # 基底の大きさ＝最大のグリフ。中央値だと`C /C`+`L1 L2`（基底3・下付き4）や`232`（基底1・
+        # 上付き2）で下付きの方が多数になり、下付きを基底と取り違えて何もしなかった。
+        dominant = max(g["size"] for g in glyphs)
+        small = [g for g in glyphs if g["size"] <= 0.8 * dominant]
+        normal = [g for g in glyphs if g["size"] > 0.8 * dominant]
+        if not small or not normal:
+            continue
+        if not _LONE_LETTER.search(text) and not any(ch.isdigit() for g in small for ch in g["text"]):
+            continue
+        # 読み順（視覚行→x）。基底の並びはtextの空白以外の並びと一致するはず。
+        def order(gs):
+            gs = sorted(gs, key=lambda g: (g["bbox"][1], g["bbox"][0]))
+            rows, cur = [], []
+            for g in gs:
+                if cur and g["bbox"][1] - cur[-1]["bbox"][1] > 0.5 * dominant:
+                    rows.append(cur); cur = []
+                cur.append(g)
+            if cur:
+                rows.append(cur)
+            return [g for row in rows for g in sorted(row, key=lambda g: g["bbox"][0])]
+        normal = order(normal)
+        # 下付きの連なり: 同じ基線帯でxが連続するもの
+        # まず基線帯（top）で行に分け、行の中を x 順に並べて隙間で連なりに切る。x だけで
+        # 並べると別の行の下付きが交互に混ざり（`HCLK`と`SYS`。V004DS0.en p21）、top の丸めで
+        # 並べると`CLK`が`K`/`CL`に割れて`tKCL`になった（H417DS0.en p133）。
+        bands: list[list[dict]] = []
+        for g in sorted(small, key=lambda g: g["bbox"][1]):
+            if bands and abs(g["bbox"][1] - bands[-1][-1]["bbox"][1]) < 0.5 * g["size"]:
+                bands[-1].append(g)
+            else:
+                bands.append([g])
+        runs: list[list[dict]] = []
+        for band in bands:
+            for g in sorted(band, key=lambda g: g["bbox"][0]):
+                if (runs and runs[-1][0] in band
+                        and -0.2 * g["size"] <= g["bbox"][0] - runs[-1][-1]["bbox"][2] < 0.35 * g["size"]):
+                    runs[-1].append(g)
+                else:
+                    runs.append([g])
+        plan = []   # (基底index, 挿す綴り, 直後の空白を落とすか, textから消す綴り)
+        for run in runs:
+            sub = raw = "".join(g["text"] for g in run)
+            x0, top, bottom = run[0]["bbox"][0], run[0]["bbox"][1], run[0]["bbox"][3]
+            # 基底: 小さいグリフの左に接し（1.5文字幅以内）、下付きなら基底より下に沈み、
+            # 上付きなら基底より上に浮いている。上付きの数字は`^`を付けて書く——`2^32`が
+            # `232`に潰れ、タイマの最大カウントが読めなかった（V208DS0.en p38・H417RM.zh p117。
+            # 全面見直しの指摘）。脚注の`(1)`のような括弧付きは`^`無しで基底の直後へ戻す。
+            bases = [(i, g) for i, g in enumerate(normal)
+                     if -0.3 * g["size"] <= x0 - g["bbox"][2] <= 1.5 * g["size"]
+                     and top >= g["bbox"][1] + 0.15 * g["size"]
+                     and bottom <= g["bbox"][3] + 0.6 * g["size"]]
+            if not bases:
+                supers = [(i, g) for i, g in enumerate(normal)
+                          if -0.3 * g["size"] <= x0 - g["bbox"][2] <= 1.5 * g["size"]
+                          and bottom <= g["bbox"][3] - 0.25 * g["size"]
+                          and top < g["bbox"][1] + 0.1 * g["size"]]
+                if not supers:
+                    break
+                bases = supers
+                if sub.isalnum():
+                    sub = "^" + sub
+            i, base = min(bases, key=lambda ig: x0 - ig[1]["bbox"][2])
+            nxt = normal[i + 1] if i + 1 < len(normal) else None
+            # 基底と次の文字の隙間が**下付きの幅でほぼ説明できる**なら印字上の空白は無い
+            # （`VS0,`）。下付きの幅を引いても1pt超の余りがあれば本物の空白（`fS = 2.4MHz`）。
+            width = run[-1]["bbox"][2] - run[0]["bbox"][0]
+            tight = (nxt is not None
+                     and abs(nxt["bbox"][1] - base["bbox"][1]) < 0.5 * dominant
+                     and (nxt["bbox"][0] - base["bbox"][2]) - width < 1.2)
+            plan.append((i, sub, tight, raw))
+        if len(plan) != len(runs):
+            continue
+        # textから下付き/上付きの綴りを（トークン優先で）消す
+        stripped = text
+        ok = True
+        for _, _, _, raw in plan:
+            m = re.search(r"(?<![A-Za-z0-9])" + re.escape(raw) + r"(?![A-Za-z0-9])", stripped)
+            pos = m.start() if m else stripped.find(raw)
+            if pos < 0:
+                ok = False
+                break
+            stripped = stripped[:pos] + stripped[pos + len(raw):]
+        if not ok:
+            continue
+        if "".join(stripped.split()) != "".join(g["text"] for g in normal):
+            continue
+        # k番目の基底の直後へ挿す（後ろから）
+        out = stripped
+        for i, sub, tight, _ in sorted(plan, key=lambda x: -x[0]):
+            count, at = -1, None
+            for idx, ch in enumerate(out):
+                if not ch.isspace():
+                    count += 1
+                    if count == i:
+                        at = idx + 1
+                        break
+            if at is None:
+                ok = False
+                break
+            tail = out[at:]
+            if tight and tail[:1] == " ":
+                tail = tail[1:]
+            out = out[:at] + sub + tail
+        if not ok:
+            continue
+        out = "\n".join(line.rstrip() for line in out.split("\n") if line.strip())
+        flat_out = "".join(out.split()).replace("^", "")
+        if out != text and (flat_out == "".join(g["text"] for g in order(glyphs))
+                            or sorted(flat_out) == sorted("".join(text.split()))):
+            cell["text"] = out
+            fixed += 1
+    return fixed
+
+
+# 見出しの続きではありえない中身: 数字・bit範囲・16進・アクセス値・`-`。
+_DATA_LIKE = re.compile(r"\[?\d+(?::\d+)?\]?|0x[0-9A-Fa-f]+|[-—–]|(?i:rw|ro|wo|rc_w0|rc_w1|rw1|w1c)|[01xX]+b?")
+
+
+def _fold_spanning_header(table: dict) -> int:
+    """見出しの一部が折り返して**見出しブロックの下の行**に落ちた形を、ヘッダへ畳む。
+
+    datasheetのpin定義表は見出しがrowspanで2〜4行の高さを持ち、`Pin`/`name`・`Main`/`function`/
+    `(after`/`reset)`のように折り返した片が下の行に別セルとして落ちる。colspanの見出し
+    （`Pin No.`）の下に並ぶ封装名（`V006D8U7`…）は本物の2段目なので残す（V006DS0.en p19・
+    V002DS0.en p16・V00XRM.en p92。全面見直しの指摘）。
+
+    見出しブロックの高さ H＝row 0 のセルの最大row_end。**列幅1の見出し**でrow_endがHに届かない
+    列について、[row_end, H) にあるその列のセルの文字を空白で繋いで見出しに足し、見出しを
+    Hまで伸ばす。空になった行は詰める。片が16字を超えるものがあれば何もしない（本文の疑い）。
+    """
+    if table.get("_bitfield"):
+        return 0
+    header = [c for c in table["cells"] if c["row_start"] == 0]
+    if len(header) < 2:
+        return 0
+    height = max(c["row_end"] for c in header)
+    if height < 2:
+        return 0
+    # 折り返し片を持つ列は**少数**（見出しの半数以下）でなければならない——`Reset value`だけが
+    # rowspan 2 の記述表では、1行目のデータ（`31`/`RAMLV`/`RW`…）が全列で「見出しの続き」に
+    # 見えてしまう（全corpusで8,284片を吸い込みかけた）。片の中身も数字・bit範囲・アクセス値
+    # のようなデータであってはならない。
+    wrapped = [h for h in header if h["column_end"] - h["column_start"] == 1 and h["row_end"] < height]
+    if not wrapped or len(wrapped) > len(header) / 2:
+        return 0
+    folded: list[dict] = []
+    for head in wrapped:
+        pieces = [c for c in table["cells"]
+                  if c["row_start"] >= head["row_end"] and c["row_start"] < height
+                  and c["column_start"] == head["column_start"]
+                  and c["column_end"] - c["column_start"] == 1 and c["row_end"] <= height]
+        texts = [" ".join((c.get("text") or "").split()) for c in pieces]
+        if any(len(x) > 16 or _DATA_LIKE.fullmatch(x) for x in texts if x):
+            return 0
+        # 見出しの続きは小文字か括弧で始まる（`name`・`function`・`(after`・`width`）。zh版は
+        # pin表（一覧表）のCJKに限る（`类型(1)`・`（复位`）。大文字・数字始まりはデータ。
+        if any(x and not (x[0].islower() or x[0] in "(（" or (_has_cjk(x[0]) and is_list_table(table)))
+               for x in texts):
+            return 0
+        if not any(texts):
+            continue
+        head["text"] = " ".join([(head.get("text") or "").replace("\n", " ").strip()]
+                                + [x for x in texts if x])
+        head["row_end"] = height
+        folded.extend(pieces)
+    if not folded:
+        return 0
+    ids = {id(c) for c in folded}
+    table["cells"] = [c for c in table["cells"] if id(c) not in ids]
+    # 見出しブロック内で、もうどのセルも始まらない行を詰める
+    occupied = {c["row_start"] for c in table["cells"]}
+    empty = [r for r in range(1, height) if r not in occupied]
+    if empty:
+        keep = [r for r in range(table["row_count"]) if r not in empty]
+        remap = {old: new for new, old in enumerate(keep)}
+        for c in table["cells"]:
+            rows = [r for r in range(c["row_start"], c["row_end"]) if r not in empty]
+            c["row_start"], c["row_end"] = remap[rows[0]], remap[rows[-1]] + 1
+        table["row_count"] = len(keep)
+        if table.get("_folded_rows"):
+            table["_folded_rows"] = sorted(remap[r] for r in table["_folded_rows"] if r in remap)
+        if table.get("row_pages"):
+            table["row_pages"] = [table["row_pages"][r] for r in keep]
+    return len(folded)
+
+
 def fold_header_wrap(table: dict) -> int:
     """`Reset value`のような狭いヘッダが2行に折り返し、2行目（`value`）がpdfplumberで
     **独立したデータ行**になったものを、ヘッダセルへ戻して行を消す（全corpus 104ページで
@@ -322,6 +709,9 @@ def fold_header_wrap(table: dict) -> int:
     if table.get("_header_folded") or table.get("row_count", 0) < 2:
         return 0
     table["_header_folded"] = True
+    folded = _fold_spanning_header(table)
+    if folded:
+        return folded
     row1 = [c for c in table["cells"] if c["row_start"] == 1 and (c.get("text") or "").strip()]
     if len(row1) != 1:
         return 0
@@ -361,7 +751,8 @@ _NAME_HEADERS = ("Name", "名称", "名字", "Field", "位域名")
 _RANGE_NAME = re.compile(r"([A-Za-z][A-Za-z_0-9]*)\s*\[\d+:\d+\]")
 
 
-def description_names(page: dict, chains: dict[str, dict] | None = None) -> set[str]:
+def description_names(page: dict, chains: dict[str, dict] | None = None,
+                      next_page: dict | None = None) -> set[str]:
     """このページの記述表の`Name`列（`名称`/`Field`/`位域名`）に並ぶ、**正しいフィールド名**。
 
     レジスタのページは「bit図」＋「bitごとの説明表」の対で書かれるので、説明表の名称列が
@@ -376,6 +767,12 @@ def description_names(page: dict, chains: dict[str, dict] | None = None) -> set[
     names: set[str] = set()
     tables = [((chains or {}).get(t["id"], {}).get("merged") or t)
               for t in page["tables"]]
+    # bit図がページ末尾に来ると、その記述表は**次ページ**で始まる（FV2x_V3xRM.en p590の
+    # R32_SDIO_MASK——`RXFIRFOXEFIIFOEE I`が直せなかった。全面見直しの指摘）。隣のページの
+    # 記述表も根拠に足す（同じ章の続きなので`PB1`/`PB11`の取り違えの危険は文書全体より小さい）。
+    if next_page is not None:
+        tables += [((chains or {}).get(t["id"], {}).get("merged") or t)
+                   for t in next_page["tables"]]
     for table in tables:
         by_row: dict[int, list[dict]] = {}
         for cell in table["cells"]:
@@ -553,6 +950,15 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         if bit.isdigit() and any(flat == base + bit for base in bases):
             continue
         pool = names | ({base + bit for base in bases} if bit.isdigit() else set())
+        # 索引がbit番号でない図（DMA_INTFRのチャネル番号`TEIF7`が bit27 に在る）では、**描画文字の
+        # 中の数字**を索引にした綴りも候補にする（V003RM.en p66 `TEIFTE7I F`。全面見直しの指摘）。
+        # 交錯の証拠として、描画文字が候補の1.5倍以上の長さであることを求める（`CTCIF1`→`TCIF1`
+        # のような1文字差は通さない）。
+        digits = re.findall(r"\d+", flat)
+        if digits:
+            compact = len(flat.replace(" ", ""))
+            pool = pool | {base + d for base in bases for d in digits
+                           if compact >= 1.5 * (len(base) + len(d))}
         candidates = [n for n in pool
                       if len(n) >= 3 and " " not in n and n != flat
                       and len(flat) <= 2 * len(n) + 2
@@ -560,6 +966,13 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
                       and not _truncates_index(flat, n)
                       and _only_duplicate_glyphs(flat, n)
                       and _is_subsequence(n, flat)]
+        if len(candidates) > 1:
+            # `RXFIRFOXEFIIFOEE I`には`RXFIFOEIE`と`RXFIFOFIE`の両方が部分列として入る。1つの
+            # レジスタに同じ名前は1度しか現れないので、**同じ図の別セルに既に在る綴り**は候補から
+            # 外す（FV2x_V3xRM.en p590 R32_SDIO_MASK。全面見直しの指摘）。
+            present = {(c.get("text") or "").replace("\n", "").strip()
+                       for c in table["cells"] if c is not cell}
+            candidates = [n for n in candidates if n not in present]
         if len(candidates) == 1:
             cell["text"] = candidates[0]
             fixed += 1
@@ -567,6 +980,60 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
 
 
 _RECOVER_TOKEN = re.compile(r"[A-Za-z0-9_\[\]:.]{2,}")
+
+
+def split_line_merges(page: dict) -> tuple[dict[str, str], set[str]]:
+    """**同じ視覚行が x のある位置で二つに割れ、境目の1文字が両側に入った**行の対を見つけ、
+    `{左のline_id: 右の続き（先頭の重複文字を除く）}` と、本文から消す右のidを返す。
+
+    zh版datasheetの本文は全行が x≈241 で `…対外`/`外多组…` のように割れ、1ページに25行も
+    「途中で改行して1文字が二重」に見えていた（V002DS0.zh・V006DS0.zh・M030DS2.zh p6。
+    全面見直しの指摘）。条件は**同じ高さ（上端差≤1.5pt）・左右が接している（隙間≤3pt）・
+    同じフォントサイズ・左の末尾文字＝右の先頭文字**。2段組の独立した列は末尾と先頭が
+    一致しないので触らない。読み順で右が先に来る（文の後半が先に出る）ものも同じ対として繋ぐ。
+    """
+    lines = [l for l in page["lines"] if (l.get("text") or "").strip()
+             and l.get("role") not in ("header", "footer")]
+    merge: dict[str, str] = {}
+    skip: set[str] = set()
+    used: set[str] = set()
+    pairs: list[tuple[dict, dict]] = []
+    for a in lines:
+        if a["id"] in used:
+            continue
+        ax0, ay0, ax1, ay1 = a["bbox"]
+        for b in lines:
+            if b is a or b["id"] in used:
+                continue
+            bx0, by0, bx1, by1 = b["bbox"]
+            if abs(ay0 - by0) > 1.5 or not -1.0 <= bx0 - ax1 <= 3.0:
+                continue
+            if abs((a.get("font_size") or 0) - (b.get("font_size") or 0)) > 0.6:
+                continue
+            ta, tb = a["text"], b["text"]
+            if not ta.strip() or not tb.strip() or ta.rstrip()[-1] != tb.lstrip()[0]:
+                continue
+            # 本文らしさ: 左半分に空白かCJKがあり、識別子や数だけの行（pin図の`11`/`12`・
+            # `SERDES_TXP`/`PE4`）ではない
+            core = ta.strip()
+            if len(core) < 4 or not (" " in core or _has_cjk(core)):
+                continue
+            pairs.append((a, b))
+            used.update((a["id"], b["id"]))
+            break
+    # 系統的な割れだけ採る——同じ境界x（±2pt）に3対以上並ぶこと。偶然の一致（隣り合う
+    # ラベルの末尾と先頭が同じ文字）は1〜2対で止まる。
+    for a, b in pairs:
+        x = a["bbox"][2]
+        if sum(1 for a2, _ in pairs if abs(a2["bbox"][2] - x) <= 2.0) >= 3:
+            merge[a["id"]] = b["text"].lstrip()[1:]
+            skip.add(b["id"])
+    return merge, skip
+
+
+def _has_cjk(text: str) -> bool:
+    return any("\u4e00" <= ch <= "\u9fff" or "\u3000" <= ch <= "\u30ff" or "\uff00" <= ch <= "\uffef"
+               for ch in text)
 
 
 def recovered_lines(page: dict, figure_regions: list | tuple = ()) -> list[dict]:
@@ -1192,6 +1659,25 @@ def apply_bitfield(table: dict, number_line: dict,
     # フィールド行（byte境界PFICの`Reserved`行と`PRIO_*`行）なので連結せず2行で残す。
     has_span = any(c["row_end"] - c["row_start"] > 1
                    for c in cells if c["row_start"] >= 1)
+    # 跨るセルが無くても、**全列が1bit幅の2段で上段が同じ綴りの繰り返し**なら折り返した
+    # 名前——CANx_FMCFGRの下位（FV2x_V3xRM.en p447）は`FBM`×16の下に`FB15M`…`FB0M`が並び、
+    # 跨るセルが無いので2段のフィールド行と見なされ、`FBM`の行と数字の行に割れていた
+    # （PDF↔MD突合の指摘）。TIMのCCMR（出力名/入力名の2段）は上段の綴りが列ごとに違う。
+    rows_present = sorted({c["row_start"] for c in cells if c["row_start"] >= 1})
+    if not has_span and len(rows_present) == 2:
+        top = [c for c in cells if c["row_start"] == rows_present[0]]
+        bottom = [c for c in cells if c["row_start"] == rows_present[1]]
+        top_texts = [(c.get("text") or "").strip() for c in top]
+        bottom_texts = [(c.get("text") or "").strip() for c in bottom]
+        same_word = len(set(top_texts)) == 1 and top_texts[0].isalpha()
+        # 上段が英字だけの短い名（列ごとに違ってよい: DMA_INTFCRの`CTEIF`/`CHTIF`/`CTCIF`/`CGIF`）で
+        # 下段が全部数字なら、名前＋索引の折り返し（V407RM.en p155。全面見直しの指摘）。
+        alpha_over_digits = (all(x.isalpha() and len(x) <= 8 for x in top_texts)
+                             and bottom_texts and all(x.isdigit() for x in bottom_texts))
+        if (len(top) >= 8 and (same_word or alpha_over_digits)
+                and all(c["column_end"] - c["column_start"] == 1 for c in top)
+                and any(ch.isdigit() for x in bottom_texts for ch in x)):
+            has_span = True
     groups: dict[tuple[int, int], list[dict]] = {}
     for cell in cells:
         if cell["row_start"] >= 1:
@@ -1329,7 +1815,12 @@ def document_chains(pages: list[dict]) -> dict[str, dict]:
     previous_page: dict | None = None
 
     for page in pages:
-        tables = sorted(page["tables"], key=lambda t: (t["bbox"][1], t["bbox"][0]))
+        # 重なりセルの残骸（本体表に中身が含まれる1列断片）は描かれないので連鎖にも入れない。
+        # p145の残骸が「前ページ最後の表」として続き（p146の11行）を引き取り、残骸ごと描かれず
+        # **11行が出力から消えていた**（V407RM.en Table 11-1。全面見直しの指摘）。
+        phantoms = fragment_tables(page)
+        tables = sorted((t for t in page["tables"] if t["id"] not in phantoms),
+                        key=lambda t: (t["bbox"][1], t["bbox"][0]))
         for index, table in enumerate(tables):
             if (index == 0 and open_chain is not None and previous_page is not None
                     and page["number"] == previous_page["number"] + 1
@@ -1354,4 +1845,8 @@ def document_chains(pages: list[dict]) -> dict[str, dict]:
                 "merged": merged,
                 "start_page": chain[0][0],
             }
+    for page in pages:
+        for table in page["tables"]:
+            out.setdefault(table["id"], {"chain": [(page["number"], table)], "start": True,
+                                         "merged": None, "start_page": page["number"]})
     return out
