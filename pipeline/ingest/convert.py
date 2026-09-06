@@ -68,7 +68,13 @@ SCHEMA_VERSION = "0.2"
 # 1.9.0: セル境界の二重取りグリフとreset列の異物も根で落とす（straddling 4,457・
 # boundary 2,337・reset列 2,200）。これまでexporterとparityだけが直しており、bundleの
 # セルには二重取りが残っていた。
-CONVERTER_VERSION = "1.9.0"
+# 1.9.1: 2026-09-06の検証ラウンド（未走査8文書・78ページ）が出した3件を根で直した。
+# (a) `reading_order`を`(top,x0)`で並べ直して**2カラム分割を打ち消していた**
+#     （全datasheetの1ページ目でFeaturesが左右交互になっていた）。
+# (b) 列境界に載ったグリフが右列の行頭に二重取りされる（2カラム16ページ全部で発生）。
+# (c) `clean_reset_column`が語彙に無い1〜2字を無条件に消していて、QingKeの`W1`/`R0`が
+#     消滅（access列の空セル509個・30文書）。小文字のLatinだけ落とすように変えた。
+CONVERTER_VERSION = "1.9.1"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -674,6 +680,35 @@ def normalize_text(text: str, undouble: bool = True) -> str:
     return _undouble(text)
 
 
+def strip_column_boundary_dupes(lines: list[dict], boundary: tuple) -> int:
+    """2カラム分割の境界に載ったグリフが**右列の行頭に二重取り**されたぶんを落とす（1.9.0）。
+
+    `column_boundary`でx_splitに沿って左右へ切ると、境界をまたぐ1グリフが両側のcropに入る。
+    右列の行は`r ● GPIO port`・`n - Built-in system clock…`・`V - Support TIMx/ADC…`のように
+    **左列の末尾文字＋空白**で始まる（2カラム判定される16ページの全部で発生。datasheetの
+    表紙なので読者が最初に見る面。2026-09-06の検証ラウンドが`m - Analog input range`で検出）。
+
+    条件は`strip_boundary_dupes`（セル版）と同じ形にする——同じ高さ（±1.5pt）の左列の行の
+    末尾非空白文字と一致し、それがASCII英数字1字で、直後が空白であること。"""
+    x_split, y_start = boundary
+    below = [l for l in lines if l["bbox"][1] >= y_start]
+    left = [l for l in below if (l["bbox"][0] + l["bbox"][2]) / 2 < x_split]
+    right = [l for l in below if (l["bbox"][0] + l["bbox"][2]) / 2 >= x_split]
+    fixed = 0
+    for r in right:
+        head = (r.get("text") or "").lstrip()
+        if len(head) < 2 or head[1] not in " \t" or not (head[0].isascii() and head[0].isalnum()):
+            continue
+        peer = next((l for l in left if abs(l["bbox"][1] - r["bbox"][1]) <= 1.5), None)
+        if peer is None:
+            continue
+        tail = (peer.get("text") or "").rstrip()
+        if tail and tail[-1] == head[0]:
+            r["text"] = head[2:].lstrip()
+            fixed += 1
+    return fixed
+
+
 def fix_line_subscripts(page_chars: list[dict], lines: list[dict]) -> int:
     """本文行でも、基底から離れた下付き/上付きをgeometryで戻す（1.8.0）。
 
@@ -776,6 +811,7 @@ def page_record(page, lang: str, source_sha256: str,
                 top_texts: set, bottom_texts: set,
                 document_type: str = "") -> tuple[dict, dict, str | None]:
     page_chars = chars(page)
+    two_column = None   # (列境界x, 開始y)。読み順のkeyが左列→右列を保つのに使う
     lines = text_items(page, "line")
     classify_lines(lines, page_chars, float(page.height), repeated_top, repeated_bottom,
                    top_texts, bottom_texts)
@@ -788,6 +824,8 @@ def page_record(page, lang: str, source_sha256: str,
             lines = text_items(page, "line", boundary=boundary)
             classify_lines(lines, page_chars, float(page.height),
                            repeated_top, repeated_bottom, top_texts, bottom_texts)
+            strip_column_boundary_dupes(lines, boundary)
+            two_column = boundary
     # 行の中で基底から離れた下付き/上付きをgeometryで戻す（`2^20`が`220`に潰れる）。
     # 2カラム再抽出のあとに掛ける——行が組み直されると位置が変わるので。
     fix_line_subscripts(page_chars, lines)
@@ -856,7 +894,23 @@ def page_record(page, lang: str, source_sha256: str,
                 for table in tables]
              + [{"id": item["id"], "type": "image", "bbox": item["bbox"]}
                 for item in page_drawings if item["type"] == "image"])
-    order.sort(key=lambda item: (item["bbox"][1], item["bbox"][0], item["type"]))
+    # **2カラムのページは「左列を全部→右列を全部」の順にする。** `text_items`が
+    # boundary付きで正しくその順に組んでいたのに、ここで`(top, x0)`で並べ直していたため
+    # **分割が打ち消され**、Featuresの箇条書きが左右交互に出ていた（全datasheetの1ページ目。
+    # 生成物では`- 2 output channels each…`が`- Core`より先に出ていた。2026-09-06の検証
+    # ラウンドが検出）。右列の項目に版面の高さを足して、列の中の上下は保ったまま列の
+    # 順を優先させる。表題帯（y_startより上）は影響を受けない。
+    height = float(page.height)
+
+    def reading_key(item: dict) -> tuple:
+        top, x0, x1 = item["bbox"][1], item["bbox"][0], item["bbox"][2]
+        if two_column:
+            x_split, y_start = two_column
+            if top >= y_start and (x0 + x1) / 2 >= x_split:
+                return (top + height, x0, item["type"])
+        return (top, x0, item["type"])
+
+    order.sort(key=reading_key)
     # 表題が折り返して途中で切れているものを全文にする（1.8.0）。それまでbundleは
     # **1行目だけ**を持ち、exporterとextract_low_powerが各々`caption_full`を呼んで
     # 繋ぎ直していた——同じ修復を2箇所で掛けていたので、根で1回にする。繋いだ続き行の

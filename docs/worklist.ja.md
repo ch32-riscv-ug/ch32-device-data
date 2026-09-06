@@ -254,6 +254,18 @@ exporterが掛けている文字の修復を全部数え、**bundleの実物が�
   総括すると、exporterに残る文字の修復は**0**になった（残っているのは
   `escape_body`・`cell_html`・見出し降格・`<br>`の畳み方など**描画の判断**だけ）。
 
+### 2026-09-06〜07 検証ラウンド1窓目（未走査8文書）／converter 1.9.1
+
+`Workflow`で1文書1エージェント・78ページを突合。**指摘51件**（high 6・medium 13・low 24・
+原本側8）、誤検出0。**根で直した3件**——(a) `reading_order`が2カラム分割を打ち消していた
+（**全datasheetの1ページ目**。前回の全面見直しを生き延びていた）、(b) 列境界のグリフが
+右列の行頭に二重取り（2カラム16ページ全部）、(c) `clean_reset_column`が語彙外の1〜2字を
+無条件に消してQingKeの`W1`/`R0`が消滅（access列の空セル509個・30文書。白名簿の漏れが
+黙った削除になる形をやめ、小文字のLatinだけ落とすようにした）。詳細と、セル格子family
+として残した high 3件は [markdown-qa-log](markdown-qa-log.ja.md)。
+**検証**: 凍結tool 23出力・非PDF 12出力・新経路CSV 4本すべて byte 一致、parity 68/68 clean、
+検査5本通過。**残り48文書**（未走査11＋走査済み未検証37）は1窓8文書で継続。
+
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
 **結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。

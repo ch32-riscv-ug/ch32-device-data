@@ -318,6 +318,21 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    なったので）。セル系3つはexporterにも残す——converterには見えないページ跨ぎの
    結合表という単位にも掛かるため。
 
+10. **2カラムのページの読み順を保つ**（converter 1.9.1）。5.はoverview/featuresページを
+    左列→右列に組み直すが、そのあと`reading_order`を`(top, x0)`で並べ直していたため
+    **分割が打ち消され**、全datasheetの1ページ目でFeaturesの箇条書きが左右交互になって
+    いた（`- 2 output channels each, optional ADC pins`が`- Core`より先に出る）。
+    読み順のkeyは、`y_start`より下で分割xより右の項目に版面の高さを足す——列の中の
+    上下は変えずに、列の順を優先させる。分割すると境界のグリフが**右側の行頭に二重取り**
+    される（`m - Analog input range`・`r ● GPIO port`。boundaryが出る**16ページの全部**）
+    ので、セル版`strip_boundary_dupes`と同じ条件で落とす。
+
+    同じ版で`clean_reset_column`を安全にした。access/reset列の語彙が知らない1〜2字を
+    一律に空にしていたので、**白名簿の漏れがそのまま黙った削除**になっていた——QingKeの
+    `W1`/`R0`が消え、access列の空セルが509個・30文書。いまは**小文字のASCIIだけ**を落とす
+    ——狙っている残骸は説明列の語の行末片なので小文字、access/reset値は大文字か数字。
+    失敗の向きが「値を消した」から「残骸を残した」に変わる。
+
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。
 
