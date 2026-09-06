@@ -242,11 +242,16 @@ def main() -> int:
             if method.split("(")[0] == evt_method.split("(")[0]:
                 confidence = "confirmed"
             else:
-                # H417 の RM は起動側も `FTPG` と書くが、driver と register_fields は
-                # PG_STRT を持つ。両論を残す。
+                # H417 の RM は起動側も `FTPG` と書く（手順4で立てた有効化bitと同じ）が、
+                # driver は `CR_PG_STRT`・`register_fields` は `PG_STRT` bit21 を持ち、
+                # 同じ direct writes 系の V407/X315 も PG_STRT。**RM側の誤記と判断して
+                # driver の読みを採用値にし、RM の読みを `!` で残す**——「どちらが正しいか
+                # 判断したら、その値を列に置く」（V103 の fast_program_bytes で RM を
+                # 採ったのと同じ扱い）。confidence は conflict のままなので、
+                # fail-closed で読む consumer の挙動は変わらない。
                 confidence = "conflict"
-                basis.append(f"!rm-vs-evt:program_method({evt_method})")
-                method, commit = method or evt_method, commit or evt_commit
+                basis.append(f"!rm:program_method({method})")
+                method, commit = evt_method, evt_commit
         elif not method:
             method, commit = evt_method, evt_commit
 

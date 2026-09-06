@@ -192,7 +192,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 **bufferの幅はbuffered系でも同じではありません。** V003/V006/V205/X035/L103が`32`、**CH32M030が`64`**、**CH32V103が`128`**で、familyの幅より小さい単位で積むと**エラーも出ずに内容が壊れます**。ch32rvがCH32V103で踏んだのがまさにこれで、DMI経由のword単位の積み込みが128bitの塊を満たせずに壊れ、標準half-word書き込み＋下の未文書commitへ退避しています。RMの番号付き手順は幅を書かないので、出所はdriverの`FLASH_BufLoad`のシグネチャ——`uint32_t Data`引数1本＝32bit（`FLASH_BufLoad(Address, Data0)`＝32、`(Address, Data0, Data1)`＝64、`(Address, Data0..Data3)`＝128）——で、`basis`に`evt-bufload(<N>bit)`と書きます。
 
-**食い違いが1件あり、RM側の誤りです。** CH32H417のRMは快速ページ編程の手順8を「FTPG位を'1'にして快速页编程を**启动**」と書きますが、`FTPG`は手順4で既に立てた有効化bitです。driverは`CR_PG_STRT`を使い、`register_fields.csv`にも`PG_STRT` bit21が在る（同系統の他familyと同じ）。`conflict`として両論を`basis`に残しています。
+**食い違いが1件あり、RM側の誤りです。** CH32H417のRMは快速ページ編程の手順8を「FTPG位を'1'にして快速页编程を**启动**」と書きますが、`FTPG`は手順4で既に立てた有効化bitです。driverは`CR_PG_STRT`を使い、`register_fields.csv`にも`PG_STRT` bit21が在る（同系統の他familyと同じ）。**そこで列にはdriverの読み**（`fast page, direct writes (PAGE_PG, then PG_STRT)`）**を置き**、RMの書き方を`basis`に`!rm:program_method(...)`として残します——CH32V103の`fast_program_bytes`で判断が逆に出て（RMが正しい）RMの値を列に置いたのと同じ扱いです。`confidence`は`conflict`のままなので、conflictをfail-closedで落とすconsumerの挙動は変わりません。
 
 **RMに無い手順が要るfamilyが2つ。** CH32V103とCH32M030のdriverは、各erase/programの後に`0x40022034`へ書き込みます（アドレスのXORはV103が`0x1000`、M030が`0x100`）。ch32rvはCH32V103で**これが無いとeraseもprogramも無反応**だったと報告しています。CH32M030は先方の手元に実機が無いので、こちらは実測ではなく注意喚起です。
 

@@ -350,6 +350,30 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    page["text"] is built
    by extract_text() independently, so the frozen tools' byte-identity holds.
 
+7. **Subscripts/superscripts inside a table cell are put back where they
+   belong** (converter 1.7.0/1.7.1). The same defect as item 6, but for cells:
+   pdfplumber picks up a cell's subscript as its own visual line, so `VSS`
+   comes out `V\nSS`, `VDD5*2-1.5` as `V *2-1.5DD5` and `2^20` as `220`
+   (14,738 cells across 61 documents). Until 1.7.0 only the exporter and the
+   parity check repaired this, so **the extractors that read bundle cells got
+   the broken spelling**. The repair itself is
+   `logical_tables.reattach_cell_subscripts` -- the same function all three
+   callers use, so no reading can drift.
+
+   **The broken split carries information, so it is kept as well.** The
+   newline pdfplumber leaves is the subscript boundary, and the frozen
+   `build_operating.norm_symbol` turns it into the canonical symbol
+   (`I\nDD` -> `I_DD`; its `KEEP` pattern accepts nothing else). 1.7.0
+   stored only the joined spelling and silently dropped **1,207 `I_DD` rows**
+   from `evidence/operating_conditions.csv`. Since 1.7.1 the cell keeps both
+   faces, the way a table keeps both `cells` and `extracted_rows`:
+   `text` is the repaired reading order, `text_split` is what the page laid
+   out. `logical_tables.text_grid(merged, "text_split")` reads the second
+   one, `merge_cells` carries it through, and `extract_low_power` uses it.
+   `extracted_rows` is **not** touched, so the 19 frozen tools are unaffected
+   (`Table.extract()` in pdfcompat returns `extracted_rows`, and `crop()` is
+   not implemented -- no frozen tool can see `cells[].text`).
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

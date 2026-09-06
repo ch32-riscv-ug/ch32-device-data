@@ -78,6 +78,7 @@
         "column_end": {"type": "integer", "minimum": 1},
         "bbox": {"$ref": "#/$defs/bbox"},
         "text": {"type": "string"},
+        "text_split": {"type": "string"},
         "bold": {"type": "boolean"},
         "italic": {"type": "boolean"}
       }
