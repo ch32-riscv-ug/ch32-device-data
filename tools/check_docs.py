@@ -44,6 +44,7 @@ WORKLIST = REPO / "docs" / "worklist.ja.md"
 # は証拠と索引の両方にあるので、綴りだけでは決まらない）。複数なら合計。
 ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "products": ("products",),
+    "flash_program_method": ("flash_program_method",),
     "product_attributes": ("product_attributes",),
     "packages": ("packages",),
     "pins": ("pins",),

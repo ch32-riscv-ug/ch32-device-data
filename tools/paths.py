@@ -38,6 +38,7 @@ CATALOG_TABLES = ("families", "series", "products", "packages", "cores",
 EVIDENCE_TABLES = (
     "pins", "pin_functions", "pin_alternate", "product_attributes",
     "features", "errata", "memory_configs", "adc_internal", "flash_geometry",
+    "flash_program_method",
     "eval_boards", "evt_examples", "link_firmware", "operating_conditions",
     "remap_fields", "remap_routes", "timers",
     "register_blocks", "registers", "register_fields", "dma_requests",
@@ -53,7 +54,8 @@ EVIDENCE_TABLES = (
 STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
                    "clock_prescalers", "clock_sources", "clock_symbols",
                    "clock_init", "evt_variants", "clock_enables", "pin_alternate",
-                   "memory_configs", "flash_geometry", "adc_internal", "debug_data")
+                   "memory_configs", "flash_geometry", "flash_program_method",
+                   "adc_internal", "debug_data")
 
 # Index tables: one combined file each (all parts / all families). People filter
 # them in the viewer (pins.html); CSV is for programs, so there are no per-part

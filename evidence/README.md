@@ -173,6 +173,24 @@ The sources are two: **the `@brief` of the EVT flash driver** (`page size 4KB`, 
 
 The erased-read columns come from the same RM chapter -- the `注：` that follows both the standard and the fast page erase procedure -- and are taken **from the Chinese edition**; the English wording varies five ways and one of them mistranslates `word` as `byte` for a 32-bit value. CH32M030 is the one family whose Chinese RM does not carry the note, so its word comes from the English edition and `basis` says `rm-en(...)`. CH32V003 and CH32V103 say nothing in either edition: their columns stay empty and `note` records that, with the measurement another repository reported. `blank_check_word` is read from the EVT IAP sample, and `basis` cites the file and line.
 
+### `flash_program_method.csv`
+
+**The order, not the granularity.** `flash_geometry.csv` holds the erase unit and the programming granularity, but not **which control bit to set in which order** -- so a consumer had to find that out on hardware, family by family. It cost real time: programming a CH32X035 with the PgStart sequence does nothing at all (erase is common to every family, so the part looks "erased but unwritable").
+
+| Column | Meaning |
+|---|---|
+| `program_method` | The fast-page programming procedure, named by the control bits the RM names. Two systems: `fast page, 32-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)` and `fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_commit` | What actually starts the write -- `STRT (bit6)` or `PG_STRT (bit21)` |
+| `erase_method` | The fast erase procedure. Families with no per-page fast erase (V407/X315/H417) say so and give the block-erase bit instead |
+| `ctlr_bit_names` | The `FLASH_CTLR` field names **as `register_fields.csv` spells them** for that family -- the RM says `FTPG`/`BUFRST` where the EVT header says `PAGE_PG`/`BUF_RST`, so a consumer joining the two tables needs the second spelling |
+| `undocumented_note` | A step the driver performs that the RM never mentions |
+
+The sources are the RM's numbered procedure (`4）设置FLASH_CTLR寄存器的FTPG位…`, Chinese edition first) and the EVT driver (`FLASH_ProgramPage_Fast`, and whether `FLASH_BufLoad`/`FLASH_BufReset` exist -- the buffered families keep the buffer loading in those separate functions, so the presence of the functions is what marks the system).
+
+**One disagreement, and it is the RM's.** The CH32H417 RM writes step 8 of fast page programming as "set FTPG to start fast page programming", but `FTPG` is the enable bit it already set in step 4; the driver uses `CR_PG_STRT` and `register_fields.csv` has `PG_STRT` at bit 21, as on every other family of that system. Recorded as `conflict` with both readings in `basis`.
+
+**Two families need a step the RM does not document.** CH32V103 and CH32M030 drivers write `0x40022034` after every erase and program, with the address XORed by `0x1000` (V103) or `0x100` (M030). ch32rv reports that on CH32V103 neither erase nor program has any effect without it; CH32M030 was not on their bench, so its note is a warning rather than a measurement.
+
 ### `opa_cmp_registers.csv`
 
 **The premises for comparator/OPA classes.** The base is in `memory_map.csv` and the input pads in `index/pinout.csv`, so what was missing is **the field layout** -- enable, input select, output, gain.

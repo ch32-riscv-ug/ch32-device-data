@@ -164,6 +164,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "families": ("build_tables.py", "FAMILY_COLUMNS"),
     "features": ("build_features.py", "COLUMNS"),
     "flash_geometry": ("build_flash_geometry.py", "COLUMNS"),
+    "flash_program_method": ("build_flash_program_method.py", "COLUMNS"),
     "interrupts": ("build_interrupts.py", "COLUMNS"),
     "link_firmware": ("build_link_firmware.py", "COLUMNS"),
     "memory_configs": ("build_memory.py", "COLUMNS"),
@@ -997,6 +998,22 @@ def main() -> int:
         if blank and word and blank.lower() != word.lower() and word.lower() != "0xff":
             bad.append(f"flash_geometry: {r['family']} の blank_check_word={blank!r} が "
                        f"erased_read_word={word!r} と食い違う")
+
+    # flash_program_method は family ごと1行。参照と、手順の語彙が register_fields の
+    # 綴りと矛盾しないこと（consumer が join する列なので）を見る。
+    ctlr_fields: dict[str, set[str]] = {}
+    for r in t["register_fields"]:
+        if "FLASH_CTLR" in r["register"]:
+            ctlr_fields.setdefault(r["family"], set()).add(r["field"])
+    for r in t["flash_program_method"]:
+        check("flash_program_method", r["family"], r["family"], families, "families")
+        for name in filter(None, r["ctlr_bit_names"].split(";")):
+            if name not in ctlr_fields.get(r["family"], set()):
+                bad.append(f"flash_program_method: {r['family']} の ctlr_bit_names={name!r} が"
+                           "register_fields の FLASH_CTLR に無い")
+        if r["program_method"] and not r["program_commit"]:
+            bad.append(f"flash_program_method: {r['family']} に program_method があるのに"
+                       "program_commit が無い")
 
     # opa_cmp_registers は EVT header の構造体＋bit define。address が memory_map の
     # block base と整合すること（base + offset）、mask と bits が同じことを言う

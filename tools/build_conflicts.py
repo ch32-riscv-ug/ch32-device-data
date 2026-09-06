@@ -54,6 +54,7 @@ KEYS: dict[str, tuple[str, ...]] = {
     "memory_configs": ("part_number", "value"),
     "adc_internal": ("family", "source", "channel"),
     "flash_geometry": ("family",),
+    "flash_program_method": ("family",),
     "eval_boards": ("family", "board"),
     "evt_examples": ("family", "example"),
     "link_firmware": ("device", "mcu", "mode", "role"),
