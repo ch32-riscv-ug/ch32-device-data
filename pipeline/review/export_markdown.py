@@ -436,6 +436,10 @@ _ENUM_START = re.compile(r"^(?:\d{1,3}|0x[0-9A-Fa-f]+|[01]{2,4}b?|\[[\d:]+\]|注
 # 折り返しの続きでなく独立した英単語（`Remapping`）。先頭大文字＋小文字が3字以上。
 _WORD = re.compile(r"[A-Z][a-z]{2,}")
 _REGISTER_NAME = re.compile(r"R(?:8|16|32)_[A-Z0-9_]{3,}")
+
+
+def _is_cjk_char(ch: str) -> bool:
+    return bool(ch) and "\u4e00" <= ch <= "\u9fff"
 _VOCAB_WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]*[A-Za-z0-9]|[A-Za-z]")
 _TAIL_WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]*$")
 _HEAD_WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]*")
@@ -525,6 +529,12 @@ def cell_html(text: str, list_cell: bool = False,
         elif _REGISTER_NAME.match(cur.strip()) and pe[-1].isalnum():
             # 別名のレジスタ名が2行に並ぶ（`R32_UH_TX_DMA`／`R32_UEP0_TX_DMA`。X315RM.en p298）。
             sep = "<br>"
+        elif _is_cjk_char(pe[-1]) and _is_cjk_char(cur[0]):
+            # CJKの本文は空白で切れないので、行末と行頭が漢字なら**折り返し**——区切りを
+            # 入れない（`…此位表`+`示期望…`が`此位表<br>示期望`と語中で割れていた。全corpus
+            # 1,020箇所・31文書。ページ跨ぎで結合したセルに多い）。文末や選択肢の始まりは
+            # 上の`_JOIN_PUNCT`と`_ENUM_START`が先に拾うのでここには来ない。
+            sep = ""
         elif pe[-1] in "_" and cur[0].isalnum():
             # `CMP2_`+`P0`——識別子が`_`で終わって折り返した形。区切りを入れない。
             sep = ""
