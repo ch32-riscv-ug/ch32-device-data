@@ -27,7 +27,7 @@ Columns derived through the vocabulary (`peripheral`, `role`, `port`, `gpio`, an
 
 **Tables that can be read as is (stable)**: `interrupts`, `memory_map`, `systick`,
 `clock_*` (5 tables), `evt_variants`, `clock_enables` and `pin_alternate`, copied from EVT headers, plus `memory_configs`,
-`flash_geometry` and `adc_internal`, are not copied into the index because their names are machine vocabulary from the start.
+`flash_geometry`, `flash_program_method`, `adc_internal` and `debug_data`, are not copied into the index because their names are machine vocabulary from the start.
 Consumers may read these directly; their columns are kept stable in the same way as the index.
 
 ## Each file
@@ -165,13 +165,15 @@ The named macros go in `condition` (held the same way as in `interrupts.csv`) an
 | `block_erase_bytes` | Unit of fast block erase (32K; 64K on V205) |
 | `program_word` | Whether `FLASH_ProgramWord`/`ProgramHalfWord` exist in the driver. **Empty = fast page only** (L103/M030/V006/V205/X035) |
 | `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | What a read returns after an erase, **exactly as the RM writes it**. Two systems: `0xFFFFFFFF`-style (the RM writes `字读- 0xFF`, so the column holds `0xFF`) and `0xe339e339`. Only the `0xe339e339` families state all four widths; the others state the word only and the remaining three columns stay **empty** -- the RM does not say them, so they are not derived |
-| `blank_check_word` | The value **WCH's own EVT IAP sample compares** `*(uint32_t*)FLASH_Base` against to decide whether an application is programmed. A separate source from the RM, so a separate column; this is where the word width becomes explicit for the `0xFF` families. Empty when the sample has no blank check (CH32V103 enters by GPIO) |
+| `blank_check_word` | **The 32-bit value to compare a word read against** -- normally the value WCH's own EVT IAP sample compares `*(uint32_t*)FLASH_Base` against to decide whether an application is programmed. A separate source from the RM, so a separate column; this is where the word width becomes explicit for the `0xFF` families. CH32V103 is the one family whose IAP sample has no blank check (it enters by GPIO), so its value is a cited third-party measurement -- see `basis` |
 | `zero_wait_note` | Relation between `flash_bytes` (zero-wait region) and total capacity. Families where it moves with option bytes point to `memory_configs.csv`; total capacity points to `code_flash_bytes` in `product_attributes` |
 | `note` | Mode dependence. CH32H417 becomes 8K pages / 64K blocks with `FLASH_CFGR0` bit28 (dual flash mode). Column values are for single mode. Also says when the RM states no erased read value, and cites another repository's measurement when one exists |
 
+**Which column to compare against: `blank_check_word`.** It is always the full 32-bit result of a word read, for every family. The `erased_read_*` columns are kept **as the RM prints them**, and the RM's width is not uniform -- the `0xe339e339` families print all four widths, while the `0xFF` families print `字读- 0xFF`, an 8-bit spelling of a word read. Comparing `erased_read_word` across families therefore compares different widths; `blank_check_word` does not.
+
 The sources are two: **the `@brief` of the EVT flash driver** (`page size 4KB`, `1page = 256Byte`) and **the body text of the RM 闪存 (flash) chapter** (`标准页（1K字节）`, `快速编程按页（128字节）`); they are cross-checked to decide confidence. **There is actually one disagreement** -- the CH32V103 driver writes `ProgramPage_Fast ... 256Byte`, but the RM says `快速编程按页（128字节）`, the erase side of the same driver is also 128B, and the argument condition of `ROM_ERASE` is `StartAddr%128 == 0`. Judged to be a copying error in the EVT comment; the value is 128, marked `conflict`, with both readings kept in `basis`.
 
-The erased-read columns come from the same RM chapter -- the `注：` that follows both the standard and the fast page erase procedure -- and are taken **from the Chinese edition**; the English wording varies five ways and one of them mistranslates `word` as `byte` for a 32-bit value. CH32M030 is the one family whose Chinese RM does not carry the note, so its word comes from the English edition and `basis` says `rm-en(...)`. CH32V003 and CH32V103 say nothing in either edition: their columns stay empty and `note` records that, with the measurement another repository reported. `blank_check_word` is read from the EVT IAP sample, and `basis` cites the file and line.
+The erased-read columns come from the same RM chapter -- the `注：` that follows both the standard and the fast page erase procedure -- and are taken **from the Chinese edition**; the English wording varies five ways and one of them mistranslates `word` as `byte` for a 32-bit value. CH32M030 is the one family whose Chinese RM does not carry the note, so its word comes from the English edition and `basis` says `rm-en(...)`. CH32V003 and CH32V103 say nothing in either edition: their `erased_read_*` columns stay empty and `note` records that. Their `blank_check_word` still has a value -- CH32V003's from the EVT IAP sample, CH32V103's from a measurement ch32rv reported on a CH32V103R8T6, cited in `basis` as `measured:ch32rv(...)`. The CH32V103 RM does corroborate it indirectly: `FLASH_STATR.PGERR` is described as being set when programming an address whose content is not `0xFFFF`, which presumes an erased word of all ones; `basis` carries that as `rm-pgerr(0xFFFF)`. `blank_check_word` is read from the EVT IAP sample, and `basis` cites the file and line.
 
 ### `flash_program_method.csv`
 
@@ -179,13 +181,16 @@ The erased-read columns come from the same RM chapter -- the `注：` that follo
 
 | Column | Meaning |
 |---|---|
-| `program_method` | The fast-page programming procedure, named by the control bits the RM names. Two systems: `fast page, 32-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)` and `fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_method` | The fast-page programming procedure, named by the control bits the RM names. Two systems: `fast page, <N>-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)` and `fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_buffer_load_bits` | **How wide one buffer load is**, for the buffered system: `32`, `64` or `128`. Empty for the direct-writes families, which have no buffer |
 | `program_commit` | What actually starts the write -- `STRT (bit6)` or `PG_STRT (bit21)` |
 | `erase_method` | The fast erase procedure. Families with no per-page fast erase (V407/X315/H417) say so and give the block-erase bit instead |
 | `ctlr_bit_names` | The `FLASH_CTLR` field names **as `register_fields.csv` spells them** for that family -- the RM says `FTPG`/`BUFRST` where the EVT header says `PAGE_PG`/`BUF_RST`, so a consumer joining the two tables needs the second spelling |
 | `undocumented_note` | A step the driver performs that the RM never mentions |
 
 The sources are the RM's numbered procedure (`4）设置FLASH_CTLR寄存器的FTPG位…`, Chinese edition first) and the EVT driver (`FLASH_ProgramPage_Fast`, and whether `FLASH_BufLoad`/`FLASH_BufReset` exist -- the buffered families keep the buffer loading in those separate functions, so the presence of the functions is what marks the system).
+
+**The buffer width is not the same for every buffered family.** It is `32` for V003/V006/V205/X035/L103, **`64` for CH32M030** and **`128` for CH32V103**, and loading in a smaller unit than the family's width silently corrupts the page -- there is no error. ch32rv hit exactly this on CH32V103 over DMI: word-at-a-time loads into a 128-bit buffer produced garbage, which is why that family is programmed with standard half-word writes plus the undocumented commit below instead. The RM's numbered procedure does not state the width, so the source is the driver's `FLASH_BufLoad` signature -- one `uint32_t Data` argument per 32 bits (`FLASH_BufLoad(Address, Data0)` = 32, `(Address, Data0, Data1)` = 64, `(Address, Data0..Data3)` = 128) -- and `basis` says `evt-bufload(<N>bit)`.
 
 **One disagreement, and it is the RM's.** The CH32H417 RM writes step 8 of fast page programming as "set FTPG to start fast page programming", but `FTPG` is the enable bit it already set in step 4; the driver uses `CR_PG_STRT` and `register_fields.csv` has `PG_STRT` at bit 21, as on every other family of that system. Recorded as `conflict` with both readings in `basis`.
 
@@ -835,6 +840,8 @@ Every CSV has a separator column whose name and every value are `#`; **everythin
 | `missing` | Not stated in any basis |
 | `partial` / `varies-by-package` | (series.csv only) uneven confidence among the members / package dependent |
 
+**`conflict` is recorded per row, but the `!` marker in `basis` says which column is disputed.** `!evt-comment:fast_program_bytes(=256)` on the CH32V103 row of `flash_geometry.csv` means the disagreement is about `fast_program_bytes` alone -- the other columns of that row are not in dispute. A consumer that fails closed on `conflict` should read the `!` marker before dropping a whole row.
+
 **Confirmation is not limited to automation.** A throwaway script presents the relevant passages, a person cross-checks both language editions, and if confirmed, the basis is recorded in `curated/`. Core and ISA are done this way (`curated/series-facts.json`, checked 2026-08-18).
 
 ## Kinds of basis (basis notation)
@@ -849,6 +856,7 @@ Every CSV has a separator column whose name and every value are `#`; **everythin
 | `rule:package-name` | The number in the package name = lead count | Basis and check for pin_count |
 | `rule:part-number-structure` | The series is determined by the part number structure | Basis for series |
 | `manual:…` | A basis a person checked and recorded (curated/) | Treated as confirmed |
+| `measured:…` | A value read from real hardware by another repository, cited by document path and part number (`measured:ch32rv(docs/data-requests/measured/erased-read-2026-09-06.md, CH32V103R8T6)`) | Normal basis, but used **only where no WCH source states the value at all**. The columns that hold the RM's own wording stay empty; only the normalised column is filled |
 
 **Rule not adopted**: the capacity code in the part number (8 = 64K etc.). Because the comparison table lists the maximum configuration for the V30x/H41x line, 24 of 92 cases disagree, so it does not hold as a rule.
 

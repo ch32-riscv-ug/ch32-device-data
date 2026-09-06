@@ -27,7 +27,7 @@
 
 **そのまま読める表（安定）**: EVT ヘッダから写した `interrupts`・`memory_map`・`systick`・
 `clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`と、`memory_configs`・
-`flash_geometry`・`adc_internal`・`debug_data` は、名前が最初から機械の語彙なので索引に写していません。
+`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` は、名前が最初から機械の語彙なので索引に写していません。
 consumer はこれらを直接読んでよく、列は索引と同じ扱いで安定させます。
 
 ## 各ファイル
@@ -165,13 +165,15 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 | `block_erase_bytes` | 快速ブロック消去の単位（32K。V205は64K） |
 | `program_word` | `FLASH_ProgramWord`/`ProgramHalfWord`がdriverにあるか。**空＝快速ページ経由のみ**（L103/M030/V006/V205/X035） |
 | `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | 消去後に読み出される値を**RMの原文のまま**。2系統ある——`0xFFFFFFFF`系（RMは`字读- 0xFF`と8bit幅で書くので列も`0xFF`）と`0xe339e339`系。4つの幅を全部書いているのは`0xe339e339`系だけで、他はwordしか書かないので残り3列は**空**（RMが言っていないので導出しない） |
-| `blank_check_word` | **WCH自身のEVT IAPサンプルが**`*(uint32_t*)FLASH_Base`と比較する値。APPが焼かれているかの判定に使う。RMとは別の出所なので列を分ける——`0xFF`系のfamilyはここで初めてword幅が確定する。サンプルにblank判定が無いfamily（CH32V103はGPIOで入る）は空 |
+| `blank_check_word` | **word読みと突き合わせる32bit値**。通常はWCH自身のEVT IAPサンプルが`*(uint32_t*)FLASH_Base`と比較する値（APPが焼かれているかの判定）。RMとは別の出所なので列を分ける——`0xFF`系のfamilyはここで初めてword幅が確定する。サンプルにblank判定が無いのはCH32V103だけ（GPIOで入る）で、そこは他repoの実測を引用して埋める——出所は`basis` |
 | `zero_wait_note` | `flash_bytes`（零等待領域）と総容量の関係。option byteで動くfamilyは`memory_configs.csv`、総容量は`product_attributes`の`code_flash_bytes`を指す |
 | `note` | モード依存。CH32H417は`FLASH_CFGR0` bit28（dual flash mode）でページ8K・ブロック64Kになる。列の値はsingle mode。RMが消去後の値を書いていないfamilyではその旨と、他repoの実測（あれば）も書く |
 
+**consumerが比較に使うのは`blank_check_word`です。** どのfamilyでも「word読みの結果そのもの」で幅が揃っています。`erased_read_*`は**RMの原文のまま**で、RM側の幅が揃っていません——`0xe339e339`系は4つの幅を全部書き、`0xFF`系は`字读- 0xFF`と8bit幅でwordの結果を書きます。つまり`erased_read_word`をfamily間で比べると違う幅を比べることになりますが、`blank_check_word`ならなりません。
+
 出所は**EVTのflash driverの`@brief`**（`page size 4KB`・`1page = 256Byte`）と**RMの闪存章の本文**（`标准页（1K字节）`・`快速编程按页（128字节）`）の2つで、突き合わせて確度を決めます。**実際に食い違いが1件**あります——CH32V103のdriverは`ProgramPage_Fast ... 256Byte`と書きますが、RMは`快速编程按页（128字节）`、同じdriverの消去側も128B、`ROM_ERASE`の引数条件も`StartAddr%128 == 0`。EVTコメントの写し間違いと判断して値は128、`conflict`で両論を`basis`に残しています。
 
-消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、列は空のままで`note`にその旨と、他repoが報告した実測を引用します。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
+消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、`erased_read_*`は空のままで`note`にその旨を書きます。`blank_check_word`には値が入ります——CH32V003はEVTのIAPサンプルから、CH32V103はch32rvがCH32V103R8T6で読んだ実測の引用で、`basis`に`measured:ch32rv(...)`と出所を書きます。CH32V103のRMも間接的には裏付けていて、`FLASH_STATR.PGERR`の説明が「内容が`0xFFFF`でない番地に書こうとすると立つ」＝消去後がオール1である前提を置いています。これを`basis`に`rm-pgerr(0xFFFF)`として持ちます。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
 
 ### `flash_program_method.csv`
 
@@ -179,13 +181,16 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 | 列 | 意味 |
 |---|---|
-| `program_method` | 快速ページ書き込みの手順を、**RMが名指す制御bit**で表す。2系統——`fast page, 32-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)`と`fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_method` | 快速ページ書き込みの手順を、**RMが名指す制御bit**で表す。2系統——`fast page, <N>-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)`と`fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_buffer_load_bits` | buffered系で**bufferに一度に積む幅**——`32`/`64`/`128`。bufferを持たないdirect writes系は空 |
 | `program_commit` | 実際に書き込みを起動するもの——`STRT (bit6)`か`PG_STRT (bit21)` |
 | `erase_method` | 快速消去の手順。per-pageの快速消去を持たないfamily（V407/X315/H417）はその旨とブロック消去のbitを書く |
 | `ctlr_bit_names` | その familyの`FLASH_CTLR`のフィールド名を**`register_fields.csv`の綴りで**。RMは`FTPG`/`BUFRST`、EVT headerは`PAGE_PG`/`BUF_RST`と同じbitを別名で呼ぶので、2つの表をjoinするconsumerには後者が要る |
 | `undocumented_note` | driverが行うのにRMが一切書いていない手順 |
 
 出所はRMの**番号付き手順**（`4）设置FLASH_CTLR寄存器的FTPG位…`。中文版を一次）と、EVTのdriver（`FLASH_ProgramPage_Fast`と、`FLASH_BufLoad`/`FLASH_BufReset`が在るか——buffered系はbuffer書き込みを別関数に分けているので、関数の有無が系統の印になる）。
+
+**bufferの幅はbuffered系でも同じではありません。** V003/V006/V205/X035/L103が`32`、**CH32M030が`64`**、**CH32V103が`128`**で、familyの幅より小さい単位で積むと**エラーも出ずに内容が壊れます**。ch32rvがCH32V103で踏んだのがまさにこれで、DMI経由のword単位の積み込みが128bitの塊を満たせずに壊れ、標準half-word書き込み＋下の未文書commitへ退避しています。RMの番号付き手順は幅を書かないので、出所はdriverの`FLASH_BufLoad`のシグネチャ——`uint32_t Data`引数1本＝32bit（`FLASH_BufLoad(Address, Data0)`＝32、`(Address, Data0, Data1)`＝64、`(Address, Data0..Data3)`＝128）——で、`basis`に`evt-bufload(<N>bit)`と書きます。
 
 **食い違いが1件あり、RM側の誤りです。** CH32H417のRMは快速ページ編程の手順8を「FTPG位を'1'にして快速页编程を**启动**」と書きますが、`FTPG`は手順4で既に立てた有効化bitです。driverは`CR_PG_STRT`を使い、`register_fields.csv`にも`PG_STRT` bit21が在る（同系統の他familyと同じ）。`conflict`として両論を`basis`に残しています。
 
@@ -812,6 +817,8 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | `missing` | どの根拠にも記載がない |
 | `partial` / `varies-by-package` | （series.csvのみ）配下の確度不揃い / package依存 |
 
+**`conflict`は行に付きますが、どの列が争点かは`basis`の`!`が言います。** `flash_geometry.csv`のCH32V103行にある`!evt-comment:fast_program_bytes(=256)`は、食い違っているのが`fast_program_bytes`**だけ**だという意味で、同じ行の他の列は争点ではありません。`conflict`をfail-closedで落とすconsumerは、行ごと捨てる前に`!`を読んでください。
+
 **確定は自動化に限りません。** 使い捨てスクリプトで該当箇所を提示させ、人が両言語を突き合わせて確認できたら確定とし、根拠を`curated/`に記録します。core・ISAはこの方式です（`curated/series-facts.json`、2026-08-18確認）。
 
 ## 根拠の種類（basis表記）
@@ -826,6 +833,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 | `rule:package-name` | package名の数字=lead数 | pin_countの根拠・照合 |
 | `rule:part-number-structure` | seriesは型番構造から決まる | seriesの根拠 |
 | `manual:…` | 人が確認して記録した根拠（curated/） | 確定として扱う |
+| `measured:…` | **他repoが実機で読んだ値**。文書パスと型番で引用する（`measured:ch32rv(docs/data-requests/measured/erased-read-2026-09-06.md, CH32V103R8T6)`） | 通常の根拠。ただし**WCH側のどの資料も値を言っていない場合だけ**使う。RMの原文をそのまま持つ列は空のままで、正規化済みの列だけを埋める |
 
 **採用しなかった規則**: 型番の容量コード（8=64K等）。V30x/H41x系は比較表が最大構成を載せるため92件中24件で不一致になり、規則として成立しません。
 

@@ -336,6 +336,35 @@ def column_drift(t: dict) -> list[str]:
     return out
 
 
+# regenerate.py に名前が出ない生成器と、それを呼ぶ生成器。
+CALLED_BY = {"build_documents.py": "build_tables.py"}
+
+
+def regeneration_coverage() -> list[str]:
+    """`COLUMN_SOURCES` の生成器が全部 `regenerate.py` の順序に載っているか。
+
+    **載っていない生成器は `--full` で走らない**ので、原本が改版されても表だけが
+    古いまま残り、しかも列は合っているので `column_drift` にも掛からない。R-32 で
+    新設した `build_flash_program_method` が実際にこの穴に落ちていた（2026-09-06）。
+    """
+    tools = Path(__file__).resolve().parent
+    text = (tools.parent / "pipeline" / "publish" / "regenerate.py").read_text(encoding="utf-8")
+    out = []
+    for name, (source, _) in sorted(COLUMN_SOURCES.items()):
+        stem = source[:-3]
+        if stem in text:
+            continue
+        # 別の生成器の中から呼ばれるものは regenerate.py に名前が出ない
+        # （`build_documents` は `build_tables` が呼ぶ）。**呼ぶ側が順序に載っていて、
+        # 実際にimportしていること**まで確かめる——ただ免除すると穴になる。
+        caller = CALLED_BY.get(source)
+        if caller and caller[:-3] in text and stem in (tools / caller).read_text(encoding="utf-8"):
+            continue
+        out.append(f"{name}: 生成器 {source} が regenerate.py の順序に無い"
+                   "——`--full` で再生成されない")
+    return out
+
+
 def pin_numbering(t: dict) -> list[str]:
     """封装の公称 lead 数と、pins が持つ番号の連番が一致するか。
 
@@ -850,6 +879,8 @@ def main() -> int:
     # 持たない代わりに、その形が壊れていないことをここで見る。
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
+    # 生成器が --full の順序に載っているか。載らない生成器は原本が動いても走らない。
+    bad += regeneration_coverage()
     bad += out_option(t)
     bad += conflict_keys(t)
     bad += shared_leads(t)
@@ -1014,6 +1045,20 @@ def main() -> int:
         if r["program_method"] and not r["program_commit"]:
             bad.append(f"flash_program_method: {r['family']} に program_method があるのに"
                        "program_commit が無い")
+        # bufferの幅（32/64/128）。**方式の文字列と列が同じ幅を言うこと**を見る——
+        # 幅を満たさない単位で積むとエラー無しで内容が壊れるので、ここがずれると
+        # consumer 側が黙って壊れる（依頼0004のフィードバック）。
+        bits = r["program_buffer_load_bits"]
+        buffered = "buffer writes" in r["program_method"]
+        if bits and bits not in ("32", "64", "128"):
+            bad.append(f"flash_program_method: {r['family']} の "
+                       f"program_buffer_load_bits={bits!r} が 32/64/128 でない")
+        if buffered != bool(bits):
+            bad.append(f"flash_program_method: {r['family']} の "
+                       f"program_buffer_load_bits と program_method が食い違う")
+        if bits and f"{bits}-bit buffer writes" not in r["program_method"]:
+            bad.append(f"flash_program_method: {r['family']} の program_method の幅が"
+                       f" program_buffer_load_bits={bits} と違う")
 
     # opa_cmp_registers は EVT header の構造体＋bit define。address が memory_map の
     # block base と整合すること（base + offset）、mask と bits が同じことを言う

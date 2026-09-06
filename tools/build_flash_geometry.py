@@ -93,6 +93,11 @@ RM_ERASED_EN = re.compile(
     r"erasing\s+successfully|a\s+successful\s+erase)[,\s]*"
     r"(?:read\s+the\s+word|the\s+word[\s\w]*?|words?[\s\w]*?|the\s+byte[\s\w]*?)"
     r"-?\s*(?P<word>0x[0-9a-fA-F]+)")
+# 消去後の値を直接は言わないRMでも、`FLASH_STATR.PGERR`の説明が「内容が`0xFFFF`でない
+# 番地に書こうとすると立つ」と言っていれば、**消去後が`0xFFFF`**である前提を置いている。
+# CH32V103（CH32xRM p272）はこれが唯一のRM側の裏付け。値は導出しない——basisとnoteで
+# 「実測がRMの前提と一致する」と言うためだけに拾う。
+RM_PGERR = re.compile(r"PGERR[^\n]{0,40}?内容不是\s*[“\"'”]?\s*(0x[0-9a-fA-F]+)")
 # 闪存章はどの RM でも前半〜中盤にある。全ページ舐めると重い。
 RM_NEEDLE = ("快速编程", "标准页", "快速擦除", "擦除成功后")
 EN_NEEDLE = ("erasing is successful", "successful erasure",
@@ -104,12 +109,16 @@ EN_NEEDLE = ("erasing is successful", "successful erasure",
 IAP_BLANK = re.compile(r"\*\s*\(\s*(?:vu32|uint32_t)\s*\*\s*\)\s*FLASH_Base\s*"
                        r"!=\s*(0x[0-9a-fA-F]+)")
 
-# RMが消去後の値を言わないfamilyについて、**他repoが実機で読んだ値**（引用。こちらでは
-# 検証していないので値の列には入れず note にだけ書く）。出所は wch-protocols の
-# bootloader 横断調査 R-31（実測は ch32rv の WCH-Link/WCH-LinkE 実装）。
+# RMが消去後の値を言わないfamilyについて、**他repoが実機で読んだ値**。出所は
+# wch-protocols の bootloader 横断調査 R-31（実測は ch32rv の WCH-Link/WCH-LinkE 実装）。
+# 原文列（`erased_read_*`）には**入れない**——RMが言っていないことは書かない。入るのは
+# 正規化済みの `blank_check_word` だけで、`basis` に `measured:...` と出所を明記する。
+# CH32V103 は RM にも WCH の IAP にも根拠が無い唯一の family で、これが無いと consumer
+# 側が手書きを消せない（依頼0004のフィードバック）。
+MEASURED = "docs/data-requests/measured/erased-read-2026-09-06.md"
 MEASURED_ERASED = {
-    "CH32V003": "ch32rv measured 0xff fill after erase (CH32V003F4P6, WCH-LinkE)",
-    "CH32V103": "ch32rv measured 0xff fill after erase (CH32V103R8T6, WCH-Link)",
+    "CH32V003": ("0xFFFFFFFF", f"ch32rv({MEASURED}, CH32V003F4P6)"),
+    "CH32V103": ("0xFFFFFFFF", f"ch32rv({MEASURED}, CH32V103R8T6)"),
 }
 
 
@@ -201,6 +210,10 @@ def read_manual(family_dir: Path) -> tuple[dict, str] | None:
         for page in pdf.pages:
             text = page.extract_text() or ""
             page.close()
+            if "_pgerr" not in found:
+                m = RM_PGERR.search(text)
+                if m:
+                    found["_pgerr"] = m.group(1)
             if not any(n in text for n in RM_NEEDLE):
                 continue
             m = RM_STANDARD.search(text)
@@ -284,7 +297,16 @@ def main() -> int:
                        "erased_read_byte_even", "erased_read_byte_odd"):
             row[column] = rm.get(column, "")
         # WCH自身のIAPが比較する値は別の出所なので別列。系統Aはここで word 幅が付く。
+        # RMにもIAPにも無いfamily（CH32V103）だけ、実測の引用で埋める。
         row["blank_check_word"] = iap[0] if iap else ""
+        from_measurement = None
+        if not row["blank_check_word"] and family in MEASURED_ERASED:
+            value, source = MEASURED_ERASED[family]
+            row["blank_check_word"] = value
+            from_measurement = (value, source)
+            basis.append(f"measured:{source}")
+            if rm.get("_pgerr"):
+                basis.append(f"rm-pgerr({rm['_pgerr']})")
         conflicts: list[str] = []
         for column in ("page_erase_bytes", "fast_erase_bytes",
                        "fast_program_bytes", "block_erase_bytes"):
@@ -322,9 +344,23 @@ def main() -> int:
             notes_for_row.append("dual flash mode (FLASH_CFGR0 bit28): page 8K, block 64K")
         if not row["erased_read_word"]:
             # RMが消去後の値を言わないfamily。空欄と「未知」を consumer が区別できるよう
-            # 明示し、他repoの実測（引用元を名指し）を添える。値としては入れない。
-            notes_for_row.append("the RM does not state the erased read value; "
-                                 + MEASURED_ERASED.get(family, "no measurement on file"))
+            # 明示し、他repoの実測（引用元を名指し）を添える。RM原文の列には入れない。
+            # **blank_check_word の出所で文言を変える**——WCH自身のIAPから採れた
+            # family（CH32V003）で「実測です」と書くと出所を偽ることになる。
+            measured = MEASURED_ERASED.get(family)
+            if from_measurement:
+                tail = (f"blank_check_word {from_measurement[0]} is a third-party "
+                        f"measurement ({from_measurement[1]}), not a WCH source")
+                if rm.get("_pgerr"):
+                    tail += (f"; the RM corroborates it indirectly -- FLASH_STATR.PGERR "
+                             f"is described as set when programming an address whose "
+                             f"content is not {rm['_pgerr']}")
+            elif measured:
+                tail = (f"blank_check_word comes from WCH's own IAP sample; "
+                        f"{measured[1]} independently measured {measured[0]}")
+            else:
+                tail = "no measurement on file"
+            notes_for_row.append("the RM does not state the erased read value; " + tail)
         row["note"] = "; ".join(notes_for_row)
         row["confidence"] = confidence
         row["basis"] = "+".join(basis + conflicts)

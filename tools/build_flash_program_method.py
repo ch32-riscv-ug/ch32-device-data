@@ -46,8 +46,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "program_method", "program_commit", "erase_method",
-           "ctlr_bit_names", "undocumented_note", "#", "confidence", "basis"]
+COLUMNS = ["family", "program_method", "program_buffer_load_bits", "program_commit",
+           "erase_method", "ctlr_bit_names", "undocumented_note", "#", "confidence", "basis"]
 
 # --- RM 側 --------------------------------------------------------------------
 # 闪存章の節見出し。手順はこの見出しの下に番号付きで並ぶ。
@@ -70,6 +70,13 @@ EVT_BIT = re.compile(r"CTLR\s*\|=\s*CR_(\w+?)(?:_Set)?\s*;")
 # **buffer経由かどうかは関数の有無で決まる**——`ProgramPage_Fast`は起動だけを行い、
 # 4バイト書込と`BUFLOAD`は`FLASH_BufLoad`という別関数に分かれている（CH32V003ほか）。
 EVT_BUFFER = re.compile(r"void\s+FLASH_Buf(?:Load|Reset)\b")
+# buffer に一度に積む幅。`FLASH_BufLoad` の `Data` 引数の本数で決まり、family で
+# **32/64/128 bit の3通り**ある（V003ほか Data0 の1本＝32、M030 は Data0/Data1＝64、
+# V103 は Data0..Data3＝128）。幅を満たさない書込は黙って壊れる——consumer(ch32rv)は
+# V103 で word 単位に積んで内容が壊れ、標準 half-word へ退避している。RM は幅を
+# 手順として書かないので、**driver のシグネチャが一次**。
+EVT_BUFLOAD_SIG = re.compile(r"void\s+FLASH_BufLoad\s*\(([^)]*)\)")
+EVT_BUFLOAD_DATA = re.compile(r"\buint32_t\s+Data\d+\b")
 # RM に無い副作用（CH32V103）。FLASH base + 0x34 への読み書き。
 MAGIC = re.compile(r"\*\s*\(\s*__IO\s+uint32_t\s*\*\s*\)\s*(0x4002203[0-9A-Fa-f])\s*="
                    r"[^;]*?\^\s*(0x[0-9A-Fa-f]+)")
@@ -108,6 +115,21 @@ def rm_steps(family_dir: Path, language: str = "zh") -> tuple[dict, str] | None:
     return ({k: v for k, v in steps.items() if v}, found[0].name)
 
 
+def buf_load_bits(family_dir: Path) -> int:
+    """`FLASH_BufLoad`が一度に積む幅（bit）。buffer経由でなければ0。
+
+    ヘッダの宣言と`.c`の定義の両方を見る（片方しか無いmirrorがある）。`Data`引数
+    1本＝32bit。**この幅を満たさない単位で積むと内容が壊れる**ので、consumerには
+    手順そのものと同じくらい効く（依頼0004のフィードバック）。"""
+    for pattern in ("EVT/**/Peripheral/inc/ch32*_flash.h",
+                    "EVT/**/Peripheral/src/ch32*_flash.c"):
+        for path in sorted(family_dir.glob(pattern)):
+            match = EVT_BUFLOAD_SIG.search(path.read_text(errors="ignore"))
+            if match:
+                return 32 * len(EVT_BUFLOAD_DATA.findall(match.group(1)))
+    return 0
+
+
 def evt_steps(family_dir: Path) -> tuple[dict, str, bool] | None:
     """driverの手順。({関数名: [立てるbit...], "_buffer": [...]}, ファイル名, RMに無い副作用)。"""
     found = sorted(family_dir.glob("EVT/**/Peripheral/src/ch32*_flash.c"))
@@ -134,14 +156,17 @@ def evt_steps(family_dir: Path) -> tuple[dict, str, bool] | None:
     return bodies, found[0].name, MAGIC.search(text)
 
 
-def classify(sequence: list[str]) -> tuple[str, str]:
-    """手順のbit列 → (program_method, program_commit)。R-30の`write_unit`と同じ語彙。"""
+def classify(sequence: list[str], bits: int = 32) -> tuple[str, str]:
+    """手順のbit列 → (program_method, program_commit)。R-30の`write_unit`と同じ語彙。
+
+    `bits`はbufferに一度に積む幅（`buf_load_bits`）。全familyを`32-bit`と書いていたが、
+    M030は64bit・V103は128bitで、そのまま実装すると壊れる（依頼0004のフィードバック）。"""
     buffered = any(b.startswith(("BUFRST", "BUF_RST", "BUFLOAD", "BUF_LOAD")) for b in sequence)
     enable = next((b for b in sequence if b in ("FTPG", "PAGE_PG")), "FTPG")
     if buffered:
         names = [b for b in sequence if b.startswith(("BUFRST", "BUF_RST"))]
         load = [b for b in sequence if b.startswith(("BUFLOAD", "BUF_LOAD"))]
-        method = (f"fast page, 32-bit buffer writes ({enable} + "
+        method = (f"fast page, {bits or 32}-bit buffer writes ({enable} + "
                   f"{names[0] if names else 'BUFRST'}/{load[0] if load else 'BUFLOAD'}, then STRT)")
         return method, "STRT (bit6)"
     if "PG_STRT" in sequence:
@@ -199,9 +224,10 @@ def main() -> int:
 
         program = pick("编程")
         erase = pick("擦除")
-        method, commit = classify(program)
+        bits = buf_load_bits(family_dir)
+        method, commit = classify(program, bits)
         evt_program = list(evt.get("_buffer", [])) + evt.get("FLASH_ProgramPage_Fast", [])
-        evt_method, evt_commit = classify(evt_program)
+        evt_method, evt_commit = classify(evt_program, bits)
 
         confidence = "reference"
         basis: list[str] = []
@@ -209,6 +235,9 @@ def main() -> int:
             basis.append(f"rm{'-en' if language == 'en' else ''}({manual_name})")
         if driver:
             basis.append(f"evt({driver_name})")
+        if bits:
+            # 幅はRMの手順には出ない。driverのシグネチャだけが根拠だとわかるようにする。
+            basis.append(f"evt-bufload({bits}bit)")
         if method and evt_method:
             if method.split("(")[0] == evt_method.split("(")[0]:
                 confidence = "confirmed"
@@ -256,6 +285,7 @@ def main() -> int:
         rows.append({
             "family": family,
             "program_method": method,
+            "program_buffer_load_bits": str(bits) if bits and "buffer writes" in method else "",
             "program_commit": commit,
             "erase_method": erase_method,
             "ctlr_bit_names": ";".join(sorted(set(ctlr_names.get(family, [])))),
