@@ -976,6 +976,27 @@ def main() -> int:
         if (r["page_erase_bytes"] and r["fast_erase_bytes"]
                 and int(r["fast_erase_bytes"]) >= int(r["page_erase_bytes"])):
             bad.append(f"flash_geometry: {r['family']} の fast_erase が標準 page 以上")
+        # 消去後の読み出し値（R-31）。RMの原文のままなので幅は正規化しないが、
+        # **16進リテラルであること**と、**幅の広い順に矛盾しないこと**は見る。
+        for column in ("erased_read_word", "erased_read_half",
+                       "erased_read_byte_even", "erased_read_byte_odd",
+                       "blank_check_word"):
+            value = r[column]
+            if value and not re.fullmatch(r"0x[0-9a-fA-F]+", value):
+                bad.append(f"flash_geometry: {r['family']} の {column}={value!r} が"
+                           "16進リテラルでない")
+        # half/byte はwordがあるときだけ在りうる（RMがwordしか書かないfamilyは空）。
+        for column in ("erased_read_half", "erased_read_byte_even", "erased_read_byte_odd"):
+            if r[column] and not r["erased_read_word"]:
+                bad.append(f"flash_geometry: {r['family']} の {column} が word 無しで在る")
+        # blank判定値はwordなので8桁。RMのwordと食い違うときは、RMが8bit幅で書いた
+        # family（`0xFF`）だけが許される——それ以外の食い違いは取り違えの印。
+        blank, word = r["blank_check_word"], r["erased_read_word"]
+        if blank and len(blank) != 10:
+            bad.append(f"flash_geometry: {r['family']} の blank_check_word={blank!r} が word 幅でない")
+        if blank and word and blank.lower() != word.lower() and word.lower() != "0xff":
+            bad.append(f"flash_geometry: {r['family']} の blank_check_word={blank!r} が "
+                       f"erased_read_word={word!r} と食い違う")
 
     # opa_cmp_registers は EVT header の構造体＋bit define。address が memory_map の
     # block base と整合すること（base + offset）、mask と bits が同じことを言う

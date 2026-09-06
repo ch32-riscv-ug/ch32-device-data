@@ -164,10 +164,14 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 | `fast_program_bytes` | 快速ページ書き込みの単位 |
 | `block_erase_bytes` | 快速ブロック消去の単位（32K。V205は64K） |
 | `program_word` | `FLASH_ProgramWord`/`ProgramHalfWord`がdriverにあるか。**空＝快速ページ経由のみ**（L103/M030/V006/V205/X035） |
+| `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | 消去後に読み出される値を**RMの原文のまま**。2系統ある——`0xFFFFFFFF`系（RMは`字读- 0xFF`と8bit幅で書くので列も`0xFF`）と`0xe339e339`系。4つの幅を全部書いているのは`0xe339e339`系だけで、他はwordしか書かないので残り3列は**空**（RMが言っていないので導出しない） |
+| `blank_check_word` | **WCH自身のEVT IAPサンプルが**`*(uint32_t*)FLASH_Base`と比較する値。APPが焼かれているかの判定に使う。RMとは別の出所なので列を分ける——`0xFF`系のfamilyはここで初めてword幅が確定する。サンプルにblank判定が無いfamily（CH32V103はGPIOで入る）は空 |
 | `zero_wait_note` | `flash_bytes`（零等待領域）と総容量の関係。option byteで動くfamilyは`memory_configs.csv`、総容量は`product_attributes`の`code_flash_bytes`を指す |
-| `note` | モード依存。CH32H417は`FLASH_CFGR0` bit28（dual flash mode）でページ8K・ブロック64Kになる。列の値はsingle mode |
+| `note` | モード依存。CH32H417は`FLASH_CFGR0` bit28（dual flash mode）でページ8K・ブロック64Kになる。列の値はsingle mode。RMが消去後の値を書いていないfamilyではその旨と、他repoの実測（あれば）も書く |
 
 出所は**EVTのflash driverの`@brief`**（`page size 4KB`・`1page = 256Byte`）と**RMの闪存章の本文**（`标准页（1K字节）`・`快速编程按页（128字节）`）の2つで、突き合わせて確度を決めます。**実際に食い違いが1件**あります——CH32V103のdriverは`ProgramPage_Fast ... 256Byte`と書きますが、RMは`快速编程按页（128字节）`、同じdriverの消去側も128B、`ROM_ERASE`の引数条件も`StartAddr%128 == 0`。EVTコメントの写し間違いと判断して値は128、`conflict`で両論を`basis`に残しています。
+
+消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、列は空のままで`note`にその旨と、他repoが報告した実測を引用します。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
 
 ### `opa_cmp_registers.csv`
 
