@@ -87,7 +87,13 @@ SCHEMA_VERSION = "0.2"
 #     語の占有幅をx軸へ投影して空白帯を探す方法をfallbackに足した。
 # (c) `clean_reset_column`の1〜2字規則を**1字**に絞った——SDコマンドの`类型`列の`ac`が
 #     消えて表32-4/5/6の14行中8行が値を失っていた（1.9.1で入れた規則の穴）。
-CONVERTER_VERSION = "1.9.3"
+# 1.9.4: 列境界に**妥当性検査**を入れた。1.9.3で`产品特性`を見出し語に足したところ、
+# それまで分割されなかったV205DS0.zh p1が**悪い位置で**分割され、右カラムの語33個が
+# 途中で切れて切れ端がページ末尾に落ちた（`crop`は跨いだ語を両側に入れる）。原因は
+# x0のギャップ方式が**右カラムの内側**（字下げの段の間）を溝と誤ったこと。2つの候補
+# （x0ギャップ・語の占有幅の投影）を出して**跨ぐ語が最小のもの**を採り、それでも3語
+# 以上跨ぐなら分割しない。2026-09-07の検証ラウンド4窓目が検出。
+CONVERTER_VERSION = "1.9.4"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -397,36 +403,52 @@ def column_boundary(page, lines: list[dict], carried: float | None = None):
 
     words = [w for w in (page.extract_words() or [])
              if not in_table(w) and w["top"] >= y_start]
-    x0s = sorted(w["x0"] for w in words)
-    x0s = [x for x in x0s if width * 0.35 <= x <= width * 0.60]
-    if len(x0s) < 3:
+    def crossings(x: float) -> int:
+        """その縦線を跨ぐ語の数。**本物の列境界はほとんど跨がれない**（1.9.4）。
+
+        x0のギャップ方式は、右カラムに字下げの段が複数あると**右カラムの内側**を
+        境界に選ぶことがある——V205DS0.zh p1では右カラムがx0≈330から始まるのに、
+        段の間の339→353を拾って346.3を境界にし、右カラムの語**33個**を途中で切って
+        いた（`crop`は跨いだ語を両側に入れるので、切れ端が二重になって末尾へ落ちる。
+        `产品特性`を見出し語に足したことで顕在化した。2026-09-07の検証ラウンド4窓目）。
+        左カラムの一番長い語が溝に届くのは普通なので0は要求せず、**少数**で判定する。"""
+        return sum(1 for w in words if w["x0"] < x < w["x1"])
+
+    candidates: list[tuple[int, float, float]] = []   # (跨ぐ語, -隙間, x)
+
+    # 候補1: 中央域のx0のギャップ（従来）
+    band = [x for x in sorted(w["x0"] for w in words) if width * 0.35 <= x <= width * 0.60]
+    if len(band) >= 3:
+        gap, mid = 0.0, None
+        for a, b in zip(band, band[1:]):
+            if b - a > gap:
+                # ギャップの中点を境界に——右カラム語の x0 ちょうどにすると、その語
+                # （bullet等）が左cropにも intersect して左行末に紛れ込む。
+                gap, mid = b - a, (a + b) / 2
+        if gap >= 15 and mid is not None:
+            candidates.append((crossings(mid), -gap, mid))
+
+    # 候補2: 語の占有幅をx軸へ投影して空白帯を探す。右カラムの字下げが何段もあって
+    # x0のギャップでは測れない版面（zh datasheet）を拾う。
+    lo, hi = width * 0.30, width * 0.70
+    cursor, gap, mid = lo, 0.0, None
+    for a, b in sorted((w["x0"], w["x1"]) for w in words):
+        if b <= lo or a >= hi:
+            continue
+        if a > cursor and a - cursor > gap:
+            gap, mid = a - cursor, (cursor + a) / 2
+        cursor = max(cursor, b)
+    if cursor < hi and hi - cursor > gap:
+        gap, mid = hi - cursor, (cursor + hi) / 2
+    if gap >= 15 and mid is not None:
+        candidates.append((crossings(mid), -gap, mid))
+
+    if not candidates:
         return None
-    best_gap, best_x = 0.0, None
-    for a, b in zip(x0s, x0s[1:]):
-        if b - a > best_gap:
-            # ギャップの中点を境界に——右カラム語の x0 ちょうどにすると、その語
-            # （bullet等）が左cropにも intersect して左行末に紛れ込む。
-            best_gap, best_x = b - a, (a + b) / 2
-    if best_gap < 15:
-        # x0のギャップでは測れない版面がある（1.9.3）——右カラムの字下げが何段もあると
-        # 中央域に入るx0が**右カラムの内側の段だけ**になり、左カラムとの本当の隙間
-        # （左の右端89 → 右の左端315）が見えない（V006DS2.zh p1。検証ラウンドが検出）。
-        # 語の**占有幅**をx軸へ投影して、中央域で一番広い空白帯を探し直す。
-        covered = [(w["x0"], w["x1"]) for w in words]
-        lo, hi = width * 0.30, width * 0.70
-        edges = sorted(covered)
-        cursor, best_gap, best_x = lo, 0.0, None
-        for a, b in edges:
-            if b <= lo or a >= hi:
-                continue
-            if a > cursor and a - cursor > best_gap:
-                best_gap, best_x = a - cursor, (cursor + a) / 2
-            cursor = max(cursor, b)
-        if cursor < hi and hi - cursor > best_gap:
-            best_gap, best_x = hi - cursor, (cursor + hi) / 2
-        if best_gap < 25:
-            return None
-    if carried is not None and not starts and abs(best_x - carried) > 10.0:
+    cross, _, best_x = min(candidates)
+    if cross > 2:
+        return None   # 溝ではなくカラムの内側を割っている
+    if carried is not None and not starts and abs(best_x - carried) > 20.0:
         return None   # 前ページと同じ列構造でない——続きとみなさない
     return (best_x, y_start)
 
