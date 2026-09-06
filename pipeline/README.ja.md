@@ -247,6 +247,24 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    収まらないが、基底`V`11.9に対しては明確に小さい（L103DS0 p36の孤立18→0）。
    `page["text"]`は`extract_text()`が別に作るので凍結toolのbyte一致は崩れない
 
+7. **表セルの中の下付き・上付きを元の位置へ戻す**（converter 1.7.0/1.7.1）。6.と
+   同じ欠陥のセル版——pdfplumberはセル内の下付きを別の視覚行として拾うので、`VSS`が
+   `V\nSS`、`VDD5*2-1.5`が`V *2-1.5DD5`、`2^20`が`220`になる（14,738セル／61文書）。
+   1.7.0までは exporter と parity 検査だけが直していたので、**bundleのセルを読む
+   抽出器には壊れた綴りのまま届いていた**。直す実体は
+   `logical_tables.reattach_cell_subscripts`——3者が同じ関数を呼ぶので読みがずれない。
+
+   **壊れた分割は情報を持っているので、そちらも残す。** pdfplumberが残す改行は
+   下付きの境界で、凍結`build_operating.norm_symbol`はそれを正規化記号に変える
+   （`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）。1.7.0で繋いだ形だけを残したら、
+   `evidence/operating_conditions.csv`の**`I_DD`系1,207行がエラーも出さずに消えた**。
+   1.7.1からはセルが2つの面を持つ——表が`cells`と`extracted_rows`を両方持つのと
+   同じ考え方で、`text`が復元後の読み順、`text_split`が版面の割り方。
+   `logical_tables.text_grid(merged, "text_split")`で引け、`merge_cells`が結合セルにも
+   引き継ぎ、`extract_low_power`がこれを読む。`extracted_rows`は**触らない**ので
+   凍結tool 19本は無傷（pdfcompatの`Table.extract()`は`extracted_rows`を返し、
+   `crop()`は未実装——凍結toolは`cells[].text`を見られない）
+
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。
 

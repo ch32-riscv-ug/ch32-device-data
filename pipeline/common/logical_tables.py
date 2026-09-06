@@ -85,6 +85,9 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
                 "column_start": c0,
                 "column_end": max(c1, c0 + 1),
                 "text": cell["text"],
+                # converterが下付きを戻す前の綴り（あれば）。版面の割り方＝下付きの
+                # 境界を要る抽出器が`text_grid(..., "text_split")`で引く。
+                **({"text_split": cell["text_split"]} if "text_split" in cell else {}),
                 # 元のページ座標と出自ページ。`bbox`という名前にしない——結合セルにbboxが
                 # 無いことをapply_bitfield等が「figure/bit図でない」印として使っている。
                 # strip_straddling_dupesだけがページ別geometryで境界重複を判定するのに使う。
@@ -1569,12 +1572,19 @@ def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
     return removed
 
 
-def text_grid(merged: dict) -> tuple[list[list[str | None]], list[int]]:
-    """結合済み論理表 → 文字の格子（抽出器向け。spanの先頭位置に文字を置く）。"""
+def text_grid(merged: dict, field: str = "text") -> tuple[list[list[str | None]], list[int]]:
+    """結合済み論理表 → 文字の格子（抽出器向け。spanの先頭位置に文字を置く）。
+
+    `field="text_split"`にすると、converterが下付きを戻す**前**の綴り（版面の割り方。
+    無いセルは`text`）を置く。改行が下付きの境界を示すので、そこから正規化記号を
+    作る抽出器（`build_operating.norm_symbol`の`I\nDD`→`I_DD`）がこちらを読む。
+    """
     rows: list[list[str | None]] = [[None] * merged["width"]
                                     for _ in range(merged["row_count"])]
     for cell in merged["cells"]:
-        rows[cell["row_start"]][cell["column_start"]] = cell["text"]
+        text = cell.get(field) if field != "text" else cell["text"]
+        rows[cell["row_start"]][cell["column_start"]] = (
+            cell["text"] if text is None else text)
     return rows, merged["row_pages"]
 
 

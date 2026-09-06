@@ -37,6 +37,7 @@ import hashlib
 import json
 import re
 import statistics
+import sys
 from collections import defaultdict
 from importlib.metadata import version
 from pathlib import Path
@@ -45,12 +46,21 @@ import jsonschema
 import pdfplumber
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import logical_tables  # noqa: E402
 SCHEMA_VERSION = "0.2"
 # 1.1.0: manifestのgeometry_sha256を**非圧縮のJSON**のhashに変更。gzipの圧縮
 # バイト列はzlibの版で変わり、GitHub Actions上の再変換がgeometry_sha256だけ
 # 全ページ不一致になった（2026-09-01、structured-repro.ymlが検出）。圧縮は
 # 保存の都合であって内容ではないので、hashは内容に対して取る。
-CONVERTER_VERSION = "1.6.3"
+# 1.7.0: セル内の下付き/上付きの復元を**converterへ移した**（`fix_cell_subscripts`）。
+# それまではexporterとparityだけが直していたので、bundleのセルを読む抽出器
+# （`operating_conditions`・`option_bytes`・`debug_wiring`）には壊れた綴りのまま
+# 届いていた（`V\nSS`・`V power regulation bit:\nIO18`）。14,738セル／61文書。
+# 1.7.1: 直す前の綴りを`cells[].text_split`に残す。1.7.0では繋いだ形しか残らず、
+# **下付きの境界という情報**が消えて`operating_conditions`の`I_DD`系1,207行が落ちた
+# （`build_operating.norm_symbol`が`I\nDD`の改行を`_`にして正規化記号を作るため）。
+CONVERTER_VERSION = "1.7.1"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -239,6 +249,37 @@ def fix_rotated_cells(page, record: dict) -> None:
             fixed = rebuild(bbox)
             if fixed is not None:
                 row_texts[index] = fixed
+
+
+def fix_cell_subscripts(page_chars: list[dict], record: dict) -> None:
+    """表セルの中で基底から離れた**下付き/上付き**をgeometryで戻す（1.7.0）。
+
+    pdfplumberはセル内の下付き（小さいフォント・低い基線）を別の視覚行として拾い、
+    `VSS`を`V\nSS`、`VDD5*2-1.5`を`V *2-1.5DD5`、`2^20`を`220`にする。判定と組み直しは
+    `logical_tables.reattach_cell_subscripts`（geometryで基底と下付きを分け、綴りが
+    一致しなければ何もしない安全側）。**行の`merge_subscript_lines`と対**で、あちらは
+    ページの行、こちらは表のセルを見る。
+
+    それまではexporterとparityだけが直していたので、bundleのセルを読む抽出器には
+    壊れた綴りのまま届いていた。ここで直せばMarkdownにもCSVにも同じ文字が行く。
+    判定用の印（`_subscripts_reattached`）はbundleに残さない——schemaに無いキー。
+
+    **直す前の綴りを`text_split`に残す。** pdfplumberの割り方は壊れているのではなく
+    **下付きの境界を持っている**——`build_operating.norm_symbol`は`I\nDD`の改行を
+    `_`に変えて正規化記号`I_DD`を作る（`KEEP`がその形しか通さない）。繋いだ形だけを
+    残すとその境界が消え、`operating_conditions`の`I_DD`系1,207行が丸ごと落ちた
+    （2026-09-06に実測）。読み順として正しいのは繋いだ形なので`text`はそれにし、
+    **版面がどう割っていたか**を別のキーに置く。`extracted_rows`（pdfplumber互換の
+    平坦化行）と同じ考え方で、面を2つ持つ。
+    """
+    if not logical_tables.has_subscript_shape(record):
+        return
+    before = [cell["text"] for cell in record["cells"]]
+    logical_tables.reattach_cell_subscripts(record, page_chars)
+    record.pop("_subscripts_reattached", None)
+    for cell, original in zip(record["cells"], before):
+        if cell["text"] != original:
+            cell["text_split"] = original
 
 
 # 2カラムが始まる見出し。**Overview/概述は含めない**——overviewの散文は全幅1行で
@@ -664,6 +705,8 @@ def page_record(page, lang: str, source_sha256: str,
             "issues": overlap_issues(cells),
         })
         fix_rotated_cells(page, tables[-1])
+        # 回転の組み直しの**後**——直った文字に対して下付きを戻す。
+        fix_cell_subscripts(page_chars, tables[-1])
         previous_bottom = table.bbox[3]
 
     def outside_tables(line: dict) -> bool:

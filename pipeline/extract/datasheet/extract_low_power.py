@@ -303,8 +303,15 @@ def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[list[list[str | N
 
     列の対応付け規則（列数が同じなら位置・違えばx和集合）と、その根拠の実測は
     `pipeline/common/logical_tables.py`に移した。
+
+    **読むのは`text_split`**——converterが下付きを戻す前の、版面が割ったままの綴り。
+    この抽出器が使う`build_operating`の正規化は**その改行が下付きの境界だという前提**で
+    書かれていて（`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）、繋いだ形を渡すと
+    `I_DD`系の行が丸ごと落ちる（converter 1.7.0で実測。1,207行）。`text`側の
+    geometry結合は綴りとしては正しいので、説明列をそちらへ移すのは別の改善として扱う
+    （`_merge_subscripts`の正規表現より確かなはずだが、1,200行の差分確認が要る）。
     """
-    return logical_tables.text_grid(logical_tables.merge_cells(fragments))
+    return logical_tables.text_grid(logical_tables.merge_cells(fragments), "text_split")
 
 
 def _unbalanced(text: str) -> bool:

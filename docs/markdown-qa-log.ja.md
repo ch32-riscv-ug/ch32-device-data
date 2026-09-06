@@ -843,7 +843,7 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   誤検出なく囲える判定（例: 罫線・矢印・小円などdiagram固有の描画種の空間的まとまり）を
   作れたとき。それまでは監査で数を追うだけにする。
 
-## セル内下付き復元を converter へ移す（2026-09-06 測定・未着手）
+## セル内下付き復元を converter へ移した（2026-09-06、converter 1.7.1）
 
 「表面より根で直す」方針（[handoff](handoff.ja.md)）に沿うと、いま
 `pipeline/common/logical_tables.reattach_cell_subscripts` を **exporter と parity から**
@@ -862,6 +862,51 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
 - **動く可能性があるのは新経路のCSV**（`operating_conditions` 等、datasheetの電気特性表を
   bundleのセルから読むもの）。下付きが本来の位置に戻るので、**動くとすれば良い方向**。
 
-**未着手の理由**: converterを変えると `CONVERTER_VERSION` を上げて**68文書を全再変換**
-（約1時間）する必要があり、その後に export → parity → `run_frozen --batch` →
-新経路CSVの差分確認までが1セット。着手はまとまった時間が取れるときに。
+**やったこと**: `convert.py` に `fix_cell_subscripts(page_chars, record)` を足し、
+`fix_rotated_cells` の**直後**（回転の組み直しで直った文字に対して）に呼ぶ。判定と
+組み直しは `logical_tables.reattach_cell_subscripts` をそのまま使う——exporter・parity・
+converter の3者が同じ関数を呼ぶので、読みがずれない。判定用の印
+（`_subscripts_reattached`）は schema に無いキーなので bundle には残さない。
+`CONVERTER_VERSION` を **1.6.3 → 1.7.0**。incremental は converter 版で効くので
+`--force` 無しで全68文書が再変換される。
+
+**触らなかったもの**: `extracted_rows`（pdfplumber互換の平坦化行）。凍結tool19本が
+これを読むので、同時に直すと正本CSVが19本まとめて動く。今回の狙いは
+「bundleのセルを読む新経路の抽出器に正しい文字を届ける」ことなので、`cells[].text`
+だけにする。**結果として同じセルの2つの表現が食い違う**——これは
+`extracted_rows` が互換のための面だと割り切った上での既知の差で、いずれ
+`extracted_rows` 側も直すなら凍結解除として別に扱う。
+
+**exporter側の重複**: exporter と parity の cell 呼び出しは converter が直した後は
+no-op になる（再変換後に測って **0セル**）。冪等で安価、かつ merged table 側の保険
+なので**残す**。
+
+### 踏んだ落とし穴: 壊れた分割が load-bearing だった（1.7.0 → 1.7.1）
+
+1.7.0（繋いだ形だけを残す）で **`evidence/operating_conditions.csv` の `I_DD` 系
+1,207行が丸ごと落ちた**。
+
+- `tools/build_operating.norm_symbol` は、pdfplumberがセル内に残す**改行を`_`に変えて**
+  正規化記号を作る（`I\nDD` → `I_DD`）。`KEEP = ^(?:[FfTtVIiRCEN]_|…)` はその形しか
+  通さないので、`IDD` は全部 `keep_row` で落ちる。
+- つまり **pdfplumber の割り方は「壊れている」のではなく、下付きの境界という情報**
+  だった。繋ぐのは読み順としては正しいが、その情報を捨てる操作でもある。
+- `build_operating` は**凍結tool**なので直せない（ページの`extract_text`を読むので
+  frozen 側は無傷。壊れたのは bundle のセルを読む新経路 `extract_low_power` だけ）。
+
+**1.7.1 の形**: `cells[].text` は復元後の綴り、`cells[].text_split` に**直す前の綴り**
+（版面の割り方）を持つ。`extracted_rows`（pdfplumber互換の平坦化行）と同じ「面を2つ
+持つ」考え方。`logical_tables.text_grid(merged, "text_split")` で引け、`merge_cells` が
+結合セルにも引き継ぐ。`extract_low_power.join_fragments` はこちらを読む。
+
+**結果**: `operating_conditions.csv` は 2,796行で**再び byte 一致**。
+
+### この移設で実際に得たもの / 得なかったもの
+
+- **Markdownは変わらない**——exporter が元から直していたので、出力は同じ（parity 68/68 clean）。
+- **`option_bytes` / `debug_wiring` も差分ゼロ**。これらが読むセルに下付きの崩れが無かった。
+- **得たのは bundle のセルが忠実になったこと**（14,738セル／61文書）。今の消費者には
+  効かないが、bundleのセルを読む次の抽出器は正しい綴りから始められる。
+- **教訓**: 「表面で覆うか根で直すか」の前に、**その崩れが情報を持っていないか**を見る。
+  持っているなら根では**捨てずに両方持つ**——捨てると、その情報に依存していた消費者が
+  静かに壊れる（今回は1,207行が、エラーも出さずに消えた）。

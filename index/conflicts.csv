@@ -7,7 +7,7 @@ clock_symbols,CH32V103,,,family=CH32V103 symbol=FLASH_ACTLR_LATENCY role=mask,,,
 clock_symbols,CH32V407,,,family=CH32V407 symbol=RCC_PLLMULL role=mask,,,evt(device-header-comment:RCC_PLLMULL[3:0]),,#,evt(device-header)+!evt(device-header-comment:RCC_PLLMULL[3:0])
 clock_symbols,CH32X035,,,family=CH32X035 symbol=FLASH_ACTLR_LATENCY role=mask,,,evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0]),,#,evt(device-header+system_ch32*.c)+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])
 flash_geometry,CH32V103,,,family=CH32V103,fast_program_bytes,128,evt-comment:fast_program_bytes,256,#,"evt(ch32v10x_flash.c)+rm(CH32xRM.PDF)+measured:ch32rv(docs/data-requests/measured/erased-read-2026-09-06.md, CH32V103R8T6)+rm-pgerr(0xFFFF)+!evt-comment:fast_program_bytes(=256)"
-flash_program_method,CH32H417,,,family=CH32H417,,,"rm-vs-evt:program_method(fast page, direct writes (PAGE_PG, then PG_STRT))",,#,"rm(CH32H417RM.PDF)+evt(ch32h417_flash.c)+!rm-vs-evt:program_method(fast page, direct writes (PAGE_PG, then PG_STRT))+evt-erase"
+flash_program_method,CH32H417,,,family=CH32H417,,,"rm:program_method(fast page (FTPG, then STRT))",,#,"rm(CH32H417RM.PDF)+evt(ch32h417_flash.c)+!rm:program_method(fast page (FTPG, then STRT))+evt-erase"
 memory_configs,,,CH32V203RBT6,part_number=CH32V203RBT6 value=00x,,,,,#,rm(CH32FV2x_V3xRM.PDF:en(p.608))+rm(CH32FV2x_V3xRM.PDF:zh(p.537))+evt(CH32V307)+evt(Link.ld)
 memory_configs,,,CH32V203RBT6,part_number=CH32V203RBT6 value=01x,,,,,#,rm(CH32FV2x_V3xRM.PDF:en(p.608))+rm(CH32FV2x_V3xRM.PDF:zh(p.537))+evt(CH32V307)+evt(Link.ld)
 memory_configs,,,CH32V203RBT6,part_number=CH32V203RBT6 value=1xx,,,,,#,rm(CH32FV2x_V3xRM.PDF:en(p.608))+rm(CH32FV2x_V3xRM.PDF:zh(p.537))+evt(CH32V307)+evt(Link.ld)
