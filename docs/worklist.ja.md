@@ -192,7 +192,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 | R-32 | main flashの消去/書き込み**手順**の分類（ch32rv 0004・優先度中） | ✅ **実装**（2026-09-06）。新表`evidence/flash_program_method.csv`（12 family。`flash_geometry`は粒度の表、手順は語彙も出所も違うので別表）——`program_method`/`program_commit`/`erase_method`/`ctlr_bit_names`/`undocumented_note`。RMの**番号付き手順**（zh一次）とEVT driverの突き合わせで confirmed 11・conflict 1。**ch32rvの実機5 familyと一致**（V20x/V307=PgStart、V003/X035/L103=Buffered）。conflictは**H417**——RMは起動bitも`FTPG`と書くがdriverは`CR_PG_STRT`・`register_fields`は`PG_STRT` bit21（RM側の誤記と判断、両論を`basis`に）。**依頼に無かった発見2件**: ①未文書の`0x40022034`書き込みは**M030にも在る**（他10 familyには無く、XORはV103が`0x1000`・M030が`0x100`）、②依頼が挙げた齟齬「V307に`PG_STRT`が無い」は**事実でない**（V20xと同じbit21が在る）。`ctlr_bit_names`は`register_fields`の綴りで出す（RMは`FTPG`、EVT headerは`PAGE_PG`と同じbitを別名で呼ぶため）。**修正**（2026-09-06、consumerのフィードバック）: `program_method`がbuffered系を全部`32-bit buffer writes`と書いていたが、EVT driverの`FLASH_BufLoad`のシグネチャでは**幅が3通り**——32bit（V003/V006/V205/X035/L103）・**64bit（M030）**・**128bit（V103）**。幅より小さい単位で積むと**エラー無しで内容が壊れる**（ch32rvがV103で踏んだ実害そのもの。だから標準half-word＋未文書commitへ退避していた）。列`program_buffer_load_bits`を新設し、方式の文字列もfamily別の幅に直した。RMは幅を書かないので出所は`basis`に`evt-bufload(<N>bit)`。`check_tables`に「列と方式文字列が同じ幅を言うこと」を追加。**ついでに見つけた登録漏れ**: この表の生成器が`pipeline/publish/regenerate.py`の`--full`順序に載っておらず、原本が改版されても再生成されない状態だった（列は合うので`column_drift`にも掛からない）。順序に追加（`ctlr_bit_names`が`register_fields`を要るので`build_registers`の後）し、同じ抜けを機械で捕まえる`check_tables.regeneration_coverage`を新設。**H417のconflictの採用値を反転**（2026-09-06、ユーザー判断）: RMの手順8は起動bitも`FTPG`と書くが、これは手順4で立てた有効化bitと同じで自己矛盾している。driver（`CR_PG_STRT`）・`register_fields`（`PG_STRT` bit21）・同系統のV407/X315の3つが揃うので**RM側の誤記と判断**し、列にはdriverの読み（`fast page, direct writes (PAGE_PG, then PG_STRT)`）を置いてRMの読みを`basis`に`!rm:program_method(...)`で残す形に直した。それまでは「READMEにはRMの誤りと書きながら列にはRMの値を置く」というねじれがあった。V103の`fast_program_bytes`（判断が逆でRMを採用）と同じ扱いに揃えたことになる。`confidence`は`conflict`のままなので、fail-closedのconsumerの挙動は変わらない。旧状態: 受領・未着手（2026-09-06）。
 | R-30 | option bytesの書き込みレイアウトと工場出荷値（ch32rv 0003・優先度中） | 🔶 **表2枚を新設**（2026-09-02、新経路のRM章抽出`pipeline/extract/rm/extract_option_bytes.py`）: [`evidence/option_bytes.csv`](../evidence/option_bytes.csv)（98行——family×バイトの配置・補数位置・書込方式。書込方式は編程手順が名指す制御bitで分類＝V003系`half-word (OBPG)`／L103・M030系`fast page, 32-bit buffer writes (FTPG)`、RMが自動反码を明記すれば`; complement auto-computed`）＋[`evidence/option_byte_fields.csv`](../evidence/option_byte_fields.csv)（106行——bit割当とRM記載の復位値）。依頼の表1に相当。**工場出荷値（依頼の表2）はRMが述べる粒度（バイト/bitの復位値）で提供**——生16バイト列の合成は導出なのでせず、新品実測との突き合わせはch32rv側の測定と依頼書どおり照合する。**WRPRの粒度も抽出済み**（2026-09-02追記）: `option_byte_fields`の`wrpr_bit_protects`列——WRPR群の説明文から「1bitが保護する範囲」（V003=1扇区1KB・V00X/X035=2扇区1KB・V205=4扇区2KB・FV2x/V407=1扇区4KB・L103=2扇区2KB・M030/V103=4KB・H417=DBMODE条件つき8K/4K）。**発見した資料側齟齬は台帳へ**（M030 en版のOB base 0x1FFFF800コピペ、X315のWRPR粒度zh/en差等）。残り: 実測ダンプとの照合（ch32rv側の測定待ち） |
 
-### 2026-09-06 セル内下付き復元を converter へ（1.7.1）／凍結台帳のドリフト
+### 2026-09-06 セル内下付き復元を converter へ（1.7.1）／凍結台帳のドリフト解消
 
 - **converter 1.7.1**: 表セルの下付き復元を exporter から converter へ移した。詳細と
   踏んだ落とし穴（壊れた分割が下付きの境界という情報を持っていて、繋いだだけだと
@@ -201,18 +201,29 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
   検証: parity 68/68 clean・assets差分なし・凍結CSV 6/6 byte一致・
   `operating_conditions`/`option_bytes`/`debug_wiring` はいずれも byte 一致に復帰。
 
-- 🔶 **凍結台帳（`pipeline/baseline/tables.csv`）が27件ずれている**（今回の作業とは
-  無関係の既存ドリフト）。`evidence/operating_conditions.csv`（台帳1588／実物2796。
-  新経路へ切り替えた分）、`evidence/registers.csv`（4995／4932）、
-  `index/register_map.csv`（8753／8690）ほか。台帳は凍結時のスナップショットで、
-  **解凍は明示的な行為として台帳を書き直す**という約束（`pipeline/README`）だが、
-  その書き直しが行われないまま正本が動いている。しかも**台帳を読むコードが無い**——
-  `pipeline/baseline/tables.csv` を参照する`.py`は1本も無く、腐り検出器そのものが
-  腐っている。**やること**: (1) 27件それぞれが「意図した移行」か「気づかない変化」かを
-  1つずつ確かめて台帳を書き直す、(2) 台帳と実物を突き合わせる検査を`check_docs`か
-  CIに足す。今回は**自分が動かした3件だけ**（`flash_program_method`・`index/conflicts`・
-  `index/manifest`）を書き直し、残り27件は触っていない——中身を見ずに再凍結すると
-  検出器としての値が消えるため。
+- ✅ **凍結台帳（`pipeline/baseline/tables.csv`）のドリフト27件を解消**（2026-09-06）。
+  **原因は台帳を読むコードが1本も無かったこと。** 台帳は「解凍は明示的な行為として
+  台帳を書き直す」という約束（`pipeline/README`）のスナップショットだが、守り忘れても
+  何も落ちないので、09-01〜09-04の6 commitで**55表のうち27表**が黙ってずれていた
+  （最大の塊は`01dab2c`＝CH32X315系の資料更新13表、次が`9f7e12c`8表。どのcommitも
+  台帳を触っていない）。**腐り検出器そのものが腐っていた**。
+
+  **確かめ方はコミットメッセージではなく再現性**にした——27表それぞれについて現行の
+  生成器を`--out`でスクラッチに走らせ、正本と byte 比較。**27/27 が byte 一致**
+  （`build_clock`3表・`build_tables`8表・`build_pins`/`build_remap`/`build_registers`/
+  `build_dma_requests`/`build_memory_map`/`build_evt_examples`/`build_eval_boards`/
+  `build_link_firmware`/`build_sources`/frozen batch・新経路の`operating_conditions`・
+  `build_index`の8表）。つまり**正本はどれも正しく、台帳だけが5日古かった**。確定して
+  から`--record`で書き直した。
+
+  **根の対処**: `tools/check_baseline.py` を新設し、CI（`check.yml`）と
+  `regenerate.py`のchecks段に入れた。正本が動いたのに台帳が動いていなければ落ちる。
+  **カバレッジも見る**——凍結後に新設した5表（`option_bytes`・`option_byte_fields`・
+  `debug_wiring`・`device_ids`・`device_id_addresses`）は**台帳に載っておらず腐り検出が
+  掛かっていなかった**ので、再現性を確認（5/5 byte一致）して台帳に追加。台帳は
+  55表→**60表**、正本の全数と一致。確かめた後の書き直しは
+  `uv run tools/check_baseline.py --record` の1コマンド——直すのが面倒だと守られないので、
+  検査と一緒に用意した。
 
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 

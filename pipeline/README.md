@@ -417,9 +417,22 @@ ever times out, github.com's file view renders the same Markdown as a fallback.
 
 ## Baseline freeze
 
-`baseline/tables.csv` records rows and SHA-256 of every canonical CSV (catalog
-8, evidence 33, index 13, including the index manifest -- 54 files) at freeze
-time. After the freeze the 19 direct-PDF tools in `tools/` stop changing, new
+`baseline/tables.csv` records rows and SHA-256 of every canonical CSV
+(including the index manifest -- 54 files at freeze time, 60 today: the five
+tables born after the freeze were added on 2026-09-06 when the coverage hole was
+found). After the freeze the 19 direct-PDF tools in `tools/` stop changing, new
 tools never write to the frozen CSVs directly, and a CSV switches source only
 after the old-vs-new comparison passes the five acceptance criteria (survey
 item 7). Unfreezing is an explicit act that re-records the ledger.
+
+**`tools/check_baseline.py` enforces that**, and it exists because nothing did.
+No code read the ledger at all, so forgetting to re-record cost nothing: by
+2026-09-06 twenty-seven of the 55 tables then in it had drifted away from it -- the tables
+were right (every one of them reproduces byte-identically from its current
+generator, checked one by one) and the ledger was simply five days behind. A rot
+detector that nothing runs rots too. The check now runs in CI and in
+`regenerate.py`, and it fails when a canonical CSV moves without the ledger. When
+it fires, **confirm the change was intended before recording it** -- run the
+generator with `--out` into a scratch directory and compare byte-wise against the
+canonical file -- then `uv run tools/check_baseline.py --record` and put the
+ledger in the same commit.
