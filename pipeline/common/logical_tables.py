@@ -426,7 +426,10 @@ _RESET_VALUE = re.compile(r"0x[0-9A-Fa-f]+|[01xX]+b?|[0-9A-Fa-f]{2,}|-|—|–|N
 # Access列（`RW`/`RO`/`WO`/`RC_W0`…）も語彙が決まっている。説明列の行端が降りて`L<br>RO 10`・
 # `E10<br>RW N m T h`になっていた（V205RM.en p37・M030RM.en p113。全面見直しの指摘）。
 _ACCESS_HEADERS = ("access", "访问", "读写", "读/写", "属性", "类型", "type", "r/w")
-_ACCESS_VALUE = re.compile(r"(?i)r|w|rw|ro|wo|rc|rs|rw1|rc_w0|rc_w1|rc_w|rw0|w1c|w0c|w1s|r/w|rw/ro|ro/rw|rwo|-|—")
+# `w1`/`r0`/`r1`/`w0` はQingKeプロセッサマニュアルの書き方（`30 resumereq W1 …`）。
+# 語彙に無いと下の1〜2字規則が**黙って消す**ので、実測で出る綴りは入れておく。
+_ACCESS_VALUE = re.compile(r"(?i)r|w|rw|ro|wo|rc|rs|rw1|rc_w0|rc_w1|rc_w|rw0|w1c|w0c|w1s"
+                           r"|r/w|rw/ro|ro/rw|rwo|w1|r0|r1|w0|-|—")
 
 
 def clean_reset_column(table: dict) -> int:
@@ -468,9 +471,16 @@ def clean_reset_column(table: dict) -> int:
             continue
         tokens = text.split()
         if len(tokens) == 1 and len(text) <= 2 and not pattern.fullmatch(text):
-            # 値の形をしていない1〜2字の単独トークン（`t`・`y`・`e`＝説明列の行末の英字）
-            cell["text"] = ""
-            fixed += 1
+            # 値の形をしていない1〜2字の単独トークン（`t`・`y`・`e`＝説明列の行末の英字）。
+            # **落とすのは小文字のLatinだけ。** 白名簿（`_ACCESS_VALUE`）に無いものを
+            # 一律に消すと、**語彙の漏れがそのまま黙った削除になる**——QingKeの`W1`/`R0`が
+            # それで消え、`访问`列が空の行が全corpus 509セル・30文書あった（2026-09-06の
+            # 検証ラウンドが検出）。落としたい残骸は説明列の行末に立つ語の一部なので
+            # 小文字で、access/reset値は大文字か数字（`RW`・`W1`・`R0`・`0`・`1x`）。
+            # これで失敗の向きが「消しすぎ」から「残しすぎ」に変わる。
+            if text.isascii() and text.islower():
+                cell["text"] = ""
+                fixed += 1
             continue
         if len(tokens) < 2:
             continue

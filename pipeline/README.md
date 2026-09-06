@@ -445,6 +445,28 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    three cell passes stay in the exporter as well: they also apply to
    page-spanning merged tables, a unit the converter cannot see.
 
+10. **Two-column pages keep their reading order** (converter 1.9.1). Item 5
+    re-extracts an overview/features page left-column-then-right-column, but
+    `reading_order` was then sorted by `(top, x0)`, which **undid the split** --
+    the Features list of every datasheet's first page came out with left and
+    right bullets alternating (`- 2 output channels each, optional ADC pins`
+    landed before `- Core`). The order key now adds the page height to items
+    that sit below `y_start` and right of the split, so the column wins over
+    the row while the order inside a column is unchanged. Splitting also leaves
+    the boundary glyph duplicated at the head of the right-hand line
+    (`m - Analog input range`, `r ● GPIO port`) -- present on **all 16** pages
+    that get a boundary -- dropped under the same conditions as the cell-level
+    `strip_boundary_dupes`.
+
+    The same version makes `clean_reset_column` safe. It used to blank any
+    one-or-two-character token an access/reset column's vocabulary did not
+    recognise, so **a gap in the whitelist silently deleted data**: QingKe's
+    `W1` / `R0` access attributes vanished, leaving 509 empty access cells
+    across 30 documents. It now blanks only lowercase ASCII -- the debris it
+    targets is a line-end fragment of a word from the description column, hence
+    lowercase, while access and reset values are uppercase or digits. The
+    failure mode is now "left some debris" instead of "deleted a value".
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
