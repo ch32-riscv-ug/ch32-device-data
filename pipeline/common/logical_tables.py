@@ -1077,9 +1077,12 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
 _RECOVER_TOKEN = re.compile(r"[A-Za-z0-9_\[\]:.]{2,}")
 
 
-def split_line_merges(page: dict) -> tuple[dict[str, str], set[str]]:
+def split_line_merges(page: dict) -> dict[str, tuple[str, str]]:
     """**同じ視覚行が x のある位置で二つに割れ、境目の1文字が両側に入った**行の対を見つけ、
-    `{左のline_id: 右の続き（先頭の重複文字を除く）}` と、本文から消す右のidを返す。
+    `{左のline_id: (右のline_id, 右の続き（先頭の重複文字を除く））}` を返す。
+
+    **呼ぶのはconverterだけ**（1.9.0）。それまではexporterとparityが各々これを呼んで
+    描画時に繋いでおり、bundleの行は割れたままだった。
 
     zh版datasheetの本文は全行が x≈241 で `…対外`/`外多组…` のように割れ、1ページに25行も
     「途中で改行して1文字が二重」に見えていた（V002DS0.zh・V006DS0.zh・M030DS2.zh p6。
@@ -1121,9 +1124,9 @@ def split_line_merges(page: dict) -> tuple[dict[str, str], set[str]]:
     for a, b in pairs:
         x = a["bbox"][2]
         if sum(1 for a2, _ in pairs if abs(a2["bbox"][2] - x) <= 2.0) >= 3:
-            merge[a["id"]] = b["text"].lstrip()[1:]
+            merge[a["id"]] = (b["id"], b["text"].lstrip()[1:])
             skip.add(b["id"])
-    return merge, skip
+    return merge
 
 
 def _has_cjk(text: str) -> bool:

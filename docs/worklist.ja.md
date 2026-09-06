@@ -225,7 +225,7 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
   `uv run tools/check_baseline.py --record` の1コマンド——直すのが面倒だと守られないので、
   検査と一緒に用意した。
 
-### 2026-09-06 「HTMLに近い層で見た目だけ整えていないか」の全面確認（converter 1.8.0）
+### 2026-09-06 「HTMLに近い層で見た目だけ整えていないか」の全面確認（converter 1.8.0 / 1.9.0）
 
 exporterが掛けている文字の修復を全部数え、**bundleの実物が壊れたままのもの**を洗い出した
 （内訳と判断は [markdown-qa-log](markdown-qa-log.ja.md) の該当節、実装は `pipeline/README` 8.）。
@@ -239,11 +239,20 @@ exporterが掛けている文字の修復を全部数え、**bundleの実物が�
 - **検証**: 凍結tool **23出力すべて byte 一致**（batch 6・tables 8・pins 2・remap 2・
   dma 1・registers 4）、新経路CSV 4本 byte 一致、`operating_conditions` 2,796行 byte 一致、
   Markdown parity 68/68 clean、assets 差分なし、`check_baseline` 60表一致。
-- **残した4つ**（`strip_straddling_dupes` 4,457 / `strip_boundary_dupes` 2,337 /
-  `clean_reset_column` 2,200 / `split_line_merges` 294）は**グリフを消す/行を組み替える
-  判断**を含み、`option_bytes`・`debug_wiring`・`operating_conditions`が読むセルに直接
-  効く。1.7.0で「繋いだだけで1,207行が消えた」のと同じ形の事故を起こしうるので、
-  **依存している消費者が居ないかを1つずつ測ってから**にする（再挑戦の条件はQAログに）。
+- **残っていた4つも1.9.0で根へ**（`strip_straddling_dupes` 4,457 /
+  `strip_boundary_dupes` 2,337 / `clean_reset_column` 2,200 /
+  `split_line_merges` 294＝9,288箇所）。再挑戦の条件どおり、まず**ページ単位で成立
+  するか**を確かめた——4つとも1ページで完結し、`clean_reset_column`だけは
+  ヘッダ行が要るので継続断片では何もしない（安全側）。**順序**も効く: 境界の二重取り
+  落としは下付き復元の後（先に落とすとグリフ読み順の照合が外れて復元が黙って死ぬ）。
+  `split_line_merges`は**行を消さず**、左に繋いで右に`merged_into`を付ける
+  （`reading_order`とidの対応、および「版面が二つに割っていた事実」を保つ）。
+  exporterとparityから`split_line_merges`呼び出しを削除、セル系3つは
+  ページ跨ぎ結合表用に残す。**検証**: 凍結tool 23出力すべて byte 一致・
+  新経路CSV 4本 byte 一致・parity 68/68 clean・assets 差分なし・検査5本通過。
+
+  総括すると、exporterに残る文字の修復は**0**になった（残っているのは
+  `escape_body`・`cell_html`・見出し降格・`<br>`の畳み方など**描画の判断**だけ）。
 
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 

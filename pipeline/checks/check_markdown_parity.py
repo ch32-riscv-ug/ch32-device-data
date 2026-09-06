@@ -73,7 +73,6 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     fragment_ids = logical_tables.fragment_tables(page)
     # exporterが繋ぐ「境界で割れた視覚行」——右半分は先頭の重複文字を除いた残りが、左半分の
     # 直後に出る。順序照合なので右半分の全文（重複文字込み）を探すと1文字ぶん前で外れる。
-    split_merge, split_skip = logical_tables.split_line_merges(page)
     vocab = export_markdown.page_vocabulary(page)
     doc_vocab = doc_vocab if doc_vocab is not None else {}
     tables = {item["id"]: item for item in page["tables"]}
@@ -190,11 +189,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             if line.get("role") == "list-item":
                 # exporterと同じく行頭bulletを落とす（`- `の二重を消す）。
                 body = export_markdown.strip_leading_bullet(body)
-            if item["id"] in split_skip:
-                continue   # 割れた視覚行の右半分は左半分へ繋いだ（exporterと同じ）
-            if item["id"] in split_merge:
-                # 左半分の直後に右半分（先頭の重複文字を除く）が続く1行として出ている。
-                body = body.rstrip() + split_merge[item["id"]]
+            if line.get("merged_into"):
+                continue   # 割れた視覚行の右半分（converterが左半分へ繋いである）
             expect(export_markdown.escape_body(body), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):
