@@ -102,7 +102,11 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 - [x] ✅ **D15 生成器が安全に試せること** — `check_tables.out_option`（2026-08-29）。`evidence/README` は「出力先は各ツールが `tools/paths.py` で決めます（`--out <dir>` は試験用の上書き）」と**全 tool について**書いていたが、`build_operating.py` と `build_evt_examples.py` は **argparse 自体を持たず**、`--out` を渡しても黙って無視して `evidence/` に書いていた。**文書のほうが正しく、tool が追いついていなかった**——そして「安全に試す方法が無い」ことに気付かないまま長時間の実験を回して、`evidence/operating_conditions.csv` を1度潰した（コミット済みの中身から復元・byte 一致を確認）。両方に `--out` を足し、**どちらもフル実行してコミット済みと byte 一致する**ことを確かめたうえで、`paths.write`／`paths.table`・`paths.index` の戻りを書き出し先として持つ生成器に `--out` があることを `ast` で毎回見るようにした（読むだけの `build_system_figures` は対象外）。**入れる前に、外して落ちることを確認**
 - [x] ✅ **D14 viewer の検査** — `tools/check_viewer.js`新設（2026-08-29）。**表には `check_tables`、文書には `check_docs` があるのに、表示だけが検査の外だった。** その結果 G1（series view の Defaults が先頭型番だけを見る）は、CH32V006 の series view で SWCLK と UART が全部 `-` になるという目に見える誤りのまま残っていた。`pins.html` の `<script>` を **DOM 無しで評価して関数を取り出し**、正本の CSV を食わせて出力を見る（ブラウザも DOM 実装も要らず、CI の node で動く）。固定するのは**壊れたら分かる少数の事実**で見た目ではない——(1) Defaults が series の全型番の和になっていること、(2) 列順が `COLUMN_ORDER` どおりで TIM が既定1列、(3) 正規化名（`SWDIO`）での検索が資料の綴り（`SWIO`）に当たること、(4) 型番に無い instance が薄表示され**持っている instance は薄くならない**こと、(5) `?chip=` 未指定で選択画面になること、(6) 比較表の見出しから資料の崩れが消えていること。**入れる前に、壊して落ちることを確認**（G1 を戻すと3件落ちる）
 - [x] ✅ **D13 文書の主張の検査** — `tools/check_docs.py`新設（2026-08-29）。**データが正しくても説明が古ければ、利用者が読むのは古いほう。** 監査が実例を3件挙げた——F-11 が解決して CSV も直っているのに**7つの文書と `build_link_firmware.py` の説明**がまだ古い状態を説明していて（`README.ja.md`・`evidence/README` 両言語・`docs/README.ja.md`・`table-reliability`・`worklist-archive`・`link-firmware-survey`）、`table-reliability` の pinout 行数は5行、clock 5表の合計は1行ずれていた。見るのは3つ: (1) `table-reliability` の「行数」列を表から数え直す、(2) README 両言語の family・series・型番・表の数、(3) **worklist の F 台帳で ✅ の穴を、別の文書が「未解決」と書いていないか**（節単位で見る。1行に複数の穴が並ぶので行全体を窓にすると隣の状態を拾う）。**文書側に印は足さない**——印は書き忘れるので検査にならない。どの綴りがどの数かは tool が持ち、**綴りが変わって当たらなくなったこと自体を失敗**として言う。CI に入れ、`docs/**` と `README*.md` の変更でも走るようにした
-- [x] ✅ **D4 同期日時の表示** — 各READMEの冒頭に`sources.csv`のmirror commit（リンク）と日付を出す（`synced_line`。2026-08-26）。生成時刻は出さない（冪等性）
+- [x] ✅ **D4 同期日時の表示** — **2026-09-06に撤去**（ユーザー指摘）。各READMEの冒頭に
+  `sources.csv`のmirror commit（リンク）と日付を出していた（`synced_line`。2026-08-26導入）が、
+  **生成物が変わらないのにこの行だけ更新され、差分がそれだけのcommitが増えていた**。mirrorは
+  翌日には最新に揃っており、いつの原典から作ったかはgitの履歴と`catalog/sources.csv`で辿れる
+  ので、行自体を無くした（12 READMEから2行ずつ削除。他の内容に差分なし）
 
 
 ### D7 生成のGitHub Actions化（計画のみ・2026-08-23）

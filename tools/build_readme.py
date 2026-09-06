@@ -818,22 +818,6 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
     return out
 
 
-def synced_line(data: Data, family: str) -> list[str]:
-    """いつの原典から作ったか（worklist の D4）。U5（原典に届かない人）が最初に見る。
-
-    `catalog/sources.csv` が持つ mirror の commit と日付を出す。生成時刻は出さない
-    （冪等性——入力が同じなら出力も同じ、を保つため。sources.csv も同じ方針）。
-    """
-    row = next((r for r in data.sources if r["family"] == family), None)
-    if not row or not row.get("commit"):
-        return []
-    date = row["committed_at"][:10]
-    short = row["commit"][:7]
-    return [f"*Generated from the mirror at commit "
-            f"[`{short}`](https://github.com/{row['repository']}/tree/{row['commit']}) "
-            f"({date}). Newer PDFs may exist upstream; see Documents below.*", ""]
-
-
 # 冒頭のジャンプ行に出す節。(見出し文, 出す名前)。**その README に実際に
 # ある見出しだけ**を出すので、Errata の無い family には Errata が出ない。
 NAV = (("Product comparison", "Choose a part"),
@@ -871,7 +855,9 @@ def render(data: Data, family: str) -> str:
     # Series・Debug defaults・Documents が先に来ていた。最初に触る人が要るのは
     # 「どう書き込むか」と「どの型番か」で、資料の一覧はその後（worklist の B4）。
     lines = [f"# {family}", "", NOTICE, ""]
-    lines += synced_line(data, family)
+    # mirrorのcommitと日付は**出さない**——生成物が変わらないのにこの行だけ更新され、
+    # 差分がそれだけのcommitが増えていた（ユーザー指摘、2026-09-06）。mirrorは翌日には
+    # 最新に揃っており、いつの原典から作ったかはgitの履歴と`catalog/sources.csv`で辿れる。
     body: list[str] = []
     lines, out = body, lines  # 以降は body に積み、最後に nav を挟んで戻す
     lines += quick_start_section(data, family)
