@@ -266,6 +266,21 @@ exporterが掛けている文字の修復を全部数え、**bundleの実物が�
 **検証**: 凍結tool 23出力・非PDF 12出力・新経路CSV 4本すべて byte 一致、parity 68/68 clean、
 検査5本通過。**残り48文書**（未走査11＋走査済み未検証37）は1窓8文書で継続。
 
+### 2026-09-07 検証ラウンド2窓目（16文書）／converter 1.9.2
+
+未走査11文書＋RM 5本・141ページ。**指摘62件**（high 8・medium 24・low 25・原本側5）。
+**根で直した2件**——(a) 括弧付きの指数`2^(G+2)`が`2(G+2)`に潰れて**掛け算に読めていた**
+（QingKe V3/V4/V5のzh/en 6箇所。ゲートが3段階とも括弧を通していなかった）、
+(b) `clean_reset_column`が`…`（行が続く印）を残骸として消していた（1窓目の`W1`/`R0`と
+同じ規則の別の穴）。**復元不能と判明**: WCH-Link 表四/表五の✓/✗は文字層に存在しない
+（図形描画）。**検証**: 凍結tool 23出力・非PDF 12出力・新経路CSV 4本 byte 一致、
+parity 68/68 clean、検査5本通過。
+
+**最大の残存 family が確定**: pdfplumberのセル格子（2窓で7件・high 6）。
+「glyphは在るのにセルに入っていない／別のセルに入っている」で、`R32_USART3_GPR`の名称や
+位（bit）列が消え、`CH32V003RM.zh` p7では**フィールドが誤ったbit位置**に出る。
+詳細と再挑戦の条件は [markdown-qa-log](markdown-qa-log.ja.md)。**残り32文書**。
+
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
 **結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。

@@ -463,7 +463,8 @@ def clean_reset_column(table: dict) -> int:
         if cell["row_start"] == 0 or pattern is None:
             continue
         text = (cell.get("text") or "").strip()
-        if (pattern is _RESET_VALUE and text and text not in ("无", "无效", "-", "—", "–")
+        if (pattern is _RESET_VALUE and text
+                and text not in ("无", "无效", "-", "—", "–", "…", "...", "．．．")
                 and not any(ch.isascii() and ch.isalnum() for ch in text)):
             # 英数字を1つも含まないreset値（`该只模E）`の`）`・`不当切`）は説明列の行端が降りたもの。
             cell["text"] = ""
@@ -510,16 +511,32 @@ def clean_reset_column(table: dict) -> int:
     return fixed
 
 
+# 括弧付きの指数（`(G+2)`・`（N-1）`）。**中に英字か演算子がある**ものだけ——数字だけの
+# `(1)`/`（2）`は脚注番号なので指数にしない。
+_PAREN_EXPONENT = re.compile(r"[（(](?=[^）)]*(?:[A-Za-z]|[+\-*/×]))[A-Za-z0-9+\-*/×^ ]+[）)]")
 _LONE_LETTER = re.compile(r"(?<![A-Za-z0-9_])[A-Za-z](?=[ \n]|$)")
 # 上付きが潰れた冪（`232`＝2^32・`220`＝2^20）の疑い。geometryで上付きと確かめてから直す。
 _POWER_OF_TWO = re.compile(r"(?<![0-9.])2(?:16|20|24|32|64)(?![0-9])")
 
 
+# 潰れた**括弧付き指数**（`2(G+2)`＝`2^(G+2)`）。数字の直後に括弧が地続きで、中に英字か
+# 演算子がある形。脚注の`2(1)`と分けるのは中身（数字だけなら脚注）。geometryを開く前の
+# 前判定に要る——`_LONE_LETTER`も`_POWER_OF_TWO`も当たらず、QingKe V3/V4/V5の
+# NAPOT行6箇所が判定に入っていなかった（2026-09-07の検証ラウンドが検出）。
+_FLAT_PAREN_EXPONENT = re.compile(
+    r"(?<![A-Za-z0-9])\d[（(](?=[^）)]{0,12}(?:[A-Za-z]|[+\-*/×]))[^）)]{1,12}[）)]")
+
+
 def has_subscript_shape(table: dict) -> bool:
-    """下付きが基底から離れた疑いのあるセル（`V *2-1.5DD5`・`f = 2.4MHz S`・`V ,V\nS0 S1`）が
-    あるか——基底が**1文字だけで空白/改行/末尾の前に立つ**。geometryを開く前の安価な前判定。"""
-    return any(_LONE_LETTER.search(c.get("text") or "") or _POWER_OF_TWO.search(c.get("text") or "")
-               for c in table["cells"])
+    """下付き/上付きが基底から離れた疑いのあるセル（`V *2-1.5DD5`・`f = 2.4MHz S`・
+    `V ,V\nS0 S1`・`2(G+2)`）があるか——基底が**1文字だけで空白/改行/末尾の前に立つ**か、
+    潰れた冪、または数字に地続きの括弧付き式。geometryを開く前の安価な前判定。"""
+    for c in table["cells"]:
+        text = c.get("text") or ""
+        if (_LONE_LETTER.search(text) or _POWER_OF_TWO.search(text)
+                or _FLAT_PAREN_EXPONENT.search(text)):
+            return True
+    return False
 
 
 def reattach_cell_subscripts(table: dict, chars) -> int:
@@ -543,7 +560,8 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
     for cell in table["cells"]:
         text = cell.get("text") or ""
         box = cell.get("bbox") or cell.get("src_bbox")
-        if not box or not (_LONE_LETTER.search(text) or _POWER_OF_TWO.search(text)):
+        if not box or not (_LONE_LETTER.search(text) or _POWER_OF_TWO.search(text)
+                           or _FLAT_PAREN_EXPONENT.search(text)):
             continue
         page_chars = chars(cell.get("page")) if callable(chars) else chars
         glyphs = [g for g in page_chars if (g.get("text") or "").strip()
@@ -558,7 +576,9 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
         normal = [g for g in glyphs if g["size"] > 0.8 * dominant]
         if not small or not normal:
             continue
-        if not _LONE_LETTER.search(text) and not any(ch.isdigit() for g in small for ch in g["text"]):
+        if (not _LONE_LETTER.search(text)
+                and not _FLAT_PAREN_EXPONENT.search(text)
+                and not any(ch.isdigit() for g in small for ch in g["text"])):
             continue
         # 読み順（視覚行→x）。基底の並びはtextの空白以外の並びと一致するはず。
         def order(gs):
@@ -628,6 +648,12 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
                 standalone = index0 == 0 or not normal[index0 - 1]["text"].isalnum()
                 if sub.isalnum() and token.isalnum() and (token.isdigit() or standalone):
                     sub = "^" + sub
+                elif token.isdigit() and _PAREN_EXPONENT.fullmatch(sub):
+                    # 括弧の中に**式**が入った指数（`2^(G+2)`＝NAPOTの領域幅）。潰すと
+                    # 掛け算に読めて値が変わる（QingKe V3/V4/V5 の zh/en 6箇所。
+                    # 2026-09-07の検証ラウンドが検出）。脚注の`(1)`/`（2）`と分けるのは
+                    # **中身**——数字だけなら脚注、英字か演算子を含むなら指数。
+                    sub = "^" + sub
             i, base = min(bases, key=lambda ig: x0 - ig[1]["bbox"][2])
             nxt = normal[i + 1] if i + 1 < len(normal) else None
             # 基底と次の文字の隙間が**下付きの幅でほぼ説明できる**なら印字上の空白は無い
@@ -682,8 +708,10 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
         # **挿した位置がグリフの読み順と一致すること**だけを条件にする。文字集合の一致で
         # 妥協すると、長い説明セルで基底の索引がずれても通ってしまい、`每2^20个…121ppm`が
         # `每2个…121pp^20m`になった（CH32xRM.zh p32。全面見直しの指摘。私が入れた回帰）。
-        # `^`の直後は必ず英数字（`ARM○^`のような裸の`^`を作らない）。
-        if re.search(r"\^(?![A-Za-z0-9])", out):
+        # `^`の直後は必ず英数字か**開き括弧**（`ARM○^`のような裸の`^`を作らない）。括弧を
+        # 許すのは`2^(G+2)`のような式の指数のため——ここで弾いていたので、NAPOTの領域幅が
+        # `2(G+2)`のまま出ていた（QingKe V3/V4/V5のzh/en 6箇所。2026-09-07の検証ラウンド）。
+        if re.search(r"\^(?![A-Za-z0-9（(])", out):
             continue
         if out != text and flat_out == "".join(g["text"] for g in order(glyphs)):
             cell["text"] = out

@@ -74,7 +74,12 @@ SCHEMA_VERSION = "0.2"
 # (b) 列境界に載ったグリフが右列の行頭に二重取りされる（2カラム16ページ全部で発生）。
 # (c) `clean_reset_column`が語彙に無い1〜2字を無条件に消していて、QingKeの`W1`/`R0`が
 #     消滅（access列の空セル509個・30文書）。小文字のLatinだけ落とすように変えた。
-CONVERTER_VERSION = "1.9.1"
+# 1.9.2: 2026-09-07の検証ラウンド2窓目（16文書・141ページ）が出した2件を根で直した。
+# (a) 括弧付きの指数`2^(G+2)`（NAPOTの領域幅）が`2(G+2)`に潰れて**掛け算に読めていた**。
+#     前判定・セル単位ゲート・`^`の直後の歯止めの3箇所が括弧を通していなかった。
+# (b) `clean_reset_column`が「英数字を含まない値は説明列の残骸」として`…`を消していた。
+#     `…`は「行が続く」印であって残骸ではない。
+CONVERTER_VERSION = "1.9.2"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"

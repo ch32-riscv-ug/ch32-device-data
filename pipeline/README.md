@@ -467,6 +467,24 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     lowercase, while access and reset values are uppercase or digits. The
     failure mode is now "left some debris" instead of "deleted a value".
 
+11. **A parenthesised exponent stays an exponent** (converter 1.9.2).
+    `2^(G+2)` -- the NAPOT region width in the PMP tables of the QingKe V3/V4/V5
+    manuals -- was flattening to `2(G+2)`, which reads as a multiplication, in
+    six places across the Chinese and English editions. Three separate gates all
+    refused a parenthesised superscript: the cheap pre-check
+    `has_subscript_shape`, the per-cell gate inside
+    `reattach_cell_subscripts`, and the final guard that a `^` must be followed
+    by an alphanumeric. A footnote marker is told apart from an exponent by what
+    is **inside** the parentheses -- digits only is a footnote, a letter or an
+    operator is an exponent -- and the `^` is only written when the base is a
+    digit, so a parenthesised *subscript* such as `C_in（HSE）` is untouched.
+
+    `clean_reset_column` also stopped deleting `…`. Its rule "a value with no
+    ASCII alphanumeric is debris from the description column" was swallowing the
+    ellipsis that marks "the rows continue" (ten cells on one QingKe page
+    alone). This is the same rule whose whitelist gap deleted `W1`/`R0` in
+    1.9.1 -- both the allow-list and the negative condition can miss.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
