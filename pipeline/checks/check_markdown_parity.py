@@ -175,8 +175,9 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                     # 折り返した表題の続き行（`+ RISC-V3F)`）は本文から消えるが、`<caption>`の
                     # 中に全文として出ていなければならない。順序は問わず**存在だけ**見る——
                     # skipにしただけでは「表題も1行目・本文からも消えた」を検出できなかった
-                    # （H417DS0.en p99、ページ跨ぎ結合表で_caption_fullが落ちていた）。
-                    body = html.escape(export_markdown.pua_normalize(lines[item["id"]]["text"]).strip())
+                    # （H417DS0.en p99、ページ跨ぎ結合表で全文が落ちていた）。converter 1.8.0で
+                    # 全文は`caption.text`そのものになったが、検査はそのまま残す。
+                    body = html.escape(lines[item["id"]]["text"].strip())
                     if body and text.find(body) < 0:
                         bad.append(f"p{page['number']} caption continuation {item['id']}: "
                                    f"missing from <caption>: {body[:60]!r}")
@@ -184,8 +185,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             line = lines[item["id"]]
             if line["bbox"][3] - line["bbox"][1] < 0.5:
                 continue   # 高さ0の退化行（重複見出しのghost）——exporterと同じくskip。
-            body = export_markdown.pua_normalize(line["text"])
-            body = export_markdown.reattach_line_subscripts(body, line, chars_for)
+            # 文字の正規化と下付き復元はconverterが済ませている（1.8.0）。
+            body = line["text"]
             if line.get("role") == "list-item":
                 # exporterと同じく行頭bulletを落とす（`- `の二重を消す）。
                 body = export_markdown.strip_leading_bullet(body)
@@ -193,7 +194,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 continue   # 割れた視覚行の右半分は左半分へ繋いだ（exporterと同じ）
             if item["id"] in split_merge:
                 # 左半分の直後に右半分（先頭の重複文字を除く）が続く1行として出ている。
-                body = body.rstrip() + export_markdown.pua_normalize(split_merge[item["id"]])
+                body = body.rstrip() + split_merge[item["id"]]
             expect(export_markdown.escape_body(body), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):

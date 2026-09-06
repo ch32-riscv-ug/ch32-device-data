@@ -374,6 +374,46 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    (`Table.extract()` in pdfcompat returns `extracted_rows`, and `crop()` is
    not implemented -- no frozen tool can see `cells[].text`).
 
+8. **Broken characters are decoded, not painted over** (converter 1.8.0).
+   Three repairs that only the exporter used to do now happen here, because
+   they are not about appearance -- the text itself is wrong, and everything
+   that reads a bundle was getting it wrong.
+
+   - **Private-use code points** (9,291 across 65 documents, in `lines`,
+     `words`, `page["text"]`, `cells` and `chars`). A PDF writes a symbol
+     font's glyph into the text layer as its private-use code point:
+     `\uf06c` is Wingdings 0x6C, a bullet. Measured code point x font:
+     0xf06c = Wingdings 9,233 / NSimSun 1 / SimHei 1; 0xf0b7 = SymbolMT 24 /
+     SimHei 5; 0xf0b4 = SymbolMT 18; 0xf06e = Wingdings 8; 0xf0b1 = SymbolMT 1.
+     The seven in CJK fonts sit in the same bullet context, so the map is not
+     keyed on font. **Nothing is lost**: which glyph it was stays in the
+     geometry's `font`. `page["text"]` is fixed too -- a broken character is
+     not a compatibility surface.
+   - **Overstruck doubling** (143: `OOSSCC__IINN` -> `OSC_IN`). Text layer
+     only; `chars` keeps both glyphs, so the fact that it was overstruck
+     survives.
+   - **Subscripts and superscripts still loose inside a line** (805 lines).
+     `merge_subscript_lines` (1.6.0) folds a subscript that became its own
+     visual line; this folds the ones that stayed on the line. It matters
+     because a flattened exponent **changes the value**: `2^20` read as `220`,
+     `x^32+x^26` as `x32+x26`. Same function as the cell case, same stop
+     condition (the result must equal the glyphs in reading order).
+     `page["text"]` is left alone here (it is built by `extract_text()` with no
+     line structure), as with `merge_subscript_lines`.
+
+   **Table captions are stored whole** in the same version. The bundle used to
+   keep only the first line of a wrapped caption, and *both* the exporter and
+   `extract_low_power` called `caption_full` to rebuild it -- the same repair
+   applied twice at two surfaces. Now `caption.text` is the full text and
+   `caption.continuation_line_ids` lists the lines it swallowed, so a reader
+   that must drop them from the body just reads that. Checked before moving:
+   across every datasheet, whether the low-power caption pattern matches is
+   the same for the first line and the full text (**zero tables change
+   selection**). It also deletes a bug class -- the exporter had to copy its
+   private full-caption key onto page-spanning merged tables, and forgetting
+   made the continuation vanish from both body and caption with parity unable
+   to see it.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

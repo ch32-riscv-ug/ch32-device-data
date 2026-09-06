@@ -60,7 +60,12 @@ SCHEMA_VERSION = "0.2"
 # 1.7.1: 直す前の綴りを`cells[].text_split`に残す。1.7.0では繋いだ形しか残らず、
 # **下付きの境界という情報**が消えて`operating_conditions`の`I_DD`系1,207行が落ちた
 # （`build_operating.norm_symbol`が`I\nDD`の改行を`_`にして正規化記号を作るため）。
-CONVERTER_VERSION = "1.7.1"
+# 1.8.0: 文字層の正規化（私用領域コードポイント9,291個・重ね描き143件）と、行の中の
+# 下付き/上付き復元（805行。`2^20`が`220`に潰れて**値が違って**いた）、表題の全文化
+# （27件。exporterとextract_low_powerが同じ修復を各々掛けていた）を**exporterから
+# converterへ**移した。それまで直っていたのはMarkdownだけで、bundleを読む抽出器には
+# 壊れた字が渡っていた。
+CONVERTER_VERSION = "1.8.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -460,13 +465,13 @@ def text_items(page, kind: str, boundary=None) -> list[dict]:
     for index, item in enumerate(source or [], 1):
         entry = {
             "id": f"p{page.page_number}-{kind}-{index:05d}",
-            "text": item["text"],
+            "text": normalize_text(item["text"]),
             "bbox": rounded_box((item["x0"], item["top"], item["x1"], item["bottom"])),
         }
         if kind == "line":
             fixed = rotated_line_text(item.get("chars") or [])
             if fixed is not None:
-                entry["text"] = fixed
+                entry["text"] = normalize_text(fixed)
                 entry["_rotated"] = True   # 内部flag。書き出す前に落とす
         out.append(entry)
     return out
@@ -477,7 +482,8 @@ def chars(page) -> list[dict]:
     for index, item in enumerate(page.chars, 1):
         out.append({
             "id": f"p{page.page_number}-char-{index:06d}",
-            "text": item.get("text", ""),
+            # 私用領域だけ直す。重ね描きの畳み込みはしない——glyphは2つ実在する。
+            "text": normalize_text(item.get("text", ""), undouble=False),
             "bbox": rounded_box((item["x0"], item["top"], item["x1"], item["bottom"])),
             "font": str(item.get("fontname") or ""),
             "size": round(float(item.get("size") or 0), 3),
@@ -571,10 +577,84 @@ def overlap_issues(cells: list[dict]) -> list[str]:
     return overlaps
 
 
+# PDFが記号フォント（Wingdings/Symbol）のグリフを**私用領域のコードポイント**として
+# 文字層に書いているもの。そのまま出すと読めないだけでなく、**文字として壊れている**
+# ので、bundleを読む抽出器にも壊れた字が渡る（全corpus 9,291個・65文書。lines/words/
+# page.text/cells/charsの全部に入っていた）。実測したコードポイントとフォントの対応:
+# 0xf06c=Wingdings-Regular 9,233・NSimSun 1・SimHei 1、0xf0b7=SymbolMT 24・SimHei 5、
+# 0xf0b4=SymbolMT 18、0xf06e=Wingdings-Regular 8、0xf0b1=SymbolMT 1。CJKフォントの
+# 7件も文脈は同じ（箇条書き記号）なのでフォントで分けない。元のグリフが何だったかは
+# geometryの`font`が持ち続けるので、この置換で情報は失われない。
+PUA_REPLACEMENTS = {
+    "\uf06c": "●",   # Wingdings 0x6C: 箇条書きの■/●
+    "\uf06e": "■",   # Wingdings 0x6E
+    "\uf0b7": "•",   # Symbol 0xB7
+    "\uf0b4": "×",   # Symbol 0xB4
+    "\uf0b1": "±",   # Symbol 0xB1
+}
+
+
+def _undouble(part: str) -> str:
+    """全グリフが2回ずつ拾われた行（`OOSSCC__IINN`→`OSC_IN`、`CCPPOOLL==00`→`CPOL=0`）を
+    畳む。PDFが太字風に同じ文字を重ね描きし、pdfplumberが両方を拾ったもの（全corpus143件）。
+    条件: 空白なし・6文字以上・偶数長・全ての隣接ペアが同じ・**hex桁以外の文字を含む**
+    （`0000FF`のような正当な16進値は偶然ペアになるので除外）。
+
+    畳むのは**文字層だけ**——geometryの`chars`には2つのグリフが実在するので触らない
+    （重ね描きだったという事実はそこに残る）。"""
+    body = part.strip()
+    if (len(body) < 6 or len(body) % 2 or " " in body
+            or any(body[i] != body[i + 1] for i in range(0, len(body), 2))
+            or len(set(body)) < 2
+            or all(ch in "0123456789abcdefABCDEF" for ch in body)):
+        return part
+    return part.replace(body, body[::2])
+
+
+def normalize_text(text: str, undouble: bool = True) -> str:
+    """文字層の正規化: 私用領域コードポイントの置換と、重ね描きの畳み込み。
+
+    **exporterではなくここで行う**——見た目を整えるためではなく、文字が壊れているから
+    （1.8.0でexporterから移した。それまではMarkdownだけが直り、bundleのlines/cells/
+    page.textには私用領域の字が残っていた）。"""
+    for pua, real in PUA_REPLACEMENTS.items():
+        if pua in text:
+            text = text.replace(pua, real)
+    if not undouble:
+        return text
+    if "\n" in text:
+        return "\n".join(_undouble(part) for part in text.split("\n"))
+    return _undouble(text)
+
+
+def fix_line_subscripts(page_chars: list[dict], lines: list[dict]) -> int:
+    """本文行でも、基底から離れた下付き/上付きをgeometryで戻す（1.8.0）。
+
+    `merge_subscript_lines`（1.6.0）は**別の視覚行として拾われた小行**を本文行へ差し込む
+    が、同じ行の中で基底から離れたものは残る——`每 2^20 个`が`每220个`に、CRCの
+    `x^32+x^26+…`が`x32+x26+…`に潰れていた（全corpus805行・61文書）。**指数が桁に化ける
+    ので値が違う**: bundleの行を読む抽出器には`220`が渡る。表セルと同じ
+    `logical_tables.reattach_cell_subscripts`に1セルの表として渡すだけで、歯止め
+    （グリフ読み順との完全一致）も共通。`page["text"]`は`extract_text()`が別に作るので
+    そちらは触らない（凍結toolのbyte一致を保つ。`merge_subscript_lines`と同じ扱い）。"""
+    fixed = 0
+    for line in lines:
+        raw = line.get("text") or ""
+        if not raw.strip() or not logical_tables.has_subscript_shape({"cells": [{"text": raw}]}):
+            continue
+        pseudo = {"cells": [{"text": raw, "bbox": line["bbox"], "row_start": 1, "row_end": 2,
+                             "column_start": 0, "column_end": 1}]}
+        if logical_tables.reattach_cell_subscripts(pseudo, page_chars):
+            line["text"] = pseudo["cells"][0]["text"]
+            fixed += 1
+    return fixed
+
+
 def cell_text(page, bbox) -> str:
     # `Table.extract()`は結合セルを矩形行列に平坦化する。物理セルの矩形で
     # cropし、rowspan/colspanを持つセルに文字を残す。
-    return (page.crop(bbox).extract_text(x_tolerance=3, y_tolerance=3) or "").strip()
+    return normalize_text(
+        (page.crop(bbox).extract_text(x_tolerance=3, y_tolerance=3) or "").strip())
 
 
 def emphasis(chars_list) -> tuple[bool, bool]:
@@ -661,6 +741,9 @@ def page_record(page, lang: str, source_sha256: str,
             lines = text_items(page, "line", boundary=boundary)
             classify_lines(lines, page_chars, float(page.height),
                            repeated_top, repeated_bottom, top_texts, bottom_texts)
+    # 行の中で基底から離れた下付き/上付きをgeometryで戻す（`2^20`が`220`に潰れる）。
+    # 2カラム再抽出のあとに掛ける——行が組み直されると位置が変わるので。
+    fix_line_subscripts(page_chars, lines)
     words = text_items(page, "word")
     page_drawings = drawings(page)
     page_captions = captions(lines, lang)
@@ -723,6 +806,19 @@ def page_record(page, lang: str, source_sha256: str,
              + [{"id": item["id"], "type": "image", "bbox": item["bbox"]}
                 for item in page_drawings if item["type"] == "image"])
     order.sort(key=lambda item: (item["bbox"][1], item["bbox"][0], item["type"]))
+    # 表題が折り返して途中で切れているものを全文にする（1.8.0）。それまでbundleは
+    # **1行目だけ**を持ち、exporterとextract_low_powerが各々`caption_full`を呼んで
+    # 繋ぎ直していた——同じ修復を2箇所で掛けていたので、根で1回にする。繋いだ続き行の
+    # idを残すので、読み順から外す側（exporter）はそれを見れば済む。
+    # `reading_order`が要るのでここで掛ける。
+    scope = {"lines": lines, "reading_order": order}
+    for table in tables:
+        if not table["caption"]:
+            continue
+        full, used = logical_tables.caption_full(scope, table)
+        if used:
+            table["caption"]["text"] = full
+            table["caption"]["continuation_line_ids"] = used
     record = {
         "schema_version": SCHEMA_VERSION,
         "source_sha256": source_sha256,
@@ -730,7 +826,10 @@ def page_record(page, lang: str, source_sha256: str,
         "width": round(float(page.width), 3),
         "height": round(float(page.height), 3),
         "rotation": int(getattr(page, "rotation", 0) or 0),
-        "text": page.extract_text() or "",
+        # `extract_text()`は行の組み直しを通らない別の面（pdfplumber互換。凍結toolが
+        # これを読む）。**文字の壊れだけは同じく直す**——PUAの字と重ね描きは互換の
+        # ためのものではなく単に壊れているので、この面に残す理由が無い。
+        "text": normalize_text(page.extract_text() or ""),
         "lines": lines,
         "words": words,
         "images": [item for item in page_drawings if item["type"] == "image"],
