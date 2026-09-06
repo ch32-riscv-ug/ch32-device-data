@@ -479,7 +479,11 @@ def clean_reset_column(table: dict) -> int:
             # 検証ラウンドが検出）。落としたい残骸は説明列の行末に立つ語の一部なので
             # 小文字で、access/reset値は大文字か数字（`RW`・`W1`・`R0`・`0`・`1x`）。
             # これで失敗の向きが「消しすぎ」から「残しすぎ」に変わる。
-            if text.isascii() and text.islower():
+            # さらに**1文字だけ**に絞る（1.9.3）。2文字の小文字は実在する値でありうる
+            # ——SDコマンドの`类型`列の`ac`（`adtc`と対）が消え、表32-4/5/6の14行中8行が
+            # 値を失っていた（CH32H417RM.zh p602。2026-09-07の検証ラウンド）。狙っている
+            # 残骸は説明列の行末に立つ**1文字**（`t`・`y`・`e`）なので、そこだけを落とす。
+            if len(text) == 1 and text.isascii() and text.islower():
                 cell["text"] = ""
                 fixed += 1
             continue

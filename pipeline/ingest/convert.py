@@ -79,7 +79,15 @@ SCHEMA_VERSION = "0.2"
 #     前判定・セル単位ゲート・`^`の直後の歯止めの3箇所が括弧を通していなかった。
 # (b) `clean_reset_column`が「英数字を含まない値は説明列の残骸」として`…`を消していた。
 #     `…`は「行が続く」印であって残骸ではない。
-CONVERTER_VERSION = "1.9.2"
+# 1.9.3: 2026-09-07の検証ラウンド3窓目（24文書・228ページ）が出した3件を根で直した。
+# (a) **2カラムの2ページ目以降が分割されていなかった**——見出しはページ1にしか刷られない
+#     のに、境界検出が見出しを必須にしていた（high 5件）。前ページの列境界xを持ち回り、
+#     同じx（±10pt）に再検出できたときだけ続きとして扱う。
+# (b) 列の隙間をx0のギャップで測れない版面（右カラムの字下げが何段もある zh datasheet）。
+#     語の占有幅をx軸へ投影して空白帯を探す方法をfallbackに足した。
+# (c) `clean_reset_column`の1〜2字規則を**1字**に絞った——SDコマンドの`类型`列の`ac`が
+#     消えて表32-4/5/6の14行中8行が値を失っていた（1.9.1で入れた規則の穴）。
+CONVERTER_VERSION = "1.9.3"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -348,10 +356,10 @@ def fix_cell_dupes(page_chars: list[dict], record: dict) -> None:
 # 2カラムが始まる見出し。**Overview/概述は含めない**——overviewの散文は全幅1行で
 # （`…microcontroller based on the QingKe RISC-V core`が1行・実測）、これを境界で
 # 割ると`ba`と`d`に裂ける。2カラムなのはFeatures（箇条書き）以降。
-COLUMN_START_HEADINGS = ("Feature", "主要特性", "功能概述")
+COLUMN_START_HEADINGS = ("Feature", "主要特性", "功能概述", "产品特性", "產品特性")
 
 
-def column_boundary(page, lines: list[dict]):
+def column_boundary(page, lines: list[dict], carried: float | None = None):
     """2カラム（datasheetのfeaturesリスト）なら(列境界x, 開始y)、なければNone。
 
     pdfplumberの行抽出は左カラムと右カラムを同じy行として1行に結合してしまう
@@ -359,12 +367,27 @@ def column_boundary(page, lines: list[dict]):
     datasheetページに限り、**見出しの下**の表外wordのx0を見て、中央域（幅の
     35〜60%）で最大のx0ギャップ（左カラム右端と右カラム左端の間）を列境界に。
     見出しで絞るので製品比較表・register bit図・pin表・overview散文は対象外。
+
+    **見出しはページ1にしか無い**（1.9.3）。箇条書きは次ページへ続くのに見出しは
+    刷り直されないので、2ページ目以降が分割されず左右が混ざったまま出ていた
+    （H417DS0.en p2・M030DS0.en p2・V007DS0.en p2 ほか。2026-09-07の検証ラウンドが
+    high 5件として検出）。`carried`に前ページの列境界xを渡すと、見出しが無くても
+    **同じxに±10ptで境界が再検出できたときだけ**続きとして扱う——版面が変わったら
+    （表のページ・1カラムに戻ったページ）検出が外れて自然に止まる。
     """
     starts = [line for line in lines if line.get("role") == "heading"
               and any(k in line["text"] for k in COLUMN_START_HEADINGS)]
-    if not starts:
+    if starts:
+        y_start = min(starts, key=lambda l: l["bbox"][1])["bbox"][3]
+    elif carried is not None:
+        # 続きのページ。本文の始まり（header/footer以外の最初の行の上端）から下を見る。
+        body = [l["bbox"][1] for l in lines
+                if l.get("role") not in ("header", "footer") and (l.get("text") or "").strip()]
+        if not body:
+            return None
+        y_start = min(body) - 1.0
+    else:
         return None
-    y_start = min(starts, key=lambda l: l["bbox"][1])["bbox"][3]
     width = float(page.width)
     tables = [t.bbox for t in page.find_tables()]
 
@@ -372,8 +395,9 @@ def column_boundary(page, lines: list[dict]):
         cx, cy = (word["x0"] + word["x1"]) / 2, (word["top"] + word["bottom"]) / 2
         return any(t[0] <= cx <= t[2] and t[1] <= cy <= t[3] for t in tables)
 
-    x0s = sorted(w["x0"] for w in (page.extract_words() or [])
-                 if not in_table(w) and w["top"] >= y_start)
+    words = [w for w in (page.extract_words() or [])
+             if not in_table(w) and w["top"] >= y_start]
+    x0s = sorted(w["x0"] for w in words)
     x0s = [x for x in x0s if width * 0.35 <= x <= width * 0.60]
     if len(x0s) < 3:
         return None
@@ -384,7 +408,26 @@ def column_boundary(page, lines: list[dict]):
             # （bullet等）が左cropにも intersect して左行末に紛れ込む。
             best_gap, best_x = b - a, (a + b) / 2
     if best_gap < 15:
-        return None
+        # x0のギャップでは測れない版面がある（1.9.3）——右カラムの字下げが何段もあると
+        # 中央域に入るx0が**右カラムの内側の段だけ**になり、左カラムとの本当の隙間
+        # （左の右端89 → 右の左端315）が見えない（V006DS2.zh p1。検証ラウンドが検出）。
+        # 語の**占有幅**をx軸へ投影して、中央域で一番広い空白帯を探し直す。
+        covered = [(w["x0"], w["x1"]) for w in words]
+        lo, hi = width * 0.30, width * 0.70
+        edges = sorted(covered)
+        cursor, best_gap, best_x = lo, 0.0, None
+        for a, b in edges:
+            if b <= lo or a >= hi:
+                continue
+            if a > cursor and a - cursor > best_gap:
+                best_gap, best_x = a - cursor, (cursor + a) / 2
+            cursor = max(cursor, b)
+        if cursor < hi and hi - cursor > best_gap:
+            best_gap, best_x = hi - cursor, (cursor + hi) / 2
+        if best_gap < 25:
+            return None
+    if carried is not None and not starts and abs(best_x - carried) > 10.0:
+        return None   # 前ページと同じ列構造でない——続きとみなさない
     return (best_x, y_start)
 
 
@@ -814,7 +857,9 @@ def page_record(page, lang: str, source_sha256: str,
                 number_occurrences: dict[str, int],
                 repeated_top: set, repeated_bottom: set,
                 top_texts: set, bottom_texts: set,
-                document_type: str = "") -> tuple[dict, dict, str | None]:
+                document_type: str = "",
+                carried_split: float | None = None,
+                ) -> tuple[dict, dict, str | None, float | None]:
     page_chars = chars(page)
     two_column = None   # (列境界x, 開始y)。読み順のkeyが左列→右列を保つのに使う
     lines = text_items(page, "line")
@@ -824,7 +869,7 @@ def page_record(page, lang: str, source_sha256: str,
     # 結合するので、列境界が見つかれば左右別々に行を組み直す（左カラム全行→
     # 右カラム全行の読み順）。見出しで絞るので他ページは触らない。
     if document_type == "datasheet":
-        boundary = column_boundary(page, lines)
+        boundary = column_boundary(page, lines, carried_split)
         if boundary:
             lines = text_items(page, "line", boundary=boundary)
             classify_lines(lines, page_chars, float(page.height),
@@ -953,7 +998,7 @@ def page_record(page, lang: str, source_sha256: str,
         "chars": page_chars,
         "drawings": page_drawings,
     }
-    return record, geometry, previous_logical_id
+    return record, geometry, previous_logical_id, (two_column[0] if two_column else None)
 
 
 def convert(pdf_path: Path, lang: str, document_type: str,
@@ -991,13 +1036,14 @@ def convert(pdf_path: Path, lang: str, document_type: str,
     number_occurrences: dict[str, int] = {}
     previous_logical_id = None
     previous_page = None
+    carried_split = None   # 前ページの列境界x。2カラムの続きページを見分けるのに使う
     with pdfplumber.open(pdf_path) as pdf:
         repeated_top, repeated_bottom, top_texts, bottom_texts = margin_repeats(pdf)
         for page in pdf.pages:
-            record, geometry, previous_logical_id = page_record(
+            record, geometry, previous_logical_id, carried_split = page_record(
                 page, lang, source_sha256, previous_logical_id,
                 previous_page, number_occurrences, repeated_top, repeated_bottom,
-                top_texts, bottom_texts, document_type)
+                top_texts, bottom_texts, document_type, carried_split)
             validate(record, PAGE_SCHEMA)
             validate_geometry(geometry)
             payload = dump_bytes(record)
