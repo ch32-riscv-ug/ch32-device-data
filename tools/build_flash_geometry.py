@@ -58,7 +58,10 @@ import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "page_erase_bytes", "fast_erase_bytes", "fast_program_bytes",
-           "block_erase_bytes", "program_word", "zero_wait_note", "note",
+           "block_erase_bytes", "program_word",
+           "erased_read_word", "erased_read_half",
+           "erased_read_byte_even", "erased_read_byte_odd",
+           "blank_check_word", "zero_wait_note", "note",
            "#", "confidence", "basis"]
 
 # --- EVT driver 側 -----------------------------------------------------------
@@ -76,8 +79,38 @@ RM_STANDARD = re.compile(r"标准页[（(](\d+)\s*K?B?字?节?[)）]|按标准�
 RM_FAST_PROGRAM = re.compile(r"快速编程按页[（(](\d+)\s*字节[)）]")
 RM_FAST_ERASE = re.compile(r"快速擦除[也]?按页[（(](\d+)\s*字节[)）]")
 RM_BLOCK = re.compile(r"快速擦除按块[（(](\d+)\s*K字节[)）]")
+# 消去後に読み出される値（consumer の依頼 R-31）。標準ページ消去と快速ページ消去の
+# 直後に同じ`注：`が付く。**原文のまま**採る——系統Aは`字读- 0xFF`と8bit幅で書いて
+# あるが、RMがそう書いている以上そのまま置き、幅の解釈は書かない。
+RM_ERASED = re.compile(r"擦除成功后[，,]\s*字读\s*-?\s*(?P<word>0x[0-9a-fA-F]+)"
+                       r"(?:\s*[，,]\s*半字读\s*-?\s*(?P<half>0x[0-9a-fA-F]+))?"
+                       r"(?:\s*[，,]\s*偶地址字节读\s*-?\s*(?P<even>0x[0-9a-fA-F]+))?"
+                       r"(?:\s*[，,]\s*奇地址读\s*-?\s*(?P<odd>0x[0-9a-fA-F]+))?")
+# en版は表現が5通りに揺れ、`word`を`byte`と誤訳する版もある（値は32bit）。zhを一次に
+# し、**zhにこの注が無いfamily（CH32M030）だけ**enから採る。
+RM_ERASED_EN = re.compile(
+    r"(?i)after\s+(?:erasing\s+is\s+successful|successful\s+erasure|"
+    r"erasing\s+successfully|a\s+successful\s+erase)[,\s]*"
+    r"(?:read\s+the\s+word|the\s+word[\s\w]*?|words?[\s\w]*?|the\s+byte[\s\w]*?)"
+    r"-?\s*(?P<word>0x[0-9a-fA-F]+)")
 # 闪存章はどの RM でも前半〜中盤にある。全ページ舐めると重い。
-RM_NEEDLE = ("快速编程", "标准页", "快速擦除")
+RM_NEEDLE = ("快速编程", "标准页", "快速擦除", "擦除成功后")
+EN_NEEDLE = ("erasing is successful", "successful erasure",
+             "erasing successfully", "a successful erase")
+
+# EVT の IAP サンプルが「APPが焼かれているか」を判定する比較値。RMの注とは**別の出所**
+# （WCH自身のコード）なので列を分ける。系統Aの家族はここで初めて word 幅が確定する
+# （RMは`0xFF`と8bit幅で書く）。
+IAP_BLANK = re.compile(r"\*\s*\(\s*(?:vu32|uint32_t)\s*\*\s*\)\s*FLASH_Base\s*"
+                       r"!=\s*(0x[0-9a-fA-F]+)")
+
+# RMが消去後の値を言わないfamilyについて、**他repoが実機で読んだ値**（引用。こちらでは
+# 検証していないので値の列には入れず note にだけ書く）。出所は wch-protocols の
+# bootloader 横断調査 R-31（実測は ch32rv の WCH-Link/WCH-LinkE 実装）。
+MEASURED_ERASED = {
+    "CH32V003": "ch32rv measured 0xff fill after erase (CH32V003F4P6, WCH-LinkE)",
+    "CH32V103": "ch32rv measured 0xff fill after erase (CH32V103R8T6, WCH-Link)",
+}
 
 
 def read_driver(family_dir: Path) -> tuple[dict, str] | None:
@@ -124,6 +157,40 @@ def read_driver(family_dir: Path) -> tuple[dict, str] | None:
     return found, paths[0].name
 
 
+def read_iap(family_dir: Path) -> tuple[str, str] | None:
+    """EVT の IAP サンプルの blank 判定値。(値, `ファイル:行`)。
+
+    `if(*(uint32_t*)FLASH_Base != 0xFFFFFFFF)` / `!= 0xe339e339`。CH32H417 だけ
+    `Common/hardware.c` に在り、CH32V103 の IAP は blank 判定を持たない（GPIO で
+    入る）ので None を返す。
+    """
+    for source in sorted(family_dir.glob("EVT/**/*IAP*/**/*.c")):
+        text = source.read_text(errors="ignore")
+        m = IAP_BLANK.search(text)
+        if not m:
+            continue
+        line = text[:m.start()].count("\n") + 1
+        return m.group(1), f"{source.relative_to(family_dir)}:{line}"
+    return None
+
+
+def read_erased_en(family_dir: Path) -> tuple[dict, str] | None:
+    """en版RMから消去後の読み出し値（word だけ）。zhに注が無いfamilyのfallback。"""
+    paths = sorted(family_dir.glob("datasheet_en/*RM.PDF"))
+    if not paths:
+        return None
+    with pdfplumber.open(paths[0]) as pdf:
+        for page in pdf.pages:
+            text = (page.extract_text() or "").replace("\n", " ")
+            page.close()
+            if not any(n in text.lower() for n in EN_NEEDLE):
+                continue
+            m = RM_ERASED_EN.search(text)
+            if m:
+                return {"erased_read_word": m.group("word")}, paths[0].name
+    return None
+
+
 def read_manual(family_dir: Path) -> tuple[dict, str] | None:
     """RM の闪存章の本文から幾何を読む。(値の辞書, ファイル名)。"""
     paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF"))
@@ -148,6 +215,14 @@ def read_manual(family_dir: Path) -> tuple[dict, str] | None:
             m = RM_BLOCK.search(text)
             if m and "block_erase_bytes" not in found:
                 found["block_erase_bytes"] = int(m.group(1)) * 1024
+            m = RM_ERASED.search(text.replace("\n", ""))
+            if m and "erased_read_word" not in found:
+                found["erased_read_word"] = m.group("word")
+                for key, column in (("half", "erased_read_half"),
+                                    ("even", "erased_read_byte_even"),
+                                    ("odd", "erased_read_byte_odd")):
+                    if m.group(key):
+                        found[column] = m.group(key)
     return found, paths[0].name
 
 
@@ -184,6 +259,13 @@ def main() -> int:
             continue
         evt, driver_name = driver or ({}, "")
         rm, manual_name = manual or ({}, "")
+        # 消去後の読み出し値: zhに注が無いfamily（CH32M030）だけen版から採る。
+        erased_en = None
+        if "erased_read_word" not in rm:
+            erased_en = read_erased_en(family_dir)
+            if erased_en:
+                rm.update(erased_en[0])
+        iap = read_iap(family_dir)
 
         confidence = "reference"
         basis: list[str] = []
@@ -191,7 +273,18 @@ def main() -> int:
             basis.append(f"evt({driver_name})")
         if manual:
             basis.append(f"rm({manual_name})")
+        if erased_en:
+            basis.append(f"rm-en({erased_en[1]})")
+        if iap:
+            basis.append(f"evt-iap({iap[1]})")
         row = {"family": family, "program_word": "1" if evt.get("program_word") else ""}
+        # 消去後の読み出し値は**RMの原文のまま**（系統Aは`0xFF`と8bit幅で書かれる）。
+        # RMが言っていない粒度は空のまま——導出して埋めない。
+        for column in ("erased_read_word", "erased_read_half",
+                       "erased_read_byte_even", "erased_read_byte_odd"):
+            row[column] = rm.get(column, "")
+        # WCH自身のIAPが比較する値は別の出所なので別列。系統Aはここで word 幅が付く。
+        row["blank_check_word"] = iap[0] if iap else ""
         conflicts: list[str] = []
         for column in ("page_erase_bytes", "fast_erase_bytes",
                        "fast_program_bytes", "block_erase_bytes"):
@@ -224,8 +317,15 @@ def main() -> int:
                         "product_attributes code_flash_bytes")
         row["zero_wait_note"] = "; ".join(zero)
         # データ列は英語（中文の原文だけが _zh 列に残る規約。check_tables が見る）。
-        row["note"] = ("dual flash mode (FLASH_CFGR0 bit28): page 8K, block 64K"
-                       if family == "CH32H417" else "")
+        notes_for_row = []
+        if family == "CH32H417":
+            notes_for_row.append("dual flash mode (FLASH_CFGR0 bit28): page 8K, block 64K")
+        if not row["erased_read_word"]:
+            # RMが消去後の値を言わないfamily。空欄と「未知」を consumer が区別できるよう
+            # 明示し、他repoの実測（引用元を名指し）を添える。値としては入れない。
+            notes_for_row.append("the RM does not state the erased read value; "
+                                 + MEASURED_ERASED.get(family, "no measurement on file"))
+        row["note"] = "; ".join(notes_for_row)
         row["confidence"] = confidence
         row["basis"] = "+".join(basis + conflicts)
         rows.append(row)
