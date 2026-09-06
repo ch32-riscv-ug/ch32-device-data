@@ -57,7 +57,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                bundle: Path | None = None,
                entries: dict[int, dict] | None = None,
                figure_regions: list | tuple = (),
-               next_page: dict | None = None) -> list[str]:
+               next_page: dict | None = None,
+               doc_vocab: dict[str, int] | None = None) -> list[str]:
     bad = []
     # previewはGitHub Pages（Jekyll）で配る。Liquidが特別扱いする並びが原本の
     # 本文（コード例の入れ子初期化など）から流れ込むとPagesのビルドごと落ちる
@@ -73,6 +74,8 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
     # exporterが繋ぐ「境界で割れた視覚行」——右半分は先頭の重複文字を除いた残りが、左半分の
     # 直後に出る。順序照合なので右半分の全文（重複文字込み）を探すと1文字ぶん前で外れる。
     split_merge, split_skip = logical_tables.split_line_merges(page)
+    vocab = export_markdown.page_vocabulary(page)
+    doc_vocab = doc_vocab if doc_vocab is not None else {}
     tables = {item["id"]: item for item in page["tables"]}
     lines = {item["id"]: item for item in page["lines"]}
     # bit図: 番号行は表のヘッダへ畳むか合成テーブルの位置になる——exporterと
@@ -120,7 +123,16 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # exporterと同じ畳み込みを見る（境界で割れたセルは前セルへ連結
                 # 済み・継続セルは空）。continuationセルは`_folded`で空になり
                 # expect("")がスキップ、前セルには連結後textが入る。
+                # **重複グリフの除去を先に**——刷り直された見出しを落とすと、その見出しから
+                # 隣のデータセルへ降りた文字（`I/O电平`の`平`が`平\nFT`）の出所が消えてしまい、
+                # `平FT`という値になっていた（V203DS0.zh p27。全面見直しの検証で発見）。
+                logical_tables.strip_boundary_dupes(record)
+                if (logical_tables.has_edge_newline(record)
+                        or logical_tables.has_short_edge(record)):
+                    logical_tables.strip_straddling_dupes(record, chars_for)
                 logical_tables.drop_repeated_headers(record)
+                # 境界行のreset列に降りた行端グリフを先に消す——空になれば続き行として畳める。
+                logical_tables.clean_reset_column(record)
                 logical_tables.fold_boundary_spills(record)
             if item["id"] in bitfields:
                 # bit番号をヘッダへ、縦割れ名を連結——exporterと同じ表を見る。
@@ -147,13 +159,15 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             for cell in sorted(record["cells"], key=lambda c: (c["row_start"], c["column_start"])):
                 # exporterと同じ表示（折り返し結合・改行は<br>・一覧表は項目改行）で検査する
                 expect(export_markdown.cell_html(cell["text"],
-                                                 list_cell=listy and cell["row_start"] > 0),
+                                                 list_cell=listy and cell["row_start"] > 0,
+                                                 vocab=vocab, doc_vocab=doc_vocab),
                        f"table {item['id']} cell")
         elif item["type"] == "line":
             if item["id"] in synth:
                 # 罫線の無いbit図: 番号行の位置で合成テーブルを見る。
                 for cell in synth[item["id"]]["cells"]:
-                    expect(export_markdown.cell_html(cell["text"]),
+                    expect(export_markdown.cell_html(cell["text"], vocab=vocab,
+                                                     doc_vocab=doc_vocab),
                            f"bitfield {item['id']} cell")
                 continue
             if item["id"] in consumed_lines:
@@ -171,6 +185,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             if line["bbox"][3] - line["bbox"][1] < 0.5:
                 continue   # 高さ0の退化行（重複見出しのghost）——exporterと同じくskip。
             body = export_markdown.pua_normalize(line["text"])
+            body = export_markdown.reattach_line_subscripts(body, line, chars_for)
             if line.get("role") == "list-item":
                 # exporterと同じく行頭bulletを落とす（`- `の二重を消す）。
                 body = export_markdown.strip_leading_bullet(body)
@@ -179,7 +194,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
             if item["id"] in split_merge:
                 # 左半分の直後に右半分（先頭の重複文字を除く）が続く1行として出ている。
                 body = body.rstrip() + export_markdown.pua_normalize(split_merge[item["id"]])
-            expect(html.escape(body), f"{line.get('role')} {item['id']}")
+            expect(export_markdown.escape_body(body), f"{line.get('role')} {item['id']}")
             if (line.get("role") not in ("header", "footer")
                     and figure_captions.caption_match(line["text"])):
                 # captionの直後には、描画済みの図（実ファイルがあること）か、
@@ -211,6 +226,7 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
     pages = [load_page(bundle, entry) for entry in manifest["pages"]]
     entry_of = {page["number"]: entry for entry, page in zip(manifest["pages"], pages)}
     chains = logical_tables.document_chains(pages)
+    doc_vocab = export_markdown.document_vocabulary(pages)
     plans = export_markdown.document_bitfields(bundle, manifest, pages)
     # exporterと同じ図領域（描画済みassetのbbox）。拾い直す行は図の中だけなので、
     # parityも同じ領域を見ないと「本文から消えた」と誤検出する。
@@ -231,7 +247,8 @@ def check_document(bundle: Path, markdown: Path, limit: int = 5) -> int:
         bad.extend(check_page(page, text, chains, markdown / "pages",
                               plans[page["number"]], bundle, entry_of,
                               regions.get(page["number"], []),
-                              pages[index + 1] if index + 1 < len(pages) else None))
+                              pages[index + 1] if index + 1 < len(pages) else None,
+                              doc_vocab))
         if lost_glyphs(bundle, entry, page) and LOST_SUBSCRIPT not in text:
             bad.append(f"p{page['number']}: lost-subscript glyphs without a "
                        "visible notice")
