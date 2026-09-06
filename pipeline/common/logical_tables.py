@@ -167,10 +167,6 @@ def drop_repeated_headers(merged: dict) -> int:
     return len(drop)
 
 
-# 続き行が溢れうる「文章の列」の見出し語。値の列（Min/Typ/Max・条件・reset）は含めない。
-_TEXT_HEADERS = ("description", "描述", "说明", "function", "功能", "remap", "重映射", "alternate", "复用", "備考", "备注", "note")
-
-
 def fold_boundary_spills(merged: dict) -> int:
     """ページ境界でセルの中身が割れた「宙ぶらりん行」を直前セルへ畳む。
 
@@ -201,8 +197,6 @@ def fold_boundary_spills(merged: dict) -> int:
         if cell["text"].strip():
             by_row.setdefault(cell["row_start"], []).append((cell, single))
     removed: list[dict] = []
-    text_columns = {c["column_start"] for c in merged["cells"] if c["row_start"] == 0
-                    and any(w in (c.get("text") or "").replace("\n", " ").lower() for w in _TEXT_HEADERS)}
     for row in sorted(by_row):
         if row == 0 or row >= len(row_pages) or row_pages[row] == row_pages[row - 1]:
             continue
@@ -217,30 +211,11 @@ def fold_boundary_spills(merged: dict) -> int:
             prev["text"] = prev["text"] + "\n" + cell["text"]
             removed.append(cell)   # 継続セルはグリッドから消す（空行を残さない）
             continue
-        # 中身のあるセルが2つ以上でも、**先頭2列（Bit/Name・引脚编号/引脚名称）が空**で、全部が
-        # 直上の単純セルの続きなら同じ「宙ぶらりん行」——説明列と重映射列が同時に次ページへ
-        # 溢れた行が、名前のない別行として出ていた（V407RM.zh p203・V003RM.zh p110・
-        # V004DS0.zh p12 PC2・V00XRM.en p92。全面見直しの指摘。CSVには名前の無い行が増える）。
-        if any(c["column_start"] <= 1 for c, _ in occupied):
-            continue
-        # 中身のある列は**説明系の列**（Description/描述/功能/重映射…）に限る。値の列（Min/Typ/Max・
-        # 条件）に中身がある行は、rowspanで括られた次の条件行（`384MHz`/`96MHz`/`107.5`）であって
-        # 続き行ではない（H417DS0.en p98/p108。ドライランで確認）。
-        if not all(c["column_start"] in text_columns for c, _ in occupied):
-            continue
-        targets = []
-        for cell, single in occupied:
-            prev = simple.get((row - 1, cell["column_start"])) if single else None
-            if prev is None or not prev["text"].strip():
-                targets = []
-                break
-            targets.append((prev, cell))
-        if not targets:
-            continue
-        for prev, cell in targets:
-            if cell["text"].strip() != prev["text"].strip():
-                prev["text"] = prev["text"] + "\n" + cell["text"]
-            removed.append(cell)
+        # **複数セルの畳み込みは撤退**（2026-09-06）。`默认复用功能`と`重映射功能`が同時に
+        # 次ページへ溢れた行を1行に畳む一般化を入れたが、**畳んだ行が他の列をrowspanで
+        # 覆っていた場合に列がずれる**回帰を生んだ（L103DS0.zh p23/p24でPB5の値が引脚编号の
+        # 列に出た。全面見直しの検証3巡目）。得られたのは全corpus22行に対し、崩れは
+        # pin表の実データなので割に合わない。中身が1つの行だけを畳む元の規則に戻す。
     for cell in removed:
         merged["cells"].remove(cell)
     # 継続セルを消した行番号（他の列の空セルだけが残る＝描画時に落とす行）。
@@ -706,14 +681,18 @@ _DATA_LIKE = re.compile(r"\[?\d+(?::\d+)?\]?|0x[0-9A-Fa-f]+|[-—–]|(?i:rw|ro|
 def _fold_spanning_header(table: dict) -> int:
     """見出しの一部が折り返して**見出しブロックの下の行**に落ちた形を、ヘッダへ畳む。
 
-    datasheetのpin定義表は見出しがrowspanで2〜4行の高さを持ち、`Pin`/`name`・`Main`/`function`/
-    `(after`/`reset)`のように折り返した片が下の行に別セルとして落ちる。colspanの見出し
-    （`Pin No.`）の下に並ぶ封装名（`V006D8U7`…）は本物の2段目なので残す（V006DS0.en p19・
-    V002DS0.en p16・V00XRM.en p92。全面見直しの指摘）。
+    datasheetのpin表は見出しがrowspanで2〜4行の高さを持ち、`Pin`/`name`・`Main`/`function`/
+    `(after`/`reset)`のように折り返した片が下の行に別セルとして落ちる。DMA転送表も
+    `Source`/`bit width`のように割れる（V407RM.en p145）。
 
-    見出しブロックの高さ H＝row 0 のセルの最大row_end。**列幅1の見出し**でrow_endがHに届かない
-    列について、[row_end, H) にあるその列のセルの文字を空白で繋いで見出しに足し、見出しを
-    Hまで伸ばす。空になった行は詰める。片が16字を超えるものがあれば何もしない（本文の疑い）。
+    **見出しの続きの行は、折り返した列にしかセルが無い**——これが本文データとの違い。
+    `Reset value`だけがrowspan 2の記述表では、下の行に`31`/`RAMLV`/`RW`/`0`と**全列**に
+    データが入るので当たらない。この判定だけで足り、片の中身の字種は見ない（`Number`の
+    ような大文字始まりの正当な続きを弾いてしまうため）。
+
+    **計画してから一括で適用する**——途中で条件に外れたときに見出しだけ書き換わって片が
+    残る、という壊れ方をしたことがある（全面見直しの検証3巡目でV407RM.en p145/p124が
+    `Source bit width`と`bit width`の二重になった）。
     """
     if table.get("_bitfield"):
         return 0
@@ -723,43 +702,46 @@ def _fold_spanning_header(table: dict) -> int:
     height = max(c["row_end"] for c in header)
     if height < 2:
         return 0
-    # 折り返し片を持つ列は**少数**（見出しの半数以下）でなければならない——`Reset value`だけが
-    # rowspan 2 の記述表では、1行目のデータ（`31`/`RAMLV`/`RW`…）が全列で「見出しの続き」に
-    # 見えてしまう（全corpusで8,284片を吸い込みかけた）。片の中身も数字・bit範囲・アクセス値
-    # のようなデータであってはならない。
-    wrapped = [h for h in header if h["column_end"] - h["column_start"] == 1 and h["row_end"] < height]
-    if not wrapped or len(wrapped) > len(header) / 2:
+    # 折り返した列＝見出しが下端まで届いていない列。
+    wrapped = [h for h in header if h["row_end"] < height]
+    # **畳むのは1列幅の見出しだけ**。複数列にまたがる見出しの下の行は、列を数え上げる
+    # 副見出し（`Pin number`の下の`QSOP28`/`QFN32`…）であって折り返しではない。
+    foldable = [h for h in wrapped if h["column_end"] - h["column_start"] == 1]
+    if not foldable or len(foldable) > len(header) / 2:
         return 0
-    folded: list[dict] = []
-    for head in wrapped:
-        pieces = [c for c in table["cells"]
-                  if c["row_start"] >= head["row_end"] and c["row_start"] < height
-                  and c["column_start"] == head["column_start"]
-                  and c["column_end"] - c["column_start"] == 1 and c["row_end"] <= height]
+    spans = [(h["column_start"], h["column_end"]) for h in wrapped]
+
+    def in_wrapped(cell: dict) -> bool:
+        return any(a <= cell["column_start"] < b for a, b in spans)
+
+    block = [c for c in table["cells"]
+             if 1 <= c["row_start"] < height and (c.get("text") or "").strip()]
+    if not block or not all(in_wrapped(c) for c in block):
+        return 0
+    plan: list[tuple[dict, str, list[dict]]] = []
+    for head in foldable:
+        pieces = [c for c in block
+                  if head["column_start"] <= c["column_start"] < head["column_end"]
+                  and c["row_start"] >= head["row_end"] and c["row_end"] <= height]
         texts = [" ".join((c.get("text") or "").split()) for c in pieces]
         if any(len(x) > 16 or _DATA_LIKE.fullmatch(x) for x in texts if x):
-            return 0
-        # 見出しの続きは小文字か括弧で始まる（`name`・`function`・`(after`・`width`）。zh版は
-        # pin表（一覧表）のCJKに限る（`类型(1)`・`（复位`）。大文字・数字始まりはデータ。
-        head_word = (head.get("text") or "").strip().lower()
-        if any(x and not (x[0].islower() or x[0] in "(（" or (_has_cjk(x[0]) and is_list_table(table))
-                          or (head_word == "reset" and x.lower() == "value"))
-               for x in texts):
             return 0
         if not any(texts):
             continue
         parts = [(head.get("text") or "").replace("\n", " ").strip()] + [x for x in texts if x]
         joined = parts[0]
         for piece in parts[1:]:
-            # CJK同士は空白を入れない（`引脚`+`类型(1)`＝`引脚类型(1)`。空白を入れると語が割れる。
-            # 全面見直しの検証で見つかった、この畳み込み自身の副作用）。
+            # CJK同士は空白を入れない（`引脚`+`类型(1)`＝`引脚类型(1)`）。
             sep = "" if (_has_cjk(joined[-1:]) and (_has_cjk(piece[:1]) or piece[:1] in "（(")) else " "
             joined += sep + piece
+        plan.append((head, joined, pieces))
+    if not plan:
+        return 0
+    folded: list[dict] = []
+    for head, joined, pieces in plan:
         head["text"] = joined
         head["row_end"] = height
         folded.extend(pieces)
-    if not folded:
-        return 0
     ids = {id(c) for c in folded}
     table["cells"] = [c for c in table["cells"] if id(c) not in ids]
     # 見出しブロック内で、もうどのセルも始まらない行を詰める
@@ -799,8 +781,7 @@ def fold_header_wrap(table: dict) -> int:
         return 0
     tail = row1[0]
     word = tail["text"].strip()
-    if not (word.isalpha() and word.islower() and len(word) <= 8
-            and tail["row_end"] - tail["row_start"] == 1):
+    if tail["row_end"] - tail["row_start"] != 1 or "\n" in word or len(word) > 16:
         return 0
     # 見出しが**既に折り返しの両行を持っている**のに、2行目の断片が別セルとして残ることがある
     # （`Reset\nvalue`のヘッダ＋row1に`value`。CH32xRM.en p72/p201）。その列を覆う見出しが
@@ -823,6 +804,10 @@ def fold_header_wrap(table: dict) -> int:
         if table.get("row_pages") and len(table["row_pages"]) > 1:
             del table["row_pages"][1]
         return 1
+    # ここから先は「見出しへ**足す**」経路——小文字1語（`value`）に限る。大文字始まりを足すと
+    # データ行を見出しへ吸い込む。
+    if not (word.isalpha() and word.islower() and len(word) <= 8):
+        return 0
     head = next((c for c in table["cells"]
                  if c["row_start"] == 0 and c["column_start"] == tail["column_start"]
                  and c["row_end"] == 1 and (c.get("text") or "").strip()), None)
