@@ -63,7 +63,8 @@
       "properties": {
         "line_id": {"type": "string"},
         "source_number": {"type": "string"},
-        "text": {"type": "string"}
+        "text": {"type": "string"},
+        "continuation_line_ids": {"type": "array", "items": {"type": "string"}}
       }
     },
     "cell": {

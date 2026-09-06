@@ -125,12 +125,11 @@ def bitfield_plan(bundle: Path, entry: dict, page: dict) -> dict:
     for t in page["tables"]:
         if t.get("caption") and t["caption"].get("line_id"):
             caption_skip.add(t["caption"]["line_id"])
-            # 折り返した表題の2行目（`+ RISC-V3F)`）も`<caption>`へ入れて本文から消す。
-            full, used = logical_tables.caption_full(page, t)
-            if used:
-                t["_caption_full"] = full
-                caption_skip.update(used)
-                caption_cont.update(used)
+            # 折り返した表題の2行目（`+ RISC-V3F)`）は**converterがcaption.textへ繋いで**
+            # あり（1.8.0）、繋いだ行のidが`continuation_line_ids`に入っている。本文から
+            # 消すだけでよい——繋ぎ直しはもうここでしない。
+            caption_skip.update(t["caption"].get("continuation_line_ids") or [])
+            caption_cont.update(t["caption"].get("continuation_line_ids") or [])
     pairs = logical_tables.bitfield_pairs(page)
     singletons = logical_tables.bitfield_singletons(page)
     if not pairs and not singletons:
@@ -209,37 +208,10 @@ def document_bitfields(bundle: Path, manifest: dict, pages: list[dict]) -> dict[
 # Wingdings/Symbolフォントの記号がPUA（私用領域）のまま本文に出ている
 # （fontで●等に見えるが文字コードは意味不明）。全コーパスで実測した5種を
 # 対応する記号へ。原本の見た目に合わせる＝「差ゼロ」に近づく。
-PUA_REPLACEMENTS = {
-    "\uf06c": "●",   # Wingdings 0x6C: bullet (8824)
-    "\uf06e": "■",   # Wingdings 0x6E: black square
-    "\uf0b7": "•",   # Symbol 0xB7: bullet
-    "\uf0b4": "×",   # Symbol 0xB4: multiply
-    "\uf0b1": "±",   # Symbol 0xB1: plus-minus
-}
-
-
-def _undouble(part: str) -> str:
-    """図ラベル等で全グリフが2回ずつ拾われた行（`OOSSCC__IINN`→`OSC_IN`、`CCPPOOLL==00`→
-    `CPOL=0`）を畳む。PDFが太字風に同じ文字を重ね描きし、pdfplumberが両方を拾ったもの。
-    条件: 空白なし・6文字以上・偶数長・全ての隣接ペアが同じ・**hex桁以外の文字を含む**
-    （`0000FF`のような正当な16進値は偶然ペアになるので除外）。全corpus実測143件。"""
-    s = part.strip()
-    if (len(s) < 6 or len(s) % 2 or " " in s
-            or any(s[i] != s[i + 1] for i in range(0, len(s), 2))
-            or len(set(s)) < 2
-            or all(ch in "0123456789abcdefABCDEF" for ch in s)):
-        return part
-    return part.replace(s, s[::2])
-
-
-def pua_normalize(text: str) -> str:
-    for pua, real in PUA_REPLACEMENTS.items():
-        if pua in text:
-            text = text.replace(pua, real)
-    if "\n" in text:
-        return "\n".join(_undouble(p) for p in text.split("\n"))
-    return _undouble(text)
-
+# 私用領域コードポイントの置換と重ね描きの畳み込みは**converterへ移した**（1.8.0）。
+# 見た目の問題ではなく文字が壊れているので、bundleのlines/cells/page.textが直る側に
+# 置くのが正しい——それまではMarkdownだけが直り、bundleを読む抽出器には壊れた字が
+# 渡っていた（9,291個・65文書）。
 
 # convert.pyの見出し判定と同じ——番号見出し（`20.1 …`）・章見出し（`第N章`/`Chapter N`）は
 # 本物なので降格しない。フォントサイズだけで見出しになった行の連続runを段落へ戻すのに使う。
@@ -389,22 +361,8 @@ def title_continuations(page: dict) -> tuple[dict[str, str], set[str]]:
 _BULLETS = "-–—•●○▪·*‣◦"
 
 
-def reattach_line_subscripts(raw: str, line: dict, chars_for) -> str:
-    """本文行でも、基底から離れた下付き/上付きをgeometryで戻す（表セルと同じ規則）。
-
-    `每 2^20 个`が`每220个`に、CRCの`x^32+x^26+…`が`x32+x26+…`に、`VDD`が`V DD`に潰れていた
-    （全corpus792行・61文書。全面見直しの指摘）。`logical_tables.reattach_cell_subscripts`へ
-    1セルの表として渡すだけ——判定も歯止め（グリフ読み順との完全一致）も共通。exporterと
-    parity検査が同じ関数を通す。
-    """
-    if not raw.strip() or not logical_tables.has_subscript_shape({"cells": [{"text": raw}]}):
-        return raw
-    pseudo = {"cells": [{"text": raw, "bbox": line["bbox"], "row_start": 1, "row_end": 2,
-                         "column_start": 0, "column_end": 1}]}
-    if logical_tables.reattach_cell_subscripts(pseudo, chars_for):
-        return pseudo["cells"][0]["text"]
-    return raw
-
+# 行の中の下付き/上付き復元も**converterへ移した**（1.8.0）。潰れると`2^20`が`220`に
+# なって**値が変わる**ので、bundleの行が直らないと抽出器に嘘が渡る（805行・61文書）。
 
 def escape_body(text: str) -> str:
     """本文行のエスケープ。HTMLエスケープに加えて`*`を`\\*`にする。
@@ -494,7 +452,6 @@ def cell_html(text: str, list_cell: bool = False,
     - 識別子（大文字・数字）の折り返し → そのまま繋ぐ（`USAR`+`T1`=`USART1`）
     - それ以外は保守的に`<br>`
     """
-    text = pua_normalize(text)
     parts = text.split("\n")
     if len(parts) == 1:
         return html.escape(text)
@@ -631,7 +588,7 @@ def table_html(table: dict, url: str | None, number: int,
     # ビット図・説明表）は、原本でも表番号が振られていない——continuation継承で
     # 前ページの表番号（logical_id）を借りて名乗ると、無関係な`table-3-1@1`が
     # 6つ並ぶ（ユーザー指摘）。内部IDは追跡用にコメントへ残す。
-    caption = (table.get("_caption_full") or table["caption"]["text"]) if table["caption"] else None
+    caption = table["caption"]["text"] if table["caption"] else None
     cap_html = f"<caption>{html.escape(caption)}</caption>" if caption else ""
     span = table.get("parts")
     parts = []
@@ -782,11 +739,11 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 continue
             record = info["merged"] or tables[item["id"]]
             logical_tables.drop_phantom_fragment_rows(record)
-            if info["merged"] and tables[item["id"]].get("_caption_full"):
-                # 折り返し表題の全文はbitfield_planがページ表に付ける。ページ跨ぎの結合表は
-                # 別dictなので載せ替える——無いと続き行がskipされたうえ表題も1行目だけになり、
-                # `+ RISC-V3F)`が本文からも表題からも消える（H417DS0.en p99。parityは検出できない）。
-                record["_caption_full"] = tables[item["id"]]["_caption_full"]
+            # 折り返し表題の全文は`caption.text`そのものになった（converter 1.8.0）ので、
+            # `merge_cells`が先頭断片のcaptionを引き継ぐだけで結合表にも届く。以前は
+            # exporterが全文を別キーで持っていたため載せ替えが要り、忘れると
+            # `+ RISC-V3F)`が本文からも表題からも消えた（H417DS0.en p99。parityでは
+            # 検出できなかった）——根で直すとこの特例が消える。
             if (not record.get("caption")
                     and not any((c.get("text") or "").strip() for c in record["cells"])):
                 # 全セル空の偽table（図box由来。全corpus 1,115件）——空の枠は出さない。
@@ -888,14 +845,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
         if item["id"] in split_skip:
             continue   # 割れた視覚行の右半分は左半分へ繋いだ
         role = line.get("role", "paragraph")
-        raw = pua_normalize(line["text"])
-        raw = reattach_line_subscripts(raw, line, chars_for)
+        raw = line["text"]
         if role == "list-item" and raw.lstrip()[:1] == "*" and raw.lstrip()[1:2] not in (" ", "\t"):
             # `*（uint32_t*）0x8000000 = 0x12345678；`——Cのポインタ参照であってbulletではない
             # （X315RM.zh p305。全面見直しの指摘）。`- `を足すと箇条書きに化ける。
             role = "paragraph"
         if item["id"] in split_merge:
-            raw = raw.rstrip() + pua_normalize(split_merge[item["id"]])
+            raw = raw.rstrip() + split_merge[item["id"]]
         if role == "list-item":
             # 原本の行頭bullet（`- `等）を落とす——exporterが`- `を足すので二重になる
             # （`- - Dual…`。ユーザー指摘）。parityも同じ関数で落として整合させる。
@@ -934,7 +890,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
             continue
         if role == "heading" and item["id"] not in demote_headings:
             if item["id"] in title_merge:
-                text += " " + html.escape(pua_normalize(title_merge[item["id"]]))
+                text += " " + html.escape(title_merge[item["id"]])
             output.extend(("", "#" * min(6, line.get("level", 2)) + " " + text, ""))
         elif role == "list-item":
             output.append("- " + text)

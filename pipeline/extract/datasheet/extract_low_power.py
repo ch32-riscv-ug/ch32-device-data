@@ -319,23 +319,14 @@ def _unbalanced(text: str) -> bool:
     return (text.count("(") + text.count("（")) > (text.count(")") + text.count("）"))
 
 
-def _caption_full(page: dict, table: dict) -> str | None:
-    """表題が2行に折り返して括弧が閉じていないとき、後続のparagraph行を括弧が閉じるまで
-    繋いだ全文を返す。bundleの`caption.text`は1行目だけ（`…SRAM (RISC-V5F`＋次行
-    `+ RISC-V3F)`。H417DS0.en p99。全corpusで11表題）。"""
-    if not table.get("caption"):
-        return None
-    return logical_tables.caption_full(page, table)[0]   # exporterと同じ全文（共通L1層）
-
-
 def caption_context(table: dict) -> str:
     caption = table.get("caption")
     if not caption:
         return ""
     # 表題の設定条件（V=3.3V・LDOTRIM=…・対象chip名）はその表全体の条件。
-    # 原文の綴りのまま条件の先頭に残す（意味づけはreviewの仕事）。折り返しで
-    # 切れた表題はbundle_tablesが繋いだ全文（`_caption_full`）を使う。
-    return TABLE_PREFIX.sub("", table.get("_caption_full") or caption["text"]).strip()
+    # 原文の綴りのまま条件の先頭に残す（意味づけはreviewの仕事）。折り返しで切れた
+    # 表題は**converterが繋いだ全文**が`caption.text`に入っている（1.8.0）。
+    return TABLE_PREFIX.sub("", caption["text"]).strip()
 
 
 def _continues(prev: str | None, nxt: str | None, strict: bool = False) -> bool:
@@ -425,8 +416,6 @@ def bundle_tables(name: str, pdf: Path):
             if table["id"] in rejected:
                 skipped += 1
                 continue
-            if table.get("caption"):
-                table["_caption_full"] = _caption_full(page, table)
             yield page["number"], table
     if skipped:
         print(f"    {name}: reviewでrejectedの表 {skipped} 個を外した", file=sys.stderr)

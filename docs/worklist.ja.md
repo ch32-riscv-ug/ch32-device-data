@@ -225,6 +225,26 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
   `uv run tools/check_baseline.py --record` の1コマンド——直すのが面倒だと守られないので、
   検査と一緒に用意した。
 
+### 2026-09-06 「HTMLに近い層で見た目だけ整えていないか」の全面確認（converter 1.8.0）
+
+exporterが掛けている文字の修復を全部数え、**bundleの実物が壊れたままのもの**を洗い出した
+（内訳と判断は [markdown-qa-log](markdown-qa-log.ja.md) の該当節、実装は `pipeline/README` 8.）。
+
+- **根へ移した4つ**: 私用領域コードポイント9,291個（65文書）・重ね描きの畳み込み143件・
+  行の中の下付き/上付き805行（`2^20`が`220`＝**値が違う**）・表題の全文化27件
+  （exporterと`extract_low_power`の**二重実装**を解消）。exporterとparityから
+  `pua_normalize`/`_undouble`/`reattach_line_subscripts`/`caption_full`呼び出しを削除。
+  ページ跨ぎ結合表へ全文キーを載せ替える特例も消えた（忘れるとparityで検出できない
+  バグの型だった）。
+- **検証**: 凍結tool **23出力すべて byte 一致**（batch 6・tables 8・pins 2・remap 2・
+  dma 1・registers 4）、新経路CSV 4本 byte 一致、`operating_conditions` 2,796行 byte 一致、
+  Markdown parity 68/68 clean、assets 差分なし、`check_baseline` 60表一致。
+- **残した4つ**（`strip_straddling_dupes` 4,457 / `strip_boundary_dupes` 2,337 /
+  `clean_reset_column` 2,200 / `split_line_merges` 294）は**グリフを消す/行を組み替える
+  判断**を含み、`option_bytes`・`debug_wiring`・`operating_conditions`が読むセルに直接
+  効く。1.7.0で「繋いだだけで1,207行が消えた」のと同じ形の事故を起こしうるので、
+  **依存している消費者が居ないかを1つずつ測ってから**にする（再挑戦の条件はQAログに）。
+
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
 **結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。

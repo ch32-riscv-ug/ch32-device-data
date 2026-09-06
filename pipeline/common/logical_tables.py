@@ -335,9 +335,13 @@ def unbalanced_parens(text: str) -> bool:
 
 def caption_full(page: dict, table: dict) -> tuple[str, list[str]]:
     """表題が折り返して括弧が閉じていないとき、後続のparagraph行を括弧が閉じるまで繋いだ
-    全文と、繋いだ続き行のidを返す。bundleの`caption.text`は1行目だけ（`…SRAM (RISC-V5F`＋
-    次行`+ RISC-V3F)`。H417DS0.en p99。全corpusで11表題）。exporter（`<caption>`と本文skip）と
-    extract_low_power（条件prefix）が同じ全文を使う。"""
+    全文と、繋いだ続き行のidを返す（`…SRAM (RISC-V5F`＋次行`+ RISC-V3F)`。H417DS0.en p99。
+    全corpus27表題）。
+
+    **呼ぶのはconverterだけ**（1.8.0）。それまではbundleの`caption.text`が1行目のままで、
+    exporterと`extract_low_power`が各々これを呼んで繋ぎ直していた——同じ修復を2箇所で
+    掛けていた。いまは`caption.text`が全文、`caption.continuation_line_ids`が繋いだ行の
+    idで、読み手はそれを読むだけでよい。"""
     caption = table.get("caption")
     if not caption:
         return "", []
