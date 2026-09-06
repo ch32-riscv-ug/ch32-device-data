@@ -636,7 +636,6 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
     # 章題の折り返し2行目（`# (SerDes)`）は1行目の見出しへ繋ぐ。
     title_merge, title_skip = title_continuations(page)
     # 同じ視覚行が境界で二つに割れ境目の文字が二重になった対を繋ぐ（zh版DSの本文）。
-    split_merge, split_skip = logical_tables.split_line_merges(page)
     # geometryは要るときだけ開く（表の端に降ってきた重複グリフ除去に使う）。ページ跨ぎの
     # 結合表はセルごとに出自ページが違うので、ページ番号で引ける関数として渡す。
     _geo: dict[int, list[dict]] = {}
@@ -842,16 +841,14 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                        # が2回。全corpusで28件全てこのパターン）。parityも同じくskip。
         if item["id"] in title_skip:
             continue   # 章題の折り返し2行目は直前の章見出しへ繋いだ
-        if item["id"] in split_skip:
-            continue   # 割れた視覚行の右半分は左半分へ繋いだ
+        if line.get("merged_into"):
+            continue   # 割れた視覚行の右半分（converterが左半分へ繋いである）
         role = line.get("role", "paragraph")
         raw = line["text"]
         if role == "list-item" and raw.lstrip()[:1] == "*" and raw.lstrip()[1:2] not in (" ", "\t"):
             # `*（uint32_t*）0x8000000 = 0x12345678；`——Cのポインタ参照であってbulletではない
             # （X315RM.zh p305。全面見直しの指摘）。`- `を足すと箇条書きに化ける。
             role = "paragraph"
-        if item["id"] in split_merge:
-            raw = raw.rstrip() + split_merge[item["id"]]
         if role == "list-item":
             # 原本の行頭bullet（`- `等）を落とす——exporterが`- `を足すので二重になる
             # （`- - Dual…`。ユーザー指摘）。parityも同じ関数で落として整合させる。

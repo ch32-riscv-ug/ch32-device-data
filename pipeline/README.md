@@ -414,6 +414,37 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    made the continuation vanish from both body and caption with parity unable
    to see it.
 
+9. **Glyphs counted twice at a cell border are dropped, and lines split
+   mid-sentence are rejoined** (converter 1.9.0) -- the last four repairs that
+   only the exporter did (9,288 places).
+
+   - `strip_boundary_dupes` (2,337 cells): `[31:12] R`, `RO R`, `s Description`
+     -- the neighbouring cell's edge character taken twice.
+   - `strip_straddling_dupes` (4,457 cells): geometry-backed, for a glyph whose
+     box crosses the border and that `crop` put in both cells.
+   - `clean_reset_column` (2,200 cells): a description column's line-end
+     characters landing in the reset-value column (`0` read as `e 0 e`). This
+     one needs the header row to find the column, so on a **continuation
+     fragment it does nothing** (fail-safe); the exporter still runs it on the
+     merged table, where the header is present.
+   - `split_line_merges` (294 lines): a body line broken at a column boundary
+     with the boundary character in both halves (every line of the Chinese
+     datasheets at x=241).
+
+   **Order matters**: the border-duplicate passes run *after* the subscript
+   repair. `reattach_cell_subscripts` stops unless its result equals the glyphs
+   in reading order, so dropping a glyph first would break that comparison and
+   silently disable the repair.
+
+   **The line join does not delete a line.** The joined text goes into the left
+   line and the right one gets `merged_into` (the left id) -- deleting it would
+   break the `reading_order`/id correspondence and would also erase the fact
+   that the page laid the sentence out in two pieces. A reader just skips lines
+   that carry `merged_into`, and `split_line_merges` now returns
+   `{left_id: (right_id, tail)}` because the converter is its only caller. The
+   three cell passes stay in the exporter as well: they also apply to
+   page-spanning merged tables, a unit the converter cannot see.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

@@ -65,7 +65,10 @@ SCHEMA_VERSION = "0.2"
 # （27件。exporterとextract_low_powerが同じ修復を各々掛けていた）を**exporterから
 # converterへ**移した。それまで直っていたのはMarkdownだけで、bundleを読む抽出器には
 # 壊れた字が渡っていた。
-CONVERTER_VERSION = "1.8.0"
+# 1.9.0: セル境界の二重取りグリフとreset列の異物も根で落とす（straddling 4,457・
+# boundary 2,337・reset列 2,200）。これまでexporterとparityだけが直しており、bundleの
+# セルには二重取りが残っていた。
+CONVERTER_VERSION = "1.9.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -285,6 +288,50 @@ def fix_cell_subscripts(page_chars: list[dict], record: dict) -> None:
     for cell, original in zip(record["cells"], before):
         if cell["text"] != original:
             cell["text_split"] = original
+
+
+def join_split_lines(page: dict) -> int:
+    """**同じ視覚行が途中で二つに割れ、境目の1文字が両側に入った**対を繋ぐ（1.9.0）。
+
+    zh版datasheetの本文は全行が x≈241 で `…対外`/`外多组…` のように割れ、1ページに25行も
+    「途中で改行して1文字が二重」に見えていた（V002DS0.zh・V006DS0.zh・M030DS2.zh p6。
+    全corpus294行）。判定は`logical_tables.split_line_merges`——同じ高さ・左右が接する・
+    同じ字送り・左の末尾＝右の先頭、かつ**同じ境界xに3対以上**、と厳しいので、2段組の
+    独立した列は当たらない。
+
+    繋いだ結果は**左の行の`text`**に入り、右の行には`merged_into`（左のid）を付けて残す
+    ——行を消すと`reading_order`とidの対応が崩れるし、**版面が二つに割っていた事実**も
+    消える。読み手（exporter/parity）は`merged_into`のある行を飛ばすだけでよい。
+    `page["text"]`は`extract_text()`が別に作る面なので触らない。"""
+    merge = logical_tables.split_line_merges(page)
+    if not merge:
+        return 0
+    lines = {line["id"]: line for line in page["lines"]}
+    for left_id, (right_id, tail) in merge.items():
+        lines[left_id]["text"] = (lines[left_id]["text"] or "").rstrip() + tail
+        lines[right_id]["merged_into"] = left_id
+    return len(merge)
+
+
+def fix_cell_dupes(page_chars: list[dict], record: dict) -> None:
+    """セル境界に載った/跨いだグリフの**二重取り**と、reset値の列に降った異物を落とす
+    （1.9.0）。`[31:12] R`（右隣`Reserved`の`R`）・`RO R`・`s Description`・reset値の
+    `e 0 e`。判定は`logical_tables`の3つで、exporter・parityと同じ関数を通す。
+
+    **下付きの復元より後**に掛ける——`reattach_cell_subscripts`は「組み直した綴りが
+    グリフの読み順と完全に一致すること」を歯止めにしているので、先にグリフを落とすと
+    その照合が外れて復元が黙って効かなくなる。
+
+    それまではexporterとparityだけが直しており、bundleのセルには二重取りしたグリフが
+    残っていた（straddling 4,457・boundary 2,337・reset列 2,200。全corpus実測）。
+    `clean_reset_column`は**ヘッダ行を持つ表**でしか列を決められないので、ページ跨ぎの
+    継続断片では何もしない（安全側。結合後にexporter側がもう一度掛ける）。"""
+    logical_tables.strip_boundary_dupes(record)
+    if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
+        logical_tables.strip_straddling_dupes(record, page_chars)
+    logical_tables.clean_reset_column(record)
+    for key in ("_deduped", "_straddle_stripped", "_reset_cleaned"):
+        record.pop(key, None)
 
 
 # 2カラムが始まる見出し。**Overview/概述は含めない**——overviewの散文は全幅1行で
@@ -744,6 +791,9 @@ def page_record(page, lang: str, source_sha256: str,
     # 行の中で基底から離れた下付き/上付きをgeometryで戻す（`2^20`が`220`に潰れる）。
     # 2カラム再抽出のあとに掛ける——行が組み直されると位置が変わるので。
     fix_line_subscripts(page_chars, lines)
+    # 列境界で割れた本文行を繋ぐ。`reading_order`より前でよい——`merged_into`を付けた
+    # 行はそのまま残るので順序は変わらない。
+    join_split_lines({"lines": lines})
     words = text_items(page, "word")
     page_drawings = drawings(page)
     page_captions = captions(lines, lang)
@@ -790,6 +840,7 @@ def page_record(page, lang: str, source_sha256: str,
         fix_rotated_cells(page, tables[-1])
         # 回転の組み直しの**後**——直った文字に対して下付きを戻す。
         fix_cell_subscripts(page_chars, tables[-1])
+        fix_cell_dupes(page_chars, tables[-1])
         previous_bottom = table.bbox[3]
 
     def outside_tables(line: dict) -> bool:
