@@ -164,10 +164,14 @@ The named macros go in `condition` (held the same way as in `interrupts.csv`) an
 | `fast_program_bytes` | Unit of fast page programming |
 | `block_erase_bytes` | Unit of fast block erase (32K; 64K on V205) |
 | `program_word` | Whether `FLASH_ProgramWord`/`ProgramHalfWord` exist in the driver. **Empty = fast page only** (L103/M030/V006/V205/X035) |
+| `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | What a read returns after an erase, **exactly as the RM writes it**. Two systems: `0xFFFFFFFF`-style (the RM writes `字读- 0xFF`, so the column holds `0xFF`) and `0xe339e339`. Only the `0xe339e339` families state all four widths; the others state the word only and the remaining three columns stay **empty** -- the RM does not say them, so they are not derived |
+| `blank_check_word` | The value **WCH's own EVT IAP sample compares** `*(uint32_t*)FLASH_Base` against to decide whether an application is programmed. A separate source from the RM, so a separate column; this is where the word width becomes explicit for the `0xFF` families. Empty when the sample has no blank check (CH32V103 enters by GPIO) |
 | `zero_wait_note` | Relation between `flash_bytes` (zero-wait region) and total capacity. Families where it moves with option bytes point to `memory_configs.csv`; total capacity points to `code_flash_bytes` in `product_attributes` |
-| `note` | Mode dependence. CH32H417 becomes 8K pages / 64K blocks with `FLASH_CFGR0` bit28 (dual flash mode). Column values are for single mode |
+| `note` | Mode dependence. CH32H417 becomes 8K pages / 64K blocks with `FLASH_CFGR0` bit28 (dual flash mode). Column values are for single mode. Also says when the RM states no erased read value, and cites another repository's measurement when one exists |
 
 The sources are two: **the `@brief` of the EVT flash driver** (`page size 4KB`, `1page = 256Byte`) and **the body text of the RM 闪存 (flash) chapter** (`标准页（1K字节）`, `快速编程按页（128字节）`); they are cross-checked to decide confidence. **There is actually one disagreement** -- the CH32V103 driver writes `ProgramPage_Fast ... 256Byte`, but the RM says `快速编程按页（128字节）`, the erase side of the same driver is also 128B, and the argument condition of `ROM_ERASE` is `StartAddr%128 == 0`. Judged to be a copying error in the EVT comment; the value is 128, marked `conflict`, with both readings kept in `basis`.
+
+The erased-read columns come from the same RM chapter -- the `注：` that follows both the standard and the fast page erase procedure -- and are taken **from the Chinese edition**; the English wording varies five ways and one of them mistranslates `word` as `byte` for a 32-bit value. CH32M030 is the one family whose Chinese RM does not carry the note, so its word comes from the English edition and `basis` says `rm-en(...)`. CH32V003 and CH32V103 say nothing in either edition: their columns stay empty and `note` records that, with the measurement another repository reported. `blank_check_word` is read from the EVT IAP sample, and `basis` cites the file and line.
 
 ### `opa_cmp_registers.csv`
 
