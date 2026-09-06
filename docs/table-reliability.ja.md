@@ -31,6 +31,7 @@
 | 検査 | 何を見るか | 見つけた実例 |
 |---|---|---|
 | `column_drift` | 表のヘッダが、その列を決めている生成器の定数と合っているか | `remap_routes`・`timers` の導出列（**ツールと生成物が数日ずれていた**。F-54） |
+| `regeneration_coverage` | `COLUMN_SOURCES` の生成器が全部 `regenerate.py` の `--full` 順序に載っているか | R-32 で新設した `build_flash_program_method` が**登録漏れ**で `--full` に載っていなかった（原本が改版されても表だけ古いまま残り、列は合っているので `column_drift` にも掛からない。2026-09-06） |
 | `routes_backed_by_pins` | `remap_routes` の (pad, signal) が、その series の `pin_functions` にあるか | 別 series の pin 表を読んでいた128行（F-50） |
 | `pin_numbering` | 封装の公称 lead 数と番号の連番 | NC の足を落としていた5型番（F-49） |
 | `remap_selector_coverage` | `remap-N` 行が selector まで辿れているか | index 側の数を誰も持っていなかった（監査の指摘） |
@@ -70,8 +71,8 @@
 | remap_fields | 287 | 全行 reference | 結合・bits の重複・reset | 一致記録が無く全行 reference。F-34/F-35 は**修正済み**（reset_value 空欄 45→7、残りは RM が復位値を書かない EXTEN CTR 等。valid_values に RM 説明文の列挙を加えた）。F-47 で V407/V467 の `ETHPHY_LED_REMAP` が入った | 🔵 |
 | remap_routes | 4,836 | 全行 reference | fields と結合・valid_values・**pin_functions に (pad, signal) があること**（`routes_backed_by_pins`。2026-08-28 に実装） | F-27/F-42 修正済み（2レジスタ分割 field の列見出しを合成して読む——V407/V467 USART1 の値が正しくなった）。F-8（V003 の ADC 規則転換トリガ PD3/PC2）と F-47（V407/V467 の LED0/LED1）の経路が入り、F-6（V30x の I2S3。2026-08-28）も入って **`candidates` の未解決は 0** になった（**index 側の数は別**——`index/pinout.csv` で selector を決められない `remap-N` 行は **3行**で、F-51 だけ。`KNOWN_SELECTOR_GAPS` が持つ。worklist の「未解決の数は2つあり、単位が違う」）。F-50 は**修正済み**（2026-08-28。CH32X033 の candidate が CH32X035 の pin 表を読んでいた——series CH32X033 の経路が別の pad 由来だった）。X033/X035 の TIM1 値3/4 は **RM に格子が無く** pin 表のみが根拠。F-43（V407 RM の I3C 列見出し誤植）は歯止めで無害化 | 🔵 |
 | timers | 67 | ref 65 / varies 1 / conflict 1 | 結合・IRQ名・variant macro | conflict 1 = V307 TIM5（RM の注が名指す variant を V307 が持たない）。V006 TIM3 の kind 空欄は **RM が種類を書いていない** | 🔵 |
-| flash_program_method | 12 | confirmed 11 / conflict 1 | 結合・ctlr_bit_names⊆register_fields | RMの**番号付き手順**（zh一次）とEVT driverの突き合わせ。conflict 1 = H417（RMは起動bitも`FTPG`と書くが、driverは`CR_PG_STRT`・register_fieldsは`PG_STRT` bit21）。V103とM030は**RMに無い必須手順**（`0x40022034`への書き込み）を`undocumented_note`に持つ | ✅ |
-| flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る） | ✅ |
+| flash_program_method | 12 | confirmed 11 / conflict 1 | 結合・ctlr_bit_names⊆register_fields・幅と方式文字列の一致 | RMの**番号付き手順**（zh一次）とEVT driverの突き合わせ。conflict 1 = H417（RMは起動bitも`FTPG`と書くが、driverは`CR_PG_STRT`・register_fieldsは`PG_STRT` bit21）。V103とM030は**RMに無い必須手順**（`0x40022034`への書き込み）を`undocumented_note`に持つ。`program_buffer_load_bits`はRMに無く**driverの`FLASH_BufLoad`のシグネチャだけが出所**（32/64/128の3通り。M030=64・V103=128） | ✅ |
+| flash_geometry | 12 | confirmed 11 / conflict 1 | 結合・2の冪・fast<page・消去後値の幅 | EVT driver と RM の**両方を読んで突き合わせ**。conflict 1 = V103 の fast_program（EVTコメント256B vs RM 128B。RM＋driverの消去側＋アドレス条件が128で揃うのでRMを採る）。`blank_check_word`はEVT IAP由来だが**V103だけRMにもIAPにも無く**、他repoの実測を引用（`basis`に`measured:ch32rv(...)`。RMの`PGERR`の説明が`0xFFFF`前提なのを`rm-pgerr`で裏付け） | ✅ |
 | opa_cmp_registers | 293 | confirmed 199 / ref 89 / conflict 5 | 結合・address=base+offset・bits=mask | EVT ヘッダ×RM レジスタ表。conflict 5 は**EVT ヘッダ側の誤り**と判断できるもの（F-44 X035 CMP_LOCK bit13→RM bit31 / F-45 L103 ITRIM 幅・V205 HYS_H 位置）。V20x/V103/X315 は bit define が無く行なし | 🟡 |
 | clock_enables | 429 | confirmed 370 / ref 59 | 結合・address=RCC base+offset | EVT rcc.h×RM。**conflict 0**。ref 59 は RM の field 名綴りが違う（`ETH_MAC_Rx` 等）だけで bit の不一致ではない | ✅ |
 | adc_internal | 19 | confirmed 13 / ref 4 / conflict 2 | 結合・channel が数 | datasheet zh/en 照合。conflict 2 = V20x/V307 の Avg_Slope 最大値が **zh 4.8 / en 4.7**（資料側の食い違い、F-46）。V003/X035 のチャネル番号は RM から | ✅ |

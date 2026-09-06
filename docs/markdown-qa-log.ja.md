@@ -842,3 +842,26 @@ Markdownの`cell_html`は`V`+`DDK`を`VDDK`に結合するが、CSVを作る抽�
   ⚠警告＋各ページのPDFリンク（最後の砦）を緩和策とする。**再挑戦の条件**: caption無し図領域を
   誤検出なく囲える判定（例: 罫線・矢印・小円などdiagram固有の描画種の空間的まとまり）を
   作れたとき。それまでは監査で数を追うだけにする。
+
+## セル内下付き復元を converter へ移す（2026-09-06 測定・未着手）
+
+「表面より根で直す」方針（[handoff](handoff.ja.md)）に沿うと、いま
+`pipeline/common/logical_tables.reattach_cell_subscripts` を **exporter と parity から**
+呼んでいるセル内の下付き/上付き復元は、**converter の `physical_cells` へ移すのが正しい**
+——bundle の `cells[].text` が直れば、Markdown だけでなく **bundle のセルを読む抽出器
+（`pipeline/extract/` 系のCSV）にも効く**からです。
+
+**影響量の実測**（bundleの生セルに当てて数えた。読み取りのみ）:
+
+- **14,738セル / 61文書**が変わる。例: `V\nSS` → `VSS`、`V\nBAT` → `VBAT`、
+  H417RMの `'V power regulation bit:\nIO18\n000: 1.2V;…'` → `'VIO18 power regulation bit:\n000: 1.2V;…'`
+- **凍結CSVは動かない**見込み。`pipeline/extract/pdfcompat.py` の `Table.extract()` は
+  bundleの **`extracted_rows`** を返し、`crop()` は `NotImplementedError`。つまり凍結tool群は
+  `cells[].text` を一切見ない。移設で触るのは `cells[].text` だけなので、`run_frozen --batch`
+  のbyte一致は保たれるはず（要実測）。
+- **動く可能性があるのは新経路のCSV**（`operating_conditions` 等、datasheetの電気特性表を
+  bundleのセルから読むもの）。下付きが本来の位置に戻るので、**動くとすれば良い方向**。
+
+**未着手の理由**: converterを変えると `CONVERTER_VERSION` を上げて**68文書を全再変換**
+（約1時間）する必要があり、その後に export → parity → `run_frozen --batch` →
+新経路CSVの差分確認までが1セット。着手はまとまった時間が取れるときに。

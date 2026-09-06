@@ -60,7 +60,11 @@ FULL_PATCHED_3 = ["build_features", "build_timers", "build_flash_geometry",
                   "build_opa_cmp_registers", "build_clock_enables",
                   "build_adc_internal", "build_usbpd_plumbing",
                   "build_registers", "build_dma_requests",
-                  "build_debug_data"]
+                  "build_debug_data",
+                  # build_registers の後でなければならない——`ctlr_bit_names` は
+                  # `register_fields.csv` の綴りをそのまま出す列なので、先に走ると
+                  # 空になる（R-32。登録漏れで --full が拾っていなかった）。
+                  "build_flash_program_method"]
 FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
                 "build_link_firmware"]
 
