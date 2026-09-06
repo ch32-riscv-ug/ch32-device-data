@@ -114,6 +114,9 @@ def plan(args: argparse.Namespace) -> list[tuple[str, list[Step]]]:
         ] if args.full else [])),
         ("checks", [
             ("check_tables", ["tools/check_tables.py"]),
+            # 正本が動いたのに凍結台帳を書き直していないと落ちる。台帳を読むコードが
+            # 無かったせいで27表が黙ってずれていた（2026-09-06）。
+            ("check_baseline", ["tools/check_baseline.py"]),
             ("check_counts", ["tools/check_counts.py"]),
             ("check_docs", ["tools/check_docs.py"]),
         ]),

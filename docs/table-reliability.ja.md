@@ -35,6 +35,7 @@
 | `routes_backed_by_pins` | `remap_routes` の (pad, signal) が、その series の `pin_functions` にあるか | 別 series の pin 表を読んでいた128行（F-50） |
 | `pin_numbering` | 封装の公称 lead 数と番号の連番 | NC の足を落としていた5型番（F-49） |
 | `remap_selector_coverage` | `remap-N` 行が selector まで辿れているか | index 側の数を誰も持っていなかった（監査の指摘） |
+| `check_baseline` | 凍結台帳（`pipeline/baseline/tables.csv`）の行数・SHA-256が正本の実物と一致するか、**かつ正本を全数覆っているか** | **27表がずれ、5表が台帳に載ってさえいなかった**（2026-09-06。ずれた27表は現行の生成器から27/27 byte一致で再現＝正本は正しく台帳が5日古いだけ。台帳を読むコードが1本も無く、「解凍は明示的に台帳を書き直す」という約束を忘れても何も落ちなかった） |
 | CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
 | `check_docs.py` | **文書が書いている行数と穴の状態**が、表と worklist の台帳と合っているか | 解決済みの F-11 を3つの文書が古いまま説明していた・この資料の pinout 行数が5行古かった（2026-08-29 の監査） |
 | `check_viewer.js` | **`pins.html` の表示**が壊れていないか（DOM 無しで関数を評価して出力を見る） | series view の Defaults が先頭型番だけを見ていた（G1。CH32V006 の SWCLK と UART が全部 `-` になっていた） |

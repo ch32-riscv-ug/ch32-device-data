@@ -56,6 +56,16 @@ jobs:
       - name: Check table joins
         run: python tools/check_tables.py
 
+      # The freeze ledger records rows+SHA-256 of every canonical CSV, and
+      # unfreezing is supposed to be an explicit act that re-records it. Nothing
+      # read the ledger, so the promise could be forgotten silently: on
+      # 2026-09-06 twenty-seven tables had drifted away from it (the tables were
+      # right, the ledger was five days behind). A rot detector that nothing
+      # runs rots too.
+      # Standard library only.
+      - name: Check the freeze ledger
+        run: python tools/check_baseline.py
+
       # Data can be right while the prose that explains it is stale, and the
       # prose is what a reader sees. Found 2026-08-29: seven documents and a
       # tool's docstring still called the WCH-Link version numbering unresolved
