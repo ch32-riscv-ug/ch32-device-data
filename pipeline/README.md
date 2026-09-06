@@ -200,7 +200,16 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            ×4 above pinout drawings), **a dense pin table is never an "uncaptioned
            figure"** even though its rotated package names look like one
            (`render_assets`: a table of 8+ rows × 4+ columns, 60%+ filled, covering
-           60%+ of the cluster), **pin/remap tables break each function onto its own
+           60%+ of the cluster), **a cell line that starts a new option keeps its
+           break** (`0:`, `11:`, `0x1F:`, `[5:0]：`, `注：`, `Note:` -- `中断指示域`+`0：异常`+
+           `1：中断` had collapsed into one run-on string, 1,740 boundaries across 29
+           documents; an English word wrapping onto `mode:` is not a value so it still
+           joins), **a word that wrapped inside a narrow cell is rejoined when the page's
+           own vocabulary says so** (`Rese`+`t` -> `Reset`, `channe`+`l`; the default is
+           still a space, as in `source is`+`greater`), **body text escapes `*`** so a
+           line like `2*ADC(TKey) … 4*OPA` is not italicised into `2ADC(TKey) … 4OPA`
+           (817 lines across 58 documents; table cells sit inside HTML blocks and are
+           left alone), **pin/remap tables break each function onto its own
            line** (`MCO`/`TIM1_CH1`/`USART1_CK` were being run together; `0x…` transfer
            lists and `R32_…` register aliases likewise), **subscripts and superscripts
            that pdfplumber detached inside a cell are put back by glyph size and
