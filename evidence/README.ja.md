@@ -173,6 +173,24 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、列は空のままで`note`にその旨と、他repoが報告した実測を引用します。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
 
+### `flash_program_method.csv`
+
+**粒度ではなく順序**です。`flash_geometry.csv`は消去単位と書き込み粒度を持ちますが、**その bit をどの順に叩くか**が無いため、consumerはfamilyごとに実機で当てるしかありませんでした。実害も出ています——CH32X035をPgStart方式で実装するとprogramが**まったく無反応**（消去は全familyで共通なので「消えているのに書けない」状態になる）。
+
+| 列 | 意味 |
+|---|---|
+| `program_method` | 快速ページ書き込みの手順を、**RMが名指す制御bit**で表す。2系統——`fast page, 32-bit buffer writes (FTPG + BUFRST/BUFLOAD, then STRT)`と`fast page, direct writes (FTPG, then PG_STRT)` |
+| `program_commit` | 実際に書き込みを起動するもの——`STRT (bit6)`か`PG_STRT (bit21)` |
+| `erase_method` | 快速消去の手順。per-pageの快速消去を持たないfamily（V407/X315/H417）はその旨とブロック消去のbitを書く |
+| `ctlr_bit_names` | その familyの`FLASH_CTLR`のフィールド名を**`register_fields.csv`の綴りで**。RMは`FTPG`/`BUFRST`、EVT headerは`PAGE_PG`/`BUF_RST`と同じbitを別名で呼ぶので、2つの表をjoinするconsumerには後者が要る |
+| `undocumented_note` | driverが行うのにRMが一切書いていない手順 |
+
+出所はRMの**番号付き手順**（`4）设置FLASH_CTLR寄存器的FTPG位…`。中文版を一次）と、EVTのdriver（`FLASH_ProgramPage_Fast`と、`FLASH_BufLoad`/`FLASH_BufReset`が在るか——buffered系はbuffer書き込みを別関数に分けているので、関数の有無が系統の印になる）。
+
+**食い違いが1件あり、RM側の誤りです。** CH32H417のRMは快速ページ編程の手順8を「FTPG位を'1'にして快速页编程を**启动**」と書きますが、`FTPG`は手順4で既に立てた有効化bitです。driverは`CR_PG_STRT`を使い、`register_fields.csv`にも`PG_STRT` bit21が在る（同系統の他familyと同じ）。`conflict`として両論を`basis`に残しています。
+
+**RMに無い手順が要るfamilyが2つ。** CH32V103とCH32M030のdriverは、各erase/programの後に`0x40022034`へ書き込みます（アドレスのXORはV103が`0x1000`、M030が`0x100`）。ch32rvはCH32V103で**これが無いとeraseもprogramも無反応**だったと報告しています。CH32M030は先方の手元に実機が無いので、こちらは実測ではなく注意喚起です。
+
 ### `opa_cmp_registers.csv`
 
 **コンパレータ/OPAクラスの前提**です。baseは`memory_map.csv`、入力padは`index/pinout.csv`が持つので、足りないのは**フィールドの配置**——enable・入力select・出力・gain。
