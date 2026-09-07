@@ -99,7 +99,20 @@ SCHEMA_VERSION = "0.2"
 # `复位值`/`Reset value`列がそれで消えていた。全corpus49表・約20文書。入れ先が一意に
 # 決まるものだけ（本物の罫線表・1列ぶんの幅・縁に接する・全行帯に中身・各24字以内）。
 # 2026-09-07の検証ラウンドが「セル格子」familyのhigh 13件として指摘した分の一部。
-CONVERTER_VERSION = "1.10.0"
+# 1.10.1: (a) **走査線に刻まれたrasterを1枚に束ねる**——別行立ての数式が高さ0.72ptの
+# 帯277枚に割れて`<!-- image -->`コメント277行になり、**内容がMarkdownから消えていた**
+# （V205DS0.en p64・L103DS0.zh p49）。(b) **セル文字列をgeometryから組み直す**fallback
+# ——脚注の上付きと下付きが同じ基底に付くシンボルで、pdfplumberが脚注を基底の行・
+# 下付きを次の行に置くため`V_DD12A(1)`が`'V (1)\nDD12A'`になる。文字は全部あって順序
+# だけが違うので挿し込みでは直せない（歯止めが正しく拒否する）。行→xに並べ直すだけなら
+# 挿入位置の曖昧さが無い。全corpus419セル・うち338が24字以内で、そこだけ組み直す。
+# 1.10.2: **caption を持たない表をページを跨いで繋ぐ**（`chain_uncaptioned`）。
+# `continues_from_previous`が「過去にcaption付きの表がある」前提だったため、caption無しの
+# 比較表はp3とp4が別の論理表になり、(a)最終セルが`USBHS (USB`で切れ、(b)`'2.0)'`だけの
+# 幽霊行が残り、(c)刷り直されたヘッダが列数を狂わせていた。結合表でしか効かない
+# `fold_boundary_spills`と`drop_repeated_headers`が届いていなかった。条件は列数と
+# **列境界xの±2pt一致**＋上下の位置で、全corpusの候補は18件（既に繋がる表は5,734件）。
+CONVERTER_VERSION = "1.10.2"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -953,6 +966,44 @@ def fix_line_subscripts(page_chars: list[dict], lines: list[dict]) -> int:
     return fixed
 
 
+def _column_edges(cells: list[dict]) -> list[float]:
+    return sorted({round(c["bbox"][0], 1) for c in cells}
+                  | {round(c["bbox"][2], 1) for c in cells})
+
+
+def chain_uncaptioned(table: dict, tail: dict | None, height: float) -> bool:
+    """**caption を持たない表を、前ページの最後の表へ繋ぐ**（1.10.2）。繋いだら真。
+
+    `continues_from_previous`は「過去にcaption付きの表がある」ことを前提にしていた
+    （`continues = bool(consecutive and previous_logical_id)`）ので、**caption が無い表は
+    ページを跨いで繋がらなかった**。`CH32H417DS0.en`の比較表がそれで、p3とp4が別の論理表に
+    なり、(a) p3の最終セルが`USBHS (USB`で切れたまま、(b) p4に`'2.0)'`だけの**幽霊行**、
+    (c) p4に刷り直されたヘッダが列数を狂わせる——という3つの症状を同時に出していた。
+    結合表でしか効かない`fold_boundary_spills`（境界のspillを畳む）と
+    `drop_repeated_headers`（刷り直しヘッダを落とす）が、そもそも届いていなかった。
+
+    条件は厳しくする——`logical_id`が変わると`extract_low_power`のフラグメント束ねが
+    変わり`operating_conditions`に影響するため。双方caption無し・列数一致・**列境界xが
+    ±2ptで一致**（最も強い証拠）・前の表はページ下端近く（75%以降で終わる）・この表は
+    上端近く（35%以内に始まる）。全corpusで候補は**18件**（すでに繋がっている表は5,734件）
+    で、実物を確認するとどれも本物の継続表（割込ベクタ表・比較表・アクセス属性の凡例）。
+    """
+    if tail is None or table["caption"] or table["continues_from_previous"]:
+        return False
+    if tail["captioned"] or tail["column_count"] != table["column_count"]:
+        return False
+    mine = _column_edges(table["cells"])
+    if len(mine) != len(tail["edges"]):
+        return False
+    if any(abs(a - b) > 2.0 for a, b in zip(mine, tail["edges"])):
+        return False
+    if tail["bottom"] < tail["height"] * 0.75 or table["bbox"][1] > height * 0.35:
+        return False
+    table["logical_id"] = tail["logical_id"]
+    table["continues_from_previous"] = True
+    return True
+
+
 def cell_text(page, bbox) -> str:
     # `Table.extract()`は結合セルを矩形行列に平坦化する。物理セルの矩形で
     # cropし、rowspan/colspanを持つセルに文字を残す。
@@ -1032,7 +1083,8 @@ def page_record(page, lang: str, source_sha256: str,
                 top_texts: set, bottom_texts: set,
                 document_type: str = "",
                 carried_split: float | None = None,
-                ) -> tuple[dict, dict, str | None, float | None]:
+                table_tail: dict | None = None,
+                ) -> tuple[dict, dict, str | None, float | None, dict | None]:
     page_chars = chars(page)
     two_column = None   # (列境界x, 開始y)。読み順のkeyが左列→右列を保つのに使う
     lines = text_items(page, "line")
@@ -1106,6 +1158,9 @@ def page_record(page, lang: str, source_sha256: str,
         fix_cell_dupes(page_chars, tables[-1])
         # 表領域の外に落ちた最外列を取り込む（入れ先が一意に決まるものだけ）。
         recover_outer_column(page_chars, tables[-1], tables)
+        # ページの最初の表なら、caption無しでも前ページの最後の表へ繋ぐか試す。
+        if table_index == 1 and chain_uncaptioned(tables[-1], table_tail, float(page.height)):
+            previous_logical_id = tables[-1]["logical_id"]
         previous_bottom = table.bbox[3]
 
     def outside_tables(line: dict) -> bool:
@@ -1175,7 +1230,14 @@ def page_record(page, lang: str, source_sha256: str,
         "chars": page_chars,
         "drawings": page_drawings,
     }
-    return record, geometry, previous_logical_id, (two_column[0] if two_column else None)
+    tail = None
+    if tables:
+        last = max(tables, key=lambda t: t["bbox"][3])
+        tail = {"logical_id": last["logical_id"], "column_count": last["column_count"],
+                "edges": _column_edges(last["cells"]), "bottom": last["bbox"][3],
+                "height": float(page.height), "captioned": bool(last["caption"])}
+    return (record, geometry, previous_logical_id,
+            (two_column[0] if two_column else None), tail)
 
 
 def convert(pdf_path: Path, lang: str, document_type: str,
@@ -1214,13 +1276,14 @@ def convert(pdf_path: Path, lang: str, document_type: str,
     previous_logical_id = None
     previous_page = None
     carried_split = None   # 前ページの列境界x。2カラムの続きページを見分けるのに使う
+    table_tail = None      # 前ページ最後の表の形。caption無しの継続を見分けるのに使う
     with pdfplumber.open(pdf_path) as pdf:
         repeated_top, repeated_bottom, top_texts, bottom_texts = margin_repeats(pdf)
         for page in pdf.pages:
-            record, geometry, previous_logical_id, carried_split = page_record(
+            record, geometry, previous_logical_id, carried_split, table_tail = page_record(
                 page, lang, source_sha256, previous_logical_id,
                 previous_page, number_occurrences, repeated_top, repeated_bottom,
-                top_texts, bottom_texts, document_type, carried_split)
+                top_texts, bottom_texts, document_type, carried_split, table_tail)
             validate(record, PAGE_SCHEMA)
             validate_geometry(geometry)
             payload = dump_bytes(record)
