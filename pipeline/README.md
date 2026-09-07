@@ -485,6 +485,23 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     alone). This is the same rule whose whitelist gap deleted `W1`/`R0` in
     1.9.1 -- both the allow-list and the negative condition can miss.
 
+12. **A column boundary must be a corridor no word crosses** (converter 1.9.4).
+    1.9.3 taught the splitter the heading `产品特性`, and a page that had
+    previously not been split at all started being split **in the wrong place**:
+    the x0-gap heuristic took a gap *inside* the right column (between two of its
+    indent levels) and cut 33 right-column words in half, `crop` putting each
+    fragment on both sides so the tails piled up at the end of the page
+    (CH32V205DS0.zh p1). The boundary is now chosen between two candidates -- the
+    x0 gap and a projection of word extents onto the x axis -- by **which one is
+    crossed by fewest words**, and the page is left unsplit if even the best is
+    crossed by three or more. The left column's longest word reaching into the
+    gutter is normal, so zero crossings is not required.
+
+    **`check_markdown_parity` reported 68/68 clean throughout that defect**: the
+    cut fragments were real bundle lines and the order was preserved. A machine
+    check of "is every line present, in order" cannot see a mis-split -- only
+    comparing against the page image can.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

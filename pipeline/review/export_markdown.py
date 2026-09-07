@@ -439,6 +439,29 @@ def page_vocabulary(page: dict) -> dict[str, int]:
     return counts
 
 
+def _item_list_cell(parts: list[str], doc_vocab: dict[str, int] | None) -> bool:
+    """セルが「1行1項目の一覧」か。**どの行も、その文書に実在する語だけでできている**なら
+    一覧、そうでなければ折り返し。
+
+    比較表の周辺機能欄（`2*ADC（TKey）`／`ADTM`／`3*GPTM`／`CRC`／`2*USART`／`SPI`／`I2C`…）が
+    識別子の折り返しと判定され、`ADTM3*GPTMCRC2*USARTSPII2C`という読めない1語に潰れていた
+    （V203DS0 zh/en・V208DS0.en。2026-09-07の検証ラウンド4窓目がhigh 3件として検出）。
+    `is_list_table`はpin表・remap表しか見ないので、この表は対象外だった。
+
+    折り返しの断片（`USAR`・`T1`・`Rese`）は**語として文書に存在しない**ので当たらない
+    ——そこが一覧との差になる。1行が複数語（空白入り）や長い行のときも一覧とみなさない。"""
+    if len(parts) < 4 or not doc_vocab:
+        return False
+    for part in parts:
+        body = part.strip()
+        if not body or " " in body or len(body) > 18:
+            return False
+        tokens = _VOCAB_WORD.findall(body)
+        if not tokens or any(doc_vocab.get(t, 0) < 2 for t in tokens):
+            return False
+    return True
+
+
 def cell_html(text: str, list_cell: bool = False,
               vocab: dict[str, int] | None = None,
               doc_vocab: dict[str, int] | None = None) -> str:
@@ -455,6 +478,8 @@ def cell_html(text: str, list_cell: bool = False,
     parts = text.split("\n")
     if len(parts) == 1:
         return html.escape(text)
+    if _item_list_cell(parts, doc_vocab):
+        return "<br>".join(html.escape(p.strip()) for p in parts)
     result = html.escape(parts[0])
     for prev, cur in zip(parts, parts[1:]):
         pe = prev.rstrip()
