@@ -796,6 +796,48 @@ def drawings(page) -> list[dict]:
     return out
 
 
+def merge_scanline_images(items: list[dict]) -> int:
+    """**走査線に刻まれたrasterを1枚に束ねる**（1.10.1）。束ねた枚数を返す。
+
+    数式や小さな図を、PDFが高さ1pt未満の帯を何百枚も並べて描くことがある——
+    `CH32V205DS0.en` p64の「Formula 1: Maximum R_AIN」は**277枚**（高さ0.72pt）に
+    刻まれていた。1枚ずつでは`render_assets`の大きさ条件に届かず描画されないので、
+    exporterが`<!-- image: … -->`を277行吐き、**数式の中身がMarkdownから完全に
+    消えていた**（`CH32L103DS0.zh` p49も同型。2026-09-07の検証ラウンドがhigh 2件）。
+
+    resource名を持たない（inline）小さな画像を**y方向の帯**でまとめ、帯に10枚以上
+    あってその囲いが縦横とも8pt以上なら1枚に置き換える。帯の切れ目は縦の隙間4pt。
+    表の罫線代わりに置かれた細い画像を巻き込まないよう、名前つきのresource画像
+    （`X49`のような実在名）は対象外。"""
+    small = sorted((i for i in items
+                    if i["type"] == "image" and not i.get("name")
+                    and i["bbox"][3] - i["bbox"][1] <= 12.0),
+                   key=lambda i: i["bbox"][1])
+    if len(small) < 10:
+        return 0
+    bands: list[list[dict]] = []
+    for item in small:
+        if bands and item["bbox"][1] - max(g["bbox"][3] for g in bands[-1]) <= 4.0:
+            bands[-1].append(item)
+        else:
+            bands.append([item])
+    merged = 0
+    for band in bands:
+        if len(band) < 10:
+            continue
+        x0 = min(g["bbox"][0] for g in band); x1 = max(g["bbox"][2] for g in band)
+        y0 = min(g["bbox"][1] for g in band); y1 = max(g["bbox"][3] for g in band)
+        if x1 - x0 < 8.0 or y1 - y0 < 8.0:
+            continue
+        keep = band[0]
+        keep["bbox"] = rounded_box((x0, y0, x1, y1))
+        keep.pop("source_size", None)
+        drop = {id(g) for g in band[1:]}
+        items[:] = [i for i in items if id(i) not in drop]
+        merged += len(band) - 1
+    return merged
+
+
 def overlap_issues(cells: list[dict]) -> list[str]:
     occupied: dict[tuple[int, int], str] = {}
     overlaps = []
@@ -1015,6 +1057,8 @@ def page_record(page, lang: str, source_sha256: str,
     join_split_lines({"lines": lines})
     words = text_items(page, "word")
     page_drawings = drawings(page)
+    # 走査線に刻まれたrasterを1枚に束ねる（数式が277枚に割れていた）。
+    merge_scanline_images(page_drawings)
     page_captions = captions(lines, lang)
     detected = sorted(page.find_tables(), key=lambda item: (item.bbox[1], item.bbox[0]))
     tables = []

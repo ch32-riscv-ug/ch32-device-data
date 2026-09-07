@@ -357,7 +357,15 @@ def render_document(bundle: Path, pdf_path: Path, out_doc: Path) -> dict:
         covered = [bbox for _, bbox in by_page.get(page["number"], [])]
         for image in page["images"]:
             x0, top, x1, bottom = image["bbox"]
-            if x1 - x0 < LARGE_IMAGE or bottom - top < LARGE_IMAGE:
+            wide = x1 - x0
+            tall = bottom - top
+            # 縦横とも大きい画像に加えて、**横長で面積のある**画像も描く——別行立ての
+            # 数式は幅167pt×高24ptのような形で、正方形の閾値（40pt）に高さが届かない。
+            # `CH32V205DS0.en` p64の「Formula 1: Maximum R_AIN」と`CH32L103DS0.zh` p49が
+            # それで、内容がMarkdownから完全に消えていた（2026-09-07の検証ラウンド）。
+            # 面積も要求するので、罫線代わりの細い帯（幅はあるが高さ数pt）は通らない。
+            banner = wide >= 80.0 and tall >= 12.0 and wide * tall >= 1500.0
+            if not banner and (wide < LARGE_IMAGE or tall < LARGE_IMAGE):
                 continue
             cx, cy = (x0 + x1) / 2, (top + bottom) / 2
             if any(b[0] <= cx <= b[2] and b[1] <= cy <= b[3] for b in covered):
