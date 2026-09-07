@@ -281,6 +281,24 @@ parity 68/68 clean、検査5本通過。
 位（bit）列が消え、`CH32V003RM.zh` p7では**フィールドが誤ったbit位置**に出る。
 詳細と再挑戦の条件は [markdown-qa-log](markdown-qa-log.ja.md)。**残り32文書**。
 
+### 2026-09-06〜07 PDF↔Markdown検証ラウンド **68/68文書 完了**（converter 1.9.4）
+
+4窓・**634ページ**・**指摘390件**（high 46・medium 164・low 145＋原本側35）。
+**根に直したのは8件**（詳細と family 別の集計は [markdown-qa-log](markdown-qa-log.ja.md)）。
+うち**値が変わっていたもの**: 括弧付き指数`2^(G+2)`の潰れ、`clean_reset_column`による
+`W1`/`R0`・`…`・`ac`の削除（access列の空セル509個・30文書）、2カラム未分割による
+存在しない文の生成。**検証**: 凍結tool 23出力・非PDF 12出力・新経路CSV 4本 byte 一致、
+parity 68/68 clean、検査5本通過。正本CSVは1バイトも動いていない。
+
+**2つの教訓を記録した**——(a) `clean_reset_column`は「白名簿に無い短い文字列を消す」設計から
+**3回**同じ事故を出したので、次は「消す」から「印を付けて残す」へ反転させる。
+(b) 1.9.3で入れた事故（右カラムが語の途中で切れる）は**parity 68/68 cleanのまま**だった
+——機械検査は取り違えを見つけられないという実例。
+
+🔶 **残る最大の family: セル格子**（49件・high 13）。「glyphは在るのにセルに入っていない／
+別のセルに入っている」。`R32_USART3_GPR`の名称消失・`位`列が丸ごと空・フィールドが誤った
+bit位置・`△`の誤挿入（3例）。再挑戦の条件はQAログに。
+
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
 **結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。
