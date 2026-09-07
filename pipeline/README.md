@@ -502,6 +502,30 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     check of "is every line present, in order" cannot see a mis-split -- only
     comparing against the page image can.
 
+13. **An outer column left outside the table region is taken back in**
+    (converter 1.10.0). When the ruling-based table finder misses the outermost
+    column's outer border, that column stays outside the table bbox -- and it
+    does not survive as a line either, because the row's line has its centre
+    inside the bbox and is therefore dropped from `reading_order`. So the values
+    were **nowhere in the Markdown**: on CH32M030RM.zh p7 the table came out as
+    `名称 / 访问 / 描述 / 复位值` and the `位` column (`[31:15]`, `14`,
+    `[13:12]`, at x 78.5-115.2 against a bbox starting at 121.8) was simply
+    gone, so you could not tell which bits a register field covered. The
+    `复位值` / `Reset value` column being pushed off the right edge is the same
+    defect mirrored.
+
+    Grouping the glyphs outside the bbox by **the table's own row boundaries**
+    puts exactly one item in each band, so the destination is unambiguous -- and
+    that is the whole test. The naive version of this rule matched over a
+    thousand tables, nearly all of them scattered labels on pages where a figure
+    was mistaken for a table (`XUSRAMMFS_DPUSBFSFS_DM`). Four conditions bring
+    it to 49: a genuinely ruled table (≥3 rows, ≥3 columns, ≥60% of cells
+    filled), the outside glyphs no wider than one column (≤30% of the table) and
+    touching its edge (gap ≤8pt), **every** row band filled (a column with a
+    hole is ambiguous, so it is left alone), and no band longer than 24
+    characters. `extracted_rows` is not touched, so the 19 frozen tools cannot
+    see the change.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
