@@ -27,6 +27,7 @@ V20x/30x表4-9で実測）、違うときだけ**x座標の和集合**（許容2
 from __future__ import annotations
 
 import re
+from collections import Counter
 
 TOLERANCE = 2.0        # pt。x辺の同一視
 BOTTOM_BAND = 0.75     # 前ページの表がこれより下で終わっていること（ページ高比）
@@ -193,8 +194,10 @@ def fold_boundary_spills(merged: dict) -> int:
     simple: dict[tuple[int, int], dict] = {}
     by_row: dict[int, list[dict]] = {}
     for cell in merged["cells"]:
-        single = (cell["row_end"] - cell["row_start"] == 1
-                  and cell["column_end"] - cell["column_start"] == 1)
+        # **1行ぶんの高さ**であればcolspanは許す（1.10.2）。畳み先は「同じ列範囲」で
+        # 決めるので、列がずれる余地は無い——`USBHS (USB`＋`2.0)`はどちらもcolspan=2で、
+        # 1行1列だけを許す旧条件では弾かれ、幽霊行が残っていた（H417DS0.en p3/p4）。
+        single = cell["row_end"] - cell["row_start"] == 1
         if single:
             simple[(cell["row_start"], cell["column_start"])] = cell
         if cell["text"].strip():
@@ -211,6 +214,8 @@ def fold_boundary_spills(merged: dict) -> int:
             prev = simple.get((row - 1, cell["column_start"]))
             if prev is None or not prev["text"].strip():
                 continue
+            if prev["column_end"] != cell["column_end"]:
+                continue   # 列範囲が違うなら畳み先が一意でない
             prev["text"] = prev["text"] + "\n" + cell["text"]
             removed.append(cell)   # 継続セルはグリッドから消す（空行を残さない）
             continue
@@ -224,6 +229,49 @@ def fold_boundary_spills(merged: dict) -> int:
     # 継続セルを消した行番号（他の列の空セルだけが残る＝描画時に落とす行）。
     merged["_folded_rows"] = sorted(c["row_start"] for c in removed)
     return len(removed)
+
+
+def extend_boundary_spans(merged: dict) -> int:
+    """**ページ境界で切れた縦の結合セルを1つに戻す**（1.10.2）。戻した数を返す。
+
+    背の高い結合セル（`VIL`が標準I/OとFT I/Oの両ブロックを覆う等）は、pdfplumberに
+    ページの切れ目で切られる。前ページ側は下端で止まったセル、次ページ側は**中身の無い
+    セル**になる（続きの箱に上枠が無い）。結合表ではその2つが別のセルとして並び、
+    しかも続き側は`fold_boundary_spills`が畳んだ行から始まるため**描画時に丸ごと落ちて
+    列が1つ足りなくなる**——`CH32H417DS0.en` p104の表3-19では「FT I/O pin, input low level
+    voltage」の3行が7列ではなく6列になり、条件がSymbol欄に、値がCondition/Min欄に出て
+    **Unit欄が消えていた**（2026-09-07の検証ラウンドがhigh 3件として指摘）。
+
+    条件は狭い——(1)ページ境界の行から始まり、(2)**中身が空**で、(3)**直上のセルと
+    列範囲が完全に一致**し、(4)直上のセルが境界でちょうど終わっていて中身が空でない。
+    この形はpdfplumberが箱を切ったときの署名。空セルを上へ吸収するので、描画される
+    文字は変わらない（元から空）——変わるのは**行の列数が揃うこと**だけ。
+    """
+    if merged.get("_spans_extended"):
+        return 0
+    merged["_spans_extended"] = True
+    row_pages = merged.get("row_pages")
+    if not row_pages:
+        return 0
+    boundaries = {r for r in range(1, min(merged["row_count"], len(row_pages)))
+                  if row_pages[r] != row_pages[r - 1]}
+    if not boundaries:
+        return 0
+    ends: dict[tuple[int, int, int], dict] = {}
+    for cell in merged["cells"]:
+        ends[(cell["row_end"], cell["column_start"], cell["column_end"])] = cell
+    absorbed = []
+    for cell in merged["cells"]:
+        if cell["row_start"] not in boundaries or (cell["text"] or "").strip():
+            continue
+        above = ends.get((cell["row_start"], cell["column_start"], cell["column_end"]))
+        if above is None or not (above["text"] or "").strip():
+            continue
+        above["row_end"] = cell["row_end"]
+        absorbed.append(cell)
+    for cell in absorbed:
+        merged["cells"].remove(cell)
+    return len(absorbed)
 
 
 def strip_boundary_dupes(table: dict) -> int:
@@ -543,6 +591,42 @@ def has_subscript_shape(table: dict) -> bool:
     return False
 
 
+def _rebuilt_from_glyphs(text: str, glyphs: list[dict], dominant: float) -> str | None:
+    """**セル文字列をgeometryの読み順から組み直す**（1.10.1）。直せないならNone。
+
+    脚注の上付きと下付きが同じ基底に付くシンボルで、pdfplumberは脚注を基底の行に、
+    下付きを次の行に置く——`V_DD12A(1)`が`'V (1)\nDD12A'`に、`t_SU(LSI)(1)`が
+    `'t (1)\nSU(LSI)'`になる。**文字は全部あって順序だけが違う**ので、挿し込みでは
+    直せない（`reattach_cell_subscripts`の歯止めが正しく拒否する）。全corpus419セル、
+    うち338が24字以内（2026-09-07の検証ラウンドが「下付きの離脱」として指摘した型）。
+
+    行（上端で束ねる）→x の順に並べ直すだけなので、**挿入位置の曖昧さが原理的に無い**
+    ——`每2^20个`を`每2个…121pp^20m`に壊した回帰は「既存の文字列に挿し込む」ことが
+    原因だった。組み直しにはその失敗モードがない。
+
+    **短いセルに限る**。グリフは空白を持たないので、長い説明セルを組み直すと
+    `Thedatabusisdriven`のように語間が失われる。24字以内（実測で81%がここに入る）で、
+    文字集合が完全に一致し、結果が現状と違うときだけ返す。
+    """
+    flat = "".join(text.split())
+    if len(flat) > 24:
+        return None
+    rows: list[list[dict]] = []
+    for glyph in sorted(glyphs, key=lambda g: (g["bbox"][1], g["bbox"][0])):
+        if rows and glyph["bbox"][1] - rows[-1][-1]["bbox"][1] > 0.5 * dominant:
+            rows.append([])
+        elif not rows:
+            rows.append([])
+        rows[-1].append(glyph)
+    rebuilt = "\n".join("".join(g["text"] for g in sorted(row, key=lambda g: g["bbox"][0]))
+                         for row in rows)
+    if not rebuilt.strip() or rebuilt == text:
+        return None
+    if Counter("".join(rebuilt.split())) != Counter(flat):
+        return None
+    return rebuilt
+
+
 def reattach_cell_subscripts(table: dict, chars) -> int:
     """表セルの中で基底から離れた**下付き**を、geometryで元の位置へ戻す。
 
@@ -580,6 +664,14 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
         normal = [g for g in glyphs if g["size"] > 0.8 * dominant]
         if not small or not normal:
             continue
+        def _fallback() -> bool:
+            """挿し込みが諦めたら、geometryから組み直せるか試す。"""
+            rebuilt = _rebuilt_from_glyphs(text, glyphs, dominant)
+            if rebuilt is None:
+                return False
+            cell["text"] = rebuilt
+            return True
+
         if (not _LONE_LETTER.search(text)
                 and not _FLAT_PAREN_EXPONENT.search(text)
                 and not any(ch.isdigit() for g in small for ch in g["text"])):
@@ -668,6 +760,7 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
                      and (nxt["bbox"][0] - base["bbox"][2]) - width < 1.2)
             plan.append((i, sub, tight, raw, x0, top))
         if not plan or len(plan) > len(runs):
+            fixed += 1 if _fallback() else 0
             continue
         # textから下付き/上付きの綴りを（トークン優先で）消す
         stripped = text
@@ -683,8 +776,12 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
                 break
             stripped = stripped[:m.start()] + stripped[m.end():]
         if not ok:
+            fixed += 1 if _fallback() else 0
             continue
         if "".join(stripped.split()) != "".join(g["text"] for g in normal):
+            # 挿し込みでは直せない（セル文字列の順序自体が壊れている）。geometryから
+            # 組み直せるなら組み直す——行→xに並べ直すだけなので挿入位置の曖昧さが無い。
+            fixed += 1 if _fallback() else 0
             continue
         # k番目の基底の直後へ挿す（後ろから）
         out = stripped

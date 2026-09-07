@@ -787,6 +787,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # 境界行のreset列に降りた行端グリフを先に消す——空になれば続き行として畳める。
                 logical_tables.clean_reset_column(record)
                 logical_tables.fold_boundary_spills(record)
+                # ページ境界で切れた縦の結合セルを続きの行まで伸ばす（列ずれを直す）。
+                logical_tables.extend_boundary_spans(record)
             if item["id"] in bitfields:
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
