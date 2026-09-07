@@ -93,7 +93,13 @@ SCHEMA_VERSION = "0.2"
 # x0のギャップ方式が**右カラムの内側**（字下げの段の間）を溝と誤ったこと。2つの候補
 # （x0ギャップ・語の占有幅の投影）を出して**跨ぐ語が最小のもの**を採り、それでも3語
 # 以上跨ぐなら分割しない。2026-09-07の検証ラウンド4窓目が検出。
-CONVERTER_VERSION = "1.9.4"
+# 1.10.0: **表領域の外に落ちた最外列を取り込む**（`recover_outer_column`）。罫線検出が
+# 最外列の外枠を拾えないと、その列が表bboxの外に残り、行の中心は表bbox内なので
+# `reading_order`からも外れて**Markdownのどこにも出ない**——`位`列（`[31:15]`/`14`）や
+# `复位值`/`Reset value`列がそれで消えていた。全corpus49表・約20文書。入れ先が一意に
+# 決まるものだけ（本物の罫線表・1列ぶんの幅・縁に接する・全行帯に中身・各24字以内）。
+# 2026-09-07の検証ラウンドが「セル格子」familyのhigh 13件として指摘した分の一部。
+CONVERTER_VERSION = "1.10.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -336,6 +342,109 @@ def join_split_lines(page: dict) -> int:
         lines[left_id]["text"] = (lines[left_id]["text"] or "").rstrip() + tail
         lines[right_id]["merged_into"] = left_id
     return len(merge)
+
+
+def recover_outer_column(page_chars: list[dict], record: dict,
+                         siblings: list[dict]) -> str | None:
+    """**表領域の外に落ちた最外列**を取り込む（1.10.0）。'left'/'right'/Noneを返す。
+
+    罫線ベースの表検出が最外列の外枠を拾えないと、その列が表bboxの外に残る——
+    `CH32M030RM.zh` p7の`位`列（x 78.5-115.2、表bboxは121.8から）がそれで、値
+    `[31:15]`/`14`/`[13:12]`は**Markdownのどこにも出ていなかった**（行の中心は表bbox内
+    なので`reading_order`からも外れる）。`复位值`/`Reset value`列が右外へ排出される型も
+    ある。全corpus49表・約20文書（2026-09-07の検証ラウンドがhigh 13件として指摘した
+    「セル格子」familyの中で、**入れ先が一意に決まる**分）。
+
+    入れ先が一意に決まるものだけ触る。**表自身の行境界**でグリフを束ね、1行帯につき
+    1セルの列を先頭（または末尾）へ挿す。次の全部を満たすときだけ:
+
+    - 本物の罫線表（3行3列以上・セルの6割以上に中身）——図の誤検出を外す
+    - 外側のグリフが**1列ぶんの幅**（表幅の30%以下）で、表の縁に接している（隙間≤8pt）
+    - **すべての行帯に中身がある**＝列として完全。1行帯でも欠けたら曖昧なので触らない
+    - どの行帯も24字以内。他の表の中にいるグリフは対象外
+
+    緩い条件（幅と行帯の完全性を見ない）では1,000表超が当たり、その大半は図を表と
+    誤検出したページの散乱ラベル（`XUSRAMMFS_DPUSBFSFS_DM`）だった。4条件で49表になる。
+    `extracted_rows`は**触らない**——凍結tool19本がそれを読むので、影響を`cells`側に閉じる。
+    """
+    if record["row_count"] < 3 or record["column_count"] < 3:
+        return None
+    cells = record["cells"]
+    if not cells or sum(1 for c in cells if (c.get("text") or "").strip()) / len(cells) < 0.6:
+        return None
+    box = record["bbox"]
+    width = box[2] - box[0]
+    ys = sorted({round(c["bbox"][1], 2) for c in cells} | {round(c["bbox"][3], 2) for c in cells})
+    if len(ys) < 4:
+        return None
+    others = [t["bbox"] for t in siblings if t is not record]
+
+    for side in ("left", "right"):
+        picked = []
+        for glyph in page_chars:
+            if not (glyph.get("text") or "").strip():
+                continue
+            gx = (glyph["bbox"][0] + glyph["bbox"][2]) / 2
+            gy = (glyph["bbox"][1] + glyph["bbox"][3]) / 2
+            if not (box[1] <= gy <= box[3]):
+                continue
+            if gx < box[0] if side == "right" else gx > box[2]:
+                continue
+            if side == "left" and gx >= box[0]:
+                continue
+            if side == "right" and gx <= box[2]:
+                continue
+            if any(o[0] <= gx <= o[2] and o[1] <= gy <= o[3] for o in others):
+                continue
+            picked.append(glyph)
+        if len(picked) < 3:
+            continue
+        x0 = min(g["bbox"][0] for g in picked)
+        x1 = max(g["bbox"][2] for g in picked)
+        if x1 - x0 > width * 0.30:
+            continue
+        gap = box[0] - x1 if side == "left" else x0 - box[2]
+        if not -2.0 <= gap <= 8.0:
+            continue
+        bands: dict[int, list[dict]] = {}
+        for glyph in picked:
+            gy = (glyph["bbox"][1] + glyph["bbox"][3]) / 2
+            index = max(i for i, y in enumerate(ys[:-1]) if y <= gy) if ys[0] <= gy else -1
+            if index < 0 or gy > ys[index + 1]:
+                bands = {}
+                break
+            bands.setdefault(index, []).append(glyph)
+        if len(bands) != len(ys) - 1:
+            continue
+        texts = {i: "".join(g["text"] for g in sorted(gs, key=lambda g: (round(g["bbox"][1], 1),
+                                                                        g["bbox"][0])))
+                 for i, gs in bands.items()}
+        if any(len(t) > 24 for t in texts.values()):
+            continue
+
+        # 既存セルを1列ずらして、外側に1列足す
+        if side == "left":
+            for cell in cells:
+                cell["column_start"] += 1
+                cell["column_end"] += 1
+            span = (x0, box[0])
+            column = 0
+        else:
+            span = (box[2], x1)
+            column = record["column_count"]
+        for index, text in texts.items():
+            cells.append({
+                "id": f"{record['id']}-outer-{index:04d}",
+                "row_start": index, "row_end": index + 1,
+                "column_start": column, "column_end": column + 1,
+                "bbox": rounded_box((span[0], ys[index], span[1], ys[index + 1])),
+                "text": text, "bold": False, "italic": False,
+            })
+        record["column_count"] += 1
+        record["bbox"] = rounded_box((min(box[0], x0), box[1], max(box[2], x1), box[3]))
+        cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+        return side
+    return None
 
 
 def fix_cell_dupes(page_chars: list[dict], record: dict) -> None:
@@ -951,6 +1060,8 @@ def page_record(page, lang: str, source_sha256: str,
         # 回転の組み直しの**後**——直った文字に対して下付きを戻す。
         fix_cell_subscripts(page_chars, tables[-1])
         fix_cell_dupes(page_chars, tables[-1])
+        # 表領域の外に落ちた最外列を取り込む（入れ先が一意に決まるものだけ）。
+        recover_outer_column(page_chars, tables[-1], tables)
         previous_bottom = table.bbox[3]
 
     def outside_tables(line: dict) -> bool:
