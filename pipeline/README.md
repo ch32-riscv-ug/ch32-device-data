@@ -526,6 +526,69 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     characters. `extracted_rows` is not touched, so the 19 frozen tools cannot
     see the change.
 
+14. **A raster sliced into scanlines is stitched back into one image**
+    (converter 1.10.1). A PDF can draw a displayed equation as **277 strips
+    0.72pt tall**; individually none is large enough for `render_assets`, so the
+    exporter emitted 277 `<!-- image: … -->` comments and the equation's content
+    was **absent from the Markdown** (CH32V205DS0.en p64, CH32L103DS0.zh p49).
+    Unnamed (inline) small images are grouped into y-bands and a band of ten or
+    more whose bounding box is at least 8pt on both sides becomes one image
+    (278 → 2). `render_assets` also now renders a **wide, sizeable** image
+    (≥80pt wide, ≥12pt tall, ≥1500pt² area) and not only one that clears 40pt in
+    both directions -- a displayed equation is 167×24pt and never clears the
+    square threshold.
+
+15. **A cell whose text is in the wrong order is rebuilt from the glyphs**
+    (converter 1.10.1). Where a footnote superscript and a subscript share a
+    base, pdfplumber puts the footnote on the base's line and the subscript on
+    the next one, so `V_DD12A(1)` arrives as `'V (1)\nDD12A'`. **Every character
+    is present; only the order is wrong**, so no insertion can fix it -- and the
+    existing guard (the result must equal the glyphs in reading order) correctly
+    refuses. So when insertion gives up, the cell is rebuilt by sorting the
+    glyphs into rows and then by x. That has **no insertion position to get
+    wrong**, which is what broke `每2^20个` into `每2个…121pp^20m` when a
+    permissive fallback was tried before. Two guards: **only cells of 24
+    characters or fewer** (glyphs carry no spaces, so rebuilding prose would
+    give `Thedatabusisdriven`; 338 of the 419 affected cells are that short) and
+    the character multiset must match exactly. Results: `VDD12A(1)`,
+    `IDD12A(1)(2)`, `VHSEH(1)`, `tSU(LSI)(1)`, `VREF-`, `VSS`, `VDD33`.
+
+16. **An uncaptioned table is chained across the page break** (converter
+    1.10.2). `continues_from_previous` was `bool(consecutive and
+    previous_logical_id)` -- it required a *captioned* table to have been seen,
+    so **a table with no caption never continued**. The CH32H417DS0.en
+    comparison table split into two logical tables and showed three symptoms at
+    once: its last cell truncated to `USBHS (USB`, a **ghost row** on the next
+    page holding only `'2.0)'` (with an empty rowspan=3 cell that stole the
+    PDUSB group label), and a reprinted header that widened the grid.
+    `fold_boundary_spills` and `drop_repeated_headers` only work inside a merged
+    table, so **neither was reaching it** -- one root looking like three
+    defects. Chaining requires the same column count, **column edges matching
+    within 2pt**, the previous table ending in the bottom quarter and this one
+    starting in the top third; corpus-wide there are **18** such pairs against
+    5,734 already-chained ones, and each is a real continuation (interrupt
+    vector table, comparison table, the `RW0`/`RW1T` access legend).
+    `fold_boundary_spills` also stopped requiring a single-column cell: a
+    colspan is fine as long as the cell above has **exactly the same column
+    range**, which is what `USBHS (USB` + `2.0)` needed. `operating_conditions`
+    stayed byte-identical at 2,796 rows even though `logical_id` moved.
+
+17. **A vertical span cut by the page break is put back together**
+    (`extend_boundary_spans`, exporter side). A tall merged cell (`VIL` covering
+    both the standard and FT I/O blocks) is cut in two: the earlier page keeps a
+    cell that stops at the bottom, the later page gets a cell **with no text**
+    (its box has no top border). In the merged table those are two cells, and
+    because the later one starts on a row that `fold_boundary_spills` folds
+    away, **it is dropped at render time and the row comes out one column
+    short** -- on CH32H417DS0.en p104 the three "FT I/O pin, input low level
+    voltage" rows had 6 columns instead of 7, putting the condition in the
+    Symbol column and **losing the Unit column entirely**. The empty
+    continuation is absorbed into the cell above when it starts on a page
+    boundary, has no text, and has **exactly the same column range** as a
+    non-empty cell ending there. Nothing visible changes (the absorbed cell was
+    empty); what changes is that the row's column count is right, and `VIL`
+    ends up with rowspan=7, which is the box the PDF actually draws.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).
