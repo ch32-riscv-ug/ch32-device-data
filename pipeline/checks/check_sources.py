@@ -12,13 +12,23 @@ CH32X315の`version_en`を1.2と言い、bundleは1.1のPDFから作られたま
 しているのと同じ考えを、**全文書 × いまのmirror**へ広げたもの。読み取りだけで、
 ネットワークも要らない。
 
+更新は**三者**でずれる。①目録の版（このリポジトリ`catalog/documents.csv`。GitHub
+Actionsがcommitするので**このリポジトリのpull**が要る）、②原本の実体（mirrorのPDF。
+mirror側の自動取得なので**各mirrorのpull**が要る）、③変換済みの記録
+（`structured/*/manifest.json`）。②vs③は通信なしで分かる（既定）。①も含めた
+「どのリポジトリをpullすべきか」は`--remote`で`git ls-remote`を引いて名指しする。
+
+**`regenerate.py`が走行の前後で呼ぶのは通信なしの②vs③だけ**——1時間強の工程の門に
+ネットワークを置くと、落ちたときに原因が増える。`--remote`は人が判断するための報告。
+
 出口:
     0  全文書が一致（走ってよい）
-    1  原本が変わった文書がある／ファイルが無い
+    1  原本が変わった文書がある／ファイルが無い／未取得のcommitがある（--remote時）
 
 実行:
-    uv run pipeline/checks/check_sources.py            # 一覧を出す
+    uv run pipeline/checks/check_sources.py            # 一覧を出す（通信なし）
     uv run pipeline/checks/check_sources.py --quiet    # 食い違いだけ出す
+    uv run pipeline/checks/check_sources.py --remote   # pullすべきリポジトリも名指しする
 """
 
 from __future__ import annotations
@@ -26,6 +36,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -58,9 +69,34 @@ def survey() -> tuple[list[str], list[tuple[str, str, str]], list[str]]:
     return same, moved, missing
 
 
+def mirror_roots() -> dict[str, Path]:
+    """mirrorのルート → そこに原本を置いている文書の数。"""
+    roots: dict[Path, int] = {}
+    for job in convert_all.targets():
+        # 原本は <mirror>/datasheet_<lang>/<file> に置かれている
+        roots[Path(job["pdf"]).parents[1]] = roots.get(Path(job["pdf"]).parents[1], 0) + 1
+    return {str(k): v for k, v in sorted(roots.items())}
+
+
+def unpulled(repo: Path) -> str | None:
+    """originのHEADがローカルのHEADと違えば、その短いhashを返す（読み取りだけ）。"""
+    if not (repo / ".git").exists():
+        return None
+    def git(*argv: str) -> str:
+        return subprocess.run(("git", "-C", str(repo), *argv), capture_output=True,
+                              text=True, timeout=30).stdout.strip()
+    local = git("rev-parse", "HEAD")
+    remote = git("ls-remote", "origin", "HEAD").split()
+    if not local or not remote:
+        return None      # originが無い/引けない——判断の材料にしない
+    return remote[0][:12] if remote[0] != local else None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--quiet", action="store_true", help="食い違いだけ出す")
+    ap.add_argument("--remote", action="store_true",
+                    help="originを引いて、pullすべきリポジトリを名指しする")
     args = ap.parse_args()
     same, moved, missing = survey()
     total = len(same) + len(moved) + len(missing)
@@ -70,12 +106,28 @@ def main() -> int:
         print(f"  ★ {name}: manifest={recorded[:12]} いまの原本={actual[:12]}")
     for line in missing:
         print(f"  ★ {line}")
+    behind: list[str] = []
+    if args.remote:
+        print("\n未取得のcommit（originを引いた結果）:")
+        for label, repo in [("このリポジトリ", REPO)] + [
+                (f"mirror {Path(root).name}（原本{count}件）", Path(root))
+                for root, count in mirror_roots().items()]:
+            head = unpulled(repo)
+            if head:
+                behind.append(label)
+                print(f"  ★ {label}: origin={head} ——**pullが要る**")
+        if not behind:
+            print("  すべて最新")
     if moved or missing:
         print("\n**原本が動いています。**この状態で再生成すると、出力が"
               "どの入力状態にも対応しなくなります。")
         print("資料の更新として取り込むなら、**コード変更とは別のcommitで**"
               "再生成してください——CSVが動いたときに原因を分けられなくなります。")
         print("手順は docs/handoff.ja.md 「原本（mirror）にPDFが追加・更新されたとき」。")
+        return 1
+    if behind:
+        print("\n未取得のcommitがあります。**pullの順序は「このリポジトリ → 該当mirror」**"
+              "——mirrorは目録を読んで原本を落とすので、機械の順序と同じ向きで追う。")
         return 1
     return 0
 
