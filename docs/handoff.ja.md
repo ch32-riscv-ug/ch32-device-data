@@ -7,6 +7,29 @@
 これまで作業機ごとのAIエージェントのメモリに散っていた約束事を、**人もエージェントも
 最初に読むこの文書**へ集めた（作業は複数マシンで行うので、機械ローカルには置かない）。
 
+## セッションの始めに1回だけ（必須）
+
+```
+uv run pipeline/checks/check_sources.py --remote
+```
+
+**入力が三者でずれる**ので、始めた時点の状態を確定させる。①目録の版
+（`catalog/documents.csv`。GitHub Actionsがcommitするので**このリポジトリのpull**が要る）、
+②原本の実体（mirrorのPDF。**各mirrorのpull**が要る）、③変換済みの記録
+（`structured/*/manifest.json`）。数秒で、読み取りだけ。
+
+- 「未取得のcommit」が出たら**ユーザーにpullを頼む**（順序は**このリポジトリ → 該当mirror**。
+  mirrorは目録を読んで原本を落とすので、機械の順序と同じ向きで追う）
+- 「原本が動いています」が出たら、それは**資料更新の取り込み待ち**。コード変更の作業に
+  入る前に、取り込むのか後回しにするのかを決める（混ぜない。下の節）
+- **mirrorが目録に追いついていない間は変換しない**（`tools/check_mirrors.py`が
+  「目録が割り当てたのにmirrorに無い」を報告する）。変換しても次のmirror更新で作り直しになる
+
+入力を数時間おきに追いかけるのは`tools/pull_inputs.py`（**人が回す**。cron/timerから）。
+再生成中は`.cache/regenerate.lock`を見て跳ばし、このリポジトリは作業ツリーがcleanな
+ときだけpullする。**禁止ではなく排他**——数時間おきのpullそのものは良いことで、困るのは
+1時間強の工程の途中で入ることだけ。
+
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
 このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠39表）・`index/`（索引13表）と、そこから生成する各family
@@ -48,7 +71,8 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
 
 ### 原本（mirror）にPDFが追加・更新されたとき
 
-**先に照合する**: `uv run pipeline/checks/check_sources.py` が、目録が割り当てた全文書に
+**先に照合する**（セッション開始時の必須手順と同じもの）:
+`uv run pipeline/checks/check_sources.py` が、目録が割り当てた全文書に
 ついて「mirrorのPDFのSHA」と「コミット済み`structured/<文書>/manifest.json`の原本SHA」を
 比べる（読み取りだけ・ネットワーク不要）。動いている文書があれば名指しで出る。
 `regenerate.py`は**走行の前と後**にこれを回す——前は高価な工程の前に止まり
@@ -62,6 +86,10 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
 だった（別に本物の回帰も1件あったので、切り分けが要った）。順序は
 「①コード変更を凍結した原本で検証してcommit → ②`--accept-sources`で資料更新を
 取り込んでcommit」。
+
+**再生成中はpullしない**——`regenerate.py`は`.cache/regenerate.lock`を置き、
+`tools/pull_inputs.py`はそれを見て跳ばす。守れなくても走行の後段照合が
+「この出力はどの入力状態にも対応しない」と言って落ちるので、黙って混ざることはない。
 
 **目録の自動更新は台帳も同じcommitに含める**（`update.yml`が`check_baseline --record`を
 呼ぶ）。`catalog/documents.csv`は人が触らずに変わる唯一の表なので、台帳を置いていくと
