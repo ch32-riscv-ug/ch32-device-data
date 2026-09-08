@@ -26,10 +26,15 @@ from importlib.metadata import version
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 import convert  # noqa: E402
+import runlock  # noqa: E402  原本を読む間の鍵（pull側が見て跳ばす）
 
 REPO = convert.REPO
-MIRRORS = Path("/home/mt/dev_wch")
+# mirrorを並べている入れ物は**このcheckoutの隣**——場所を直書きしない。
+# `tools/`の凍結tool19本は各自`/home/mt/dev_wch`を持っているが、あれは更新停止中
+# （baseline凍結）なので触らない。新経路はここを通す。
+MIRRORS = REPO.parent
 TARGET_KINDS = ("datasheet", "reference-manual", "core-manual",
                 "package-drawing", "other")
 
@@ -110,12 +115,18 @@ def main() -> int:
 
     started = time.perf_counter()
     results = []
-    if jobs:
-        with multiprocessing.Pool(args.jobs) as pool:
-            for name, took, pages in pool.imap_unordered(
-                    run_one, [(j, str(args.out), str(args.structured)) for j in jobs]):
-                results.append((name, took, pages))
-                print(f"  {name}: {pages}p {took:.0f}s", file=sys.stderr)
+    # **原本を読む間は鍵を取る**——数時間おきの`pull --ff-only`が途中で入ると、
+    # 文書ごとに違うmirror状態から変換したbundle群になる（各manifestは自分が読んだ
+    # bytesのSHAを持つので嘘は無いが、集合としてどの入力状態にも対応しない）。
+    with runlock.acquire("convert_all") as taken:
+        if not taken:
+            return 1
+        if jobs:
+            with multiprocessing.Pool(args.jobs) as pool:
+                for name, took, pages in pool.imap_unordered(
+                        run_one, [(j, str(args.out), str(args.structured)) for j in jobs]):
+                    results.append((name, took, pages))
+                    print(f"  {name}: {pages}p {took:.0f}s", file=sys.stderr)
     total_pages = sum(pages for _, _, pages in results)
     print(f"converted {len(results)} versions / {total_pages} pages "
           f"in {time.perf_counter() - started:.0f}s "

@@ -1,0 +1,17 @@
+[Unit]
+Description=CH32 device data: pull the originals (catalogue mirrors)
+Documentation=file:%h/dev_wch/ch32-device-data/docs/handoff.ja.md
+# 原本を読んでいる工程（regenerate.py / convert_all.py）が走っている間は
+# スクリプト自身が .cache/regenerate.lock を見て跳ばす（exit 1）。
+
+[Service]
+Type=oneshot
+# WorkingDirectory は enable する前に自分のcheckoutへ書き換える
+WorkingDirectory=%h/dev_wch/ch32-device-data
+# `uv` は ~/.local/bin にあり、systemdの既定PATH（/usr/local/bin:/usr/bin:/bin）には
+# 入っていない——`%h`で辿る（ホームを直書きしない）。別の場所へ入れているなら書き換える。
+ExecStart=%h/.local/bin/uv run tools/pull_inputs.py
+# 「忙しくて跳ばした」(1) は失敗ではない——次の回で拾う
+SuccessExitStatus=0 1
+Nice=10
+IOSchedulingClass=idle
