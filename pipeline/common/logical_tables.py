@@ -54,10 +54,50 @@ def compatible(a: list[float], b: list[float]) -> bool:
     return len(_union_edges([a, b])) <= max(len(a), len(b)) + 2
 
 
+def _snap(edges: list[float], x: float) -> int:
+    return min(range(len(edges)), key=lambda i: abs(edges[i] - x))
+
+
+def _ghost_free_edges(per: list[tuple], merged_edges: list[float]) -> list[float] | None:
+    """**断片より列が増えた**結合表で、幽霊列を消せる基準の境界を返す（無ければNone）。
+
+    列境界は断片の**和集合**（`_union_edges`）なので、片方のページの余分な境界が論理表
+    全体へ伝播する。`compatible`が+2列まで許すため、5列の表が6列になり**どのセルも
+    占めていない列**が1本挟まる——`CH32M030RM.en` p46では見出しが7つの列枠に対し本文が
+    1,1,2,1,2と並び、`Name`が2〜3列目・`RO`が3〜4列目と**ラベルと値が1つずれて**いた
+    （再突合の指摘。`CH32xRM.zh` p179は`R32_USART3_GPR`が空セルになっていた）。
+
+    **境界の最も多い断片を基準に寄せ直す**が、次を両方満たすときだけ——満たさないなら
+    和集合のまま（安全側）:
+
+    - どの断片のどのセルも**colspanが変わらない**（消えるのは占有されていない列だけ）
+    - 同じ行で2つのセルが同じ列に**衝突しない**
+
+    全corpus実測: 断片より列が増えた結合表は47件（+81列）で衝突は**0件**。うち
+    colspanが保たれるのが**14件**で、そこだけ寄せる。幅が変わる33件（`CH32X315DS0.en`
+    p22の70セル等）は断片の境界が大きく食い違うので触らない。
+    """
+    reference = max((edges for _, _, edges in per), key=len)
+    if len(merged_edges) <= len(reference):
+        return None
+    for _, table, _ in per:
+        seen: set[tuple[int, int]] = set()
+        for cell in table["cells"]:
+            start = _snap(reference, round(cell["bbox"][0], 2))
+            end = max(_snap(reference, round(cell["bbox"][2], 2)), start + 1)
+            if end - start != cell["column_end"] - cell["column_start"]:
+                return None
+            if (cell["row_start"], start) in seen:
+                return None
+            seen.add((cell["row_start"], start))
+    return reference
+
+
 def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
     """断片列 → 結合済み論理表。セルはグローバルな行/列番号を持つ。"""
     per = [(page, table, fragment_edges(table)) for page, table in fragments]
 
+    reference_edges: list[float] | None = None
     if len({len(edges) for _, _, edges in per}) == 1:
         index_maps = [{edge: i for i, edge in enumerate(edges)} for _, _, edges in per]
 
@@ -66,6 +106,8 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
         width = len(per[0][2]) - 1
     else:
         merged_edges = _union_edges([edges for _, _, edges in per])
+        # 幽霊列を消せる基準の境界を**記録するだけ**（適用は人向け経路）。
+        reference_edges = _ghost_free_edges(per, merged_edges)
 
         def column(fragment: int, x: float) -> int:
             return min(range(len(merged_edges)),
@@ -109,6 +151,8 @@ def merge_cells(fragments: list[tuple[int, dict]]) -> dict:
         "row_pages": row_pages,
         "issues": [issue for _, table in fragments for issue in table["issues"]],
         "parts": [(page, table["id"]) for page, table in fragments],
+        # 人向け経路だけが使う（`snap_ghost_columns`）。canonicalの列番号は動かさない。
+        **({"_reference_edges": reference_edges} if reference_edges else {}),
     }
 
 
@@ -260,9 +304,21 @@ def extend_boundary_spans(merged: dict) -> int:
     ends: dict[tuple[int, int, int], dict] = {}
     for cell in merged["cells"]:
         ends[(cell["row_end"], cell["column_start"], cell["column_end"])] = cell
+    # **その行が自分の中身を持つなら触らない**（2026-09-08）。「境界の空セル＋直上が
+    # 境界でちょうど終わる」形は、箱が切られた場合と**次ページの行が正当にその列だけ
+    # 空**な場合で見分けが付かない。中身のある行へ吸わせると、直上の値がその行に
+    # 被さって**値の捏造**になる——`CH32M030DS2.zh` p3/p4で`17|25|ISP1`の行が上の
+    # `PA8`の`ADC_IN7/MCO/…`と`SPI_MOSI_3`を持つ形になった（再突合が指摘）。
+    # 全corpus実測: 発火11,015件のうち1,185件が中身のある行＝捏造、9,830件が
+    # `fold_boundary_spills`で空になった行＝安全。取りこぼす側（結合を戻さず空セルの
+    # まま）は列数が合ったままなので無害で、誤りの向きが非対称。
+    own_content = {cell["row_start"] for cell in merged["cells"]
+                   if (cell.get("text") or "").strip()}
     absorbed = []
     for cell in merged["cells"]:
         if cell["row_start"] not in boundaries or (cell["text"] or "").strip():
+            continue
+        if cell["row_start"] in own_content:
             continue
         above = ends.get((cell["row_start"], cell["column_start"], cell["column_end"]))
         if above is None or not (above["text"] or "").strip():
@@ -272,6 +328,227 @@ def extend_boundary_spans(merged: dict) -> int:
     for cell in absorbed:
         merged["cells"].remove(cell)
     return len(absorbed)
+
+
+def drop_empty_boundary_rows(merged: dict) -> int:
+    """**ページ境界に残った「セルが1つも無い行」をグリッドから消す**。消した数を返す。
+
+    `fold_boundary_spills`が継続セルを畳み、`extend_boundary_spans`が残りの空セルを
+    上へ吸い上げると、その行には**セルが1つも残らない**。exporterはそれを空の`<tr>`
+    として出し、しかも跨いでいる結合セルのrowspanが1つ余分になる——`CH32H417DS0.en`
+    p104の表3-19では`VIL`がPDFの6行ぶんに対し7、`Standard I/O …`が3に対し4になり、
+    値の欄を横に割る空の帯が出ていた（同 p3のPDUSBはrowspan=5対PDF4行、
+    `CH32L103DS0.zh` p21・`CH32L103RM.en` p13も同形。再突合が指摘）。
+
+    落とすのは**境界行かつセルが0個**のものだけ——文字を持つセルは1つも無いので
+    出力の文字は変わらず、変わるのはrowspanと行数だけ。同一ページ内のセル0行
+    （結合の段で空いた穴。全corpus8件）は原因が別なので触らない。冪等。
+
+    行番号の詰め直しは間違えやすいので例で固定する。跨いでいるセルは下端が詰まり、
+    下にある行は繰り上がる:
+
+    >>> def c(r0, r1, text=""):
+    ...     return {"row_start": r0, "row_end": r1, "column_start": 0,
+    ...             "column_end": 1, "text": text}
+    >>> t = {"id": "t", "row_count": 4, "row_pages": [1, 1, 2, 2],
+    ...      "cells": [c(0, 1, "a"), c(1, 3, "span"), c(3, 4, "d")],
+    ...      "_folded_rows": [2]}
+    >>> drop_empty_boundary_rows(t), t["row_count"], t["row_pages"]
+    (1, 3, [1, 1, 2])
+    >>> [(x["row_start"], x["row_end"], x["text"]) for x in t["cells"]]
+    [(0, 1, 'a'), (1, 2, 'span'), (2, 3, 'd')]
+
+    **自分の中身を持つ境界行は消さない**（`extend_boundary_spans`が実データ行へ
+    吸い上げるのを止めたのと同じ理由。これを消すと値が1行ぶん繰り上がる）:
+
+    >>> t = {"id": "t", "row_count": 3, "row_pages": [1, 2, 2],
+    ...      "cells": [c(0, 1, "a"), c(1, 2, "real"), c(2, 3, "b")]}
+    >>> drop_empty_boundary_rows(t), t["row_count"]
+    (0, 3)
+
+    消える行から始まって**下へ続く**空セルは、次の行から始まるセルへ読み替える:
+
+    >>> t = {"id": "t", "row_count": 4, "row_pages": [1, 2, 2, 2],
+    ...      "cells": [c(0, 1, "a"), c(1, 2), c(1, 4), c(2, 3, "c")],
+    ...      "_folded_rows": [1]}
+    >>> drop_empty_boundary_rows(t), t["row_count"]
+    (1, 3)
+    >>> sorted((x["row_start"], x["row_end"], x["text"]) for x in t["cells"])
+    [(0, 1, 'a'), (1, 2, 'c'), (1, 3, '')]
+    """
+    if merged.get("_rows_dropped"):
+        return 0
+    merged["_rows_dropped"] = True
+    row_pages = merged.get("row_pages")
+    if not row_pages:
+        return 0
+    count = merged.get("row_count", 0)
+    have = {cell["row_start"] for cell in merged["cells"]}
+    texted = {cell["row_start"] for cell in merged["cells"]
+              if (cell.get("text") or "").strip()}
+    folded = set(merged.get("_folded_rows", ()))
+    gone = {row for row in range(1, min(count, len(row_pages)))
+            if row not in texted and row_pages[row] != row_pages[row - 1]
+            and (row not in have or row in folded)}
+    if not gone:
+        return 0
+    _remove_rows(merged, gone)
+    return len(gone)
+
+
+def _remove_rows(table: dict, gone: set[int]) -> None:
+    """指定した行をグリッドから消す（跨ぐセルの下端を詰め、以降の行を繰り上げる）。
+
+    消える行に**空セルが残っている**ことがある——`extend_boundary_spans`は直上が空の列
+    （`Typ.`のように全行空）を吸い上げないので、1つだけ残って行が消えなかった
+    （`CH32H417DS0.en` p104の空帯が残った理由）。下へ続く空セルは**次の行から始まる
+    セル**に読み替え、その行だけの空セルは落とす。文字は無いので失われない。
+    """
+    if not gone:
+        return
+    count = table.get("row_count", 0)
+    # 消える行が2つ続く場合もあるので、どのセルも消える行から始まらなくなるまで繰り返す。
+    while any(cell["row_start"] in gone for cell in table["cells"]):
+        for cell in list(table["cells"]):
+            if cell["row_start"] not in gone:
+                continue
+            if cell["row_end"] - cell["row_start"] > 1:
+                cell["row_start"] += 1
+            else:
+                table["cells"].remove(cell)
+    for cell in table["cells"]:
+        # 跨いでいる途中の行が消えるぶんだけ下端を詰め、下にある行はまとめて繰り上げる。
+        cell["row_end"] -= sum(1 for row in gone
+                               if cell["row_start"] < row < cell["row_end"])
+        shift = sum(1 for row in gone if row < cell["row_start"])
+        cell["row_start"] -= shift
+        cell["row_end"] -= shift
+    table["row_count"] = count - len(gone)
+    row_pages = table.get("row_pages")
+    if row_pages:
+        table["row_pages"] = [page for row, page in enumerate(row_pages) if row not in gone]
+    if table.get("_folded_rows"):
+        table["_folded_rows"] = sorted(
+            row - sum(1 for dead in gone if dead < row)
+            for row in table["_folded_rows"] if row not in gone)
+
+
+def snap_ghost_columns(merged: dict) -> int:
+    """**幽霊列を消す**（`merge_cells`が記録した基準の境界へ寄せる）。消えた列数を返す。
+
+    列境界は断片の**和集合**（`_union_edges`）なので、片方のページの余分な境界が論理表
+    全体へ伝播する。`compatible`が+2列まで許すため、5列の表が6列になり隣のセルの
+    colspanが伸びて**ラベルと値が1つずれる**——`CH32M030RM.en` p46では見出しが7つの列枠に
+    対し本文が1,1,2,1,2と並び、`Name`が2〜3列目・`RO`が3〜4列目に出ていた
+    （`CH32xRM.zh` p179は`R32_USART3_GPR`の行が空セルになっていた。再突合の指摘）。
+
+    寄せられるかの判定は`merge_cells`が済ませている（`_reference_edges`。境界の最も
+    多い断片で、どの断片のどのセルもcolspanが変わらず衝突もしないときだけ記録される）。
+    ここでは各セルの`src_bbox`をその境界へ寄せ直す。
+
+    **人向け出力専用**（exporterとparity検査だけが呼ぶ）——`merge_cells`の列番号を
+    動かすと正規CSVに効く。`merge_cells`側で寄せた版を試したところ
+    `evidence/operating_conditions.csv`にX315の偽行（`typ=enabled`）が1行増え、
+    zhの異論がStop mode行から奪われた（`check_baseline`が捕捉。2026-09-08に撤退して
+    この形に組み替えた）。canonicalは和集合の列番号のまま、人向けだけ寄せる。
+
+    全corpus実測: 断片より列が増えた結合表47件のうち、寄せても壊れないのが**14件**。
+    幅が変わる33件（`CH32X315DS0.en` p22の70セル等）は断片の境界が大きく食い違うので
+    `merge_cells`が記録しない。冪等（`_ghost_snapped`）。
+    """
+    if merged.get("_ghost_snapped"):
+        return 0
+    merged["_ghost_snapped"] = True
+    reference = merged.get("_reference_edges")
+    if not reference:
+        return 0
+    before = merged.get("width") or merged.get("column_count") or 0
+    for cell in merged["cells"]:
+        box = cell.get("src_bbox") or cell.get("bbox")
+        if not box:
+            return 0   # 座標が無いセルがあるなら触らない（bit図の合成など）
+        start = _snap(reference, round(box[0], 2))
+        cell["column_start"] = start
+        cell["column_end"] = max(_snap(reference, round(box[2], 2)), start + 1)
+    merged["width"] = len(reference) - 1
+    if "column_count" in merged:
+        merged["column_count"] = merged["width"]
+    merged["cells"].sort(key=lambda c: (c["row_start"], c["column_start"]))
+    return before - merged["width"]
+
+
+def strip_duplicated_span_lines(table: dict) -> int:
+    """**縦の結合セルの1行分が、覆っている行にもう一度出ているぶん**を落とす。
+
+    斜めに割れた角セル（`Product model`／`Resource differences`）や折り返した見出し
+    （`Reset`／`value`）を、pdfplumberは**結合セルとして1つ**出したうえで**下の行に
+    もう1つ**出すことがある。結合表ではその行が列数を超え、**以降のセルが右へずれる**
+    ——`CH32H417DS0.en` p3では行が10列（表は8列）になり、`QEU6`〜`REU6`が`128`〜`60`の
+    2つ右に出て、どの型番が何ピンか読み違える形になっていた（再突合の指摘）。
+    比較表の先頭（`CH32L103DS0.en` p2・`CH32V205DS0.en` p3・同zh）も同じ形。
+
+    落とすのは次を全部満たすセルだけ:
+
+    - その行の占める列数が**表の列数を超えている**（超えていないなら独立したセル）
+    - 覆っている結合セルと**列範囲が重なる**（同じ箱の二重出力に限る）
+    - 結合セルの本文が**2行以内**で、そのセルの本文が**その1行と完全一致**する
+
+    「2行以内」が要——長い説明セルは**次の行の文字まで飲み込む**ことがあり、そのとき
+    小さいセルの方が本物なので消すとデータが失われる（`QingKeV4_Processor_Manual` p37の
+    `Floating-point unit status FS FS Meaning 00 OFF …`が9行ぶんを飲み、`FS Meaning`・
+    `Initial`・`Clean`・`Dirty`が独立セルで在る）。全corpus実測: 列数超え＋重なり＋
+    部分一致は206件、うち**完全一致かつ上が2行以内は74件・26文書**で、これは全部本物の
+    二重出力（`Product model`／`Reset value`／`TIM2_RM=10`＋`Partial mapping`／
+    `PLLCLK/8`／`td(CLKL_AV)`／`ITR1`＋`（TS=001）`）。**3行以上は40件**あり、そこに
+    上の危険な型が入る。
+
+    消しても**文字は失われない**——同じ綴りが結合セルに残っている。変わるのは行の列数が
+    揃って以降のセルが本来の列に戻ることだけ。`strip_boundary_dupes`と同じ「二重取りの
+    除去」なので同じ層に置き、**人向け出力専用**（exporterとparity検査だけが呼ぶ）。
+    冪等（`_span_dupes_stripped`）。
+    """
+    if table.get("_span_dupes_stripped"):
+        return 0
+    table["_span_dupes_stripped"] = True
+    columns = table.get("width") or table.get("column_count") or 0
+    if not columns:
+        return 0
+
+    def norm(text: str | None) -> str:
+        return " ".join((text or "").split())
+
+    dead: set[int] = set()
+    dead_rows: set[int] = set()
+
+    def row_width(row: int) -> int:
+        return sum(cell["column_end"] - cell["column_start"] for cell in table["cells"]
+                   if cell["row_start"] <= row < cell["row_end"] and id(cell) not in dead)
+
+    for span in [c for c in table["cells"]
+                 if c["row_end"] - c["row_start"] > 1 and norm(c.get("text"))]:
+        lines = [norm(part) for part in (span.get("text") or "").split("\n") if norm(part)]
+        if not lines or len(lines) > 2:
+            continue
+        for row in range(span["row_start"] + 1, span["row_end"]):
+            for cell in table["cells"]:
+                if row_width(row) <= columns:
+                    break
+                if (cell is span or cell["row_start"] != row or id(cell) in dead
+                        or not (cell["column_start"] < span["column_end"]
+                                and span["column_start"] < cell["column_end"])):
+                    continue
+                if norm(cell.get("text")) in lines:
+                    dead.add(id(cell))
+                    dead_rows.add(row)
+    if not dead:
+        return 0
+    table["cells"] = [cell for cell in table["cells"] if id(cell) not in dead]
+    # 二重出力だけで出来ていた行は、消したあとセルが1つも残らない——空の`<tr>`として
+    # 出て、覆っている結合セルのrowspanも1つ余分になる（remap表のヘッダは版面では
+    # 1行で、2行目は折り返しの続きだった）。その行はグリッドから詰める。
+    have = {cell["row_start"] for cell in table["cells"]}
+    _remove_rows(table, {row for row in dead_rows if row not in have})
+    return len(dead)
 
 
 def strip_boundary_dupes(table: dict) -> int:
