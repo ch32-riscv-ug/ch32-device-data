@@ -1,25 +1,25 @@
 {
- "schema_version": "0.2",
- "source_sha256": "008980845bada9cd5fbb73994caed557b6a33e8bc0cf149827945a679b20f0e8",
- "status": "partial",
- "decisions": {
-  "p306-table-002": {
-   "status": "approved",
-   "canonical_table_number": "23-4"
-  },
-  "p91-table-005": {
-   "status": "approved",
-   "canonical_table_number": "10-23",
-   "note": "printed as 10-10; the zh edition does not caption the remap tables, so its chapter-10 numbering differs"
-  },
-  "p96-table-002": {
-   "status": "approved",
-   "canonical_table_number": "10-24",
-   "note": "printed as 10-11"
-  },
-  "p182-table-003": {
-   "status": "approved",
-   "canonical_table_number": "14-2"
+  "schema_version": "0.2",
+  "source_sha256": "008980845bada9cd5fbb73994caed557b6a33e8bc0cf149827945a679b20f0e8",
+  "status": "partial",
+  "decisions": {
+    "p306-table-002": {
+      "status": "approved",
+      "canonical_table_number": "23-4"
+    },
+    "p91-table-005": {
+      "status": "approved",
+      "canonical_table_number": "10-10",
+      "note": "printed as 10-10; the en edition v1.1 printed 10-23 and v1.2 now prints 10-10 too"
+    },
+    "p96-table-002": {
+      "status": "approved",
+      "canonical_table_number": "10-11",
+      "note": "printed as 10-11; the en edition v1.1 printed 10-24 and v1.2 now prints 10-11 too"
+    },
+    "p182-table-003": {
+      "status": "approved",
+      "canonical_table_number": "14-2"
+    }
   }
- }
 }

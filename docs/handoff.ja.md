@@ -48,6 +48,25 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
 
 ### 原本（mirror）にPDFが追加・更新されたとき
 
+**先に照合する**: `uv run pipeline/checks/check_sources.py` が、目録が割り当てた全文書に
+ついて「mirrorのPDFのSHA」と「コミット済み`structured/<文書>/manifest.json`の原本SHA」を
+比べる（読み取りだけ・ネットワーク不要）。動いている文書があれば名指しで出る。
+`regenerate.py`は**走行の前と後**にこれを回す——前は高価な工程の前に止まり
+（資料更新の取り込みなら`--accept-sources`）、後は**走行中にpullされた**ことを検出して
+「この出力はどの入力状態にも対応しない」と言って落ちる。
+
+**資料更新の再生成と、コード変更の再生成を混ぜない**（別commitにする）。混ぜると
+**CSVが動いたのがコードのせいか資料のせいか区別できなくなる**——2026-09-08にこれで
+誤診した: CH32X315のen版1.1→1.2がpullされた状態で`check_baseline`が赤くなり、最初
+「自分の変更の回帰」と読んだが、実際は目録の自動更新が凍結台帳を書き直していないため
+だった（別に本物の回帰も1件あったので、切り分けが要った）。順序は
+「①コード変更を凍結した原本で検証してcommit → ②`--accept-sources`で資料更新を
+取り込んでcommit」。
+
+**目録の自動更新は台帳も同じcommitに含める**（`update.yml`が`check_baseline --record`を
+呼ぶ）。`catalog/documents.csv`は人が触らずに変わる唯一の表なので、台帳を置いていくと
+**自分が作った変更で次のCIが赤くなる**。常時赤い検査は読まれなくなる。
+
 1. **mirrorの`git pull`はユーザーが行う。** 上流との差は読み取りだけで分かる
    （`git -C /home/mt/dev_wch/<FAMILY> ls-remote origin HEAD` と `git log -1`）。「PDFが追加された」と
    聞いたら、まずローカルに本当に新しいファイルがあるか（`find … -mtime -3`、bundleの
