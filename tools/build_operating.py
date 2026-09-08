@@ -40,6 +40,7 @@ import pdfplumber
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import wrap_rules
 import paths  # noqa: E402
 
 # 対象の表。「一般動作条件」に加えて発振器の表も読む。後者はクロック源の
@@ -217,7 +218,9 @@ def attach_subscript(text: str) -> str:
 
 
 def norm_text(cell):
-    text = re.sub(r"\s+", " ", (cell or "").replace("\n", " ")).strip()
+    # 行末のハイフンで割れた語を先に繋ぐ（`high-`⏎`speed`。規則と実測は wrap_rules）
+    cell = wrap_rules.join_hyphen_wrap(cell or "")
+    text = re.sub(r"\s+", " ", cell.replace("\n", " ")).strip()
     for pattern, repl in TEXT_REPAIRS:
         text = pattern.sub(repl, text)
     return attach_subscript(text)

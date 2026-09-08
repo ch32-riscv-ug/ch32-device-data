@@ -447,6 +447,61 @@ reference に降格）** に割れた。`ch5 USART1_RX_0` も同様。
 （`2-1-1`・`2-1-2`・`3-6-1`・`12-18`・`23-4`が印字されるようになった）。章10だけ
 番号が変わった（`10-23`→`10-10`＝zhに揃った）ので両版のcanonicalを揃えた。
 
+### 2026-09-09 最終検証（converter 1.14.0・凍結15表が bundle 入力）
+
+`regenerate.py --verify --human` 全段成功。**原本の照合 68/68**（前後とも）・
+**凍結パリティ 6/6 byte-identical を 15秒で**（従来1,819秒。PDF直読みではなく bundle を
+読んでいる証拠）・**markdown parity 68/68 clean**・検査4本通過・台帳60表一致。検証は正本を
+1バイトも動かしていない。
+
+HEAD に対して動いた正本は7表——`features`（1行完成）・`dma_requests`/`index/dma`（654→650、
+全 confirmed）・`operating_conditions`（46+2行の綴り）・`product_attributes`（10行の見出し）・
+`index/features`・`index/manifest`——と台帳。すべて上の節で説明した意図した変化で、
+`pins`(4,563)・`pin_functions`(28,483)・`registers`(4,932)・`register_fields`(33,365) 等の
+残り53表は byte 一致。
+
+### X315 更新で見えた2つの分断を直した（2026-09-09）
+
+- **`dma_requests` のページ跨ぎ**: `USART1_T`⏎`X_0` の折り返しの間にページ境界が来て3行に
+  割れていた（全部 reference）。`build_dma_requests.read_manual` に「見出し無し続き表の先頭行の
+  断片を、前表の最終行の同じ列の要求と繋いで書き戻す」を入れた。発火点は**続き側**
+  （`STARTS_REQUEST` でも `BARE` でもない＝断片）——`complete("USART1_T")` が True を返すので
+  持ち越し側では判定できなかった。全12 RM で dry-run: 変わるのは X315.en だけ。
+  正本 654→**650 行・全 confirmed**。
+- **行末ハイフン**（`high- speed`・`General- purpose`）: `tools/wrap_rules.py` に規則を置き、
+  `build_operating.norm_text` と `extract_products` の見出し結合から使う。左が全大文字（記号の
+  マイナス `V_REF-`）・右が接続詞（保留ハイフン `low- and`）だけ残す。全corpus 112件で
+  106繋ぐ／6残す、残した6件は全部正しい。`operating_conditions` 46+2行が直る。
+  `product_attributes` は 8 行が直り、残った CH32V317 の 2 行は `join_wrap()`（ページ境界で切れた
+  見出しを継ぐ関数）が ASCII 同士を常に空白で継いでいたのが根——`spaced()` と同じ CONNECTORS
+  規則を入れて **残り 0**。同じ判断が3箇所に別々に書かれ、1箇所だけ正しかった。
+
+詳細は [markdown-qa-log](markdown-qa-log.ja.md)。凍結の対象は**入力層**で、これらは
+**正規化層**（綴りの結合）と**読み手の欠陥**（ページ跨ぎ）の修正——「凍結toolの下を直す」の
+範囲を越えるが、値の解釈は変えていない。
+
+### 凍結toolは bundle を読んでいなかった（2026-09-08 発覚・同日修正）
+
+`features.csv` の切れた見出しが converter 1.13.0 で直らなかったことから、`run_patched.py`/
+`run_frozen.py` の差し替えが**効いていなかった**ことが分かった（詳細は
+[markdown-qa-log](markdown-qa-log.ja.md)）。原因は2つ——`__main__` を差し替えた瞬間に
+比較基準が壊れる（ログの `(1 modules)` が印）・関数内の遅延 import が属性差し替えを迂回する。
+両方直した（基準を局所に控える・`sys.modules` ごと差し替える）。
+
+**意味が変わった検証**: 今日何度も挙げた「凍結パリティ 6/6 byte-identical」は「正本が原本PDFの
+新しい読みと一致する」検査でしかなく、「新しい bundle を古い読み手に食わせても同じか」では
+なかった。pdfcompat の入口ゲートも一度も動いていない。D18 工程(5) は15表について効いていなかった。
+
+**差し替えが効いた瞬間の実測**（`--full`）: 15表のうち **12表 byte一致**（`register_fields`
+33,365行を含む）・`features` 1行改善・**`pins`系3表が回帰**（LQFP100 の3部品の足が全部落ちる）。
+原因は二重正規化——`fix_rotated_cells`（1.3.1）が回転見出しの向きを `extracted_rows` にも書き、
+鏡文字前提の `extract_pins.read_variant` が `LQFP100` を `001PFQL` に再反転。
+→ converter 1.14.0 で `extracted_rows` を pdfplumber の生に戻した（`cells` 側の修復は残す）。
+対象DSで `find_pin_tables` を両バックエンド比較: **zh/en とも 110行・variants 完全一致**。
+
+**退役の順序が効いた**——bundle 入力で1度回す工程そのものが、converter 側の隠れた前提を
+検査した。一括で消していたら気付けなかった。
+
 ### 凍結tool（PDF直読み）の退役の順序（2026-09-08 方針確認）
 
 「そろそろ凍結toolをなくしてもいいか」への答え——**目標として正しいが一括では消せない**。

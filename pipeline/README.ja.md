@@ -493,6 +493,30 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     文字は失われない。`strip_boundary_dupes`と同じ「二重取りの除去」なので同じ層に置く
     （人向け出力専用）。
 
+24. **折り返した節見出しの続きを見出しへ繋ぐ**（`join_heading_wraps`。converter 1.13.0）。
+    読む側は`extract_text()`の行ごとに見出しの正規表現を当てるので、折り返した題は1行目
+    しか取れず、`evidence/features.csv`に`1.4.19 … (USBSS) (Not applicable`と切れて入って
+    いた（続きは`to CH32X305)`）。**`lines`と`text`の両方で繋ぐ**——凍結toolが読むのは
+    `text`。条件は「直前が節見出し・同じ左マージン・直下・同じbold・続きは見出しでない・
+    **見出しの括弧が閉じていない or 続きが小文字始まり**」。最後の条件が要で、これが
+    無いと562件当たり大半が`● …`の箇条書き（繋ぐと壊れる）。全corpusで**22件**、全部本物。
+    継ぎ目はCJKなら無区切り・英数同士は空白・`,;:`の後は空白・それ以外は無区切り
+    （`(y`＋`= 1/2)`）——22件すべてで正しいことを実測。
+
+25. **runnerの差し替えバグを直し、`extracted_rows`を生に戻した**（converter 1.14.0）。
+    `run_patched.py`/`run_frozen.py`の差し替えループは、`__main__`（runner自身）を差し替えた
+    瞬間に比較基準（runnerのグローバル`pdfplumber`）が壊れ、後に来る凍結tool本体が全部
+    素通りしていた（ログの`(1 modules)`がその印）。加えて関数内の遅延importは属性の差し替え
+    を迂回する。→ 基準を局所に控え、`sys.modules["pdfplumber"]`ごと差し替える。
+    **それまで凍結toolはbundleではなく原本PDFを直読みしていた**——「凍結パリティ
+    byte一致」は「正本がPDFの新しい読みと一致する」検査でしかなく、pdfcompatの入口
+    ゲートも一度も動いていなかった。差し替えが効いた途端に`pins`系が回帰（LQFP100の
+    3部品の足が全部落ちる）: `fix_rotated_cells`（1.3.1）が回転見出しの向きを
+    `extracted_rows`にも書いていて、鏡文字を前提に自分で戻す`extract_pins.read_variant`
+    が`LQFP100`を`001PFQL`に再反転した。`extracted_rows`はpdfplumberの生のまま＝凍結tool
+    の前提、が正しい（`cells`側の修復は残す）。直後の実測: 15表のうち12表byte一致・
+    `features`1行改善・`pins`系は一致に戻った。
+
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。
 

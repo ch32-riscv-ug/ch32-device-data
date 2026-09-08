@@ -32,6 +32,10 @@ def main() -> int:
         print("usage: run_patched.py <tool> [args...]", file=sys.stderr)
         return 2
     name = sys.argv[1]
+    # **関数内の遅延import**（`build_dma_requests`・`build_debug_data`は`import pdfplumber`を
+    # 関数の中で行う）は属性の差し替えを迂回する——patch時点で属性が無いから。
+    # `sys.modules`ごと差し替えれば、後から解決されるimportも互換層を受け取る。
+    sys.modules["pdfplumber"] = pdfcompat
     module = importlib.import_module(name)
     # **基準は局所に控える。** `pdfplumber`はこのmoduleのグローバルなので、ループが
     # `__main__`（このrunner自身）を差し替えた瞬間に基準そのものがpdfcompatへ変わり、
@@ -44,7 +48,10 @@ def main() -> int:
         if loaded is not None and getattr(loaded, "pdfplumber", None) is real:
             loaded.pdfplumber = pdfcompat
             patched += 1
-    print(f"[{name}] pdfplumber -> pdfcompat ({patched} modules)", file=sys.stderr)
+    # `sys.modules`を先に差し替えるので、toolの属性は最初からpdfcompat——属性ループが
+    # 数えるのは先にimport済みのmodule（runner自身）だけ。数は指標にならない。
+    print(f"[{name}] pdfplumber -> pdfcompat (sys.modules swapped; {patched} earlier import(s) patched)",
+          file=sys.stderr)
     sys.argv = [f"{name}.py", *sys.argv[2:]]
     return module.main()
 

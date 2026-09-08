@@ -112,6 +112,10 @@ SCHEMA_VERSION = "0.2"
 # 幽霊行が残り、(c)刷り直されたヘッダが列数を狂わせていた。結合表でしか効かない
 # `fold_boundary_spills`と`drop_repeated_headers`が届いていなかった。条件は列数と
 # **列境界xの±2pt一致**＋上下の位置で、全corpusの候補は18件（既に繋がる表は5,734件）。
+# 1.14.0: **`fix_rotated_cells`が`extracted_rows`を書き換えるのを止めた**。runnerの差し替えバグ
+# （`__main__`を差し替えた瞬間に比較基準が壊れ、凍結tool本体が素通り）が直って初めて凍結tool
+# がbundleを読み、`read_variant`が正しい向きの`LQFP100`を再反転して`001PFQL`にした。
+# `extracted_rows`はpdfplumberの生のまま＝凍結toolの前提。`cells`側の修復は残す。
 # 1.13.0: **折り返した節見出しの続きを見出しへ繋ぐ**（`join_heading_wraps`）。読む側は
 # `extract_text()`の行ごとに見出しの正規表現を当てるので、折り返した題は1行目しか
 # 取れず、`evidence/features.csv`に`1.4.19 … (USBSS) (Not applicable`と切れて入って
@@ -132,7 +136,7 @@ SCHEMA_VERSION = "0.2"
 # **14個の行見出しがどのセルにも入っていなかった**。行と列の座標は他のセルから決まるので
 # 入れ先は一意。条件は「同じ列に3つ以上の穴があり、その3つ以上に文字が在る」——散発の
 # 穴（図の誤検出ページのラベル断片。全corpus90個/50表）を外すとこの1表だけになる。
-CONVERTER_VERSION = "1.13.0"
+CONVERTER_VERSION = "1.14.0"
 
 # 継ぎ目の区切りを決めるのに使う（CJKは字間が無い）。
 CJK_CHAR = re.compile(r"[\u3000-\u303f\u3040-\u30ff\u4e00-\u9fff\uff01-\uff60]")
@@ -293,9 +297,17 @@ def fix_rotated_cells(page, record: dict) -> None:
 
     引脚定义表の型番ヘッダ等は縦書きで、`table.extract()`のセル文字は行と同じく
     鏡順になる（`6UEW714H`＝H417WEU6。322表／43文書で実測）。行（1.3.0）と同じ
-    組み直しをセルにも適用する——`cells[].text`と`extracted_rows`の両方。
-    旧toolも同じ鏡順を読んで正規化していたので正本CSVは無事だが、人向け出力の
-    表セルには裸で出ていた。
+    組み直しを**`cells[].text`だけ**に適用する。
+
+    **`extracted_rows`は触らない**（1.14.0で戻した）。1.3.1〜1.13.0は両方に書いていて、
+    docstringは「旧toolも同じ鏡順を読んで正規化するので正本CSVは無事」と言っていたが、
+    それが成立していたのは**凍結toolがbundleを読んでいなかったから**（runnerの差し替え
+    バグ。2026-09-08に発覚）。差し替えが効いた途端、`extract_pins.read_variant`が
+    正しい向きの`LQFP100`をもう一度反転して`001PFQL`にし、LQFP100の3部品の足が
+    全部落ちた（`pins` −300行・`pin_functions` −1,619行）。凍結toolは鏡順を前提に
+    自分で戻すので、`extracted_rows`はpdfplumberの生のままが正しい——後続の修復
+    （`recover_outer_column`・`fill_grid_holes`）が守っている約束と同じになる。
+    人向け出力は`cells`を読むので失うものは無い。
     """
     rotated_centers = [((c["x0"] + c["x1"]) / 2, (c["top"] + c["bottom"]) / 2)
                        for c in page.chars
@@ -317,13 +329,6 @@ def fix_rotated_cells(page, record: dict) -> None:
         fixed = rebuild(cell["bbox"])
         if fixed is not None:
             cell["text"] = fixed
-    for row_texts, row_boxes in zip(record["extracted_rows"], record["row_cells"]):
-        for index, bbox in enumerate(row_boxes):
-            if bbox is None or index >= len(row_texts) or row_texts[index] is None:
-                continue
-            fixed = rebuild(bbox)
-            if fixed is not None:
-                row_texts[index] = fixed
 
 
 def fix_cell_subscripts(page_chars: list[dict], record: dict) -> None:

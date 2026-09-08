@@ -61,9 +61,12 @@ def patch_all_modules() -> int:
 def run_tool(name: str) -> list[tuple[str, str]]:
     out_dir = CANDIDATES / name
     out_dir.mkdir(parents=True, exist_ok=True)
+    # 関数内の遅延importも互換層へ（属性の差し替えでは届かない。run_patched.pyと同じ）。
+    sys.modules["pdfplumber"] = pdfcompat
     module = importlib.import_module(name)
     patched = patch_all_modules()
-    print(f"[{name}] pdfplumber -> pdfcompat ({patched} modules)", file=sys.stderr)
+    print(f"[{name}] pdfplumber -> pdfcompat (sys.modules swapped; {patched} earlier import(s) patched)",
+          file=sys.stderr)
     argv, sys.argv = sys.argv, [f"{name}.py", "--out", str(out_dir)]
     try:
         module.main()

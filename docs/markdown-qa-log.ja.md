@@ -1747,3 +1747,117 @@ bundle の page `text` は `normalize_text(page.extract_text())`＝**pdfplumber�
 出力が良くなる**。同じ欠陥を2箇所で別々に扱わずに済む。影響は測定済みで、切れた見出しが
 正本CSVに出ているのは**この1行だけ**（他の21件はRMのレジスタ見出しで、どの正本CSVにも
 題として入っていない）。
+
+## 凍結toolは bundle を読んでいなかった——runner の差し替えバグ（2026-09-08）
+
+`features.csv` の切れた見出しが converter 1.13.0 で直らなかったことから発覚した。
+
+### 2つの経路で壊れていた
+
+```python
+for loaded in list(sys.modules.values()):
+    if getattr(loaded, "pdfplumber", None) is pdfplumber:   # ← 基準（runner のグローバル）
+        loaded.pdfplumber = pdfcompat                        # ← __main__ もここで書き換わる
+```
+
+1. **基準の書き換え**: `pdfplumber` は runner 自身（`__main__`）のグローバル。`sys.modules` は
+   `__main__` が先に来るので、最初の反復で基準そのものが pdfcompat に変わり、以降のモジュール
+   ——差し替えたい凍結tool本体——が全部素通りした。ログの `(1 modules)` がその印。
+   最小再現: `patched = ['__main__']`、tool は素通り。→ 基準を局所変数に控えて直した。
+2. **関数内の遅延 import**: `build_dma_requests`・`build_debug_data` は `import pdfplumber` を
+   関数の中で行うので、patch 時点で属性が無い。→ `sys.modules["pdfplumber"] = pdfcompat`
+   で後から解決される import も互換層を受けるようにした。
+
+### 私の報告のどこが誤っていたか
+
+今日「凍結パリティ 6/6 byte-identical」を converter 変更の安全性の根拠として何度も挙げた。
+実際は凍結toolが bundle を読んでいなかったので、**converter を変えても動かないのは自明**
+だった。検査として「正本CSVが原本PDFの新しい読みと一致する」ことは示していたが、
+私が主張した「新しい bundle を古い読み手に食わせても同じ答えか」ではなかった。
+`pdfcompat` の入口ゲート（原本SHAと bundle の照合）も一度も動いていない。
+D18 工程(5)「入力層だけを bundle に替える」は15表について効いていなかった。
+
+### 差し替えが効いた瞬間に出た回帰——二重正規化
+
+`--full` で15表を初めて bundle 入力で回すと:
+
+| 結果 | 表 |
+|---|---|
+| byte 一致（12表） | `registers`(4,932)・`register_fields`(33,365)・`memory_configs`・`timers`・`flash_geometry`・`adc_internal`・`opa_cmp_registers`・`clock_enables`・`usbpd_plumbing`・`flash_program_method`・`debug_data`・`register_blocks` |
+| 改善（1行） | `features` — 切れた題が完全に |
+| ★ 回帰 | `pins` 4,563→4,263・`pin_functions` 28,483→26,864・`remap_routes` 4,836→4,712。`CH32V303VCT6`/`V307VCT6`/`V317VCT6`（LQFP100）の足が1〜100番まで全部無い |
+
+`find_pin_tables` を両バックエンドで追跡すると、行数・layout・ページ追跡は完全一致で
+**variants（封装見出し）だけが違った**: real `LQFP100` / compat **`001PFQL`**（逆順）。
+
+原因: `fix_rotated_cells`（1.3.1）が回転見出しの向きを **`extracted_rows` にも**書いていた。
+docstring の「旧toolも同じ鏡順を読んで正規化するので正本CSVは無事」は、**凍結toolが bundle
+を読んでいなかったから成立していた**だけ。差し替えが効くと `extract_pins.read_variant`
+（鏡文字を前提に両読みを試す）が正しい向きの `LQFP100` を再反転して `001PFQL` にする。
+
+→ converter 1.14.0: `fix_rotated_cells` は `cells` だけを直し、**`extracted_rows` は
+pdfplumber の生のまま**にした（後続の修復が守っている約束と同じ）。対象DSを scratch に
+再変換して `find_pin_tables` を比べると zh/en とも **110行・variants 完全一致**。
+
+### 教訓
+
+- 「差し替えが効いている」ことは**ログの数字で確認できた**（`1 modules` は runner 自身だけ）。
+  自明に見える機構ほど1回は数える。
+- 凍結toolを退役させる前に bundle 入力で回すこと自体が、converter 側の隠れた前提
+  （`extracted_rows` の生さ）を検査していた。**退役の順序（byte一致を1度示す）が
+  効いた**具体例。
+
+## 資料更新で見えた2つの分断——`dma_requests` の割れと `high- speed`（2026-09-09）
+
+### `dma_requests`: 折り返しの間にページ境界が来る
+
+CH32X315RM.en v1.2 で `USART1_TX_0` が3行に割れた（`USART1_T`・`USART1_TX_0`・`X_0`、全部
+reference）。セル内の折り返し `USART1_T`⏎`X_0` は `cell_tokens` が繋ぐが、その**間に
+ページ境界が来る**と p119 の最終行に `USART1_T`、p120 の見出し無し続き表の先頭行に `X_0`
+が別々に出る。
+
+最初のパッチは「前表の最終行で `complete()` でない末尾を持ち越す」だったが**差が出なかった**
+——`complete("USART1_T")` が **True**（`[A-Z]{1,2}` の末尾を役割として受ける）。発火点を
+**続き側**に移した: 続き表の先頭行（ラベル無し）のセルの先頭が `STARTS_REQUEST`（要求の頭）
+でも `BARE`（周辺名）でもなければ断片。前表の最終行で同じ列に出した要求と繋いで
+`complete()` なら、**その行を書き戻して**断片は出さない。
+
+全12 RM × zh/en で dry-run: **変わるのは CH32X315.en だけ**（1,140→1,138 行）。正本は
+654→**650 行・全 confirmed**（v1.1 時点の値に戻った）。
+
+### `high- speed`: 行末のハイフン
+
+`operating_conditions` 86箇所・`product_attributes` 28箇所。`\n`→空白の結合が
+`high- speed`・`pre- division`・`General- purpose` を作っていた。
+
+| 規則 | 繋ぐ | 残す | 残した中身 |
+|---|---:|---:|---|
+| 語彙照合（`X-Y` が文書内に切れずに在る） | 89 | 23 | ❌ `Input- triggered`・`pre- division`（文書内に切れずに出ない） |
+| **左が全大文字 or 右が接続詞** | **106** | **6** | ✅ `REF- equal/is/should`（記号のマイナス）・`power- on`（RM、正本に届かない） |
+
+`low- and high-speed`（保留ハイフン）は接続詞ガードで残る。`time-channel`（"dead time-channel 2"、
+判断が割れる）は RM の説明文で正本に届かないので影響無し。
+
+置き場所は `tools/wrap_rules.py`（正規化層。凍結の対象は入力層なので対象外）。
+`build_operating.norm_text` と `extract_products` の見出し結合から使う。
+`operating_conditions`: 46行の condition と2行の parameter（`high- level`）が直り、他は不変。
+
+### 追記: `product_attributes` に残った2件は `join_wrap` だった
+
+wrap_rules を見出しの段の結合（`join_lines`）に入れても CH32V317 の
+`Timer General- purpose (16-bit)(2)` が2行残った。`dewrap` は無罪——`spaced()` は
+行末が `CONNECTORS = "-+/(_&"` なら詰める。残ったのは**ページ境界で切れた見出しを継ぐ
+`join_wrap()`** の経路で、こちらは「ASCII 同士なら常に空白」で `spaced()` の規則を持って
+いなかった。`join_wrap` にも CONNECTORS を入れ（`General-`＋`purpose` は詰める、
+`USBHS (USB`＋`2.0)` は空白のまま）、wrap_rules には改行が既に空白へ解決された形
+（`X- y`）も同じガードで扱わせた。**同じ判断が3箇所に別々に書かれていた**のが根で、
+1箇所（`spaced`）だけ正しかった。
+
+### 追記: 壊れた README がコミットされていた——戻し忘れの教訓
+
+runner の差し替えが効いた最初の `--full`（LQFP100 の足が落ちた回）で `build_readme` も走り、
+`generated/readme/CH32V307.md` を **4製品・66 pads** の壊れた形で書いていた。私は正本CSV 8本を
+控えから戻したが **`generated/` を戻し忘れ**、それが `4c5526b` にそのまま入った。
+正しい CSV から再生成した今の README は壊れる前（`2915575`）と **byte 一致**で復元された。
+**中断・撤退した走行のあとは、正本だけでなく派生物（`generated/`）も戻す**——
+`git status` を全体で見れば気付けた。
