@@ -589,6 +589,115 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     empty); what changes is that the row's column count is right, and `VIL`
     ends up with rowspan=7, which is the box the PDF actually draws.
 
+18. **Item 17 now fires only on a row that carries nothing of its own**, and
+    **a boundary row left with no cells is removed from the grid**
+    (`drop_empty_boundary_rows`). Item 17's signature cannot tell a box the
+    extractor cut from a next-page row that is **legitimately empty in that one
+    column**, and firing on the latter pulls the value above down over the row
+    -- **fabricating data**: on CH32M030DS2.zh p3/p4 the pin-25 `ISP1` row came
+    out holding `PA8`'s `ADC_IN7/MCO/CMP3_OUT0/ISN1` and `SPI_MOSI_3`. Measured
+    over the corpus: of 11,015 firings, **1,185 were on a row with its own
+    content**; the other 9,830 were on rows `fold_boundary_spills` had emptied.
+    Declining to merge leaves a separate empty cell, so the column count stays
+    right -- the error is asymmetric, and the safe side is to decline.
+    The other side effect: after folding and absorbing, a row can be left with
+    **no cells at all**. The exporter had a rule to drop a folded row unless a
+    rowspan covered it, but **item 17 is what creates that rowspan**, so such
+    rows always survived, as an empty `<tr>` plus one extra rowspan (`VIL` 7
+    against the PDF's 6, `PDUSB` 5 against 4, pin 8's cell 3 against 2). The
+    **2,283** boundary rows with zero cells are now removed (spans shrink,
+    later rows shift up). Empty cells still sitting on a folded row (a column
+    like `Typ.` whose cell above is also empty, so item 17 skipped it) are
+    re-read as starting on the next row when they continue downward. Checked by
+    comparing tag-stripped body text against the previous output: of 11,695
+    files exactly one differs, with **no word lost and none gained**.
+
+19. **The item-list test no longer counts the space before a bracket**
+    (`_item_list_cell`, exporter side). The peripheral column of the comparison
+    table was collapsing into one unreadable token,
+    `ADTM3*GPTMCRC2*USARTSPII2CUSBDUSBFSCANRTC2*WDG2*OPA`. The bundle's cell
+    text keeps its newlines; the wrap-join was collapsing them because the
+    item-list test bailed on **the single space in the first line,
+    `2*ADC (TKey)`** (the zh spelling is `2*ADC（TKey）`, with no space, so it
+    passed). Dropping the space condition outright widens this to 315 cells and
+    breaks wrapped prose (`ADON bit` / `set to 1 or`); ignoring **only the space
+    before a bracket** gives 24 cells -- 9 are the intended lists, 11 are
+    block-diagram labels, and 2 are wrapped headings in columns so narrow that a
+    break and a wrap look the same.
+
+20. **A column missing from the grid entirely is filled in** (`fill_grid_holes`,
+    converter 1.11.0). When the rules are thin the extractor builds no cell at
+    all for that column: the feature-comparison table on WCH-LinkUserManual.zh
+    p4 (15 rows, 5 columns) had a column-0 cell only in the header row, so
+    `RISC-V模式`, `ARM-SWD模式-HID设备` and **12 more row labels were in no cell
+    at all**. Column 0's coordinates come from the header cell and each row's
+    from the other cells in that row, so there is exactly one place they can go.
+    The condition is **three or more holes in the same column, three or more of
+    them holding glyphs** -- excluding scattered holes (label fragments on pages
+    where a figure was read as a table; 90 of them across 50 tables) leaves this
+    single table. It sits in the same layer as `recover_outer_column` (item 15)
+    for the same reason and leaves `extracted_rows` untouched. The check and
+    cross marks in that same table **do not exist as glyphs** (they are vector
+    drawings) and cannot be recovered: all 1,019 glyphs on the page leave that
+    band empty.
+
+21. **The outer-column recovery (item 15) was relaxed in three ways**
+    (converter 1.12.0). Three separate reports about CH32L103RM.en p13 -- an
+    empty `Bit` header, a phantom column, and a missing `[31:21]` -- were one
+    cause: the p13 fragment's table box starts at x=109.9 and the `Bit` column
+    (x 60.5-109.9) lies outside it. (a) **The 8pt gap ceiling is replaced by
+    "the full extent to the table edge fits in one column"**: a gap is
+    `column width - text width`, so a wide left-aligned column produces a large
+    one, which makes it a poor threshold -- p13 was **rejected at 8.4pt, 0.4pt
+    over**. Measured by extent, figure fragments (`['Syst','em','Bus']`, gap
+    219pt) are still rejected while real `Bit`/`Reset value` columns pass.
+    (b) **Three rows becomes two** -- a bit-description table is often a
+    "header plus one row" fragment. (c) **Both sides are considered** (the old
+    code returned after recovering one, leaving the right-hand column behind in
+    the many tables where both `Bit` and `Reset value` had been expelled).
+    Measured: 49 tables become **94 more** (47 left-only, 34 right-only, 13
+    both) for **408 cells**, all of them complete `Bit` / `Reset value` /
+    `复位值` / `位` / register-name columns. Because each such line's centre is
+    inside the table box, these were **dropped from the reading order too**: on
+    CH32V003RM.en p132 `Reset value 0xFFFF` fell outside the table as body text
+    reading `Reset` / `value` / `0xFFF` / `F` -- **with the value split in two**.
+
+22. **A recovered column's spelling is handed to `cell_html`'s wrap logic**
+    (`spell_glyphs`). Columns taken in from outside the table never pass through
+    the extractor's cell text, so they had no separators at all:
+    `Resetvalue`, `Filterregister0`. The right fix is to **put a `\n` at each
+    visual line break** -- in a narrow column both headings and values wrap, and
+    `Reset`/`value` must be joined with a space while `0xFFF`/`F` must not,
+    which is a decision `cell_html` already makes (`'Reset\nvalue'` →
+    `Reset value`, `'0xFFF\nF'` → `0xFFFF`, `'Filter register\n0'` →
+    `Filter register 0`). Spaces between words on one visual line are recovered
+    from the gaps (wider than 0.35 × the median glyph width, both sides ASCII):
+    35 cells change across the corpus, all of them `Reset value`-style headings,
+    and the threshold gives the same answer anywhere from 0.25 to 0.50 -- the
+    gaps separate cleanly. No value cell changes.
+
+23. **A diagonally split corner cell emitted twice is de-duplicated**
+    (`strip_duplicated_span_lines`). The extractor sometimes emits a diagonally
+    split corner (`Product model` / `Resource differences`) **both** as one
+    merged cell **and** again as a cell on the row below. That row then occupies
+    more grid columns than the table has, shifting everything after it: on
+    CH32H417DS0.en p3 the part-number suffixes `QEU6`..`REU6` sat **two columns
+    right** of the pin counts `128`..`60` they label -- a wrong reading, at the
+    top of the comparison table, which is the most-read table there is. A cell
+    is dropped only when its row exceeds the column count, its column range
+    **overlaps** the covering merged cell, and that cell's text is **at most two
+    lines** and **exactly matches** one of them. **The two-line limit is what
+    makes it safe**: a long description cell sometimes swallows the next rows'
+    text, and there the small cells are the real data, so removing them would
+    lose it (on QingKeV4_Processor_Manual.en p37 `Floating-point unit status FS
+    FS Meaning 00 OFF ...` swallows nine lines while `FS Meaning` and friends
+    exist as their own cells; 40 cases have that shape). Measured: 1,273
+    substring matches narrow to 179 overlapping, 149 over-wide, and **74 exact
+    matches with at most two lines, across 26 documents** -- all of them real
+    duplicates. Nothing is lost, because the same spelling stays in the merged
+    cell. It lives in the same layer as `strip_boundary_dupes` for the same
+    reason (human-facing output only).
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

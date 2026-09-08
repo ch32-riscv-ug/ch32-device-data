@@ -112,7 +112,20 @@ SCHEMA_VERSION = "0.2"
 # 幽霊行が残り、(c)刷り直されたヘッダが列数を狂わせていた。結合表でしか効かない
 # `fold_boundary_spills`と`drop_repeated_headers`が届いていなかった。条件は列数と
 # **列境界xの±2pt一致**＋上下の位置で、全corpusの候補は18件（既に繋がる表は5,734件）。
-CONVERTER_VERSION = "1.10.2"
+# 1.12.0: **最外列の取り込みを3つ緩めた**（`recover_outer_column`）。(a) 隙間の上限8ptを
+# 「**縁までの全幅**が1列ぶん」に置き換え——隙間は「列幅−文字幅」で決まるので閾値として
+# 筋が悪く、`CH32L103RM.en` p13の`Bit`/`[31:21]`は8.4ptで**0.4pt足りずに落ちていた**。
+# (b) 3行→2行（bit説明表は「見出し＋1行」の断片になりやすい）。(c) **左右の両方**を見る
+# （以前は片方でreturnし、`Bit`と`Resetvalue`が両方外に出ている表で右が残っていた）。
+# 全corpus実測: 49表→107表。増える分は全部`Bit`/`Resetvalue`/`复位值`/`位`/レジスタ名の
+# 完全な列で、これらは行の中心が表bbox内のため**reading_orderからも外れて**いた
+# （`CH32V003RM.en` p132は`Reset`/`value`/`0xFFF`/`F`と値を分断した本文になっていた）。
+# 1.11.0: **グリッドから丸ごと抜けた列を埋める**（`fill_grid_holes`）。罫線が細いと
+# pdfplumberはその列のセルを1つも作らず、`WCH-LinkUserManual.zh` p4の機能比較表は
+# **14個の行見出しがどのセルにも入っていなかった**。行と列の座標は他のセルから決まるので
+# 入れ先は一意。条件は「同じ列に3つ以上の穴があり、その3つ以上に文字が在る」——散発の
+# 穴（図の誤検出ページのラベル断片。全corpus90個/50表）を外すとこの1表だけになる。
+CONVERTER_VERSION = "1.12.0"
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -357,9 +370,45 @@ def join_split_lines(page: dict) -> int:
     return len(merge)
 
 
+def spell_glyphs(glyphs: list[dict]) -> str:
+    """グリフ列を読み順（行→x）で綴る。**語の間の空白を隙間から復元する**。
+
+    表の外から取り込む列（`recover_outer_column`・`fill_grid_holes`）は、pdfplumberの
+    セル抽出を通らないので区切りが入らず`Resetvalue`・`Filterregister0`になっていた。
+
+    - **視覚行の切れ目は`\n`**にする。狭い列では見出しも値も折り返され、`Reset`/`value`
+      は空白で繋ぐべきで`0xFFF`/`F`は繋いではいけない——この判定は既に
+      `cell_html`（行末・行頭の文字種で折り返しか意図的な改行かを分ける）が持っている
+      ので、そちらへ渡す。改行を入れずに繋いでいたので`Resetvalue`になっていた。
+    - **同じ視覚行の語間の空白**は隙間から復元する。隙間が**グリフ幅の中央値の0.35倍**を
+      超え、かつ両側がASCIIなら空白（CJKは字間が広く、識別子`R32_ESIG_FLACAP`のような
+      連続は隙間が空かない）。全corpus実測: 空白が入るのは35セルで全部`Reset value`型の
+      見出し。閾値0.25〜0.50で結果が同じ＝隙間が明確に分かれているので真ん中を採る。
+      値のセル（`0xFFFF`・`[31:0]`）は1つも変わらない。
+    """
+    ordered = sorted(glyphs, key=lambda g: (round(g["bbox"][1], 1), g["bbox"][0]))
+    if not ordered:
+        return ""
+    widths = sorted(g["bbox"][2] - g["bbox"][0] for g in ordered)
+    median = widths[len(widths) // 2]
+    out: list[str] = []
+    for index, glyph in enumerate(ordered):
+        if index:
+            previous = ordered[index - 1]
+            both_ascii = previous["text"].isascii() and glyph["text"].isascii()
+            if abs(glyph["bbox"][1] - previous["bbox"][1]) >= 1.0:
+                out.append("\n")
+            elif (both_ascii
+                    and glyph["bbox"][0] - previous["bbox"][2] > median * 0.35):
+                out.append(" ")
+        out.append(glyph["text"])
+    return "".join(out)
+
+
 def recover_outer_column(page_chars: list[dict], record: dict,
                          siblings: list[dict]) -> str | None:
-    """**表領域の外に落ちた最外列**を取り込む（1.10.0）。'left'/'right'/Noneを返す。
+    """**表領域の外に落ちた最外列**を取り込む（1.10.0）。取り込んだ側を返す
+    （`"left"`・`"right"`・`"left,right"`・None）。
 
     罫線ベースの表検出が最外列の外枠を拾えないと、その列が表bboxの外に残る——
     `CH32M030RM.zh` p7の`位`列（x 78.5-115.2、表bboxは121.8から）がそれで、値
@@ -371,28 +420,50 @@ def recover_outer_column(page_chars: list[dict], record: dict,
     入れ先が一意に決まるものだけ触る。**表自身の行境界**でグリフを束ね、1行帯につき
     1セルの列を先頭（または末尾）へ挿す。次の全部を満たすときだけ:
 
-    - 本物の罫線表（3行3列以上・セルの6割以上に中身）——図の誤検出を外す
-    - 外側のグリフが**1列ぶんの幅**（表幅の30%以下）で、表の縁に接している（隙間≤8pt）
+    - 本物の罫線表（2行3列以上・セルの6割以上に中身）——図の誤検出を外す
+    - 外側のグリフが**1列ぶんの幅**（表幅の30%以下）で、**表の縁までの全幅も1列ぶん**
+      （同30%以下）に収まる。縁に食い込んでいない（隙間≥-2pt）
     - **すべての行帯に中身がある**＝列として完全。1行帯でも欠けたら曖昧なので触らない
     - どの行帯も24字以内。他の表の中にいるグリフは対象外
 
     緩い条件（幅と行帯の完全性を見ない）では1,000表超が当たり、その大半は図を表と
-    誤検出したページの散乱ラベル（`XUSRAMMFS_DPUSBFSFS_DM`）だった。4条件で49表になる。
+    誤検出したページの散乱ラベル（`XUSRAMMFS_DPUSBFSFS_DM`）だった。上の条件で107表。
     `extracted_rows`は**触らない**——凍結tool19本がそれを読むので、影響を`cells`側に閉じる。
+
+    **1.12.0で3つ緩めた**（再突合が`CH32L103RM.en` p13の`Bit`列欠落として指摘した分の根）:
+
+    1. 隙間の上限8ptを**縁までの全幅**の条件に置き換えた。隙間は「列幅−文字幅」で決まる
+       ので閾値として筋が悪く、`名称`のような左寄せの広い列では大きくなる。L103RM.en p13の
+       `Bit`/`[31:21]`は隙間8.4ptで**0.4pt足りずに落ちていた**。全幅で見ると図の断片
+       （`['Syst','em','Bus']`。隙間219pt）は落ち、本物の`Bit`/`Resetvalue`列は通る。
+    2. 3行→**2行**（行帯3本→2本）。レジスタのbit説明表は「見出し＋1行」の2行断片に
+       なることが多く、L103RM.en p13もそれ。緩めて増える64件は全部`Bit`/`Resetvalue`/
+       `复位值`/`位`/レジスタ名の列だった。
+    3. **左右の両方**を見る（以前は片方を取り込んだ時点でreturnしていた）。`Bit`列と
+       `Resetvalue`列が両方外へ出ている表が多数あり、右側が取り残されていた。
+
+    実測: 107表。中身は`['Bit','[31:0]']`・`['Resetvalue','0xFFFF']`・`['复位值','0']`・
+    `['过滤寄存器0',…]`のような完全な列ばかり。これらは**行の中心が表bbox内なので
+    reading_orderからも外れ**、`CH32V003RM.en` p132では`Reset value 0xFFFF`が表の外に
+    `Reset`/`value`/`0xFFF`/`F`と**値を分断された本文**として落ちていた。
     """
-    if record["row_count"] < 3 or record["column_count"] < 3:
-        return None
-    cells = record["cells"]
-    if not cells or sum(1 for c in cells if (c.get("text") or "").strip()) / len(cells) < 0.6:
-        return None
-    box = record["bbox"]
-    width = box[2] - box[0]
-    ys = sorted({round(c["bbox"][1], 2) for c in cells} | {round(c["bbox"][3], 2) for c in cells})
-    if len(ys) < 4:
+    if record["row_count"] < 2 or record["column_count"] < 3:
         return None
     others = [t["bbox"] for t in siblings if t is not record]
+    recovered: list[str] = []
 
     for side in ("left", "right"):
+        # 左を取り込むと列番号とbboxが動くので、側ごとに読み直す（行帯は変わらない）。
+        cells = record["cells"]
+        if not cells or sum(1 for c in cells
+                            if (c.get("text") or "").strip()) / len(cells) < 0.6:
+            break
+        box = record["bbox"]
+        width = box[2] - box[0]
+        ys = sorted({round(c["bbox"][1], 2) for c in cells}
+                    | {round(c["bbox"][3], 2) for c in cells})
+        if len(ys) < 3:
+            break
         picked = []
         for glyph in page_chars:
             if not (glyph.get("text") or "").strip():
@@ -417,7 +488,11 @@ def recover_outer_column(page_chars: list[dict], record: dict,
         if x1 - x0 > width * 0.30:
             continue
         gap = box[0] - x1 if side == "left" else x0 - box[2]
-        if not -2.0 <= gap <= 8.0:
+        if gap < -2.0:
+            continue     # 縁に食い込んでいる＝表の中のグリフ
+        # 縁までの**全幅**が1列ぶんに収まること。隙間の上限では左寄せの広い列を弾いた。
+        extent = box[0] - x0 if side == "left" else x1 - box[2]
+        if extent > width * 0.30:
             continue
         bands: dict[int, list[dict]] = {}
         for glyph in picked:
@@ -429,9 +504,7 @@ def recover_outer_column(page_chars: list[dict], record: dict,
             bands.setdefault(index, []).append(glyph)
         if len(bands) != len(ys) - 1:
             continue
-        texts = {i: "".join(g["text"] for g in sorted(gs, key=lambda g: (round(g["bbox"][1], 1),
-                                                                        g["bbox"][0])))
-                 for i, gs in bands.items()}
+        texts = {i: spell_glyphs(gs) for i, gs in bands.items()}
         if any(len(t) > 24 for t in texts.values()):
             continue
 
@@ -456,8 +529,90 @@ def recover_outer_column(page_chars: list[dict], record: dict,
         record["column_count"] += 1
         record["bbox"] = rounded_box((min(box[0], x0), box[1], max(box[2], x1), box[3]))
         cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
-        return side
-    return None
+        recovered.append(side)
+    return ",".join(recovered) or None
+
+
+def fill_grid_holes(page_chars: list[dict], record: dict) -> int:
+    """**グリッドから丸ごと抜けた列**を、行・列の座標とグリフから埋める（1.11.0）。
+
+    罫線が細い/途切れていると、pdfplumberはその列のセルを**1つも作らない**——
+    `WCH-LinkUserManual.zh` p4の機能比較表（15行5列）は列0のセルがヘッダ行にしか無く、
+    `RISC-V模式`・`ARM-SWD模式-HID设备`…**14個の行見出しがどのセルにも入っていなかった**
+    （再突合が「14行すべての1列目が空」として指摘）。列0の座標はヘッダのセルから、行の
+    座標は同じ行の他のセルから決まるので、**入れ先は一意**。
+
+    触るのは次を満たすときだけ:
+
+    - 3行以上・2〜12列の表で、単一行/単一列のセルから**全ての行と列の座標が決まる**
+    - どのセルにも覆われていない位置（穴）が**同じ列に3つ以上**あり、その3つ以上に文字が在る
+    - 穴の矩形（0.5pt内側）に中心が入るグリフだけを取る
+
+    「同じ列に3つ以上」が要——散らばった単発の穴は、図を表と誤検出したページの
+    ラベル断片（`ghes`・`tw(NE)`・`SIOX0SIOX1`）で、埋めると意味の無いセルが出来る。
+    全corpus実測: 文字が在る穴は90個/50表あるが、**列まるごとの条件を課すとこの1表**
+    だけになり、14個の行見出しが完全な形で戻る（誤検出0）。
+
+    `extracted_rows`は触らない——凍結tool19本がそれを読むので影響を`cells`側に閉じる
+    （`recover_outer_column`と同じ約束）。
+    """
+    rows, columns = record["row_count"], record["column_count"]
+    cells = record["cells"]
+    if rows < 3 or not 2 <= columns <= 12 or not cells:
+        return 0
+    spans_x: dict[int, list[tuple[float, float]]] = {}
+    spans_y: dict[int, list[tuple[float, float]]] = {}
+    for cell in cells:
+        box = cell.get("bbox")
+        if not box:
+            continue
+        if cell["column_end"] - cell["column_start"] == 1:
+            spans_x.setdefault(cell["column_start"], []).append((box[0], box[2]))
+        if cell["row_end"] - cell["row_start"] == 1:
+            spans_y.setdefault(cell["row_start"], []).append((box[1], box[3]))
+    if len(spans_x) < columns or len(spans_y) < rows:
+        return 0   # 座標が決まらない列/行があるなら触らない
+    xr = {k: (min(a for a, _ in v), max(b for _, b in v)) for k, v in spans_x.items()}
+    yr = {k: (min(a for a, _ in v), max(b for _, b in v)) for k, v in spans_y.items()}
+    covered = {(row, column)
+               for cell in cells
+               for row in range(cell["row_start"], cell["row_end"])
+               for column in range(cell["column_start"], cell["column_end"])}
+    holes: dict[int, list[int]] = {}
+    for row in range(rows):
+        for column in range(columns):
+            if (row, column) not in covered:
+                holes.setdefault(column, []).append(row)
+    added = 0
+    for column, missing in sorted(holes.items()):
+        if len(missing) < 3:
+            continue
+        x0, x1 = xr[column]
+        found: list[tuple[int, str]] = []
+        for row in missing:
+            y0, y1 = yr[row]
+            inside = [g for g in page_chars
+                      if (g.get("text") or "").strip()
+                      and x0 + 0.5 <= (g["bbox"][0] + g["bbox"][2]) / 2 <= x1 - 0.5
+                      and y0 + 0.5 <= (g["bbox"][1] + g["bbox"][3]) / 2 <= y1 - 0.5]
+            found.append((row, spell_glyphs(inside)))
+        if sum(1 for _, text in found if text.strip()) < 3:
+            continue
+        for row, text in found:
+            if not text.strip():
+                continue
+            y0, y1 = yr[row]
+            cells.append({
+                "id": f"{record['id']}-hole-{row:04d}-{column:02d}",
+                "row_start": row, "row_end": row + 1,
+                "column_start": column, "column_end": column + 1,
+                "bbox": rounded_box((x0, y0, x1, y1)),
+                "text": text, "bold": False, "italic": False,
+            })
+            added += 1
+    if added:
+        cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+    return added
 
 
 def fix_cell_dupes(page_chars: list[dict], record: dict) -> None:
@@ -1158,6 +1313,8 @@ def page_record(page, lang: str, source_sha256: str,
         fix_cell_dupes(page_chars, tables[-1])
         # 表領域の外に落ちた最外列を取り込む（入れ先が一意に決まるものだけ）。
         recover_outer_column(page_chars, tables[-1], tables)
+        # グリッドから丸ごと抜けた列を、行・列の座標とグリフから埋める。
+        fill_grid_holes(page_chars, tables[-1])
         # ページの最初の表なら、caption無しでも前ページの最後の表へ繋ぐか試す。
         if table_index == 1 and chain_uncaptioned(tables[-1], table_tail, float(page.height)):
             previous_logical_id = tables[-1]["logical_id"]

@@ -98,6 +98,9 @@ jobs:
           python -m doctest pipeline/common/figure_captions.py -o FAIL_FAST
           python -m doctest pipeline/common/lost_subscripts.py -o FAIL_FAST
           python -m doctest pipeline/common/review_sidecar.py -o FAIL_FAST
+          # 行の詰め直し（ページ境界で空になった行を消す）は添字計算で、
+          # 間違えても文字は消えず rowspan がずれるだけなので parity では出ない。
+          python -m doctest pipeline/common/logical_tables.py -o FAIL_FAST
 
       # Everything derivable without a PDF must already be committed in its
       # regenerated form. This used to cover catalog/documents.csv only, and the

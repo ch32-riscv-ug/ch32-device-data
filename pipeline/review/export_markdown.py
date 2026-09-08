@@ -439,6 +439,10 @@ def page_vocabulary(page: dict) -> dict[str, int]:
     return counts
 
 
+# 括弧の直前の空白（`2*ADC (TKey)`）は語の区切りではない——一覧判定でだけ無視する。
+_SPACE_BEFORE_BRACKET = re.compile(r"\s+(?=[(\uff08\[])")
+
+
 def _item_list_cell(parts: list[str], doc_vocab: dict[str, int] | None) -> bool:
     """セルが「1行1項目の一覧」か。**どの行も、その文書に実在する語だけでできている**なら
     一覧、そうでなければ折り返し。
@@ -449,11 +453,20 @@ def _item_list_cell(parts: list[str], doc_vocab: dict[str, int] | None) -> bool:
     `is_list_table`はpin表・remap表しか見ないので、この表は対象外だった。
 
     折り返しの断片（`USAR`・`T1`・`Rese`）は**語として文書に存在しない**ので当たらない
-    ——そこが一覧との差になる。1行が複数語（空白入り）や長い行のときも一覧とみなさない。"""
+    ——そこが一覧との差になる。1行が複数語（空白入り）や長い行のときも一覧とみなさない。
+
+    ただし**括弧の直前の空白は語の区切りとして数えない**——同じ表のzh版は`2*ADC（TKey）`
+    （全角で空白なし）なので一覧と判定されるのに、en版は`2*ADC (TKey)`の1文字の空白だけで
+    落ちていた（V203DS0.en・V20x_30xDS0.en。再突合が4件として指摘）。折り返し本文は
+    `ADON bit`・`current in`・`The level`のように**普通の語の間**に空白が入るので、この
+    正規化では救われない。全corpus実測: 新たに一覧になるのは24セルで、うち9件が目的の
+    周辺機能欄・11件はブロック図のラベル（`<br>`が妥当）・2件が折り返し見出し
+    （`Frame Type Indicator Bit (FT)`。狭い列では改行と折り返しの見た目が変わらない）。
+    空白の条件をただ外すと315セルに広がり、その大半が折り返し本文で壊れる。"""
     if len(parts) < 4 or not doc_vocab:
         return False
     for part in parts:
-        body = part.strip()
+        body = _SPACE_BEFORE_BRACKET.sub("", part.strip())
         if not body or " " in body or len(body) > 18:
             return False
         tokens = _VOCAB_WORD.findall(body)
@@ -779,6 +792,11 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # **重複グリフの除去を先に**——刷り直された見出しを落とすと、その見出しから
                 # 隣のデータセルへ降りた文字（`I/O电平`の`平`が`平\nFT`）の出所が消えてしまい、
                 # `平FT`という値になっていた（V203DS0.zh p27。全面見直しの検証で発見）。
+                # 幽霊列（断片の境界の和集合が生む余分な1列）を先に消す。
+                logical_tables.snap_ghost_columns(record)
+                # 斜めに割れた角セル/折り返し見出しの二重出力を先に落とす——行の列数が
+                # 揃わないと以降の畳み込みも列を数え違える。
+                logical_tables.strip_duplicated_span_lines(record)
                 logical_tables.strip_boundary_dupes(record)
                 if (logical_tables.has_edge_newline(record)
                         or logical_tables.has_short_edge(record)):
@@ -789,6 +807,8 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 logical_tables.fold_boundary_spills(record)
                 # ページ境界で切れた縦の結合セルを続きの行まで伸ばす（列ずれを直す）。
                 logical_tables.extend_boundary_spans(record)
+                # 空になった境界行を消す（余分なrowspanと空`<tr>`を出さない）。
+                logical_tables.drop_empty_boundary_rows(record)
             if item["id"] in bitfields:
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
@@ -800,6 +820,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 logical_tables.fix_doubled_names(record, description_names)
             else:
                 # 通常表: `Reset`/`value`に割れたヘッダを戻し、境界グリフの二重取り（`[31:12] R`等）を落とす。
+                logical_tables.strip_duplicated_span_lines(record)
                 logical_tables.fold_header_wrap(record)
                 logical_tables.strip_boundary_dupes(record)
                 # 端に降ってきた別行のCJK/句読点グリフ（reset値の`0\n。`・`0000b\n时`）を
