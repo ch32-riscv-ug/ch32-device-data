@@ -59,6 +59,17 @@ jobs:
           python tools/build_readme.py
           python tools/check_tables.py
 
+      # The freeze ledger follows the catalogue in the same commit, for the same
+      # reason everything else downstream does: documents.csv is the one table
+      # whose source changes without a person touching the repository, so a
+      # ledger left behind turns check.yml red on the next push for a change
+      # this job made itself -- and a check that is always red stops being read.
+      # (Found 2026-09-08: an automated catalogue commit had bumped two
+      # version_en fields, and the resulting check_baseline failure was first
+      # misread as a regression in a code change made the same day.)
+      - name: Re-record the freeze ledger for the tables the catalogue moved
+        run: python tools/check_baseline.py --record
+
       - name: Check the mirrors against it
         env:
           GITHUB_TOKEN: ${{ github.token }}

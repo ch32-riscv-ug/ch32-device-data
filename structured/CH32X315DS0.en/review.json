@@ -1,22 +1,22 @@
 {
- "schema_version": "0.2",
- "source_sha256": "4ec0a1a3b99bb3f1bf805c3a89773ab45e0099547262ae351e9963b9278e80c1",
- "status": "partial",
- "decisions": {
-  "p19-table-001": {
-   "status": "approved",
-   "canonical_table_number": "2-1-1",
-   "note": "printed as 2-1"
-  },
-  "p22-table-003": {
-   "status": "approved",
-   "canonical_table_number": "2-1-2",
-   "note": "printed as 2-2"
-  },
-  "p36-table-001": {
-   "status": "approved",
-   "canonical_table_number": "3-6-1",
-   "note": "printed as 3-6"
+  "schema_version": "0.2",
+  "source_sha256": "0b25241bb1fd19928a417fba6bb4f0be58fc8670a06f5fb71ee0e4a28893dfde",
+  "status": "partial",
+  "decisions": {
+    "p19-table-001": {
+      "status": "approved",
+      "canonical_table_number": "2-1-1",
+      "note": "v1.2 prints Table 2-1-1; v1.1 printed 2-1"
+    },
+    "p23-table-001": {
+      "status": "approved",
+      "canonical_table_number": "2-1-2",
+      "note": "v1.2 prints Table 2-1-2 (moved from p22 in v1.1, which printed 2-2)"
+    },
+    "p36-table-001": {
+      "status": "approved",
+      "canonical_table_number": "3-6-1",
+      "note": "v1.2 prints Table 3-6-1; v1.1 printed 3-6"
+    }
   }
- }
 }

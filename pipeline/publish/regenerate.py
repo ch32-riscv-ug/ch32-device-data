@@ -40,6 +40,8 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "checks"))
+import check_sources  # noqa: E402  走行の前後で原本を照合する
 
 Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 
@@ -147,6 +149,9 @@ def main() -> int:
                     help="図の描画と人向けMarkdownと差ゼロ検査も回す")
     ap.add_argument("--jobs", type=int, default=4, help="convert_allの並列数")
     ap.add_argument("--list", action="store_true", help="計画だけ表示して実行しない")
+    ap.add_argument("--accept-sources", action="store_true",
+                    help="原本が動いている状態で走る（資料更新の取り込みとして。"
+                         "コード変更と混ぜないこと）")
     args = ap.parse_args()
 
     stages = plan(args)
@@ -156,6 +161,23 @@ def main() -> int:
             for label, argv in steps:
                 print(f"  {label:36} uv run {argv[0]} {' '.join(argv[1:])}".rstrip())
         return 0
+
+    # **入力が走行中に変わるのを見つける**（2026-09-08に実際に起きた。1時間強かかる
+    # 工程の途中でmirrorが`git pull`されると、出力はどの入力状態にも対応しなくなり、
+    # CSVが動いたのがコードのせいか資料のせいか区別できなくなる）。
+    before = check_sources.survey()
+    same, moved, missing = before
+    print(f"=== 原本の照合: {len(same)}/{len(same) + len(moved) + len(missing)} 一致",
+          file=sys.stderr)
+    if (moved or missing) and not args.accept_sources:
+        for name, recorded, actual in moved:
+            print(f"  ★ {name}: manifest={recorded[:12]} いまの原本={actual[:12]}",
+                  file=sys.stderr)
+        for line in missing:
+            print(f"  ★ {line}", file=sys.stderr)
+        print("\n原本が動いています。資料更新の取り込みなら `--accept-sources` を付けて、"
+              "**コード変更とは別のcommitで**走らせてください。", file=sys.stderr)
+        return 1
 
     done: list[tuple[str, str, float]] = []
     for stage, steps in stages:
@@ -170,6 +192,20 @@ def main() -> int:
                 print(f"\nFAILED [{stage}] {label} (exit {code}) -- 後続は走らせない",
                       file=sys.stderr)
                 return code
+    # 走行の**後**にもう一度照合する。集合が変わっていればこの走行は無効——
+    # 出力は「途中まで旧原本・途中から新原本」の混合で、再現もできない。
+    after = check_sources.survey()
+    if after != before:
+        print("\n★ 走行中に原本が変わりました（mirrorがpullされた）。"
+              "この出力はどの入力状態にも対応しません——**やり直してください**。",
+              file=sys.stderr)
+        was = {n for n, _, _ in before[1]} | set(before[2])
+        now = {n for n, _, _ in after[1]} | set(after[2])
+        for name in sorted(now - was):
+            print(f"  ★ 走行中に動いた: {name}", file=sys.stderr)
+        for name in sorted(was - now):
+            print(f"  ★ 走行中に取り込まれた: {name}", file=sys.stderr)
+        return 1
     print("\n=== 全段成功", file=sys.stderr)
     for stage, label, took in done:
         print(f"  {stage:9} {label:36} {took:6.1f}s", file=sys.stderr)
