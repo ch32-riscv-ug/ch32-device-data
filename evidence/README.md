@@ -104,7 +104,7 @@ Holds **all attributes of the comparison table in long form** (except flash/sram
 
 **`group` is the upper tier of the heading.** The heading column of the comparison table is two-tiered, and `label` holds the whole thing joined (`Communication interfaces CAN`). It is kept separately so that the upper tier can be stripped when only the lower tier is needed (for display). `group` is always a prefix of `label`.
 
-Whether to strip is the reader's decision. Two guidelines: do not strip when stripping would give the same name as another row (`ADC/TKey Unit` and `HSADC Unit`), and do not strip when only an ordinary English word would remain (`Unit`, `Voltage`). If it contains an abbreviation or a number (`CAN`, `Basic (16-bit)`), it names something by itself and can be stripped. The `attribute` column (join key) is **built from the whole joined heading**, so stripping causes no collisions.
+Whether to strip is the reader's decision. Two guidelines: do not strip when stripping would give the same name as another row (`ADC/TKey Unit` and `HSADC Unit`), and do not strip when only an ordinary English word would remain (`Unit`, `Voltage`). If it contains an abbreviation or a number (`CAN`, `Basic (16-bit)`), it names something by itself and can be stripped. The `attribute` column (join key) is **built from the whole joined heading**, so stripping causes no collisions. When a heading level ends in a line-end hyphen (`General-` / `purpose timer`) the levels are joined without a space (`tools/wrap_rules.py`; `attribute` slugs identically either way).
 
 ### Rows where several pads share the same lead number
 
@@ -325,7 +325,7 @@ Of 650 rows, 577 are confirmed; the 73 reference rows are all CH32V407 (whose RM
 - H417 uses DMAMUX, and this table is its "request number table". Assignment to channels is done at run time by writing to `DMAMUX`
 
 The tables come in 5 shapes (a one-page grid / continued on the next page without headings / channel 8 onwards in a separate table / 2 DMAs + `*` marks + cells
-spanning pages / DMAMUX number table), all read with one reading method. The reading rules and the documents' quirks are written
+spanning pages / DMAMUX number table), all read with one reading method. A request wrapped inside a cell (`USART2_T`⏎`X_1`) is joined into one name, and one whose wrap is **cut by the page break** (`USART1_T` on the last row of one page, `X_0` on the first row of the uncaptioned continuation) is joined too, by writing the continuation's fragment back onto the row above. The reading rules and the documents' quirks are written
 at the top of `tools/build_dma_requests.py`.
 
 ### `pin_functions.csv` is **per pinout**, not a per-part-number function list
@@ -753,7 +753,7 @@ The combining layer cleans the `parameter`/`condition` text of the base rows wit
 touching the frozen logic: split subscripts are rejoined (`V DD` -> `VDD`), fullwidth
 punctuation in the description columns is normalized, and a cell cut by a page break
 (`Accuracy of HSI oscillator (after` + `calibration)` on the next page) is completed from
-the bundle's merged table grid when exactly one continuation closes the parenthesis.
+the bundle's merged table grid when exactly one continuation closes the parenthesis. **A word broken by a line-end hyphen** (`high-`⏎`speed`) is joined; a space is kept only when the left side is all capitals (the minus of `V_REF-`) or the right side is a conjunction (the suspended hyphen of `low-`⏎`and`) -- rules in `tools/wrap_rules.py`.
 
 **Which rows are taken is not decided by a list of symbols.** A symbol names its physical
 quantity in its stem (`V_*` a voltage, `I_*` a current, `t_*` a time), so a row is taken when

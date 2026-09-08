@@ -107,8 +107,10 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
    エージェントのシェルは10分で切れるので `nohup setsid … > log 2>&1 &` で切り離し、ログの
    `=== [段] `／`FAILED`／`全段成功`／`Traceback` を監視する。**実行中は`pipeline/`を編集しない**
    （各段が読む）
-5. 終わったら `git status` で変わった表を確認し、commit対象（`structured/<文書>/manifest.json` を含む）
-   を報告する。`pipeline/ingest/convert.py` の `CONVERTER_VERSION` を上げたときも同じ流れ
+5. 終わったら `git status` を**全体で**見て変わった表を確認し、commit対象（`structured/<文書>/manifest.json` を含む）
+   を報告する。**走行を途中で止めた/結果を捨てたときは、正本CSVだけでなく `generated/` の派生物も戻す**
+   （2026-09-08: 壊れた `--full` の README を戻し忘れ、そのままコミットされた）。
+   `pipeline/ingest/convert.py` の `CONVERTER_VERSION` を上げたときも同じ流れ
    （全bundleが増分再変換される。VSCodeの再起動で中断しても文書単位で原子的なので再開できる）
 
 ## 守ること

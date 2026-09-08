@@ -101,6 +101,8 @@ jobs:
           # 行の詰め直し（ページ境界で空になった行を消す）は添字計算で、
           # 間違えても文字は消えず rowspan がずれるだけなので parity では出ない。
           python -m doctest pipeline/common/logical_tables.py -o FAIL_FAST
+          # 行末ハイフンの結合規則（正本の条件文・比較表の見出しに効く）
+          python -m doctest tools/wrap_rules.py -o FAIL_FAST
 
       # Everything derivable without a PDF must already be committed in its
       # regenerated form. This used to cover catalog/documents.csv only, and the

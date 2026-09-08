@@ -31,6 +31,7 @@ import sys
 from pathlib import Path
 
 import pdfplumber
+import wrap_rules
 
 MODEL = re.compile(r"^CH32[A-Z0-9]{4,}$")
 FAMILY = re.compile(r"^CH32[A-Z]\d{3}$")
@@ -264,7 +265,10 @@ def join_wrap(head: str, tail: str) -> str:
     """
     if not head:
         return tail
-    if head[-1].isascii() and tail[:1].isascii():
+    # 行末が語を繋ぐ記号（`General-`＋`purpose`）なら語の途中——`spaced()` と同じ規則。
+    # ここだけ ASCII 同士を常に空白で継いでいたので、CH32V317 の比較表の見出しが
+    # `General- purpose` になっていた（2026-09-09）。
+    if head[-1].isascii() and tail[:1].isascii() and head[-1] not in CONNECTORS:
         return f"{head} {tail}"
     return head + tail
 
@@ -302,8 +306,9 @@ def read_row_layout(rows: list[list[str]]) -> list[dict] | None:
     # `Communication interface` を後から剥がせない（worklist の F-20）。
     stacks = [[rows[j][c] for j in range(first) if c < len(rows[j]) and rows[j][c]]
               for c in range(width)]
-    labels = [" ".join(stack).strip() or f"col{c}" for c, stack in enumerate(stacks)]
-    groups = [" ".join(stack[:-1]).strip() for stack in stacks]
+    # 段の切れ目のハイフン（`General-`／`purpose timer`）は語の折り返し——wrap_rules で繋ぐ
+    labels = [wrap_rules.join_lines(stack).strip() or f"col{c}" for c, stack in enumerate(stacks)]
+    groups = [wrap_rules.join_lines(stack[:-1]).strip() for stack in stacks]
     products: list[dict] = []
     carried: list[str] = [""] * width
     for row in rows[first:]:
@@ -435,7 +440,7 @@ def read_column_layout(rows: list[list[str]], default_family: str,
             for level, cell in enumerate(cells):
                 if cell:
                     carried[level] = join_wrap(carried[level], cell)
-            joined = " ".join(part for part in carried if part).strip()
+            joined = wrap_rules.join_lines([part for part in carried if part]).strip()
             if joined != last_label:
                 carry.setdefault("renames", []).append((last_label, joined))
                 last_label = joined
@@ -448,11 +453,11 @@ def read_column_layout(rows: list[list[str]], default_family: str,
                 for lower in range(level + 1, depth):
                     carried[lower] = ""
         stack = [part for part in carried if part]
-        label = " ".join(stack).strip()
+        label = wrap_rules.join_lines(stack).strip()
         if not label:
             continue
         # 最後の段が見出しそのもの。その上は群の名前で、剥がせるように分けて持つ。
-        group = " ".join(stack[:-1]).strip()
+        group = wrap_rules.join_lines(stack[:-1]).strip()
         last_label = label
         # **値の空欄は「左と同じ」。** 比較表は同じ値が続く列を横に結合するので、
         # 空いたセルは隣の型番と同じことを言っている。CH32V30x の Ethernet 行は

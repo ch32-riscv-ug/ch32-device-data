@@ -698,6 +698,40 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     cell. It lives in the same layer as `strip_boundary_dupes` for the same
     reason (human-facing output only).
 
+24. **A wrapped section heading is joined with its continuation**
+    (`join_heading_wraps`, converter 1.13.0). Readers apply the heading regex
+    line by line to `extract_text()`, so a wrapped title only yielded its first
+    line: `evidence/features.csv` carried `1.4.19 ... (USBSS) (Not applicable`
+    with `to CH32X305)` lost. The join is applied to **both `lines` and
+    `text`** -- the frozen tools read `text`. Conditions: the previous line is a
+    numbered heading, same left margin, immediately below, same bold, the
+    continuation is not itself a heading, and **either the heading has an
+    unclosed bracket or the continuation starts lowercase**. That last condition
+    is what makes it safe: without it 562 candidates match, mostly `● ...`
+    bullet items that would be destroyed by joining. Corpus-wide: **22 cases**,
+    all genuine. The seam is empty next to CJK, a space between alphanumerics
+    and after `,;:`, and empty otherwise (`(y` + `= 1/2)`) -- verified correct
+    on all 22.
+
+25. **The runner substitution bug is fixed and `extracted_rows` is raw again**
+    (converter 1.14.0). The substitution loop in `run_patched.py` /
+    `run_frozen.py` replaced `__main__` (the runner itself) first, which rebound
+    the comparison baseline (the runner's global `pdfplumber`) to pdfcompat, so
+    every later module -- the frozen tool itself -- fell through (`(1 modules)`
+    in the log was the tell). Function-local imports bypass attribute patching
+    as well. Fix: keep the baseline in a local and swap `sys.modules["pdfplumber"]`.
+    **Until then the frozen tools had been reading the original PDFs, not the
+    bundles**: "frozen parity byte-identical" only meant "the canonical CSVs
+    match a fresh PDF read", and pdfcompat's source-hash gate never ran. The
+    moment substitution worked, the pin tables regressed (three LQFP100 parts
+    lost every lead): `fix_rotated_cells` (1.3.1) had written the corrected
+    orientation of rotated headings into `extracted_rows` too, and
+    `extract_pins.read_variant`, which expects mirror text and un-mirrors it,
+    re-reversed `LQFP100` into `001PFQL`. `extracted_rows` must stay exactly
+    what pdfplumber returns -- that is the frozen tools' premise (the `cells`
+    repair stays). Measured right after: of 15 tables, 12 byte-identical,
+    `features` improved by one row, and the pin tables back to identical.
+
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
 version+page footers are caught 35/35 (en) and 30/30 (zh).

@@ -229,6 +229,7 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
                 channels = [HEAD_CHANNEL.match(c.replace("\n", "")) for c in head[1:]]
                 is_header = bool(head and HEAD_FIRST.match(head[0].replace("\n", ""))
                                  and any(channels))
+                continuation = False
                 if is_header:
                     # 結合セルの None 列（V30x の DMA2 表）は直前の channel に畳む
                     col_channel: list[int | None] = []
@@ -254,11 +255,14 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
                 elif grid and not grid.get("skip") and len(head) == grid["width"]:
                     body = cells          # 見出しの無い続き
                     page_has_grid = True
+                    continuation = True
                 elif grid and grid.get("skip") and len(head) == grid.get("width", -1):
                     continue
                 else:
                     continue
-                for row in body:
+                tail = grid.pop("tail", {}) if continuation else {}
+                grid.pop("tail", None)
+                for index, row in enumerate(body):
                     if not row or all(not c for c in row):
                         continue
                     label = row[0].replace("\n", "")
@@ -268,16 +272,47 @@ def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
                             continue
                     if not label and grid["last"] is None:
                         continue
+                    # **ページ境界で割れた要求名**を繋ぐ。セル内の折り返し（`USART2_T`⏎`X_1`）は
+                    # `cell_tokens` が繋ぐが、折り返しの**間にページ境界が来る**と、前のページの
+                    # 最終行に `USART1_T`、見出しの無い続き表の先頭行に `X_0` が別々に出て、
+                    # `USART1_T`・`USART1_TX_0`・`X_0` の3行に割れた（CH32X315RM.en v1.2
+                    # p119→p120。2026-09-08）。判定は**続き側**で行う——`X_0` は要求の頭
+                    # （`STARTS_REQUEST`）でも周辺名（`BARE`）でもない断片。前表の最終行で
+                    # 同じ列に出した要求と繋いで完結するなら、その行を書き戻して断片は出さない。
+                    # `complete()` を発火点にはできない——`USART1_T` を「完結」と判定するため。
+                    if index == 0 and not label and tail:
+                        row = list(row)
+                        for ci in list(tail):
+                            if ci >= len(row) or not row[ci]:
+                                continue
+                            first, *rest = [ln.strip() for ln in row[ci].split("\n") if ln.strip()] or [""]
+                            if not first or STARTS_REQUEST.match(first) or BARE.match(first) or not TOKEN.match(first):
+                                continue
+                            at, previous = tail[ci]
+                            joined = cell_tokens(previous + first)
+                            if len(joined) == 1 and complete(joined[0][0]) and at < len(rows):
+                                req, verbatim, remap, note = joined[0]
+                                rows[at].update({"request": req, "verbatim": verbatim,
+                                                 "remap": remap or rows[at]["remap"],
+                                                 "note": note or rows[at]["note"]})
+                                row[ci] = "\n".join(rest)
+                    tail = {}
+                    last_row = index == len(body) - 1
                     for ci, cell in enumerate(row[1:]):
                         channel = grid["cols"][ci] if ci < len(grid["cols"]) else None
                         if channel is None or not cell:
                             continue
+                        before = len(rows)
                         for req, verbatim, remap, note in cell_tokens(cell):
                             rows.append({"variant": grid["variant"], "dma": grid["dma"],
                                          "channel": channel, "request_id": "",
                                          "request": req, "verbatim": verbatim,
                                          "remap": remap, "note": note,
                                          "page": pno, "table": grid["table"]})
+                        if last_row and len(rows) > before:
+                            last_line = [ln.strip() for ln in cell.split("\n") if ln.strip()][-1]
+                            if FOOTNOTE.sub("", last_line).replace(" ", "") == rows[-1]["verbatim"]:
+                                grid.setdefault("tail", {})[ci + 1] = (len(rows) - 1, last_line)
                     if label:
                         grid["last"] = label
             if not page_has_grid and grid and not grid.get("skip"):
