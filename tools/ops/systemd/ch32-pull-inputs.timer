@@ -1,0 +1,13 @@
+[Unit]
+Description=CH32 device data: pull the originals every 4 hours
+
+[Timer]
+OnCalendar=*-*-* 00/4:07:00
+# **WSLは常時稼働ではない**——落ちている間に来た回を次回起動時に拾う。
+# これがcronでは出来ない（飛んだ回に気づけない）。
+Persistent=true
+RandomizedDelaySec=5m
+AccuracySec=1m
+
+[Install]
+WantedBy=timers.target
