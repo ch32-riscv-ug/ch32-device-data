@@ -41,10 +41,22 @@ def held_by() -> dict | None:
     return info
 
 
+# 鍵を持っている工程が子へ伝える印。`regenerate.py`は`convert_all.py`を子プロセスと
+# して呼ぶので、**入れ子は取り直さない**（親が持っているのに子が拒否されて第1段で
+# 落ちる）。pidの祖先を辿るより環境変数の方が確実（多段の`uv run`を挟むため）。
+INHERITED = "CH32_RUNLOCK_HELD"
+
+
 @contextlib.contextmanager
 def acquire(what: str):
-    """鍵を取る。取れなければ`False`をyieldし、持ち主を標準エラーへ出す。"""
+    """鍵を取る。取れなければ`False`をyieldし、持ち主を標準エラーへ出す。
+
+    既に鍵を持っている工程の**子**なら、取り直さずそのまま通す（`INHERITED`）。
+    """
     import sys
+    if os.environ.get(INHERITED):
+        yield True
+        return
     other = held_by()
     if other:
         print(f"別の工程が原本を読んでいます（{other.get('what', '?')}・"
@@ -56,7 +68,9 @@ def acquire(what: str):
     LOCK.write_text(json.dumps({"pid": os.getpid(), "what": what,
                                 "started": time.strftime("%Y-%m-%dT%H:%M:%S")}),
                     encoding="utf-8")
+    os.environ[INHERITED] = what
     try:
         yield True
     finally:
+        os.environ.pop(INHERITED, None)
         LOCK.unlink(missing_ok=True)

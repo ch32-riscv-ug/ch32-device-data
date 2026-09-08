@@ -34,8 +34,6 @@ check_images）はここに入れない。
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import subprocess
 import sys
 import time
@@ -43,27 +41,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "checks"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
 import check_sources  # noqa: E402  走行の前後で原本を照合する
+import runlock  # noqa: E402  原本を読む間の鍵（pull側が見て跳ばす。入れ子は通る）
 
 Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 
-# **走行中の`git pull`を止めるための鍵**。入力（mirrorのPDF・目録）を数時間おきに
-# `pull --ff-only`で追いかけるのは管理として正しいが、1時間強のこの工程の途中で
-# 入ることだけは困る（出力がどの入力状態にも対応しなくなる）。禁止ではなく排他にする
-# ——`tools/pull_inputs.py`はこの鍵を見て跳ばす。走行の後段照合は最後の砦として残す。
-LOCK = REPO / ".cache" / "regenerate.lock"
-
-
-def held_by() -> dict | None:
-    """鍵の持ち主（生きているプロセスのものだけ）。死んだ鍵は無視して奪う。"""
-    if not LOCK.is_file():
-        return None
-    try:
-        info = json.loads(LOCK.read_text(encoding="utf-8"))
-        os.kill(int(info["pid"]), 0)
-    except (ValueError, KeyError, OSError):
-        return None
-    return info
 
 
 # --fullの旧tool群（bundle入力の正規実行形）。PATCHED=PDFを読むので
@@ -199,19 +182,10 @@ def main() -> int:
               "**コード変更とは別のcommitで**走らせてください。", file=sys.stderr)
         return 1
 
-    other = held_by()
-    if other:
-        print(f"別の再生成が走っています（pid {other['pid']}・開始 {other['started']}）。"
-              "同時に走らせると入力も出力も混ざります。", file=sys.stderr)
-        return 1
-    LOCK.parent.mkdir(parents=True, exist_ok=True)
-    LOCK.write_text(json.dumps({"pid": os.getpid(),
-                                "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                "argv": sys.argv[1:]}), encoding="utf-8")
-    try:
+    with runlock.acquire("regenerate") as taken:
+        if not taken:
+            return 1
         return run(stages, before)
-    finally:
-        LOCK.unlink(missing_ok=True)
 
 
 def run(stages: list[tuple[str, list[Step]]], before: tuple) -> int:
