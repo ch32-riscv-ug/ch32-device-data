@@ -33,9 +33,15 @@ def main() -> int:
         return 2
     name = sys.argv[1]
     module = importlib.import_module(name)
+    # **基準は局所に控える。** `pdfplumber`はこのmoduleのグローバルなので、ループが
+    # `__main__`（このrunner自身）を差し替えた瞬間に基準そのものがpdfcompatへ変わり、
+    # `sys.modules`で後に来るmodule——**差し替えたい凍結tool本体**——が全部素通りして
+    # いた（`sys.modules`は`__main__`が先。ログの`(1 modules)`がその印）。
+    # 2026-09-08まで凍結toolはbundleではなく**原本PDFを直読みしていた**。
+    real = pdfplumber
     patched = 0
     for loaded in list(sys.modules.values()):
-        if loaded is not None and getattr(loaded, "pdfplumber", None) is pdfplumber:
+        if loaded is not None and getattr(loaded, "pdfplumber", None) is real:
             loaded.pdfplumber = pdfcompat
             patched += 1
     print(f"[{name}] pdfplumber -> pdfcompat ({patched} modules)", file=sys.stderr)

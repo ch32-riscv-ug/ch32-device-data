@@ -45,9 +45,14 @@ def patch_all_modules() -> int:
     toolは互いにimportし合う（`build_pins`→`extract_pins`など）ので、対象module
     だけでなく連鎖して読み込まれた全部を差し替える。
     """
+    # **基準は局所に控える**——`pdfplumber`はこのmoduleのグローバルなので、ループが
+    # `__main__`（runner自身）を差し替えると基準がpdfcompatへ変わり、後に来る
+    # 凍結tool本体が素通りする（2026-09-08に発覚。ログの`(1 modules)`がその印で、
+    # それまで凍結toolはbundleではなく原本PDFを直読みしていた）。
+    real = pdfplumber
     patched = 0
     for module in list(sys.modules.values()):
-        if module is not None and getattr(module, "pdfplumber", None) is pdfplumber:
+        if module is not None and getattr(module, "pdfplumber", None) is real:
             module.pdfplumber = pdfcompat
             patched += 1
     return patched
