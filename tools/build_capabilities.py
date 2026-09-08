@@ -105,9 +105,13 @@ CAPABILITIES: dict[str, str] = {
     "communication_interface_usbhd_2_0fs": "usb-fs:usbhd",
     "pdusb_usbhs": "usb-hs",
     "pdusb_usbhs_usb_2_0": "usb-hs",
+    # CH32X315DS0 v1.2 は`USBHS(USB2.0)`と空白なしで刷る（v1.1は`USBHS(USB 2.0)`）。
+    # 原文の綴りは`attribute`に残すので、同じ能力への綴りが2つ在る（2026-09-08）。
+    "pdusb_usbhs_usb2_0": "usb-hs",
     "usbhs_include_phy": "usb-hs:include-phy",
     "communication_interfaces_usbhs_include_phy": "usb-hs:include-phy",
     "pdusb_usbss_usb_3_0": "usb-ss",
+    "pdusb_usbss_usb3_0": "usb-ss",   # 同上（`USBSS(USB3.0)`）
     "pdusb_usbpd": "usb-pd",
     "pdusb_usbpd_type_c": "usb-pd",
     "pdusb_usb_pd_type_c": "usb-pd",
