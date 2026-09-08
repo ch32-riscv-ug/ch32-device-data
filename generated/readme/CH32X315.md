@@ -61,8 +61,8 @@ Only the 6 rows that differ between these 3 products; the other 17 are the same 
 | USART | 4 | 4 | 4 |
 | SPI | 3 | 3 | 3 |
 | I2C | 2 | 2 | 2 |
-| USBHS(USB 2.0) | Host/Device | Host/Device | Host/Device |
-| USBSS(USB 3.0) | Device | Device | Device |
+| USBHS(USB2.0) | Host/Device | Host/Device | Host/Device |
+| USBSS(USB3.0) | Device | Device | Device |
 | USBPD | 1 | 1 Built-in Rd(2) | 1 |
 | ARGB | 1 | 1 | 1 |
 | CPU main frequency | Max: 480MHz | Max: 480MHz | Max: 480MHz |

@@ -1652,7 +1652,7 @@ CH32X305RCT6,10,adc_adc4_channel,10,ADC,ADC ADC4 channel,ADC ADC4通道数,ADC A
 CH32X305RCT6,11,usart,4,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32X305RCT6,12,spi,3,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
 CH32X305RCT6,13,i2c,2,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32X305RCT6,14,pdusb_usbhs_usb_2_0,Host/Device,PDUSB,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),#,confirmed,products:zh+products:en
+CH32X305RCT6,14,pdusb_usbhs_usb2_0,Host/Device,PDUSB,PDUSB USBHS(USB2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),#,confirmed,products:zh+products:en
 CH32X305RCT6,15,pdusb_usbpd,1,PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,#,confirmed,products:zh+products:en
 CH32X305RCT6,16,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
 CH32X305RCT6,17,cpu_main_frequency,Max: 480MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
@@ -1670,8 +1670,8 @@ CH32X315CCU6,10,adc_adc4_channel,6,ADC,ADC ADC4 channel,ADC ADC4通道数,ADC AD
 CH32X315CCU6,11,usart,4,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32X315CCU6,12,spi,3,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
 CH32X315CCU6,13,i2c,2,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32X315CCU6,14,pdusb_usbhs_usb_2_0,Host/Device,PDUSB,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),#,confirmed,products:zh+products:en
-CH32X315CCU6,15,pdusb_usbss_usb_3_0,Device,PDUSB,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),#,confirmed,products:zh+products:en
+CH32X315CCU6,14,pdusb_usbhs_usb2_0,Host/Device,PDUSB,PDUSB USBHS(USB2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),#,confirmed,products:zh+products:en
+CH32X315CCU6,15,pdusb_usbss_usb3_0,Device,PDUSB,PDUSB USBSS(USB3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),#,confirmed,products:zh+products:en
 CH32X315CCU6,16,pdusb_usbpd,1,PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,#,confirmed,products:zh+products:en
 CH32X315CCU6,17,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
 CH32X315CCU6,18,cpu_main_frequency,Max: 480MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
@@ -1689,8 +1689,8 @@ CH32X315MCU6,10,adc_adc4_channel,12,ADC,ADC ADC4 channel,ADC ADC4通道数,ADC A
 CH32X315MCU6,11,usart,4,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32X315MCU6,12,spi,3,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
 CH32X315MCU6,13,i2c,2,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32X315MCU6,14,pdusb_usbhs_usb_2_0,Host/Device,PDUSB,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),#,confirmed,products:zh+products:en
-CH32X315MCU6,15,pdusb_usbss_usb_3_0,Device,PDUSB,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),#,confirmed,products:zh+products:en
+CH32X315MCU6,14,pdusb_usbhs_usb2_0,Host/Device,PDUSB,PDUSB USBHS(USB2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),#,confirmed,products:zh+products:en
+CH32X315MCU6,15,pdusb_usbss_usb3_0,Device,PDUSB,PDUSB USBSS(USB3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),#,confirmed,products:zh+products:en
 CH32X315MCU6,16,pdusb_usbpd,1 Built-in Rd(2),PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,#,conflict,products:en+!products:zh(=1 built-in Rd(2))
 CH32X315MCU6,17,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
 CH32X315MCU6,18,cpu_main_frequency,Max: 480MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
@@ -1708,8 +1708,8 @@ CH32X315WCU6,10,adc_adc4_channel,12,ADC,ADC ADC4 channel,ADC ADC4通道数,ADC A
 CH32X315WCU6,11,usart,4,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32X315WCU6,12,spi,3,,SPI,SPI,SPI,#,confirmed,products:zh+products:en
 CH32X315WCU6,13,i2c,2,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32X315WCU6,14,pdusb_usbhs_usb_2_0,Host/Device,PDUSB,PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB 2.0),#,confirmed,products:zh+products:en
-CH32X315WCU6,15,pdusb_usbss_usb_3_0,Device,PDUSB,PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB 3.0),#,confirmed,products:zh+products:en
+CH32X315WCU6,14,pdusb_usbhs_usb2_0,Host/Device,PDUSB,PDUSB USBHS(USB2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),#,confirmed,products:zh+products:en
+CH32X315WCU6,15,pdusb_usbss_usb3_0,Device,PDUSB,PDUSB USBSS(USB3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),#,confirmed,products:zh+products:en
 CH32X315WCU6,16,pdusb_usbpd,1,PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,#,confirmed,products:zh+products:en
 CH32X315WCU6,17,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
 CH32X315WCU6,18,cpu_main_frequency,Max: 480MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en

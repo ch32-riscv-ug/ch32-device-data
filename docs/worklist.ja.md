@@ -397,6 +397,85 @@ markdownを書き直してからparityを見る**。順序を守らないと自�
 確認せずに古い報告へ着手すると正しい出力を壊す。表が**前のページへ移る**型
 （`L103RM.en`のp270→p269）も先に伝える。
 
+### ⚠ `dma_requests` が新版で割れた——`fold_boundary_spills` が届かない（2026-09-08）
+
+CH32X315 en v1.2 の取り込みで`evidence/dma_requests.csv`が 650 → 654 行になった。
+**セル値の折り返しの間にページ境界が来た**ため:
+
+```
+p119 最終行  ['USART1','','','', 'USART1_T', 'USART1_R', '', '']
+p120 先頭行  ['',      '','','', 'X_0',      'X_0',      '', '']
+```
+
+`ch4 USART1_TX_0`（confirmed）が **`USART1_T` ＋ `USART1_TX_0` ＋ `X_0`（すべて
+reference に降格）** に割れた。`ch5 USART1_RX_0` も同様。
+
+`build_dma_requests`（凍結）は**同一ページ内の折り返しは繋げている**（同じp120の
+`USART2_T`⏎`X_1`は正しい`USART2_TX_1`になる）。繋げないのは**ページ境界を跨いだとき
+だけ**で、これは人向け経路の`fold_boundary_spills`が畳む形そのもの。凍結toolは
+ページ単位の`extracted_rows`を読むので届かない（`extracted_rows`は触らない約束）。
+
+**これは凍結tool退役の優先順位を決める材料**——`dma_requests`は「新経路の機構が既に
+解ける欠陥を、凍結toolが解けないまま抱えている」最初の表になった。D18の受入条件
+（凍結出力とbyte一致→切替→凍結tool削除）を次に通す候補。
+
+台帳は**この4行を含めて再記録した**（コミットする内容と一致させる必要がある）。
+黙って凍結したわけではない——ここに記録して、移行で直す。
+
+### X315 en v1.2 の取り込み（2026-09-08）
+
+`--accept-sources`で取り込み、動いた13表すべての中身を旧版と突合した。
+
+| 表 | 変化 | 中身 |
+|---|---|---|
+| `pin_functions` | 1,024行 | **`table`列だけ**（`2-1`→`2-1-1` 766行・`2-2`→`2-1-2` 258行）。他の列は完全一致——**新版が表番号を訂正**し、review sidecarのcanonicalと一致した |
+| `index/conflicts` | 211→**206** | **en/zhの食い違いが5件解消**（`I_DD` Stop modeのtyp=1.1/1.0・消去時間のmax・WRPR粒度）＝新版が値を直した |
+| `features`・`index/features` | 1行 | 切れた題が`(Not`→`(Not applicable`（**まだ切れている**。converter 1.13.0で直す） |
+| `option_bytes`系 | 17行 | `basis`のページ番号だけ（en p.361→p.360。RMが1ページ減った） |
+| `operating_conditions` | 2,796→2,797 | 条件文が`high-speed`→**`high- speed`**（新版が行末でハイフン分割し、繋ぎ目に空白が入った。**未解決**） |
+| `product_attributes`・`capabilities` | 7行 | `USBHS(USB 2.0)`→`USBHS(USB2.0)`で属性のslugが`usb_2_0`→`usb2_0`。**語彙に新しい綴りを追加**（H415系は空白のままなので両方必要） |
+| `dma_requests`・`index/dma` | 650→654 | ⚠ 上の節 |
+| `sources.csv` | 12行 | mirrorのcommit（09-01→09-06）。実際のHEADと一致を確認 |
+
+**検証**: 凍結パリティ**6/6 byte-identical**・markdown parity **68/68 clean**・検査5本通過。
+
+**途中で2度止まった。どちらも設計どおり**: (1) `build_capabilities`が語彙に無い属性2種で
+停止（新版の綴り変化）、(2) `check_docs`が文書の行数5箇所の陳腐化を検出。
+
+**review sidecarのガードも働いた**——原本が変わったので`convert_all`が再変換を拒否し、
+8件の判断を新版と突合させた。結果、**新版がその指摘をほぼ全部訂正**していた
+（`2-1-1`・`2-1-2`・`3-6-1`・`12-18`・`23-4`が印字されるようになった）。章10だけ
+番号が変わった（`10-23`→`10-10`＝zhに揃った）ので両版のcanonicalを揃えた。
+
+### 凍結tool（PDF直読み）の退役の順序（2026-09-08 方針確認）
+
+「そろそろ凍結toolをなくしてもいいか」への答え——**目標として正しいが一括では消せない**。
+実測: 正本60表のうち**15表の生産者がまだ凍結tool（11本）**で、44表はPDFに依存しない
+（EVT・配布物。凍結ではない）。新経路が既に書いているのは3表
+（`operating_conditions`・`option_bytes`系・`debug_wiring`）。
+
+**彼らが今も働いている証拠**: 2026-09-08のconverter変更（1.11.0→1.12.0）で
+`run_frozen --batch`の**6/6 byte-identical**が「converterを変えても正本の読みは
+動いていない」を保証した。これは凍結台帳（CSVのhash）では代替できない——台帳は
+「ファイルが動いたか」しか言えず、「**新しいbundleを古い読み手に食わせても同じ答えか**」は
+言えない。
+
+**同じ日に、凍結の使い方の実例も出た**。`features.csv`の切れた見出しを直すのに
+converter側（1.13.0）を選べたのは、**凍結toolの下を直せば凍結を解かずに出力が良くなる**
+から。凍結解除して`build_features.py`を直す道は、同じ欠陥を2箇所で別々に扱うことになる。
+
+**退役はD18の受入条件どおり表ごとに**（schema互換・説明できない欠落0・追加変更行の
+原文リンク・consumer検査合格・再実行同一）:
+
+1. 新経路の抽出器を書く
+2. 凍結出力と**byte一致**を1度示す
+3. その表の生産を切り替える
+4. **その時点でその凍結toolを消す**
+
+この順序を通ったのは`operating_conditions`だけ（1,588行を再現→A11行を追加）。
+残り**14表・10本**が同じ道を通る必要がある。一括で消すと「移行でデータが変わって
+いない」と言う手段が無くなる——**消すのは最後の一歩で、最初の一歩ではない**。
+
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
 **結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。
@@ -695,7 +774,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 |---|---|---|
 | **電気特性・低消費電力**（絶対最大定格・動作/待機/スリープ電流・Flash 書換回数と保持期間・各低消費モードのウェイクアップ時間・GPIO 駆動能力と入力閾値・ADC 精度） | ✅ **実装**（2026-08-29） | **抽出器を書く仕事ではなく語彙を広げる仕事だった。** `build_operating.py` は**すでに電気的特性表と絶対最大定格表を歩いていて**、`KEEP` 正規表現で落としているだけだった。**304 → 1,588行**（記号187種・全27 series・confirmed 1,379 / ref 179 / conflict 30）。内訳は 電圧・しきい値 489／時間 393／クロック 195／電流 148／抵抗 70／容量 66／温度 34／ADC 誤差 32／Flash 寿命 21。監査が名指しした項目はほぼ入った——`N_END`（書換 300K回）・`t_RET`（保持 20年）・`I_DDA`・`t_SU(HSI/LSI/HSE)`・`t_STAB`・`V_IH`/`V_IL`/`V_OL`/`V_hys`/`I_lkg`・`t_s`/`t_CONV`/`f_S`/`R_ADC`/`C_ADC`・`ED`/`EL`/`EO`/`ET`・`t_prog_page`/`t_erase_*`・`T_J`。<br>**やり方**: (1) `KEEP` を記号の一覧ではなく**頭字＝物理量**にし、単位で弾く（`UNIT_FOR` を拡張。`T_S_*`・`t_RET`・`N_END` は具体規則を先に置く先勝ち）、(2) 値の判定を `reads_as_value` に書き直して**式**（`0.22*(VDD-2.7)+1.55`）と記号（`VREF-`）と `∞` を採る、(3) 値の欄の**添字修復**`attach_value_subscript`（`V-0.4DD` → `VDD-0.4`）、(4) 見出し行（`Symbol`）と2記号が畳まれた行を落とす。<br>**検証**: 既存 304 行は**1行も欠けず確度も根拠も不変**（純粋な追加）。probe が落とした87通りの値を全部新しい規則に通して45採用・42却下を1件ずつ確認。単位と物理量の不一致 0。データ列の CJK 0。`index/parts.csv` と生成 README は**無変化**（クロック・電圧の読み方に影響なし）。<br>**残り**: (a) ~~消費電流とウェイクアップ時間~~——A11 として切り出し、**2026-09-01に受入済み**、(b) **添字が `*` に化けた式**（19通り。推測になるので埋めない）、(c) conflict 30 のうち**8件は綴りの差**（`mS`/`ms`・`0.8VDD`/`0.8*VDD`・`VI/O`/`VIO`）で、単位の大小を無視する正規化は `MΩ`/`mΩ` を潰すため入れていない |
 | **機械可読な列定義**（`meta/columns.csv`。型・単位・主キー・空欄の意味） | ⬜ 保留。**要求は本物だが置き場所が違う** | 空欄の意味が混ざっている（該当しない／資料にない／未解決／variant 依存／0個／索引では意図的に省略）という指摘はそのとおり。ただし51表・約500列の台帳を人が別ファイルに書くと、**それ自体が次に腐るもの**になる。`check_tables.column_drift` がすでに「ヘッダ＝生成器の `*COLUMNS` 定数」を毎回見ているので、足すなら**定数の隣に型と空欄理由を書き、そこから生成する**形にしたい。着手前に consumer がどの列で困っているかを聞く |
-| **出所・矛盾の縦持ち索引**（`claim_id, subject, predicate, value, source, ...`） | 🔧 **安い部分を実装**（2026-08-29）→ `index/conflicts.csv` | `basis` が1セル内の DSL なので横断で引けない、というのは事実。まず `confidence=conflict` の行だけを集める索引を作った（**証拠の表の conflict は 211 行**。memory_configs 67・register_fields 38・operating_conditions **40**（A11受入とX315 zh改版で2026-09-01に30→40）・product_attributes 25・pin_functions 18（2026-09-04 に V407 の en 版 RM が加わり、FSMC_NADV の格子読みが zh/en で割れて 12→18。F-60）・option_byte_fields 4（R-30の新表。8→4は2026-09-02の裁定）・clock_symbols 5・opa_cmp_registers 5・registers 4・adc_internal 2・flash_geometry 1・timers 1。この数は `check_docs.py` と `check_tables.py` が数え直す）。`basis` から `!<出所>` と `(=<値>)`（新経路の `(address=…)`・`(field=…)` 形も）を取り出すので、**129行は「表が採った値」と「相手が言う値」が横に並ぶ**（例: CH32V407 `RCC_CFGR2.UTMI1ON` は EVT が bit31・RM が bit30）。残る75行は、食い違いを散文で記録している表（memory_configs・timers の68行）と、**相手が「値を書かない」型**（新しいX315 zh版がFlash時間のmaxを載せない等）。**分かったこと**: `product_attributes` の25行は仕様の差と**言い回しの差**（`Typical: 72MHz` / `Typ. 72MHz`）が混ざっていて、conflict の印が「本当の食い違い」と同義ではない表がある。claim 表まで広げるかは、この索引が使われるかを見てから |
+| **出所・矛盾の縦持ち索引**（`claim_id, subject, predicate, value, source, ...`） | 🔧 **安い部分を実装**（2026-08-29）→ `index/conflicts.csv` | `basis` が1セル内の DSL なので横断で引けない、というのは事実。まず `confidence=conflict` の行だけを集める索引を作った（**証拠の表の conflict は 206 行**。memory_configs 67・register_fields 38・operating_conditions **40**（A11受入とX315 zh改版で2026-09-01に30→40）・product_attributes 25・pin_functions 18（2026-09-04 に V407 の en 版 RM が加わり、FSMC_NADV の格子読みが zh/en で割れて 12→18。F-60）・option_byte_fields 4（R-30の新表。8→4は2026-09-02の裁定）・clock_symbols 5・opa_cmp_registers 5・registers 4・adc_internal 2・flash_geometry 1・timers 1。この数は `check_docs.py` と `check_tables.py` が数え直す）。`basis` から `!<出所>` と `(=<値>)`（新経路の `(address=…)`・`(field=…)` 形も）を取り出すので、**129行は「表が採った値」と「相手が言う値」が横に並ぶ**（例: CH32V407 `RCC_CFGR2.UTMI1ON` は EVT が bit31・RM が bit30）。残る75行は、食い違いを散文で記録している表（memory_configs・timers の68行）と、**相手が「値を書かない」型**（新しいX315 zh版がFlash時間のmaxを載せない等）。**分かったこと**: `product_attributes` の25行は仕様の差と**言い回しの差**（`Typical: 72MHz` / `Typ. 72MHz`）が混ざっていて、conflict の印が「本当の食い違い」と同義ではない表がある。claim 表まで広げるかは、この索引が使われるかを見てから |
 | **版間差分のデータ化** | ⬜ 保留 | git 履歴はあり、`catalog/sources.csv` が読んだミラーの commit を持つので材料は揃っている。**D7（生成の Actions 化）と一緒にやるのが自然**——差分を出す主体が定期実行だから |
 | **ブート・書込み・保護設定の意味索引**（option byte・BOOT 条件・読み出し保護・IAP・debug 無効化・reset source） | ⬜ 保留。**consumer が現れてから** | register field は `index/registers.csv` に揃っているので、足りないのは目的別の語彙だけ。ただし**いま作ると語彙を推測で決めることになる**（どの粒度で引きたいかは使う側が決める） |
 | **パッケージ実装情報**（辺ごとの lead 数・番号方向・exposed pad 寸法・推奨ランド・courtyard） | ⬜ 保留 | PCB や部品ライブラリの生成まで見るなら要るが、consumer からの依頼が無い。画像 C1〜C3 と同じ扱い |

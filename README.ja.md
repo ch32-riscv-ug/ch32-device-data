@@ -68,7 +68,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   配布物の版番号（`wchlink.wcfg`）と実機が申告する`major.minor`の対応は
   `wcfg = major*10 + minor`で、`tools/read_link_version.py`が実機から読んだ値と
   突き合わせる（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
-- `tools/build_capabilities.py`: 比較表の属性（154種類の綴り・1,714行）を
+- `tools/build_capabilities.py`: 比較表の属性（156種類の綴り・1,714行）を
   「型番 × 能力」の縦持ち索引`index/capabilities.csv`にする。`index/parts.csv`は
   横長なので13種類しか列に持てない。属性→能力の対応は**総当たりの辞書**で、
   辞書に無い属性が現れたら生成が落ちる（`adc`はチャネル数、`adc_unit`はユニット数、
