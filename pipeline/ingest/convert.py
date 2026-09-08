@@ -112,6 +112,13 @@ SCHEMA_VERSION = "0.2"
 # 幽霊行が残り、(c)刷り直されたヘッダが列数を狂わせていた。結合表でしか効かない
 # `fold_boundary_spills`と`drop_repeated_headers`が届いていなかった。条件は列数と
 # **列境界xの±2pt一致**＋上下の位置で、全corpusの候補は18件（既に繋がる表は5,734件）。
+# 1.13.0: **折り返した節見出しの続きを見出しへ繋ぐ**（`join_heading_wraps`）。読む側は
+# `extract_text()`の行ごとに見出しの正規表現を当てるので、折り返した題は1行目しか
+# 取れず、`evidence/features.csv`に`1.4.19 … (USBSS) (Not applicable`と切れて入って
+# いた（続きは`to CH32X305)`）。v1.1では`(Not`で切れていて、**新版で切れる位置が
+# 動いただけ**。`lines`と`text`の両方で繋ぐ——凍結toolが読むのは`text`。
+# 全corpus実測: 節見出し17,400のうち条件を満たすのは**22件**（緩い条件では562件当たり、
+# その大半は`● …`の箇条書き）。
 # 1.12.0: **最外列の取り込みを3つ緩めた**（`recover_outer_column`）。(a) 隙間の上限8ptを
 # 「**縁までの全幅**が1列ぶん」に置き換え——隙間は「列幅−文字幅」で決まるので閾値として
 # 筋が悪く、`CH32L103RM.en` p13の`Bit`/`[31:21]`は8.4ptで**0.4pt足りずに落ちていた**。
@@ -125,7 +132,10 @@ SCHEMA_VERSION = "0.2"
 # **14個の行見出しがどのセルにも入っていなかった**。行と列の座標は他のセルから決まるので
 # 入れ先は一意。条件は「同じ列に3つ以上の穴があり、その3つ以上に文字が在る」——散発の
 # 穴（図の誤検出ページのラベル断片。全corpus90個/50表）を外すとこの1表だけになる。
-CONVERTER_VERSION = "1.12.0"
+CONVERTER_VERSION = "1.13.0"
+
+# 継ぎ目の区切りを決めるのに使う（CJKは字間が無い）。
+CJK_CHAR = re.compile(r"[\u3000-\u303f\u3040-\u30ff\u4e00-\u9fff\uff01-\uff60]")
 DEFAULT_BUNDLES = REPO / ".cache" / "structured-bundles"
 DEFAULT_STRUCTURED = REPO / "structured"
 MANIFEST_SCHEMA = REPO / "schemas" / "structured-document-manifest.schema.json"
@@ -892,6 +902,77 @@ def chars(page) -> list[dict]:
     return out
 
 
+HEADING_NUMBERED = re.compile(r"^\d+(?:\.\d+){1,3}\s+.*[A-Za-z\u4e00-\u9fff].*$")
+
+
+def _wrap_joiner(head: str, tail: str) -> str:
+    """折り返しの継ぎ目に入れる区切り（`cell_html`の折り返し判定と同じ考え方）。"""
+    if CJK_CHAR.search(head[-1]) or CJK_CHAR.search(tail[0]):
+        return ""              # CJKは字間が無い
+    if head[-1].isalnum() and tail[0].isalnum():
+        return " "             # 英単語の折り返し
+    if head[-1] in ",;:":
+        return " "             # 英文の読点のあとは1字空ける
+    return ""                  # 語の途中で折れた（`(y` ＋ `= 1/2)`）
+
+
+def join_heading_wraps(lines: list[dict]) -> list[tuple[str, str, str]]:
+    """**折り返した節見出しの続きを見出しへ繋ぐ**（1.13.0）。繋いだ組を返す。
+
+    節見出しが版面幅を超えると次の行へ折り返すが、**続きは独立した行**になる。
+    読む側は行ごとに見出しの正規表現を当てるので、`build_features.py`は
+    `1.4.19 … (USBSS) (Not applicable`で切れた題を`evidence/features.csv`に入れて
+    いた（続きは`to CH32X305)`。CH32X315DS0.en v1.2。ユーザー指摘）。v1.1では
+    `(Not`で切れていて、**新版で切れる位置が動いただけ**で直っていなかった。
+
+    繋ぐのは次の全部を満たすときだけ:
+
+    - 直前が節番号を持つ見出し（`role == "heading"`）
+    - 続きが**同じ左マージン**（±1pt）で**すぐ下**（隙間が行高の0.6倍以内）
+    - **boldが見出しと同じ**
+    - 続きが**それ自身節見出しでない**
+    - 見出しの**括弧が閉じていない**、または続きが**小文字で始まる**
+
+    最後の条件が要——これが無いと562件当たり、その大半は
+    `9.1.1 NVIC 控制器`＋`● 88个可屏蔽的中断通道`のような**箇条書きの1項目**で、
+    繋ぐと壊れる（節見出しと同じ左マージン・同じboldで直下に来る）。全corpus実測:
+    節見出し17,400のうち候補744、次も見出し160を除いて584、**この条件で22**。
+    22件は全部本物の折り返し（DMAレジスタの`(x=…,`＋`y=1/2)`が大半）。うち3件は
+    本文が節番号に見えて見出しと誤判定されたものだが、**繋ぐと正しい文になる**ので
+    害は無い。
+
+    続きの行には`merged_into`（見出しのid）を付けて残す——`join_split_lines`と同じ
+    約束で、読み手はそれを飛ばすだけでよい。
+    """
+    joined: list[tuple[str, str, str]] = []
+    ordered = sorted((line for line in lines if (line.get("text") or "").strip()),
+                     key=lambda line: (round(line["bbox"][1], 1), line["bbox"][0]))
+    for index, line in enumerate(ordered[:-1]):
+        head = (line.get("text") or "").strip()
+        if line.get("role") != "heading" or not HEADING_NUMBERED.match(head):
+            continue
+        follow = ordered[index + 1]
+        tail = (follow.get("text") or "").strip()
+        if not tail or follow.get("merged_into") or HEADING_NUMBERED.match(tail):
+            continue
+        if abs(follow["bbox"][0] - line["bbox"][0]) > 1.0:
+            continue
+        height = line["bbox"][3] - line["bbox"][1]
+        if not 0 <= follow["bbox"][1] - line["bbox"][3] <= height * 0.6:
+            continue
+        if bool(follow.get("bold")) != bool(line.get("bold")):
+            continue
+        unbalanced = (head.count("(") != head.count(")")
+                      or head.count("\uff08") != head.count("\uff09"))
+        if not (unbalanced or tail[:1].islower()):
+            continue
+        separator = _wrap_joiner(head, tail)
+        line["text"] = head + separator + tail
+        follow["merged_into"] = line["id"]
+        joined.append((head, separator, tail))
+    return joined
+
+
 def classify_lines(lines: list[dict], page_chars: list[dict], height: float,
                    repeated_top: set, repeated_bottom: set,
                    top_texts: set = frozenset(), bottom_texts: set = frozenset()) -> None:
@@ -1230,6 +1311,14 @@ def captions(lines: list[dict], lang: str) -> list[dict]:
     return found
 
 
+def _text_with_heading_wraps(text: str,
+                             joins: list[tuple[str, str, str]]) -> str:
+    """ページ本文で「見出し\n続き」を繋いだ形へ置き換える（見付かった分だけ）。"""
+    for head, separator, tail in joins:
+        text = text.replace(f"{head}\n{tail}", head + separator + tail, 1)
+    return text
+
+
 def page_record(page, lang: str, source_sha256: str,
                 previous_logical_id: str | None,
                 previous_page: int | None,
@@ -1259,6 +1348,8 @@ def page_record(page, lang: str, source_sha256: str,
     # 行の中で基底から離れた下付き/上付きをgeometryで戻す（`2^20`が`220`に潰れる）。
     # 2カラム再抽出のあとに掛ける——行が組み直されると位置が変わるので。
     fix_line_subscripts(page_chars, lines)
+    # 折り返した節見出しの続きを見出しへ繋ぐ（textにも同じ結合を反映する）。
+    heading_wraps = join_heading_wraps(lines)
     # 列境界で割れた本文行を繋ぐ。`reading_order`より前でよい——`merged_into`を付けた
     # 行はそのまま残るので順序は変わらない。
     join_split_lines({"lines": lines})
@@ -1373,7 +1464,11 @@ def page_record(page, lang: str, source_sha256: str,
         # `extract_text()`は行の組み直しを通らない別の面（pdfplumber互換。凍結toolが
         # これを読む）。**文字の壊れだけは同じく直す**——PUAの字と重ね描きは互換の
         # ためのものではなく単に壊れているので、この面に残す理由が無い。
-        "text": normalize_text(page.extract_text() or ""),
+        # 折り返した見出しは`text`でも1行にする——読む側（凍結tool含む）は
+        # `extract_text()`の行ごとに見出しの正規表現を当てるので、ここが分かれて
+        # いると題が切れたまま正本CSVへ入る。見付からなければ何もしない（安全側）。
+        "text": _text_with_heading_wraps(
+            normalize_text(page.extract_text() or ""), heading_wraps),
         "lines": lines,
         "words": words,
         "images": [item for item in page_drawings if item["type"] == "image"],
