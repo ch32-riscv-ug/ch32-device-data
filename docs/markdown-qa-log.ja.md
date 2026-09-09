@@ -2173,3 +2173,75 @@ evidence 段の中でその順に並べた。他の消費者（`build_feature_ta
 `build_opa_cmp_registers`・`build_flash_program_method`・`extract_package_dims`・`scan_errata`・
 `extract_images`（pixel。原本が要る）。次に退役させるなら `extract_registers`（`find_tables`・
 `extract_text_lines`・`page.search` が要る——`bundle_pages` に足す最初の相手）。
+
+## ⚠ 撤退: CH32X035DS0.zh V2.3 の取り込み——`operating_conditions` がポート群を表せない（2026-09-09）
+
+コードを3つのcommitに入れて tree が clean になったので、保留していた資料更新を
+`regenerate.py --full --verify --human --accept-sources` で取り込もうとした。**撤退した。**
+
+### 何が起きるか
+
+V2.3 は電気特性章を改版し、**出力電圧特性をポート群ごとに分けた**（新しい表3-14 输出电压特性）:
+
+| 記号 | 条件 | 値 |
+|---|---|---|
+| `VOL（PA0-PA23）` | I_IO = 50mA / 100mA | 0.4V / 0.5V |
+| `VOH（PA0-PA23）` | I_IO = 30mA / 50mA | VDD-0.4 / VDD-0.5 |
+| `VOL（PB0-PB21）` | I_IO = 50mA / 100mA | 0.4V / 0.5V |
+| `VOH（PB0-PB21）` | I_IO = 6mA / 10mA | VDD-0.4 / VDD-0.5 |
+| `VOL（PC0-PC7，PC14-…）` | I_IO = 18mA / 32mA | 0.4V / 0.5V |
+| `VOH（PC0-PC7，PC14-…）` | I_IO = 8mA / 16mA | VDD-0.4 / VDD-0.5 |
+
+V2.2 はこれを「普通I/O引脚输出高/低电平电压」の1組（6mA/12mA・8mA/16mA）で書いていた。
+**PA が 50mA を引けるという新しい事実**が入った改版で、consumer にとって価値がある。
+
+ところが正本 `operating_conditions.csv` は行数が **98→98 のまま**で、新しい12行が1つも入らない。
+ポート群が**記号セルの中**にあるので `norm_symbol` が `VOH_(PA0-PA23)` を返し、凍結
+`build_operating.keep_row` の白名簿 `KEEP = ^(?:[FfTtVIiRCEN]_|C$|E[DLOT0]|ACC_|…)` が
+`V_` の形しか通さないため**全部落ちる**。
+
+さらに悪いことに、落ちた結果 en（まだ V2.2）の4行が相手を失い:
+
+- `V_OH / I_IO = 12mA V_DD = 5V`・`V_OL / I_IO = 16mA V_DD = 5V`: confirmed → **reference**
+- `V_OH / I_IO = 6mA V_DD = 3.3V`: confirmed → **conflict**（`!zh(min=2.8)`）
+- `V_OL / I_IO = 8mA V_DD = 3.3V`: confirmed → **conflict**（`!zh(max=0.3)`）
+
+この2件の conflict は**偽**だった。`2.8`/`0.3` の出所を追うと p32 の**別の表**
+「静态输出高电平/静态输出低电平」（USB/PD 系の静的出力レベル）で、一般 I/O の話ではない。
+一般 I/O の zh 行が消えたので、記号だけが一致する別表の行が en と突き合わされていた。
+
+つまり取り込むと、正本に**偽の conflict 2件**と**根拠を失った reference 2件**が入り、
+**新しいポート群ごとの規格は1行も入らない**。「変化が意図したものか」の答えは No。
+
+### なぜ安く直せないか
+
+ポート群の置き場所は `condition` 列（`series`+`symbol`+`parameter`+`condition` が鍵）。しかし行の
+組み立ては凍結 `tools/build_operating.py` の `read_edition` の中で、新経路
+`pipeline/extract/datasheet/build_operating_conditions.py` はそれを**ライブラリとして呼び**
+（`operating.main()` に `--out` を渡してCSVを書かせ、それを読む）、セル読みと行の絞り込みの
+**間に割り込む場所が無い**。`norm_symbol` だけ差し替えても、群の情報を condition へ渡せない
+（列が別なので）。直すには `build_operating.py`（656行。`operating_conditions` 経路で最後に残った
+大きな塊）を**凍結解除するか新経路へ移植する**しかない。
+
+### 撤退の内容と再突入の条件
+
+戻したもの: 正本4表（`catalog/sources.csv`・`evidence/operating_conditions.csv`・
+`index/conflicts.csv`・`index/manifest.csv`）・`structured/CH32X035DS0.zh/manifest.json`・
+`.cache/structured-bundles/CH32X035DS0.zh`（旧原本 147f0d22d073 の控えから）。Markdown は
+human 段まで進んでいないので無傷（差分0）。作業ツリーは HEAD と同一、検査4本通過。
+
+**再突入の条件**: `operating_conditions` が**ポート群の次元を持てるようになったら**取り込む
+（記号から `condition` へ移す、または列を足す）。それには `build_operating` の行組み立てを
+新経路へ移すのが先——退役の順序としても自然な次の相手（`extract_registers` と並ぶ大物）。
+それまで manifest は 147f0d22d073 のままで、`check_sources` は 67/68 を報告し続ける。
+**その報告は正しい**ので黙らせない。
+
+### 副産物: 読みが改善した箇所と、走行の途中失敗
+
+- `V_DD 工作电源电压` の表は V2.2 でページを跨いでいた `使用ADC功能 2.5 5.5` の行が V2.3 では
+  1つの表に収まり、`V_DD / Performance may be reduced` が **conflict → confirmed** に直る。
+  取り込みの価値はここにもある（撤退したので保留）。
+- 最初の走行は legacy 段の最後 `build_link_firmware` が **ネットワークのタイムアウト**
+  （`取得できない: The read operation timed out`）で落ちた。`link_firmware.csv` は無傷で、
+  資料更新とは無関係。evidence 段から `resume.py` で継いだ。この tool はネットワークに依存する
+  唯一の生成器なので、走行の失敗としては切り分けて読む。
