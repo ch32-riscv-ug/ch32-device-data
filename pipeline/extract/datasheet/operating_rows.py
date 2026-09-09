@@ -688,6 +688,35 @@ def main():
 
         # 行対応は記号ごとの値照合。中国語版は行の増減（極限行の同居等）や
         # rowspanの空単位があるため、序数でなく値で突き合わせる。
+        # **綴りの差は食い違いではない。** 対応付けは値と単位の一致で決めるので、同じ事実を
+        # 版が別の綴りで書くと conflict になる。長く「conflict のうち何件は綴りの差」と
+        # 台帳に書いてきた分（`docs/table-reliability.ja.md`）を、ここで外す。
+        #
+        # 単位: **先頭の `M` だけ大小を保って残りを小文字にする。** `m`（ミリ）と `M`（メガ）
+        # だけが大小で意味が変わるので、そこだけ残せば `mS`/`ms`・`us`/`uS`・`kHz`/`KHz`・
+        # `kΩ`/`KΩ`・`Times`/`times` が揃い、`mΩ`/`MΩ`・`mV`/`MV` は揃わない
+        # （単純な大小無視を入れなかった理由がこれ）。全corpus実測で大小が揺れる単位は
+        # `kHz`/`KHz`（10/32）・`kΩ`/`KΩ`（73/4）・`ms`/`mS`（82/13）・`us`/`uS`（190/1）・
+        # `Times`/`times`・`year`/`Year`・`time`/`Time` の7組。
+        #
+        # 値: `*`（掛け算）と `I/O` の綴り。`0.8*VDD` と `0.8VDD`、`VI/O` と `VIO` は
+        # 同じ値の別の書き方（`VI/O` は `V` に添字 `I/O` が付いた綴りで、同じ行の中で
+        # `min=0.8VI/O` と `max=VIO` が混ざる実例がある）。全corpus実測: 値に `/` を含む
+        # セルは7つで、うち `I/O` は2つ、残る5つは本物の割り算（`VDD/4`・`VDDA/2`）なので
+        # `/` を一律に落とすことはしない。`*` を含むセルは42で全部掛け算。
+        # **公開する綴りは変えない**（英語版の書き方をそのまま出す）。ここは対応付けの
+        # ためだけの正規化で、揃った結果は `basis` に両版が並ぶ形で見える。
+        def same_unit(a, b):
+            def canon(u):
+                return "".join(c if i == 0 and c == "M" else c.lower()
+                               for i, c in enumerate(u or ""))
+            return canon(a) == canon(b)
+
+        def same_value(a, b):
+            def canon(v):
+                return (v or "").replace("*", "").replace("I/O", "IO")
+            return canon(a) == canon(b)
+
         def agrees(zh, en):
             # **ピン群が違う行は同じ事実ではない。** 群は`PA0-PA23`のように言語に依らないので
             # 版をまたいで比べられる。`CH32X035DS0` V2.3（zh）は出力電圧特性をポート群ごとに
@@ -696,14 +725,15 @@ def main():
             # 群が揃っている版どうしなら従来どおり対応する。
             if (zh.get("_group") or "") != (en.get("_group") or ""):
                 return False
-            if zh["min"] != en["min"] or zh["max"] != en["max"]:
+            if not same_value(zh["min"], en["min"]) or not same_value(zh["max"], en["max"]):
                 return False
             # 単位と典型値は、片方の版だけが列を持つことがある（rowspanの空セル、
             # 版によって典型値の列を落とす表）。空は不一致ではないので、
             # 両方が値を持つときだけ突き合わせる。
-            for key in ("unit", "typ"):
-                if zh[key] and en[key] and zh[key] != en[key]:
-                    return False
+            if zh["unit"] and en["unit"] and not same_unit(zh["unit"], en["unit"]):
+                return False
+            if zh["typ"] and en["typ"] and not same_value(zh["typ"], en["typ"]):
+                return False
             return True
 
         # **対応付けは二段**。一段目で値の一致する対を全部取り、二段目で残りを
