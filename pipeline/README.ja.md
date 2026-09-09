@@ -50,7 +50,7 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            ので据え置き（`--hold-sources`）でもゲートと食い違わない）
            run_frozen.py（凍結toolをコード不変のままbundle入力で走らせ、出力を
            凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
-           run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
+           scan_errata.py（エラッタ増分検査（KNOWN/NEW）。bundle を直接読む。
            対象選定は凍結toolのまま）
            images/run_extract_images.py（family repoのimage/を作る凍結
            `extract_images`を、**`pdfplumber.open`だけ原本hashゲート経由**で走らせる。

@@ -65,7 +65,7 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            run_frozen.py (runs frozen tools unmodified on bundle input and
            byte-compares their output against the frozen CSVs -- the old-vs-new
            parity harness; the ledger is in the worklist under D18)
-           run_scan_errata.py (the incremental errata scan (KNOWN/NEW) on bundle
+           scan_errata.py (the incremental errata scan (KNOWN/NEW) on bundle
            input; target selection stays the frozen tool's)
            images/run_extract_images.py (runs the frozen `extract_images` -- which
            builds each family repo's image/ -- with **only `pdfplumber.open`

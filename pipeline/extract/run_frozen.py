@@ -9,9 +9,8 @@ byte一致で再現できることを生成器ごとに証明する**こと（`o
 
 multiprocessingを使うtool（`build_all`系）と、pixelを読むtool（`extract_images`）は
 対象外（前者は子processへのpatchが要る＝別実装、後者はasset rendererが後継）。
-`--out`を持たない別型CLIも対象外——`extract_package_dims`の`extract()`は
-`build_tables`が呼ぶのでpackages.csvのパリティで証明済み、`scan_errata`は
-`run_scan_errata.py`が同じ差し替えで走らせる（旧新の出力byte一致を実測済み）。
+`--out`を持たない別型CLIも対象外だった——`extract_package_dims`と`scan_errata`は
+2026-09-10に新経路へ退役した（第11号）。
 
 実行:
     uv run pipeline/extract/run_frozen.py build_remap ...
@@ -51,7 +50,7 @@ CANDIDATES = REPO / ".cache" / "pipeline-candidates" / "frozen"
 # ので、この定番一式が見ているのは「出力が再現するか」だけになった。PDF直読みの凍結toolで
 # 単一プロセス・`--out` 持ちのものが無くなったため——残る直読みは `build_all`
 # （multiprocessing）・`build_tables`・`extract_products`/`extract_ordering`（`build_all` 経由）・
-# `extract_remap`（review 経路）・`extract_package_dims`・`scan_errata`・`extract_images`（pixel）で、
+# `extract_remap`（review 経路）・`extract_images`（pixel）で、
 # どれもこの形に載らない。**次の退役でここは空になる見込み**で、そのときはパリティの相手を
 # 作り直すのではなく `--verify` の意味自体を見直すことになる。
 #
