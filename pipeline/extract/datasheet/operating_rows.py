@@ -95,9 +95,25 @@ MARKER = {
 #
 # ページ規則で届くページは**そのページの表を全部**見る（従来のまま）。表題で届いた表は
 # **その表だけ**を見る——ページを丸ごと開くと隣の無関係な表まで入る。
+# OPA/CMP の特性表も足した（2026-09-09）。X035 V2.3 の取り込みで残った唯一の誤り
+# （`V_DD Recommended not less than 2.5V` の偽 conflict）の原因がこれだった——正しい相手は
+# zh p.34 `表3-26 OPA运放特性`／p.35 `表3-27 CMP电压比较器特性` の `建议不低于2.5V 2/5/5.5` で
+# en 行と値も条件も完全一致するのに、**その2ページが窓の外**だった（読めていた zh は
+# 9・23–27・32・33 だけ。en は OPA 表 p.37 に届いていたので片翼だけ入り、相手を失った en 行が
+# p.32 ADC 表の `额定性能` を取って偽の conflict になった）。
+#
+# 表題は `OPA`／`CMP` を含み、かつ `特性`／`characteristic` を含むもの（後読み）。全corpus実測:
+# OPA/CMP を含む表78のうち**68が特性表で全部当たり**、残る10は`引脚功能`／`Pin Functions`で
+# **全部落ちる**（pin表を電気特性に混ぜない）。**zh/en の表数は全文書で対称**
+# （H417 3/3・L103 4/4・M030 6/6・V003 1/1・V006DS0 2/2・V007 4/4・V203 1/1・V205 4/4・
+# V208 1/1・V20x_30x 2/2・V407 2/2・X035 2/2）——片翼だけ増えると zh/en の対応が崩れて
+# 既存の行が消えるので、これが入れる前提だった。`CH32V006DS2` は zh 4・en 0 だが
+# 目録範囲外の文書（対象SKUがproductsに無い）。
 TABLE_CAPTION = re.compile(
     r"输\s*出\s*电\s*压\s*特\s*性"
-    r"|Output\s+voltage\s+characteristic",
+    r"|Output\s+voltage\s+characteristic"
+    r"|(?:OPA|CMP)(?=.*特\s*性)"
+    r"|(?:OPA|CMP)(?=.*characteristic)",
     re.IGNORECASE)
 
 # ヘッダー名 → 正規列。抽出時のCJK間スペースと脚注を吸収する。
@@ -111,6 +127,12 @@ HEADER_MAP = {
     "unit": "unit", "单位": "unit",
 }
 FOOTNOTE = re.compile(r"[（(]\d+[）)]")
+# **脚注の括弧が添字を挟んで割れる。** `CH32V007DS0.en` p.63 の記号セルは
+# `V (2⏎OHSAT⏎)` で、閉じ括弧が添字のうしろに落ちている（同じ表の次ページは
+# `V (2)⏎OHSAT` で正しい）。`FOOTNOTE` は `(2)` の形しか落とさないので、
+# 行を `_` で繋ぐと **`V_(2_OHSAT_)` という記号**になっていた。
+# 全corpus実測: この壊れ方をするのは `V_OHSAT`・`V_OLSAT` の4行だけ。
+FOOTNOTE_SPLIT = re.compile(r"[（(]\d+\s*\n\s*([A-Za-z]\w*)\s*\n?\s*[）)]")
 # 中文だけの表記。`operating_conditions.csv`は**CJKを1文字も含まない英語の表**（表示テキストは
 # 英語版から取る設計。実測: 2,797行の parameter/condition に CJK は0）。zh だけが持つ行を出すときも
 # その性格を保つ——中文の項目名を入れない（下の`zh_only_rows`）。
@@ -187,7 +209,13 @@ def reads_as_value(text: str) -> bool:
     return len(text) <= 8               # 記号そのもの（`VREFP`・`F_HCLK`）
 # 抽出時に潰れた表記の修繕（サブスクリプト割り込み・原文の詰まり）
 WIDE_PARENS = str.maketrans({"（": "(", "）": ")"})
-SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK"}
+# `I_LOAD_PG_A` は**添字そのものが2行に割れた**跡（`CH32V007DS0.en` p.62 のセルは
+# `I⏎LOAD_PG⏎A`。同じ文書の p.63 と中文版は `I⏎LOAD_PGA` で正しい）。行を `_` で繋ぐ
+# のが既定なので、割れ目に `_` が入ってしまう——一般に「単独の大文字は添字だから `_` で
+# 繋ぐ」（`V (2)⏎DD` → `V_DD`）のが正しいので、ここだけ綴りで直す。
+# 全corpus実測: `_` を除くと同じになる記号の組はこの1組だけ。
+SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK",
+              "I_LOAD_PG_A": "I_LOAD_PGA"}
 VALUE_FIX = {"FHCLK": "F_HCLK"}
 TEXT_REPAIRS = [
     (re.compile(r"^T = (.+?)\s*A$"), r"T_A = \1"),
@@ -213,7 +241,50 @@ HEADLINE = {
 }
 
 
+# 表全体に掛かる限定が**条件ヘッダの中に**書かれている形（`条件：V_DD = 5V`／
+# `Condition: V_DD = 5V`）。これを`条件`と読めないと`{symbol,min,condition}`が揃わず、
+# 表そのものが落ちる。全corpus実測で**4表だけ**——`CH32X035DS0` の OPA/CMP 特性表
+# （zh 2・en 2）。素の`条件`ヘッダは1,053表なので、これは例外の形。
+#
+# **限定そのものは行に写さない。** 表全体の条件を持つ列が無いので、写すには表の設計を
+# 変えるか条件欄に混ぜるかしかなく、混ぜると`V_DD 供电电压 建议不低于2.5V`の行が
+# `V_DD = 5V, Recommended not less than 2.5V`という自己矛盾した書き方になる。
+# en 側の同じ行は隣接ページの繰り越しで**すでに限定なしで正本に入っている**ので、
+# zh を足すことで悪くはならない（表全体の条件を表せないことは既知の穴として記録）。
+CONDITION_HEADER = re.compile(r"^\s*(?:条\s*件|condition)\s*[：:]", re.IGNORECASE)
+
+
+# **表の範囲**（食い違いの相手を絞るのに使う）。表題に出る**大文字の略語**の集合。
+# 略語は両版で同じ綴りで出るので言語に依らない——`表3-37-1 CMP1特性` と
+# `Table 3-37-1 CMP1 characteristics` はどちらも `{CMP1}`、`表3-36-3 OPA3和OPA4特性` と
+# `Table 3-36-3 OPA3 and OPA4 characteristics` はどちらも `{OPA3, OPA4}`。表番号は使わない
+# ——版で振り方が違う（`CH32X035DS0` の OPA 表は zh 3-26・en 3-24）。
+#
+# なぜ要るか: 記号は**同じ文書の複数の表に出る**（`V_hys`・`t_D`・`I_DDOPAMP` は OPA/CMP の
+# 表ごとに別の値を持つ）。記号だけで突き合わせると、片版で行数が違うときに余りが
+# **別の表の行**と組んで**偽の食い違い**になる。実測（OPA/CMP の特性表を読めるようにした
+# 2026-09-09）: `CH32M030DS0` は zh が CMP2 の表に、en が CMP1 の表に同じ記号を置いていて
+# `I_DDOPAMP`(35/55)・`V_hys`(100/5・200/50)・`t_D`(40/30) の4件が偽の食い違いになり、
+# `CH32V007DS0` は en の CMP2 の `V_hys` が zh の一般I/Oの `V_hys`(min=150) と組んだ。
+# **一致するのは confirmed（値が一致）のときは要求しない**——値が一致するなら別の表でも
+# 同じ規格の裏付けとして正しい。
+# 略語の取り方は2つ捨てるものがある。(1) **括弧の中**——zh の表題は周波数を括弧で足すことが
+# あり（`表4-12 …低速外部时钟（fLSE=32.768KHz）`）、en 側（`Table 4-12 Low-speed external
+# clock generated from…`）には無いので**版で非対称な鍵**になる。両版が括弧で書く修飾
+# （`（高速模式）`/`(High-speed mode)`）は略語を持たないので落としても同じ。
+# (2) **単位の綴り**——`MHz`・`KHz` は `MH`・`KH` に化ける。大文字の直後が小文字なら単位と
+# みなして採らない（`HSI)`・`OPA3 `・`CMP1特`は採る）。
+TABLE_ACRONYM = re.compile(r"[A-Z]{2,}[0-9]*(?![a-z])")
+PARENTHESISED = re.compile(r"[（(][^）)]*[）)]")
+
+
+def table_scope(caption: str) -> frozenset:
+    return frozenset(TABLE_ACRONYM.findall(PARENTHESISED.sub(" ", caption or "")))
+
+
 def norm_header(cell):
+    if CONDITION_HEADER.search(cell or ""):
+        return "condition"
     text = FOOTNOTE.sub("", (cell or "")).replace(" ", "").replace(".", "")
     return HEADER_MAP.get(text.lower() if text.isascii() else text)
 
@@ -248,7 +319,9 @@ def split_pin_group(cell):
 
 
 def norm_symbol(cell):
-    parts = [p.strip() for p in (cell or "").split("\n") if p.strip()]
+    # 添字を挟んで割れた脚注を先に畳む（`V (2⏎OHSAT⏎)` → `V ⏎OHSAT`）。
+    cell = FOOTNOTE_SPLIT.sub(lambda m: "\n" + m.group(1), cell or "")
+    parts = [p.strip() for p in cell.split("\n") if p.strip()]
     sym = FOOTNOTE.sub("", "_".join(parts))
     # 添字はセル内で改行にも空白にもなる。"F HSE_ext" は F_HSE_ext、
     # "ACC HSI" は ACC_HSI。空白を消してしまうと FHSE_ext になり引けない。
@@ -298,7 +371,12 @@ def norm_text(cell):
 # 値の欄でも添字は離れて出る。条件欄の `attach_subscript` と同じ壊れ方で、
 # `V_DD-0.4` が `V-0.4DD`、`0.45*V_DD+0.41` が `0.45*V+DD0.41` になる。
 # **添字を、離れた場所から裸の記号のうしろへ戻す。**
-VALUE_SUBSCRIPTS = ("DD33", "DDIO", "DDA", "DD8", "CC12V", "HCLK", "SCK", "DD", "IO")
+# 長いものを先に置く（`DD33A` を `DD33` より先に見ないと末尾の `A` が値のうしろに
+# 取り残される。`CH32H417DS0` の `V_OHSAT` は `V -160`＋添字`DD33A` で、`DD33` と読むと
+# `VDD33-160A` になり、en 版の別ページ（`V -16`＋`DD33A`＋`0`）では `VDD33-16A0` という
+# 壊れた数になっていた——同じ事実が3通りに綴られて偽の食い違いが3件出た。2026-09-09）
+VALUE_SUBSCRIPTS = ("DD33A", "DD33", "DDIO", "DDA", "DD8", "CC12V", "HCLK", "SCK",
+                    "DD", "IO")
 BARE_BASE = re.compile(r"(?<![A-Za-z])([VtIfCRT])(?![A-Za-z])")
 # 小数点のあとに数が続かない＝添字を数の途中から抜いてしまった跡。
 BROKEN_NUMBER = re.compile(r"\d\.(?!\d)|\.\.")
@@ -327,6 +405,11 @@ def attach_value_subscript(value: str) -> str:
 
     >>> attach_value_subscript("0.41*(V-1.DD8)+1.3")
     '0.41*(VDD-1.8)+1.3'
+
+    **添字が数字で終わらないこともある。** 長いほうを先に見ないと末尾の英字が残る。
+
+    >>> attach_value_subscript("V-160DD33A"), attach_value_subscript("V-16DD33A0")
+    ('VDD33A-160', 'VDD33A-160')
     """
     for sub in VALUE_SUBSCRIPTS:
         at = value.find(sub)
@@ -397,11 +480,26 @@ def read_edition(bundle, lang):
     found = []
     carry = False
     last_cols = None
+    # **表題の無い表は直前の表題を継ぐ。** 表がページを跨ぐと続きの断片は表題を持たない
+    # （表題は表の上の行から取るので、続きページには無い）。継がないと2つ困る:
+    # (1) 表題で届く表の**続きの断片が読まれない**（`CH32V006DS0` の OPA 特性表は
+    # zh p.38 に断片があり、そこの `C_LOAD 50pF` が落ちて en の 50 が zh の高速モード表の
+    # 20 と組み、偽の食い違いになっていた）、(2) **表の範囲**（`table_scope`）が空になり、
+    # 食い違いの相手を絞れない（`CH32V205DS0` の zh p.55 の ADC 特性表は表題が欠けていて、
+    # en の `Table 3-28 ADC characteristics` と別の表に見えた——`f_ADC` の 64/96MHz は
+    # **本物の食い違い**なので、絞りすぎると本物を隠す）。
+    # 表題は**跳ばすページの表でも**更新する（最後に見た表題が続く、という意味だから）。
+    last_caption = ""
     for page in bundle_pages.pages(bundle):
         text = page.get("text") or ""
         hit = bool(marker.search(text))
+        tables = []
+        for caption, tbl in bundle_pages.captioned_tables(page):
+            if (caption or "").strip():
+                last_caption = caption
+            tables.append((last_caption, tbl))
         if not hit and not carry and not any(
-                TABLE_CAPTION.search(cap) for cap, _ in bundle_pages.captioned_tables(page)):
+                TABLE_CAPTION.search(cap) for cap, _ in tables):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
@@ -409,7 +507,7 @@ def read_edition(bundle, lang):
         # 無関係な表を拾っても記号の絞り込みで落ちる。
         carry_from, carry = carry and not hit, hit
         page_ok = hit or carry_from
-        for caption, tbl in bundle_pages.captioned_tables(page):
+        for caption, tbl in tables:
             # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
             if not page_ok and not TABLE_CAPTION.search(caption):
                 continue
@@ -418,11 +516,18 @@ def read_edition(bundle, lang):
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
             if {"symbol", "min", "condition"} <= set(cols):
                 last_cols = cols
-            elif (carry_from and last_cols
+            elif ((carry_from or TABLE_CAPTION.search(caption)) and last_cols
                   and len(tbl[0]) == len(last_cols)):
                 # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
                 # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
                 # このページにしかない。
+                #
+                # **表題で届いた表の続き**も同じ扱いにする（2026-09-09）。表題は
+                # 直前の表から継ぐので（`last_caption`）、続きの断片も表題では届くが、
+                # 1行目がデータ行なのでヘッダの検査に落ちて捨てられていた。
+                # `CH32V006DS0.zh` p.38 の OPA 特性表の続き（`C_LOAD 50pF`）がそれで、
+                # 落ちると en の 50 が zh の**高速モード表**の 20 と組んで偽の食い違いに
+                # なっていた。
                 cols, body = last_cols, tbl
             else:
                 continue
@@ -464,7 +569,9 @@ def read_edition(bundle, lang):
                 })
             kept = [r for r in rows if keep_row(r, lang, page["number"])]
             if kept:
-                found += [{**r, "_page": page["number"]} for r in kept]
+                scope = table_scope(caption)
+                found += [{**r, "_page": page["number"], "_table": scope}
+                          for r in kept]
     return found
 
 
@@ -636,8 +743,10 @@ def main():
             cands = ([] if exact else
                      [z for z in remaining if z["symbol"] == row["symbol"]
                       and (z.get("_group") or "") == (row.get("_group") or "")
+                      and z.get("_table") == row.get("_table")
                       and bool(z["condition"]) == bool(row["condition"])])
             en_page = row.pop("_page")
+            row.pop("_table", None)
             if exact:
                 # 表示テキストは英語版から取るが、典型値は数値なので言語に
                 # 依らない。英語版が列を落としていれば中国語版で埋める。
@@ -793,16 +902,32 @@ def main():
     # 2つある。この表はどの表から来たかを持たない（列がない）ので、両者は
     # 完全同一行になる——数える意味のない重複で、CH32V303/305/307/317 の
     # F_PLL_IN が2行あった。値・確度・根拠まで同じ行は1行にする。
-    seen: set[tuple] = set()
-    unique = []
+    # **根拠が違うだけの重複も1行にする**（2026-09-09）。資料は同じ規格を複数の表に
+    # 繰り返す——`CH32L103DS0` は OPA と CMP の特性表4つが同じ `V_CM 0〜V_DDA` を載せ、
+    # `CH32V407DS0` は OPA 表2つが同じ飽和出力電圧を載せる。表題で表を選べるように
+    # なって OPA/CMP の表が全部読めると、この繰り返しがそのまま行の重複になった
+    # （実測: 同じ主張が2行以上あるのが 6 件 → 49 件）。この表は「どの表から来たか」を
+    # 持たないので、重複は**読む側に何も足さない**。
+    # **確度の良い方を残す**（confirmed > conflict > reference）——同じ主張が、ある表では
+    # 両版が揃って confirmed になり、別の表では片版だけで reference になることがある
+    # （`CH32H417DS0` の `V_DD33A`・`CH32V407DS0` の `I_LOAD`/`V_IOFFSET`）。裏付けの
+    # 強い方が正しい。
+    RANK = {"confirmed": 0, "conflict": 1, "reference": 2}
+    # **確度は鍵に入れない。** 入れると「同じ主張で確度が違う2行」が残る
+    # （`CH32H417DS0` の `V_DD33A 1.8/3.3/3.6` は OPA 表で confirmed・CMP 表で reference）。
+    claim = [c for c in COLUMNS if c not in ("basis", "#", "confidence")]
+    best: dict[tuple, dict] = {}
+    order: list[tuple] = []
     for r in out:
-        key = tuple(r.get(c, "") for c in COLUMNS)
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(r)
+        key = tuple(r.get(c, "") for c in claim)
+        if key not in best:
+            best[key] = r
+            order.append(key)
+        elif RANK[r["confidence"]] < RANK[best[key]["confidence"]]:
+            best[key] = r
+    unique = [best[k] for k in order]
     if len(unique) != len(out):
-        print(f"完全同一の重複行を落とした: {len(out) - len(unique)} 行", file=sys.stderr)
+        print(f"同じ主張の重複行を落とした: {len(out) - len(unique)} 行", file=sys.stderr)
     out = unique
 
     out.sort(key=lambda r: (r["series"], r["symbol"], r["condition"], r["typ"]))
