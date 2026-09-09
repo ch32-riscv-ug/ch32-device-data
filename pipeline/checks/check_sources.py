@@ -116,7 +116,15 @@ def mirror_roots() -> dict[str, Path]:
 
 
 def unpulled(repo: Path) -> str | None:
-    """originのHEADがローカルのHEADと違えば、その短いhashを返す（読み取りだけ）。"""
+    """originのHEADが手元に**無い**なら、その短いhashを返す（読み取りだけ）。
+
+    hashの不一致で判断していたので、**未pushのcommitが1つあると毎回「pullが要る」**と
+    言っていた（2026-09-09に発覚。このリポジトリでコード変更を3つcommitした直後の
+    セッション開始検査が誤警報を出した）。引くものがあるかは**祖先関係**で決まる——
+    originのHEADが手元のHEADの祖先なら、こちらが先行しているだけで引くものは無い。
+    手元にそのcommitが無ければ `--is-ancestor` は失敗するので、そのまま「要る」と読む
+    （分岐しているときも「要る」＝正しい）。
+    """
     if not (repo / ".git").exists():
         return None
     def git(*argv: str) -> str:
@@ -126,7 +134,12 @@ def unpulled(repo: Path) -> str | None:
     remote = git("ls-remote", "origin", "HEAD").split()
     if not local or not remote:
         return None      # originが無い/引けない——判断の材料にしない
-    return remote[0][:12] if remote[0] != local else None
+    if remote[0] == local:
+        return None
+    ancestor = subprocess.run(
+        ("git", "-C", str(repo), "merge-base", "--is-ancestor", remote[0], "HEAD"),
+        capture_output=True, timeout=30)
+    return None if ancestor.returncode == 0 else remote[0][:12]
 
 
 def main() -> int:
