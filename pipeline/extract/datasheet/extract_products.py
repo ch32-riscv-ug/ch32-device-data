@@ -19,7 +19,7 @@ Values are kept under the document's own labels rather than mapped onto schema
 fields, so nothing is lost before the shape of the record is settled.
 
 Usage:
-    uv run tools/extract_products.py <datasheet.pdf> [--emit]
+    uv run pipeline/extract/datasheet/extract_products.py <bundle名 or datasheet.pdf> [--emit]
 """
 
 from __future__ import annotations
@@ -30,7 +30,29 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
+
+# bundle 名の言語は原本の置き場から決まる（`pdfcompat` と同じ規則）。
+_LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
+
+
+def bundle_name(argument: str) -> str:
+    """bundle 名（`CH32V003DS0.zh`）はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。
+
+    凍結の呼ぶ側（`build_all`・`build_tables`）が原本のパスを渡してくるので、ここで受けて
+    bundle に向ける——呼ぶ側を触らずに済む。**原本は開かない。**
+    """
+    path = Path(argument)
+    if path.suffix.upper() != ".PDF":
+        return argument
+    found = _LANG_DIR.match(path.parent.name)
+    if not found:
+        raise SystemExit(f"{argument}: 言語が分からない"
+                         "——`datasheet_zh`/`datasheet_en` の下のPDFか、bundle名を渡してください")
+    return f"{path.stem}.{found.group(1)}"
 import wrap_rules
 
 MODEL = re.compile(r"^CH32[A-Z0-9]{4,}$")
@@ -68,21 +90,18 @@ ZERO_WAIT = {
 ZERO_WAIT_LABEL = {"zh": "零等待Code FLASH（字节）", "en": "Zero-wait Code FLASH (bytes)"}
 
 
-def read_zero_wait(pdf, lang: str) -> tuple[int, str] | None:
+def read_zero_wait(pages, lang: str) -> tuple[int, str] | None:
     """(page_no, "192K") — 脚注が言う零等待領域。無ければ None。
 
     折り返しで文が2行に割れるので、隣接2行の窓で読む。
     """
     pattern = ZERO_WAIT[lang]
-    for page in pdf.pages[:MAX_PAGES]:
-        lines = (page.extract_text() or "").splitlines()
+    for page in pages[:MAX_PAGES]:
+        lines = (page.get("text") or "").splitlines()
         for i, _ in enumerate(lines):
             found = pattern.search(" ".join(lines[i:i + 2]))
             if found:
-                result = page.page_number, f"{found.group('zero')}K"
-                page.close()
-                return result
-        page.close()
+                return page["number"], f"{found.group('zero')}K"
     return None
 
 
@@ -96,7 +115,7 @@ FOOTNOTE_MARK = re.compile(r"[（(](\d{1,2})[)）]")
 def read_footnotes(page) -> dict[str, str]:
     """{脚注番号: 本文}。表の下に並ぶ注記。"""
     out: dict[str, str] = {}
-    for line in (page.extract_text() or "").splitlines():
+    for line in (page.get("text") or "").splitlines():
         found = FOOTNOTE_LINE.match(line.strip())
         if found:
             out.setdefault(found.group("number"), found.group("text"))
@@ -115,7 +134,7 @@ def unrotate(page, table, rows: list[list[str]]) -> list[list[str]]:
     回った文字が 1 つも無いページでは何もしない——ほとんどのページがそうで、
     セルごとに文字を走査する費用を払わずに済む。
     """
-    turned = [c for c in page.chars if not c.get("upright", True)]
+    turned = [c for c in bundle_pages.chars(page) if not c.get("upright", True)]
     if not turned:
         return rows
     for i, row in enumerate(rows):
@@ -183,7 +202,7 @@ def dewrap(page, table, raw: list[list]) -> list[list[str]]:
     rows = [[flatten(c) for c in r] for r in raw]
     if not wrapped:
         return rows
-    chars = page.chars
+    chars = bundle_pages.chars(page)
     for i, j in wrapped:
         if i >= len(table.rows) or j >= len(table.rows[i].cells):
             continue
@@ -497,81 +516,84 @@ def read_column_layout(rows: list[list[str]], default_family: str,
     return list(products.values())
 
 
-def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
+def extract(source) -> tuple[list[dict], list[str]]:
     notes: list[str] = []
     products: list[dict] = []
     seen: set[str] = set()
-    with pdfplumber.open(pdf_path) as pdf:
-        title = ""
-        for line in pdf.pages[0].extract_text_lines() or []:
-            # The English cover reads "CH32M030 Datasheet", the Chinese one
-            # "CH32M030数据手册" with no space, so the name is not delimited.
-            m = re.match(r"^(CH32[A-Z][0-9A-Z]{2,5}?)(?=[\s\u4e00-\u9fff]|$)", line["text"].strip())
-            if m:
-                title = m.group(1)
-                break
-        if not title:
-            notes.append("先頭ページから family 名を読めず、転置表の型番を補完できません")
-        # 比較表はページを跨ぐ。`pdfplumber` はページごとに別の表として返すので、
-        # 前の表の状態をここで持ち回る（F-19）。**隣り合うページの間だけ**——
-        # 間に別の内容が挟まったらもう続きではない。
-        carry: dict = {}
-        for pno, page in enumerate(pdf.pages[:MAX_PAGES], start=1):
-            if carry and pno > carry.get("page", 0) + 1:
-                carry = {}
-            for table in page.find_tables():
-                rows = unrotate(page, table, dewrap(page, table, table.extract()))
-                if not rows or len(rows[0]) < 4:
+    pages = list(bundle_pages.pages(bundle_name(str(source))))
+    title = ""
+    for line in bundle_pages.text_lines(pages[0]):
+        # The English cover reads "CH32M030 Datasheet", the Chinese one
+        # "CH32M030数据手册" with no space, so the name is not delimited.
+        m = re.match(r"^(CH32[A-Z][0-9A-Z]{2,5}?)(?=[\s\u4e00-\u9fff]|$)", line["text"].strip())
+        if m:
+            title = m.group(1)
+            break
+    if not title:
+        notes.append("先頭ページから family 名を読めず、転置表の型番を補完できません")
+    # 比較表はページを跨ぐ。`pdfplumber` はページごとに別の表として返すので、
+    # 前の表の状態をここで持ち回る（F-19）。**隣り合うページの間だけ**——
+    # 間に別の内容が挟まったらもう続きではない。
+    carry: dict = {}
+    for pno, page in enumerate(pages[:MAX_PAGES], start=1):
+        if carry and pno > carry.get("page", 0) + 1:
+            carry = {}
+        for table in bundle_pages.tables(page):
+            rows = unrotate(page, table, dewrap(page, table, table.extract()))
+            if not rows or len(rows[0]) < 4:
+                continue
+            notes_here = read_footnotes(page)
+            found = read_row_layout(rows)
+            layout = "row"
+            if not found:
+                layout = "column"
+                found = read_column_layout(rows, title, notes_here,
+                                           column_spans(table), carry)
+                if found:
+                    carry["page"] = pno
+            for product in found or ():
+                # 脚注は値の横流しの例外を決めるが、判定は注文型番が
+                # 揃ってからでないとできない（excepted の説明）。持ち回す。
+                product["_footnotes"] = dict(notes_here)
+            if not found:
+                continue
+            # ページ境界で切れたラベルは、前のページに書いたものを直す。
+            for old_label, new_label in carry.pop("renames", []):
+                for target in products + found:
+                    for key in ("attributes", "_groups"):
+                        holder = target.get(key)
+                        if holder and old_label in holder:
+                            holder[new_label] = holder.pop(old_label)
+                    filled = target.get("_filled")
+                    if filled and old_label in filled:
+                        filled.discard(old_label)
+                        filled.add(new_label)
+            for product in found:
+                key = product["part_number"]
+                if key in seen:
+                    # Continuation page: merge the further attributes in.
+                    # **脚注も足す。** 比較表は複数ページに渡り、注記は
+                    # 最後のページの下にある。最初のページのぶんだけ持って
+                    # いると、`（3）` が指す注が手元に無いことになる。
+                    for existing in products:
+                        if existing["part_number"] == key:
+                            existing["attributes"].update(product["attributes"])
+                            existing.setdefault("_groups", {}).update(
+                                product.get("_groups") or {})
+                            existing.setdefault("_footnotes", {}).update(
+                                product.get("_footnotes") or {})
+                            existing.setdefault("_filled", set()).update(
+                                product.get("_filled") or set())
                     continue
-                notes_here = read_footnotes(page)
-                found = read_row_layout(rows)
-                layout = "row"
-                if not found:
-                    layout = "column"
-                    found = read_column_layout(rows, title, notes_here,
-                                               column_spans(table), carry)
-                    if found:
-                        carry["page"] = pno
-                for product in found or ():
-                    # 脚注は値の横流しの例外を決めるが、判定は注文型番が
-                    # 揃ってからでないとできない（excepted の説明）。持ち回す。
-                    product["_footnotes"] = dict(notes_here)
-                if not found:
-                    continue
-                # ページ境界で切れたラベルは、前のページに書いたものを直す。
-                for old_label, new_label in carry.pop("renames", []):
-                    for target in products + found:
-                        for key in ("attributes", "_groups"):
-                            holder = target.get(key)
-                            if holder and old_label in holder:
-                                holder[new_label] = holder.pop(old_label)
-                        filled = target.get("_filled")
-                        if filled and old_label in filled:
-                            filled.discard(old_label)
-                            filled.add(new_label)
-                for product in found:
-                    key = product["part_number"]
-                    if key in seen:
-                        # Continuation page: merge the further attributes in.
-                        # **脚注も足す。** 比較表は複数ページに渡り、注記は
-                        # 最後のページの下にある。最初のページのぶんだけ持って
-                        # いると、`（3）` が指す注が手元に無いことになる。
-                        for existing in products:
-                            if existing["part_number"] == key:
-                                existing["attributes"].update(product["attributes"])
-                                existing.setdefault("_groups", {}).update(
-                                    product.get("_groups") or {})
-                                existing.setdefault("_footnotes", {}).update(
-                                    product.get("_footnotes") or {})
-                                existing.setdefault("_filled", set()).update(
-                                    product.get("_filled") or set())
-                        continue
-                    seen.add(key)
-                    product["_source"] = {"page": pno, "layout": layout}
-                    products.append(product)
-            page.close()
-        lang = "zh" if "datasheet_zh" in str(pdf_path) else "en"
-        split = read_zero_wait(pdf, lang)
+                seen.add(key)
+                product["_source"] = {"page": pno, "layout": layout}
+                products.append(product)
+        # 凍結版はここでページの解析キャッシュを捨てていた（`page.close()`）。
+        # bundle のページ record は素の JSON なので要らない。
+    # 言語は bundle 名の接尾辞から（原本のパスを渡されたときは `bundle_name` が
+    # 親ディレクトリから読んで同じ形にしている）。
+    lang = "zh" if bundle_name(str(source)).endswith(".zh") else "en"
+    split = read_zero_wait(pages, lang)
     if split:
         page_no, value = split
         notes.append(f"零等待領域は脚注にある（p.{page_no}）: {value}")
@@ -582,7 +604,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("pdf", type=Path)
+    ap.add_argument("pdf", help="bundle名（CH32V003DS0.zh）か原本PDFのパス")
     ap.add_argument("--emit", action="store_true")
     args = ap.parse_args()
 

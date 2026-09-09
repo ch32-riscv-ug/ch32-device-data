@@ -34,6 +34,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import build_documents  # noqa: E402
+# 凍結 `tools/extract_ordering.py`・`extract_products.py` は退役した（第12号）。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "datasheet"))
 import extract_ordering  # noqa: E402
 # 凍結 `tools/extract_package_dims.py` は退役した（第11号）。読み手は新経路の
 # `pipeline/extract/package/extract_package_dims.py`——`extract()` は原本PDFのパスを

@@ -15,7 +15,7 @@ given a record reports where the two disagree. It emits candidates only and neve
 writes device records.
 
 Usage:
-    uv run tools/extract_remap.py <manual.pdf> [--compare <record>.json] [--emit]
+    uv run pipeline/extract/rm/extract_remap.py <bundle名 or manual.pdf> [--compare <record>.json] [--emit]
 """
 
 from __future__ import annotations
@@ -26,7 +26,29 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
+
+# bundle 名の言語は原本の置き場から決まる（`pdfcompat` と同じ規則）。
+_LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
+
+
+def bundle_name(argument: str) -> str:
+    """bundle 名（`CH32V003DS0.zh`）はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。
+
+    凍結の呼ぶ側（`build_all`・`build_tables`・`build_candidate`）が原本のパスを渡してくるので、
+    ここで受けて bundle に向ける——呼ぶ側を触らずに済む。**原本は開かない。**
+    """
+    path = Path(argument)
+    if path.suffix.upper() != ".PDF":
+        return argument
+    found = _LANG_DIR.match(path.parent.name)
+    if not found:
+        raise SystemExit(f"{argument}: 言語が分からない"
+                         "——`datasheet_zh`/`datasheet_en` の下のPDFか、bundle名を渡してください")
+    return f"{path.stem}.{found.group(1)}"
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -218,30 +240,30 @@ def pads_in(cell: str) -> tuple[list[str], bool]:
     return PAD_IN_PROSE.findall(text), True
 
 
-def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
+def extract(source) -> tuple[list[dict], list[str]]:
     routes: list[dict] = []
     notes: list[str] = []
     pending: list[tuple[str, list[int]]] | None = None
     pending_page = -2
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            for table in page.find_tables():
+    if True:
+        for page in bundle_pages.pages(bundle_name(str(source))):
+            for table in bundle_pages.tables(page):
                 rows = [[flatten(c) for c in row] for row in table.extract()]
                 if not rows or len(rows[0]) < MIN_COLUMNS:
                     continue
                 header = read_header(rows[0]) or read_bare_header(rows, notes)
                 if header:
-                    pending, pending_page = header, page.page_number
+                    pending, pending_page = header, page["number"]
                     body = rows[1:]
                 elif (pending and not is_header_row(rows[0])
                       and len(rows[0]) == len(pending) + 1
-                      and page.page_number - pending_page <= 1):
+                      and page["number"] - pending_page <= 1):
                     # A grid split across pages repeats no header on the later part.
                     body = rows
                 else:
                     continue
-                pending_page = page.page_number
+                pending_page = page["number"]
                 for row in body:
                     signal_cell = row[0]
                     if not signal_cell:
@@ -282,7 +304,7 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
                                             "value": value,
                                             "signal": signal,
                                             "pad": pad,
-                                            "page": page.page_number,
+                                            "page": page["number"],
                                             **({"_pad_from_prose": True} if from_prose else {}),
                                             **(
                                                 {"_signal_from_prose": True}
@@ -295,7 +317,8 @@ def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
             # reference manual を読むだけで数百MBまで育つ**ので、family を
             # 並列に走らせたときに効く。落とすのはキャッシュだけで、読み終えた
             # 行はすでに素の list になっている。
-            page.close()
+            # 凍結版はここでページの解析キャッシュを捨てていた（`page.close()`）。
+            # bundle のページ record は素の JSON なので要らない。
     return routes, notes
 
 

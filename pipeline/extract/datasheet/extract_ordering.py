@@ -12,7 +12,7 @@ Column order and spelling vary -- CH32V103 leads with the order model and adds a
 packing type, CH32V208 prints "Bidy Size" -- so columns are found by their labels.
 
 Usage:
-    uv run tools/extract_ordering.py <datasheet.pdf> [--emit]
+    uv run pipeline/extract/datasheet/extract_ordering.py <bundle名 or datasheet.pdf> [--emit]
 """
 
 from __future__ import annotations
@@ -23,7 +23,29 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
+
+# bundle 名の言語は原本の置き場から決まる（`pdfcompat` と同じ規則）。
+_LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
+
+
+def bundle_name(argument: str) -> str:
+    """bundle 名（`CH32V003DS0.zh`）はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。
+
+    凍結の呼ぶ側（`build_all`・`build_tables`・`build_candidate`）が原本のパスを渡してくるので、
+    ここで受けて bundle に向ける——呼ぶ側を触らずに済む。**原本は開かない。**
+    """
+    path = Path(argument)
+    if path.suffix.upper() != ".PDF":
+        return argument
+    found = _LANG_DIR.match(path.parent.name)
+    if not found:
+        raise SystemExit(f"{argument}: 言語が分からない"
+                         "——`datasheet_zh`/`datasheet_en` の下のPDFか、bundle名を渡してください")
+    return f"{path.stem}.{found.group(1)}"
 
 MODEL = re.compile(r"CH32[A-Z0-9]{4,}")
 MAX_PAGES_FROM_END = 60
@@ -69,45 +91,46 @@ def read_layout(row: list[str]) -> dict[str, int] | None:
     return layout
 
 
-def extract(pdf_path: Path) -> tuple[list[dict], list[str]]:
+def extract(source) -> tuple[list[dict], list[str]]:
     notes: list[str] = []
     entries: list[dict] = []
-    with pdfplumber.open(pdf_path) as pdf:
-        # The table sits near the back of the document.
-        start = max(0, len(pdf.pages) - MAX_PAGES_FROM_END)
-        layout: dict[str, int] | None = None
-        for page in pdf.pages[start:]:
-            for table in page.find_tables():
-                rows = [[flatten(c) for c in r] for r in table.extract()]
-                if not rows:
+    pages = list(bundle_pages.pages(bundle_name(str(source))))
+    # The table sits near the back of the document.
+    start = max(0, len(pages) - MAX_PAGES_FROM_END)
+    layout: dict[str, int] | None = None
+    for page in pages[start:]:
+        for table in bundle_pages.tables(page):
+            rows = [[flatten(c) for c in r] for r in table.extract()]
+            if not rows:
+                continue
+            found = read_layout(rows[0])
+            if found:
+                layout, body = found, rows[1:]
+            elif layout and len(rows[0]) > max(layout.values()):
+                body = rows  # continuation without a repeated header
+            else:
+                continue
+            carried: dict[str, str] = {}
+            for row in body:
+                if max(layout.values()) >= len(row):
                     continue
-                found = read_layout(rows[0])
-                if found:
-                    layout, body = found, rows[1:]
-                elif layout and len(rows[0]) > max(layout.values()):
-                    body = rows  # continuation without a repeated header
-                else:
-                    continue
-                carried: dict[str, str] = {}
-                for row in body:
-                    if max(layout.values()) >= len(row):
-                        continue
-                    values = {f: row[c] for f, c in layout.items()}
-                    # A package spanning several models leaves the shared cells blank.
-                    for field, value in values.items():
-                        if value:
-                            carried[field] = value
-                        else:
-                            values[field] = carried.get(field, "")
-                    for model in MODEL.findall(values["model"]):
-                        entries.append(
-                            {
-                                "part_number": model,
-                                **{k: v for k, v in values.items() if k != "model"},
-                                "page": page.page_number,
-                            }
-                        )
-            page.close()
+                values = {f: row[c] for f, c in layout.items()}
+                # A package spanning several models leaves the shared cells blank.
+                for field, value in values.items():
+                    if value:
+                        carried[field] = value
+                    else:
+                        values[field] = carried.get(field, "")
+                for model in MODEL.findall(values["model"]):
+                    entries.append(
+                        {
+                            "part_number": model,
+                            **{k: v for k, v in values.items() if k != "model"},
+                            "page": page["number"],
+                        }
+                    )
+        # 凍結版はここでページの解析キャッシュを捨てていた（`page.close()`）。
+        # bundle のページ record は素の JSON なので要らない。
     if not entries:
         notes.append("ordering情報の表を認識できませんでした")
     return entries, notes
