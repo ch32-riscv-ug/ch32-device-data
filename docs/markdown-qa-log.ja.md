@@ -2981,3 +2981,42 @@ datasheet 横断のエラッタ収集。**出力の mirror 相対パスを変え
 `convert_structured`/`document_converter`（converter 自身）。
 **`--out` を持つ単体CLIはもう無い**ので、次は `build_all` の一族（`build_tables`・
 `extract_products`・`extract_ordering`）をまとめて動かす企画になる。
+
+## 凍結toolの退役 第12号——`extract_remap`・`extract_products`・`extract_ordering`（2026-09-10）
+
+`build_all` 一族の**葉**を先に移した。`build_all` 本体（multiprocessing）と `build_tables` は
+まだ凍結のままだが、**原本を読む部分はこの3本に閉じている**ので、葉を移した時点で
+一族の PDF 直読みはほぼ消える。3本とも `extract()` が **bundle 名でも原本PDFのパスでも
+受ける**ので、呼ぶ側（`build_all`・`build_tables`・`build_candidate`・`crosscheck_languages`）は
+import 先を変えるだけで済んだ。
+
+### 足した面——`chars(page)` と manifest のキャッシュ
+
+`extract_products` は回転した文字を `page.chars` で見分ける（`upright: False`）ので字形が要る。
+字形は別ファイル（gzip）なので、`pages()` が返す record に**どの bundle のどの項目か**を
+私用の鍵で添え（`_bundle`・`_entry`）、`chars(page)` を **1引数**で引けるようにした
+——`text_lines(page)`・`tables(page)` と揃う。移植で bundle 名を関数の間に通して回ると
+呼び出し側が汚れる。`pdfcompat` と 78ページで完全一致を確認。
+
+併せて **manifest を1プロセス1回だけ読む**ようにした。表ごとに文書を何度も走る抽出器
+（`extract_pins`・`extract_ordering`）で JSON の読み直しが効いてくる。bundle が走行中に
+作り直されることは無い（`convert_all` は別の段）。
+
+### 検算
+
+凍結版と新経路の `extract()` の戻り値が**全版で完全一致**:
+
+| | 版数 | 結果 |
+|---|---|---|
+| `extract_ordering` | 34（datasheet） | 一致 |
+| `extract_remap` | 24（RM） | 一致 |
+| `extract_products` | 34（datasheet） | 一致 |
+
+`extract_products` の戻り値は `set` を含むので JSON では比べられない（`pprint` で比較）。
+
+### 残る PDF 直読み
+
+`build_all`（multiprocessing）・`build_tables`・`extract_images`（pixel。原本が要る）・
+`convert_structured`/`document_converter`（converter 自身）。
+**`build_all` と `build_tables` が自分で PDF を開く箇所はもう無い**（葉に委譲しきっている）
+——次はその2本から `pdfplumber` の import を落とすだけの企画になる。

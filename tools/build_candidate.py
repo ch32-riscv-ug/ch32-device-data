@@ -39,7 +39,7 @@ sys.path.insert(0, str(_PIPELINE / "rm"))
 sys.path.insert(0, str(_PIPELINE / "datasheet"))
 import extract_pins  # noqa: E402
 import register_fields as extract_registers  # noqa: E402
-import extract_remap  # noqa: E402
+import extract_remap  # noqa: E402  新経路（pipeline/extract/rm/。第12号で退役）
 import extract_remap_fields  # noqa: E402
 import extract_selectors  # noqa: E402
 import signal_vocabulary  # noqa: E402

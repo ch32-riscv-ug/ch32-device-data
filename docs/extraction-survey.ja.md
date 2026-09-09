@@ -10,7 +10,7 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 測定は2段階です。まず精度を測るため、すでに人手で作成した3 record（CH32V003F4P6、CH32X035F8U6、CH32M030C8T7）をground truthとして抽出器の出力と照合しました。次に適用範囲を測るため、mirrorしている全datasheetを掃引しました。
 
-抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`pipeline/extract/datasheet/extract_pins.py`](../pipeline/extract/datasheet/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
+抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`pipeline/extract/datasheet/extract_pins.py`](../pipeline/extract/datasheet/extract_pins.py)、[`pipeline/extract/rm/extract_remap.py`](../pipeline/extract/rm/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
 
 ## 前提
 
@@ -266,7 +266,7 @@ CH32V003でrecordと食い違った9件のうち、抽出器が「要確認」�
 
 各datasheetの冒頭には、注文可能な全modelをmemory・pin数・周辺機器数とともに並べた比較表があります。**SKUの母集合そのものと、recordのidentity・memory・package・peripheralsの出所**です。
 
-[`tools/extract_products.py`](../tools/extract_products.py)がこれを読みます。値はschemaへ写さず、資料が使っているラベルのまま保持します。
+[`pipeline/extract/datasheet/extract_products.py`](../pipeline/extract/datasheet/extract_products.py)がこれを読みます。値はschemaへ写さず、資料が使っているラベルのまま保持します。
 
 ### 2つのレイアウト
 
@@ -308,7 +308,7 @@ TIM1_ETR           | PC1                 | PC1                 | ...
 TIM1_CH1           | PB9                 | PB9                 | ...
 ```
 
-[`tools/extract_remap.py`](../tools/extract_remap.py)がこの格子を`(field, value, signal, pad)`へ読み込みます。datasheet側の抽出と突き合わせる相互確認の材料になります。
+[`pipeline/extract/rm/extract_remap.py`](../pipeline/extract/rm/extract_remap.py)がこの格子を`(field, value, signal, pad)`へ読み込みます。datasheet側の抽出と突き合わせる相互確認の材料になります。
 
 ### 測定結果
 
@@ -642,7 +642,7 @@ QFN48X7_A    | 7*7mm     | 0.5mm     | Quad Flat No-lead   | CH32M030C8U3
 QFN48        | 5*5mm     | 0.35mm    | Quad Flat No-lead   | CH32M030C8U7
 ```
 
-[`tools/extract_ordering.py`](../tools/extract_ordering.py)が読みます。16 datasheet中14に存在します（CH32V20x_30xDS0にはありません）。列順と綴りは一定でなく、CH32V103はorder modelが先頭でpacking typeが増え、CH32V208は`Bidy Size`と誤記しています。
+[`pipeline/extract/datasheet/extract_ordering.py`](../pipeline/extract/datasheet/extract_ordering.py)が読みます。16 datasheet中14に存在します（CH32V20x_30xDS0にはありません）。列順と綴りは一定でなく、CH32V103はorder modelが先頭でpacking typeが増え、CH32V208は`Bidy Size`と誤記しています。
 
 **これがSKUとpackageの最も強い根拠**で、`QFN48`と`QFN48X7_A`のようにpin数だけでは決まらない組を確定できます。CH32M030は5 SKU中3 SKUしか列を決められませんでしたが、ordering表を第一根拠にして5/5になりました。
 
@@ -692,7 +692,7 @@ package判定は3つの独立な根拠で検証できます。
 
 ```sh
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <record>.json
-uv run tools/extract_remap.py <manual>.PDF --compare <record>.json
+uv run pipeline/extract/rm/extract_remap.py <manual>.PDF --compare <record>.json
 uv run pipeline/extract/rm/register_fields.py <manual>.PDF --compare <record>.json
 
 uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --list

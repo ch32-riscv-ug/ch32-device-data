@@ -31,14 +31,24 @@ REPO = Path(__file__).resolve().parents[2]
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
 
+# manifest は1プロセスで何度も引く（`pages()`・`chars()`・据え置きの照合）。JSON を
+# 読み直すと表ごとに文書を走る抽出器で効いてくるので、名前ごとに1回だけ読む。
+# **bundle が走行中に作り直されることは無い**（`convert_all` は別の段）。
+_MANIFESTS: dict[str, dict] = {}
+
+
 def manifest(name: str) -> dict:
-    """bundle の manifest。無ければ止まる（**PDFへ黙って落ちない**）。"""
+    """bundle の manifest。無ければ止まる（**PDFへ黙って落ちない**）。1プロセス1回だけ読む。"""
+    cached = _MANIFESTS.get(name)
+    if cached is not None:
+        return cached
     path = BUNDLES / name / "manifest.json"
     if not path.exists():
         raise SystemExit(f"{name}: bundle が無い（{path}）——"
                          "`uv run pipeline/ingest/convert_all.py` で変換してください "
                          "（抽出は原本PDFへfallbackしません）")
-    return json.loads(path.read_text(encoding="utf-8"))
+    _MANIFESTS[name] = json.loads(path.read_text(encoding="utf-8"))
+    return _MANIFESTS[name]
 
 
 def load_page(name: str, entry: dict) -> dict:
@@ -62,9 +72,25 @@ def load_geometry(name: str, entry: dict) -> dict:
 
 
 def pages(name: str, limit: int | None = None):
-    """ページ record を manifest の順に。`limit` は先頭N枚（`pdf.pages[:N]`と同じ）。"""
+    """ページ record を manifest の順に。`limit` は先頭N枚（`pdf.pages[:N]`と同じ）。
+
+    record に **どの bundle のどの項目か**を私用の鍵で添える（`_bundle`・`_entry`）。
+    字形は別ファイル（gzip）なので、`chars(page)` を **1引数**で引けるようにするため
+    ——`text_lines(page)`・`tables(page)` と揃う。凍結toolは `page.chars` と書いていて、
+    移植で bundle 名を関数の間に通して回るのは呼び出し側を汚す。
+    """
     for entry in manifest(name)["pages"][:limit]:
-        yield load_page(name, entry)
+        yield {**load_page(name, entry), "_bundle": name, "_entry": entry}
+
+
+def chars(page: dict) -> list[dict]:
+    """ページの字形（`page.chars` の置き換え）。座標キーと `fontname`・`size`・`upright`。
+
+    `pages()` が添えた `_bundle`/`_entry` から gzip の字形ファイルを読む（sha 照合つき）。
+    """
+    return [{**_boxed(item), "fontname": item["font"], "size": item["size"],
+             "upright": item["upright"]}
+            for item in load_geometry(page["_bundle"], page["_entry"])["chars"]]
 
 
 def texts(name: str, limit: int | None = None):

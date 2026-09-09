@@ -53,6 +53,10 @@ import pdfplumber  # noqa: E402
 import build_candidate  # noqa: E402
 import paths  # noqa: E402
 import extract_pins  # noqa: E402
+# 凍結 `tools/extract_ordering.py`・`extract_products.py` は退役した（第12号）。
+# 読み手は新経路の `pipeline/extract/datasheet/`——`extract()` は原本のパスを受けて
+# bundle 名に直すので、呼び方は変えなくてよい。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "datasheet"))
 import extract_ordering  # noqa: E402
 import extract_products  # noqa: E402
 

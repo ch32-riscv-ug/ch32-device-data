@@ -31,6 +31,7 @@ import extract_ordering  # noqa: E402
 # `bundle_name()` で bundle 名に直す。
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]
                        / "pipeline" / "extract" / "datasheet"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "datasheet"))
 import extract_pins  # noqa: E402
 import extract_products  # noqa: E402
 

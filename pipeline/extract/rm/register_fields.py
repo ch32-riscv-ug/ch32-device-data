@@ -302,8 +302,8 @@ def _expand_bits(pattern: str) -> list[list[str]]:
 
 
 def score(fields: list[dict], record: Path) -> None:
-    # `canonical_field` は凍結 `tools/extract_remap.py` から借りる（`--compare` の
-    # review 経路だけ。`extract_remap` が退役したらその移植先に向け直す）。
+    # `canonical_field` は `extract_remap` から借りる（`--compare` の review 経路だけ）。
+    # 第12号で新経路（同じ `pipeline/extract/rm/`）へ移ったので、そのまま import できる。
     from extract_remap import canonical_field
 
     rec = json.loads(record.read_text(encoding="utf-8"))
