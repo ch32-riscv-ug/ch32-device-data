@@ -2050,3 +2050,38 @@ CJK 本文に本来空白は無く、下付きが隙間を埋めていたもの�
   `DATA | A`。**残り**: `IPRIOR63` の行（p107-table-008）は bit 番号行と組で bit 図として描かれる表で、
   `apply_bitfield` が bit 列の左外にあるラベルを落とす（以前からの制約。bundle のセルにはある）。行ラベルを
   caption か先頭 `<th>` として出す設計が要る——次周。
+
+## `IPRIOR63` が bit 図から消えていた——中心の外のセルは dedup で上書きされる（2026-09-09）
+
+converter 1.15.0 の `recover_sibling_labels` が `IPRIOR63`/`IPRIORx`/`IPRIOR0` を列として拾ったのに、
+Markdown には `IPRIORx`/`IPRIOR0` しか出なかった。3表のうち **`IPRIOR63` の表だけが bit 図として
+描かれる**（直上の番号行 `31 24 23 16 15 8 7 0` と組になる）ためで、`apply_bitfield` の中で消えていた。
+
+機構: `bit_span` は「bit 番号の x 中心を含む列」でセルを割り当てる。ラベル（x 84.4–129.9）は中心
+（142.4–508.0）を1つも含まないので near フォールバックが**最も近い1列**＝端の bit 列へ寄せ、最後の
+dedup（`deduped[(row_start, column_start)]`。同じ格子に落ちたセルは後勝ち）で `PRIO_255` に上書き
+されていた。dedup 自体はページ跨ぎで中心が実列数より少ない図のために要る歯止めで、正しい。
+
+直し: **中心の外に丸ごとあるセルのうち、変換器が外から拾ったもの**を行ラベルの列として残す
+（左なら列0、bit 列を1..width へずらす）。根拠は**セルの id**——`-outer-`（`recover_outer_column`）と
+`-label-`（`recover_sibling_labels`）は変換器自身が記録した出自。
+
+**幾何だけでは分けられない**のを実測で確かめた。全 corpus の bit 図 9,760 件のうち中心の外にセルが
+あるのは 33 件で、内訳は:
+
+| 種類 | 件数 | 中身 |
+|---|---:|---|
+| `-label-`（兄弟ラベル） | 22 | `IPRIOR63`・`IALLOC63`（RM 全機種。1×5 の表・中心8） |
+| `-outer-`（最外列回収） | 2 | `IPRIOR17`・`IPRIOR16`（L103RM.zh p70。2×5 の表） |
+| `-cell-`（pdfplumber の格子） | 9 | `FBM`×4 と `15`..`12`（H417RM.en p620）・`Reserved`（V407RM.en p224） |
+
+`-cell-` の 9 件は**本物のフィールド**——番号行が16列のうち12〜13列ぶんしか無い図で、表が番号行の
+左へ伸びている。「孤立しているか」でも分けられない（p224 の `Reserved` は行内で孤立している）。
+
+ラベルは**縦連結の対象から外す**。`IPRIOR17` と `IPRIOR16` は同じ列0に落ちるので、
+`(column_start, column_end)` のグループに入れると `IPRIOR17IPRIOR16` になる。
+
+検証: 対象21文書を書き出して 4 文書を目視（`IPRIOR63`・`IALLOC63`・`IPRIOR17`/`IPRIOR16` が
+`<td>` の行ラベルとして出る）、**壊してはいけない2表**（H417RM.en p620・V407RM.en p224）は byte 不変、
+parity は 68/68 clean。exporter とその検査だけが `apply_bitfield` を呼ぶので、converter の版・bundle・
+正本 CSV・凍結台帳はどれも動かない。

@@ -820,6 +820,28 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     finding). The letter is kept when its glyph lies at least half inside its own cell. The
     intended `Standard I/O port` -> `t` sits on the boundary with less than half inside, so it
     still drops.
+32. **Keep a bit diagram's outside row label as a column** (`apply_bitfield`,
+    exporter side). Register-array bit diagrams put the row label to the left of
+    the table (`PFIC_IPRIORx`'s `IPRIOR63`, `PFIC_IALLOCx`'s `IALLOC63`,
+    `CH32L103RM.zh` p70's `IPRIOR17` / `IPRIOR16`). Even once the converter picked
+    those up as a column (items 15, 27), `apply_bitfield` assigns cells to columns
+    by the x-centres of the bit numbers, so a label containing no centre fell to
+    the `near` fallback, landed on the edge bit column, and the final dedup (last
+    cell wins per grid slot) **overwrote it with the field** -- `IPRIOR63` on
+    `CH32FV2x_V3xRM.zh` p107 appeared nowhere in the Markdown (re-check finding).
+    The test is the **cell id**: columns the converter recovered from outside the
+    table record their own provenance as `-outer-` (`recover_outer_column`) or
+    `-label-` (`recover_sibling_labels`). Cells of pdfplumber's own grid also land
+    outside the centres -- diagrams whose number line covers only 12-13 of 16
+    columns (`CH32H417RM.en` p620's four `FBM` plus `15`..`12`, `CH32V407RM.en`
+    p224's `Reserved`) -- and those are real fields, so geometry alone cannot
+    separate them. Corpus-wide: of **9,760** bit diagrams, 33 have a cell outside
+    the centres; **24** are `-label-`/`-outer-` (all register-array row labels) and
+    9 are `-cell-` (all real fields). Labels are **excluded from the vertical join**
+    (`IPRIOR17` and `IPRIOR16` share a column and would be concatenated). Rendering:
+    `<tr><th></th><th>31</th>…</tr><tr><td>IPRIOR63</td><td colspan="2">PRIO_255</td>…`
+    -- `table_html` fills the header row's column 0 as an empty slot (a row label
+    has no bit number).
 
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The
