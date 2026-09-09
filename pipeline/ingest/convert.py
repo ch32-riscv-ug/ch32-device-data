@@ -112,6 +112,27 @@ SCHEMA_VERSION = "0.2"
 # 幽霊行が残り、(c)刷り直されたヘッダが列数を狂わせていた。結合表でしか効かない
 # `fold_boundary_spills`と`drop_repeated_headers`が届いていなかった。条件は列数と
 # **列境界xの±2pt一致**＋上下の位置で、全corpusの候補は18件（既に繋がる表は5,734件）。
+# 1.16.0: (d) `_owned_elsewhere`の照合を**字形の位置**に戻した（1.15.0の個数照合は、相手が別の迷子を
+# 抱えると崩れ、`IACTS`の右隣に`S\nReserved`を作った——走行の前後比較で捕捉。中程は常に相手のもの、
+# 端は綴りの行頭/行末で見る。字形が綴りから消えるのは行端の除去だけなので、これで足りる）。
+# 1.16.0: (a) **下付きの連なりの下限を-0.35に**（`reattach_cell_subscripts`）——太字系フォントで字形箱が
+# 重なる`PCLK`が単字に割れ、単字除去が本文の`SCK`を食ってセル全体の復元が失敗していた（L103RM.zh
+# p239 `F /2；`+`PCLK PCLK`。再突合の指摘）。緩めて変わるのは全corpus 9セル、全部正しい復元。
+# (b) **二重取り除去の後にもう一度下付きを戻す**——除去前は照合が通らないセルが67あり、Markdown
+# （exporterが再適用）では直っていたのにbundleのセルには残っていた。(c) `strip_boundary_dupes`の
+# 「英字1文字のセルを空にする」規則を**幾何で裏取り**——`HVCP | P`（type列）・`DATA | A`（ACK）等、
+# 左の語から離れた独立の値94セルを消していた（M030DS2.zh p3。再突合の指摘）。
+# 1.15.0: (a) **同じ列境界の1行表が縦に並ぶ図の行ラベルを取り込む**（`recover_sibling_labels`）。
+# `PFIC_IPRIORx`の`IPRIOR63`/`IPRIORx`/`IPRIOR0`・SDIOの`DAT3-0`・`Slot`は1行表の左外にあり、
+# `recover_outer_column`（2行以上）が触れず、行の中心が表bbox内なので本文からも消えていた
+# （FV2x_V3xRM.zh p107。再突合の指摘）。兄弟を行帯にして同じ条件（1列ぶんの幅・縁まで30%・
+# 24字以内・全兄弟に揃う）で拾う。全corpus実測: 54組・173表・22文書、中身は全部ラベル。
+# (b) `strip_straddling_dupes`（`fix_cell_dupes`経由）の`_owned_elsewhere`が**字形の位置**で照合する
+# ようになった（相手の字形行の中程なら常に相手のもの、端なら相手の綴りの行頭/行末がその文字か）。
+# 同じ文字が相手の別の場所にあるだけで「相手の持ち物」と
+# 誤認し、列幅より広い名前`IACTS`の末尾`S`が両セルから消えて`IACT`（Markdownでは`IACT9`）に
+# なっていた（M030RM.en p46。再突合の指摘）。(c) `spell_glyphs`を`logical_tables`へ移した
+# （人向け経路の`recover_chain_columns`と綴りを共有。出力は同一）。
 # 1.14.0: **`fix_rotated_cells`が`extracted_rows`を書き換えるのを止めた**。runnerの差し替えバグ
 # （`__main__`を差し替えた瞬間に比較基準が壊れ、凍結tool本体が素通り）が直って初めて凍結tool
 # がbundleを読み、`read_variant`が正しい向きの`LQFP100`を再反転して`001PFQL`にした。
@@ -136,7 +157,7 @@ SCHEMA_VERSION = "0.2"
 # **14個の行見出しがどのセルにも入っていなかった**。行と列の座標は他のセルから決まるので
 # 入れ先は一意。条件は「同じ列に3つ以上の穴があり、その3つ以上に文字が在る」——散発の
 # 穴（図の誤検出ページのラベル断片。全corpus90個/50表）を外すとこの1表だけになる。
-CONVERTER_VERSION = "1.14.0"
+CONVERTER_VERSION = "1.16.0"
 
 # 継ぎ目の区切りを決めるのに使う（CJKは字間が無い）。
 CJK_CHAR = re.compile(r"[\u3000-\u303f\u3040-\u30ff\u4e00-\u9fff\uff01-\uff60]")
@@ -385,39 +406,9 @@ def join_split_lines(page: dict) -> int:
     return len(merge)
 
 
-def spell_glyphs(glyphs: list[dict]) -> str:
-    """グリフ列を読み順（行→x）で綴る。**語の間の空白を隙間から復元する**。
-
-    表の外から取り込む列（`recover_outer_column`・`fill_grid_holes`）は、pdfplumberの
-    セル抽出を通らないので区切りが入らず`Resetvalue`・`Filterregister0`になっていた。
-
-    - **視覚行の切れ目は`\n`**にする。狭い列では見出しも値も折り返され、`Reset`/`value`
-      は空白で繋ぐべきで`0xFFF`/`F`は繋いではいけない——この判定は既に
-      `cell_html`（行末・行頭の文字種で折り返しか意図的な改行かを分ける）が持っている
-      ので、そちらへ渡す。改行を入れずに繋いでいたので`Resetvalue`になっていた。
-    - **同じ視覚行の語間の空白**は隙間から復元する。隙間が**グリフ幅の中央値の0.35倍**を
-      超え、かつ両側がASCIIなら空白（CJKは字間が広く、識別子`R32_ESIG_FLACAP`のような
-      連続は隙間が空かない）。全corpus実測: 空白が入るのは35セルで全部`Reset value`型の
-      見出し。閾値0.25〜0.50で結果が同じ＝隙間が明確に分かれているので真ん中を採る。
-      値のセル（`0xFFFF`・`[31:0]`）は1つも変わらない。
-    """
-    ordered = sorted(glyphs, key=lambda g: (round(g["bbox"][1], 1), g["bbox"][0]))
-    if not ordered:
-        return ""
-    widths = sorted(g["bbox"][2] - g["bbox"][0] for g in ordered)
-    median = widths[len(widths) // 2]
-    out: list[str] = []
-    for index, glyph in enumerate(ordered):
-        if index:
-            previous = ordered[index - 1]
-            both_ascii = previous["text"].isascii() and glyph["text"].isascii()
-            if abs(glyph["bbox"][1] - previous["bbox"][1]) >= 1.0:
-                out.append("\n")
-            elif (both_ascii
-                    and glyph["bbox"][0] - previous["bbox"][2] > median * 0.35):
-                out.append(" ")
-        out.append(glyph["text"])
-    return "".join(out)
+# グリフ列の綴りは`logical_tables.spell_glyphs`に移した（人向け経路の`recover_chain_columns`
+# も同じ綴りを使う）。名前は`recover_outer_column`・`fill_grid_holes`のために残す。出力は同一。
+spell_glyphs = logical_tables.spell_glyphs
 
 
 def recover_outer_column(page_chars: list[dict], record: dict,
@@ -548,6 +539,98 @@ def recover_outer_column(page_chars: list[dict], record: dict,
     return ",".join(recovered) or None
 
 
+def recover_sibling_labels(page_chars: list[dict], tables: list[dict]) -> int:
+    """**同じ列境界の1行表が縦に並ぶ図の行ラベル**を取り込む（1.15.0）。列を足した表数を返す。
+
+    `PFIC_IPRIORx`のレジスタ配列（`IPRIOR63`/`IPRIORx`/`IPRIOR0`の3段。RM全機種）・
+    `PFIC_IALLOCx`・SDIOのデータ線（`DAT3`〜`DAT0`）・I2S/SAIの`Slot`・`SDI`/`SDO`のように
+    1行の表を縦に並べ、各行のラベルを**表の左外**に置く図。`recover_outer_column`は表1つを
+    見て「2行以上・全行帯に中身」を要求するので1行表には触れず、ラベルは行の中心が表bbox内
+    のため`reading_order`からも外れて（表と重なる本文の行として畳まれる）、
+    `CH32FV2x_V3xRM.zh` p107では`IPRIOR63`が**Markdownのどこにも出ていなかった**
+    （再突合の指摘）。
+
+    兄弟＝同じページの1行・3列以上の表で、列数が同じで左右端x（±0.5pt）が一致するもの
+    2つ以上。兄弟の各表を行帯として`recover_outer_column`と同じ条件を掛ける: 外側の
+    グリフ（他の表の中のものは除く）が各表の帯にあり、1列ぶんの幅（表幅の30%以下）・
+    縁までの全幅も30%以下・縁に食い込まない（隙間≥-2pt）・24字以内。**全兄弟に揃って
+    ある**ときだけ各表に1列足す（`cells`のみ。`extracted_rows`は凍結toolの前提なので
+    触らない）。
+
+    全corpus実測（1.14.0）: 54組・173表・22文書、中身は全部ラベル（`IPRIOR63`・`IALLOC63`・
+    `DAT3`・`D7`・`SDI`・`Slot`・フレーム図の開始ビット`S`）。
+    """
+    ones = [t for t in tables if t["row_count"] == 1 and t["column_count"] >= 3]
+    done: set[str] = set()
+    changed = 0
+    for table in ones:
+        if table["id"] in done:
+            continue
+        siblings = [o for o in ones
+                    if o["column_count"] == table["column_count"]
+                    and abs(o["bbox"][0] - table["bbox"][0]) < 0.5
+                    and abs(o["bbox"][2] - table["bbox"][2]) < 0.5]
+        if len(siblings) < 2:
+            continue
+        done.update(o["id"] for o in siblings)
+        ids = {o["id"] for o in siblings}
+        others = [o["bbox"] for o in tables if o["id"] not in ids]
+        for side in ("left", "right"):
+            found: list[tuple[dict, str, tuple[float, float]]] = []
+            for sibling in siblings:
+                box = sibling["bbox"]
+                width = box[2] - box[0]
+                picked = []
+                for glyph in page_chars:
+                    if not (glyph.get("text") or "").strip():
+                        continue
+                    gx = (glyph["bbox"][0] + glyph["bbox"][2]) / 2
+                    gy = (glyph["bbox"][1] + glyph["bbox"][3]) / 2
+                    if not (box[1] <= gy <= box[3]):
+                        continue
+                    if (gx >= box[0]) if side == "left" else (gx <= box[2]):
+                        continue
+                    if any(o[0] <= gx <= o[2] and o[1] <= gy <= o[3] for o in others):
+                        continue
+                    picked.append(glyph)
+                if not picked:
+                    break
+                x0 = min(g["bbox"][0] for g in picked)
+                x1 = max(g["bbox"][2] for g in picked)
+                gap = box[0] - x1 if side == "left" else x0 - box[2]
+                extent = box[0] - x0 if side == "left" else x1 - box[2]
+                if x1 - x0 > width * 0.30 or extent > width * 0.30 or gap < -2.0:
+                    break
+                text = spell_glyphs(picked)
+                if not text or len(text) > 24:
+                    break
+                found.append((sibling, text, (x0, x1)))
+            if len(found) != len(siblings):
+                continue
+            for sibling, text, (x0, x1) in found:
+                box = sibling["bbox"]
+                cells = sibling["cells"]
+                if side == "left":
+                    for cell in cells:
+                        cell["column_start"] += 1
+                        cell["column_end"] += 1
+                    span, column = (x0, box[0]), 0
+                else:
+                    span, column = (box[2], x1), sibling["column_count"]
+                cells.append({
+                    "id": f"{sibling['id']}-label-{side}",
+                    "row_start": 0, "row_end": 1,
+                    "column_start": column, "column_end": column + 1,
+                    "bbox": rounded_box((span[0], box[1], span[1], box[3])),
+                    "text": text, "bold": False, "italic": False,
+                })
+                cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+                sibling["column_count"] += 1
+                sibling["bbox"] = rounded_box((min(box[0], x0), box[1], max(box[2], x1), box[3]))
+                changed += 1
+    return changed
+
+
 def fill_grid_holes(page_chars: list[dict], record: dict) -> int:
     """**グリッドから丸ごと抜けた列**を、行・列の座標とグリフから埋める（1.11.0）。
 
@@ -643,7 +726,7 @@ def fix_cell_dupes(page_chars: list[dict], record: dict) -> None:
     残っていた（straddling 4,457・boundary 2,337・reset列 2,200。全corpus実測）。
     `clean_reset_column`は**ヘッダ行を持つ表**でしか列を決められないので、ページ跨ぎの
     継続断片では何もしない（安全側。結合後にexporter側がもう一度掛ける）。"""
-    logical_tables.strip_boundary_dupes(record)
+    logical_tables.strip_boundary_dupes(record, page_chars)
     if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
         logical_tables.strip_straddling_dupes(record, page_chars)
     logical_tables.clean_reset_column(record)
@@ -1407,6 +1490,12 @@ def page_record(page, lang: str, source_sha256: str,
         # 回転の組み直しの**後**——直った文字に対して下付きを戻す。
         fix_cell_subscripts(page_chars, tables[-1])
         fix_cell_dupes(page_chars, tables[-1])
+        # **二重取りを落とした後にもう一度**下付きを戻す（1.16.0）。復元は「綴りがグリフの読み順と
+        # 一致すること」を歯止めにするので、境界の余剰グリフが残っていると通らないセルがある——
+        # exporterは除去後に再適用するのでMarkdownでは直っていたが、bundleのセル（CSVの読み手が
+        # 見る面）には67セルが未復元のまま残っていた（全corpus実測）。先に掛ける側は上の注記のとおり
+        # 逆の順序でしか通らないセルのため。どちらも冪等の歯止め付きなので両方掛ける。
+        fix_cell_subscripts(page_chars, tables[-1])
         # 表領域の外に落ちた最外列を取り込む（入れ先が一意に決まるものだけ）。
         recover_outer_column(page_chars, tables[-1], tables)
         # グリッドから丸ごと抜けた列を、行・列の座標とグリフから埋める。
@@ -1415,6 +1504,10 @@ def page_record(page, lang: str, source_sha256: str,
         if table_index == 1 and chain_uncaptioned(tables[-1], table_tail, float(page.height)):
             previous_logical_id = tables[-1]["logical_id"]
         previous_bottom = table.bbox[3]
+
+    # 同じ列境界の1行表が縦に並ぶ図（`PFIC_IPRIORx`・SDIOの`DAT3-0`・`Slot`）の行ラベルは、
+    # 1行では`recover_outer_column`が触れない——兄弟をまとめて行帯にして拾う。
+    recover_sibling_labels(page_chars, tables)
 
     def outside_tables(line: dict) -> bool:
         x0, top, x1, bottom = line["bbox"]

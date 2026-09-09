@@ -1861,3 +1861,192 @@ runner の差し替えが効いた最初の `--full`（LQFP100 の足が落ち�
 正しい CSV から再生成した今の README は壊れる前（`2915575`）と **byte 一致**で復元された。
 **中断・撤退した走行のあとは、正本だけでなく派生物（`generated/`）も戻す**——
 `git status` を全体で見れば気付けた。
+
+## 再突合の残り21件から直した3つの根——欠けた最外列・1行表のラベル・跨いだ字形の帰属（2026-09-09）
+
+### 再突合: 21件のうち8件は機械的に解消していた
+
+前回の走行（1.14.0）の出力で残り21件を再確認した。**8件は直っていた**——H417DS0 p3・
+L103RM.en p13（`Bit`列）・V203/V208/V20x_30x の項目一覧・V407RM p402・WCH-Link のラベル・
+X315RM.en p155（`p155-table-004`が5列で値まで揃った）。残りの中で「入れ先が一意に決まる」
+ものを3族に分け、いずれも**先に母数を測ってから**直した。
+
+### 1. `R32_USART3_GPR`——継続断片に欠けた最外列（exporter側 `recover_chain_columns`）
+
+`CH32xRM.zh` p179-180 の結合表で、p180 の断片だけ名称列の罫線が拾われず4列になり、行が
+`| 0x40004818 | UASRT3保护时间和预分频 | | 0x00000000 |` と**名無し**だった。converter の
+`recover_outer_column` は断片1つを見て「1列ぶんの幅・全行帯に中身」を要るので届かない。
+結合表なら先頭断片の**列のx範囲**（単独列セルの `src_bbox`）が分かるので、入れ先は一意。
+
+母数: 「断片の列数 < 結合表の幅」で外側グリフが全行帯にある候補は **190断片**。試作で
+実際に足すセルを数えると、**1,313座標は既にセルがあった**——1,225は converter が同じ文字で
+埋めたもの（1.12.0の `recover_outer_column`）、60は正当な colspan、28は行/列をまたぐ既存セルを
+私の帯読みが部分的に見ただけ。**足すのは18表33セル**で全件を既存の行と並べて目視:
+レジスタ名12（`R32_CRC_CTLR`・`R32_GPIOC_SPEED`・`R32_FLASH_BOOT_MODEKEYR`…）・bit範囲2・
+reset値4・見出し4（`Bit`/`Reset value`/`复位值`）・記述子名3（`TDes5-7`）、そして
+`CH32M030RM.en` p226 の**ページ末で見出し行の外2列が落ちた** `RB_UEPn` / `Description: The
+address…`（pdfplumber は中2列しか見ていなかった）。`snap_ghost_columns` の後に置く（列番号が
+確定してから穴を見る）。`spell_glyphs` は `logical_tables` へ移して converter と共有した。
+
+### 2. `IPRIOR63`——同じ列境界の1行表が縦に並ぶ図（converter 1.15.0 `recover_sibling_labels`）
+
+`CH32FV2x_V3xRM.zh` p107 の `PFIC_IPRIORx` は **1×4 の表が3つ**（`p107-table-008/009/010`、
+x0=129.9）で、ラベル `IPRIOR63`/`IPRIORx`/`IPRIOR0` は x=84–126 の左外にある。1行表は
+`recover_outer_column` の「2行以上」に外れ、ラベルの行（`p107-line-00029`）は表と重なる本文
+として畳まれるので、**Markdownのどこにも出なかった**。
+
+同じページの1行・3列以上・同じ列数・左右端±0.5pt の兄弟を行帯にして同じ条件（1列ぶんの幅
+≤30%・縁まで≤30%・隙間≥-2pt・24字以内・**全兄弟に揃う**）を掛けると、全corpus **54組・173表・
+22文書**、中身は全部ラベル——`IPRIOR63`/`IALLOC63`（RM全機種）・SDIO の `DAT3-0`・`D7-0`・
+`SDI`/`SDO`・`Slot`・フレーム図の開始ビット `S`。bundle データに掛けた単体確認で p107 の3表が
+`IPRIOR63 | PRIO_255 | … | PRIO_252` になる。`extracted_rows` は触らない。
+
+### 3. `IACT9`——境界を跨いだ字形が**両セルから**消える（`_owned_elsewhere`）
+
+`CH32M030RM.en` p46 の bit図 `p46-table-003`: c5 `IACTS`（x 245.9–268.9）の末尾 `S` は
+x=267.7–272.9 で境界 268.9 を跨ぎ、面積の78%が右セル c6 にある。pdfplumber の `crop` は
+両セルに入れる（c5 `IACTS`・c6 `S IACTS`。`Table.extract()` の中心規則では `IACT`・`S IACTS`）。
+
+1. `strip_boundary_dupes` が c6 の先頭 `S `（空白で切れた別語）を落とす——正しい
+2. `strip_straddling_dupes` が c5 を見る: 自グリフ（面積≥50%）は `IACT`、綴りは `IACTS`、
+   余剰1文字 `S`。`_owned_elsewhere(S)`: 面積78%が c6 に入り、**c6 の綴り `IACTS` は `S` で
+   終わる**→ 相手の持ち物→ 落とす。だが c6 末尾の `S` は x=296.5 の**別の字形**。
+
+文字の一致だけで字形の同一性を見ていなかった。**字形が相手の綴りから消える経路は
+`strip_boundary_dupes` の行端の除去だけ**なので、判定は字形の**位置**で決まる（`_glyph_still_in_other`）:
+相手の自グリフ（面積の半分以上が相手に入る）を同じ視覚行で並べ、この字形が**行の中程なら常に
+相手のもの**、**左端なら相手の綴りに `ch` で始まる行**、**右端なら `ch` で終わる行**があるか。
+IACT の迷子 `S` は右セルの左端で、綴りは `I` で始まる→相手のものでない→残る。bundle のセルに
+crop 相当の文字列を戻して再現し、修正後は `IACTS | IACTS`。exporter 側にも同じ関数が効くので、
+再export で `CH32xRM.zh` p138 の `C3NE`→`CC3NE` も直った。
+
+**3回書いた**。(1) 位置照合の最初の版は「中程なら偽」にしていて、再変換の2文書目
+（`CH32H417DS0.en`）の前後比較で `t⏎w(NWE)` が `)t⏎w(NWE)` になる回帰が出た——落とすべき `)` は
+`td(ALE-NWE) th(NWE-ALE)` という**1行に2語ある結合セル**の語末で、行の端ではない（基底 `t` と
+下付き `d(…)` は別の視覚行なので、視覚行の綴りの包含で見る案も偽）。走行を bundles 段で止めた。
+(2) **個数**（相手に半分以上入る `ch` の字形数 ≤ 相手の綴りの `ch` 数）に変えて走行2を通したが、
+全文書の前後比較で `IACTS` の右隣 `Reserved` が `S⏎Reserved` になる回帰が出た——`IACTS` の右セルは
+左からの迷子 `S` も抱えるので個数が合わず、その右セルの**末尾**の `S`（さらに右にも掛かる）を
+「相手のものでない」と誤った。(3) 位置照合に戻し、中程を真にした。これが原則から導ける形で、
+4つの再現（IACT・`)`・`S⏎Reserved`・p740 の `b7 b7`）を全部満たす。
+**再変換の前後比較を全文書で回す**のが、この種の回帰を捕まえる唯一の網だった（早期比較の
+6文書には現れなかった）。
+
+### 作業中に原本が動いた——`--hold-sources`
+
+timer の pull が 08:10 に入り、mirror の `CH32X035DS0.zh` が V2.2→**V2.3** に動いた（この
+リポジトリ自身の pull は作業ツリーが dirty で跳ばされた——設計どおり）。コード変更の検証を
+そのまま回すと X035DS0.zh だけ新原本を読み、**資料更新がコードのコミットに混ざる**。
+`regenerate.py --hold-sources`（動いた文書を `convert_all.py --skip` で据え置き、bundle は前の
+原本のまま）を足して回した。V2.3 の差分はフッタ以外に **11ページ**——電気特性章（p23–35）の
+動作条件の並び替え・USART 表 3-21 の新設・ADC/OPA 表の変更で、取り込み時に
+`operating_conditions` が動く見込み（別コミット）。
+
+
+### 据え置きが凍結toolの入口ゲートと衝突した——走行2は `check_tables` で停止
+
+`--hold-sources` は再変換を跳ばすだけだった。凍結tool（`pdfcompat.open`）と図の描画
+（`render_assets`）は**原本の SHA-256 と bundle の manifest を照合する入口ゲート**を持ち、据え置いた
+`CH32X035DS0.zh` では必ず食い違う。ゲートが拒否し、`build_all` が X035 family を**丸ごと落として**
+目録から消えた（families 12→11・series 25・pins 4,563→4,302・register_fields 33,365→31,634・
+dma_requests 650→623）。`check_tables` が参照不整合 147 件で止め、`check_baseline` の前で済んだ。
+正本（catalog/evidence/index/generated の 46 ファイル）は HEAD から戻した（`git show HEAD:…`）。
+
+直し: `pipeline/common/held_sources.py`——`regenerate.py --hold-sources` が動いた文書名を環境変数
+`CH32_HOLD_SOURCES` に置き、ゲートを持つ経路がそれを読む。ゲートは**3経路**あった: `pdfcompat.open`
+（凍結tool 全部。sha 照合を省いて前の原本の bundle を開く）、`extract_low_power.bundle_tables`
+（`operating_conditions` の A11 部分。走行3はここで止まって見つかった——文言が違うので grep で
+拾えていなかった。原本 sha を比較する箇所を repo 全体で洗い直して確認）、`render_assets`（描画を
+跳ばす。既存 assets のまま）。さらに `build_sources` は据え置き文書の mirror family の行を**前のまま保つ**
+——`sources.csv` は「出力がどの入力状態に対応するか」を言う表で、mirror の HEAD を書くと bundle
+（前の commit の PDF）と食い違う（走行3の `check_baseline` が捕捉）。**「据え置く」は再変換を跳ばすことではなく、
+ゲートを持つ全経路に「知っていて古い bundle を使う」と伝えること**だった。
+
+### 教訓
+
+- **export → parity の順**をまた踏んだ。`_owned_elsewhere` を直した後に古い Markdown へ
+  parity を掛けて「順序違い70件」が出た。exporter 側の共有関数を触ったら再export が先。
+- 粗い分類（部分文字列の一致）は `IACT` 型を拾えなかった。族の**機構**（どの関数がどの規則で
+  落とすか）を特定してから母数を測る。
+- 「跳ばす」だけの据え置きは半分だった。入口ゲートを持つ経路（pdfcompat・render_assets）を
+  列挙して、据え置きを**伝える**までが仕事。ゲートは黙って文書を落とし、検査が捕まえた。
+
+## 凍結toolの退役 第1号・第2号——`dma_requests`・`features`（2026-09-09）
+
+D18 の受け入れ基準（bundle 入力で凍結tool と byte 一致 → 切替 → 削除）で、pdfplumber の API 面が
+最も小さい2本を退役させた。移植は**pdfplumber 依存だけを外す**——`pdf.pages` の走査を manifest の
+`pages` に、`extract_text()` を record の `text` に、`find_tables()`/`extract()` を
+`tables[].extracted_rows` に置き換え、読みの規則（正規表現・結合・印の解釈）は1行も変えていない。
+
+- `pipeline/extract/rm/extract_dma_requests.py`（← `tools/build_dma_requests.py`）: 650行 byte 一致。
+  family→RM は目録（`documents.csv` の `repositories`）で引く——凍結tool の「mirror の
+  `datasheet_{lang}/*RM.PDF` の先頭」と12 family 全部で同じ文書になることを確認。`build_index` と
+  `check_tables` が使う正規化規則（`REMAPPED`・`TYPO`・`peripheral_of`・`COLUMNS`）は新モジュールが持つ。
+- `pipeline/extract/datasheet/extract_features.py`（← `tools/build_features.py`）: byte 一致。
+  `run_frozen --batch` の定番一式からも外した（tool が無くなるので。凍結パリティは 6→5 表）。
+
+**入口ゲート**: ページ record の sha256 を manifest と照合する（`pdfcompat.Page._load` と同じ）。
+書いてすぐ効いた——走行中の bundle（`CH32H417RM.zh/pages/0105.json`）を読んで manifest と食い違い、
+新経路は止まった。変換中の bundle を読まない、が仕組みで守られる。
+
+次の候補（pdfplumber の API 面が小さい順）: `build_clock_enables`（`search`×2）・`build_debug_data`
+（`extract_text`＋`search`×2）・`build_usbpd_plumbing`（`search`×3）・`build_timers`。`search` は
+pdfcompat が `lines[].text` への正規表現一致として実装しているので、3本目からは bundle ページの
+共通読み手（`_load_page`・`search`）を `pipeline/extract/` に1つ置いて共有する。
+
+## 再突合の残りから直した3つ目の束——下付き復元の取り残しと「1文字セル」の偽陽性（converter 1.16.0・2026-09-09）
+
+### `F /2； PCLK PCLK`——連なりが割れて復元が丸ごと失敗（L103RM.zh p239）
+
+`reattach_cell_subscripts` は下付きの字形を「隙間 −0.2〜0.35×size」で連なりに束ね、基底の直後へ
+挿す。太字系フォントの `PCLK` は字形箱が**互いに 22% 重なる**ので連なりが `P`・`C`・`L`・`K` に割れ、
+単字の除去（`re.search("(C)")`）が本文 `SCK` の `C`/`K` を食って「基底の順序が合わない」→ 24字超で
+組み直しも不可 → セル全体が手つかずだった。下限を **−0.35** に緩めると全corpus で **9セル**が変わり、
+全文を目視して全部正しい（`FPCLK`・`FHCLK`・`VIO18`・`VDDIO`・`VBC_SRC`・`fDFSDMCLK`）。
+緩和後にまだ直らないセルの内訳: 基底の順序が合わない 120・plan なし 109・最終照合に失敗 12——
+これは別の族（次周）。
+converter は本文の行も**擬似セル**として同じ関数に通すので、この緩和は `lines` にも効く——
+下付きの直後の空白が消える（`VDD33 供电时`→`VDD33供电时`・`Cstray 是`→`Cstray是`。H417DS0.zh p43/p89。
+CJK 本文に本来空白は無く、下付きが隙間を埋めていたもの）。ページ `text` は変わらない。
+
+### 除去の後に掛けていない——67セル
+
+同じ計測で「現行の関数でも直るのに旧 bundle では未反映」が **67セル**出た。converter は
+`fix_cell_subscripts` を `fix_cell_dupes` の**前**にしか掛けていない（除去後だと逆に通らないセルが
+あるため）。exporter は除去後に再適用するので Markdown では直っていて、**bundle のセル（CSV の
+読み手が見る面）だけ古かった**（`| V |⏎IO18_x`→`| VIO18_x|`・`t⏎w(NWE)`→`tw(NWE)`）。両方掛ける。
+
+### `HVCP | P`——文字だけの判定が独立した値を消す（M030DS2.zh p3）
+
+`strip_boundary_dupes` の「英字1文字のセルで、左隣の4字以上がその文字で終わる→空にする」規則。
+狙いは `Standard I/O port`→`t`（末尾字形のはみ出し）だが、pin 表の type 列 `P`（電源）や
+フレーム図の ACK `A`（`DATA | A`）も消していた。旧 bundle で条件に当たる **94セル**の字形を測ると
+**全件が左の語から 8〜31pt 離れた独立の値**。字形が自セルに面積の半分以上入っていれば消さない
+（`chars` を渡す。converter・exporter・parity の3経路とも）。
+
+### 解消していた指摘・記録だけの指摘
+
+- X035DS0.en p37（VIOFFSET の rowspan）: 第3条件行は p38 の続き断片で、`extend_boundary_spans`
+  が rowspan を伸ばして列も揃っている——**解消済み**。
+- X315DS0.en p34 の `△`: 字形の y が **+27.3pt**（行ピッチ 16.1 の…ではなく一定量）ずれて次の行帯に
+  入る＝記号フォントの metrics。`| VDD_x|` の `|` の直後に △ 幅ぶんの隙間が空いているので位置は
+  推定できるが、フォント別の補正は今回は入れない（撤退記録のまま。機構だけ更新）。
+- V003RM.zh p7: bit 位置の誤りは解消済み（QA ログ既載）。
+
+### 走行3の結果（converter 1.16.0・退役2本・据え置きゲート）
+
+`regenerate.py --full --verify --human --hold-sources`。据え置きゲートの見落とし2件（`extract_low_power`・
+`build_sources`）を直して同じ計画の残り段から再開し、**全段成功**。
+
+- bundle: 67版再変換。`extracted_rows`・ページ `text` の変化 **0**、`lines` 6行（下付き直後の空白）、
+  セル文字の変化 173（幾何ガードで復活 94・下付き 75・`S⏎Reserved` の消滅 2・IACT 型の復活 2）——全件を
+  分類・目視して想定外なし
+- 正本: `catalog/sources.csv` だけ（X315 の mirror commit 前進。PDF は同一。X035 は据え置きで前の行）。
+  evidence/index の CSV は **全部 HEAD と byte 同一**——`operating_conditions` も動かない（`text_split` を読む）
+- 凍結パリティ **5/5**（`build_features` を退役して 6→5）、markdown parity **68/68 clean**、check_tables・
+  check_counts・check_docs 通過、families 12・pins 4,563・register_fields 33,365・dma_requests 650・features 397
+- Markdown: 28文書が変わった。`IPRIORx`・`IPRIOR0` の行が `<th>IPRIORx</th><th>PRIO_（4x+3）</th>…` と載り、
+  `IACT9`→`IACTS9`、`R32_USART3_GPR` の行に名前、`HVCP | P`、`000：FPCLK/2； 001：FPCLK/4；`、`| VIO18_x|`、
+  `DATA | A`。**残り**: `IPRIOR63` の行（p107-table-008）は bit 番号行と組で bit 図として描かれる表で、
+  `apply_bitfield` が bit 列の左外にあるラベルを落とす（以前からの制約。bundle のセルにはある）。行ラベルを
+  caption か先頭 `<th>` として出す設計が要る——次周。

@@ -326,7 +326,8 @@ Of 650 rows, 577 are confirmed; the 73 reference rows are all CH32V407 (whose RM
 
 The tables come in 5 shapes (a one-page grid / continued on the next page without headings / channel 8 onwards in a separate table / 2 DMAs + `*` marks + cells
 spanning pages / DMAMUX number table), all read with one reading method. A request wrapped inside a cell (`USART2_T`⏎`X_1`) is joined into one name, and one whose wrap is **cut by the page break** (`USART1_T` on the last row of one page, `X_0` on the first row of the uncaptioned continuation) is joined too, by writing the continuation's fragment back onto the row above. The reading rules and the documents' quirks are written
-at the top of `tools/build_dma_requests.py`.
+at the top of `pipeline/extract/rm/extract_dma_requests.py` (the bundle-reading extractor that
+replaced the frozen `tools/build_dma_requests.py` on 2026-09-09 after a byte-identical run).
 
 ### `pin_functions.csv` is **per pinout**, not a per-part-number function list
 
@@ -920,7 +921,7 @@ uv run tools/build_pin_alternate.py             # pin_alternate (from EVT's AFIO
 uv run pipeline/extract/run_patched.py build_memory                    # memory_configs (from the RM and EVT's Link.ld; takes a few minutes)
 uv run tools/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
 uv run tools/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
-uv run pipeline/extract/run_patched.py build_features                  # features (from the datasheet functional description chapter; takes a few minutes)
+uv run pipeline/extract/datasheet/extract_features.py   # features (datasheet functional-description headings, read from the bundles; seconds)
 uv run pipeline/extract/run_patched.py build_timers                    # timers (from the RM's TIMx_CNT headings; takes a few minutes)
 uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry (EVT flash driver + RM 闪存 (flash) chapter)
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers (EVT headers + RM register tables. Reads the whole RM; slow)
@@ -928,7 +929,7 @@ uv run pipeline/extract/run_patched.py build_clock_enables             # clock_e
 uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal (prose and electrical characteristics tables of both datasheet editions)
 uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing (after clock_enables. EVT headers + RM)
 uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields + index/register_layouts (EVT headers + whole RM; about 19 minutes on bundles. No cache -- a stale --rm-cache once rolled the canonical back to a pre-revision RM reading)
-uv run pipeline/extract/run_patched.py build_dma_requests              # dma_requests (DMA chapter grids of the RM zh/en. Scans all pages; about 15 minutes)
+uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests (DMA chapter grids of the RM zh/en, read from the bundles; seconds)
 uv run tools/build_eval_boards.py               # eval_boards (from EVT's PUB/)
 uv run tools/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
 uv run tools/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)

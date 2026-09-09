@@ -21,7 +21,8 @@ uv run pipeline/checks/check_sources.py --remote
 - 「未取得のcommit」が出たら**ユーザーにpullを頼む**（順序は**このリポジトリ → 該当mirror**。
   mirrorは目録を読んで原本を落とすので、機械の順序と同じ向きで追う）
 - 「原本が動いています」が出たら、それは**資料更新の取り込み待ち**。コード変更の作業に
-  入る前に、取り込むのか後回しにするのかを決める（混ぜない。下の節）
+  入る前に、取り込むのか後回しにするのかを決める（混ぜない。下の節）。後回しにするなら
+  `regenerate.py --hold-sources`で**据え置いて**走る（動いた文書だけ再変換しない）
 - **mirrorが目録に追いついていない間は変換しない**（`tools/check_mirrors.py`が
   「目録が割り当てたのにmirrorに無い」を報告する）。変換しても次のmirror更新で作り直しになる
 
@@ -86,6 +87,22 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
 だった（別に本物の回帰も1件あったので、切り分けが要った）。順序は
 「①コード変更を凍結した原本で検証してcommit → ②`--accept-sources`で資料更新を
 取り込んでcommit」。
+
+**作業の途中で原本が動いたとき**（mirrorのpullは数時間おきに入る。2026-09-09に
+`CH32X035DS0.zh`がそれで、converter 1.15.0の検証中だった）: `regenerate.py --hold-sources`
+で走る。動いた文書を**据え置き**（`convert_all.py --skip <文書>`。そのbundleは前の原本のまま）、
+他の文書だけ再変換するので、出力は「コード変更＋前の入力状態」に対応する。コードをcommit
+してから、`--accept-sources`で資料更新を**別のcommit**に取り込む。据え置いた文書の
+`manifest.json`は動かないので、`check_sources`は取り込むまで同じ1件を出し続ける（それが正しい）。
+このリポジトリ自身のpullは`pull_inputs.py`が作業ツリーdirtyで跳ばしている——commitして
+cleanになれば次の周期で入る。
+**据え置きは入口ゲートにも伝わる**（`pipeline/common/held_sources.py`。`regenerate.py`が環境変数
+`CH32_HOLD_SOURCES`に置き、`pdfcompat.open`はその文書だけsha照合を省き、`render_assets`は描画を
+跳ばす）。伝えないとゲートが据え置き文書を**黙って落とし**、`build_all`がfamilyごと目録から消す
+（2026-09-09の走行2: families 12→11、`check_tables`の参照不整合147件で停止、正本46ファイルをHEADから
+戻した）。ゲートは3経路（`pdfcompat.open`・`extract_low_power.bundle_tables`・`render_assets`）で、
+`build_sources`も据え置きfamilyの行を前のまま保つ。据え置きを新しく読む経路（原本shaを比較する箇所）を
+足すときは`held_sources.is_held`を通すこと。
 
 **再生成中はpullしない**——`regenerate.py`は`.cache/regenerate.lock`を置き、
 `tools/pull_inputs.py`はそれを見て跳ばす。守れなくても走行の後段照合が

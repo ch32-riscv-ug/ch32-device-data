@@ -38,6 +38,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import paths  # noqa: E402
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "repository", "commit", "committed_at", "dirty",
@@ -63,9 +65,31 @@ def main() -> int:
     with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [(r["family"], r.get("repository", "")) for r in csv.DictReader(f)]
 
+    # 据え置き（`regenerate.py --hold-sources`）: 原本が動いた文書の bundle は前の原本のままなので、
+    # その mirror の family は**前の行を保つ**——この表は「出力がどの入力状態に対応するか」を言う表で、
+    # mirror の HEAD を書くと bundle（前の commit の PDF）と食い違う（2026-09-09 の走行3で
+    # `check_baseline` が捕捉）。取り込み（`--accept-sources`）の走行で HEAD に揃う。
+    dest = paths.table("sources", args.out)
+    held_repos: set[str] = set()
+    if held_sources.names():
+        with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if any(f"{Path(row['document']).stem}.{lang}" in held_sources.names()
+                       for lang in ("zh", "en")):
+                    held_repos.update(r for r in row["repositories"].split(";") if r)
+    previous: dict[str, dict] = {}
+    if held_repos and dest.exists():
+        with dest.open(newline="", encoding="utf-8") as f:
+            previous = {r["family"]: r for r in csv.DictReader(f)}
+
     rows: list[dict] = []
     notes: list[str] = []
     for family, repository in families:
+        if family in held_repos and family in previous:
+            rows.append(previous[family])
+            notes.append(f"{family}: 据え置き——sources の行を前のまま保つ"
+                         f"（commit {previous[family]['commit'][:7]}。bundle が前の原本のため）")
+            continue
         path = args.mirrors / family
         if not path.is_dir():
             notes.append(f"{family}: mirror が {path} に無い")
@@ -93,7 +117,6 @@ def main() -> int:
         })
 
     rows.sort(key=lambda r: r["family"])
-    dest = paths.table("sources", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()

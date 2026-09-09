@@ -794,10 +794,13 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # `平FT`という値になっていた（V203DS0.zh p27。全面見直しの検証で発見）。
                 # 幽霊列（断片の境界の和集合が生む余分な1列）を先に消す。
                 logical_tables.snap_ghost_columns(record)
+                # 続きの断片に欠けた最外列（レジスタ名・`Bit`・`Reset value`）を、先頭断片の
+                # 列境界とそのページのgeometryで埋める（`R32_USART3_GPR`が名無しだった）。
+                logical_tables.recover_chain_columns(record, chars_for)
                 # 斜めに割れた角セル/折り返し見出しの二重出力を先に落とす——行の列数が
                 # 揃わないと以降の畳み込みも列を数え違える。
                 logical_tables.strip_duplicated_span_lines(record)
-                logical_tables.strip_boundary_dupes(record)
+                logical_tables.strip_boundary_dupes(record, chars_for)
                 if (logical_tables.has_edge_newline(record)
                         or logical_tables.has_short_edge(record)):
                     logical_tables.strip_straddling_dupes(record, chars_for)
@@ -822,7 +825,7 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 # 通常表: `Reset`/`value`に割れたヘッダを戻し、境界グリフの二重取り（`[31:12] R`等）を落とす。
                 logical_tables.strip_duplicated_span_lines(record)
                 logical_tables.fold_header_wrap(record)
-                logical_tables.strip_boundary_dupes(record)
+                logical_tables.strip_boundary_dupes(record, chars_for)
                 # 端に降ってきた別行のCJK/句読点グリフ（reset値の`0\n。`・`0000b\n时`）を
                 # geometryで確認して落とす。Latin英数字は`tsu`/`td`の実文字と区別できないので
                 # 触らない（latin_ok=False）。候補セルがあるページだけgeometryを開く。

@@ -64,6 +64,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "common"))
 
 import build_operating as operating  # noqa: E402  凍結ロジック（読むだけ）
 import convert_all  # noqa: E402
+import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 import review_sidecar  # noqa: E402
 import logical_tables  # noqa: E402
 
@@ -401,10 +402,16 @@ def bundle_tables(name: str, pdf: Path):
     L2 sidecarでrejectedのblockは正本生成に使わない（黙って跳ばさず数を言う）。"""
     bundle = BUNDLES / name
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
-    actual = hashlib.sha256(pdf.read_bytes()).hexdigest()
-    if manifest["source"]["sha256"] != actual:
-        raise SystemExit(f"{bundle}: bundle was converted from a different original "
-                         "-- run pipeline/ingest/convert_all.py first")
+    if held_sources.is_held(name):
+        # 据え置き（`regenerate.py --hold-sources`）: 原本が動いたが前の原本の bundle を承知で読む。
+        # 2026-09-09 の走行3はここで止まった——ゲートは pdfcompat だけではなかった。
+        print(f"[extract_low_power] {name}: 据え置き——前の原本の bundle を読む（sha 照合を省く）",
+              file=sys.stderr)
+    else:
+        actual = hashlib.sha256(pdf.read_bytes()).hexdigest()
+        if manifest["source"]["sha256"] != actual:
+            raise SystemExit(f"{bundle}: bundle was converted from a different original "
+                             "-- run pipeline/ingest/convert_all.py first")
     rejected = review_sidecar.rejected_ids(name)
     skipped = 0
     for entry in manifest["pages"]:

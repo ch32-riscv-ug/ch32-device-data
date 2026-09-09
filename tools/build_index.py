@@ -42,7 +42,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import paths  # noqa: E402
 import signal_vocabulary  # noqa: E402
-from build_dma_requests import REMAPPED, TYPO, peripheral_of  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "pipeline" / "extract" / "rm"))
+from extract_dma_requests import REMAPPED, TYPO, peripheral_of  # noqa: E402  新経路（凍結toolは退役）
 
 # **pad 名には役割が継ぎ足されることがある**（`PA0-WKUP`・`PC13-TAMPER-RTC`）。
 # GPIO としての読み（port と番号）はその装飾を落として取る。

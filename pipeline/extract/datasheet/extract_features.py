@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""family が持つ周辺の一覧 → tables/features.csv
+"""family が持つ周辺の一覧 → evidence/features.csv。**bundle を直接読む**。
+
+`tools/build_features.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを外した
+移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09）。読む欄は bundle の `text`（ページ本文。
+converter 1.13.0 で折り返した節見出しが繋がれているもの）だけ——`pdfcompat` が凍結tool に
+見せていたものと同じなので、読みの規則は変えていない。
 
 **比較表からは作れない**（A6 の調査）。datasheet の比較表は「シリーズ内で差が
 ある列」しか持たないので、シリーズ共通の周辺は列ごと存在しない——CH32V307 の
@@ -27,24 +33,30 @@ datasheet を複数持つことがあり（CH32V006 は V002/V004/V006/V007 の 
 書き込み方式（worklist の A8）もここに出る——`2-wire SDI Serial Debug Interface`
 と `1-wire SDI` が見出しとして立っている。
 
+bundle は `catalog/products.csv` の `datasheet` 列（PDF 名）と言語から
+`.cache/structured-bundles/<stem>.<lang>` で引く。原本と bundle の一致は `regenerate.py` の
+前後照合（`check_sources`）が保証し、ページ record の sha256 は manifest と照合する。
+
 実行:
-    uv run tools/build_features.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/datasheet/extract_features.py [--out <dir>]
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
-import pdfplumber
-
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
 import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
+
+BUNDLES = REPO / ".cache" / "structured-bundles"
 # 機能説明の章は必ず前の方にある。ここまで見れば足りる。
 MAX_PAGES = 40
 
@@ -67,22 +79,32 @@ NUMERIC_ROW = re.compile(r"^[\d.]+(?:\s|$)")
 TRAILING = re.compile(r"\s*[.·…]{2,}\s*\d+\s*$")
 
 
-def read_headings(path: Path) -> tuple[str, dict[str, str]]:
+def _load_page(bundle: Path, entry: dict) -> dict:
+    """manifest の項目からページ record を読む。**sha256 を照合する**（`pdfcompat.Page._load` と
+    同じ入口ゲート——変換中で一部だけ書き換わった bundle を読まない）。"""
+    payload = (bundle / entry["file"]).read_bytes()
+    actual = hashlib.sha256(payload).hexdigest()
+    if actual != entry["sha256"]:
+        raise SystemExit(f"{bundle.name}/{entry['file']}: sha256 {actual[:12]} != manifest "
+                         f"{entry['sha256'][:12]} -- reconvert the bundle")
+    return json.loads(payload)
+
+
+def read_headings(bundle: Path) -> tuple[str, dict[str, str]]:
     """(機能説明の章番号, {子節番号: 題})。読めなければ ("", {})。
 
     同じ番号が2回出たら目次と本文の両方に出ているので、後に出た本文側を採る。
     """
     seen: dict[str, str] = {}
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages[:MAX_PAGES]:
-            for line in (page.extract_text() or "").splitlines():
-                heading = HEADING.match(line.strip())
-                if not heading:
-                    continue
-                title = TRAILING.sub("", heading.group("title")).strip()
-                if title and not NUMERIC_ROW.match(title):
-                    seen[heading.group("section")] = title
-            page.flush_cache()
+    manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
+    for entry in manifest["pages"][:MAX_PAGES]:
+        for line in (_load_page(bundle, entry).get("text") or "").splitlines():
+            heading = HEADING.match(line.strip())
+            if not heading:
+                continue
+            title = TRAILING.sub("", heading.group("title")).strip()
+            if title and not NUMERIC_ROW.match(title):
+                seen[heading.group("section")] = title
     chapter = next((s for s, t in seen.items() if DESCRIPTION.match(t)), "")
     if not chapter:
         return "", {}
@@ -92,7 +114,6 @@ def read_headings(path: Path) -> tuple[str, dict[str, str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
@@ -110,9 +131,9 @@ def main() -> int:
         editions: dict[str, dict[str, str]] = {}
         chapters: dict[str, str] = {}
         for lang in ("zh", "en"):
-            path = args.mirrors / family / f"datasheet_{lang}" / datasheet
-            if path.exists():
-                chapter, found = read_headings(path)
+            bundle = BUNDLES / f"{Path(datasheet).stem}.{lang}"
+            if (bundle / "manifest.json").exists():
+                chapter, found = read_headings(bundle)
                 if found:
                     editions[lang] = found
                     chapters[lang] = chapter
@@ -166,7 +187,6 @@ def main() -> int:
         writer.writeheader()
         writer.writerows({**row, "#": "#"} for row in rows)
     seen = sorted({r["series"] for r in rows})
-    from collections import Counter
     print(f"{dest}: {len(rows)} 行  series 群 {len(seen)}  "
           f"{dict(Counter(r['confidence'] for r in rows))}", file=sys.stderr)
     for note in dict.fromkeys(notes):
