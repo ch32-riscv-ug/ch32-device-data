@@ -2618,18 +2618,18 @@ CH32V407;CH32V467,t_s,Power-on time,,1.5,,239.5,1/fADC,#,confirmed,CH32V407DS0.P
 CH32V407;CH32V467,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,2.4,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_wustop,Wakeup from Stop mode (The voltage regulator is in running mode),Wakeup time from low-power mode(1); Wake up using HSI RC clock,,23.1,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_wustop,Wakeup from Stop mode (The voltage regulator is in low-power mode),Wakeup time from low-power mode(1); Wake-up time of voltage regulator from low power consumption mode+wake-up time of +HSIRC clock,,76.7,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
-CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃~85℃,-2.6,±1.1,2.2,%,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃~70℃,-1.7,±0.8,1.6,%,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃~85℃,-2.6,±1.1,2.2,%,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃~70℃,-1.7,±0.8,1.6,%,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,C_ADC,Internal sample and hold capacitor,,,21,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,C_IO,Single I/O pin capacitor (without double I/O co-seal),,,5,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,C_IO,Single I/O pin capacitor (without double I/O co-seal),,,5,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,ED,Differential nonlinearity error,,,±1,±10,LSB,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,EL,Integral nonlinearity error,,,±4,±20,LSB,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,EO,Dysregulation error,"f_DD = 3MHz, ADC R < 10kΩ, AIN V = 5V",,±4,,LSB,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,F_HCLK,Internal system bus frequency or microprocessor main frequency,,,,48,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
-CH32X033;CH32X035,F_HSI,Frequency (after calibration),,,48,,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,F_HSI,Frequency (after calibration),,,48,,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.9)+CH32X035DS0.PDF:en(p.10),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD,Supply current,,,290,480,uA,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD,Supply current,,,290,480,uA,#,conflict,"CH32X035DS0.PDF:en(p.36)+!CH32X035DS0.PDF:zh(typ=560,max=)",CH32X035DS0.PDF
 CH32X033;CH32X035,I_DD,Current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = 8MHz HCLK; Disable all peripherals",,2.0,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
 CH32X033;CH32X035,I_DD,Current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = 8MHz HCLK; Enable all peripherals",,2.2,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
 CH32X033;CH32X035,I_DD,Current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = HCLK 16MHz; Disable all peripherals",,2.1,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
@@ -2646,29 +2646,29 @@ CH32X033;CH32X035,I_DD,"Current in Sleep mode (In this case, peripheral power su
 CH32X033;CH32X035,I_DD,"Current in Sleep mode (In this case, peripheral power supply and clock are maintained)","Typical current consumption in Sleep mode, data processing code runs from internal Flash or SRAM; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = HCLK 24MHz; Enable all peripherals",,2.1,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,I_DD,"Current in Sleep mode (In this case, peripheral power supply and clock are maintained)","Typical current consumption in Sleep mode, data processing code runs from internal Flash or SRAM; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = HCLK 48MHz; Disable all peripherals",,1.8,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,I_DD,"Current in Sleep mode (In this case, peripheral power supply and clock are maintained)","Typical current consumption in Sleep mode, data processing code runs from internal Flash or SRAM; Runs on the high-speed internal RC oscillator (HSI). Uses HB prescaler to reduce the frequency.; F = HCLK 48MHz; Enable all peripherals",,3.0,,mA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; AWU status enabled,,528,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD,Current in Stop mode,Typical current consumption in Stop and Standby mode; High-speed internal RC oscillator is off (no independent watchdog),,75,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; Independent watchdog and AWU status enabled,,51,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; Independent watchdog enabled,,530,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_DD(HSI),HSI oscillator power consumption,,,312,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
-CH32X033;CH32X035,I_PD,PA0-PA15 pins weak pull-down current,V_DD = 3.3V,30,75,180,uA,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,I_PD,PA0-PA15 pins weak pull-down current,V_DD = 5V,60,150,350,uA,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 3.3V,12,30,65,uA,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 5V,25,60,140,uA,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,I_lkg,Input leakage current,,-2,,2,uA,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; AWU status enabled,,528,,uA,#,reference,CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD,Current in Stop mode,Typical current consumption in Stop and Standby mode; High-speed internal RC oscillator is off (no independent watchdog),,75,,uA,#,reference,CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; Independent watchdog and AWU status enabled,,51,,uA,#,reference,CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD,Current in Standby mode,Typical current consumption in Stop and Standby mode; Independent watchdog enabled,,530,,uA,#,reference,CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,I_DD(HSI),HSI oscillator power consumption,,,312,,uA,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,I_PD,PA0-PA15 pins weak pull-down current,V_DD = 3.3V,30,75,180,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,I_PD,PA0-PA15 pins weak pull-down current,V_DD = 5V,60,150,350,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 3.3V,12,30,65,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 5V,25,60,140,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,I_lkg,Input leakage current,,-2,,2,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,N_END,Number of erasures,T_A = 25℃,300K,,,Times,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,N_END,Number of erasures,T_A = 70℃,100K,,,Times,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,R_ADC,Sampling switch resistance,,0.5,0.6,1.5,kΩ,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,R_ADC,Sampling switch resistance,,0.5,0.6,1.5,kΩ,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,T_S_vrefint,ADC sampling time when reading the internal reference voltage,Slow sampling recommended,,,11,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
-CH32X033;CH32X035,V_AIN,Conversion voltage range,,0,,VDD,V,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,V_AIN,Conversion voltage range,,0,,VDD,V,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,V_CM,Common mode input voltage,,0,,VDD,V,#,reference,CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Disable ADC function,2.0,,5.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Disable USB or PD function,2.0,,5.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
-CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Enable ADC function,2.5,,5.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
+CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Enable ADC function,2.5,,5.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Operating supply voltage (nominal 5V),Enable USB or PD function,3.0,,5.3,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
-CH32X033;CH32X035,V_DD,Supply voltage,Performance may be reduced,2.5,,5.5,V,#,conflict,"CH32X035DS0.PDF:en(p.36)+!CH32X035DS0.PDF:zh(min=3.0,typ=5,max=5.3)",CH32X035DS0.PDF
+CH32X033;CH32X035,V_DD,Supply voltage,Performance may be reduced,2.5,,5.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,V_DD,Supply voltage,Rated performance,3.0,5,5.3,V,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,V_DD,Supply voltage,Recommended not less than 2.5V,2,5,5.5,V,#,reference,CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
+CH32X033;CH32X035,V_DD,Supply voltage,Recommended not less than 2.5V,2,5,5.5,V,#,conflict,"CH32X035DS0.PDF:en(p.37)+!CH32X035DS0.PDF:zh(min=3.0,max=5.3)",CH32X035DS0.PDF
 CH32X033;CH32X035,V_IH,"Standard I/O pin, input high-level voltage",,(VDD-2)*0.36+1.3,,VDD,V,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,V_IH,"Standard I/O pin, input high-level voltage",V_DD = 3.3V,1.8,,VDD,V,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,V_IH,"Standard I/O pin, input high-level voltage",V_DD = 5V,2.4,,VDD,V,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
@@ -2677,10 +2677,22 @@ CH32X033;CH32X035,V_IL,"Standard I/O pin, input low-level voltage",V_DD = 3.3V,0
 CH32X033;CH32X035,V_IL,"Standard I/O pin, input low-level voltage",V_DD = 5V,0,,1.1,V,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,V_IOFFSET,Input offset voltage,Common mode input V = 0.5V CM,,±5,±13,mV,#,reference,CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,V_IOFFSET,Input offset voltage,Common mode input V = CM,,±3,±10,mV,#,reference,CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
-CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage",I_IO = 12mA V_DD = 5V,VDD-0.5,,,V,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage",I_IO = 6mA V_DD = 3.3V,VDD-0.4,,,V,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage",I_IO = 16mA V_DD = 5V,,,0.5,V,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage",I_IO = 8mA V_DD = 3.3V,,,0.4,V,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage",I_IO = 12mA V_DD = 5V,VDD-0.5,,,V,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage",I_IO = 6mA V_DD = 3.3V,VDD-0.4,,,V,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PA0-PA23, I_IO = 30mA V_DD = 3.3V",VDD-0.4,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PA0-PA23, I_IO = 50mA V_DD = 5V",VDD-0.5,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PB0-PB21, I_IO = 10mA V_DD = 5V",VDD-0.5,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PB0-PB21, I_IO = 6mA V_DD = 3.3V",VDD-0.4,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PC0-PC7, PC14-PC19, I_IO = 16mA V_DD = 5V",VDD-0.5,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OH,"Standard I/O pin, output high-level voltage","PC0-PC7, PC14-PC19, I_IO = 8mA V_DD = 3.3V",VDD-0.4,,,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage",I_IO = 16mA V_DD = 5V,,,0.5,V,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage",I_IO = 8mA V_DD = 3.3V,,,0.4,V,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PA0-PA23, I_IO = 100mA V_DD = 5V",,,0.5,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PA0-PA23, I_IO = 50mA V_DD = 3.3V",,,0.4,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PB0-PB21, I_IO = 100mA V_DD = 5V",,,0.5,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PB0-PB21, I_IO = 50mA V_DD = 3.3V",,,0.4,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PC0-PC7, PC14-PC19, I_IO = 18mA V_DD = 3.3V",,,0.4,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
+CH32X033;CH32X035,V_OL,"Standard I/O pin, output low-level voltage","PC0-PC7, PC14-PC19, I_IO = 32mA V_DD = 5V",,,0.5,V,#,reference,CH32X035DS0.PDF:zh(p.27),CH32X035DS0.PDF
 CH32X033;CH32X035,V_PDRhyst,PDR hysteresis,,,20,,mV,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_POR/PDR,Power-on/power-down reset threshold,Falling edge,,1.78,,V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_POR/PDR,Power-on/power-down reset threshold,Rising edge,,1.8,,V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
@@ -2694,11 +2706,11 @@ CH32X033;CH32X035,V_PVD,Level selection of programmable voltage detector,PLS[1:0
 CH32X033;CH32X035,V_PVD,Level selection of programmable voltage detector,PLS[1:0] = 11 (rising edge),,4.02,,V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_PVDhyst,PVD hysteresis,,,20,,mV,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.16,1.2,1.24,V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
-CH32X033;CH32X035,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,V_DD = 5V,180,350,,mV,#,confirmed,CH32X035DS0.PDF:zh(p.27)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD < 3.2V,3,,6,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD ≥ 3.2V,3,,8,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,f_S,Sampling rate,V_DD < 3.2V,125,,353,KHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,f_S,Sampling rate,V_DD ≥ 3.2V,125,,470,KHz,#,confirmed,CH32X035DS0.PDF:zh(p.32)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,V_DD = 5V,180,350,,mV,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD < 3.2V,3,,6,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,f_ADC,ADC clock frequency,V_DD ≥ 3.2V,3,,8,MHz,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,f_S,Sampling rate,V_DD < 3.2V,125,,353,KHz,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,f_S,Sampling rate,V_DD ≥ 3.2V,125,,470,KHz,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,t_CONV,Total conversion time (including sampling time),,17,,24,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,t_Iat,Injected trigger conversion latency,,,1,,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,t_Iatr,Regular trigger conversion latency,,,1,,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
@@ -2706,7 +2718,7 @@ CH32X033;CH32X035,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference
 CH32X033;CH32X035,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,t_RSTTEMPO,Power on reset,,4,17,24,ms,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_RSTTEMPO,Other resets,,6,9,20,us,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
-CH32X033;CH32X035,t_SU(HSI),HSI oscillator startup stabilization time,,1.5,,3.5,us,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(HSI),HSI oscillator startup stabilization time,,1.5,,3.5,us,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,t_VDD,V rise time rate DD,,0.1,,∞,us/V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_VDD,V fall time rate DD,,10,,∞,us/V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,10,,us,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF

@@ -2334,51 +2334,6 @@ candidate を書く D18 工程4の道具）も削除した——走らせる相�
 次は `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` を `bundle_pages` に
 足すのが先。
 
-## 凍結toolの退役 第8号——`build_operating`（撤退の再突入条件を外した）（2026-09-09）
-
-`CH32X035DS0.zh` V2.3 の撤退の再突入条件は「`operating_conditions` がポート群の次元を持てるように
-なったら」で、そのためには行の組み立てが**編集できる**必要があった。組み立ては凍結
-`tools/build_operating.py`（656行）の `read_edition` の中で、新経路はそれを CSV 経由で呼ぶだけ
-だったので割り込めなかった。**その移植をやった。**
-
-- `pipeline/extract/datasheet/operating_rows.py`（668行）。`pdfplumber.open`＋`pdf.pages`＋
-  `extract_text()`＋`extract_tables()`＋`page_number`＋`flush_cache()` を `bundle_pages` へ置き換え、
-  mirror のパス組み立てを bundle 名（`<stem>.<lang>`）に。**抽出の規則は1行も変えていない。**
-- `bundle_pages.extracted_tables(page)` を足した（`page.extract_tables()` の置き換え＝
-  `tables[].extracted_rows`）。`extract_tables` を使う凍結toolはこれで0本になった。
-- 検証は**二段**: 基礎行 1,588 行が凍結ロジックの bundle 入力（`run_operating.py` の candidate）と
-  **byte 一致**、正本 `operating_conditions.csv` 2,797 行も **byte 一致**。
-
-### 呼ぶ側が軽くなった
-
-`build_operating_conditions.py` は `operating.pdfplumber = pdfcompat` を差し替えていた（凍結tool に
-bundle を読ませるため）。**その一行が要らなくなった**——`operating_rows` は原本を開かないので、
-据え置き（`--hold-sources`）でもゲートと食い違わない。`pdfcompat` の import も落ちた。
-用済みの `pipeline/extract/datasheet/run_operating.py`（凍結ロジックを bundle 入力で走らせて
-candidate を書く D18 工程4の道具）も削除した——走らせる相手が無い。
-
-### 途中で踏んだこと
-
-- **`ast.parse` は「関数外の `return`」を通す。** 移植で `with pdfplumber.open(...)` の入れ子を
-  1段浅くするとき、字下げを4字だけ機械的に外したら関数直下の `return found` まで外へ出た。
-  `ast.parse` は通り、実行時に `SyntaxError: 'return' outside function`。**12字以上の行だけ**を
-  寄せるように直し、検証を `py_compile`（symbol table まで見る）に変えた。
-- `check_tables.CALLED_BY` は呼び元を `tools/` 固定で読んでいた。新経路の生成器
-  （`pipeline/extract/<層>/`）を登録した瞬間に `tools/build_operating_conditions.py` を探して落ちた
-  → `generator_path(name)` を足して両方の木から名前で引く。
-- `out_option`（正本を書く生成器は `--out` を受けること。D15）の網も `tools/build_*.py` 固定だった。
-  新経路の11本へ広げた——全部すでに `--out` を持っていたので指摘は増えないが、**次に足す生成器は
-  ここで捕まる**。正本を書く生成器はいま新経路に増えているので、網もそちらへ動かす必要があった。
-
-### 残る PDF 直読み
-
-`build_all`（multiprocessing）・`build_tables`・`build_pins`→`extract_pins`・`build_remap`→
-`extract_remap`・`build_registers`→`extract_registers`（`build_clock_enables`・`build_usbpd_plumbing`
-も委譲）・`extract_products`/`extract_ordering`（`build_all` 経由）・`build_opa_cmp_registers`・
-`build_flash_program_method`・`extract_package_dims`・`scan_errata`・`extract_images`（pixel。原本が要る）。
-次は `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` を `bundle_pages` に
-足すのが先。
-
 ## X035 V2.3 再突入の分解——3つ必要で、1つ済み・2つは別企画（2026-09-09）
 
 移植（第8号）で行の組み立てが編集できるようになったので、撤退の再突入に取りかかった。
@@ -2494,3 +2449,95 @@ confirmed→reference に落ちていた。行数は変わらず、15行の信�
   正本全体の conflict は 36 → 28
 
 en 版が V2.3 になれば群が両版で揃い、同じ行が `confirmed` に上がる。
+
+## CH32X035DS0.zh V2.3 を取り込んだ——撤退の再突入完了（2026-09-09）
+
+`--accept-sources` で取り込んだ。**撤退（上の節）の再突入条件は満たした**。
+
+### 入った事実
+
+`表3-14 输出电压特性`（zh p.27）の**12行**が `operating_conditions` に入り、
+**PA0-PA23 が source 30/50mA・sink 50/100mA を引ける**という新しい規格が読めるようになった。
+抽出は原文と1セルずつ照合済み——PA と PB は **sink 電流が同じ**（50/100mA）で
+**source 電流だけが違う**（30/50mA 対 6/10mA）という資料どおりの非対称も保っている。
+
+| | zh V2.3（p.27・`reference`） | en V2.2（p.29・`reference`） |
+|---|---|---|
+| `V_OH` | PA 30/50mA・PB 6/10mA・PC 8/16mA の6行 | 一般I/O 6/12mA の2行 |
+| `V_OL` | PA 50/100mA・PB 50/100mA・PC 18/32mA の6行 | 一般I/O 8/16mA の2行 |
+
+en の4行は**どの群にも当たらない**（en の 8/16mA は zh のどの群とも違う）ので、
+片版の主張として `reference` で残る。**偽の conflict は0**——p.32 の
+`静态输出高电平`（一般I/Oではない別表）と取り違えていない。
+
+### 数
+
+| | 前 | 後 |
+|---|---|---|
+| `operating_conditions` | 2,864 | **2,876**（+12） |
+| うち X035 | 98 | **110** |
+| confidence | confirmed 2,646 / ref 191 / conflict 27 | **confirmed 2,638 / ref 210 / conflict 28** |
+| `index/conflicts.csv` | 197 | **198** |
+
+**鍵ごと消えた行 0**（鍵は series・記号・パラメータ名・条件・min/typ/max・単位）・
+データ列の **CJK 0**・値まで同じで信頼度が違う組 **0**・完全同一行 **0**。
+検査は6本（`check_tables`・`check_counts`・`check_docs`・`check_baseline`・`check_sources`・`check_viewer`）と
+凍結パリティ 6/6・**markdown parity 68/68 clean**。`generated/` の派生物は**無変化**。
+
+CSV の変更行は 43 増・31 減で、**行単位で全部説明が付く**——新しい12行、信頼度が動いた11行、
+**`basis` のページ番号だけが動いた19行**（V2.3 で章が動いた。クロック系は zh p.26→p.25、
+ADC 系は zh p.32→p.33）、`V_DD Enable ADC function` の出所が zh p.32（ADC表）から
+**zh p.23（表3-2 通用工作条件）に変わった1行**（値 2.5//5.5 は不変。こちらが正しい出所）。
+**変更行は全部 `CH32X033;CH32X035`**。
+
+`structured/CH32X035DS0.zh/manifest.json` は**converter 1.14.0 → 1.16.0 も一緒に動く**——
+コード変更の走行ではこの文書を据え置いていたので、1.16.0 が当たるのがこの取り込みになった。
+原本 sha が変わり、41ページ全部の sha が変わる（版フッタが V2.2 → V2.3 で全ページに出る）。ページ数は 41 のまま。
+凍結台帳は動いた4表を**中身を見たうえで**再記録した。
+
+### 同時に動いた既存11行——全部原文で裁定した
+
+**動いた行は全部 `CH32X033;CH32X035`**（更新した文書そのもの）で、他の文書は1行も動いていない。
+
+- **一般I/Oの `V_OH`/`V_OL` 4行が confirmed → `reference`。正しい。** zh V2.3 が一般I/Oの行を
+  **ポート群ごとの行に置き換えた**ので、en V2.2 の一般I/O行（6/12mA・8/16mA）は zh の裏を失った。
+  en が単独で言っていることになったので `reference` が honest な印。en が V2.3 になれば群が両版で揃う。
+- `I_DD Supply current`（X035）が confirmed → **conflict**。**資料の本物の食い違い**で、
+  これが正しい: zh V2.3 が typ **560µA**、en V2.2 が **290/480µA**。V2.3 が改定した値。
+- `V_DD Performance may be reduced` が conflict → **confirmed**。改善（群と条件の有無で
+  相手を絞ったので偽の食い違いが消えた）。
+- `V_DD Recommended not less than 2.5V` が reference → **conflict**。**11件のうち誤りはこの1件だけ**で、
+  原因は照合の失敗ではなく**到達できていないこと**だった。正しい相手は zh にちゃんとある——
+  p.34 `表3-26 OPA运放特性` と p.35 `表3-27 CMP电压比较器特性` の
+  `V_DD 供电电压 建议不低于2.5V 2/5/5.5` で、en の `Recommended not less than 2.5V 2/5/5.5` と
+  **値も条件も完全一致**する。ところが**その2ページは窓の外**（X035 で読めている zh のページは
+  9・23–27・32・33 だけ。en は 10・26–29・36・37 で、en だけ OPA 表 p.37 に届いている）。
+  相手を失った en 行が、p.32 ADC 表の `额定性能`（3.0/5/5.3）を相手に取って偽の conflict になった。
+  **直し方は出力電圧と同じ**——OPA/CMP の表題を `TABLE_CAPTION` に足せば zh 側が届き、
+  この行は `confirmed` に上がる。同じ穴で `V_CM`・`V_IOFFSET` 2行も en 単独の `reference` に
+  なっている（`I_LOAD`・`CMRR`・`PSRR`・`G_BW` は en 側も落ちているので語彙の別問題）。
+  **コード変更なので取り込みとは別のcommitにする**（次項）。
+- `I_DD Current in Standby/Stop` 4行が confirmed → **reference**。V2.3 の**表番号振り直し**で
+  A11 層が zh 側を見失った。同じ表の Run/Sleep 行は confirmed のまま。
+
+### 測って**入れなかった**ガード
+
+「conflict は min/typ/max のどれかが（両方非空で）一致すること」を条件に足すと、
+22件のうち19件は残り3件が `reference` に落ちる。落ちる3件は:
+
+```
+CH32V203DS0.PDF  T_S_vrefint  en=''        //17.1     zh=''       17.1//
+CH32V203DS0.PDF  g_m          en='Startup' /17/       zh='启动'    /25.3/
+CH32X035DS0.PDF  I_DD         en=''        /290/480   zh=''       /560/
+```
+
+3件目は**上で確かめた本物の食い違い**（560µA 対 290/480µA）で、2件目も値が本当に違う。
+**このガードは本物を隠す**ので入れない。しかも `V_DD 2.5V` の1件は**照合の問題ではなく到達の問題**
+だったので、ガードで隠すのは症状を消すだけだった——直すのは表の選択のほうである。
+
+### 次にやること（別commit）
+
+OPA/CMP の表題を `TABLE_CAPTION` に足す。出力電圧のときと同じ受入条件を課す:
+足した行を1件ずつ原文と照合し、正本から消える行が0であることを確かめる。
+`V_DD Recommended not less than 2.5V` が conflict → confirmed に、`V_CM`・`V_IOFFSET` が
+reference → confirmed に上がる見込み。
