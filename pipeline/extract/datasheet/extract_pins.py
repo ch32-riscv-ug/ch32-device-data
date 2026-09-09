@@ -40,31 +40,6 @@ import bundle_pages  # noqa: E402
 _LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
 
 
-def _pages(source):
-    """ページの並びを取り出す。**pdf object でもページの並びでも受ける。**
-
-    凍結 `tools/build_all.py`（multiprocessing。退役は別企画）がこの module の
-    解析関数を `pdf` object のまま呼ぶ——`run_patched` で `pdfplumber` が `pdfcompat` に
-    差し替わっているので中身は bundle だが、渡ってくるのは `pdf` と `pdfcompat.Page`。
-    新経路は**ページ record（素の dict）の並び**を渡す。`build_all` が退役すれば
-    この層と下の `_lines`/`_tables` は消える。
-    """
-    return getattr(source, "pages", source)
-
-
-def _lines(page) -> list[dict]:
-    """視覚行。ページ record（新経路）でも `pdfcompat.Page`（凍結tool経由）でも返す。"""
-    return (bundle_pages.text_lines(page) if isinstance(page, dict)
-            else page.extract_text_lines() or [])
-
-
-def _tables(page) -> list:
-    """矩形つきの表。どちらの入口でも `bbox`・`rows[].cells`・`extract()` を持つ
-    （`pdfcompat.Table` は `bundle_pages.Table` そのもの）。"""
-    return (bundle_pages.tables(page) if isinstance(page, dict)
-            else page.find_tables())
-
-
 def bundle_name(argument: str) -> str:
     """`CH32V003DS0.zh` はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。"""
     path = Path(argument)
@@ -343,8 +318,8 @@ PIN_TABLE_TITLE = ("pin definition", "引脚定义")
 def captions(pages) -> list[tuple[str, str, int]]:
     """Every table caption, as (label, title, page index)."""
     out = []
-    for pno, page in enumerate(_pages(pages)):
-        for line in _lines(page):
+    for pno, page in enumerate(pages):
+        for line in bundle_pages.text_lines(page):
             m = CAPTION.match(line["text"].strip())
             if m:
                 out.append((m.group(1), m.group(2), pno))
@@ -387,7 +362,7 @@ def caption_position(page, label: str) -> float | None:
     The label must end where it ends: "Table 3-1" is not an occurrence of
     "Table 3-1-1", which numbers a different table.
     """
-    for line in _lines(page):
+    for line in bundle_pages.text_lines(page):
         if re.match(re.escape(label) + r"(?![-\d])", line["text"].strip()):
             return line["top"]
     return None
@@ -543,14 +518,14 @@ def find_pin_tables(
     width = 0
     started = False
     chunks: list[list[list[str]]] = []
-    for page in _pages(pages):
+    for page in pages:
         begin = caption_position(page, table_label)
         if begin is not None:
             started = True
         elif not started:
             continue
         cut = caption_position(page, stop_label)
-        for table in _tables(page):
+        for table in bundle_pages.tables(page):
             if begin is not None and table.bbox[3] <= begin:
                 continue
             if cut is not None and table.bbox[1] >= cut:

@@ -3020,3 +3020,48 @@ import 先を変えるだけで済んだ。
 `convert_structured`/`document_converter`（converter 自身）。
 **`build_all` と `build_tables` が自分で PDF を開く箇所はもう無い**（葉に委譲しきっている）
 ——次はその2本から `pdfplumber` の import を落とすだけの企画になる。
+
+## 凍結toolの退役 第13号——互換層ごと消えた（2026-09-10）
+
+**原本（PDF）を読む生成器が pipeline から居なくなった。** 最後に残っていたのは
+`build_all.pin_tables()` の1箇所で、そこを bundle に向けたら、互換層とその runner が
+まるごと不要になった。
+
+### 消したもの
+
+| ファイル | 何だったか |
+|---|---|
+| `pipeline/extract/pdfcompat.py` | bundle を pdfplumber の部分集合として見せる互換層 |
+| `pipeline/extract/run_patched.py` | 凍結toolの `pdfplumber` 属性を互換層に差し替えて走らせる runner |
+| `pipeline/extract/run_frozen.py` | 同じ差し替えで走らせて出力を凍結CSVと byte 比較する道具 |
+
+`regenerate.py` の `--full` の並びから `patched` という種別も消えた（残るのは `plain` と
+`new` だけ）。`--verify` の**凍結パリティも外した**——あれが証明していたのは
+「凍結toolがbundle入力でも原本直読みと同じバイトを出す」ことで、**相手が居なくなった**
+（最後まで残った `build_remap` は `candidates/*.json` と `pin_functions.csv` から作るので、
+そもそもPDFを読まない）。
+
+**同じ役目を果たしているもの**: `check_baseline`（正本のバイトを凍結台帳と照合）と
+`markdown parity`（人向けMarkdownを原本と照合。68/68）。退役ごとの byte 一致は、その都度
+実測してこのログに残している——事後の常設検査ではなく、**移すときに証明する**形に変わった。
+
+### `build_all` の1箇所
+
+`pin_tables()` だけが `pdfplumber.open(datasheet)` を残していた（表の解析自体は
+`extract_pins` に委譲していて、`pdf` object を渡していた）。`bundle_pages.pages()` の
+list を渡すように変え、`import pdfplumber` を落とした。
+
+これで `extract_pins` に置いていた**互換の薄い層**（`_pages`/`_lines`/`_tables`。pdf object も
+ページ record も受ける）が**呼ばれなくなったので消した**——第10号で「`build_all` を触らずに
+済ませる」ために入れたもので、役目は3日で終わった。
+
+`build_all` の docstring にあった「pdfplumber がページ解析と text-map LRU を抱えるので
+worker が 360MiB 要る」というメモリの話も、bundle のページ record は素の JSON なので
+現実に合わなくなった。実測の履歴として残しつつ、いまの前提を書き直した。
+
+### いま原本を読むもの
+
+**bundle を作る側**（`pipeline/ingest/convert.py`）と **pixel が要る側**
+（`pipeline/review/render_assets.py`・`tools/extract_images.py`）、それに converter 自身の
+PoC 2本（`tools/convert_structured.py`・`tools/document_converter.py`）だけ。
+D18 の「PDFを直接読む旧`tools/`を実行経路から外す」は**これで達成**。

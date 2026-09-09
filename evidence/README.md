@@ -902,18 +902,17 @@ The series block diagrams (`system_*.png`) are not in the original datasheets; t
 everything below in dependency order on structured-bundle input and finishes
 with the checks (about an hour; `regenerate.py` without `--full` is the fast
 new-path-only variant). The list below is for regenerating one table at a time.
-PDF-reading tools run through `pipeline/extract/run_patched.py`, which swaps
-their input layer to the structured bundles (the tool's own code is unchanged);
-running them as plain `tools/<name>.py` would read the PDFs directly, which is
-off the execution path since the switchover. Each tool decides its output
-location in `tools/paths.py` (`--out <dir>` is an override for testing). In
-order from the top.
+**Since 2026-09-10 no generator reads a PDF directly**, so each can be run as
+it stands (every reader takes structured bundles; the only things that open a
+PDF are the converter that builds the bundles and the figure renderer). Each
+tool decides its output location in `tools/paths.py` (`--out <dir>` is an
+override for testing). In order from the top.
 
 ```sh
-uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/ (extraction candidates per part number; serial -- the patch does not survive worker processes)
-uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run tools/build_all.py --jobs 1               # .cache/candidates/ (extraction candidates per part number; from bundles)
+uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
 uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions (from bundles; takes a few minutes)
-uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes (from candidates)
+uv run tools/build_remap.py                     # remap_fields/remap_routes (from candidates)
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions (new path, bundle input; frozen base rows + A11 rows)
 uv run tools/build_evt_examples.py              # evt_examples (from the EVT tree and catalog)
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init (from EVT)

@@ -19,13 +19,14 @@ The worker prints nothing while it runs; its block is printed when it finishes, 
 **families appear in completion order, not in catalogue order**. Interleaving the
 lines live would make them unreadable.
 
-Memory, not cores, is what bounds `--jobs`. A worker walks a whole reference manual,
-and pdfplumber keeps both parsed page objects and a text-map LRU, so both caches are
-dropped as each page is finished. Without that, one small family peaked at 581 MiB;
-with it, the largest family peaks at about 360 MiB. The default is 4 rather than the
-core count because **on WSL the memory a worker can actually have is not what
-`free` reports**: `free` describes the Linux VM, the Windows host underneath may
-have far less, and overcommitting there thrashes instead of failing.
+Memory, not cores, is what bounds `--jobs`. A worker walks a whole reference manual.
+That used to mean pdfplumber's parsed page objects plus its per-page text-map LRU
+(581 MiB for one small family before both caches were dropped per page, 360 MiB after);
+**since the readers moved to structured bundles (2026-09-10) a page is plain JSON**,
+so the ceiling is far lower. The default stays well below the core count because
+**on WSL the memory a worker can actually have is not what `free` reports**: `free`
+describes the Linux VM, the Windows host underneath may have far less, and
+overcommitting there thrashes instead of failing.
 
 Usage:
     uv run tools/build_all.py --out candidates [--family CH32M030] [--limit 5]
@@ -48,17 +49,19 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-import pdfplumber  # noqa: E402
+# 原本（PDF）はもう開かない——読み手は全部新経路（第12・13号）。`extract_ordering`・
+# `extract_products`・`extract_pins` の `extract()`/`bundle_name()` は原本のパスを受けて
+# bundle 名に直すので、呼び方は変えなくてよい。
+_PIPELINE = Path(__file__).resolve().parents[1] / "pipeline" / "extract"
+sys.path.insert(0, str(_PIPELINE))
+sys.path.insert(0, str(_PIPELINE / "datasheet"))
 
 import build_candidate  # noqa: E402
-import paths  # noqa: E402
-import extract_pins  # noqa: E402
-# 凍結 `tools/extract_ordering.py`・`extract_products.py` は退役した（第12号）。
-# 読み手は新経路の `pipeline/extract/datasheet/`——`extract()` は原本のパスを受けて
-# bundle 名に直すので、呼び方は変えなくてよい。
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "datasheet"))
+import bundle_pages  # noqa: E402
 import extract_ordering  # noqa: E402
+import extract_pins  # noqa: E402
 import extract_products  # noqa: E402
+import paths  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
 # Headings the text layer loses, read off the rendered page by hand.
@@ -117,23 +120,25 @@ def pin_tables(
     """
     overrides = curated_columns().get(datasheet.name, {})
     out = []
-    with pdfplumber.open(datasheet) as pdf:
-        caps = extract_pins.captions(pdf)
-        seen: set[str] = set()
-        for i, (label, title, _) in enumerate(caps):
-            # Both editions: "... Pin definition" / "...引脚定义".
-            if not any(t in title.lower() for t in extract_pins.PIN_TABLE_TITLE)                     or label in seen:
-                continue
-            seen.add(label)
-            stop = extract_pins.next_caption(caps, i)
-            rows, variants, layout = extract_pins.find_pin_tables(pdf, label, stop)
-            fixed = overrides.get(label, {}).get("columns")
-            if fixed:
-                # The curated list is authoritative; the parser only found where the
-                # columns are, not always what they are called.
-                variants = fixed + variants[len(fixed):]
-            if variants:
-                out.append((label, title, rows, variants, layout))
+    # 原本は開かない——bundle のページ record を読む（退役 第13号）。表ごとに文書を
+    # 何度も走るので、generator ではなく list にして持ち回る。
+    pages = list(bundle_pages.pages(extract_pins.bundle_name(str(datasheet))))
+    caps = extract_pins.captions(pages)
+    seen: set[str] = set()
+    for i, (label, title, _) in enumerate(caps):
+        # Both editions: "... Pin definition" / "...引脚定义".
+        if not any(t in title.lower() for t in extract_pins.PIN_TABLE_TITLE)                     or label in seen:
+            continue
+        seen.add(label)
+        stop = extract_pins.next_caption(caps, i)
+        rows, variants, layout = extract_pins.find_pin_tables(pages, label, stop)
+        fixed = overrides.get(label, {}).get("columns")
+        if fixed:
+            # The curated list is authoritative; the parser only found where the
+            # columns are, not always what they are called.
+            variants = fixed + variants[len(fixed):]
+        if variants:
+            out.append((label, title, rows, variants, layout))
     return out
 
 
@@ -464,10 +469,10 @@ def default_jobs() -> int:
     overcommitting there does not fail loudly, it thrashes. Six workers hung this
     machine even though `free` showed 8 GB available.
 
-    After dropping both pdfplumber's page properties and its per-page text-map
-    LRU, one CH32H417 worker peaks at about **360 MiB**. Four workers therefore
-    need roughly 1.5 GiB plus the parent and OS; `--jobs` can raise or lower this
-    for a machine's actual headroom.
+With pdfplumber (page properties plus the per-page text-map LRU, both dropped
+    per page) one CH32H417 worker peaked at about **360 MiB**. The readers now read
+    structured bundles, where a page is plain JSON, so the peak is much lower —
+    but the WSL caveat above still decides the default, not the measurement.
     """
     return max(1, min(6, (os.cpu_count() or 2) - 1))
 
