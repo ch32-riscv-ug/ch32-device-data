@@ -2887,3 +2887,61 @@ evidence 段へ移せる。退役が進んで「凍結かどうか」より順�
 `extract_package_dims`・`scan_errata`・`extract_images`（pixel）で、どれもこの形に載らない。
 **次の退役でここは空になる**見込みで、そのときはパリティの相手を作り直すのではなく
 `--verify` の意味自体を見直す（`markdown parity` と `check_baseline` が実質の防波堤になる）。
+
+## CH32H417 の EVT v1.6 を取り込んだ——ベンダの誤字修正と、読む場所の選び方（2026-09-10）
+
+原本PDFは動かず（68/68 一致）、**EVT だけ**の更新。目録が先に気づいていた
+（`catalog/documents.csv` の自動commitで `CH32H417EVT.ZIP` の zh が 1.5 → 1.6）。mirror の
+日次CI（15:07 UTC）は目録の更新より前に走っていたので、実体が届いたのはその次の回。
+mirror は 1,381ファイル（追加241・削除6・変更1,102）動いた。
+
+### 動いた10表——全部説明が付く
+
+| 表 | 変化 | 何が起きたか |
+|---|---|---|
+| `catalog/sources.csv` | 1行 | CH32H417 の mirror commit（b3dfa77 → a8ce259） |
+| `evidence/registers.csv` | 4,932 → **4,936** | USB の LINK レジスタ4本が予約バイトから実体になった |
+| `evidence/register_blocks.csv` | hash 4件 | DMA1/DMA2（下記の誤字修正）と USBSSD/USBSSH（新レジスタ） |
+| `evidence/register_fields.csv` | **1行** | 下記の誤字修正 |
+| `index/register_layouts.csv` | 3行 | USBSSD 47 → 50・USBSSH 39 → 40 レジスタ（大きさは 416/180 のまま＝予約と入れ替わった） |
+| `index/registers.csv` | +4 | 上記の派生 |
+| `index/register_map.csv` | +4 | 同上 |
+| `evidence/evt_examples.csv` | 1,604 → **1,608** | Betaflight・RT_Thread・USB host 2件 |
+| `evidence/clock_configs.csv` | 154行のまま | `evt_copies` の分母だけ 390 → 396（例題ディレクトリが増えた） |
+| `index/manifest.csv` | hash | 上記の派生 |
+
+`generated/readme/CH32H417.md` は EVT 例題の数が 233 → 237。
+
+### ベンダの誤字が直った（`register_fields` の1行）
+
+`ch32h417.h` V1.0.5 → V1.0.6 で、DMA の CFGR5 の半転送割り込み許可ビットの綴りが直った:
+
+```
+-#define  DMA_CCFGR_HTIE   ((uint16_t)0x0004)
++#define  DMA_CFGR5_HTIE   ((uint16_t)0x0004)
++#define  DMA_CCFGR_HTIE   DMA_CFGR5_HTIE        （後方互換の別名）
+```
+
+`CFGR5` の兄弟（`TCIE`・`TEIE`・`DIR`…）の中でこの1本だけ `CCFGR` と綴られていた。
+正本の field 名も `CCFGR_HTIE` → **`HTIE`** に直り、**兄弟と同じ名前で引けるようになった**。
+行数は変わらない（名前と define が変わっただけ）。
+
+### 読む場所の選び方が効いた——`RCC_HSADCSource` の入れ替え
+
+`ch32h417_rcc.h` V1.0.1 → V1.0.2 で、ライブラリの引数定数が**入れ替わった**:
+
+```
+-#define RCC_HSADCSource_PLLCLK  ((uint8_t)0x00)
+-#define RCC_HSADCSource_SYSCLK  ((uint8_t)0x01)
++#define RCC_HSADCSource_SYSCLK  ((uint8_t)0x00)
++#define RCC_HSADCSource_PLLCLK  ((uint8_t)0x01)
+```
+
+**正本は1行も動かなかった。** この表が読むのは `ch32h417.h` の**レジスタ定義**
+（`RCC_HSADCSRC_SYSCLK` = 0x0・`RCC_HSADCSRC_PLLCLK` = 0x10000000）で、そちらは前から
+SYSCLK=0・PLLCLK=1 と言っていた。つまり**ライブラリの引数定数のほうが逆で、今回
+ハードウェアに合わせて直された**。
+
+これは「**API の定数ではなくレジスタ定義を読む**」という設計判断が当たった実例。
+API の定数は人が書く便宜的な層で、こう入れ替わることがある。レジスタ定義は
+ハードウェアの記述なので、そちらを一次に置いたぶんこの改版で何も壊れなかった。
