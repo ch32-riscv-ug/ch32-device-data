@@ -18,6 +18,11 @@ uv run pipeline/checks/check_sources.py --remote
 ②原本の実体（mirrorのPDF。**各mirrorのpull**が要る）、③変換済みの記録
 （`structured/*/manifest.json`）。数秒で、読み取りだけ。
 
+この検査は**④`.cache`のbundleが③と一致しているか**も見る（`cache_drift`）。正本CSVは
+`.cache/structured-bundles`から作られ、その出自が③にcommitされるので、この2つは常に一致して
+いなければならない。**片方だけ戻すと据え置きが黙って破れる**（下の節）。`regenerate.py`も
+走る前にここで止まる。
+
 - 「未取得のcommit」が出たら**ユーザーにpullを頼む**（順序は**このリポジトリ → 該当mirror**。
   mirrorは目録を読んで原本を落とすので、機械の順序と同じ向きで追う）
 - 「原本が動いています」が出たら、それは**資料更新の取り込み待ち**。コード変更の作業に
@@ -127,6 +132,11 @@ cleanになれば次の周期で入る。
 5. 終わったら `git status` を**全体で**見て変わった表を確認し、commit対象（`structured/<文書>/manifest.json` を含む）
    を報告する。**走行を途中で止めた/結果を捨てたときは、正本CSVだけでなく `generated/` の派生物も戻す**
    （2026-09-08: 壊れた `--full` の README を戻し忘れ、そのままコミットされた）。
+   **`.cache/structured-bundles/<文書>` も戻す**——tracked fileだけ戻すと`.cache`のbundleが新原本のまま
+   残り、次の`--hold-sources`が「旧原本で据え置いている」と信じながら**新原本を読む**
+   （2026-09-09。`convert_all --skip`は`.cache`を触らず、`pdfcompat`は据え置き文書のsha照合を省くため）。
+   `check_sources`が`cache_drift`で報告し、`regenerate.py`は走る前に止まる。取り込み側へ揃えるなら
+   `uv run pipeline/ingest/convert_all.py --force --only <文書>`。
    `pipeline/ingest/convert.py` の `CONVERTER_VERSION` を上げたときも同じ流れ
    （全bundleが増分再変換される。VSCodeの再起動で中断しても文書単位で原子的なので再開できる）
 

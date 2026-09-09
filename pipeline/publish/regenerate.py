@@ -192,6 +192,18 @@ def main() -> int:
     same, moved, missing = before
     print(f"=== 原本の照合: {len(same)}/{len(same) + len(moved) + len(missing)} 一致",
           file=sys.stderr)
+    # **`.cache`のbundleとcommit済みmanifestの食い違い**は、走る前に必ず止める。片方だけ戻した
+    # 状態で走ると、据え置き（`--hold-sources`）が黙って破れる（`convert_all --skip`は`.cache`を
+    # 触らず、`pdfcompat`は据え置き文書のsha照合を省く）。逆向きなら古いbundleから正本を作る。
+    # 2026-09-09に実際に起きた——取り込みを途中で止めてtracked fileだけ戻した。
+    drift = check_sources.cache_drift()
+    if drift:
+        for name, committed, cached in drift:
+            print(f"  ★ {name}: commit済み={committed} .cacheのbundle={cached}", file=sys.stderr)
+        print("\n`.cache`のbundleがcommit済みの記録と食い違っています——**片方だけ戻した状態**。\n"
+              "取り込むなら `uv run pipeline/ingest/convert_all.py --force --only <文書>` で揃え、\n"
+              "撤退するなら`.cache`のbundleも控えから戻してください。", file=sys.stderr)
+        return 1
     if moved and not missing and args.hold_sources and not args.accept_sources:
         # 作業中に原本が動いた（mirrorのpullは数時間おきに走る）。据え置いた文書は
         # 前の原本のbundleのままなので、この走行の出力は「コード変更＋前の入力状態」に

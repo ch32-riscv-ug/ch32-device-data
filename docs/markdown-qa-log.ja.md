@@ -2245,3 +2245,46 @@ human 段まで進んでいないので無傷（差分0）。作業ツリーは 
   （`取得できない: The read operation timed out`）で落ちた。`link_firmware.csv` は無傷で、
   資料更新とは無関係。evidence 段から `resume.py` で継いだ。この tool はネットワークに依存する
   唯一の生成器なので、走行の失敗としては切り分けて読む。
+
+## 撤退のあと `.cache` だけが先に進んでいた——据え置きが黙って破れる穴を塞いだ（2026-09-09）
+
+撤退の直後、`uv run tools/pull_inputs.py` を人が回し、その出力が案内する取り込みコマンド
+（`regenerate.py --full --verify --human --accept-sources`）も走ってしまった。途中で止めて
+**tracked file を戻した**——が、それでは足りなかった。
+
+状態を確かめると、食い違いは**1つだけ**残っていた:
+
+| | 原本 | converter |
+|---|---|---|
+| commit 済み `structured/CH32X035DS0.zh/manifest.json` | `147f0d22d073`（旧） | 1.14.0 |
+| `.cache/structured-bundles/CH32X035DS0.zh` | `a3f2a0f66cfc`（新） | 1.16.0 |
+
+（この文書は据え置き中で再変換を跳ばしていたので、commit 済みの記録は converter 1.14.0 のまま
+——それが正しい姿。18:20 の再変換で`.cache`だけが 1.16.0/新原本へ進んだ。）
+
+**なぜ危ないか**: この状態で次に `--hold-sources` を回すと、`survey()` は commit 済み manifest と
+mirror の PDF を比べて「動いた」と言い、`convert_all --skip` はその bundle を触らず、`pdfcompat` は
+据え置き文書の sha 照合を省く——だから凍結tool は**新原本の bundle を読みながら「旧原本で据え置いて
+いる」と信じる**。逆向き（commit が新しく`.cache`が古い）も同じく危険で、`up_to_date` が「最新」と
+判断して再変換を跳ばし、古い bundle から正本を作る。**どちらも黙って起きる。**
+
+### 直したもの
+
+- `.cache` の bundle を控えから戻した（41ページ・geometry の sha 不一致0で読めることを確認）。
+  これで commit 済み manifest と`.cache`が**68文書すべて一致**。
+- `check_sources.cache_drift()` を足した——commit 済み manifest と`.cache`の manifest を全文書で
+  比べ、食い違いを名指しして exit 1。**セッション開始の必須検査に自動で入る**（同じコマンド）。
+- `regenerate.py` は走る**前に**これで止まる。原本の照合（②vs③）とは別の門なので、
+  `--accept-sources`/`--hold-sources` のどちらでも止まる。直し方も出力に書いた。
+
+### 検証
+
+わざと`.cache`の converter 版を書き換えて検出（`commit済み=147f0d22d073/1.14.0
+.cacheのbundle=147f0d22d073/9.9.9`）→ `check_sources` exit 1・`regenerate` は段に入る前に停止。
+戻すと報告0件。撤退後の状態そのものも再確認: 作業ツリーは HEAD（`980b0c7`）と同一、正本の検査4本
+通過、凍結パリティ **8/8 byte 一致**、markdown parity 抜き取り2文書 clean、Markdown は控えと差分0、
+`.cache/pipeline-candidates` は出力専用（入力に使う経路は無い）。
+
+**教訓**: 「撤退したら戻す」の対象は**tracked file だけではない**。正本CSV・`generated/`の派生物・
+`.cache`のbundle の3つで、最後のひとつは`git status`に出ないので忘れる。**忘れても検査が捕まえる**
+形にしたのが今回の追加。
