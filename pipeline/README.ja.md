@@ -35,6 +35,11 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            基礎行＋A11行。2026-09-01に受入・**最初に切替が完了したCSV**——2,796行）
            manual/extract_debug_wiring.py（**debug_wiring.csvの正本生成器**——新経路が
            初めて正本に足した新規evidence表。WCH-Link manualの配線表＋両対応注記）
+           rm/extract_dma_requests.py（**dma_requests.csvの正本生成器**。凍結tool
+           `build_dma_requests`からpdfplumber依存だけを外した移植。bundle入力で650行
+           **byte一致**を確認して切替・凍結toolを削除——2026-09-09。退役の第1号）
+           datasheet/extract_features.py（**features.csvの正本生成器**。凍結tool
+           `build_features`の同じ移植——`text`だけを読む。退役の第2号）
            run_frozen.py（凍結toolをコード不変のままbundle入力で走らせ、出力を
            凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
            run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
@@ -516,6 +521,61 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     が`LQFP100`を`001PFQL`に再反転した。`extracted_rows`はpdfplumberの生のまま＝凍結tool
     の前提、が正しい（`cells`側の修復は残す）。直後の実測: 15表のうち12表byte一致・
     `features`1行改善・`pins`系は一致に戻った。
+
+26. **継続断片に欠けた最外列を、結合表の列境界で埋める**（`recover_chain_columns`。exporter側）。
+    ページ跨ぎの結合表で、続きのページの断片だけ最外列の罫線が拾われず列が1つ少ないと、
+    その列の値は**Markdownのどこにも出なかった**（`CH32xRM.zh` p179-180の`R32_USART3_GPR`
+    ——行が名無しで`| 0x40004818 | UASRT3保护时间和预分频 | | 0x00000000 |`。再突合の指摘）。
+    converterの`recover_outer_column`（項目15・21）は**断片1つ**を見て「1列ぶんの幅・全行帯に
+    中身」を要るので、1行の断片や外側グリフの幅が決められないものには触れない。結合表なら
+    先頭断片が持つ列の**x範囲**（単独列セルの`src_bbox`）が分かるので、入れ先が一意に決まる。
+    断片の行帯ごとにその範囲のグリフを`spell_glyphs`で綴り、全行帯に中身があり既にセルが
+    無い座標だけに足す。全corpus実測（1.14.0）: 候補190断片のうち1,225セルはconverterが既に
+    同じ文字で埋めており、88セルは行/列をまたぐ既存セルの部分読み（触らない）、足すのは
+    **18表33セル**で全件目視——レジスタ名12・bit範囲2・reset値4・見出し4（`Bit`/`Reset value`/
+    `复位值`）・記述子名3（`TDes5-7`）・ページ末で見出し行の外2列が落ちた`RB_UEPn`/
+    `Description: The address…`（`CH32M030RM.en` p226）。人向け専用（`snap_ghost_columns`の後。
+    exporterとparityが同じ順で呼ぶ）。`spell_glyphs`は`logical_tables`へ移して共有（出力は同一）。
+27. **同じ列境界の1行表が縦に並ぶ図の行ラベルを取り込む**（`recover_sibling_labels`。
+    converter 1.15.0）。`PFIC_IPRIORx`の`IPRIOR63`/`IPRIORx`/`IPRIOR0`（RM全機種）・`IALLOC`・
+    SDIOの`DAT3-0`・`D7-0`・`SDI`/`SDO`・`Slot`・フレーム図の開始ビット`S`。1行表は
+    `recover_outer_column`の「2行以上」に外れ、ラベルの行の中心は表bbox内なので本文としても
+    出ず、`CH32FV2x_V3xRM.zh` p107では`IPRIOR63`が**どこにも無かった**（再突合の指摘）。
+    兄弟（同ページ・1行・3列以上・同じ列数・左右端±0.5pt）2つ以上を行帯にして、同じ条件
+    （1列ぶんの幅≤30%・縁まで≤30%・隙間≥-2pt・24字以内・**全兄弟に揃う**）で各表に1列足す
+    （`cells`のみ。`extracted_rows`は触らない）。全corpus実測: **54組・173表・22文書**、中身は全部ラベル。
+28. **境界を跨いだ字形の帰属を「字形の位置」で照合する**（`_owned_elsewhere`→
+    `_glyph_at_text_edge`。converter 1.15.0の`fix_cell_dupes`とexporterの両方）。
+    `strip_straddling_dupes`は「相手セルの綴りの端にその文字がある」ことを根拠に重複を落として
+    いたが、文字の一致だけなので**同じ文字が相手の反対側の端にある**だけで誤認した——bit図の
+    `IACTS | IACTS`（名前が列幅より広く、左の`S`の面積78%が右セルに掛かる）で、先に
+    `strip_boundary_dupes`が右の先頭`S `を落とし、次にこの誤認で左の`S`も落ちて`IACT`
+    （Markdownでは`IACT9`）になっていた（`CH32M030RM.en` p46。再突合の指摘）。字形が相手の
+    綴りから消える経路は`strip_boundary_dupes`の**行端**の除去だけなので、判定は字形の**位置**で
+    決まる（`_glyph_still_in_other`）: 相手の自グリフ（面積の半分以上が相手に入る）を同じ視覚行で
+    並べ、この字形が**行の中程なら常に相手のもの**、**左端なら綴りの行頭**・**右端なら行末**が
+    その文字か。3回書いた——中程を偽にした版は1行に2語の結合セル`td(ALE-NWE) th(NWE-ALE)`の
+    語末`)`を外して隣の`t\nw(NWE)`に`)`を残し（H417DS0.en p128）、個数で見た版は相手が別の迷子を
+    抱える`IACTS`の右隣に`S\nReserved`を作った（M030RM.en p46・V205RM.en p81）。どちらも**再変換の
+    前後比較**で捕まえた。`CH32xRM.zh` p138の`C3NE`→`CC3NE`も同じ根で直った。
+29. **下付きの連なりの下限を-0.35に**（`reattach_cell_subscripts`。converter 1.16.0）。太字系の
+    フォントは下付きの字形箱が**互いに重なる**（`PCLK`のP/Cが幅の22%重なる）。下限-0.2で連なりが
+    `P`・`C`・`L`・`K`に割れ、単字の除去が本文の`SCK`の`C`/`K`を食って**セル全体の復元が失敗**して
+    いた——`CH32L103RM.zh` p239の`000：F /2； 001：F /4；`＋`PCLK PCLK`が4行そのまま（再突合の
+    指摘）。緩めて変わるのは全corpus **9セル**、全文を目視して全部正しい復元（`FPCLK`・`FHCLK`・
+    `VIO18`・`VDDIO`・`VBC_SRC`・`fDFSDMCLK`）。本文の行も擬似セルとして同じ関数に通るので`lines`にも
+    効く（下付き直後の空白が消える。`VDD33 供电时`→`VDD33供电时`。ページ`text`は変わらない）。
+30. **二重取り除去の後にもう一度下付きを戻す**（converter 1.16.0）。復元は「綴りがグリフの読み順と
+    一致すること」を歯止めにするので、境界の余剰グリフが残っていると通らない。converterは除去の
+    **前**にしか掛けておらず（除去後だと逆に通らないセルがあるため）、exporterは除去後に再適用する
+    のでMarkdownでは直っているのに、bundleのセル（CSVの読み手が見る面）には**67セル**が未復元で
+    残っていた（`| V |⏎IO18_x`→`| VIO18_x|`・`t⏎w(NWE)`→`tw(NWE)`）。両方掛ける（冪等の歯止め付き）。
+31. **「英字1文字のセルを空にする」規則を幾何で裏取り**（`strip_boundary_dupes(table, chars)`。
+    converterとexporterの両方）。左隣の4字以上の語がその文字で終われば「はみ出し」と見ていたが、
+    pin表の`HVCP | P`（type列の`P`＝電源）やフレーム図の`DATA | A`（ACK）を消していた——全corpus
+    **94セル**、全件が左の語から8〜31pt離れた**独立の値**（`CH32M030DS2.zh` p3。再突合の指摘）。
+    その文字の字形が自セルに面積の半分以上入っていれば消さない。狙いの`Standard I/O port`→`t`は
+    字形が境界に接して自セルに半分も入らないので、裏取りしても落ちる。
 
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。

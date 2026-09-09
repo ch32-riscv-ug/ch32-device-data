@@ -43,6 +43,13 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            manual/extract_debug_wiring.py (**generator of record for
            debug_wiring.csv** -- the first evidence table this path added to the
            canonical set: the WCH-Link manual's wiring table + dual-support note)
+           rm/extract_dma_requests.py (**generator of record for dma_requests.csv**:
+           the frozen `build_dma_requests` with only its pdfplumber dependency
+           removed. Byte-identical on bundle input (650 rows), switched over and the
+           frozen tool deleted on 2026-09-09 -- the first retirement)
+           datasheet/extract_features.py (**generator of record for features.csv**:
+           the same port of the frozen `build_features`, reading only `text`. The
+           second retirement)
            run_frozen.py (runs frozen tools unmodified on bundle input and
            byte-compares their output against the frozen CSVs -- the old-vs-new
            parity harness; the ledger is in the worklist under D18)
@@ -731,6 +738,88 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     what pdfplumber returns -- that is the frozen tools' premise (the `cells`
     repair stays). Measured right after: of 15 tables, 12 byte-identical,
     `features` improved by one row, and the pin tables back to identical.
+
+26. **Fill the missing outer column of a continuation fragment from the merged
+    table's column edges** (`recover_chain_columns`, exporter side). When only
+    the fragment on the next page lost the rule of its outer column and has one
+    column fewer, that column's values appeared **nowhere in the Markdown**
+    (`CH32xRM.zh` p179-180 `R32_USART3_GPR`: the row was nameless,
+    `| 0x40004818 | ... | | 0x00000000 |`; found by the re-check). The converter's
+    `recover_outer_column` (items 15, 21) looks at **one fragment** and requires a
+    column-wide glyph run in every row band, so a one-row fragment, or one whose
+    outer glyphs have no measurable width, is out of reach. In a merged table the
+    first fragment fixes the column's **x-range** (`src_bbox` of single-column
+    cells), so the destination is unambiguous. Per fragment row band, spell the
+    glyphs in that range (`spell_glyphs`); add only when every band has text and
+    the grid position is empty. Corpus-wide (1.14.0): of 190 candidate fragments,
+    1,225 cells were already filled by the converter with the same text, 88 were
+    partial reads of existing row/column spans (left alone), and **33 cells in 18
+    tables** are added, all inspected: 12 register names, 2 bit ranges, 4 reset
+    values, 4 headers (`Bit` / `Reset value` / `复位值`), 3 descriptor names
+    (`TDes5-7`), and the two header cells that fell outside the page-bottom header
+    row `RB_UEPn` / `Description: The address...` (`CH32M030RM.en` p226).
+    Human-facing only (after `snap_ghost_columns`; exporter and parity call it in
+    the same order). `spell_glyphs` moved to `logical_tables` so both paths share
+    it (identical output).
+27. **Pick up row labels of stacked one-row tables that share column edges**
+    (`recover_sibling_labels`, converter 1.15.0). `PFIC_IPRIORx`'s `IPRIOR63` /
+    `IPRIORx` / `IPRIOR0` (every RM), `IALLOC`, SDIO `DAT3-0`, `D7-0`, `SDI` /
+    `SDO`, `Slot`, the start bit `S` of frame diagrams. One-row tables fail
+    `recover_outer_column`'s "two rows or more", and the label line's centre lies
+    inside the table bbox so it is not body text either: on `CH32FV2x_V3xRM.zh`
+    p107 `IPRIOR63` appeared **nowhere** (re-check finding). Siblings (same page,
+    one row, 3+ columns, same column count, left/right edges within 0.5 pt), two
+    or more, serve as the row bands under the same conditions (glyph run <= 30 %
+    of the width, extent to the edge <= 30 %, gap >= -2 pt, <= 24 chars, **present
+    on every sibling**); each gets one column (`cells` only; `extracted_rows`
+    untouched). Corpus-wide: **54 groups, 173 tables, 22 documents**, all labels.
+28. **Attribute a boundary-straddling glyph by the glyph's position**
+    (`_owned_elsewhere` -> `_glyph_at_text_edge`; both converter 1.15.0's
+    `fix_cell_dupes` and the exporter). `strip_straddling_dupes` dropped a
+    duplicate when "the character sits at an edge of the other cell's text", a
+    text-only test that was fooled whenever **the same character sat at the other
+    cell's opposite edge**: in the bit diagram `IACTS | IACTS` (names wider than
+    the column; 78 % of the left `S` overlaps the right cell) `strip_boundary_dupes`
+    first removed the right cell's leading `S `, then this misattribution removed
+    the left `S` too, leaving `IACT` (`IACT9` in Markdown; `CH32M030RM.en` p46,
+    re-check finding). The only path that removes a glyph from a cell's text is
+    `strip_boundary_dupes`, which strips **line edges**, so the test is the glyph's
+    **position** (`_glyph_still_in_other`): sort the other cell's own glyphs (at least
+    half inside it) on the same visual line; a glyph in the **interior is always the
+    other cell's**, one at the **left edge** needs a text line starting with the
+    character, one at the **right edge** a line ending with it. Written three times:
+    the version that treated the interior as "not owned" kept a stray `)` at the start
+    of `t\nw(NWE)` next to the two-word merged cell `td(ALE-NWE) th(NWE-ALE)`
+    (H417DS0.en p128); a count-based version (glyphs of that character at least half
+    inside <= occurrences in the text) broke when the other cell held a second stray of
+    the same letter and produced `S\nReserved` next to `IACTS` (M030RM.en p46,
+    V205RM.en p81). Both were caught by the **before/after comparison of the
+    re-converted bundles**. `C3NE` -> `CC3NE` on `CH32xRM.zh` p138 was the same root.
+29. **Subscript run gap lower bound -0.35** (`reattach_cell_subscripts`, converter 1.16.0).
+    Bold-ish fonts draw subscript glyph boxes that **overlap each other** (`PCLK`: P and C
+    overlap by 22 % of the width). With -0.2 the run split into `P`, `C`, `L`, `K`, and the
+    single-letter removal ate the `C`/`K` of `SCK` in the prose, so the **whole cell's
+    repair failed** -- `CH32L103RM.zh` p239 kept `000：F /2； 001：F /4；` + `PCLK PCLK` as
+    four lines (re-check finding). Relaxing changes **9 cells** corpus-wide, all inspected in
+    full and all correct (`FPCLK`, `FHCLK`, `VIO18`, `VDDIO`, `VBC_SRC`, `fDFSDMCLK`). Body
+    lines pass through the same function as pseudo-cells, so `lines` change too (the space
+    after a re-attached subscript disappears: `VDD33 供电时` -> `VDD33供电时`; page `text`
+    is unchanged).
+30. **Re-run the subscript repair after the duplicate-glyph removal** (converter 1.16.0).
+    The repair requires the spelling to match the glyphs' reading order, so a leftover
+    boundary glyph blocks it. The converter applied it only **before** the removal (some
+    cells pass only in that order), while the exporter re-applied it after, so the Markdown
+    was right but the bundle cells -- the face the CSV readers see -- kept **67 cells**
+    unrepaired (`| V |⏎IO18_x` -> `| VIO18_x|`, `t⏎w(NWE)` -> `tw(NWE)`). Now both passes run
+    (each idempotent).
+31. **Geometry check for the "single-letter cell" wipe** (`strip_boundary_dupes(table, chars)`,
+    converter and exporter). A one-letter cell whose left neighbour (4+ chars) ends with that
+    letter was taken as an overflow, which wiped the pin table's `HVCP | P` (type column, `P`
+    = power) and the frame diagram's `DATA | A` (ACK): **94 cells** corpus-wide, every one an
+    **independent value** 8-31 pt away from the left word (`CH32M030DS2.zh` p3, re-check
+    finding). The letter is kept when its glyph lies at least half inside its own cell. The
+    intended `Standard I/O port` -> `t` sits on the boundary with less than half inside, so it
+    still drops.
 
 Measured on CH32V003 (zh/en): text, words, tables and characters are
 **identical** to the PoC bundles; only roles and image names change. The

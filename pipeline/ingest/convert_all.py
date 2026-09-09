@@ -93,6 +93,8 @@ def main() -> int:
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--force", action="store_true", help="incremental判定を無視して全部変換")
     ap.add_argument("--only", help="対象を絞る（`CH32V003DS0.en`のようにカンマ区切り）")
+    ap.add_argument("--skip", help="据え置く文書（カンマ区切り）。原本が動いた文書を**前の原本の"
+                                   "bundleのまま**残し、コード変更の検証に資料更新を混ぜない")
     ap.add_argument("--out", type=Path, default=convert.DEFAULT_BUNDLES,
                     help="bundleの出力先の上書き（試験用）")
     ap.add_argument("--structured", type=Path, default=convert.DEFAULT_STRUCTURED,
@@ -106,6 +108,14 @@ def main() -> int:
         missing = wanted - {j["name"] for j in jobs}
         if missing:
             raise SystemExit(f"unknown targets: {sorted(missing)}")
+
+    if args.skip:
+        held = set(args.skip.split(","))
+        unknown = held - {j["name"] for j in targets()}
+        if unknown:
+            raise SystemExit(f"unknown --skip targets: {sorted(unknown)}")
+        jobs = [j for j in jobs if j["name"] not in held]
+        print(f"  据え置き（再変換しない）: {', '.join(sorted(held))}", file=sys.stderr)
 
     skipped = []
     if not args.force:

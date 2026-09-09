@@ -34,6 +34,7 @@ check_images）はここに入れない。
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 import time
@@ -43,6 +44,7 @@ REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "checks"))
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 import check_sources  # noqa: E402  走行の前後で原本を照合する
+import held_sources  # noqa: E402  据え置き文書の名簿（--hold-sources）
 import runlock  # noqa: E402  原本を読む間の鍵（pull側が見て跳ばす。入れ子は通る）
 
 Step = tuple[str, list[str]]  # (label, argv after the interpreter)
@@ -61,10 +63,10 @@ FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
 # 正本を古い読みへ戻す**（2026-09-02の初回--fullで実際に踏んだ: 08-26製のcacheが
 # X315 RM改版前のARGB番地0x40023400を返し、registers 9行が偽conflictになった。
 # check_docsが捕捉→revert）。bundle入力ならcache無しでも数分で済む。
-FULL_PATCHED_3 = ["build_features", "build_timers", "build_flash_geometry",
+FULL_PATCHED_3 = ["build_timers", "build_flash_geometry",
                   "build_opa_cmp_registers", "build_clock_enables",
                   "build_adc_internal", "build_usbpd_plumbing",
-                  "build_registers", "build_dma_requests",
+                  "build_registers",
                   "build_debug_data",
                   # build_registers の後でなければならない——`ctlr_bit_names` は
                   # `register_fields.csv` の綴りをそのまま出す列なので、先に走ると
@@ -87,11 +89,12 @@ def legacy_steps() -> list[Step]:
     return steps
 
 
-def plan(args: argparse.Namespace) -> list[tuple[str, list[Step]]]:
+def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list[Step]]]:
     stages: list[tuple[str, list[Step]]] = [
         ("bundles", [
             ("convert_all (incremental)",
-             ["pipeline/ingest/convert_all.py", "--jobs", str(args.jobs)]),
+             ["pipeline/ingest/convert_all.py", "--jobs", str(args.jobs),
+              *(["--skip", ",".join(held)] if held else [])]),
         ]),
     ]
     if args.full:
@@ -104,6 +107,11 @@ def plan(args: argparse.Namespace) -> list[tuple[str, list[Step]]]:
              ["pipeline/extract/manual/extract_debug_wiring.py"]),
             ("option_bytes + option_byte_fields",
              ["pipeline/extract/rm/extract_option_bytes.py"]),
+            # 凍結tool `build_dma_requests` の退役（2026-09-09）: bundle 入力で byte 一致を確認して
+            # 新経路へ切替。毎回走る（数秒）。
+            ("dma_requests", ["pipeline/extract/rm/extract_dma_requests.py"]),
+            # 凍結tool `build_features` の退役（2026-09-09）: 同じく byte 一致で切替。
+            ("features", ["pipeline/extract/datasheet/extract_features.py"]),
             ("device_id_addresses + device_ids",
              ["tools/build_device_ids.py"]),
         ]),
@@ -155,6 +163,10 @@ def main() -> int:
     ap.add_argument("--accept-sources", action="store_true",
                     help="原本が動いている状態で走る（資料更新の取り込みとして。"
                          "コード変更と混ぜないこと）")
+    ap.add_argument("--hold-sources", action="store_true",
+                    help="動いた原本を**据え置いて**走る——その文書のbundleは前の原本のまま"
+                         "再変換せず、他の文書だけ回す（コード変更の検証を資料更新と混ぜない"
+                         "ため。取り込みは別のcommitで`--accept-sources`）")
     args = ap.parse_args()
 
     stages = plan(args)
@@ -172,7 +184,19 @@ def main() -> int:
     same, moved, missing = before
     print(f"=== 原本の照合: {len(same)}/{len(same) + len(moved) + len(missing)} 一致",
           file=sys.stderr)
-    if (moved or missing) and not args.accept_sources:
+    if moved and not missing and args.hold_sources and not args.accept_sources:
+        # 作業中に原本が動いた（mirrorのpullは数時間おきに走る）。据え置いた文書は
+        # 前の原本のbundleのままなので、この走行の出力は「コード変更＋前の入力状態」に
+        # 対応する。資料更新は次の走行で別のcommitに。
+        held = [name for name, _, _ in moved]
+        for name, recorded, actual in moved:
+            print(f"  ↺ 据え置き {name}: manifest={recorded[:12]} いまの原本={actual[:12]}"
+                  "（再変換しない）", file=sys.stderr)
+        stages = plan(args, held)
+        # 凍結tool（pdfcompat）と図の描画（render_assets）の入口ゲートに、据え置きを伝える。
+        # 伝えないとゲートが拒否して**その文書が落ち、family が目録から消える**（2026-09-09）。
+        os.environ[held_sources.ENV] = ",".join(held)
+    elif (moved or missing) and not args.accept_sources:
         for name, recorded, actual in moved:
             print(f"  ★ {name}: manifest={recorded[:12]} いまの原本={actual[:12]}",
                   file=sys.stderr)

@@ -14,7 +14,7 @@ multiprocessingを使うtool（`build_all`系）と、pixelを読むtool（`extr
 `run_scan_errata.py`が同じ差し替えで走らせる（旧新の出力byte一致を実測済み）。
 
 実行:
-    uv run pipeline/extract/run_frozen.py build_features build_timers ...
+    uv run pipeline/extract/run_frozen.py build_adc_internal build_timers ...
     uv run pipeline/extract/run_frozen.py --batch   # 単一プロセスの定番一式
 """
 
@@ -35,7 +35,7 @@ import pdfcompat  # noqa: E402
 CANDIDATES = REPO / ".cache" / "pipeline-candidates" / "frozen"
 
 # 単一プロセスでPDFを読む凍結tool。--out（D15）を持つものだけ。
-BATCH = ("build_features", "build_adc_internal", "build_memory", "build_timers",
+BATCH = ("build_adc_internal", "build_memory", "build_timers",
          "build_flash_geometry", "build_debug_data")
 
 

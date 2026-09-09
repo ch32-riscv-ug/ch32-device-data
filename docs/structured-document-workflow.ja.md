@@ -328,10 +328,10 @@ performance/storage見積り、移行計画とする。これらをreviewして�
 
 | 群 | 主な既存tool | 必要な構造 |
 |---|---|---|
-| datasheet本文 | `build_features`, `scan_errata`, `build_adc_internal` | page text、heading、原文ID |
+| datasheet本文 | ~~`build_features`~~（新経路 `extract_features` へ退役済み）, `scan_errata`, `build_adc_internal` | page text、heading、原文ID |
 | datasheet表 | `extract_products`, `extract_ordering`, `extract_pins`, `build_pins`, `build_operating`, `build_all` | 物理cell、span、平坦化row、改ページ継続 |
 | RM本文 | `build_memory`, `build_timers`, `build_flash_geometry` | heading、paragraph、章境界 |
-| RM表 | `extract_registers`, `build_registers`, `extract_remap`, `build_dma_requests` | headingとtableの読み順、row geometry |
+| RM表 | `extract_registers`, `build_registers`, `extract_remap`, ~~`build_dma_requests`~~（新経路 `extract_dma_requests` へ退役済み） | headingとtableの読み順、row geometry |
 | core/package | `build_debug_data`, `extract_package_dims` | text、文書種別 |
 | 画像 | `extract_images` | word/char/drawing geometry＋別asset renderer |
 

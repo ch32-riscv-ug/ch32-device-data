@@ -54,7 +54,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `tools/build_memory_map.py`: アドレス空間の地図を`evidence/memory_map.csv`にする。
   EVTの`*_BASE`定数から。**FLASHの番地は2つある**——ヘッダーの`FLASH_BASE`と
   linker scriptの`ORIGIN`は別の窓口を指すので両方持つ
-- `tools/build_features.py`: familyが持つ周辺の一覧を`evidence/features.csv`にする。
+- `pipeline/extract/datasheet/extract_features.py`: familyが持つ周辺の一覧を`evidence/features.csv`にする。
   比較表は「シリーズ内で差がある列」しか持たないので機能フラグを作れない。
   **機能説明章の節見出し**を採る。節番号は言語に依らないので中英が厳密に対応する
 - `tools/build_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを

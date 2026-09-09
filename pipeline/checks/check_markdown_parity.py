@@ -127,10 +127,13 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # `平FT`という値になっていた（V203DS0.zh p27。全面見直しの検証で発見）。
                 # 幽霊列（断片の境界の和集合が生む余分な1列）を先に消す。
                 logical_tables.snap_ghost_columns(record)
+                # 続きの断片に欠けた最外列（レジスタ名・`Bit`・`Reset value`）を、先頭断片の
+                # 列境界とそのページのgeometryで埋める（`R32_USART3_GPR`が名無しだった）。
+                logical_tables.recover_chain_columns(record, chars_for)
                 # 斜めに割れた角セル/折り返し見出しの二重出力を先に落とす——行の列数が
                 # 揃わないと以降の畳み込みも列を数え違える。
                 logical_tables.strip_duplicated_span_lines(record)
-                logical_tables.strip_boundary_dupes(record)
+                logical_tables.strip_boundary_dupes(record, chars_for)
                 if (logical_tables.has_edge_newline(record)
                         or logical_tables.has_short_edge(record)):
                     logical_tables.strip_straddling_dupes(record, chars_for)
@@ -155,7 +158,7 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 # 通常表: exporterと同じ変換（ヘッダ折り返しの畳み込み・境界二重取り除去）を見る。
                 logical_tables.strip_duplicated_span_lines(record)
                 logical_tables.fold_header_wrap(record)
-                logical_tables.strip_boundary_dupes(record)
+                logical_tables.strip_boundary_dupes(record, chars_for)
                 if logical_tables.has_edge_newline(record) or logical_tables.has_short_edge(record):
                     logical_tables.strip_straddling_dupes(record, chars_for)
                 logical_tables.clean_reset_column(record)

@@ -209,7 +209,7 @@ consumer は commit を固定しているので、途中の状態で壊れるこ
 - consumer 側（ArduinoCore-CH32 の lock）は別 repository の作業でまだ
 - `dma_requests` の再生成で、en 版が `TIM1_CH4` / `TIM1_TRI` / `G` と折り返すセルを
   `TIM1_CH4TIM1_TRIG` に繋いでいた（L103/V205/X035 の4セル）。完結していない行でも
-  周辺名で始まれば新しい要求の先頭と読むように直した（`tools/build_dma_requests.py`
+  周辺名で始まれば新しい要求の先頭と読むように直した（`pipeline/extract/rm/extract_dma_requests.py`。旧 `tools/build_dma_requests.py`
   の `STARTS_REQUEST`・`GLUED`）
 - `dma_requests.request_en`（en 版の綴りが zh 版と違うときだけ入る列）は、再生成の結果**全行空**
   だった——`*` 印も `_0`/`_1` も両版が同じ綴りで書いている。列は規則どおり残す（違いが出たら入る）

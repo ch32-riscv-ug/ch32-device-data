@@ -326,7 +326,8 @@ reference manualのDMA章の「DMAx各通道外设映射表」だけが持つ情
 
 表の形が5通りある（1ページ格子／次ページに見出し無しで続く／channel 8以降が別の表／2 DMA＋`*`印＋セルの
 ページ跨ぎ／DMAMUX番号表）のを1つの読み方で読んでいます。セル内の折り返し（`USART2_T`⏎`X_1`）は1語に繋ぎ、その折り返しの**間にページ境界が来た**もの（前ページ最終行の`USART1_T`＋続き表先頭行の`X_0`）も、続き側の断片から前の行へ書き戻して繋ぎます。読み方の規則と資料側の癖は
-`tools/build_dma_requests.py`の冒頭に書きました。
+`pipeline/extract/rm/extract_dma_requests.py`の冒頭に書きました（凍結tool `tools/build_dma_requests.py` を
+bundle入力でbyte一致を確認して置き換えた新経路の生成器。2026-09-09）。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
@@ -894,7 +895,7 @@ uv run tools/build_pin_alternate.py             # pin_alternate（EVTのAFIO構�
 uv run pipeline/extract/run_patched.py build_memory                    # memory_configs（RMとEVTのLink.ldから・数分かかる）
 uv run tools/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
-uv run pipeline/extract/run_patched.py build_features                  # features（datasheetの機能説明章から・数分かかる）
+uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
 uv run pipeline/extract/run_patched.py build_timers                    # timers（RMのTIMx_CNT見出しから・数分かかる）
 uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry（EVTのflash driver＋RMの闪存章）
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
@@ -902,7 +903,7 @@ uv run pipeline/extract/run_patched.py build_clock_enables             # clock_e
 uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal（datasheet両言語の散文と電気的特性表）
 uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
 uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読み。bundleで約19分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
-uv run pipeline/extract/run_patched.py build_dma_requests              # dma_requests（RM zh/en のDMA章の格子。全ページ走査で15分前後）
+uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests（RM zh/en のDMA章の格子をbundleから。数秒）
 uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
 uv run tools/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""DMA の要求→channel の対応（R-20 の D-7）→ tables/dma_requests.csv
+"""RM の DMA 要求→channel の対応（R-20 の D-7）→ evidence/dma_requests.csv。**bundle を直接読む**。
+
+`tools/build_dma_requests.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09）。読む欄は bundle の `text`（ページ本文）と
+`tables[].extracted_rows`（pdfplumber の `Table.extract()` の生の行列）——`pdfcompat` が凍結tool に
+見せていたものと同じなので、読みの規則は変えていない。`extracted_rows` は pdfplumber の生のまま
+＝この抽出器の前提（converter 1.14.0 で確定）。
 
 **EVT header には無く、reference manual の表にしかない**もの。RM の DMA 章にある
 「DMAx 各通道外设映射表」（peripheral × channel の格子）を zh/en 両版から読み、
@@ -24,11 +31,21 @@
 - 先頭セルが空の行は、前の行のセルがページ境界で折り返したもの（V205 の `TIM1_COM`）
 - セル内の改行は複数の要求（`TIM1_CH4\\nTIM1_TRIG`）。ただし `_` で終わる行は
   次の行と1語（V407 の `SPI_I2S2_\\nRX`）
+- 折り返しの**間にページ境界が来た**要求（`USART1_T`⏎`X_0`。X315.en v1.2）は、見出し無し続き表の
+  先頭行の断片を前表の最終行の同じ列の要求と繋いで書き戻す
 - 印: `*`（EXTEN で経路選択）→ `remap=selectable`、X315 の `_0`/`_1` → `default`/`remap`、
   `（1）` 等の脚注 → `note`。**綴りは資料のまま**（V407 の `13C`、H417 の `I3X_RX` も）
 
+family と RM の対応は目録（`catalog/documents.csv` の `repositories`）から決める——凍結tool は
+mirror の `datasheet_{lang}/*RM.PDF` の先頭を採っていたが、mirror は目録を読んで原本を落とすので
+同じ文書になる（切替時に全 family で一致を確認）。原本と bundle の一致は `regenerate.py` の
+前後照合（`check_sources`）が保証する——ここでは PDF を開かない。
+
+`tools/build_index.py` と `tools/check_tables.py` はこのモジュールの正規化規則
+（`REMAPPED`・`TYPO`・`peripheral_of`・`COLUMNS`）だけを使う。標準ライブラリだけで import できる。
+
 実行:
-    uv run tools/build_dma_requests.py [--mirrors <dir>] [--out tables] [--family F]
+    uv run pipeline/extract/rm/extract_dma_requests.py [--out <dir>] [--family F]
 """
 
 from __future__ import annotations
@@ -36,19 +53,19 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import hashlib
+import json
 import re
 import sys
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
+import paths  # noqa: E402
 import signal_vocabulary  # noqa: E402
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
+BUNDLES = REPO / ".cache" / "structured-bundles"
 
 # `request` は RM の綴りそのまま（zh 版。`TIM1_UP*` の `*`、X315 の `_0`/`_1` も
 # 残す）。en 版の綴りが違えば `request_en`。印の読み（selectable / default / remap）
@@ -175,156 +192,180 @@ def peripheral_of(request: str) -> str:
     return signal_vocabulary.canonical_peripheral(head) if head else request
 
 
-def read_manual(pdf_path: Path, family: str) -> tuple[list[dict], list[str]]:
-    """1冊の RM から [{variant, dma, channel, request_id, request, remap, note, page}]。"""
-    rows: list[dict] = []
-    notes: list[str] = []
-    grid: dict | None = None      # 読みかけの格子 {dma, variant, channels:[...], last_row}
-    # 遅延 import: tools/build_index.py と check_tables.py がこのモジュールの
-    # 正規化規則（REMAPPED・TYPO・peripheral_of）だけを使う。CI は標準ライブラリ
-    # だけの python で検査を回すので、PDF を読むときにだけ pdfplumber を要る。
-    import pdfplumber  # noqa: PLC0415
+def _load_page(bundle: Path, entry: dict) -> dict:
+    """manifest の項目からページ record を読む。**sha256 を照合する**（`pdfcompat.Page._load` と同じ
+    入口ゲート——bundle の一部だけが書き換わった状態を読まない）。"""
+    payload = (bundle / entry["file"]).read_bytes()
+    actual = hashlib.sha256(payload).hexdigest()
+    if actual != entry["sha256"]:
+        raise SystemExit(f"{bundle.name}/{entry['file']}: sha256 {actual[:12]} != manifest "
+                         f"{entry['sha256'][:12]} -- reconvert the bundle")
+    return json.loads(payload)
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for pno, page in enumerate(pdf.pages, start=1):
-            text = page.extract_text() or ""
-            if not re.search(r"DMA", text):
-                page.close()
-                grid = None
+
+def rm_bundles(family: str) -> dict[str, tuple[Path, str]]:
+    """family → {lang: (bundle dir, 原本の PDF 名)}。目録の reference-manual で `repositories` に
+    family を含む行（複数なら文書名順の先頭＝凍結tool の `sorted(glob)[0]` と同じ）。"""
+    with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:
+        docs = sorted((row for row in csv.DictReader(f)
+                       if row["kind"] == "reference-manual" and row["status"] == "assigned"
+                       and family in row["repositories"].split(";")),
+                      key=lambda row: row["document"])
+    out: dict[str, tuple[Path, str]] = {}
+    for lang in ("zh", "en"):
+        for row in docs:
+            if row[f"version_{lang}"]:
+                out[lang] = (BUNDLES / f"{Path(row['document']).stem}.{lang}", row["document"])
+                break
+    return out
+
+
+def read_bundle(bundle: Path, family: str) -> list[dict]:
+    """1冊の RM の bundle から [{variant, dma, channel, request_id, request, remap, note, page}]。"""
+    manifest_path = bundle / "manifest.json"
+    if not manifest_path.exists():
+        raise SystemExit(f"{bundle}: bundle is missing -- run pipeline/ingest/convert_all.py "
+                         "(extraction never falls back to reading the PDF)")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    rows: list[dict] = []
+    grid: dict | None = None      # 読みかけの格子 {dma, variant, channels:[...], last_row}
+    for entry in manifest["pages"]:
+        pno = entry["number"]
+        page = _load_page(bundle, entry)
+        text = page.get("text") or ""
+        if not re.search(r"DMA", text):
+            grid = None
+            continue
+        captions = [(m.start(), m.group("number"), m.group("dma").upper())
+                    for m in CAPTION.finditer(text)
+                    if CAPTION_TABLE.search(text[m.start():m.start() + 80])]
+        mux_captions = [(m.start(), m.group("number")) for m in CAPTION_MUX.finditer(text)]
+        used_captions = 0
+        page_has_grid = False
+        for table in page.get("tables", []):
+            cells = [[(c or "").strip() for c in row] for row in table["extracted_rows"]]
+            if not cells:
                 continue
-            captions = [(m.start(), m.group("number"), m.group("dma").upper())
-                        for m in CAPTION.finditer(text)
-                        if CAPTION_TABLE.search(text[m.start():m.start() + 80])]
-            mux_captions = [(m.start(), m.group("number")) for m in CAPTION_MUX.finditer(text)]
-            tables = page.find_tables()
-            used_captions = 0
-            page_has_grid = False
-            for table in tables:
-                cells = [[(c or "").strip() for c in row] for row in table.extract()]
-                if not cells:
+            head = cells[0]
+            # DMAMUX の番号表（H417）。見出しの無い続き（英語版は次ページへ割れる）は
+            # 「数字・名前」が交互に並ぶ行の表として認める。
+            mux_head = sum(1 for c in head if HEAD_MUX.search(c)) >= 2
+            mux_body = (grid is not None and grid.get("mux")
+                        and len(head) % 2 == 0
+                        and all(r[i].replace("\n", "").isdigit() or not r[i]
+                                for r in cells for i in range(0, len(r) - 1, 2))
+                        and any(r[0].replace("\n", "").isdigit() for r in cells))
+            if mux_head or mux_body:
+                number = mux_captions[0][1] if mux_captions else (grid or {}).get("table", "")
+                for row in (cells[1:] if mux_head else cells):
+                    row = [c.replace("\n", "") for c in row]
+                    for i in range(0, len(row) - 1, 2):
+                        if row[i].isdigit():
+                            for req, verbatim, remap, note in cell_tokens(row[i + 1]):
+                                rows.append({"variant": "", "dma": "", "channel": "",
+                                             "request_id": int(row[i]), "request": req,
+                                             "verbatim": verbatim, "remap": remap, "note": note,
+                                             "page": pno, "table": number})
+                grid = {"mux": True, "table": number, "skip": True, "width": -1}
+                page_has_grid = True
+                continue
+            channels = [HEAD_CHANNEL.match(c.replace("\n", "")) for c in head[1:]]
+            is_header = bool(head and HEAD_FIRST.match(head[0].replace("\n", ""))
+                             and any(channels))
+            continuation = False
+            if is_header:
+                # 結合セルの None 列（V30x の DMA2 表）は直前の channel に畳む
+                col_channel: list[int | None] = []
+                current = None
+                for m in channels:
+                    current = int(m.group(1)) if m else current
+                    col_channel.append(current)
+                number, dma = "", "DMA1"
+                if used_captions < len(captions):
+                    _, number, dma = captions[used_captions]
+                    used_captions += 1
+                elif grid:
+                    number, dma = grid["table"], grid["dma"]   # ch8〜 の続きの表
+                if number in SKIP.get(family, set()):
+                    grid = {"skip": True}
                     continue
-                head = cells[0]
-                # DMAMUX の番号表（H417）。見出しの無い続き（英語版は次ページへ割れる）は
-                # 「数字・名前」が交互に並ぶ行の表として認める。
-                mux_head = sum(1 for c in head if HEAD_MUX.search(c)) >= 2
-                mux_body = (grid is not None and grid.get("mux")
-                            and len(head) % 2 == 0
-                            and all(r[i].replace("\n", "").isdigit() or not r[i]
-                                    for r in cells for i in range(0, len(r) - 1, 2))
-                            and any(r[0].replace("\n", "").isdigit() for r in cells))
-                if mux_head or mux_body:
-                    number = mux_captions[0][1] if mux_captions else (grid or {}).get("table", "")
-                    for row in (cells[1:] if mux_head else cells):
-                        row = [c.replace("\n", "") for c in row]
-                        for i in range(0, len(row) - 1, 2):
-                            if row[i].isdigit():
-                                for req, verbatim, remap, note in cell_tokens(row[i + 1]):
-                                    rows.append({"variant": "", "dma": "", "channel": "",
-                                                 "request_id": int(row[i]), "request": req,
-                                                 "verbatim": verbatim, "remap": remap, "note": note,
-                                                 "page": pno, "table": number})
-                    grid = {"mux": True, "table": number, "skip": True, "width": -1}
-                    page_has_grid = True
+                grid = {"dma": dma if dma != "DMA" else "DMA1", "table": number,
+                        "variant": VARIANT_OF.get((family, number), ""),
+                        "cols": col_channel, "width": len(head), "last": None,
+                        "skip": False}
+                body = cells[1:]
+                page_has_grid = True
+            elif grid and not grid.get("skip") and len(head) == grid["width"]:
+                body = cells          # 見出しの無い続き
+                page_has_grid = True
+                continuation = True
+            elif grid and grid.get("skip") and len(head) == grid.get("width", -1):
+                continue
+            else:
+                continue
+            tail = grid.pop("tail", {}) if continuation else {}
+            grid.pop("tail", None)
+            for index, row in enumerate(body):
+                if not row or all(not c for c in row):
                     continue
-                channels = [HEAD_CHANNEL.match(c.replace("\n", "")) for c in head[1:]]
-                is_header = bool(head and HEAD_FIRST.match(head[0].replace("\n", ""))
-                                 and any(channels))
-                continuation = False
-                if is_header:
-                    # 結合セルの None 列（V30x の DMA2 表）は直前の channel に畳む
-                    col_channel: list[int | None] = []
-                    current = None
-                    for m in channels:
-                        current = int(m.group(1)) if m else current
-                        col_channel.append(current)
-                    number, dma = "", "DMA1"
-                    if used_captions < len(captions):
-                        _, number, dma = captions[used_captions]
-                        used_captions += 1
-                    elif grid:
-                        number, dma = grid["table"], grid["dma"]   # ch8〜 の続きの表
-                    if number in SKIP.get(family, set()):
-                        grid = {"skip": True}
+                label = row[0].replace("\n", "")
+                if label and not TOKEN.match(label.replace("（", "(").replace("）", ")").replace("(", "").replace(")", "")):
+                    # 脚注の文が表に入ったもの
+                    if len(label) > 24 or re.search(r"[一-鿿]{3,}", label):
                         continue
-                    grid = {"dma": dma if dma != "DMA" else "DMA1", "table": number,
-                            "variant": VARIANT_OF.get((family, number), ""),
-                            "cols": col_channel, "width": len(head), "last": None,
-                            "skip": False}
-                    body = cells[1:]
-                    page_has_grid = True
-                elif grid and not grid.get("skip") and len(head) == grid["width"]:
-                    body = cells          # 見出しの無い続き
-                    page_has_grid = True
-                    continuation = True
-                elif grid and grid.get("skip") and len(head) == grid.get("width", -1):
+                if not label and grid["last"] is None:
                     continue
-                else:
-                    continue
-                tail = grid.pop("tail", {}) if continuation else {}
-                grid.pop("tail", None)
-                for index, row in enumerate(body):
-                    if not row or all(not c for c in row):
-                        continue
-                    label = row[0].replace("\n", "")
-                    if label and not TOKEN.match(label.replace("（", "(").replace("）", ")").replace("(", "").replace(")", "")):
-                        # 脚注の文が表に入ったもの
-                        if len(label) > 24 or re.search(r"[一-鿿]{3,}", label):
+                # **ページ境界で割れた要求名**を繋ぐ。セル内の折り返し（`USART2_T`⏎`X_1`）は
+                # `cell_tokens` が繋ぐが、折り返しの**間にページ境界が来る**と、前のページの
+                # 最終行に `USART1_T`、見出しの無い続き表の先頭行に `X_0` が別々に出て、
+                # `USART1_T`・`USART1_TX_0`・`X_0` の3行に割れた（CH32X315RM.en v1.2
+                # p119→p120。2026-09-08）。判定は**続き側**で行う——`X_0` は要求の頭
+                # （`STARTS_REQUEST`）でも周辺名（`BARE`）でもない断片。前表の最終行で
+                # 同じ列に出した要求と繋いで完結するなら、その行を書き戻して断片は出さない。
+                # `complete()` を発火点にはできない——`USART1_T` を「完結」と判定するため。
+                if index == 0 and not label and tail:
+                    row = list(row)
+                    for ci in list(tail):
+                        if ci >= len(row) or not row[ci]:
                             continue
-                    if not label and grid["last"] is None:
-                        continue
-                    # **ページ境界で割れた要求名**を繋ぐ。セル内の折り返し（`USART2_T`⏎`X_1`）は
-                    # `cell_tokens` が繋ぐが、折り返しの**間にページ境界が来る**と、前のページの
-                    # 最終行に `USART1_T`、見出しの無い続き表の先頭行に `X_0` が別々に出て、
-                    # `USART1_T`・`USART1_TX_0`・`X_0` の3行に割れた（CH32X315RM.en v1.2
-                    # p119→p120。2026-09-08）。判定は**続き側**で行う——`X_0` は要求の頭
-                    # （`STARTS_REQUEST`）でも周辺名（`BARE`）でもない断片。前表の最終行で
-                    # 同じ列に出した要求と繋いで完結するなら、その行を書き戻して断片は出さない。
-                    # `complete()` を発火点にはできない——`USART1_T` を「完結」と判定するため。
-                    if index == 0 and not label and tail:
-                        row = list(row)
-                        for ci in list(tail):
-                            if ci >= len(row) or not row[ci]:
-                                continue
-                            first, *rest = [ln.strip() for ln in row[ci].split("\n") if ln.strip()] or [""]
-                            if not first or STARTS_REQUEST.match(first) or BARE.match(first) or not TOKEN.match(first):
-                                continue
-                            at, previous = tail[ci]
-                            joined = cell_tokens(previous + first)
-                            if len(joined) == 1 and complete(joined[0][0]) and at < len(rows):
-                                req, verbatim, remap, note = joined[0]
-                                rows[at].update({"request": req, "verbatim": verbatim,
-                                                 "remap": remap or rows[at]["remap"],
-                                                 "note": note or rows[at]["note"]})
-                                row[ci] = "\n".join(rest)
-                    tail = {}
-                    last_row = index == len(body) - 1
-                    for ci, cell in enumerate(row[1:]):
-                        channel = grid["cols"][ci] if ci < len(grid["cols"]) else None
-                        if channel is None or not cell:
+                        first, *rest = [ln.strip() for ln in row[ci].split("\n") if ln.strip()] or [""]
+                        if not first or STARTS_REQUEST.match(first) or BARE.match(first) or not TOKEN.match(first):
                             continue
-                        before = len(rows)
-                        for req, verbatim, remap, note in cell_tokens(cell):
-                            rows.append({"variant": grid["variant"], "dma": grid["dma"],
-                                         "channel": channel, "request_id": "",
-                                         "request": req, "verbatim": verbatim,
-                                         "remap": remap, "note": note,
-                                         "page": pno, "table": grid["table"]})
-                        if last_row and len(rows) > before:
-                            last_line = [ln.strip() for ln in cell.split("\n") if ln.strip()][-1]
-                            if FOOTNOTE.sub("", last_line).replace(" ", "") == rows[-1]["verbatim"]:
-                                grid.setdefault("tail", {})[ci + 1] = (len(rows) - 1, last_line)
-                    if label:
-                        grid["last"] = label
-            if not page_has_grid and grid and not grid.get("skip"):
-                # 格子の無いページが挟まったら読みかけは終わり
-                grid = None
-            page.close()
-    return rows, notes
+                        at, previous = tail[ci]
+                        joined = cell_tokens(previous + first)
+                        if len(joined) == 1 and complete(joined[0][0]) and at < len(rows):
+                            req, verbatim, remap, note = joined[0]
+                            rows[at].update({"request": req, "verbatim": verbatim,
+                                             "remap": remap or rows[at]["remap"],
+                                             "note": note or rows[at]["note"]})
+                            row[ci] = "\n".join(rest)
+                tail = {}
+                last_row = index == len(body) - 1
+                for ci, cell in enumerate(row[1:]):
+                    channel = grid["cols"][ci] if ci < len(grid["cols"]) else None
+                    if channel is None or not cell:
+                        continue
+                    before = len(rows)
+                    for req, verbatim, remap, note in cell_tokens(cell):
+                        rows.append({"variant": grid["variant"], "dma": grid["dma"],
+                                     "channel": channel, "request_id": "",
+                                     "request": req, "verbatim": verbatim,
+                                     "remap": remap, "note": note,
+                                     "page": pno, "table": grid["table"]})
+                    if last_row and len(rows) > before:
+                        last_line = [ln.strip() for ln in cell.split("\n") if ln.strip()][-1]
+                        if FOOTNOTE.sub("", last_line).replace(" ", "") == rows[-1]["verbatim"]:
+                            grid.setdefault("tail", {})[ci + 1] = (len(rows) - 1, last_line)
+                if label:
+                    grid["last"] = label
+        if not page_has_grid and grid and not grid.get("skip"):
+            # 格子の無いページが挟まったら読みかけは終わり
+            grid = None
+    return rows
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     ap.add_argument("--family", action="append", default=None)
     args = ap.parse_args()
@@ -336,14 +377,9 @@ def main() -> int:
 
     out_rows: list[dict] = []
     for family in families:
-        family_dir = args.mirrors / family
-        editions: dict[str, tuple[Path, list[dict]]] = {}
-        for lang in ("zh", "en"):
-            manuals = sorted((family_dir / f"datasheet_{lang}").glob("*RM.PDF"))
-            if not manuals:
-                continue
-            rows, _ = read_manual(manuals[0], family)
-            editions[lang] = (manuals[0], rows)
+        editions: dict[str, tuple[str, list[dict]]] = {}
+        for lang, (bundle, document) in rm_bundles(family).items():
+            editions[lang] = (document, read_bundle(bundle, family))
         if not editions:
             print(f"  - {family}: RM が無い", file=sys.stderr)
             continue
@@ -354,11 +390,11 @@ def main() -> int:
             return (r["variant"], r["dma"], r["channel"], r["request_id"], r["request"])
 
         seen: dict[tuple, dict] = {}
-        for lang, (path, rows) in editions.items():
+        for lang, (document, rows) in editions.items():
             for r in rows:
                 k = key(r)
                 entry = seen.setdefault(k, {**r, "langs": {}, "spelled": {}})
-                entry["langs"][lang] = f"rm:{lang}({path.name} p.{r['page']})"
+                entry["langs"][lang] = f"rm:{lang}({document} p.{r['page']})"
                 entry["spelled"][lang] = r["verbatim"]
                 if r["note"] and not entry["note"]:
                     entry["note"] = r["note"]
@@ -383,8 +419,11 @@ def main() -> int:
         only = {lang: sum(1 for e in seen.values() if list(e["langs"]) == [lang]) for lang in editions}
         print(f"  {family}: {sum(tally.values())} 行 {dict(tally)} 片翼 {only}", file=sys.stderr)
 
-    out_rows.sort(key=lambda r: (r["family"], r["variant"], r["dma"],
-                                 int(r["channel"] or 0), int(r["request_id"] or 0), r["request"]))
+    def order(r: dict) -> tuple:
+        return (r["family"], r["variant"], r["dma"], int(r["channel"] or 0),
+                int(r["request_id"] or 0), r["request"])
+
+    out_rows.sort(key=order)
     dest = paths.table("dma_requests", args.out)
     if args.family:
         try:
@@ -392,8 +431,7 @@ def main() -> int:
                 keep = [r for r in csv.DictReader(f) if r["family"] not in set(args.family)]
         except FileNotFoundError:
             keep = []
-        out_rows = sorted(keep + out_rows, key=lambda r: (r["family"], r["variant"], r["dma"],
-                                                          int(r["channel"] or 0), int(r["request_id"] or 0), r["request"]))
+        out_rows = sorted(keep + out_rows, key=order)
     with dest.open("w", encoding="utf-8", newline="") as out:
         w = csv.DictWriter(out, fieldnames=COLUMNS)
         w.writeheader()

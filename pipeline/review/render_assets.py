@@ -52,6 +52,7 @@ from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
+import held_sources  # noqa: E402
 import figure_captions  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
@@ -427,6 +428,11 @@ def main() -> int:
     jobs = {job["name"]: job for job in convert_all.targets()}
     if args.all:
         for name, job in jobs.items():
+            if held_sources.is_held(name):
+                # 据え置き（`regenerate.py --hold-sources`）: 原本 PDF は新しいものしか無く bundle と
+                # 合わないので描画を跳ばす。既存の assets（前の原本で描いたもの）をそのまま使う。
+                print(f"[render_assets] {name}: 据え置き——描画を跳ばす（assets は前のまま）", file=sys.stderr)
+                continue
             render_document(BUNDLES / name, job["pdf"], args.out / name)
         return 0
     if not args.bundle:

@@ -23,9 +23,13 @@ import gzip
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
+import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
+
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
 _LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
@@ -193,4 +197,11 @@ def open(path) -> Document:
     if not lang_dir:
         raise ValueError(f"{path}: cannot infer language -- expected .../datasheet_<lang>/<doc>")
     bundle = BUNDLES / f"{path.stem}.{lang_dir.group(1)}"
+    if held_sources.is_held(bundle.name):
+        # 据え置き（`regenerate.py --hold-sources`）: 原本が動いたが、前の原本の bundle を承知で読む。
+        # 照合すると必ず食い違い、凍結tool がその文書を落として目録から family が消える
+        # （2026-09-09 に X035 で起きた）。
+        print(f"[pdfcompat] {bundle.name}: 据え置き——前の原本の bundle を読む（sha 照合を省く）",
+              file=sys.stderr)
+        return Document(bundle)
     return Document(bundle, hashlib.sha256(path.read_bytes()).hexdigest())

@@ -477,6 +477,158 @@ def snap_ghost_columns(merged: dict) -> int:
     return before - merged["width"]
 
 
+def spell_glyphs(glyphs: list[dict]) -> str:
+    """グリフ列を読み順（行→x）で綴る。**語の間の空白を隙間から復元する**。
+
+    表の外から取り込む列（converterの`recover_outer_column`・`fill_grid_holes`、人向け
+    経路の`recover_chain_columns`）は、pdfplumberのセル抽出を通らないので区切りが入らず
+    `Resetvalue`・`Filterregister0`になっていた。converter 1.10.0で`convert.py`に書き、
+    人向け経路も同じ綴りを使うためここへ移した（converterは名前を残して委譲。出力は同一）。
+
+    - **視覚行の切れ目は`\\n`**にする。狭い列では見出しも値も折り返され、`Reset`/`value`
+      は空白で繋ぐべきで`0xFFF`/`F`は繋いではいけない——この判定は既に
+      `cell_html`（行末・行頭の文字種で折り返しか意図的な改行かを分ける）が持っている
+      ので、そちらへ渡す。改行を入れずに繋いでいたので`Resetvalue`になっていた。
+    - **同じ視覚行の語間の空白**は隙間から復元する。隙間が**グリフ幅の中央値の0.35倍**を
+      超え、かつ両側がASCIIなら空白（CJKは字間が広く、識別子`R32_ESIG_FLACAP`のような
+      連続は隙間が空かない）。全corpus実測: 空白が入るのは35セルで全部`Reset value`型の
+      見出し。閾値0.25〜0.50で結果が同じ＝隙間が明確に分かれているので真ん中を採る。
+      値のセル（`0xFFFF`・`[31:0]`）は1つも変わらない。
+
+    >>> spell_glyphs([{"text": "R", "bbox": [0, 0, 5, 10]}, {"text": "e", "bbox": [5, 0, 10, 10]},
+    ...               {"text": "v", "bbox": [14, 0, 19, 10]}, {"text": "0", "bbox": [0, 12, 5, 22]}])
+    'Re v\\n0'
+    """
+    ordered = sorted(glyphs, key=lambda g: (round(g["bbox"][1], 1), g["bbox"][0]))
+    if not ordered:
+        return ""
+    widths = sorted(g["bbox"][2] - g["bbox"][0] for g in ordered)
+    median = widths[len(widths) // 2]
+    out: list[str] = []
+    for index, glyph in enumerate(ordered):
+        if index:
+            previous = ordered[index - 1]
+            both_ascii = previous["text"].isascii() and glyph["text"].isascii()
+            if abs(glyph["bbox"][1] - previous["bbox"][1]) >= 1.0:
+                out.append("\n")
+            elif (both_ascii
+                    and glyph["bbox"][0] - previous["bbox"][2] > median * 0.35):
+                out.append(" ")
+        out.append(glyph["text"])
+    return "".join(out)
+
+
+def recover_chain_columns(merged: dict, chars_for) -> int:
+    """**継続断片に欠けた最外列**を、結合表の列境界とページのgeometryから埋める。
+    足したセル数を返す。
+
+    ページ跨ぎの結合表で、続きのページの断片だけ最外列（レジスタ名・`Bit`・`Reset value`）
+    の罫線が拾われず列数が1つ少ないと、その列の値が**Markdownのどこにも出ない**——
+    `CH32xRM.zh` p179-180の`R32_USART3_GPR`（再突合の指摘。行が`| 0x40004818 | UASRT3保护
+    时间和预分频 | | 0x00000000 |`と名無しになっていた）。converterの`recover_outer_column`
+    は**その断片1つだけ**を見て「1列ぶんの幅・全行帯に中身」を要求するので、断片が1行の
+    ときや外側グリフの幅が判断できないときは触れない。結合表なら先頭断片が持つ列の
+    **x範囲**が分かるので、入れ先が一意に決まる。
+
+    手順（断片ごと）: 単独列セルの`src_bbox`から列0と列(width-1)のx範囲を取り、断片の
+    行帯（自セルの`src_bbox`のy境界）ごとにその範囲の中心を持つグリフを`spell_glyphs`で
+    綴る。次を全部満たすときだけ足す:
+
+    - 結合表が3列以上で、断片の列数が結合表より少ない
+    - **すべての行帯に中身がある**（1つでも空なら列ではない）
+    - 既にセルがある座標には足さない（rowspanの続き・converterが埋めた列はそのまま）
+
+    全corpus実測（converter 1.14.0）: 候補190断片のうち、1,225セルはconverterが既に同じ
+    文字で埋めていて、88セルは行/列をまたぐ既存セルの部分読み（触らない）。足すのは
+    **18表33セル**で、全件目視: レジスタ名12（`R32_CRC_CTLR`・`R32_GPIOC_SPEED`・
+    `R32_FLASH_BOOT_MODEKEYR`…）、bit範囲2、reset値4、見出し4（`Bit`・`Reset value`・
+    `复位值`）、記述子名3（`TDes5-7`）、ページ末で見出し行の外2列が落ちた`RB_UEPn`/
+    `Description: The address…`（`CH32M030RM.en` p226）。
+
+    **人向け出力専用**（exporterとparity検査が同じ順で呼ぶ）。canonicalの列番号や
+    `extracted_rows`は動かさない。`snap_ghost_columns`の**後**に呼ぶ（列番号が確定して
+    から穴を見る）。冪等（`_chain_recovered`）。
+
+    >>> merged = {"width": 3, "row_pages": [1, 2], "parts": [(1, "a"), (2, "b")], "cells": [
+    ...     {"row_start": 0, "row_end": 1, "column_start": 0, "column_end": 1, "text": "Name",
+    ...      "src_bbox": [10, 0, 50, 10], "page": 1},
+    ...     {"row_start": 0, "row_end": 1, "column_start": 1, "column_end": 2, "text": "Addr",
+    ...      "src_bbox": [50, 0, 90, 10], "page": 1},
+    ...     {"row_start": 0, "row_end": 1, "column_start": 2, "column_end": 3, "text": "Reset",
+    ...      "src_bbox": [90, 0, 130, 10], "page": 1},
+    ...     {"row_start": 1, "row_end": 2, "column_start": 1, "column_end": 2, "text": "0x40",
+    ...      "src_bbox": [50, 0, 90, 10], "page": 2},
+    ...     {"row_start": 1, "row_end": 2, "column_start": 2, "column_end": 3, "text": "0",
+    ...      "src_bbox": [90, 0, 130, 10], "page": 2}]}
+    >>> glyphs = {2: [{"text": ch, "bbox": [12 + 4 * i, 1, 15 + 4 * i, 9]}
+    ...               for i, ch in enumerate("R32_X")]}
+    >>> recover_chain_columns(merged, lambda page: glyphs.get(page, []))
+    1
+    >>> [c["text"] for c in merged["cells"] if c["row_start"] == 1]
+    ['R32_X', '0x40', '0']
+    >>> recover_chain_columns(merged, lambda page: glyphs.get(page, []))   # 冪等
+    0
+    """
+    if merged.get("_chain_recovered") or not merged.get("parts"):
+        return 0
+    merged["_chain_recovered"] = True
+    width = merged.get("width") or merged.get("column_count") or 0
+    cells = merged["cells"]
+    if width < 3 or any(not c.get("src_bbox") for c in cells):
+        return 0
+    spans: dict[int, list[float]] = {}     # 列 → 単独列セルのx範囲（全断片の和）
+    for cell in cells:
+        if cell["column_end"] - cell["column_start"] == 1:
+            box = cell["src_bbox"]
+            span = spans.setdefault(cell["column_start"], [box[0], box[2]])
+            span[0], span[1] = min(span[0], box[0]), max(span[1], box[2])
+    covered = {(r, k) for c in cells for r in range(c["row_start"], c["row_end"])
+               for k in range(c["column_start"], c["column_end"])}
+    row_pages = merged.get("row_pages") or []
+    added = 0
+    for page, _table_id in merged["parts"]:
+        rows = [r for r, p in enumerate(row_pages) if p == page]
+        own = [c for c in cells if c.get("page") == page and not c.get("_chain_recovered")]
+        if not rows or not own:
+            continue
+        ys = sorted({round(c["src_bbox"][1], 2) for c in own}
+                    | {round(c["src_bbox"][3], 2) for c in own})
+        xs = {round(c["src_bbox"][0], 2) for c in own} | {round(c["src_bbox"][2], 2) for c in own}
+        if len(ys) != len(rows) + 1 or len(xs) - 1 >= width:
+            continue
+        glyphs: list[dict] | None = None
+        for column in (0, width - 1):
+            if column not in spans or all((r, column) in covered for r in rows):
+                continue
+            cx0, cx1 = spans[column]
+            if glyphs is None:
+                glyphs = [g for g in chars_for(page) if (g.get("text") or "").strip()]
+            found: list[str] = []
+            for index in range(len(rows)):
+                y0, y1 = ys[index], ys[index + 1]
+                inside = [g for g in glyphs
+                          if cx0 + 0.5 <= (g["bbox"][0] + g["bbox"][2]) / 2 <= cx1 - 0.5
+                          and y0 + 0.5 <= (g["bbox"][1] + g["bbox"][3]) / 2 <= y1 - 0.5]
+                found.append(spell_glyphs(inside) if inside else "")
+            if not all(found):
+                continue
+            for index, text in enumerate(found):
+                row = rows[index]
+                if (row, column) in covered:
+                    continue
+                cells.append({
+                    "row_start": row, "row_end": row + 1,
+                    "column_start": column, "column_end": column + 1,
+                    "text": text, "src_bbox": [cx0, ys[index], cx1, ys[index + 1]],
+                    "page": page, "_chain_recovered": True,
+                })
+                covered.add((row, column))
+                added += 1
+    if added:
+        cells.sort(key=lambda c: (c["row_start"], c["column_start"]))
+    return added
+
+
 def strip_duplicated_span_lines(table: dict) -> int:
     """**縦の結合セルの1行分が、覆っている行にもう一度出ているぶん**を落とす。
 
@@ -551,7 +703,7 @@ def strip_duplicated_span_lines(table: dict) -> int:
     return len(dead)
 
 
-def strip_boundary_dupes(table: dict) -> int:
+def strip_boundary_dupes(table: dict, chars=None) -> int:
     """セル境界に載ったグリフをpdfplumberが左右両セルへ二重取りしたぶんを落とす。
 
     `[31:12] R`（右隣`Reserved`の先頭`R`が末尾に重複）・`RO R`・`s Description`
@@ -563,10 +715,28 @@ def strip_boundary_dupes(table: dict) -> int:
     先頭の誤検出は既に文字交錯で崩れた図セルのみ（無害）。exporter・parity検査だけが
     呼ぶ**人向け専用**。凍結CSVの抽出器は呼ばない（canonicalはEVTヘッダ基準で無関係）。
     冪等（`_deduped`）。
+
+    `chars`（ページのグリフ列か`page番号→グリフ列`の関数）を渡すと、下の「英字1文字のセル」の
+    規則を**幾何で裏取り**する——その文字の字形が自セルに面積の半分以上入っていれば、隣からの
+    はみ出しではなく自分の値なので消さない。文字だけの判定は、pin表の`HVCP | P`（type列の
+    `P`＝電源）やフレーム図の`DATA | A`（ACK）を「`HVCP`の末尾がはみ出した」と誤認して**94セルの
+    値を消していた**（全corpus実測。全件が左の語から8〜31pt離れた独立の値。2026-09-09の再突合が
+    M030DS2.zh p3で指摘）。狙いの`Standard I/O port`→`t`は字形が境界に接して自セルに半分も
+    入らないので、裏取りしても落ちる。
     """
     if table.get("_deduped"):
         return 0
     table["_deduped"] = True
+
+    def own_glyph(cell: dict, ch: str) -> bool:
+        """chの字形がこのセルに面積の半分以上入っているか（charsが無ければ判定できない＝偽）。"""
+        if chars is None:
+            return False
+        box = cell.get("bbox") or cell.get("src_bbox")
+        if not box:
+            return False
+        page_chars = chars(cell.get("page")) if callable(chars) else chars
+        return any(g.get("text") == ch and _overlap_frac(g["bbox"], box) >= 0.5 for g in page_chars)
     by_row: dict[int, list[dict]] = {}
     for cell in table["cells"]:
         if (cell.get("text") or "").strip():
@@ -587,7 +757,7 @@ def strip_boundary_dupes(table: dict) -> int:
             if (len(text.strip()) == 1 and text.strip().isalpha() and index > 0
                     and cell["column_start"] not in unit_columns):
                 left = (cells[index - 1].get("text") or "").rstrip()
-                if len(left) >= 4 and left[-1] == text.strip():
+                if len(left) >= 4 and left[-1] == text.strip() and not own_glyph(cell, text.strip()):
                     cell["text"] = ""
                     removed += 1
                     continue
@@ -978,8 +1148,12 @@ def reattach_cell_subscripts(table: dict, chars) -> int:
         runs: list[list[dict]] = []
         for band in bands:
             for g in sorted(band, key=lambda g: g["bbox"][0]):
+                # 下限は-0.35——太字系のフォントは下付きの字形箱が**互いに重なる**（`PCLK`のP/Cが
+                # 幅の22%重なる。L103RM.zh p239）。-0.2で割れると`P`・`C`・`L`・`K`の単字除去が本文の
+                # `SCK`を食い、セル全体の復元が失敗していた。全corpus実測: 緩めて変わるのは9セルで
+                # 全部正しい復元（`FPCLK`・`FHCLK`・`VIO18`・`VBC_SRC`）。
                 if (runs and runs[-1][0] in band
-                        and -0.2 * g["size"] <= g["bbox"][0] - runs[-1][-1]["bbox"][2] < 0.35 * g["size"]):
+                        and -0.35 * g["size"] <= g["bbox"][0] - runs[-1][-1]["bbox"][2] < 0.35 * g["size"]):
                     runs[-1].append(g)
                 else:
                     runs.append([g])
@@ -1904,9 +2078,57 @@ def _owned_elsewhere(table: dict, cell: dict, ch: str, chars: list[dict],
                 # 融合している側が本物で、切れている側がcropの拾いすぎ。幾何が相手寄りでも
                 # こちらの文字は残す（狭い列から名前があふれた典型）。
                 continue
-            if _overlap_frac(glyph["bbox"], obox) >= 0.5:
+            if (_overlap_frac(glyph["bbox"], obox) >= 0.5
+                    and _glyph_still_in_other(glyph, obox, other_text, chars)):
                 return True
     return False
+
+
+def _glyph_still_in_other(glyph: dict, obox: list[float], text: str, chars: list[dict]) -> bool:
+    """相手セルの**その字形**が、相手の綴りにまだ残っているか。
+
+    `_at_line_edge`は文字の一致しか見ないので、**同じ文字が相手の別の場所にある**だけで
+    「相手の持ち物」と誤認した——`IACTS | IACTS`（bit図の名前が列幅より広く、左の`S`が
+    面積の78%で右セルに掛かる）で、右セルの綴りは末尾に**別の**`S`を持つため、左の`S`が
+    落ちて`IACT`（Markdownでは`IACT9`）になっていた（`CH32M030RM.en` p46。再突合の指摘）。
+    先に`strip_boundary_dupes`が右セルの先頭`S `を落としているので、この字形は右の綴りの
+    どこにも残っていないのに、右からも左からも消えていた。
+
+    字形が相手の綴りから消える経路は`strip_boundary_dupes`の**行端**の除去（と1文字だけの行）
+    しか無い。だから判定は字形の**位置**で決まる: 相手の自グリフ（面積の半分以上が相手に入る）
+    を同じ視覚行（top±1pt）で並べ、この字形が**行の中程**なら常に残っている（真）、**左端**なら
+    相手の綴りに`ch`で始まる行があるか、**右端**なら`ch`で終わる行があるか（1字だけの行はどちらか）。
+
+    2回やり直した（2026-09-09）。(1) 中程を偽にしていた版は、1行に2語の結合セル
+    `td(ALE-NWE) th(NWE-ALE)`の語末`)`を「相手のものでない」として隣の`t\\nw(NWE)`の先頭に
+    残した（H417DS0.en p128）。(2) 個数（相手に半分以上入る`ch`の字形数 ≤ 綴りの`ch`数）で見た版は、
+    相手が**別の迷子**を抱えていると崩れた——`IACTS`の右セルは左からの`S`も抱えるので個数が合わず、
+    その右セルの末尾`S`（さらに右の`Reserved`にも掛かる）を「相手のものでない」として
+    `S\\nReserved`を作った（M030RM.en p46・V205RM.en p81。走行2の前後比較で捕捉）。
+
+    >>> chars = [{"text": "S", "bbox": [0, 0, 4, 10]}, {"text": "I", "bbox": [6, 0, 8, 10]},
+    ...          {"text": "S", "bbox": [8, 0, 12, 10]}]
+    >>> _glyph_still_in_other(chars[0], [1, 0, 12, 10], "IS", chars)   # 左端の字形。行頭はI
+    False
+    >>> _glyph_still_in_other(chars[2], [1, 0, 12, 10], "IS", chars)   # 右端の字形。行末はS
+    True
+    >>> _glyph_still_in_other(chars[1], [1, 0, 12, 10], "XX", chars)   # 中程は常に残っている
+    True
+    """
+    ch = glyph.get("text")
+    line = sorted((g for g in chars if (g.get("text") or "").strip()
+                   and _overlap_frac(g["bbox"], obox) >= 0.5
+                   and abs(g["bbox"][1] - glyph["bbox"][1]) < 1.0),
+                  key=lambda g: g["bbox"][0])
+    same = [g is glyph or g["bbox"] == glyph["bbox"] for g in line]
+    if not any(same):
+        return False
+    first, last = same[0], same[-1]
+    if not first and not last:
+        return True
+    lines = [part.strip() for part in text.split("\n") if part.strip()]
+    return ((first and any(part[0] == ch for part in lines))
+            or (last and any(part[-1] == ch for part in lines)))
 
 
 def strip_straddling_dupes(table: dict, chars: list[dict]) -> int:
