@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""タイマ1つずつの素性 → tables/timers.csv
+"""タイマ1つずつの素性 → evidence/timers.csv。**bundle を直接読む**。
+
+`tools/build_timers.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第3号）。読む欄は bundle の `text`
+（ページ本文）だけ——`pdfcompat` が凍結tool に見せていたものと同じなので、読みの規則は
+変えていない。ページの読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき）。
 
 **「このタイマのカウンタは何ビットか」が機械可読でありませんでした。** 比較表は
 `Timer General-purpose TIM4 (32-bit)` のような**文**を series 粒度で持つだけで、
@@ -24,8 +30,13 @@ EVT の variant macro を置きます（`interrupts.csv` と同じ持ち方）�
 `index/timers.csv` が持ちます（tools/build_index.py。`pinout` の `(TIMn, CHm)` と
 `(TIMn, CHmN)`。**pinout 単位の下限**であって silicon の上限ではない）。
 
+RM は目録（`catalog/documents.csv` の `repositories`）で引く——凍結tool は mirror の
+`datasheet_zh/*RM.PDF` の先頭を採っていたが、mirror は目録を読んで原本を落とすので同じ文書に
+なる（12 family 全部で一致を確認済み）。原本と bundle の対応は `regenerate.py` の前後照合が
+保証するので、ここでは PDF を開かない。
+
 実行:
-    uv run tools/build_timers.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_timers.py [--out <dir>]
 """
 
 from __future__ import annotations
@@ -37,12 +48,12 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
 
 # `channels`/`complementary`（pin に出ているチャネルから数える導出）は索引
 # `index/timers.csv` が持つ（tools/build_index.py）。ここは RM と EVT の記述だけ。
@@ -80,8 +91,8 @@ KINDS = {"高级定时器": "advanced", "通用定时器": "general-purpose",
 LOOKAHEAD = 25
 
 
-def read_timers(path: Path) -> tuple[list[dict], list[str]]:
-    """RM から (timer, kind, width, condition の素材) を読む。"""
+def read_timers(bundle: str) -> tuple[list[dict], list[str]]:
+    """RM の bundle から (timer, kind, width, condition の素材) を読む。"""
     found: dict[int, dict] = {}
     notes: list[str] = []
     # **見出しとその表がページを跨ぐ**ことがあるので（CH32H417 の TIM6/7、
@@ -89,11 +100,8 @@ def read_timers(path: Path) -> tuple[list[dict], list[str]]:
     # 1本に繋いでから走査します。行がどのページのものかは `basis` に要るので
     # 持ち回ります。
     stream: list[tuple[int, str]] = []
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            stream += [(page.page_number, text)
-                       for text in (page.extract_text() or "").splitlines()]
-            page.close()
+    for number, text in bundle_pages.texts(bundle):
+        stream += [(number, line) for line in text.splitlines()]
     lines = [text for _, text in stream]
 
     for i, line in enumerate(lines):
@@ -144,7 +152,6 @@ def read_timers(path: Path) -> tuple[list[dict], list[str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
@@ -173,11 +180,12 @@ def main() -> int:
     rows: list[dict] = []
     notes: list[str] = []
     for family in families:
-        manual = next((p for p in sorted((args.mirrors / family / "datasheet_zh").glob("*RM.PDF"))), None)
-        if manual is None:
+        editions = bundle_pages.rm_bundles(family)
+        if "zh" not in editions:
             notes.append(f"{family}: reference manual が無い")
             continue
-        found, said = read_timers(manual)
+        bundle, document = editions["zh"]
+        found, said = read_timers(bundle.name)
         notes += [f"{family}: {n}" for n in said]
         if not found:
             notes.append(f"{family}: タイマの計数器の見出しを1つも読めない")
@@ -202,7 +210,7 @@ def main() -> int:
                 "condition": ";".join(applies),
                 "confidence": ("varies-by-package" if applies else
                                "conflict" if varies else "reference"),
-                "basis": f"rm({manual.name}:p{timer['page']})",
+                "basis": f"rm({document}:p{timer['page']})",
             })
 
     dest = paths.table("timers", args.out)

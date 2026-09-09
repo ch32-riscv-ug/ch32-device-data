@@ -43,6 +43,7 @@ mirror の `datasheet_{lang}/*RM.PDF` の先頭を採っていたが、mirror �
 
 `tools/build_index.py` と `tools/check_tables.py` はこのモジュールの正規化規則
 （`REMAPPED`・`TYPO`・`peripheral_of`・`COLUMNS`）だけを使う。標準ライブラリだけで import できる。
+ページの読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。3本目の退役で共通化した）。
 
 実行:
     uv run pipeline/extract/rm/extract_dma_requests.py [--out <dir>] [--family F]
@@ -53,19 +54,17 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
-import hashlib
-import json
 import re
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 import signal_vocabulary  # noqa: E402
-
-BUNDLES = REPO / ".cache" / "structured-bundles"
 
 # `request` は RM の綴りそのまま（zh 版。`TIM1_UP*` の `*`、X315 の `_0`/`_1` も
 # 残す）。en 版の綴りが違えば `request_en`。印の読み（selectable / default / remap）
@@ -192,46 +191,12 @@ def peripheral_of(request: str) -> str:
     return signal_vocabulary.canonical_peripheral(head) if head else request
 
 
-def _load_page(bundle: Path, entry: dict) -> dict:
-    """manifest の項目からページ record を読む。**sha256 を照合する**（`pdfcompat.Page._load` と同じ
-    入口ゲート——bundle の一部だけが書き換わった状態を読まない）。"""
-    payload = (bundle / entry["file"]).read_bytes()
-    actual = hashlib.sha256(payload).hexdigest()
-    if actual != entry["sha256"]:
-        raise SystemExit(f"{bundle.name}/{entry['file']}: sha256 {actual[:12]} != manifest "
-                         f"{entry['sha256'][:12]} -- reconvert the bundle")
-    return json.loads(payload)
-
-
-def rm_bundles(family: str) -> dict[str, tuple[Path, str]]:
-    """family → {lang: (bundle dir, 原本の PDF 名)}。目録の reference-manual で `repositories` に
-    family を含む行（複数なら文書名順の先頭＝凍結tool の `sorted(glob)[0]` と同じ）。"""
-    with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:
-        docs = sorted((row for row in csv.DictReader(f)
-                       if row["kind"] == "reference-manual" and row["status"] == "assigned"
-                       and family in row["repositories"].split(";")),
-                      key=lambda row: row["document"])
-    out: dict[str, tuple[Path, str]] = {}
-    for lang in ("zh", "en"):
-        for row in docs:
-            if row[f"version_{lang}"]:
-                out[lang] = (BUNDLES / f"{Path(row['document']).stem}.{lang}", row["document"])
-                break
-    return out
-
-
-def read_bundle(bundle: Path, family: str) -> list[dict]:
+def read_bundle(bundle: str, family: str) -> list[dict]:
     """1冊の RM の bundle から [{variant, dma, channel, request_id, request, remap, note, page}]。"""
-    manifest_path = bundle / "manifest.json"
-    if not manifest_path.exists():
-        raise SystemExit(f"{bundle}: bundle is missing -- run pipeline/ingest/convert_all.py "
-                         "(extraction never falls back to reading the PDF)")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     rows: list[dict] = []
     grid: dict | None = None      # 読みかけの格子 {dma, variant, channels:[...], last_row}
-    for entry in manifest["pages"]:
-        pno = entry["number"]
-        page = _load_page(bundle, entry)
+    for page in bundle_pages.pages(bundle):
+        pno = page["number"]
         text = page.get("text") or ""
         if not re.search(r"DMA", text):
             grid = None
@@ -378,8 +343,8 @@ def main() -> int:
     out_rows: list[dict] = []
     for family in families:
         editions: dict[str, tuple[str, list[dict]]] = {}
-        for lang, (bundle, document) in rm_bundles(family).items():
-            editions[lang] = (document, read_bundle(bundle, family))
+        for lang, (bundle, document) in bundle_pages.rm_bundles(family).items():
+            editions[lang] = (document, read_bundle(bundle.name, family))
         if not editions:
             print(f"  - {family}: RM が無い", file=sys.stderr)
             continue

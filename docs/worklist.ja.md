@@ -554,9 +554,19 @@ V407RM p402・WCH-Link のラベル・X315RM.en p155）。残りから「入れ�
 `pipeline/extract/datasheet/extract_features.py`）。移植は pdfplumber 依存を外すだけ（`pdf.pages`→
 manifest、`extract_text()`→`text`、`find_tables()/extract()`→`tables[].extracted_rows`）。bundle 入力で
 **byte 一致**を確認して `regenerate.py` の evidence 段へ移し、凍結 tool を削除。`run_frozen --batch`
-の定番一式は 6→5。次は API 面の小さい順に `build_clock_enables`（`search`×2）・`build_debug_data`・
-`build_usbpd_plumbing`・`build_timers`——`search` は `lines[].text` への正規表現一致なので、3本目から
-bundle ページの共通読み手（`_load_page`・`search`）を `pipeline/extract/` に1つ置いて共有する。
+の定番一式は 6→5。
+
+**第3・4号 完了（同日）**: `timers`（`pipeline/extract/rm/extract_timers.py`。67行 byte 一致）と
+`debug_data`（`pipeline/extract/manual/extract_debug_data.py`。12行 byte 一致）。3本目で
+**ページの読み手を共通化**した（`pipeline/extract/bundle_pages.py`——`pages()`/`texts()`/`rm_bundles()`。
+sha 照合つき）。既存の第1・2号もそちらへ寄せた（出力は byte 一致のまま）。凍結パリティの定番一式は
+**3本**（`build_adc_internal`・`build_memory`・`build_flash_geometry`）。`timers` は legacy 段で
+`evt_variants` より前に走っていたので、evidence 段へ移して同じ走行の値を読むようにした。
+
+`build_clock_enables`・`build_usbpd_plumbing` の「`search`×2〜3」は `re.search` の誤検出で、実体は
+`extract_registers.extract(pdf, …)` への委譲——**`extract_registers` の退役が先**。次は
+`bundle_pages` に `page.search`（`lines[].text` への正規表現一致）を足して `build_flash_geometry`・
+`build_adc_internal`・`build_memory` あたり。
 
 ### 凍結tool（PDF直読み）の退役の順序（2026-09-08 方針確認）
 

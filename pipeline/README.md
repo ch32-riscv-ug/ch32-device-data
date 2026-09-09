@@ -50,6 +50,13 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            datasheet/extract_features.py (**generator of record for features.csv**:
            the same port of the frozen `build_features`, reading only `text`. The
            second retirement)
+           rm/extract_timers.py, manual/extract_debug_data.py (third and fourth
+           retirements: the same port for `timers` and `debug_data`. From here the
+           page reader is shared -- `bundle_pages.py`)
+           bundle_pages.py (**the new path's page reader**: yields page records in
+           manifest order, checking each page's sha256 against the manifest; resolves
+           family -> RM bundle from the catalogue. It never opens a PDF, so a held
+           source (`--hold-sources`) cannot disagree with a gate)
            run_frozen.py (runs frozen tools unmodified on bundle input and
            byte-compares their output against the frozen CSVs -- the old-vs-new
            parity harness; the ledger is in the worklist under D18)

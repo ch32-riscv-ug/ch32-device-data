@@ -32,8 +32,8 @@ def main() -> int:
         print("usage: run_patched.py <tool> [args...]", file=sys.stderr)
         return 2
     name = sys.argv[1]
-    # **関数内の遅延import**（`build_debug_data`は`import pdfplumber`を
-    # 関数の中で行う）は属性の差し替えを迂回する——patch時点で属性が無いから。
+    # **関数内の遅延import**（`import pdfplumber`を関数の中で行うtool）は属性の差し替えを
+    # 迂回する——patch時点で属性が無いから。
     # `sys.modules`ごと差し替えれば、後から解決されるimportも互換層を受け取る。
     sys.modules["pdfplumber"] = pdfcompat
     module = importlib.import_module(name)

@@ -2085,3 +2085,37 @@ dedup（`deduped[(row_start, column_start)]`。同じ格子に落ちたセルは
 `<td>` の行ラベルとして出る）、**壊してはいけない2表**（H417RM.en p620・V407RM.en p224）は byte 不変、
 parity は 68/68 clean。exporter とその検査だけが `apply_bitfield` を呼ぶので、converter の版・bundle・
 正本 CSV・凍結台帳はどれも動かない。
+
+## 凍結toolの退役 第3・4号——`timers`・`debug_data`と共通のページ読み手（2026-09-09）
+
+候補を pdfplumber の API 面の小さい順に見直したら、`build_clock_enables` と
+`build_usbpd_plumbing` の「`search`×2〜3」は**`re.search`の誤検出**だった（私の grep が
+`.search(` で数えていた）。この2本は PDF を自分で読まず、`extract_registers.extract(pdf, …)`
+に委譲している——つまり退役には `extract_registers`（355行・`extract_text_lines`・`find_tables`・
+`page.search`）が先に要る。**API 面の見立てをやり直して**、本当に `extract_text` だけの2本を採った。
+
+- `pipeline/extract/rm/extract_timers.py`（← `tools/build_timers.py`）: 67行 byte 一致。
+  RM は目録で引く（`bundle_pages.rm_bundles`）。**`regenerate.py` の順序も直した**——`timers` は
+  legacy 段で `evt_variants` より**前**に走っていて前回の走行の値を読んでいた（`condition` 列の
+  variant macro がそこから来る）。evidence 段なら同じ走行の値を読む。
+- `pipeline/extract/manual/extract_debug_data.py`（← `tools/build_debug_data.py`）: 12行 byte 一致。
+  QingKe プロセッサマニュアル4冊（zh）の `hartinfo.dataaddr` を先頭60ページから読む。
+  EVT の `debug.c` は mirror をそのまま読む（PDF ではないので構造化の対象外）。
+
+### 3本目からページの読み手を共通化した——`pipeline/extract/bundle_pages.py`
+
+第1・2号はそれぞれが同じ10行（manifest を開く・ページの sha256 を照合する・`text` を返す）を
+持っていた。3本目でそれを1つにまとめ、既存の2本もそちらへ寄せた（出力は byte 一致のまま）。
+`pages()`/`texts()`（`pdf.pages`・`page.extract_text()` の置き換え。`limit` は `pdf.pages[:N]`）と
+`rm_bundles()`（family→RM。目録の `repositories` で引く）を持つ。
+
+**この読み手は PDF を開かない**ので、据え置き（`--hold-sources`）でもゲートと食い違わない
+——凍結tool 側は `pdfcompat`/`extract_low_power`/`render_assets` の3経路に `held_sources` で
+「承知で古い bundle を使う」と伝える必要があった。新経路が増えるほどその配線が要らなくなる。
+
+凍結パリティの定番一式は **6→5→3本**（`build_adc_internal`・`build_memory`・`build_flash_geometry`）。
+残りの PDF 直読み tool のうち大きいのは `extract_registers`（`build_registers`・`build_clock_enables`・
+`build_usbpd_plumbing` が委譲）・`extract_pins`・`build_all`・`extract_remap`・`build_memory`・
+`build_flash_geometry`・`build_adc_internal`・`build_flash_program_method`・`extract_images`。
+次は `page.search` を `bundle_pages` に足して（`lines[].text` への正規表現一致）
+`build_flash_geometry`・`build_adc_internal`・`build_memory` あたり。

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Debug module の data0/data1 レジスタの hart 側アドレス → evidence/debug_data.csv
+"""Debug module の data0/data1 レジスタの hart 側アドレス → evidence/debug_data.csv。
+**マニュアルは bundle を直接読む**。
+
+`tools/build_debug_data.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第4号）。読む欄は bundle の `text`
+（ページ本文）だけ——`pdfcompat` が凍結tool に見せていたものと同じなので、読みの規則は
+変えていない。ページの読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき）。
+EVT の `debug.c` は mirror をそのまま読む（PDF ではないので構造化の対象外）。
 
 SDI print（DMDATA0/1 の mailbox 経由の printf）は、hart から見た debug module の
 data0/data1 に書く。**その番地は die で違う**（consumer の R-27。V003 は 0xE00000F4、
@@ -19,7 +27,7 @@ CH32H417 の EVT には define が無く（SDI_Printf 例が無い）、V5/V3 �
 ので、行は残して番地は空・confidence は missing。
 
 実行:
-    uv run tools/build_debug_data.py [--mirrors <dir>] [--out <dir>]
+    uv run pipeline/extract/manual/extract_debug_data.py [--mirrors <dir>] [--out <dir>]
 """
 
 from __future__ import annotations
@@ -32,8 +40,11 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
 COLUMNS = ["family", "core", "dm_data0_addr", "dm_data1_addr", "#", "confidence", "basis", "evt_file"]
@@ -64,22 +75,18 @@ def evt_defines(family_dir: Path) -> tuple[dict[str, str], list[str], list[str]]
     return {n: next(iter(v)) for n, v in found.items() if len(v) == 1}, files, notes
 
 
-def manual_dataaddr(mirrors: Path) -> dict[int, str]:
-    """世代 → hartinfo.dataaddr（`0x380` か、固定しない印の `0xXXX`）。zh 版（原典）から。"""
-    import pdfplumber  # noqa: PLC0415  （CI の検査は PDF を読まない）
-
+def manual_dataaddr() -> dict[int, str]:
+    """世代 → hartinfo.dataaddr（`0x380` か、固定しない印の `0xXXX`）。zh 版（原典）の bundle から。"""
     out: dict[int, str] = {}
     for gen in (2, 3, 4, 5):
-        pdf_path = mirrors / "WCH-common" / "datasheet_zh" / f"QingKeV{gen}_Processor_Manual.PDF"
-        if not pdf_path.exists():
+        name = f"QingKeV{gen}_Processor_Manual.zh"
+        if not (bundle_pages.BUNDLES / name / "manifest.json").exists():
             continue
-        with pdfplumber.open(pdf_path) as pdf:
-            for page in pdf.pages[:60]:
-                m = DATAADDR.search(page.extract_text() or "")
-                page.close()
-                if m:
-                    out[gen] = m.group("value")
-                    break
+        for _number, text in bundle_pages.texts(name, 60):
+            m = DATAADDR.search(text)
+            if m:
+                out[gen] = m.group("value")
+                break
     return out
 
 
@@ -91,7 +98,7 @@ def main() -> int:
 
     families = paths.load("families")
     measured = json.loads((paths.CURATED / "debug-data-measured.json").read_text(encoding="utf-8"))["measured"]
-    fixed = manual_dataaddr(args.mirrors)
+    fixed = manual_dataaddr()
     print(f"manual hartinfo.dataaddr: {fixed}", file=sys.stderr)
 
     rows: list[dict] = []
