@@ -3850,7 +3850,7 @@ CH32H417,DMA_CFGR4,DMA,DMA_Channel.CFGR,DOUBLE_MODE,DMA_CFGR4_DOUBLE_MODE,field,
 CH32H417,DMA_CFGR4,DMA,DMA_Channel.CFGR,FLAG_CURMEM,DMA_CFGR4_FLAG_CURMEM,field,,16,0x10000,,,,,#,reference,evt(ch32h417.h)
 CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,EN,DMA_CFGR5_EN,field,,0,0x1,,Channel enable,,,#,reference,evt(ch32h417.h)
 CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,TCIE,DMA_CFGR5_TCIE,field,,1,0x2,,Transfer complete interrupt enable,,,#,reference,evt(ch32h417.h)
-CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,CCFGR_HTIE,DMA_CCFGR_HTIE,field,,2,0x4,,Half Transfer interrupt enable,,,#,reference,evt(ch32h417.h)
+CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,HTIE,DMA_CFGR5_HTIE,field,,2,0x4,,Half Transfer interrupt enable,,,#,reference,evt(ch32h417.h)
 CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,TEIE,DMA_CFGR5_TEIE,field,,3,0x8,,Transfer error interrupt enable,,,#,reference,evt(ch32h417.h)
 CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,DIR,DMA_CFGR5_DIR,field,,4,0x10,,Data transfer direction,,,#,reference,evt(ch32h417.h)
 CH32H417,DMA_CFGR5,DMA,DMA_Channel.CFGR,CIRC,DMA_CFGR5_CIRC,field,,5,0x20,,Circular mode,,,#,reference,evt(ch32h417.h)

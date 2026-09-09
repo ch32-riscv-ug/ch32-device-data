@@ -13,6 +13,7 @@ CH32H417,ADC,DualDAC_Triangle,Dual DAC output triangular wave routine,#,confirme
 CH32H417,ADC,Internal_Temperature,Internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32H417_List_EN.txt
 CH32H417,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,Betaflight,H41x Betaflight Library,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,FATFS_eMMC,Eight-line operation EMMC card porting file read-write system FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,LTDC_LVGL,use LTDC driver to display some animations on the LCD,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -33,6 +34,7 @@ CH32H417,CPU,INT/Interrupt_VTF,VTF interrupt routine,#,confirmed,evt:tree+evt:li
 CH32H417,CPU,IPC,IPC routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,OS,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,OS/FreeRTOS,FreeRTOS routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,CPU,OS/RT_Thread,RT_Thread routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,PFIC,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,PFIC/Interrupt_Nest,interrupt nested routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,PFIC/Interrupt_VTF,VTF IRQ interrupt routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -229,6 +231,8 @@ CH32H417,USB,USBSS/DEVICE/CH372Device,"Simulate custom USB devices (CH372 device
 CH32H417,USB,USBSS/DEVICE/UVC,,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USB,USBSS/HOST,,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USB,USBSS/HOST/HOST_SS_ACCESS_SECTOR,USBSS scanning routine,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/Host_SS_Hub_Access_Sector,"This routine demonstrates CH32H417 acting as a USB host, accessing and reading/writing U-disk sectors via an external USB HUB.",#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/Host_SS_Hub_Udisk_Exams,This routine demonstrates how the CH32H417 can act as a USB host to control the udisk under the HUB（Support for file system）.,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USBPD,USBPD_SNK,PD SNK routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USBPD,USBPD_SRC,PD SRC routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,WWDG,WWDG,Window Watchdog routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
