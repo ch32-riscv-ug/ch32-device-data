@@ -196,6 +196,32 @@ def norm_header(cell):
     return HEADER_MAP.get(text.lower() if text.isascii() else text)
 
 
+# 記号セルの末尾に付く**ピン群**（`VOH（PA0-PA23）`・`VOL（PC0-PC7，PC14-…）`）。これは記号の
+# 一部ではなく**適用範囲の条件**なので、条件欄へ回す（`split_pin_group`）。
+#
+# 2026-09-09に`CH32X035DS0.zh` V2.3が出力電圧特性をポート群ごとに分け（PAは50mA、PBは6/10mA、
+# PCは8/16mA）、記号が`VOH（PA0-PA23）`になった。`norm_symbol`はそれを`VOH_(PA0-PA23)`にし、
+# `keep_row`の白名簿`KEEP`（`V_`の形しか通さない）が**全部落としていた**。落ちると en 版の
+# 一般I/O行が相手を失い、別表（p32の静态输出高电平）の`V_OH`と突き合わされて**偽のconflict**に
+# なる。記号を`V_OH`に戻し、群を条件に置けばその取り違えが消える。
+#
+# **括弧つきの記号は他にもある**が、そちらは下付きの修飾で記号の一部（`t_SU(LSI)`・`I_DD(HSI)`・
+# `C_in(HSE)`・`F_max(IO)out`・`V_IH(RST)`）。全corpus実測: 括弧を含む記号は399件・31種類で、
+# **ピン群は0件**——だから「`P`＋英字＋数字で始まる中身」に絞れば既存の記号は1つも動かない。
+# 閉じ括弧は無くてもよい（セルが`（PC0-PC7，⏎PC14-PC1`で切れている実例がある）。
+PIN_GROUP = re.compile(r"[（(]\s*(?P<group>P[A-Z]\d[^）)]*?)\s*[）)]?\s*$")
+
+
+def split_pin_group(cell):
+    """記号セル → (ピン群を外した記号セル, ピン群 or "")。"""
+    text = cell or ""
+    flat = " ".join(text.split())
+    m = PIN_GROUP.search(flat)
+    if not m:
+        return cell, ""
+    return flat[:m.start()].strip(), " ".join(m.group("group").split())
+
+
 def norm_symbol(cell):
     parts = [p.strip() for p in (cell or "").split("\n") if p.strip()]
     sym = FOOTNOTE.sub("", "_".join(parts))
@@ -370,7 +396,7 @@ def read_edition(bundle, lang):
                 cols, body = last_cols, tbl
             else:
                 continue
-            rows, sym, unit, param = [], "", "", ""
+            rows, sym, unit, param, group = [], "", "", "", ""
             for raw in body:
                 cells = dict()
                 extra = []
@@ -379,16 +405,22 @@ def read_edition(bundle, lang):
                         cells[cols[i]] = cell
                     elif cell:
                         extra.append(cell)
-                s = norm_symbol(cells.get("symbol"))
+                symbol_cell, pin_group = split_pin_group(cells.get("symbol"))
+                s = norm_symbol(symbol_cell)
                 this_param = norm_text(cells.get("parameter"))
                 if s:  # 新しい記号の行。継続行は記号と参数を引き継ぐ
-                    sym, param = s, this_param
+                    sym, param, group = s, this_param, pin_group
                 else:
                     param = this_param or param
+                    group = pin_group or group
                 unit = norm_value(cells.get("unit")) or unit
                 condition = " ".join(
                     filter(None, [norm_text(cells.get("condition"))]
                            + [norm_text(e) for e in extra]))
+                # ピン群は**条件の先頭**に置く（`PA0-PA23, I_IO = 50mA V_DD = 3.3V`）。
+                # 記号は`V_OH`のまま引けて、群ごとの行が別の条件として並ぶ。
+                if group:
+                    condition = f"{group}, {condition}" if condition else group
                 rows.append({
                     "symbol": sym,
                     "parameter": param,
