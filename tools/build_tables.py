@@ -35,6 +35,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import build_documents  # noqa: E402
 import extract_ordering  # noqa: E402
+# 凍結 `tools/extract_package_dims.py` は退役した（第11号）。読み手は新経路の
+# `pipeline/extract/package/extract_package_dims.py`——`extract()` は原本PDFのパスを
+# 受けて bundle 名に直すので、呼び方は変えなくてよい（原本は開かない）。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]
+                       / "pipeline" / "extract" / "package"))
 import extract_package_dims  # noqa: E402
 import extract_products  # noqa: E402
 from crosscheck_languages import canonical_value  # noqa: E402
@@ -1032,9 +1037,9 @@ def errata_rows() -> list[dict]:
     """curated/errata.csv, carried into tables/ with its judgement attached.
 
     source_zh / source_en record where the statement appears in each
-    datasheet edition (PDF page numbers, verified via tools/scan_errata.py).
+    datasheet edition (PDF page numbers, verified via pipeline/extract/scan_errata.py).
     Both editions agreeing makes the row confirmed; a single edition stays
-    reference.  The match column only serves scan_errata.py and is dropped.
+    reference.  The match column only serves scan_errata and is dropped.
     """
     path = REPO / "curated" / "errata.csv"
     if not path.exists():

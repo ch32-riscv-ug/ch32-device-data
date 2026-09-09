@@ -20,7 +20,7 @@
               build_all（直列）→ datasheet/RM表群 → EVT系 → 索引 → README生成。
               committedと同一入力なら`git status`差分ゼロで終わる
     verify    --verify: 凍結toolのbundle入力パリティ（run_frozen --batch）＋
-              エラッタ増分検査（run_scan_errata。NEW候補があれば失敗）
+              エラッタ増分検査（scan_errata。NEW候補があれば失敗）
     human     --human: 図の描画 → 人向けMarkdown → PDFとの差ゼロ検査
 
 実行:
@@ -176,7 +176,7 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("frozen parity (run_frozen --batch)",
              ["pipeline/extract/run_frozen.py", "--batch"]),
             ("errata incremental scan",
-             ["pipeline/extract/run_scan_errata.py"]),
+             ["pipeline/extract/scan_errata.py"]),
         ]))
     if args.human:
         stages.append(("human", [

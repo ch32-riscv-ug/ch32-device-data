@@ -841,7 +841,7 @@ I2C1・SPI1・USART2のselectorへ付いていました。**TIM1の経路が3つ
 ### 収集済みにしたもの
 
 - **一般動作条件（General operating conditions / 通用工作条件）表** → `evidence/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
-- **ロット依存注記（エラッタ）** → `evidence/errata.csv` 21行（`tools/scan_errata.py`で走査、`curated/errata.csv`で管理）
+- **ロット依存注記（エラッタ）** → `evidence/errata.csv` 21行（`pipeline/extract/scan_errata.py`で走査、`curated/errata.csv`で管理）
 
 抽出上の注意（build_operating.pyが吸収済み）: zh版の表題は「通用工作条件」（「一般」ではない）、絶対最大定格表が同一ページにあり`条件`列の有無で区別する、記号セルの折返しで`F_HCLK or F_SYS`が壊れる、脚注は全角括弧`（2）`、rowspanの単位セルはzh版で空になる。
 
@@ -854,4 +854,4 @@ I2C1・SPI1・USART2のselectorへ付いていました。**TIM1の経路が3つ
 
 ### エラッタの増分監視
 
-エラッタはdatasheet改版で増えるため、`uv run tools/scan_errata.py`を単体実行すると全datasheetを走査して既知（`curated/errata.csv`の`match`列）と照合し、未知の記述をNEWとして報告します（終了コード1）。mirror PDFが必要なためCIではなく手動運用です。datasheet更新を取り込んだら一度回してNEW: 0を確認します。
+エラッタはdatasheet改版で増えるため、`uv run pipeline/extract/scan_errata.py`を単体実行すると全datasheetを走査して既知（`curated/errata.csv`の`match`列）と照合し、未知の記述をNEWとして報告します（終了コード1）。mirror PDFが必要なためCIではなく手動運用です。datasheet更新を取り込んだら一度回してNEW: 0を確認します。

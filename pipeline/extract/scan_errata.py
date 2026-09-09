@@ -8,14 +8,24 @@ curated/errata.csv の match 列（正規表現）と照合して KNOWN / NEW �
 エラッタは後から増える可能性があるため、データシート更新後などに
 単体で実行して NEW が出ないか確認する運用:
 
-    uv run python tools/scan_errata.py            # DS0 のみ（数分）
-    uv run python tools/scan_errata.py --rm       # RM も走査（十数分かかる）
+    uv run pipeline/extract/scan_errata.py         # DS0 のみ
+    uv run pipeline/extract/scan_errata.py --rm    # RM も走査
 
 NEW が出たら curated/errata.csv に行を追加し（match 列にその記述を
 識別する正規表現を書く）、再実行して NEW: 0 になることを確認する。
 match は「リポジトリ相対パス + 空白 + 前後文脈」に対して検索される。
 
 終了コード: NEW 候補があれば 1、なければ 0。
+
+読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。凍結 `tools/scan_errata.py` の
+移植＝退役 第11号）。使うのはページ本文だけ。
+
+**出力の mirror 相対パスは変えない**——`curated/errata.csv` の `match` はこの文字列
+（`CH32V003/datasheet_zh/CH32V003DS0.PDF` ＋ 文脈）に対して掛かるので、綴りが変わると
+KNOWN が NEW に化ける。凍結版は mirror を glob していたが、こちらは目録
+（`catalog/documents.csv` の `repositories`）から同じ並びを組む——**DS のみ34件・RM 込み58件が、
+順序まで含めて glob と一致する**ことを実測で確かめた（`CH32FV2x_V3xRM.PDF` だけ2つの
+repository に載るので2回走るのも凍結版と同じ）。
 """
 
 import argparse
@@ -24,10 +34,12 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
-REPO = Path(__file__).resolve().parent.parent
 
 # エラッタらしさのシグナル。広すぎる語（注/Note 単独など）はノイズに
 # なるため、ロット・版数・訂正の文脈を示す語だけに絞る。
@@ -52,23 +64,21 @@ def load_known():
     return known
 
 
-def scan_pdf(path, lang):
+def scan_pdf(bundle, lang):
     """ページ全文に対して finditer し、行またぎのマッチも文脈窓で拾う。"""
     hits = []
     pat = PATTERNS[lang]
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            last_end = -1
-            for m in pat.finditer(text):
-                if m.start() < last_end:  # 直前の窓に含まれる分は割愛
-                    continue
-                lo = max(0, m.start() - WINDOW)
-                hi = min(len(text), m.end() + WINDOW)
-                last_end = hi
-                snip = " / ".join(
-                    s.strip() for s in text[lo:hi].splitlines() if s.strip())
-                hits.append((page.page_number, snip))
+    for page_number, text in bundle_pages.texts(bundle):
+        last_end = -1
+        for m in pat.finditer(text):
+            if m.start() < last_end:  # 直前の窓に含まれる分は割愛
+                continue
+            lo = max(0, m.start() - WINDOW)
+            hi = min(len(text), m.end() + WINDOW)
+            last_end = hi
+            snip = " / ".join(
+                s.strip() for s in text[lo:hi].splitlines() if s.strip())
+            hits.append((page_number, snip))
     return hits
 
 
@@ -80,22 +90,31 @@ def main():
     args = ap.parse_args()
 
     known = load_known()
+    # 目録から mirror の並びを組む（glob と順序まで一致することを実測済み）。
+    rows = bundle_pages.documents("datasheet") + bundle_pages.documents("reference-manual")
+    repos = sorted({r for row in rows for r in row["repositories"].split(";")}
+                   & {p.name for p in MIRRORS.glob("CH32*")})
     targets = []
-    for repo in sorted(MIRRORS.glob("CH32*")):
+    for repo in repos:
         for lang in ("zh", "en"):
-            for pdf in sorted((repo / f"datasheet_{lang}").glob("*.PDF")):
-                if "RM" in pdf.name and not args.rm:
+            for row in sorted(rows, key=lambda r: r["document"]):
+                document = row["document"]
+                if repo not in row["repositories"].split(";"):
                     continue
-                if args.only and args.only not in pdf.name:
+                bundle = f"{Path(document).stem}.{lang}"
+                if not (bundle_pages.BUNDLES / bundle / "manifest.json").exists():
                     continue
-                targets.append((pdf, lang))
+                if "RM" in document and not args.rm:
+                    continue
+                if args.only and args.only not in document:
+                    continue
+                targets.append((f"{repo}/datasheet_{lang}/{document}", bundle, lang))
 
     new_count = 0
     found_ids = set()
-    for pdf, lang in targets:
-        rel = pdf.relative_to(MIRRORS)
+    for rel, bundle, lang in targets:
         try:
-            hits = scan_pdf(pdf, lang)
+            hits = scan_pdf(bundle, lang)
         except Exception as exc:  # 壊れたPDFはスキップして報告
             print(f"{rel}: 読み取り失敗 {exc}", file=sys.stderr)
             continue

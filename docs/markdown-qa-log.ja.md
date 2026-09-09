@@ -2945,3 +2945,39 @@ SYSCLK=0・PLLCLK=1 と言っていた。つまり**ライブラリの引数定�
 これは「**API の定数ではなくレジスタ定義を読む**」という設計判断が当たった実例。
 API の定数は人が書く便宜的な層で、こう入れ替わることがある。レジスタ定義は
 ハードウェアの記述なので、そちらを一次に置いたぶんこの改版で何も壊れなかった。
+
+## 凍結toolの退役 第11号——`extract_package_dims`・`scan_errata`（2026-09-10）
+
+どちらも使う面は `extract_text` だけで、第9号までに足した `bundle_pages.texts` で足りた。
+**`run_scan_errata.py`（互換層で走らせるための runner）も要らなくなって消えた。**
+
+### `extract_package_dims`（92行）
+
+PACKAGE.PDF の目次6ページから封装の寸法を読む（図面ページは画像で文字層が無いので、
+目次が機械可読な唯一の記述）。`packages.csv` の `body_size`/`pin_pitch` の出所。
+
+`extract()` は **bundle 名でも原本PDFのパスでも受ける**ようにした——凍結
+`tools/build_tables.py`（退役は別企画）が `WCH-common/datasheet_<lang>/PACKAGE.PDF` を
+渡してくるので、親ディレクトリから言語を読んで `PACKAGE.zh`/`PACKAGE.en` に直す。
+呼ぶ側を触らずに済む。**zh/en とも 105 entry が凍結版と完全一致。**
+
+### `scan_errata`（125行）
+
+datasheet 横断のエラッタ収集。**出力の mirror 相対パスを変えられない**のが要点——
+`curated/errata.csv` の `match` はその文字列（`CH32V003/datasheet_zh/CH32V003DS0.PDF` ＋
+前後文脈）に掛かるので、綴りが変わると KNOWN が NEW に化ける。
+
+凍結版は mirror を glob していた。新経路は目録（`catalog/documents.csv` の `repositories`）
+から同じ並びを組む——**移植の前に、DS のみ34件・RM 込み58件が順序まで含めて glob と
+一致することを実測**してから書いた。`CH32FV2x_V3xRM.PDF` だけ2つの repository に載るので
+2回走るのも凍結版と同じ。
+
+**出力が byte 一致**——DS のみ56行、`--rm` 込み568行、終了コードも同じ。
+
+### 残る PDF 直読み
+
+`build_all`（multiprocessing）・`build_tables`・`extract_products`/`extract_ordering`
+（`build_all` 経由）・`extract_remap`（review 経路）・`extract_images`（pixel。原本が要る）・
+`convert_structured`/`document_converter`（converter 自身）。
+**`--out` を持つ単体CLIはもう無い**ので、次は `build_all` の一族（`build_tables`・
+`extract_products`・`extract_ordering`）をまとめて動かす企画になる。

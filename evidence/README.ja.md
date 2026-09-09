@@ -723,7 +723,7 @@ schematic-pdf  family単位の回路図PDF                      12
 
 1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
 
-エラッタは今後のdatasheet改版で増えうるため、`tools/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
+エラッタは今後のdatasheet改版で増えうるため、`pipeline/extract/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
 
 ### `operating_conditions.csv`
 
@@ -924,6 +924,6 @@ uv run tools/check_tables.py                    # 全テーブルの参照結合
 uv run tools/check_counts.py                    # 比較表の周辺数 vs pinのinstance数
 uv run tools/check_docs.py                      # 文書が書いている行数・穴の状態 vs 実際の表
 node tools/check_viewer.js                      # pins.html の表示（script を DOM 無しで評価）
-uv run pipeline/extract/run_scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
+uv run pipeline/extract/scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
 uv run tools/build_tables.py --family CH32V006  # 1familyだけ
 ```

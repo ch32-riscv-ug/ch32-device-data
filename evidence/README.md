@@ -741,7 +741,7 @@ at the target. It is an identifier, not a "display value".
 
 One row per erratum (lot-dependent behaviour, hardware cautions). The source is `curated/errata.csv` (hand-edited); the `condition` column holds which lots/part numbers it applies to. **Rows with the page in both language datasheets recorded (source_zh/source_en) are confirmed**; one side only is reference.
 
-Since errata can grow with future datasheet revisions, `tools/scan_errata.py` scans all datasheets, matches against the known ones (identified by the regular expressions in the `match` column of curated/errata.csv), and reports any unknown text as `NEW` (exit code 1). When NEW appears, add a row to curated/errata.csv and re-run to confirm NEW: 0.
+Since errata can grow with future datasheet revisions, `pipeline/extract/scan_errata.py` scans all datasheets, matches against the known ones (identified by the regular expressions in the `match` column of curated/errata.csv), and reports any unknown text as `NEW` (exit code 1). When NEW appears, add a row to curated/errata.csv and re-run to confirm NEW: 0.
 
 ### `operating_conditions.csv`
 
@@ -951,6 +951,6 @@ uv run tools/check_tables.py                    # reference joins of all tables,
 uv run tools/check_counts.py                    # peripheral counts of the comparison table vs pin instance counts
 uv run tools/check_docs.py                      # row counts and hole states claimed by the documents vs the tables
 node tools/check_viewer.js                      # what pins.html shows (its script evaluated without a DOM)
-uv run pipeline/extract/run_scan_errata.py                     # incremental errata check (exit code 1 on NEW)
+uv run pipeline/extract/scan_errata.py                     # incremental errata check (exit code 1 on NEW)
 uv run tools/build_tables.py --family CH32V006  # one family only
 ```
