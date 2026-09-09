@@ -912,7 +912,7 @@ order from the top.
 ```sh
 uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/ (extraction candidates per part number; serial -- the patch does not survive worker processes)
 uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
-uv run pipeline/extract/run_patched.py build_pins                      # pins/pin_functions (takes a few minutes)
+uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions (from bundles; takes a few minutes)
 uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes (from candidates)
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions (new path, bundle input; frozen base rows + A11 rows)
 uv run tools/build_evt_examples.py              # evt_examples (from the EVT tree and catalog)

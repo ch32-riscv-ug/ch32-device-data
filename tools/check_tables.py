@@ -175,8 +175,8 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "option_byte_fields": ("extract_option_bytes.py", "FIELD_COLUMNS"),
     "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
     "pin_alternate": ("build_pin_alternate.py", "COLUMNS"),
-    "pin_functions": ("build_pins.py", "FUNCTION_COLUMNS"),
-    "pins": ("build_pins.py", "PIN_COLUMNS"),
+    "pin_functions": ("extract_pin_tables.py", "FUNCTION_COLUMNS"),
+    "pins": ("extract_pin_tables.py", "PIN_COLUMNS"),
     "product_attributes": ("build_tables.py", "ATTRIBUTE_COLUMNS"),
     "products": ("build_tables.py", "PRODUCT_COLUMNS"),
     "register_blocks": ("extract_registers.py", "BLOCK_COLUMNS"),
@@ -463,7 +463,7 @@ def routes_backed_by_pins(t: dict) -> list[str]:
     """`remap_routes` の各経路が、その series の pin 表に実在するか。
 
     **どちらも同じ datasheet の pin 表から来るのに、通る道が違います。**
-    `pin_functions` は `build_pins` が PDF を直読みして両言語版を突き合わせたもの、
+    `pin_functions` は `extract_pin_tables` が bundle から両言語版を突き合わせたもの、
     `remap_routes` は `build_all` が作った candidate 経由。**同じ事実の2つの読みが
     食い違っていないことを、ここで初めて突き合わせます。**
 

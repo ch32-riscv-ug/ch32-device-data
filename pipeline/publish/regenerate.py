@@ -53,32 +53,51 @@ Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 
 
 
-# --fullの旧tool群（bundle入力の正規実行形）。PATCHED=PDFを読むので
-# run_patched.py経由、PLAIN=EVT・candidates・配布物しか読まないのでそのまま。
-# 並びはevidence/READMEの「生成」の依存順。
-FULL_PATCHED_1 = ["build_all --jobs 1", "build_tables", "build_pins", "build_remap"]
-FULL_PLAIN_1 = ["build_evt_examples", "build_clock", "build_systick",
-                "build_pin_alternate"]
-# FULL_PATCHED_2（`build_memory`）は2026-09-09に退役して evidence 段の
-# `pipeline/extract/rm/extract_memory.py` になった。PDFを読む段が1つ減った。
-FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
-# FULL_PATCHED_3（`build_opa_cmp_registers`・`build_clock_enables`・
-# `build_usbpd_plumbing`・`build_registers`・`build_flash_program_method`）は
-# 2026-09-09に退役して evidence 段の `pipeline/extract/rm/` になった（退役 第9号）。
-# **PDFを読む legacy の段はこれで `FULL_PATCHED_1` だけになった。**
-FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
-                "build_link_firmware"]
+# --fullの全再生成の**順序そのもの**（evidence/READMEの「生成」の依存順）。
+# 実行の仕方を kind で持つ:
+#   patched … 凍結tool。PDFを読むので `run_patched.py` 経由で bundle を読ませる
+#   plain   … 凍結tool。EVT・candidates・配布物しか読まないのでそのまま呼ぶ
+#   new     … 退役済みの新経路の生成器。argv をそのまま持つ
+#
+# **退役した生成器がこの並びの中に残るのは、凍結toolがその出力を読むとき。**
+# `extract_pin_tables`（退役 第10号）がそれ——`build_remap` と `build_pin_alternate` が
+# `pin_functions.csv` を読むので、evidence 段（legacy の後に走る）へ移すと前回の走行の
+# 値を読んでしまう（`timers`・`flash_program_method` で踏んだ形）。読む側が退役したら
+# evidence 段へ移せる。
+#
+# 以前は PATCHED/PLAIN の5つのリストだった。退役が進んで「凍結かどうか」より
+# **順序**が本質になったので、1つの並びに畳んだ（2026-09-09）。退役済み:
+# `build_memory`（旧 FULL_PATCHED_2）・`build_opa_cmp_registers`・`build_clock_enables`・
+# `build_usbpd_plumbing`・`build_registers`・`build_flash_program_method`（旧 FULL_PATCHED_3）
+# は evidence 段の `pipeline/extract/rm/` へ。
+FULL_ORDER: list[tuple[str, str]] = [
+    ("patched", "build_all --jobs 1"),
+    ("patched", "build_tables"),
+    ("new", "pipeline/extract/datasheet/extract_pin_tables.py"),
+    ("patched", "build_remap"),
+    ("plain", "build_evt_examples"),
+    ("plain", "build_clock"),
+    ("plain", "build_systick"),
+    ("plain", "build_pin_alternate"),
+    ("plain", "build_interrupts"),
+    ("plain", "build_memory_map"),
+    ("plain", "build_eval_boards"),
+    ("plain", "build_sources"),
+    ("plain", "build_evt_variants"),
+    ("plain", "build_link_firmware"),
+]
 
 
 def legacy_steps() -> list[Step]:
     steps: list[Step] = []
-    for patched, names in ((True, FULL_PATCHED_1), (False, FULL_PLAIN_1),
-                           (False, FULL_PLAIN_2), (False, FULL_PLAIN_3)):
-        for spec in names:
-            name, *extra = spec.split()
-            argv = (["pipeline/extract/run_patched.py", name, *extra] if patched
-                    else [f"tools/{name}.py", *extra])
-            steps.append((spec, argv))
+    for kind, spec in FULL_ORDER:
+        name, *extra = spec.split()
+        if kind == "new":
+            steps.append((Path(name).stem, [name, *extra]))
+            continue
+        argv = (["pipeline/extract/run_patched.py", name, *extra] if kind == "patched"
+                else [f"tools/{name}.py", *extra])
+        steps.append((spec, argv))
     return steps
 
 

@@ -2823,3 +2823,67 @@ module import の `paths` を shadow していた——`build_usbpd_plumbing` �
 `convert_structured`/`document_converter`（converter 自身）。
 次は `extract_pins`／`extract_remap`（どちらも `extract_text_lines`・`find_tables` で、
 第9号で足した面で足りる）。`build_all` は multiprocessing なので別の企画。
+
+## 凍結toolの退役 第10号——`extract_pins`・`build_pins`（2026-09-10）
+
+`pins` 4,563行・`pin_functions` 28,483行。**`--verify` のパリティ定番一式が実質空になった**
+（残る `build_remap` は PDF を読まない）ので、そのことも記録に残す。
+
+### 足した面と、消した重複
+
+`extract_pins` は縦に結合されたセルを「矩形が覆っている行」に配る（`fill_merged`。
+datasheet は2つの pad が同じ足に出ることを lead 番号のセルの縦結合で書く）ので、
+**行ごとのセルの矩形**が要る。`bundle_pages.tables(page)` を足した——`page.find_tables()`
+の置き換えで、`bbox`・`rows[].cells`・`extract()` を持つ。
+
+**同じ形の定義が2箇所にあったのを1つにした。** `Row`/`Table` は `pdfcompat` にもあったので、
+**新経路の読み手（`bundle_pages`）に置いて互換層がそれを import する**形にした——互換層は
+凍結toolのために同じ形を必要とするだけなので、凍結toolが全部退役すれば module ごと消える。
+`extracted_tables`・`positioned_tables` も `tables()` 経由に書き直して、定義の分岐を無くした。
+`run_frozen --batch` が引き続き byte 一致なので、互換層の振る舞いは変わっていない。
+
+### `pdf` object ではなく**ページ record のリスト**を持ち回る
+
+凍結版は `pdfplumber.open()` の `pdf` を持ち回り、表ごとに `pdf.pages` を何度も走った。
+新経路は `pages = list(bundle_pages.pages(bundle))` を持ち回る——generator だと表ごとに
+ページを読み直す（sha 照合も毎回）ことになる。
+
+pdfplumber の頃はページの解析結果が重くて（**148ページで約800MiB**）読み終えたページを
+`close()` していたが、bundle のページ record は素の JSON なのでその必要が無い。
+`page.close()` の呼び出しは落とし、なぜ要らないかをコメントに残した。
+
+### `build_all` を import しない
+
+凍結 `build_pins` は列の手当て（`curated/pin-table-columns.json`）を
+`build_all.curated_columns()` から取っていた。`build_all` は PDF 直読みの凍結tool
+（multiprocessing）なので、import すると**新経路が凍結toolを引き込む**。JSON を読むだけの
+3行なので新経路に持った。
+
+### `--full` の順序を1つのリストに畳んだ
+
+`pin_functions.csv` は `build_remap` と `build_pin_alternate` が読む。どちらも凍結tool
+（legacy 段）で、evidence 段は legacy の**後**に走るので、`extract_pin_tables` を evidence 段へ
+移すと前回の走行の値を読んでしまう（`timers`・`flash_program_method` で踏んだ形）。
+
+そこで `regenerate.py` の `--full` の並びを、PATCHED/PLAIN の5つのリストから
+**`FULL_ORDER` という1つの並び**に畳んだ。各段は `kind` を持つ——`patched`（凍結・PDFを読む
+ので `run_patched` 経由）・`plain`（凍結・PDFを読まない）・`new`（退役済みの新経路）。
+退役した生成器がこの並びに残るのは**凍結toolがその出力を読むときだけ**で、読む側が退役したら
+evidence 段へ移せる。退役が進んで「凍結かどうか」より順序が本質になったので、この形が素直。
+
+### 検算
+
+`pins.csv`・`pin_functions.csv` が**正本と byte 一致**。`run_frozen --batch` は
+`build_remap` の2出力が byte 一致。
+
+### パリティ定番一式の意味が変わった
+
+`BATCH` は6本 → 2本（第9号）→ **1本**（第10号）になり、残る `build_remap` は
+`candidates/*.json` と `pin_functions.csv` から作るので**PDF を読まない**。つまり
+`--verify` の凍結パリティが見ているのは「出力が再現するか」だけで、**bundle 入力の
+妥当性はもう見ていない**。PDF直読みで単一プロセス・`--out` 持ちの凍結toolが無くなったため
+——残るのは `build_all`（multiprocessing）・`build_tables`・`extract_products`/
+`extract_ordering`（`build_all` 経由）・`extract_remap`（review 経路）・
+`extract_package_dims`・`scan_errata`・`extract_images`（pixel）で、どれもこの形に載らない。
+**次の退役でここは空になる**見込みで、そのときはパリティの相手を作り直すのではなく
+`--verify` の意味自体を見直す（`markdown parity` と `check_baseline` が実質の防波堤になる）。

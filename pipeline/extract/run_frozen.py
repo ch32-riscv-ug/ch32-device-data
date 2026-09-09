@@ -14,7 +14,7 @@ multiprocessingを使うtool（`build_all`系）と、pixelを読むtool（`extr
 `run_scan_errata.py`が同じ差し替えで走らせる（旧新の出力byte一致を実測済み）。
 
 実行:
-    uv run pipeline/extract/run_frozen.py build_pins build_remap ...
+    uv run pipeline/extract/run_frozen.py build_remap ...
     uv run pipeline/extract/run_frozen.py --batch   # 単一プロセスの定番一式
 """
 
@@ -42,21 +42,28 @@ CANDIDATES = REPO / ".cache" / "pipeline-candidates" / "frozen"
 # `opa_cmp_registers`・`clock_enables`・`usbpd_plumbing`・`flash_program_method`）を覆った。
 # bundle入力なので6本で約19秒（PDF直読みの頃は1本で数分）。
 #
-# **2026-09-09（退役 第9号）に4本が抜けた**——`build_opa_cmp_registers`・
-# `build_clock_enables`・`build_usbpd_plumbing`・`build_flash_program_method` は
-# 新経路（`pipeline/extract/rm/`）へ移して削除した。残るのは `build_pins`（`pins`
-# 4,563行・`pin_functions` 28,483行）と `build_remap`（`remap_fields`・`remap_routes`）で、
-# **行数で見ればパリティの覆いはほとんど減っていない**（退役した4表は合わせて747行）。
-# **据え置き中（`--hold-sources`）に単体で回すときは`CH32_HOLD_SOURCES`を渡す**——渡さないと
-# pdfcompatのゲートが据え置き文書を拒否し、その文書ぶんが落ちた出力を「不一致」と報告する
-# （`build_pins`のX035DS0.zhで実際に出た）。`regenerate.py --hold-sources`経由なら自動で入る。
-BATCH = ("build_pins", "build_remap")
+# **2026-09-09に5本が抜けた**——第9号で `build_opa_cmp_registers`・`build_clock_enables`・
+# `build_usbpd_plumbing`・`build_flash_program_method`、第10号で `build_pins` を新経路へ
+# 移して削除した。残るのは `build_remap`（`remap_fields` 287行・`remap_routes` 4,836行）
+# **1本**。
+#
+# **`build_remap` は PDF を読まない**（`candidates/*.json` と `pin_functions.csv` から作る）
+# ので、この定番一式が見ているのは「出力が再現するか」だけになった。PDF直読みの凍結toolで
+# 単一プロセス・`--out` 持ちのものが無くなったため——残る直読みは `build_all`
+# （multiprocessing）・`build_tables`・`extract_products`/`extract_ordering`（`build_all` 経由）・
+# `extract_remap`（review 経路）・`extract_package_dims`・`scan_errata`・`extract_images`（pixel）で、
+# どれもこの形に載らない。**次の退役でここは空になる見込み**で、そのときはパリティの相手を
+# 作り直すのではなく `--verify` の意味自体を見直すことになる。
+#
+# 据え置き中（`--hold-sources`）に単体で回すときの `CH32_HOLD_SOURCES` は、PDFを読む相手が
+# 居なくなったので `build_remap` には効かない（渡しても害は無い）。
+BATCH = ("build_remap",)
 
 
 def patch_all_modules() -> int:
     """読み込まれた全moduleの`pdfplumber`属性を互換層へ差し替える。
 
-    toolは互いにimportし合う（`build_pins`→`extract_pins`など）ので、対象module
+    toolは互いにimportし合う（`build_all`→`extract_products`など）ので、対象module
     だけでなく連鎖して読み込まれた全部を差し替える。
     """
     # **基準は局所に控える**——`pdfplumber`はこのmoduleのグローバルなので、ループが

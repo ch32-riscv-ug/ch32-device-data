@@ -21,8 +21,17 @@ absorbs the editions' drift in table numbering, column spelling and shared
 columns. A fact both editions state is confirmed, one edition alone is
 reference, and the same lead carrying different pads is a conflict.
 
+読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。凍結 `tools/build_pins.py` の
+移植＝退役 第10号）。表の解析は `pipeline/extract/datasheet/extract_pins.py`
+（凍結 `tools/extract_pins.py` の移植）。datasheet は目録（`catalog/products.csv` の
+`datasheet` 欄）で引き、bundle 名は `<stem>.<lang>`。
+
+列の手当て（`curated/pin-table-columns.json`）は凍結 `build_all.curated_columns()` が
+読んでいたのと同じファイルを直接読む——`build_all` を import すると PDF 直読みの
+凍結tool を新経路に引き込むことになるので、JSON を読むだけの3行はこちらに持つ。
+
 Usage:
-    uv run tools/build_pins.py --out tables [--family CH32V003]
+    uv run pipeline/extract/datasheet/extract_pin_tables.py --out tables [--family CH32V003]
 """
 
 from __future__ import annotations
@@ -35,19 +44,24 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-
-import pdfplumber  # noqa: E402
-
-import build_all  # noqa: E402
-import extract_pins  # noqa: E402
-
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import bundle_pages  # noqa: E402
+import extract_pins  # noqa: E402
 import paths  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
-REPO = Path(__file__).resolve().parent.parent
+# 凍結 `build_all.curated_columns()` と同じファイル（列の手当て。人が書いた台帳）。
+CURATED_COLUMNS = REPO / "curated" / "pin-table-columns.json"
+
+
+def curated_columns() -> dict:
+    if not CURATED_COLUMNS.exists():
+        return {}
+    return json.loads(CURATED_COLUMNS.read_text(encoding="utf-8"))
 
 # The "#" column separates data from metadata; see tables/README.ja.md.
 PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type",
@@ -76,7 +90,7 @@ def canon_variant(name: str) -> str:
     return FOOTNOTE.sub("", name.replace("×", "X")).strip().upper()
 
 
-def read_edition(path: Path) -> tuple[dict, dict, dict]:
+def read_edition(bundle: str, document: str) -> tuple[dict, dict, dict]:
     """One edition's pin tables.
 
     Returns (columns, functions, titles):
@@ -89,33 +103,33 @@ def read_edition(path: Path) -> tuple[dict, dict, dict]:
     columns: dict = {}
     functions: dict = collections.defaultdict(set)
     titles: dict = {}
-    overrides = build_all.curated_columns().get(path.name, {})
+    overrides = curated_columns().get(document, {})
     ordinal: collections.Counter = collections.Counter()
     # 表は先に全部読む。**名前の語彙は datasheet 単位**で、番号表でしか綴られない
     # 名前と説明表でしか綴られない名前があるため（extract_pins.resplit）。
     parsed: list[tuple[str, str, list, list, dict]] = []
-    with pdfplumber.open(path) as pdf:
-        caps = extract_pins.captions(pdf)
-        seen: set[str] = set()
-        for i, (label, title, _) in enumerate(caps):
-            if not any(t in title.lower() for t in extract_pins.PIN_TABLE_TITLE) \
-                    or label in seen:
-                continue
-            seen.add(label)
-            stop = extract_pins.next_caption(caps, i)
-            rows, variants, layout = extract_pins.find_pin_tables(pdf, label, stop)
-            fixed = overrides.get(label, {}).get("columns")
-            if fixed:
-                # The curated list is authoritative; the parser only found where
-                # the columns are, not always what they are called.
-                variants = fixed + variants[len(fixed):]
-            parsed.append((label, title, rows, variants, layout))
+    pages = list(bundle_pages.pages(bundle))
+    caps = extract_pins.captions(pages)
+    seen: set[str] = set()
+    for i, (label, title, _) in enumerate(caps):
+        if not any(t in title.lower() for t in extract_pins.PIN_TABLE_TITLE) \
+                or label in seen:
+            continue
+        seen.add(label)
+        stop = extract_pins.next_caption(caps, i)
+        rows, variants, layout = extract_pins.find_pin_tables(pages, label, stop)
+        fixed = overrides.get(label, {}).get("columns")
+        if fixed:
+            # The curated list is authoritative; the parser only found where
+            # the columns are, not always what they are called.
+            variants = fixed + variants[len(fixed):]
+        parsed.append((label, title, rows, variants, layout))
     # **pad 欄を先に直す。** 折り返しを読み落とした `PC14-` を同じ版の他の表の
     # 綴りへ寄せる（`extract_pins.complete_truncated_pads`）。機能は pad をキーに
     # 帰属させるので、語彙と機能を作る前にやる必要がある。
     for note in extract_pins.complete_truncated_pads(
             [(r, lay) for _, _, r, _, lay in parsed]):
-        print(f"{path.name}: {note}", file=sys.stderr)
+        print(f"{document}: {note}", file=sys.stderr)
     spelled = extract_pins.datasheet_names([(r, lay) for _, _, r, _, lay in parsed])
     for label, title, rows, variants, layout in parsed:
         m = re.search(r"CH32[A-Z0-9]+", title)
@@ -344,9 +358,11 @@ def main() -> int:
     for (family, datasheet) in sorted(products):
         editions = {}
         for lang in ("zh", "en"):
-            path = MIRRORS / family / f"datasheet_{lang}" / datasheet
+            bundle = f"{Path(datasheet).stem}.{lang}"
+            has = (bundle_pages.BUNDLES / bundle / "manifest.json").exists()
             try:
-                editions[lang] = read_edition(path) if path.exists() else ({}, {}, {})
+                editions[lang] = (read_edition(bundle, datasheet) if has
+                                  else ({}, {}, {}))
             except Exception as exc:  # noqa: BLE001
                 print(f"{family}/{datasheet} {lang}: 読めません {exc}", file=sys.stderr)
                 editions[lang] = ({}, {}, {})
