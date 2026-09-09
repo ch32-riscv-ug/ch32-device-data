@@ -44,8 +44,15 @@
     EVT の Link.ld     組合せの一覧（符号は無い）。RM との照合に使う
     EVT の header      FLASH_OBR のマスクと OB_RAM_CODE_MOD の値
 
+`tools/build_memory.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第6号）。読む欄は bundle の `text`
+（ページ本文）と `number` だけで、読みの規則は変えていない。ページの読み手は
+`pipeline/extract/bundle_pages.py`（sha 照合つき）。EVT のヘッダと linker script は mirror を
+そのまま読む（PDF ではないので構造化の対象外）ので `--mirrors` は残す。
+
 実行:
-    uv run tools/build_memory.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_memory.py [--mirrors <dir>] [--out <dir>]
 """
 
 from __future__ import annotations
@@ -56,12 +63,12 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["part_number", "value", "code_bytes", "sram_bytes",
            "datasheet_value", "option_byte_bits", "obr_bits",
@@ -119,7 +126,7 @@ def bit_span(mask: int) -> tuple[int, int] | None:
     return (hi, lo) if mask >> lo == (1 << (hi - lo + 1)) - 1 else None
 
 
-def read_manual(path: Path) -> list[dict]:
+def read_manual(bundle: str) -> list[dict]:
     """reference manual から組合せの組を読む。
 
     同じ表が2回出る（FLASH_OBR の節と用户选择字の節）。**続きの行が組に属するか
@@ -130,36 +137,35 @@ def read_manual(path: Path) -> list[dict]:
     current: dict | None = None
     tail: list[str] = []
     user_bits: tuple[int, int] | None = None
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            if "CODE-" not in text and "CODE -" not in text and "USER" not in text:
+    for page in bundle_pages.pages(bundle):
+        text = page.get("text") or ""
+        if "CODE-" not in text and "CODE -" not in text and "USER" not in text:
+            continue
+        for line in text.splitlines():
+            line = line.strip()
+            if RUNNING.search(line):
                 continue
-            for line in text.splitlines():
-                line = line.strip()
-                if RUNNING.search(line):
-                    continue
-                found = USER_BITS.search(line)
-                if found and user_bits is None:
-                    user_bits = (int(found.group("hi")), int(found.group("lo")))
-                match = COMBINATION.search(line)
-                if match:
-                    # 組の切れ目は「適用先を書き終えたところ」。組合せ行の間に
-                    # 別の行が挟まるのは PDF が同じセルを分けて出しているだけで、
-                    # 切れ目ではない（en 版は 110 と 111 の間にフィールド名の
-                    # 折り返しが入る）。
-                    if current is not None and any(
-                            marker in text for text in tail
-                            for marker in NARROWS):
-                        current["tail"] = tail
-                        groups.append(current)
-                        current, tail = None, []
-                    if current is None:
-                        current = {"page": page.page_number, "values": {}}
-                    current["values"][match.group("value")] = (
-                        int(match.group("code")) * 1024, int(match.group("sram")) * 1024)
-                elif current is not None:
-                    tail.append(line)
+            found = USER_BITS.search(line)
+            if found and user_bits is None:
+                user_bits = (int(found.group("hi")), int(found.group("lo")))
+            match = COMBINATION.search(line)
+            if match:
+                # 組の切れ目は「適用先を書き終えたところ」。組合せ行の間に
+                # 別の行が挟まるのは PDF が同じセルを分けて出しているだけで、
+                # 切れ目ではない（en 版は 110 と 111 の間にフィールド名の
+                # 折り返しが入る）。
+                if current is not None and any(
+                        marker in text for text in tail
+                        for marker in NARROWS):
+                    current["tail"] = tail
+                    groups.append(current)
+                    current, tail = None, []
+                if current is None:
+                    current = {"page": page["number"], "values": {}}
+                current["values"][match.group("value")] = (
+                    int(match.group("code")) * 1024, int(match.group("sram")) * 1024)
+            elif current is not None:
+                tail.append(line)
     if current is not None:
         current["tail"] = tail
         groups.append(current)
@@ -265,7 +271,7 @@ def expand(applies: list[str], parts: list[dict], variants: dict[str, list[str]]
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
+    ap.add_argument("--mirrors", type=Path, default=paths.MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
@@ -314,9 +320,9 @@ def main() -> int:
         family = owners[0]
         readings: dict[str, list[dict]] = {}
         for lang in ("zh", "en"):
-            path = args.mirrors / family / f"datasheet_{lang}" / document
-            if path.exists():
-                readings[lang] = read_manual(path)
+            name = f"{Path(document).stem}.{lang}"
+            if (bundle_pages.BUNDLES / name / "manifest.json").exists():
+                readings[lang] = read_manual(name)
         if not readings:
             notes.append(f"{document}: 読める版が無い")
             continue

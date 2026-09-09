@@ -57,7 +57,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `pipeline/extract/datasheet/extract_features.py`: familyが持つ周辺の一覧を`evidence/features.csv`にする。
   比較表は「シリーズ内で差がある列」しか持たないので機能フラグを作れない。
   **機能説明章の節見出し**を採る。節番号は言語に依らないので中英が厳密に対応する
-- `tools/build_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを
+- `pipeline/extract/rm/extract_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを
   `evidence/memory_configs.csv`にする。`products.csv`の`flash_bytes`/`sram_bytes`は
   datasheetの比較表が載せる1組しか言わないので、**振り直せること自体がそこから
   読めない**。reference manualが符号と適用先を、EVTの`Link.ld`が組合せを言い、

@@ -609,7 +609,7 @@ on the consumer side (F-10/F-12 in docs/worklist.ja.md (Japanese)).
 
 The combination table for **parts whose FLASH/SRAM boundary moves with the 用户选择字 (user option bytes)**.
 One row per (part number, code). `flash_bytes`/`sram_bytes` in `products.csv` state only the one pair the datasheet
-comparison table lists, so the fact that it can be reassigned cannot be read from there (`tools/build_memory.py`).
+comparison table lists, so the fact that it can be reassigned cannot be read from there (`pipeline/extract/rm/extract_memory.py`).
 
 The scope is **19 parts / 3 families** -- CH32V20x's `_D8`/`_D8W` (V203RB, V208),
 CH32V30x's C parts (V303RC/VC, V307RC/VC/WC, V317VC/WC), CH32V407/V467.
@@ -918,15 +918,15 @@ uv run tools/build_evt_examples.py              # evt_examples (from the EVT tre
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init (from EVT)
 uv run tools/build_systick.py                   # systick (from EVT's core_riscv.h)
 uv run tools/build_pin_alternate.py             # pin_alternate (from EVT's AFIO structure and GPIO driver)
-uv run pipeline/extract/run_patched.py build_memory                    # memory_configs (from the RM and EVT's Link.ld; takes a few minutes)
+uv run pipeline/extract/rm/extract_memory.py         # memory_configs (the RM's code table + EVT's Link.ld, read from the bundles; seconds)
 uv run tools/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
 uv run tools/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
 uv run pipeline/extract/datasheet/extract_features.py   # features (datasheet functional-description headings, read from the bundles; seconds)
 uv run pipeline/extract/rm/extract_timers.py         # timers (the RM's TIMx_CNT headings, read from the bundles; seconds)
-uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry (EVT flash driver + RM 闪存 (flash) chapter)
+uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry (EVT flash driver + the RM's flash chapter, read from the bundles; seconds)
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers (EVT headers + RM register tables. Reads the whole RM; slow)
 uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables (EVT rcc.h + RM register tables. Reads the whole RM; slow)
-uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal (prose and electrical characteristics tables of both datasheet editions)
+uv run pipeline/extract/datasheet/extract_adc_internal.py  # adc_internal (prose and electrical characteristics tables of both datasheet editions, read from the bundles; seconds)
 uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing (after clock_enables. EVT headers + RM)
 uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields + index/register_layouts (EVT headers + whole RM; about 19 minutes on bundles. No cache -- a stale --rm-cache once rolled the canonical back to a pre-revision RM reading)
 uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests (DMA chapter grids of the RM zh/en, read from the bundles; seconds)

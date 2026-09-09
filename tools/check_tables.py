@@ -143,7 +143,7 @@ def shared_leads(t: dict) -> list[str]:
 # 値は (ファイル名, 定数名)。定数は `ast` で読むので、pdfplumber を要する生成器でも
 # import せずに見られる。
 COLUMN_SOURCES: dict[str, tuple[str, str]] = {
-    "adc_internal": ("build_adc_internal.py", "COLUMNS"),
+    "adc_internal": ("extract_adc_internal.py", "COLUMNS"),
     "clock_configs": ("build_clock.py", "CONFIG_COLUMNS"),
     "clock_enables": ("build_clock_enables.py", "COLUMNS"),
     "clock_init": ("build_clock.py", "INIT_COLUMNS"),
@@ -163,11 +163,11 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "evt_variants": ("build_evt_variants.py", "COLUMNS"),
     "families": ("build_tables.py", "FAMILY_COLUMNS"),
     "features": ("extract_features.py", "COLUMNS"),
-    "flash_geometry": ("build_flash_geometry.py", "COLUMNS"),
+    "flash_geometry": ("extract_flash_geometry.py", "COLUMNS"),
     "flash_program_method": ("build_flash_program_method.py", "COLUMNS"),
     "interrupts": ("build_interrupts.py", "COLUMNS"),
     "link_firmware": ("build_link_firmware.py", "COLUMNS"),
-    "memory_configs": ("build_memory.py", "COLUMNS"),
+    "memory_configs": ("extract_memory.py", "COLUMNS"),
     "memory_map": ("build_memory_map.py", "COLUMNS"),
     "opa_cmp_registers": ("build_opa_cmp_registers.py", "COLUMNS"),
     "operating_conditions": ("build_operating.py", "COLUMNS"),
@@ -1411,7 +1411,7 @@ def main() -> int:
                 bad.append(f"memory_configs: {r['part_number']} の {column} が正の数でない")
     span = re.compile(r"^\[(\d+):(\d+)\]$")
     for part, rows in sorted(by_part.items()):
-        # 「既定」と呼べる1組は資料が決めていない（build_memory.py の説明）。
+        # 「既定」と呼べる1組は資料が決めていない（extract_memory.py の説明）。
         # 列が言うのは「datasheet の比較表が載せる組」だけで、それは1つ。
         quoted = [r for r in rows if r["datasheet_value"]]
         if len(quoted) != 1:

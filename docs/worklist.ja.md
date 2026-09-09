@@ -564,9 +564,22 @@ sha 照合つき）。既存の第1・2号もそちらへ寄せた（出力は b
 `evt_variants` より前に走っていたので、evidence 段へ移して同じ走行の値を読むようにした。
 
 `build_clock_enables`・`build_usbpd_plumbing` の「`search`×2〜3」は `re.search` の誤検出で、実体は
-`extract_registers.extract(pdf, …)` への委譲——**`extract_registers` の退役が先**。次は
-`bundle_pages` に `page.search`（`lines[].text` への正規表現一致）を足して `build_flash_geometry`・
-`build_adc_internal`・`build_memory` あたり。
+`extract_registers.extract(pdf, …)` への委譲——**`extract_registers` の退役が先**。
+
+**第5〜7号 完了（同日）**: `adc_internal`（19行）・`memory_configs`（67行）・`flash_geometry`（12行）。
+3本とも `extract_text` だけだった（`page.search` は要らなかった）。evidence 段へ移す前に**順序の依存を
+全部洗い**、実際の依存1本（`flash_geometry`←`memory_configs`）だけを段の中で守った。`build_memory` が
+抜けて **FULL_PATCHED_2 が空**になった。
+
+**`run_frozen --batch` を入れ替えた**——元の6本が全部退役してパリティを見る相手が無くなったので、
+残る凍結toolのうち単一プロセス・`--out` 持ちの6本（`build_pins`・`build_remap`・
+`build_opa_cmp_registers`・`build_clock_enables`・`build_usbpd_plumbing`・
+`build_flash_program_method`）にした。約19秒で全部 byte 一致。**これまで覆っていなかった**
+`pins` 4,563行・`pin_functions` 28,483行が入る。据え置き中に単体で回すときは
+`CH32_HOLD_SOURCES` が要る（`build_pins` が X035DS0.zh を読む）。
+
+次に退役させるなら `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` が要るので、
+`bundle_pages` にその3つを足すのが先。
 
 ### 凍結tool（PDF直読み）の退役の順序（2026-09-08 方針確認）
 

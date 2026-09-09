@@ -105,7 +105,7 @@ CH32V006の代表`Link.ld`は3 SKU分を同居させ、2つをコメントアウ
 CH32V407は`LENGTH = 136K-1K`、CH32H417は`ORIGIN = (0x200C0000+512+256)`と式評価が必要です。
 
 **コメントが「振り直せる組合せ」を挙げるfamilyがあります（2026-08-22追記）。**
-`tools/build_memory.py`はこれを reference manual の符号表と突き合わせる第2の読みに
+`pipeline/extract/rm/extract_memory.py`（旧 `tools/build_memory.py`）はこれを reference manual の符号表と突き合わせる第2の読みに
 使っています。
 
 ```

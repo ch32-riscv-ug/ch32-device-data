@@ -57,15 +57,15 @@ Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 FULL_PATCHED_1 = ["build_all --jobs 1", "build_tables", "build_pins", "build_remap"]
 FULL_PLAIN_1 = ["build_evt_examples", "build_clock", "build_systick",
                 "build_pin_alternate"]
-FULL_PATCHED_2 = ["build_memory"]
+# FULL_PATCHED_2（`build_memory`）は2026-09-09に退役して evidence 段の
+# `pipeline/extract/rm/extract_memory.py` になった。PDFを読む段が1つ減った。
 FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
 # build_registersに--rm-cacheを渡さない——cacheは原本更新後も**無検証で再利用され、
 # 正本を古い読みへ戻す**（2026-09-02の初回--fullで実際に踏んだ: 08-26製のcacheが
 # X315 RM改版前のARGB番地0x40023400を返し、registers 9行が偽conflictになった。
 # check_docsが捕捉→revert）。bundle入力ならcache無しでも数分で済む。
-FULL_PATCHED_3 = ["build_flash_geometry",
-                  "build_opa_cmp_registers", "build_clock_enables",
-                  "build_adc_internal", "build_usbpd_plumbing",
+FULL_PATCHED_3 = ["build_opa_cmp_registers", "build_clock_enables",
+                  "build_usbpd_plumbing",
                   "build_registers",
                   # build_registers の後でなければならない——`ctlr_bit_names` は
                   # `register_fields.csv` の綴りをそのまま出す列なので、先に走ると
@@ -78,7 +78,7 @@ FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
 def legacy_steps() -> list[Step]:
     steps: list[Step] = []
     for patched, names in ((True, FULL_PATCHED_1), (False, FULL_PLAIN_1),
-                           (True, FULL_PATCHED_2), (False, FULL_PLAIN_2),
+                           (False, FULL_PLAIN_2),
                            (True, FULL_PATCHED_3), (False, FULL_PLAIN_3)):
         for spec in names:
             name, *extra = spec.split()
@@ -115,6 +115,11 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             # 走っていて前回の走行の値を読んでいた——evidence 段なら同じ走行の値を読む。
             ("timers", ["pipeline/extract/rm/extract_timers.py"]),
             ("debug_data", ["pipeline/extract/manual/extract_debug_data.py"]),
+            # 退役の第5〜7号（2026-09-09）。**`memory_configs` は `flash_geometry` より前**
+            # ——後者が前者を読む（option byte で領域が動く family の zero-wait 注記）。
+            ("memory_configs", ["pipeline/extract/rm/extract_memory.py"]),
+            ("flash_geometry", ["pipeline/extract/rm/extract_flash_geometry.py"]),
+            ("adc_internal", ["pipeline/extract/datasheet/extract_adc_internal.py"]),
             ("device_id_addresses + device_ids",
              ["tools/build_device_ids.py"]),
         ]),
