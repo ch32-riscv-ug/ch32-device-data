@@ -26,7 +26,19 @@
 ACC_HSI の ±% 側にある。min/max だけを載せると、公称周波数そのものが
 落ちる — つまりPLL入力が決まらず、逓倍後のSYSCLKが計算できない。
 
-実行: uv run python tools/build_operating.py [--out <dir>]
+`tools/build_operating.py`（凍結tool。PDFをpdfplumberで直読み）からpdfplumber依存だけを
+外した移植（2026-09-09。退役の第8号）。`operating_conditions.csv`の正本生成器は
+`build_operating_conditions.py`で、そちらが**このmoduleをライブラリとして**呼ぶ
+（基礎行の組み立て・記号と値の正規化・行の採否）。読む欄はbundleの`text`（ページ本文）と
+`tables[].extracted_rows`（`Table.extract()`の平坦化行）だけで、抽出の規則は1行も変えていない。
+ページの読み手は`pipeline/extract/bundle_pages.py`（sha照合つき）。
+
+移植で消えたもの: `pdfplumber`のimport、mirrorのパス組み立て（bundle名`<stem>.<lang>`で引く）、
+`page.flush_cache()`（`bundle_pages.pages`はgeneratorでページを溜めない）。**呼ぶ側が
+`operating.pdfplumber = pdfcompat`を差し替える必要も無くなった**——原本を開かないので、
+据え置き（`--hold-sources`）でもゲートと食い違わない。
+
+実行: uv run python pipeline/extract/datasheet/operating_rows.py [--out <dir>]
 """
 
 import argparse
@@ -35,12 +47,18 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-MIRRORS = Path("/home/mt/dev_wch")
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import wrap_rules
+import bundle_pages  # noqa: E402
+import wrap_rules  # noqa: E402
+
+
+def _bundle(document: str, lang: str) -> str | None:
+    """原本のPDF名と言語 → bundle名。無ければNone（`path.exists()`の置き換え）。"""
+    name = f"{Path(document).stem}.{lang}"
+    return name if (bundle_pages.BUNDLES / name / "manifest.json").exists() else None
 import paths  # noqa: E402
 
 # 対象の表。「一般動作条件」に加えて発振器の表も読む。後者はクロック源の
@@ -317,7 +335,7 @@ def keep_row(row, lang, page_no):
     return True
 
 
-def read_edition(pdf_path, lang):
+def read_edition(bundle, lang):
     """対象表の行。行ごとに読み取ったページ番号を `_page` で持つ。
 
     対象表は1ページに収まらない。一般動作条件のほかに発振器の表が5つあり
@@ -328,62 +346,61 @@ def read_edition(pdf_path, lang):
     found = []
     carry = False
     last_cols = None
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            hit = bool(marker.search(text))
-            if not hit and not carry:
+    for page in bundle_pages.pages(bundle):
+        text = page.get("text") or ""
+        hit = bool(marker.search(text))
+        if not hit and not carry:
+            continue
+        # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
+        # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
+        # 無い続きページも1ページだけ見る。列の並びが同じ表しか読まないので、
+        # 無関係な表を拾っても記号の絞り込みで落ちる。
+        carry_from, carry = carry and not hit, hit
+        for tbl in bundle_pages.extracted_tables(page):
+            cols = [norm_header(c) for c in tbl[0]]
+            body = tbl[1:]
+            # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
+            if {"symbol", "min", "condition"} <= set(cols):
+                last_cols = cols
+            elif (carry_from and last_cols
+                  and len(tbl[0]) == len(last_cols)):
+                # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
+                # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
+                # このページにしかない。
+                cols, body = last_cols, tbl
+            else:
                 continue
-            # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
-            # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
-            # 無い続きページも1ページだけ見る。列の並びが同じ表しか読まないので、
-            # 無関係な表を拾っても記号の絞り込みで落ちる。
-            carry_from, carry = carry and not hit, hit
-            for tbl in page.extract_tables():
-                cols = [norm_header(c) for c in tbl[0]]
-                body = tbl[1:]
-                # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
-                if {"symbol", "min", "condition"} <= set(cols):
-                    last_cols = cols
-                elif (carry_from and last_cols
-                      and len(tbl[0]) == len(last_cols)):
-                    # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
-                    # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
-                    # このページにしかない。
-                    cols, body = last_cols, tbl
+            rows, sym, unit, param = [], "", "", ""
+            for raw in body:
+                cells = dict()
+                extra = []
+                for i, cell in enumerate(raw):
+                    if i < len(cols) and cols[i]:
+                        cells[cols[i]] = cell
+                    elif cell:
+                        extra.append(cell)
+                s = norm_symbol(cells.get("symbol"))
+                this_param = norm_text(cells.get("parameter"))
+                if s:  # 新しい記号の行。継続行は記号と参数を引き継ぐ
+                    sym, param = s, this_param
                 else:
-                    continue
-                rows, sym, unit, param = [], "", "", ""
-                for raw in body:
-                    cells = dict()
-                    extra = []
-                    for i, cell in enumerate(raw):
-                        if i < len(cols) and cols[i]:
-                            cells[cols[i]] = cell
-                        elif cell:
-                            extra.append(cell)
-                    s = norm_symbol(cells.get("symbol"))
-                    this_param = norm_text(cells.get("parameter"))
-                    if s:  # 新しい記号の行。継続行は記号と参数を引き継ぐ
-                        sym, param = s, this_param
-                    else:
-                        param = this_param or param
-                    unit = norm_value(cells.get("unit")) or unit
-                    condition = " ".join(
-                        filter(None, [norm_text(cells.get("condition"))]
-                               + [norm_text(e) for e in extra]))
-                    rows.append({
-                        "symbol": sym,
-                        "parameter": param,
-                        "condition": condition,
-                        "min": norm_value(cells.get("min")),
-                        "typ": norm_value(cells.get("typ")),
-                        "max": norm_value(cells.get("max")),
-                        "unit": unit,
-                    })
-                kept = [r for r in rows if keep_row(r, lang, page.page_number)]
-                if kept:
-                    found += [{**r, "_page": page.page_number} for r in kept]
+                    param = this_param or param
+                unit = norm_value(cells.get("unit")) or unit
+                condition = " ".join(
+                    filter(None, [norm_text(cells.get("condition"))]
+                           + [norm_text(e) for e in extra]))
+                rows.append({
+                    "symbol": sym,
+                    "parameter": param,
+                    "condition": condition,
+                    "min": norm_value(cells.get("min")),
+                    "typ": norm_value(cells.get("typ")),
+                    "max": norm_value(cells.get("max")),
+                    "unit": unit,
+                })
+            kept = [r for r in rows if keep_row(r, lang, page["number"])]
+            if kept:
+                found += [{**r, "_page": page["number"]} for r in kept]
     return found
 
 
@@ -405,41 +422,37 @@ MHZ_48 = re.compile(r"(?<![\d.])48\s*MHz", re.IGNORECASE)
 CPU_WITH_USB = {
     "zh": re.compile(r"CPU\s*的频率必须是(?P<list>[^。；]*)"),
     "en": re.compile(r"CPU\s+(?:frequency\s+|clock\s+speed\s+)?must\s+be(?P<list>[^.;]*)",
-                     re.IGNORECASE),
+                 re.IGNORECASE),
 }
 USB_MENTIONED = re.compile(r"USB", re.IGNORECASE)
 MHZ_VALUE = re.compile(r"(\d+(?:\.\d+)?)\s*MHz", re.IGNORECASE)
 
 
-def scan_prose(pdf_path, hit):
+def scan_prose(bundle, hit):
     """ページ本文を1行と次行の窓で読み、hit が返した値を (page_no, 値) で返す。
 
     折り返しで文が2行に割れるため、行単体ではなく隣接2行の窓を渡す。最初に
     当たったページで止める——同じ事実が章ごとに繰り返されるだけなので。
     """
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            lines = (page.extract_text() or "").splitlines()
-            for i, _ in enumerate(lines):
-                found = hit(" ".join(lines[i:i + 2]))
-                if found:
-                    page_no = page.page_number
-                    page.flush_cache()
-                    return page_no, found
-            page.flush_cache()
+    for page in bundle_pages.pages(bundle):
+        lines = (page.get("text") or "").splitlines()
+        for i, _ in enumerate(lines):
+            found = hit(" ".join(lines[i:i + 2]))
+            if found:
+                return page["number"], found
     return None, None
 
 
-def read_usb_clock(pdf_path, lang):
+def read_usb_clock(bundle, lang):
     """(page_no, "48") — 全速 USB block が 48MHz を要求すると書いてあれば。"""
     def hit(window):
         if FULL_SPEED.search(window) and MHZ_48.search(window):
             return "48"
         return None
-    return scan_prose(pdf_path, hit)
+    return scan_prose(bundle, hit)
 
 
-def read_cpu_with_usb(pdf_path, lang):
+def read_cpu_with_usb(bundle, lang):
     """(page_no, ["48", "96", "144"]) — USB 使用時に許される CPU 周波数の列挙。"""
     pattern = CPU_WITH_USB[lang]
 
@@ -449,19 +462,18 @@ def read_cpu_with_usb(pdf_path, lang):
             return None
         values = MHZ_VALUE.findall(found.group("list"))
         return values or None
-    return scan_prose(pdf_path, hit)
+    return scan_prose(bundle, hit)
 
 
-def read_headline_clock(pdf_path, lang):
+def read_headline_clock(bundle, lang):
     """(page_no, MHz) — 1ページ目付近の特徴リストが謳う系統主頻。無ければ(None, None)。"""
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages[:3]:
-            text = page.extract_text() or ""
-            values = {m.group(1) for pattern in HEADLINE[lang]
-                      for m in pattern.finditer(text)}
-            if values:
-                # 同一ページに複数表記があるときは高い方（「最高NNMHz」表記）
-                return page.page_number, max(values, key=int)
+    for page in bundle_pages.pages(bundle, 3):
+        text = page.get("text") or ""
+        values = {m.group(1) for pattern in HEADLINE[lang]
+                  for m in pattern.finditer(text)}
+        if values:
+            # 同一ページに複数表記があるときは高い方（「最高NNMHz」表記）
+            return page["number"], max(values, key=int)
     return None, None
 
 
@@ -490,10 +502,10 @@ def main():
         family = ds_family[datasheet]
         editions = {}
         for lang in ("zh", "en"):
-            path = MIRRORS / family / f"datasheet_{lang}" / datasheet
-            if not path.exists():
+            bundle = _bundle(datasheet, lang)
+            if bundle is None:
                 continue
-            rows = read_edition(path, lang)
+            rows = read_edition(bundle, lang)
             if rows:
                 editions[lang] = rows
         if "en" not in editions:
@@ -546,9 +558,9 @@ def main():
 
         heads = {}
         for lang in ("zh", "en"):
-            path = MIRRORS / family / f"datasheet_{lang}" / datasheet
-            if path.exists():
-                page_no, value = read_headline_clock(path, lang)
+            bundle = _bundle(datasheet, lang)
+            if bundle:
+                page_no, value = read_headline_clock(bundle, lang)
                 if value:
                     heads[lang] = (page_no, value)
         if heads:
@@ -582,9 +594,9 @@ def main():
             seen = {}
             for paper in papers:
                 for lang in ("zh", "en"):
-                    path = MIRRORS / family / f"datasheet_{lang}" / paper
-                    if path.exists() and (paper, lang) not in seen:
-                        page_no, value = reader(path, lang)
+                    bundle = _bundle(paper, lang)
+                    if bundle and (paper, lang) not in seen:
+                        page_no, value = reader(bundle, lang)
                         if value:
                             seen[(paper, lang)] = (page_no, value)
                 if seen:

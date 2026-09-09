@@ -13,7 +13,7 @@ pdfplumber のセル文字列は版面の行で割れる。`\\n` を空白に置
 `power- on`（RM の説明文。正本には届かない）だけで、他106件は全部語の折り返し
 （`pull-down`・`floating-point`・`high-speed`・`pre-division`…）。
 
-使う側: `tools/build_operating.norm_text`（operating_conditions の条件文）と
+使う側: `pipeline/extract/datasheet/operating_rows.norm_text`（operating_conditions の条件文）と
 `tools/extract_products`（比較表の見出し）。凍結toolの入力層ではなく**正規化層**なので、
 凍結の対象外（値の解釈は変えず、綴りの結合だけ）。
 """

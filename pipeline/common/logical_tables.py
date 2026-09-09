@@ -2222,7 +2222,7 @@ def text_grid(merged: dict, field: str = "text") -> tuple[list[list[str | None]]
 
     `field="text_split"`にすると、converterが下付きを戻す**前**の綴り（版面の割り方。
     無いセルは`text`）を置く。改行が下付きの境界を示すので、そこから正規化記号を
-    作る抽出器（`build_operating.norm_symbol`の`I\nDD`→`I_DD`）がこちらを読む。
+    作る抽出器（`operating_rows.norm_symbol`の`I\nDD`→`I_DD`）がこちらを読む。
     """
     rows: list[list[str | None]] = [[None] * merged["width"]
                                     for _ in range(merged["row_count"])]

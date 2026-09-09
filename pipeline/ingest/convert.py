@@ -59,7 +59,7 @@ SCHEMA_VERSION = "0.2"
 # 届いていた（`V\nSS`・`V power regulation bit:\nIO18`）。14,738セル／61文書。
 # 1.7.1: 直す前の綴りを`cells[].text_split`に残す。1.7.0では繋いだ形しか残らず、
 # **下付きの境界という情報**が消えて`operating_conditions`の`I_DD`系1,207行が落ちた
-# （`build_operating.norm_symbol`が`I\nDD`の改行を`_`にして正規化記号を作るため）。
+# （`operating_rows.norm_symbol`が`I\nDD`の改行を`_`にして正規化記号を作るため）。
 # 1.8.0: 文字層の正規化（私用領域コードポイント9,291個・重ね描き143件）と、行の中の
 # 下付き/上付き復元（805行。`2^20`が`220`に潰れて**値が違って**いた）、表題の全文化
 # （27件。exporterとextract_low_powerが同じ修復を各々掛けていた）を**exporterから
@@ -366,7 +366,7 @@ def fix_cell_subscripts(page_chars: list[dict], record: dict) -> None:
     判定用の印（`_subscripts_reattached`）はbundleに残さない——schemaに無いキー。
 
     **直す前の綴りを`text_split`に残す。** pdfplumberの割り方は壊れているのではなく
-    **下付きの境界を持っている**——`build_operating.norm_symbol`は`I\nDD`の改行を
+    **下付きの境界を持っている**——`operating_rows.norm_symbol`は`I\nDD`の改行を
     `_`に変えて正規化記号`I_DD`を作る（`KEEP`がその形しか通さない）。繋いだ形だけを
     残すとその境界が消え、`operating_conditions`の`I_DD`系1,207行が丸ごと落ちた
     （2026-09-06に実測）。読み順として正しいのは繋いだ形なので`text`はそれにし、

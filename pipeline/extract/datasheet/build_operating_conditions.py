@@ -3,9 +3,8 @@
 
 D18工程4-5。2つの部品を合成する:
 
-1. **基礎行**——凍結した`tools/build_operating.py`のロジックを、入力だけ
-   構造化bundle（`pipeline/extract/pdfcompat`。原本hashの入口ゲート付き）へ
-   差し替えて走らせる。凍結時の1,588行を**byte一致**で再現する（2026-09-01実測）
+1. **基礎行**——`operating_rows`（同じディレクトリ）が組み立てる。凍結時の1,588行を
+   **byte一致**で再現する（2026-09-01実測。2026-09-09に`operating_rows`へ移植しても一致）
 2. **A11の行**——消費電流とウェイクアップ時間（`extract_low_power.collect_rows`。
    caption選定・断片結合・表番号スコープの2段階zh/en照合）
 
@@ -14,7 +13,10 @@ unchanged 1,588 / added 1,208 / changed 0 / missing 0。追加行の内訳は
 confirmed 1,200 / conflict 6 / reference 2で、conflict 6件は原文突き合わせで
 **全て資料側のzh/en齟齬**と裁定（詳細はworklist A11）、reference 2件は
 en版だけが行を持つもの。これをもって`operating_conditions.csv`の正本生成元は
-このtoolになり、旧`build_operating.py`は参照実装（凍結）のまま。
+このtoolになり、旧`tools/build_operating.py`は参照実装（凍結）のまま置いていた。
+**2026-09-09にそれを`operating_rows.py`へ移植して削除した**（退役の第8号）——bundleを直接読むので
+`pdfplumber`を`pdfcompat`へ差し替える必要が無く、原本を開かないので据え置き（`--hold-sources`）でも
+ゲートと食い違わない。抽出の規則は1行も変えていない（基礎行は byte 一致）。
 
 実行:
     uv run pipeline/extract/datasheet/build_operating_conditions.py [--out <dir>]
@@ -35,17 +37,15 @@ sys.path.insert(0, str(REPO / "tools"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract" / "datasheet"))
 
-import build_operating as operating  # noqa: E402  凍結ロジック（読むだけ）
 import extract_low_power  # noqa: E402
+import operating_rows as operating  # noqa: E402  基礎行の組み立て（規則は凍結時のまま）
 import paths  # noqa: E402
-import pdfcompat  # noqa: E402
 
 
 def frozen_base_rows() -> list[dict]:
-    """凍結ロジックをbundle入力で走らせ、基礎行を得る。"""
-    operating.pdfplumber = pdfcompat
+    """`operating_rows`で基礎行を得る（規則は凍結時のまま。bundleを直接読む）。"""
     with tempfile.TemporaryDirectory() as scratch:
-        argv, sys.argv = sys.argv, ["build_operating.py", "--out", scratch]
+        argv, sys.argv = sys.argv, ["operating_rows.py", "--out", scratch]
         try:
             operating.main()
         finally:

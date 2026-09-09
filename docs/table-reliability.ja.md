@@ -39,7 +39,7 @@
 | CI: 導出物の鮮度 | PDF 不要な生成物がコミット済みの内容と一致するか | カタログ更新が README を置き去りにしていた（D11） |
 | `check_docs.py` | **文書が書いている行数と穴の状態**が、表と worklist の台帳と合っているか | 解決済みの F-11 を3つの文書が古いまま説明していた・この資料の pinout 行数が5行古かった（2026-08-29 の監査） |
 | `check_viewer.js` | **`pins.html` の表示**が壊れていないか（DOM 無しで関数を評価して出力を見る） | series view の Defaults が先頭型番だけを見ていた（G1。CH32V006 の SWCLK と UART が全部 `-` になっていた） |
-| `out_option` | 表を書く生成器が**試験用の出力先 `--out` を受ける**か | `build_operating` と `build_evt_examples` が argparse を持たず、`--out` を黙って無視して `evidence/` に書いていた（2026-08-29。実際に正本を1つ潰した） |
+| `out_option` | 表を書く生成器が**試験用の出力先 `--out` を受ける**か | `build_operating`（現`operating_rows`） と `build_evt_examples` が argparse を持たず、`--out` を黙って無視して `evidence/` に書いていた（2026-08-29。実際に正本を1つ潰した） |
 
 **中身の鮮度は PDF が要るので CI では見られません。** そこは `catalog/sources.csv`（読んだミラーの commit）と手動のフル実行が担当です。`column_drift` は「中身は見られなくても列なら見られる」という割り切りで、実際に F-54 の2件はこれで捕まりました。
 

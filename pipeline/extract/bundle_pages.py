@@ -73,6 +73,15 @@ def texts(name: str, limit: int | None = None):
         yield page["number"], (page.get("text") or "")
 
 
+def extracted_tables(page: dict) -> list[list[list[str | None]]]:
+    """ページの表を`Table.extract()`の平坦化行で返す（`page.extract_tables()`の置き換え）。
+
+    `extracted_rows`は**pdfplumberが返したそのまま**——converterの修復は`cells`側に閉じている
+    （converter 1.14.0で確定した契約）。この面を読む抽出器は、凍結toolと同じ行列を見る。
+    """
+    return [table["extracted_rows"] for table in page.get("tables", [])]
+
+
 def documents(kind: str) -> list[dict]:
     """目録の assigned な文書（`kind`で絞る）。文書名順。"""
     with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:

@@ -434,9 +434,13 @@ V2.3 は出力電圧特性を**ポート群ごと**に分けた（`VOH（PA0-PA2
 
 **再突入の条件**: `operating_conditions` がポート群の次元を持てるようになったら取り込む（記号から
 `condition` へ移す、または列を足す）。行の組み立ては凍結 `tools/build_operating.py`（656行）の
-`read_edition` の中で、新経路はそれをライブラリとして呼ぶだけなので割り込めない——**`build_operating`
-の新経路への移植が先**（`extract_registers` と並ぶ最後の大物）。それまで `check_sources` は 67/68 を
-報告し続ける（正しい報告なので黙らせない）。詳細は [markdown-qa-log](markdown-qa-log.ja.md)。
+`read_edition` の中で、新経路はそれをライブラリとして呼ぶだけなので割り込めなかった。
+
+**その移植は同日に済んだ**（退役の第8号。`pipeline/extract/datasheet/operating_rows.py`。基礎行1,588行と
+正本2,797行がともに byte 一致）。**残る作業はポート群を記号から `condition` へ移すこと**——行の組み立てが
+編集できるようになったので、`read_edition` で記号セルの末尾の `（PA0-PA23）` を条件へ回す。全corpusで
+括弧つき記号の母数を測ってから入れる（他 family の記号を壊さないこと）。それまで `check_sources` は
+67/68 を報告し続ける（正しい報告なので黙らせない）。詳細は [markdown-qa-log](markdown-qa-log.ja.md)。
 
 ### X315 en v1.2 の取り込み（2026-09-08）
 
@@ -593,6 +597,26 @@ sha 照合つき）。既存の第1・2号もそちらへ寄せた（出力は b
 `build_flash_program_method`）にした。約19秒で全部 byte 一致。**これまで覆っていなかった**
 `pins` 4,563行・`pin_functions` 28,483行が入る。据え置き中に単体で回すときは
 `CH32_HOLD_SOURCES` が要る（`build_pins` が X035DS0.zh を読む）。
+
+**第8号 完了（同日）**: `build_operating`（656行）→ `pipeline/extract/datasheet/operating_rows.py`。
+基礎行1,588行と正本`operating_conditions.csv` 2,797行がともに **byte 一致**。`bundle_pages` に
+`extracted_tables`（`page.extract_tables()`の置き換え）を足した。呼ぶ側の
+`operating.pdfplumber = pdfcompat` の差し替えが要らなくなり、用済みの `run_operating.py` も削除。
+**これで X035 V2.3 撤退の再突入条件（行の組み立てが編集できること）は外れた**——残るのはポート群を
+記号から `condition` へ移す作業で、全corpusで括弧つき記号の母数を測ってから入れる。
+
+副産物の直し: `check_tables.CALLED_BY` の呼び元探索が `tools/` 固定だったのを名前引き
+（`generator_path`）に、`out_option` の網を新経路の生成器11本へ広げた（全部すでに `--out` あり）。
+
+**第8号 完了（同日）**: `build_operating`（656行）→ `pipeline/extract/datasheet/operating_rows.py`。
+基礎行1,588行と正本`operating_conditions.csv` 2,797行がともに **byte 一致**。`bundle_pages` に
+`extracted_tables`（`page.extract_tables()`の置き換え）を足した。呼ぶ側の
+`operating.pdfplumber = pdfcompat` の差し替えが要らなくなり、用済みの `run_operating.py` も削除。
+**これで X035 V2.3 撤退の再突入条件（行の組み立てが編集できること）は外れた**——残るのはポート群を
+記号から `condition` へ移す作業で、全corpusで括弧つき記号の母数を測ってから入れる。
+
+副産物の直し: `check_tables.CALLED_BY` の呼び元探索が `tools/` 固定だったのを名前引き
+（`generator_path`）に、`out_option` の網を新経路の生成器11本へ広げた（全部すでに `--out` あり）。
 
 次に退役させるなら `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` が要るので、
 `bundle_pages` にその3つを足すのが先。

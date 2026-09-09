@@ -31,7 +31,12 @@ common/    logical_tables.py (**L1: joins the physical fragments of a page-spann
            match, else by the union of x-edges. Shared by review and extract)
 extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate;
            no silent fallback to the PDF)
-           datasheet/run_operating.py (runs the frozen extraction logic on bundle
+           datasheet/operating_rows.py (**assembles the base rows**: the frozen
+           `tools/build_operating.py` with only its pdfplumber dependency removed --
+           the extraction rules are unchanged. `build_operating_conditions.py` calls it
+           as a library. The eighth retirement; no direct PDF read is left in the
+           operating_conditions path)
+           datasheet/run_operating.py (deleted -- ran the frozen extraction logic on bundle
            input; reproduces evidence/operating_conditions.csv **byte-identically**,
            all 1,588 rows -- measured 2026-09-01)
            datasheet/extract_low_power.py (A11: consumption current and wake-up
@@ -376,7 +381,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
 
    **The broken split carries information, so it is kept as well.** The
    newline pdfplumber leaves is the subscript boundary, and the frozen
-   `build_operating.norm_symbol` turns it into the canonical symbol
+   `operating_rows.norm_symbol` turns it into the canonical symbol
    (`I\nDD` -> `I_DD`; its `KEEP` pattern accepts nothing else). 1.7.0
    stored only the joined spelling and silently dropped **1,207 `I_DD` rows**
    from `evidence/operating_conditions.csv`. Since 1.7.1 the cell keeps both

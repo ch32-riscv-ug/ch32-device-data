@@ -34,13 +34,13 @@ V003/L103/H417/V007の全件一致を実証したものを、0.2 bundle向けに
 - **結合セルの引き継ぎは記号が変わったら捨てる**（新しい記号の行でstateを作り直す）
 - **値の列を割るのは、同じ種類（min/typ/max）の列が2箇所以上ある表だけ**。
   普通のmin/typ/max表を3行に割らない（doctestで固定）
-- 行の採否・記号/値の正規化は凍結した`tools/build_operating.py`の規則を
+- 行の採否・記号/値の正規化は`operating_rows`（凍結`tools/build_operating.py`の移植。規則は同じ）の
   そのまま使う（`keep_row`・`UNIT_FOR`）
 - **zh/en照合は表番号のスコープで2段階**: まず同じ表番号（zh/enで1:1に
   対応する）の中で照合し、残りをdatasheet全体で照合する。第2段は
   版どうしで表番号がずれる既知の1件（CH32V007 enの3-9-2重複）のため。
   照合規則そのもの（symbol＋min/max一致、unit/typは両方あるときだけ）は
-  凍結`build_operating`と同じ
+  `operating_rows`と同じ
 
 実行:
     uv run pipeline/extract/datasheet/extract_low_power.py [--out <dir>]
@@ -61,8 +61,10 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "tools"))
 sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
+# 単体で走らせても`operating_rows`（同じディレクトリ）を引けるように。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import build_operating as operating  # noqa: E402  凍結ロジック（読むだけ）
+import operating_rows as operating  # noqa: E402  記号/値の正規化（規則は凍結時のまま）
 import convert_all  # noqa: E402
 import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 import review_sidecar  # noqa: E402
@@ -306,7 +308,7 @@ def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[list[list[str | N
     `pipeline/common/logical_tables.py`に移した。
 
     **読むのは`text_split`**——converterが下付きを戻す前の、版面が割ったままの綴り。
-    この抽出器が使う`build_operating`の正規化は**その改行が下付きの境界だという前提**で
+    この抽出器が使う`operating_rows`の正規化は**その改行が下付きの境界だという前提**で
     書かれていて（`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）、繋いだ形を渡すと
     `I_DD`系の行が丸ごと落ちる（converter 1.7.0で実測。1,207行）。`text`側の
     geometry結合は綴りとしては正しいので、説明列をそちらへ移すのは別の改善として扱う
@@ -478,7 +480,7 @@ def selected_numbers_for(names: dict[str, str], pdfs: dict[str, Path]) -> set[st
 def merge_editions(datasheet: str, series: str, en_rows: list[dict],
                    zh_rows: list[dict]) -> list[dict]:
     """zh/en照合。照合規則（symbol＋min/max、unit/typは両方あるときだけ）と
-    basis表記は凍結build_operatingと同じ。**対応付けは表番号のスコープで2段階**——
+    basis表記は`operating_rows`と同じ。**対応付けは表番号のスコープで2段階**——
     まず同じ論理表の中で値の一致を探し、残りだけをdatasheet全体で探す。
     ずれの影響が表の中に閉じ、旧経路の「表の集合の食い違いが偽conflictの連鎖に
     なる」再発を防ぐ。第2段は版どうしで表番号がずれる既知の1件
