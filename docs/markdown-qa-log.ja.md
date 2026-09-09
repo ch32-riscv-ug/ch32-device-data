@@ -2119,3 +2119,57 @@ parity は 68/68 clean。exporter とその検査だけが `apply_bitfield` を�
 `build_flash_geometry`・`build_adc_internal`・`build_flash_program_method`・`extract_images`。
 次は `page.search` を `bundle_pages` に足して（`lines[].text` への正規表現一致）
 `build_flash_geometry`・`build_adc_internal`・`build_memory` あたり。
+
+## 凍結toolの退役 第5〜7号——`run_frozen --batch` の6本が空になり、入れ替えた（2026-09-09）
+
+`build_adc_internal`・`build_memory`・`build_flash_geometry` も `pdfplumber.open`＋`pdf.pages`＋
+`extract_text()` だけだった（`page.search` は要らなかった——前回「次は `page.search` を足して」と
+書いたのは調べ直す前の見立て）。3本とも移植して byte 一致:
+
+| 新経路 | 表 | 行数 |
+|---|---|---:|
+| `pipeline/extract/datasheet/extract_adc_internal.py` | `adc_internal` | 19 |
+| `pipeline/extract/rm/extract_memory.py` | `memory_configs` | 67 |
+| `pipeline/extract/rm/extract_flash_geometry.py` | `flash_geometry` | 12 |
+
+**順序の依存を先に測った。** evidence 段へ移すと legacy 段の消費者が前回の走行の値を読む恐れが
+あるので、7表（`memory_configs`・`flash_geometry`・`adc_internal`・`timers`・`debug_data`・
+`features`・`dma_requests`）を読む生成器を全部洗った。実際の依存は**1本だけ**——
+`flash_geometry` が `memory_configs` を読む（option byte で領域が動く family の zero-wait 注記）。
+evidence 段の中でその順に並べた。他の消費者（`build_feature_tags`・`build_debug_interfaces`・
+`build_index`）は index 段なので後に走る。`build_memory_map` は `memory_configs` を読まない。
+
+`build_memory` が抜けて **FULL_PATCHED_2 が空**になった（PDFを読む legacy の段が1つ減った）。
+
+### 定番一式の入れ替え——空になった検査を空のまま残さない
+
+`run_frozen --batch` の6本（`build_features`・`build_timers`・`build_debug_data`・
+`build_adc_internal`・`build_memory`・`build_flash_geometry`）は**全部退役した**ので、パリティを
+見る相手が無くなった。0/0 で緑になる検査は読まれなくなるので、残る凍結toolのうち単一プロセスで
+`--out` を持つものを測って入れ替えた:
+
+| 凍結tool | 表 | 時間 |
+|---|---|---:|
+| `build_pins` | `pins` 4,563行・`pin_functions` 28,483行 | 4.1s |
+| `build_remap` | `remap_routes`・`remap_fields` | 0.3s |
+| `build_opa_cmp_registers` | `opa_cmp_registers` | 3.5s |
+| `build_clock_enables` | `clock_enables` | 4.6s |
+| `build_usbpd_plumbing` | `usbpd_plumbing` | 2.5s |
+| `build_flash_program_method` | `flash_program_method` | 4.5s |
+
+6本＝**8 CSV** で約19秒、全部 byte 一致（`build_pins` と `build_remap` は2表ずつ出す）。**これまでパリティを見ていなかった表**を覆う——`pins`/`pin_functions`
+は正本で最も大きい2表で、`extracted_rows` の回帰（2026-09-08 の `001PFQL`）が出たのもここ。
+
+**据え置き中に単体で回すと不一致に見える**のを踏んだ: `build_pins` は X035DS0.zh を読むので、
+`CH32_HOLD_SOURCES` を渡さないと `pdfcompat` のゲートが拒否し、その文書ぶんが落ちた出力を
+「DIFFERS」と報告する（pins 4,563→4,301）。渡せば byte 一致。`regenerate.py --hold-sources`
+経由なら自動で入る。`run_frozen.py` の冒頭に書いた。
+
+### 残る PDF 直読み tool
+
+`build_all`（multiprocessing）・`build_tables`・`build_pins`→`extract_pins`・`build_remap`→
+`extract_remap`・`build_registers`→`extract_registers`（`build_clock_enables`・
+`build_usbpd_plumbing` も委譲）・`build_operating`→`extract_products`/`extract_ordering`・
+`build_opa_cmp_registers`・`build_flash_program_method`・`extract_package_dims`・`scan_errata`・
+`extract_images`（pixel。原本が要る）。次に退役させるなら `extract_registers`（`find_tables`・
+`extract_text_lines`・`page.search` が要る——`bundle_pages` に足す最初の相手）。

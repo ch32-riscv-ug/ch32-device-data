@@ -590,7 +590,7 @@ consumer側で全滅していました（docs/worklist.ja.mdのF-10/F-12）。
 
 **FLASH/SRAMの境界が用户选择字（option byte）で動くpart**の組合せ表。
 1行1（型番, 符号）。`products.csv`の`flash_bytes`/`sram_bytes`はdatasheetの比較表が
-載せる1組しか言わないので、振り直せること自体がそこから読めません（`tools/build_memory.py`）。
+載せる1組しか言わないので、振り直せること自体がそこから読めません（`pipeline/extract/rm/extract_memory.py`）。
 
 対象は**19 part / 3 family**——CH32V20xの`_D8`/`_D8W`（V203RB・V208）、
 CH32V30xのC品（V303RC/VC・V307RC/VC/WC・V317VC/WC）、CH32V407/V467。
@@ -892,15 +892,15 @@ uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
 uv run tools/build_systick.py                   # systick（EVTのcore_riscv.hから）
 uv run tools/build_pin_alternate.py             # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
-uv run pipeline/extract/run_patched.py build_memory                    # memory_configs（RMとEVTのLink.ldから・数分かかる）
+uv run pipeline/extract/rm/extract_memory.py         # memory_configs（RMの符号表とEVTのLink.ldをbundleから。数秒）
 uv run tools/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_timers.py         # timers（RMのTIMx_CNT見出しをbundleから。数秒）
-uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry（EVTのflash driver＋RMの闪存章）
+uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry（EVTのflash driver＋RMの闪存章をbundleから。数秒）
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
 uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
-uv run pipeline/extract/run_patched.py build_adc_internal              # adc_internal（datasheet両言語の散文と電気的特性表）
+uv run pipeline/extract/datasheet/extract_adc_internal.py  # adc_internal（datasheet両言語の散文と電気的特性表をbundleから。数秒）
 uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
 uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読み。bundleで約19分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
 uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests（RM zh/en のDMA章の格子をbundleから。数秒）

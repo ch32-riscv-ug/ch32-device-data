@@ -27,8 +27,15 @@ Avg_Slope・内部参考電圧 VREFINT）と、読むときに必要なサンプ
 （`Vref内部参考电压：连接ADC_IN8通道` / `连接ADC_IN15通道`）。datasheet に無ければ
 RM を読み、basis にそう書く。
 
+`tools/build_adc_internal.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第5号）。読む欄は bundle の `text`
+（ページ本文）だけで、読みの規則は変えていない。ページの読み手は
+`pipeline/extract/bundle_pages.py`（sha 照合つき）。datasheet は `catalog/products.csv` の
+`datasheet` 列と言語、RM は目録の `repositories` で引く。ここでは PDF を開かない。
+
 実行:
-    uv run tools/build_adc_internal.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/datasheet/extract_adc_internal.py [--out <dir>]
 """
 
 from __future__ import annotations
@@ -40,12 +47,13 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "source", "channel", "sample_time", "sample_time_unit",
            "sample_clock_mhz", "v25_mv", "v25_mv_min", "v25_mv_max",
@@ -84,13 +92,9 @@ EN_VREF = re.compile(rf"(?:internal|built-?in)\s+reference\s+voltage[^\n]*?{NUM}
                      re.IGNORECASE)
 
 
-def pages_of(path: Path) -> list[str]:
-    out = []
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            out.append(page.extract_text() or "")
-            page.close()
-    return out
+def pages_of(bundle: str) -> list[str]:
+    """bundle の全ページの本文（`pdf.pages`＋`extract_text()` の置き換え）。"""
+    return [text for _number, text in bundle_pages.texts(bundle)]
 
 
 def mv(value: str) -> str:
@@ -139,7 +143,6 @@ def read_en(pages: list[str]) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
@@ -151,24 +154,26 @@ def main() -> int:
     rows: list[dict] = []
     notes: list[str] = []
     for datasheet, family in sorted(sheets.items()):
-        zh_path = args.mirrors / family / "datasheet_zh" / datasheet
-        en_path = args.mirrors / family / "datasheet_en" / datasheet
-        if not zh_path.exists():
+        stem = Path(datasheet).stem
+        zh_name, en_name = f"{stem}.zh", f"{stem}.en"
+        if not (bundle_pages.BUNDLES / zh_name / "manifest.json").exists():
             continue
-        zh, where = read_zh(pages_of(zh_path))
-        en = read_en(pages_of(en_path)) if en_path.exists() else {}
+        zh, where = read_zh(pages_of(zh_name))
+        en = (read_en(pages_of(en_name))
+              if (bundle_pages.BUNDLES / en_name / "manifest.json").exists() else {})
         rm_basis = ""
         if ("ch_vref" not in zh and "vref" in zh) or ("ch_temp" not in zh and "slope" in zh):
-            manuals = sorted((args.mirrors / family / "datasheet_zh").glob("*RM.PDF"))
-            if manuals:
-                for pno, text in enumerate(pages_of(manuals[0]), 1):
+            manuals = bundle_pages.rm_bundles(family)
+            if "zh" in manuals:
+                manual_bundle, manual_document = manuals["zh"]
+                for pno, text in bundle_pages.texts(manual_bundle.name):
                     flat = text.replace("\n", "")
                     for key, pattern in (("ch_vref", RM_VREF), ("ch_temp", RM_TEMP)):
                         m = pattern.search(flat)
                         if m and key not in zh:
                             zh[key] = int(m.group(1))
                             where[key] = pno
-                            rm_basis = f"+rm({manuals[0].name}:p.{pno})"
+                            rm_basis = f"+rm({manual_document}:p.{pno})"
 
         def judged(*keys: str) -> tuple[str, str]:
             """zh の値が en にもあるか。keys のどれかで比べる。"""

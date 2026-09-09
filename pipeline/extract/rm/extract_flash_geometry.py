@@ -37,8 +37,15 @@ CH32H417 は **flash モードで幾何が変わります**——`FLASH_CFGR0` b
 （dual flash mode）とページ 8K・ブロック 64K、寝ていると 4K/32K。driver の
 `FLASH_ErasePage` がアドレスマスクを切り替えているのがそれで、`note` に書きます。
 
+`tools/build_flash_geometry.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
+外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
+こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第7号——これで凍結パリティの定番一式が空に
+なる）。読む欄は bundle の `text`（ページ本文）だけで、読みの規則は変えていない。ページの
+読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき）。RM は目録の `repositories` で引く。
+EVT の flash driver と IAP は mirror をそのまま読む（PDF ではない）ので `--mirrors` は残す。
+
 実行:
-    uv run tools/build_flash_geometry.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_flash_geometry.py [--mirrors <dir>] [--out <dir>]
 """
 
 from __future__ import annotations
@@ -50,12 +57,12 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
-MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "page_erase_bytes", "fast_erase_bytes", "fast_program_bytes",
            "block_erase_bytes", "program_word",
@@ -183,65 +190,62 @@ def read_iap(family_dir: Path) -> tuple[str, str] | None:
     return None
 
 
-def read_erased_en(family_dir: Path) -> tuple[dict, str] | None:
+def read_erased_en(family: str) -> tuple[dict, str] | None:
     """en版RMから消去後の読み出し値（word だけ）。zhに注が無いfamilyのfallback。"""
-    paths = sorted(family_dir.glob("datasheet_en/*RM.PDF"))
-    if not paths:
+    editions = bundle_pages.rm_bundles(family)
+    if "en" not in editions:
         return None
-    with pdfplumber.open(paths[0]) as pdf:
-        for page in pdf.pages:
-            text = (page.extract_text() or "").replace("\n", " ")
-            page.close()
-            if not any(n in text.lower() for n in EN_NEEDLE):
-                continue
-            m = RM_ERASED_EN.search(text)
-            if m:
-                return {"erased_read_word": m.group("word")}, paths[0].name
+    bundle, document = editions["en"]
+    for _number, raw in bundle_pages.texts(bundle.name):
+        text = raw.replace("\n", " ")
+        if not any(n in text.lower() for n in EN_NEEDLE):
+            continue
+        m = RM_ERASED_EN.search(text)
+        if m:
+            return {"erased_read_word": m.group("word")}, document
     return None
 
 
-def read_manual(family_dir: Path) -> tuple[dict, str] | None:
-    """RM の闪存章の本文から幾何を読む。(値の辞書, ファイル名)。"""
-    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF"))
-    if not paths:
+def read_manual(family: str) -> tuple[dict, str] | None:
+    """RM の闪存章の本文から幾何を読む。(値の辞書, 原本のPDF名)。"""
+    editions = bundle_pages.rm_bundles(family)
+    if "zh" not in editions:
         return None
+    bundle, document = editions["zh"]
     found: dict = {}
-    with pdfplumber.open(paths[0]) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            page.close()
-            if "_pgerr" not in found:
-                m = RM_PGERR.search(text)
-                if m:
-                    found["_pgerr"] = m.group(1)
-            if not any(n in text for n in RM_NEEDLE):
-                continue
-            m = RM_STANDARD.search(text)
-            if m and "page_erase_bytes" not in found:
-                found["page_erase_bytes"] = int(m.group(1) or m.group(2)) * 1024
-            m = RM_FAST_PROGRAM.search(text)
-            if m and "fast_program_bytes" not in found:
-                found["fast_program_bytes"] = int(m.group(1))
-            m = RM_FAST_ERASE.search(text)
-            if m and "fast_erase_bytes" not in found:
-                found["fast_erase_bytes"] = int(m.group(1))
-            m = RM_BLOCK.search(text)
-            if m and "block_erase_bytes" not in found:
-                found["block_erase_bytes"] = int(m.group(1)) * 1024
-            m = RM_ERASED.search(text.replace("\n", ""))
-            if m and "erased_read_word" not in found:
-                found["erased_read_word"] = m.group("word")
-                for key, column in (("half", "erased_read_half"),
-                                    ("even", "erased_read_byte_even"),
-                                    ("odd", "erased_read_byte_odd")):
-                    if m.group(key):
-                        found[column] = m.group(key)
-    return found, paths[0].name
+    for _number, text in bundle_pages.texts(bundle.name):
+        if "_pgerr" not in found:
+            m = RM_PGERR.search(text)
+            if m:
+                found["_pgerr"] = m.group(1)
+        if not any(n in text for n in RM_NEEDLE):
+            continue
+        m = RM_STANDARD.search(text)
+        if m and "page_erase_bytes" not in found:
+            found["page_erase_bytes"] = int(m.group(1) or m.group(2)) * 1024
+        m = RM_FAST_PROGRAM.search(text)
+        if m and "fast_program_bytes" not in found:
+            found["fast_program_bytes"] = int(m.group(1))
+        m = RM_FAST_ERASE.search(text)
+        if m and "fast_erase_bytes" not in found:
+            found["fast_erase_bytes"] = int(m.group(1))
+        m = RM_BLOCK.search(text)
+        if m and "block_erase_bytes" not in found:
+            found["block_erase_bytes"] = int(m.group(1)) * 1024
+        m = RM_ERASED.search(text.replace("\n", ""))
+        if m and "erased_read_word" not in found:
+            found["erased_read_word"] = m.group("word")
+            for key, column in (("half", "erased_read_half"),
+                                ("even", "erased_read_byte_even"),
+                                ("odd", "erased_read_byte_odd")):
+                if m.group(key):
+                    found[column] = m.group(key)
+    return found, document
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mirrors", type=Path, default=MIRRORS)
+    ap.add_argument("--mirrors", type=Path, default=paths.MIRRORS)
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
 
@@ -266,7 +270,7 @@ def main() -> int:
     for family in families:
         family_dir = args.mirrors / family
         driver = read_driver(family_dir)
-        manual = read_manual(family_dir)
+        manual = read_manual(family)
         if driver is None and manual is None:
             notes.append(f"{family}: flash driver も RM も読めない")
             continue
@@ -275,7 +279,7 @@ def main() -> int:
         # 消去後の読み出し値: zhに注が無いfamily（CH32M030）だけen版から採る。
         erased_en = None
         if "erased_read_word" not in rm:
-            erased_en = read_erased_en(family_dir)
+            erased_en = read_erased_en(family)
             if erased_en:
                 rm.update(erased_en[0])
         iap = read_iap(family_dir)
