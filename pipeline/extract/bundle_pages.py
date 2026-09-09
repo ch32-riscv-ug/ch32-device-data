@@ -16,7 +16,7 @@
 
 **原本と bundle の対応は `regenerate.py` の前後照合（`check_sources`）が保証する**——ここで
 PDF は開かない。だから据え置き（`--hold-sources`）のときもゲートと食い違わない（凍結tool側は
-`held_sources` で照合を省く必要があった）。
+`held_sources` で照合を省く必要があった。その互換層は2026-09-10に消えた）。
 """
 
 from __future__ import annotations
@@ -118,9 +118,9 @@ class Row:
 class Table:
     """bundle の表 record を pdfplumber の `Table` の形で見せる。
 
-    **この形の定義はここに1つだけ置く。** 互換層（`pdfcompat`）は凍結tool のために
-    同じ形を必要とするので、そちらがこのクラスを import する（退役 第9号までは
-    2箇所に同じ定義があった）。凍結tool が全部退役すれば互換層ごと消える。
+    **この形の定義はここに1つだけ。** 退役 第9号までは互換層（`pdfcompat`）にも同じ
+    定義があり、そちらがここを import する形にした。**2026-09-10 に凍結toolが全部退役して
+    互換層ごと消えた**ので、いまはここが唯一の定義。
 
     `extract()` が返す行は **pdfplumber が返したそのまま**（`extracted_rows`）。
     converter の修復は `cells` 側に閉じている（converter 1.14.0 で確定した契約）。

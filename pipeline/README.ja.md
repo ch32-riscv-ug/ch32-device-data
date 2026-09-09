@@ -48,10 +48,8 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            bundle_pages.py（**新経路のページ読み手**。manifest順にページrecordを返し、
            ページのsha256をmanifestと照合する。family→RM bundleは目録で引く。PDFは開かない
            ので据え置き（`--hold-sources`）でもゲートと食い違わない）
-           run_frozen.py（凍結toolをコード不変のままbundle入力で走らせ、出力を
-           凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
            scan_errata.py（エラッタ増分検査（KNOWN/NEW）。bundle を直接読む。
-           対象選定は凍結toolのまま）
+           対象は目録から組む——mirror の glob と順序まで一致することを実測済み）
            images/run_extract_images.py（family repoのimage/を作る凍結
            `extract_images`を、**`pdfplumber.open`だけ原本hashゲート経由**で走らせる。
            pixelのcropは原本PDFが要りpdfcompatでは差し替えられないので、openで

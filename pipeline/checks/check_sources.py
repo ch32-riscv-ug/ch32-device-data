@@ -83,7 +83,7 @@ def cache_drift() -> list[tuple[str, str, str]]:
 
     この状態は**据え置き（`--hold-sources`）を黙って破る**: `survey()`はcommit済みmanifestと
     mirrorのPDFを比べて「動いた」と言い、`convert_all --skip`はそのbundleを触らず、
-    `pdfcompat`は据え置き文書のsha照合を省く——だから凍結toolは**新原本のbundleを読みながら
+    当時の互換層`pdfcompat`は据え置き文書のsha照合を省いた——だから凍結toolは**新原本のbundleを読みながら
     「旧原本で据え置いている」と信じる**。逆向き（commitが新しく`.cache`が古い）も同じく危険で、
     `up_to_date`が「最新」と判断して再変換を跳ばし、古いbundleから正本を作る。
 

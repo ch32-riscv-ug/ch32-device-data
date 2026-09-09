@@ -876,17 +876,16 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 
 **正面玄関は `uv run pipeline/publish/regenerate.py --full`**——以下の全部を
 依存順に構造化bundle入力で回し、検査まで進む（1時間強。`--full`なしは新経路
-だけの速い再生成）。下の一覧は1表ずつ回すときのもの。PDFを読むtoolは
-`pipeline/extract/run_patched.py`経由で回す（入力層だけをbundleへ差し替える。
-toolのコードは不変）——素の`tools/<name>.py`で回すとPDF直読みになり、切替後は
-実行経路の外。出力先は各ツールが `tools/paths.py` で決めます（`--out <dir>` は
-試験用の上書き）。上から順に。
+だけの速い再生成）。下の一覧は1表ずつ回すときのもの。**2026-09-10 に原本を直読みする
+生成器は無くなった**ので、どれもそのまま呼べる（読み手は全部 bundle。原本を開くのは
+bundle を作る側と図の描画だけ）。出力先は各ツールが `tools/paths.py` で決めます
+（`--out <dir>` は試験用の上書き）。上から順に。
 
 ```sh
-uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/（型番ごとの抽出候補。直列——patchはworker子プロセスに効かない）
-uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run tools/build_all.py --jobs 1               # .cache/candidates/（型番ごとの抽出候補。bundleから）
+uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
 uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions（bundleから。数分かかる）
-uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes（candidates から）
+uv run tools/build_remap.py                     # remap_fields/remap_routes（candidates から）
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
 uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）

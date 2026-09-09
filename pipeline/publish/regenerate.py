@@ -15,12 +15,12 @@
     index     evidenceから導出する索引（debug_interfaces・conflicts・build_index）
     checks    check_tables / check_counts / check_docs
     legacy    --full: **全CSVの再生成**（D18工程(5)の切替後の正規実行形）——
-              凍結toolをコード不変のままbundle入力で走らせて正本へ書かせる
-              （`run_patched.py`。PDFを読まないEVT系toolはそのまま）。
+              旧`tools/`の生成器（**もう原本は読まない**。読み手は全部新経路）と
+              退役済みの生成器を、依存順どおりに走らせて正本へ書かせる。
               build_all（直列）→ datasheet/RM表群 → EVT系 → 索引 → README生成。
               committedと同一入力なら`git status`差分ゼロで終わる
-    verify    --verify: 凍結toolのbundle入力パリティ（run_frozen --batch）＋
-              エラッタ増分検査（scan_errata。NEW候補があれば失敗）
+    verify    --verify: エラッタ増分検査（scan_errata。NEW候補があれば失敗）。
+              凍結toolのbundle入力パリティは相手が居なくなって2026-09-10に外した
     human     --human: 図の描画 → 人向けMarkdown → PDFとの差ゼロ検査
 
 実行:
@@ -55,9 +55,12 @@ Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 
 # --fullの全再生成の**順序そのもの**（evidence/READMEの「生成」の依存順）。
 # 実行の仕方を kind で持つ:
-#   patched … 凍結tool。PDFを読むので `run_patched.py` 経由で bundle を読ませる
-#   plain   … 凍結tool。EVT・candidates・配布物しか読まないのでそのまま呼ぶ
-#   new     … 退役済みの新経路の生成器。argv をそのまま持つ
+#   plain … 旧`tools/`の生成器。そのまま呼ぶ（**原本はもう読まない**——読み手は
+#           全部新経路で、この段に残っているのは候補と目録を組み立てる側だけ）
+#   new   … 退役済みの新経路の生成器。argv をそのまま持つ
+#
+# 2026-09-10 まではもう1つ `patched` があった——PDFを読む凍結toolを `run_patched.py` で
+# 互換層に向けて走らせる形。読み手が全部退役して相手が居なくなったので、互換層ごと消した。
 #
 # **退役した生成器がこの並びの中に残るのは、凍結toolがその出力を読むとき。**
 # `extract_pin_tables`（退役 第10号）がそれ——`build_remap` と `build_pin_alternate` が
@@ -71,10 +74,15 @@ Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 # `build_usbpd_plumbing`・`build_registers`・`build_flash_program_method`（旧 FULL_PATCHED_3）
 # は evidence 段の `pipeline/extract/rm/` へ。
 FULL_ORDER: list[tuple[str, str]] = [
-    ("patched", "build_all --jobs 1"),
-    ("patched", "build_tables"),
+    # `build_all`・`build_tables` は **2026-09-10 に原本を読まなくなった**（退役 第12・13号。
+    # 読み手は全部新経路で、この2本は候補と目録を組み立てるだけ）。`run_patched` 経由をやめて
+    # そのまま呼ぶ。`--jobs 1` は互換層の差し替えを効かせるための直列化だったので、
+    # 並列に戻せる——ただし速さの変更は別に測ってからにする。
+    ("plain", "build_all --jobs 1"),
+    ("plain", "build_tables"),
     ("new", "pipeline/extract/datasheet/extract_pin_tables.py"),
-    ("patched", "build_remap"),
+    # `build_remap` は `candidates/*.json` と `pin_functions.csv` から作る（原本を読まない）。
+    ("plain", "build_remap"),
     ("plain", "build_evt_examples"),
     ("plain", "build_clock"),
     ("plain", "build_systick"),
@@ -95,9 +103,7 @@ def legacy_steps() -> list[Step]:
         if kind == "new":
             steps.append((Path(name).stem, [name, *extra]))
             continue
-        argv = (["pipeline/extract/run_patched.py", name, *extra] if kind == "patched"
-                else [f"tools/{name}.py", *extra])
-        steps.append((spec, argv))
+        steps.append((spec, [f"tools/{name}.py", *extra]))
     return steps
 
 
@@ -172,9 +178,15 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
         ]),
     ]
     if args.verify:
+        # 凍結パリティ（`run_frozen --batch`）は **2026-09-10 に役目を終えて外した**。
+        # あれが証明していたのは「凍結toolがbundle入力でも原本直読みと同じバイトを出す」
+        # ことで、**原本を読む凍結toolがpipelineから居なくなった**時点で相手が無い
+        # （最後まで残った `build_remap` は `candidates/*.json` と `pin_functions.csv` から
+        # 作るので、そもそもPDFを読まない）。互換層 `pdfcompat` ごと消した。
+        # いま同じ役目を果たしているのは `check_baseline`（正本のバイトを台帳と照合）と
+        # `markdown parity`（人向けMarkdownを原本と照合。68/68）で、退役ごとの byte 一致は
+        # そのときに実測して `docs/markdown-qa-log.ja.md` に残している。
         stages.append(("verify", [
-            ("frozen parity (run_frozen --batch)",
-             ["pipeline/extract/run_frozen.py", "--batch"]),
             ("errata incremental scan",
              ["pipeline/extract/scan_errata.py"]),
         ]))
@@ -223,7 +235,7 @@ def main() -> int:
           file=sys.stderr)
     # **`.cache`のbundleとcommit済みmanifestの食い違い**は、走る前に必ず止める。片方だけ戻した
     # 状態で走ると、据え置き（`--hold-sources`）が黙って破れる（`convert_all --skip`は`.cache`を
-    # 触らず、`pdfcompat`は据え置き文書のsha照合を省く）。逆向きなら古いbundleから正本を作る。
+    # 触らず、当時の互換層は据え置き文書のsha照合を省いた）。逆向きなら古いbundleから正本を作る。
     # 2026-09-09に実際に起きた——取り込みを途中で止めてtracked fileだけ戻した。
     drift = check_sources.cache_drift()
     if drift:
@@ -242,7 +254,7 @@ def main() -> int:
             print(f"  ↺ 据え置き {name}: manifest={recorded[:12]} いまの原本={actual[:12]}"
                   "（再変換しない）", file=sys.stderr)
         stages = plan(args, held)
-        # 凍結tool（pdfcompat）と図の描画（render_assets）の入口ゲートに、据え置きを伝える。
+        # 図の描画（render_assets）ほかの入口ゲートに、据え置きを伝える。
         # 伝えないとゲートが拒否して**その文書が落ち、family が目録から消える**（2026-09-09）。
         os.environ[held_sources.ENV] = ",".join(held)
     elif (moved or missing) and not args.accept_sources:

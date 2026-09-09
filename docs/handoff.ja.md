@@ -156,9 +156,10 @@ cleanになれば次の周期で入る。
   commitで更新し、何がなぜ動いたかをcommitとworklistに書く（ユーザー方針、2026-09-06）
 - **崩しそうになったら撤退。** 出力を良くする変換は自律的に進めてよいが、崩れる兆候があれば戻す。
   戻した項目は [markdown-qa-log.ja.md](markdown-qa-log.ja.md) の撤退リストに履歴と再挑戦の条件つきで残す
-- **凍結tool（`tools/build_*.py` をbundle入力で走らせる `run_patched`）の出力はbyte一致を保つ。**
-  正本CSVを綺麗にする修正は結合層（例: `pipeline/extract/datasheet/build_operating_conditions.py`）に置き、
-  凍結ロジックには触れない
+- **抽出ロジックを移すときは出力の byte 一致を保つ。** 2026-09-10 に凍結toolは全部退役し、
+  `run_patched`/`run_frozen`/`pdfcompat`（互換層）は消えた。移植は「新経路へ写す → byte 一致を
+  実測 → 切替 → 旧を削除」の順で、**一致を確かめずに切り替えない**。正本CSVを綺麗にする修正は
+  結合層（例: `pipeline/extract/datasheet/build_operating_conditions.py`）に置く
 - **公開する情報（表の全列・生成 README・各ディレクトリの README）に日本語を入れない。** 表は `basis` 列も含めて英語、中国語は `*_zh` 列と `path` だけ（`check_tables` が全列を見て落とす）。README は英語版（`README.md`）を必ず置き、日本語版（`.ja.md`）は併記。`docs/` の作業文書だけが日本語
 - **索引（`index/`）に事実を足さない。** 直すのは語彙か抽出（証拠 `evidence/`）。
   証拠の綴りは資料どおりに残し、訂正しない（食い違いは `conflict`）。区分の定義は
