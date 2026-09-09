@@ -2335,6 +2335,23 @@ def apply_bitfield(table: dict, number_line: dict,
     番号のx中心が「跨ぐbit数」を決める。空の箱は捨て、名前を持つセルだけを中心の
     包含で列に割り当て、番号のヘッダ行を上に足す。同じ列spanで縦に割れた名前は連結、
     どのセルも開始しない空き行は詰める（TIMの出力/入力2段は残る）。
+
+    **変換器が表の外から拾った列は行ラベル**として先頭（右外なら末尾）の列に残す
+    （下の`outside`。レジスタ配列の`IPRIOR63`）。
+
+    >>> table = {"id": "t", "bbox": [0, 0, 100, 20], "row_count": 1, "column_count": 3,
+    ...          "cells": [
+    ...     {"id": "t-label-left", "text": "IPRIOR63", "bbox": [0, 10, 20, 20],
+    ...      "row_start": 0, "row_end": 1, "column_start": 0, "column_end": 1},
+    ...     {"id": "t-cell-0001", "text": "PRIO_1", "bbox": [20, 10, 60, 20],
+    ...      "row_start": 0, "row_end": 1, "column_start": 1, "column_end": 2},
+    ...     {"id": "t-cell-0002", "text": "PRIO_0", "bbox": [60, 10, 100, 20],
+    ...      "row_start": 0, "row_end": 1, "column_start": 2, "column_end": 3}]}
+    >>> apply_bitfield(table, None, [("7", 40.0), ("0", 80.0)])
+    >>> table["row_count"], table["column_count"]
+    (2, 3)
+    >>> [(c["row_start"], c["column_start"], c["text"]) for c in table["cells"]]
+    [(0, 1, '7'), (0, 2, '0'), (1, 0, 'IPRIOR63'), (1, 1, 'PRIO_1'), (1, 2, 'PRIO_0')]
     """
     if table.get("_bitfield"):
         return
@@ -2356,6 +2373,35 @@ def apply_bitfield(table: dict, number_line: dict,
     fields = [c for c in table["cells"] if (c.get("text") or "").strip() and "bbox" in c]
     if not fields:
         return
+
+    def outside(cell: dict) -> str | None:
+        """bit中心の**外に丸ごと**あるか（"left"/"right"/None）。"""
+        box = cell["bbox"]
+        if any(box[0] <= x < box[2] for x in xs):
+            return None
+        return "left" if box[2] <= min(xs) else ("right" if box[0] > max(xs) else None)
+
+    # **変換器が表の外から拾った列**（`recover_outer_column`の`-outer-`・
+    # `recover_sibling_labels`の`-label-`）はbitフィールドではない——レジスタ配列の
+    # 行ラベル（`IPRIOR63`・`IALLOC63`・`IPRIOR17`）。bit中心はpdfplumberの格子から
+    # 決まるので外から足した列に中心は無く、`bit_span`のnearフォールバックが端のbit列へ
+    # 寄せ、最後のdedupで**フィールドに上書きされて消えていた**（`CH32FV2x_V3xRM.zh`
+    # p107の`IPRIOR63`はMarkdownのどこにも出ていなかった。再突合の指摘）。
+    #
+    # 根拠をidにするのは、**それが変換器自身が記録した出自**だから。同じ「中心の外」には
+    # pdfplumberの格子のセルも来る——番号行が16列のうち12〜13列ぶんしか無い図
+    # （`CH32H417RM.en` p620の`FBM`×4と`15`..`12`、`CH32V407RM.en` p224の`Reserved`）で、
+    # これらは本物のフィールドなので触らない。全corpus実測: bit図9,760件のうち中心の外に
+    # セルがあるのは**33件**で、`-label-`/`-outer-`が24件（全部レジスタ配列の行ラベル）・
+    # `-cell-`が9件（全部本物のフィールド）。
+    labels = [c for c in fields
+              if ("-label-" in c.get("id", "") or "-outer-" in c.get("id", ""))
+              and outside(c)]
+    if labels:
+        marked = {id(c) for c in labels}
+        fields = [c for c in fields if id(c) not in marked]
+        if not fields:
+            return          # ラベルだけの表は組み直さない（bit図ではない）
     field_min = min(c["row_start"] for c in fields)
     cells: list[dict] = []
     for cell in fields:
@@ -2363,6 +2409,14 @@ def apply_bitfield(table: dict, number_line: dict,
         cells.append({**cell, "column_start": start, "column_end": end,
                       "row_start": cell["row_start"] - field_min + 1,
                       "row_end": cell["row_end"] - field_min + 1})
+    # 行ラベルは仮に列-1（左）/width（右）へ置く。**縦連結の対象にしない**（`IPRIOR17`と
+    # `IPRIOR16`が1セルに繋がる。L103RM.zh p70）ので、グループ分けの後に足す。
+    label_cells = [{**cell,
+                    "column_start": -1 if outside(cell) == "left" else width,
+                    "column_end": 0 if outside(cell) == "left" else width + 1,
+                    "row_start": max(1, cell["row_start"] - field_min + 1),
+                    "row_end": max(2, cell["row_end"] - field_min + 1)}
+                   for cell in labels]
     for i, (num, _) in enumerate(centers):
         cells.append({"id": f"{table['id']}-bit{i}", "row_start": 0, "row_end": 1,
                       "column_start": i, "column_end": i + 1, "text": num,
@@ -2436,6 +2490,7 @@ def apply_bitfield(table: dict, number_line: dict,
         drop.extend(group[1:])
     for cell in drop:
         cells.remove(cell)
+    cells.extend(label_cells)
     # どのセルも開始しない行（縦割れが消えて空いた行）を詰める。開始行の集合で番号を
     # 振り直す——単純レジスタは1データ行に、TIMの出力名/入力名の2段は2行のまま残り、
     # CC1S[1:0]のような両モード共有名は両行にまたがる。
@@ -2449,6 +2504,14 @@ def apply_bitfield(table: dict, number_line: dict,
     for cell in cells:
         if cell["row_start"] >= 1:
             cell["text"] = (cell.get("text") or "").replace("\n", "")
+    # 行ラベルを入れたぶん列をずらす（左のラベルは列0、bit列は1..width）。ヘッダ行の列0は
+    # セルが無い穴になり、`table_html`が`<th></th>`で埋める（行ラベルに番号は無い）。
+    if label_cells:
+        if any(c["column_start"] < 0 for c in cells):
+            for cell in cells:
+                cell["column_start"] += 1
+                cell["column_end"] += 1
+        width = max(c["column_end"] for c in cells)
     # 描画順（行→列）に並べる。parityはセルのリスト順に読み進めるので、ヘッダ行を
     # 先頭に置かないと番号が「順序外」に見える。
     cells.sort(key=lambda c: (c["row_start"], c["column_start"]))

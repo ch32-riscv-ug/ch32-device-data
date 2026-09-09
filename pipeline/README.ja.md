@@ -576,6 +576,23 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     **94セル**、全件が左の語から8〜31pt離れた**独立の値**（`CH32M030DS2.zh` p3。再突合の指摘）。
     その文字の字形が自セルに面積の半分以上入っていれば消さない。狙いの`Standard I/O port`→`t`は
     字形が境界に接して自セルに半分も入らないので、裏取りしても落ちる。
+32. **bit図の外にある行ラベルを列として残す**（`apply_bitfield`。exporter側）。レジスタ配列の
+    bit図は行ラベルを表の左外に置く（`PFIC_IPRIORx`の`IPRIOR63`・`PFIC_IALLOCx`の`IALLOC63`・
+    `CH32L103RM.zh` p70の`IPRIOR17`/`IPRIOR16`）。converterがそれを列として取り込んでも
+    （項目15・27）、`apply_bitfield`はbit番号のx中心でセルを列へ割り当てるので、中心を1つも
+    含まないラベルはnearフォールバックで端のbit列へ寄せられ、最後のdedup（同じ格子に落ちた
+    セルは後勝ち）で**フィールドに上書きされて消えていた**——`CH32FV2x_V3xRM.zh` p107の
+    `IPRIOR63`はMarkdownのどこにも出ていなかった（再突合の指摘）。
+    判定の根拠は**セルのid**。変換器が表の外から拾った列は`-outer-`（`recover_outer_column`）・
+    `-label-`（`recover_sibling_labels`）と自分の出自を記録している。同じ「中心の外」には
+    pdfplumberの格子のセルも来る——番号行が16列のうち12〜13列ぶんしか無い図（`CH32H417RM.en`
+    p620の`FBM`×4と`15`..`12`、`CH32V407RM.en` p224の`Reserved`）で、これらは本物のフィールドな
+    ので幾何だけでは分けられない。全corpus実測: bit図**9,760件**のうち中心の外にセルがあるのは
+    **33件**で、`-label-`/`-outer-`が**24件**（全部レジスタ配列の行ラベル）・`-cell-`が9件
+    （全部本物のフィールド）。ラベルは**縦連結の対象から外す**（同じ列に落ちる`IPRIOR17`と
+    `IPRIOR16`が1セルに繋がる）。描画は
+    `<tr><th></th><th>31</th>…</tr><tr><td>IPRIOR63</td><td colspan="2">PRIO_255</td>…`
+    ——ヘッダ行の列0は`table_html`が空スロットとして埋める（行ラベルにbit番号は無い）。
 
 実測（V003 zh/en）: 本文・語・表・文字は旧PoC bundleと**完全一致**、変わるのは
 roleと画像名だけ。version+pageのfooterはen 35/35・zh 30/30で取りこぼし0。

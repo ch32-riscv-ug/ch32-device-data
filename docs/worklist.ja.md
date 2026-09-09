@@ -515,10 +515,13 @@ V407RM p402・WCH-Link のラベル・X315RM.en p155）。残りから「入れ�
   正本 CSV の変化は `catalog/sources.csv`（X315 の mirror commit 前進。PDF 同一）だけで台帳を書き直し、
   evidence/index は **全部 HEAD と byte 同一**。凍結パリティ 5/5・markdown parity 68/68 clean・検査4本通過。
   Markdown は 28 文書が変わった（`IPRIORx`/`IPRIOR0` の行ラベル・`IACTS9`・`R32_USART3_GPR` 行・`HVCP | P`・
-  `FPCLK`）。`IPRIOR63` の行は bit 図として描かれ `apply_bitfield` が左外ラベルを落とす——次周の候補に追加。
+  `FPCLK`）。
+- **bit 図の左外ラベル**（`apply_bitfield`。exporter のみ・converter 版は動かない）: bit 中心の外にあり
+  変換器が外から拾った（id が `-outer-`/`-label-`）セルを行ラベルの列として残す。bit 図 9,760 件のうち
+  中心の外にセルがあるのは 33 件で、ラベル 24・本物のフィールド 9（H417RM.en p620・V407RM.en p224）。
+  `IPRIOR63`・`IALLOC63`・`IPRIOR17`/`IPRIOR16` が 21 文書で復活し、parity 68/68・正本は不変。
 
-**残り（次周の候補）**: bit 図として描く表の**左外ラベル**（`IPRIOR63`。`apply_bitfield` が落とす——caption か
-先頭 `<th>` として出す）、下付き復元がまだ通らない約240セル（基底の順序が合わない 120・plan なし 109）、
+**残り（次周の候補）**: 下付き復元がまだ通らない約240セル（基底の順序が合わない 120・plan なし 109）、
 跨いだ**語**の分割（`WAK|KE PCE`・`0x|x000000XX`・`TIMCMV|V[15:0]`。
 270件・28文書、大半は bit図。セル文字列の割り当て層で「語を丸ごと1セルへ」——`apply_bitfield` との
 分担の設計から）、L103RM.zh p239 `F_PCLK`、M030DS2.zh p3 `HVCP P`、V003RM.zh p7、X035DS0.en p37
