@@ -2,7 +2,7 @@
 """mirrorのPDFが、コミット済みmanifestの原本SHAと一致しているかを報告する。
 
 **入力が走行中に変わるのを見つけるための検査**。`pipeline/publish/regenerate.py` は
-1時間強かかるので、その途中でmirrorが`git pull`されると、出力は**どの入力状態にも
+全再生成には数分〜十数分かかるので、その途中でmirrorが`git pull`されると、出力は**どの入力状態にも
 対応しない**ものになる。2026-09-08に実際に起きた: 目録（`catalog/documents.csv`）は
 CH32X315の`version_en`を1.2と言い、bundleは1.1のPDFから作られたまま、その状態で
 全再生成が走った。`check_baseline`が赤くなったが原因は別（目録の自動更新が凍結台帳を
