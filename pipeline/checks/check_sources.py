@@ -45,6 +45,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 import convert_all  # noqa: E402  目録が割り当てた文書とmirrorのパス
 
 STRUCTURED = REPO / "structured"
+BUNDLES = REPO / ".cache" / "structured-bundles"
 
 
 def survey() -> tuple[list[str], list[tuple[str, str, str]], list[str]]:
@@ -67,6 +68,42 @@ def survey() -> tuple[list[str], list[tuple[str, str, str]], list[str]]:
         (same.append(name) if actual == recorded
          else moved.append((name, recorded, actual)))
     return same, moved, missing
+
+
+def cache_drift() -> list[tuple[str, str, str]]:
+    """(文書, commit済みの記録, .cacheの記録) —— **`.cache`のbundleがcommit済みmanifestと
+    食い違う**文書。読み取りだけ。
+
+    正本CSVは`.cache/structured-bundles`のbundleから作られ、その出自は
+    `structured/<文書>/manifest.json`にcommitされる。この2つは常に一致していなければ
+    ならない——**片方だけ戻すと壊れる**。2026-09-09に実際に起きた: 資料更新の取り込みを
+    途中で止めて**tracked fileだけ**を戻したので、`structured/CH32X035DS0.zh/manifest.json`は
+    旧原本（147f0d22d073・converter 1.14.0）に戻ったのに、`.cache`のbundleは新原本
+    （a3f2a0f66cfc・1.16.0）のまま残った。
+
+    この状態は**据え置き（`--hold-sources`）を黙って破る**: `survey()`はcommit済みmanifestと
+    mirrorのPDFを比べて「動いた」と言い、`convert_all --skip`はそのbundleを触らず、
+    `pdfcompat`は据え置き文書のsha照合を省く——だから凍結toolは**新原本のbundleを読みながら
+    「旧原本で据え置いている」と信じる**。逆向き（commitが新しく`.cache`が古い）も同じく危険で、
+    `up_to_date`が「最新」と判断して再変換を跳ばし、古いbundleから正本を作る。
+
+    `.cache`が無い（初めての checkout）のは食い違いではない——`convert_all`が作る。
+    """
+    out: list[tuple[str, str, str]] = []
+    for job in convert_all.targets():
+        name = job["name"]
+        committed, cached = STRUCTURED / name / "manifest.json", BUNDLES / name / "manifest.json"
+        if not (committed.is_file() and cached.is_file()):
+            continue
+        a = json.loads(committed.read_text(encoding="utf-8"))
+        b = json.loads(cached.read_text(encoding="utf-8"))
+        if a == b:
+            continue
+
+        def tag(m: dict) -> str:
+            return f"{m['source']['sha256'][:12]}/{m['conversion']['converter_version']}"
+        out.append((name, tag(a), tag(b)))
+    return out
 
 
 def mirror_roots() -> dict[str, Path]:
@@ -102,6 +139,10 @@ def main() -> int:
     total = len(same) + len(moved) + len(missing)
     if not args.quiet:
         print(f"原本とmanifestの照合: {len(same)}/{total} 一致")
+    drift = cache_drift()
+    for name, committed, cached in drift:
+        print(f"  ★ {name}: commit済み={committed} .cacheのbundle={cached}"
+              " ——**片方だけ戻した状態**")
     for name, recorded, actual in moved:
         print(f"  ★ {name}: manifest={recorded[:12]} いまの原本={actual[:12]}")
     for line in missing:
@@ -118,6 +159,16 @@ def main() -> int:
                 print(f"  ★ {label}: origin={head} ——**pullが要る**")
         if not behind:
             print("  すべて最新")
+    if drift:
+        print("\n**`.cache`のbundleがcommit済みの記録と食い違っています。**"
+              "正本はbundleから作られ、その出自はmanifestにcommitされるので、"
+              "この2つは常に一致していなければなりません。")
+        print("片方だけ戻すと、据え置き（`--hold-sources`）が黙って破れます"
+              "——`convert_all --skip`は`.cache`を触らず、`pdfcompat`は据え置き文書の"
+              "sha照合を省くので、凍結toolは**新原本を読みながら旧原本で据え置いていると信じます**。")
+        print("直し方: 取り込むなら `uv run pipeline/ingest/convert_all.py --force --only <文書>` で"
+              "両方を揃える。撤退するなら`.cache`のbundleも控えから戻す（tracked fileだけでは足りない）。")
+        return 1
     if moved or missing:
         print("\n**原本が動いています。**この状態で再生成すると、出力が"
               "どの入力状態にも対応しなくなります。")
