@@ -35,7 +35,8 @@ datasheet を複数持つことがあり（CH32V006 は V002/V004/V006/V007 の 
 
 bundle は `catalog/products.csv` の `datasheet` 列（PDF 名）と言語から
 `.cache/structured-bundles/<stem>.<lang>` で引く。原本と bundle の一致は `regenerate.py` の
-前後照合（`check_sources`）が保証し、ページ record の sha256 は manifest と照合する。
+前後照合（`check_sources`）が保証し、ページ record の sha256 は manifest と照合する
+（`pipeline/extract/bundle_pages.py`。3本目の退役で共通化した）。
 
 実行:
     uv run pipeline/extract/datasheet/extract_features.py [--out <dir>]
@@ -45,8 +46,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
-import json
 import re
 import sys
 from collections import Counter
@@ -54,9 +53,10 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "tools"))
-import paths  # noqa: E402
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-BUNDLES = REPO / ".cache" / "structured-bundles"
+import bundle_pages  # noqa: E402
+import paths  # noqa: E402
 # 機能説明の章は必ず前の方にある。ここまで見れば足りる。
 MAX_PAGES = 40
 
@@ -79,26 +79,14 @@ NUMERIC_ROW = re.compile(r"^[\d.]+(?:\s|$)")
 TRAILING = re.compile(r"\s*[.·…]{2,}\s*\d+\s*$")
 
 
-def _load_page(bundle: Path, entry: dict) -> dict:
-    """manifest の項目からページ record を読む。**sha256 を照合する**（`pdfcompat.Page._load` と
-    同じ入口ゲート——変換中で一部だけ書き換わった bundle を読まない）。"""
-    payload = (bundle / entry["file"]).read_bytes()
-    actual = hashlib.sha256(payload).hexdigest()
-    if actual != entry["sha256"]:
-        raise SystemExit(f"{bundle.name}/{entry['file']}: sha256 {actual[:12]} != manifest "
-                         f"{entry['sha256'][:12]} -- reconvert the bundle")
-    return json.loads(payload)
-
-
-def read_headings(bundle: Path) -> tuple[str, dict[str, str]]:
+def read_headings(bundle: str) -> tuple[str, dict[str, str]]:
     """(機能説明の章番号, {子節番号: 題})。読めなければ ("", {})。
 
     同じ番号が2回出たら目次と本文の両方に出ているので、後に出た本文側を採る。
     """
     seen: dict[str, str] = {}
-    manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
-    for entry in manifest["pages"][:MAX_PAGES]:
-        for line in (_load_page(bundle, entry).get("text") or "").splitlines():
+    for _number, text in bundle_pages.texts(bundle, MAX_PAGES):
+        for line in text.splitlines():
             heading = HEADING.match(line.strip())
             if not heading:
                 continue
@@ -131,9 +119,9 @@ def main() -> int:
         editions: dict[str, dict[str, str]] = {}
         chapters: dict[str, str] = {}
         for lang in ("zh", "en"):
-            bundle = BUNDLES / f"{Path(datasheet).stem}.{lang}"
-            if (bundle / "manifest.json").exists():
-                chapter, found = read_headings(bundle)
+            name = f"{Path(datasheet).stem}.{lang}"
+            if (bundle_pages.BUNDLES / name / "manifest.json").exists():
+                chapter, found = read_headings(name)
                 if found:
                     editions[lang] = found
                     chapters[lang] = chapter

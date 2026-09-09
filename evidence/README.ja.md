@@ -450,7 +450,7 @@ mailbox 経由の printf が書く番地）。1行1 family。**番地は die で
 
 CH32H417 は EVT に define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しないので、
 行は残して番地は空・`missing`。埋めるには hartinfo の実測が要る。`dm_data1_addr` は常に `dm_data0_addr + 4`
-（`check_tables` が見る）。生成は `tools/build_debug_data.py`。
+（`check_tables` が見る）。生成は `pipeline/extract/manual/extract_debug_data.py`。
 
 ### `debug_wiring.csv`
 
@@ -896,7 +896,7 @@ uv run pipeline/extract/run_patched.py build_memory                    # memory_
 uv run tools/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
 uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
-uv run pipeline/extract/run_patched.py build_timers                    # timers（RMのTIMx_CNT見出しから・数分かかる）
+uv run pipeline/extract/rm/extract_timers.py         # timers（RMのTIMx_CNT見出しをbundleから。数秒）
 uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry（EVTのflash driver＋RMの闪存章）
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
 uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
@@ -911,7 +911,7 @@ uv run tools/build_conflicts.py                 # index/conflicts（catalog/・e
 uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
 uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
 uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
-uv run pipeline/extract/run_patched.py build_debug_data                # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表＋実測）
+uv run pipeline/extract/manual/extract_debug_data.py  # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表をbundleから。数秒）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）

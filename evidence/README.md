@@ -451,7 +451,7 @@ Three sources; a row where they agree is `confirmed`:
 
 CH32H417 has no define in its EVT (no SDI_Printf example) and the V5/V3 manuals do not fix the value,
 so its row stays with empty addresses and `missing`; a hartinfo reading is needed to fill it.
-`dm_data1_addr` is always `dm_data0_addr + 4` (checked by `check_tables`). Built by `tools/build_debug_data.py`.
+`dm_data1_addr` is always `dm_data0_addr + 4` (checked by `check_tables`). Built by `pipeline/extract/manual/extract_debug_data.py`.
 
 ### `debug_wiring.csv`
 
@@ -922,7 +922,7 @@ uv run pipeline/extract/run_patched.py build_memory                    # memory_
 uv run tools/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
 uv run tools/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
 uv run pipeline/extract/datasheet/extract_features.py   # features (datasheet functional-description headings, read from the bundles; seconds)
-uv run pipeline/extract/run_patched.py build_timers                    # timers (from the RM's TIMx_CNT headings; takes a few minutes)
+uv run pipeline/extract/rm/extract_timers.py         # timers (the RM's TIMx_CNT headings, read from the bundles; seconds)
 uv run pipeline/extract/run_patched.py build_flash_geometry            # flash_geometry (EVT flash driver + RM 闪存 (flash) chapter)
 uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers (EVT headers + RM register tables. Reads the whole RM; slow)
 uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables (EVT rcc.h + RM register tables. Reads the whole RM; slow)
@@ -937,7 +937,7 @@ uv run tools/build_conflicts.py                 # index/conflicts (every conflic
 uv run tools/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
 uv run tools/build_evt_variants.py              # evt_variants (from the EVT device headers)
 uv run tools/build_link_firmware.py             # link_firmware (from WCH's distribution)
-uv run pipeline/extract/run_patched.py build_debug_data                # debug_data (defines in EVT debug.c + QingKe manual hartinfo table + measurements)
+uv run pipeline/extract/manual/extract_debug_data.py  # debug_data (defines in EVT debug.c + the QingKe manuals' hartinfo tables, read from the bundles; seconds)
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)

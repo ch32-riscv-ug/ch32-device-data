@@ -330,10 +330,14 @@ performance/storage見積り、移行計画とする。これらをreviewして�
 |---|---|---|
 | datasheet本文 | ~~`build_features`~~（新経路 `extract_features` へ退役済み）, `scan_errata`, `build_adc_internal` | page text、heading、原文ID |
 | datasheet表 | `extract_products`, `extract_ordering`, `extract_pins`, `build_pins`, `build_operating`, `build_all` | 物理cell、span、平坦化row、改ページ継続 |
-| RM本文 | `build_memory`, `build_timers`, `build_flash_geometry` | heading、paragraph、章境界 |
+| RM本文 | `build_memory`, ~~`build_timers`~~（新経路 `extract_timers` へ退役済み）, `build_flash_geometry` | heading、paragraph、章境界 |
 | RM表 | `extract_registers`, `build_registers`, `extract_remap`, ~~`build_dma_requests`~~（新経路 `extract_dma_requests` へ退役済み） | headingとtableの読み順、row geometry |
-| core/package | `build_debug_data`, `extract_package_dims` | text、文書種別 |
+| core/package | ~~`build_debug_data`~~（新経路 `extract_debug_data` へ退役済み）, `extract_package_dims` | text、文書種別 |
 | 画像 | `extract_images` | word/char/drawing geometry＋別asset renderer |
+
+退役の進捗（bundle入力でbyte一致→切替→削除）は[worklist](worklist.ja.md)の
+「凍結tool（PDF直読み）の退役の順序」に記録する。表のtool名は移行単位の代表で、
+取り消し線は**その代表が新経路へ移った**という印（群そのものは残る）。
 
 本実装の完了条件は、(1) 対象55版が全ページbundleでhash検査済み、(2) 各抽出器の旧新比較を
 保存、(3) 未承認blockを正本生成に使わない、(4) 正本CSVの意図しない差分0、(5) 原本更新時に

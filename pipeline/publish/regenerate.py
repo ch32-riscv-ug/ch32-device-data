@@ -63,11 +63,10 @@ FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
 # 正本を古い読みへ戻す**（2026-09-02の初回--fullで実際に踏んだ: 08-26製のcacheが
 # X315 RM改版前のARGB番地0x40023400を返し、registers 9行が偽conflictになった。
 # check_docsが捕捉→revert）。bundle入力ならcache無しでも数分で済む。
-FULL_PATCHED_3 = ["build_timers", "build_flash_geometry",
+FULL_PATCHED_3 = ["build_flash_geometry",
                   "build_opa_cmp_registers", "build_clock_enables",
                   "build_adc_internal", "build_usbpd_plumbing",
                   "build_registers",
-                  "build_debug_data",
                   # build_registers の後でなければならない——`ctlr_bit_names` は
                   # `register_fields.csv` の綴りをそのまま出す列なので、先に走ると
                   # 空になる（R-32。登録漏れで --full が拾っていなかった）。
@@ -112,6 +111,10 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("dma_requests", ["pipeline/extract/rm/extract_dma_requests.py"]),
             # 凍結tool `build_features` の退役（2026-09-09）: 同じく byte 一致で切替。
             ("features", ["pipeline/extract/datasheet/extract_features.py"]),
+            # 退役の第3・4号（2026-09-09）。`timers` は legacy 段では `evt_variants` より**前**に
+            # 走っていて前回の走行の値を読んでいた——evidence 段なら同じ走行の値を読む。
+            ("timers", ["pipeline/extract/rm/extract_timers.py"]),
+            ("debug_data", ["pipeline/extract/manual/extract_debug_data.py"]),
             ("device_id_addresses + device_ids",
              ["tools/build_device_ids.py"]),
         ]),

@@ -40,6 +40,11 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            **byte一致**を確認して切替・凍結toolを削除——2026-09-09。退役の第1号）
            datasheet/extract_features.py（**features.csvの正本生成器**。凍結tool
            `build_features`の同じ移植——`text`だけを読む。退役の第2号）
+           rm/extract_timers.py・manual/extract_debug_data.py（退役の第3・4号。同じ移植で
+           `timers`と`debug_data`。ここから**ページの読み手を共通化**した——`bundle_pages.py`）
+           bundle_pages.py（**新経路のページ読み手**。manifest順にページrecordを返し、
+           ページのsha256をmanifestと照合する。family→RM bundleは目録で引く。PDFは開かない
+           ので据え置き（`--hold-sources`）でもゲートと食い違わない）
            run_frozen.py（凍結toolをコード不変のままbundle入力で走らせ、出力を
            凍結CSVとbyte比較する——旧新パリティの道具。台帳はworklistのD18）
            run_scan_errata.py（エラッタ増分検査（KNOWN/NEW）をbundle入力で。
