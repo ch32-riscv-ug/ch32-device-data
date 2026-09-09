@@ -43,22 +43,11 @@ def _object(item: dict) -> dict:
             **({"text": item["text"]} if "text" in item else {})}
 
 
-class Row:
-    def __init__(self, cells):
-        self.cells = cells
-
-
-class Table:
-    def __init__(self, record: dict):
-        self._record = record
-        self.bbox = tuple(record["bbox"])
-        self.cells = [tuple(cell["bbox"]) for cell in record["cells"]]
-        self.rows = [Row([tuple(cell) if cell is not None else None for cell in row])
-                     for row in record["row_cells"]]
-
-    def extract(self, **_kwargs):
-        return self._record["extracted_rows"]
-
+# 表の形（`Row`/`Table`）は**新経路の読み手が持つ**——同じ定義が2箇所にあったのを
+# 退役 第9号で1つにした。互換層は凍結toolのために同じ形を必要とするだけなので、
+# 凍結toolが全部退役すればこのmoduleごと消える。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from bundle_pages import Row, Table  # noqa: E402,F401  凍結toolが触る表の形
 
 class Page:
     def __init__(self, bundle: Path, entry: dict):

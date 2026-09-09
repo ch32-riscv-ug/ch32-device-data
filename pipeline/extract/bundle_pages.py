@@ -79,7 +79,48 @@ def extracted_tables(page: dict) -> list[list[list[str | None]]]:
     `extracted_rows`は**pdfplumberが返したそのまま**——converterの修復は`cells`側に閉じている
     （converter 1.14.0で確定した契約）。この面を読む抽出器は、凍結toolと同じ行列を見る。
     """
-    return [table["extracted_rows"] for table in page.get("tables", [])]
+    return [table.extract() for table in tables(page)]
+
+
+class Row:
+    """表の1行。`cells` は左から右のセルの矩形（無いセルは None）。"""
+
+    def __init__(self, cells):
+        self.cells = cells
+
+
+class Table:
+    """bundle の表 record を pdfplumber の `Table` の形で見せる。
+
+    **この形の定義はここに1つだけ置く。** 互換層（`pdfcompat`）は凍結tool のために
+    同じ形を必要とするので、そちらがこのクラスを import する（退役 第9号までは
+    2箇所に同じ定義があった）。凍結tool が全部退役すれば互換層ごと消える。
+
+    `extract()` が返す行は **pdfplumber が返したそのまま**（`extracted_rows`）。
+    converter の修復は `cells` 側に閉じている（converter 1.14.0 で確定した契約）。
+    """
+
+    def __init__(self, record: dict):
+        self._record = record
+        self.bbox = tuple(record["bbox"])
+        self.cells = [tuple(cell["bbox"]) for cell in record["cells"]]
+        self.rows = [Row([tuple(cell) if cell is not None else None for cell in row])
+                     for row in record["row_cells"]]
+
+    def extract(self, **_kwargs):
+        return self._record["extracted_rows"]
+
+
+def tables(page: dict) -> list[Table]:
+    """ページの表を**矩形つき**で返す（`page.find_tables()` の置き換え）。
+
+    セルの矩形が要る抽出器のための面——`extract_pins` は縦に結合されたセルを
+    「矩形が覆っている行」に配る（`fill_merged`。datasheet は2つの pad が同じ足に
+    出ることを lead 番号のセルの縦結合で書く）ので、行ごとのセルの矩形が要る。
+    行だけで足りるなら `extracted_tables`、表題で選ぶなら `captioned_tables`、
+    上端だけなら `positioned_tables` を使う。
+    """
+    return [Table(record) for record in page.get("tables", [])]
 
 
 def _boxed(item: dict) -> dict:
@@ -108,7 +149,7 @@ def positioned_tables(page: dict) -> list[tuple[float, list[list[str | None]]]]:
     読み方をするので、**表の上端**が要る。行そのものは `extracted_tables` と同じ
     `extracted_rows`（pdfplumber が返したまま）。
     """
-    return [(table["bbox"][1], table["extracted_rows"]) for table in page.get("tables", [])]
+    return [(table.bbox[1], table.extract()) for table in tables(page)]
 
 
 def captioned_tables(page: dict) -> list[tuple[str, list[list[str | None]]]]:

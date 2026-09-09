@@ -26,6 +26,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import extract_ordering  # noqa: E402
+# 凍結 `tools/extract_pins.py` は退役した（第10号）。読み手は新経路の
+# `pipeline/extract/datasheet/extract_pins.py`——bundle を読むので、原本のパスは
+# `bundle_name()` で bundle 名に直す。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]
+                       / "pipeline" / "extract" / "datasheet"))
 import extract_pins  # noqa: E402
 import extract_products  # noqa: E402
 
@@ -153,7 +158,8 @@ def ordering_of(path: Path) -> dict[str, dict]:
 
 
 def pins_of(path: Path, package: str) -> dict[str, list]:
-    pins, _, _ = extract_pins.build(path, package, "", "")
+    pins, _, _ = extract_pins.build(
+        extract_pins.bundle_name(str(path)), package, "", "")
     return {
         p["pad"]: [p["number"]] + sorted(
             f"{f['signal']}@{f.get('route')}" for f in p["functions"]

@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
-"""Extract package pin / alternate-function candidates from a datasheet pin table.
+"""datasheet の pin 定義表 → pad の割り付けと代替機能の候補（凍結 `tools/extract_pins.py`
+の移植。退役 第10号）
 
-The vendor pin table is the only source for package bond-out and pad routing; the
-EVT tree does not carry it. PDF table recovery is layout-dependent, so this tool
-emits *candidates* for human review and, when given a record, reports how far the
-candidates agree with it. It never writes device records.
+pad の割り付けと配線は**資料の pin 表しか言わない**（EVT の木は持たない）。表の復元は
+版面に依るので、この module は**候補**を出して人の review に回す。device record は書かない。
 
-Usage:
-    uv run tools/extract_pins.py <datasheet.pdf> --package TSSOP20 \
-        [--compare <record>.json] [--emit]
+読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき）。凍結版は `pdfplumber.open()` の
+`pdf` object を持ち回っていたが、この版は**ページ record のリスト**を持ち回る
+（`pages = list(bundle_pages.pages(bundle))`）——表ごとに文書を何度も走るので、
+generator だと毎回ページを読み直すことになる。pdfplumber の頃はページの解析結果が
+重くて（148ページで約800MiB）読み終えたページを `close()` していたが、bundle の
+ページ record は素の JSON なのでその必要が無い。
+
+使う面は `bundle_pages.text_lines`（見出しの y 座標）と `bundle_pages.tables`
+（矩形つきの表。縦結合セルを矩形が覆う行に配る `fill_merged` が行ごとのセルの矩形を要る）。
+
+    uv run pipeline/extract/datasheet/extract_pins.py <bundle名 or 原本PDFのパス>
+        --package TSSOP20 [--compare <record>.json] [--emit] [--list]
+
+`<bundle名>` は `CH32V003DS0.zh` の形。原本PDFのパスを渡すと、親ディレクトリの
+`datasheet_zh`/`datasheet_en` から言語を読んで bundle 名にする（原本は開かない）。
 """
 
 from __future__ import annotations
@@ -19,7 +30,51 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
+
+# bundle 名の言語は原本の置き場から決まる（`pdfcompat` と同じ規則）。
+_LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
+
+
+def _pages(source):
+    """ページの並びを取り出す。**pdf object でもページの並びでも受ける。**
+
+    凍結 `tools/build_all.py`（multiprocessing。退役は別企画）がこの module の
+    解析関数を `pdf` object のまま呼ぶ——`run_patched` で `pdfplumber` が `pdfcompat` に
+    差し替わっているので中身は bundle だが、渡ってくるのは `pdf` と `pdfcompat.Page`。
+    新経路は**ページ record（素の dict）の並び**を渡す。`build_all` が退役すれば
+    この層と下の `_lines`/`_tables` は消える。
+    """
+    return getattr(source, "pages", source)
+
+
+def _lines(page) -> list[dict]:
+    """視覚行。ページ record（新経路）でも `pdfcompat.Page`（凍結tool経由）でも返す。"""
+    return (bundle_pages.text_lines(page) if isinstance(page, dict)
+            else page.extract_text_lines() or [])
+
+
+def _tables(page) -> list:
+    """矩形つきの表。どちらの入口でも `bbox`・`rows[].cells`・`extract()` を持つ
+    （`pdfcompat.Table` は `bundle_pages.Table` そのもの）。"""
+    return (bundle_pages.tables(page) if isinstance(page, dict)
+            else page.find_tables())
+
+
+def bundle_name(argument: str) -> str:
+    """`CH32V003DS0.zh` はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。"""
+    path = Path(argument)
+    if path.suffix.upper() != ".PDF":
+        return argument
+    found = _LANG_DIR.match(path.parent.name)
+    if not found:
+        raise SystemExit(f"{argument}: 言語が分からない"
+                         "——`datasheet_zh`/`datasheet_en` の下のPDFか、bundle名を渡してください")
+    return f"{path.stem}.{found.group(1)}"
 
 # The pin table leads with one pin-number column per orderable variant, then pad,
 # type, reset function, default alternate and remapping. Neither the number of
@@ -285,32 +340,28 @@ CAPTION = re.compile(r"^((?:Table\s+|表)[\d]+(?:-[\d]+)*)\s*(\S.*)$")
 PIN_TABLE_TITLE = ("pin definition", "引脚定义")
 
 
-def captions(pdf) -> list[tuple[str, str, int]]:
+def captions(pages) -> list[tuple[str, str, int]]:
     """Every table caption, as (label, title, page index)."""
     out = []
-    for pno, page in enumerate(pdf.pages):
-        for line in page.extract_text_lines() or []:
+    for pno, page in enumerate(_pages(pages)):
+        for line in _lines(page):
             m = CAPTION.match(line["text"].strip())
             if m:
                 out.append((m.group(1), m.group(2), pno))
-        # This preliminary pass visits the whole document.  Keeping every page's
-        # parsed layout alive until find_pin_tables() starts made a 148-page
-        # datasheet consume about 800 MiB just to collect its captions.  The
-        # captions above are plain strings now, so none of the page cache is
-        # needed by the caller.
-        # close() also clears get_textmap's per-page lru_cache; flush_cache()
-        # alone leaves that large text map reachable.
-        page.close()
+        # 凍結版はここでページの解析キャッシュを捨てていた（`page.close()`）——
+        # pdfplumber の版面解析を全ページ抱えると 148ページで約800MiB 食った
+        # （`flush_cache()` だけでは `get_textmap` の lru_cache が残る）。
+        # bundle のページ record は素の JSON なので捨てる必要が無い。
     return out
 
 
-def choose_table(pdf) -> tuple[str, str]:
+def choose_table(pages) -> tuple[str, str]:
     """Pick the first pin-definition table and the caption that ends it.
 
     Families number these differently -- Table 2-1, Table 2-1-1, Table 3-1-1 -- so
     the caption is found by its wording rather than by a fixed label.
     """
-    found = captions(pdf)
+    found = captions(pages)
     for i, (label, title, _) in enumerate(found):
         if any(k in title.lower() for k in PIN_TABLE_TITLE):
             return label, next_caption(found, i)
@@ -336,7 +387,7 @@ def caption_position(page, label: str) -> float | None:
     The label must end where it ends: "Table 3-1" is not an occurrence of
     "Table 3-1-1", which numbers a different table.
     """
-    for line in page.extract_text_lines() or []:
+    for line in _lines(page):
         if re.match(re.escape(label) + r"(?![-\d])", line["text"].strip()):
             return line["top"]
     return None
@@ -465,7 +516,7 @@ def _outwards(start: int, total: int):
 
 
 def find_pin_tables(
-    pdf, table_label: str, stop_label: str
+    pages, table_label: str, stop_label: str
 ) -> tuple[list[list], list[str], dict[str, int]]:
     """Collect data rows of the pin-definition table across the pages it spans.
 
@@ -492,14 +543,14 @@ def find_pin_tables(
     width = 0
     started = False
     chunks: list[list[list[str]]] = []
-    for page in pdf.pages:
+    for page in _pages(pages):
         begin = caption_position(page, table_label)
         if begin is not None:
             started = True
         elif not started:
             continue
         cut = caption_position(page, stop_label)
-        for table in page.find_tables():
+        for table in _tables(page):
             if begin is not None and table.bbox[3] <= begin:
                 continue
             if cut is not None and table.bbox[1] >= cut:
@@ -514,9 +565,8 @@ def find_pin_tables(
                     layout, variants = found
                     width = len(extracted[0])
             chunks.append(extracted)
-        # 読み終えたページの解析キャッシュは捨てる。同じ pdf を表ごとに
-        # 何度も走査するので、貯め込むと datasheet 1本でも重くなる。
-        page.close()
+        # 凍結版はここでもページの解析キャッシュを捨てていた（表ごとに文書を
+        # 何度も走査するので、pdfplumber では貯め込むと datasheet 1本でも重かった）。
         if cut is not None:
             break
     if layout:
@@ -777,14 +827,14 @@ def signals(cell: str, known: frozenset[str] = frozenset(),
 
 
 def build(
-    pdf_path: Path, package: str, table_label: str, stop_label: str
+    bundle: str, package: str, table_label: str, stop_label: str
 ) -> tuple[list[dict], list[str], list[str]]:
     notes: list[str] = []
-    with pdfplumber.open(pdf_path) as pdf:
-        if not table_label:
-            table_label, stop_label = choose_table(pdf)
-            notes.append(f"表を自動選択: {table_label}（{stop_label} まで）")
-        rows, packages, layout = find_pin_tables(pdf, table_label, stop_label)
+    pages = list(bundle_pages.pages(bundle))
+    if not table_label:
+        table_label, stop_label = choose_table(pages)
+        notes.append(f"表を自動選択: {table_label}（{stop_label} まで）")
+    rows, packages, layout = find_pin_tables(pages, table_label, stop_label)
     if not packages:
         raise SystemExit(f"{table_label} の列見出しを認識できませんでした")
     if package not in packages:
@@ -1110,7 +1160,7 @@ def score(pins: list[dict], record: Path) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("pdf", type=Path)
+    ap.add_argument("document", help="bundle名（CH32V003DS0.zh）か原本PDFのパス")
     ap.add_argument("--package", help="列見出し。パッケージ名か型番（例: TSSOP20, V006K8U7）")
     ap.add_argument("--table", default="", help="pin定義表の見出し。既定は自動選択")
     ap.add_argument("--stop", default="", help="読み取りを止める次表の見出し")
@@ -1119,17 +1169,17 @@ def main() -> int:
     ap.add_argument("--emit", action="store_true")
     args = ap.parse_args()
 
+    bundle = bundle_name(args.document)
     if args.list:
-        with pdfplumber.open(args.pdf) as pdf:
-            for label, title, pno in captions(pdf):
-                if any(k in title.lower() for k in PIN_TABLE_TITLE):
-                    print_err(f"  {label:<14} p{pno + 1:<4} {title}")
+        for label, title, pno in captions(bundle_pages.pages(bundle)):
+            if any(k in title.lower() for k in PIN_TABLE_TITLE):
+                print_err(f"  {label:<14} p{pno + 1:<4} {title}")
         return 0
     if not args.package:
         ap.error("--package か --list が要ります")
 
-    pins, notes, packages = build(args.pdf, args.package, args.table, args.stop)
-    print_err(f"入力: {args.pdf}")
+    pins, notes, packages = build(bundle, args.package, args.table, args.stop)
+    print_err(f"入力: {bundle}（bundle）")
     print_err(f"表にある列: {', '.join(packages)}")
     print_err(f"{args.package} の抽出 pin: {len(pins)} / function: {sum(len(p['functions']) for p in pins)}")
     if notes:

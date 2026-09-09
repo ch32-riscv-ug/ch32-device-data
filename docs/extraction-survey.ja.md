@@ -10,7 +10,7 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 測定は2段階です。まず精度を測るため、すでに人手で作成した3 record（CH32V003F4P6、CH32X035F8U6、CH32M030C8T7）をground truthとして抽出器の出力と照合しました。次に適用範囲を測るため、mirrorしている全datasheetを掃引しました。
 
-抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`tools/extract_pins.py`](../tools/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
+抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`pipeline/extract/datasheet/extract_pins.py`](../pipeline/extract/datasheet/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
 
 ## 前提
 
@@ -695,9 +695,9 @@ uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <reco
 uv run tools/extract_remap.py <manual>.PDF --compare <record>.json
 uv run pipeline/extract/rm/register_fields.py <manual>.PDF --compare <record>.json
 
-uv run tools/extract_pins.py <datasheet>.PDF --list
-uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare <record>.json
-uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --emit > candidate.json
+uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --list
+uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare <record>.json
+uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --package V006K8U7 --emit > candidate.json
 ```
 
 `extract_pins.py`は`--list`でpin定義表の一覧を表示します。`--package`にはパッケージ名と型番のどちらも渡せます。表は既定で自動選択し、`--table`と`--stop`で明示もできます。

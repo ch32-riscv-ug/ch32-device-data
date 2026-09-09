@@ -29,10 +29,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+# 凍結 `tools/extract_registers.py`（第9号）と `tools/extract_pins.py`（第10号）は
+# 退役した。読み手は新経路の `pipeline/extract/rm/register_fields.py` と
+# `pipeline/extract/datasheet/extract_pins.py`——どちらも同じ関数を持つので、
+# `extract_registers` は別名で入れる。**新経路は bundle を読む**ので、原本のパスを
+# 渡している箇所は `bundle_name()` で bundle 名に直す。
+_PIPELINE = Path(__file__).resolve().parents[1] / "pipeline" / "extract"
+sys.path.insert(0, str(_PIPELINE / "rm"))
+sys.path.insert(0, str(_PIPELINE / "datasheet"))
 import extract_pins  # noqa: E402
-# 凍結 `tools/extract_registers.py` は退役した（第9号）。field 表の読み手は
-# 新経路の `pipeline/extract/rm/register_fields.py`——同じ関数を持つので別名で入れる。
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "rm"))
 import register_fields as extract_registers  # noqa: E402
 import extract_remap  # noqa: E402
 import extract_remap_fields  # noqa: E402
@@ -147,7 +152,8 @@ def read_silicon(
 def build(header: Path, manuals: Path | list[Path] | None, datasheet: Path,
           package: str, gpio: Path | None = None) -> tuple[dict, list[str]]:
     selectors, reg_fields, routes, evt_values, notes = read_silicon(header, manuals, gpio)
-    pins, pin_notes, _ = extract_pins.build(datasheet, package, "", "")
+    pins, pin_notes, _ = extract_pins.build(
+        extract_pins.bundle_name(str(datasheet)), package, "", "")
     notes += [f"[pins] {n}" for n in pin_notes[:5]]
     return join(selectors, reg_fields, routes, pins, evt_values, notes)
 

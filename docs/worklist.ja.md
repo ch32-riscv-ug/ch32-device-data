@@ -674,6 +674,26 @@ evidence 段より**先**に走るため置いたままにできなかった（`
 （`build_usbpd_plumbing` と同じ F-54 型。同じ関数の中で使い切っていたので露出していなかった）。
 新経路では変数を作らない。
 
+**第10号 完了（2026-09-10）**: `extract_pins`・`build_pins`（`pins` 4,563行・`pin_functions` 28,483行）。
+**足した面**は `bundle_pages.tables(page)`（`page.find_tables()` の置き換え。`bbox`・`rows[].cells`・
+`extract()`）——`fill_merged` が縦結合セルを「矩形が覆っている行」に配るので行ごとのセルの矩形が要る。
+併せて `Row`/`Table` の**同じ定義が `pdfcompat` と2箇所にあったのを1つにした**（新経路の
+`bundle_pages` に置いて互換層がそれを import する。凍結toolが全部退役すれば互換層ごと消える）。<br>
+**`pdf` object ではなくページ record のリストを持ち回る**——表ごとに文書を何度も走るので
+generator では読み直しになる。pdfplumber の頃の `page.close()`（148ページで約800MiB）は要らない。<br>
+**`build_all` を import しない**——列の手当て（`curated/pin-table-columns.json`）を読む3行を
+新経路に持った。import すると PDF 直読みの凍結tool（multiprocessing）を引き込む。<br>
+**`--full` の順序を1つのリストに畳んだ**（`FULL_ORDER`。kind は patched／plain／new）——
+`pin_functions.csv` を `build_remap`・`build_pin_alternate`（どちらも凍結tool）が読むので、
+evidence 段（legacy の後）へ移すと前回の走行の値を読む。退役した生成器がこの並びに残るのは
+**凍結toolがその出力を読むときだけ**で、読む側が退役したら evidence 段へ移せる。<br>
+**検算**: `pins.csv`・`pin_functions.csv` が正本と byte 一致。<br>
+**パリティ定番一式の意味が変わった**: `BATCH` は6本→2本→**1本**で、残る `build_remap` は
+PDF を読まない（`candidates/*.json` と `pin_functions.csv` から作る）。`--verify` の凍結パリティは
+もう bundle 入力の妥当性を見ていない。**次の退役でここは空になる**見込みで、そのときは
+相手を作り直すのではなく `--verify` の意味自体を見直す（`markdown parity` と `check_baseline` が
+実質の防波堤）。
+
 **第8号 完了（同日）**: `build_operating`（656行）→ `pipeline/extract/datasheet/operating_rows.py`。
 基礎行1,588行と正本`operating_conditions.csv` 2,797行がともに **byte 一致**。`bundle_pages` に
 `extracted_tables`（`page.extract_tables()`の置き換え）を足した。呼ぶ側の

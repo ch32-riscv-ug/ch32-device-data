@@ -885,7 +885,7 @@ toolのコードは不変）——素の`tools/<name>.py`で回すとPDF直読�
 ```sh
 uv run pipeline/extract/run_patched.py build_all --jobs 1  # .cache/candidates/（型番ごとの抽出候補。直列——patchはworker子プロセスに効かない）
 uv run pipeline/extract/run_patched.py build_tables                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
-uv run pipeline/extract/run_patched.py build_pins                      # pins/pin_functions（数分かかる）
+uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions（bundleから。数分かかる）
 uv run pipeline/extract/run_patched.py build_remap                     # remap_fields/remap_routes（candidates から）
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
 uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
