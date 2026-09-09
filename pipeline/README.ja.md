@@ -27,7 +27,10 @@ common/    logical_tables.py（**L1: ページを跨ぐ表の断片を1つの論
            末尾が表・縦位置の連続・列構造互換。列の対応付けは列数が同じなら位置、
            違えばx座標の和集合。reviewとextractが同じ部品を使う）
 extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDFへのsilent fallbackなし）
-           datasheet/run_operating.py（凍結ロジックをbundle入力で走らせる。
+           datasheet/operating_rows.py（**基礎行の組み立て**。凍結`tools/build_operating.py`から
+           pdfplumber依存だけを外した移植で、抽出の規則は1行も同じ。`build_operating_conditions.py`が
+           ライブラリとして呼ぶ。退役の第8号——これで`operating_conditions`経路のPDF直読みは無くなった）
+           datasheet/run_operating.py（削除済み。凍結ロジックをbundle入力で走らせる
            evidence/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
            datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間。
            caption選定＋断片結合＋表番号スコープの2段階zh/en照合。偽conflict 0）
@@ -265,7 +268,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    `logical_tables.reattach_cell_subscripts`——3者が同じ関数を呼ぶので読みがずれない。
 
    **壊れた分割は情報を持っているので、そちらも残す。** pdfplumberが残す改行は
-   下付きの境界で、凍結`build_operating.norm_symbol`はそれを正規化記号に変える
+   下付きの境界で、`operating_rows.norm_symbol`はそれを正規化記号に変える
    （`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）。1.7.0で繋いだ形だけを残したら、
    `evidence/operating_conditions.csv`の**`I_DD`系1,207行がエラーも出さずに消えた**。
    1.7.1からはセルが2つの面を持つ——表が`cells`と`extracted_rows`を両方持つのと

@@ -2288,3 +2288,93 @@ mirror の PDF を比べて「動いた」と言い、`convert_all --skip` は�
 **教訓**: 「撤退したら戻す」の対象は**tracked file だけではない**。正本CSV・`generated/`の派生物・
 `.cache`のbundle の3つで、最後のひとつは`git status`に出ないので忘れる。**忘れても検査が捕まえる**
 形にしたのが今回の追加。
+
+## 凍結toolの退役 第8号——`build_operating`（撤退の再突入条件を外した）（2026-09-09）
+
+`CH32X035DS0.zh` V2.3 の撤退の再突入条件は「`operating_conditions` がポート群の次元を持てるように
+なったら」で、そのためには行の組み立てが**編集できる**必要があった。組み立ては凍結
+`tools/build_operating.py`（656行）の `read_edition` の中で、新経路はそれを CSV 経由で呼ぶだけ
+だったので割り込めなかった。**その移植をやった。**
+
+- `pipeline/extract/datasheet/operating_rows.py`（668行）。`pdfplumber.open`＋`pdf.pages`＋
+  `extract_text()`＋`extract_tables()`＋`page_number`＋`flush_cache()` を `bundle_pages` へ置き換え、
+  mirror のパス組み立てを bundle 名（`<stem>.<lang>`）に。**抽出の規則は1行も変えていない。**
+- `bundle_pages.extracted_tables(page)` を足した（`page.extract_tables()` の置き換え＝
+  `tables[].extracted_rows`）。`extract_tables` を使う凍結toolはこれで0本になった。
+- 検証は**二段**: 基礎行 1,588 行が凍結ロジックの bundle 入力（`run_operating.py` の candidate）と
+  **byte 一致**、正本 `operating_conditions.csv` 2,797 行も **byte 一致**。
+
+### 呼ぶ側が軽くなった
+
+`build_operating_conditions.py` は `operating.pdfplumber = pdfcompat` を差し替えていた（凍結tool に
+bundle を読ませるため）。**その一行が要らなくなった**——`operating_rows` は原本を開かないので、
+据え置き（`--hold-sources`）でもゲートと食い違わない。`pdfcompat` の import も落ちた。
+用済みの `pipeline/extract/datasheet/run_operating.py`（凍結ロジックを bundle 入力で走らせて
+candidate を書く D18 工程4の道具）も削除した——走らせる相手が無い。
+
+### 途中で踏んだこと
+
+- **`ast.parse` は「関数外の `return`」を通す。** 移植で `with pdfplumber.open(...)` の入れ子を
+  1段浅くするとき、字下げを4字だけ機械的に外したら関数直下の `return found` まで外へ出た。
+  `ast.parse` は通り、実行時に `SyntaxError: 'return' outside function`。**12字以上の行だけ**を
+  寄せるように直し、検証を `py_compile`（symbol table まで見る）に変えた。
+- `check_tables.CALLED_BY` は呼び元を `tools/` 固定で読んでいた。新経路の生成器
+  （`pipeline/extract/<層>/`）を登録した瞬間に `tools/build_operating_conditions.py` を探して落ちた
+  → `generator_path(name)` を足して両方の木から名前で引く。
+- `out_option`（正本を書く生成器は `--out` を受けること。D15）の網も `tools/build_*.py` 固定だった。
+  新経路の11本へ広げた——全部すでに `--out` を持っていたので指摘は増えないが、**次に足す生成器は
+  ここで捕まる**。正本を書く生成器はいま新経路に増えているので、網もそちらへ動かす必要があった。
+
+### 残る PDF 直読み
+
+`build_all`（multiprocessing）・`build_tables`・`build_pins`→`extract_pins`・`build_remap`→
+`extract_remap`・`build_registers`→`extract_registers`（`build_clock_enables`・`build_usbpd_plumbing`
+も委譲）・`extract_products`/`extract_ordering`（`build_all` 経由）・`build_opa_cmp_registers`・
+`build_flash_program_method`・`extract_package_dims`・`scan_errata`・`extract_images`（pixel。原本が要る）。
+次は `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` を `bundle_pages` に
+足すのが先。
+
+## 凍結toolの退役 第8号——`build_operating`（撤退の再突入条件を外した）（2026-09-09）
+
+`CH32X035DS0.zh` V2.3 の撤退の再突入条件は「`operating_conditions` がポート群の次元を持てるように
+なったら」で、そのためには行の組み立てが**編集できる**必要があった。組み立ては凍結
+`tools/build_operating.py`（656行）の `read_edition` の中で、新経路はそれを CSV 経由で呼ぶだけ
+だったので割り込めなかった。**その移植をやった。**
+
+- `pipeline/extract/datasheet/operating_rows.py`（668行）。`pdfplumber.open`＋`pdf.pages`＋
+  `extract_text()`＋`extract_tables()`＋`page_number`＋`flush_cache()` を `bundle_pages` へ置き換え、
+  mirror のパス組み立てを bundle 名（`<stem>.<lang>`）に。**抽出の規則は1行も変えていない。**
+- `bundle_pages.extracted_tables(page)` を足した（`page.extract_tables()` の置き換え＝
+  `tables[].extracted_rows`）。`extract_tables` を使う凍結toolはこれで0本になった。
+- 検証は**二段**: 基礎行 1,588 行が凍結ロジックの bundle 入力（`run_operating.py` の candidate）と
+  **byte 一致**、正本 `operating_conditions.csv` 2,797 行も **byte 一致**。
+
+### 呼ぶ側が軽くなった
+
+`build_operating_conditions.py` は `operating.pdfplumber = pdfcompat` を差し替えていた（凍結tool に
+bundle を読ませるため）。**その一行が要らなくなった**——`operating_rows` は原本を開かないので、
+据え置き（`--hold-sources`）でもゲートと食い違わない。`pdfcompat` の import も落ちた。
+用済みの `pipeline/extract/datasheet/run_operating.py`（凍結ロジックを bundle 入力で走らせて
+candidate を書く D18 工程4の道具）も削除した——走らせる相手が無い。
+
+### 途中で踏んだこと
+
+- **`ast.parse` は「関数外の `return`」を通す。** 移植で `with pdfplumber.open(...)` の入れ子を
+  1段浅くするとき、字下げを4字だけ機械的に外したら関数直下の `return found` まで外へ出た。
+  `ast.parse` は通り、実行時に `SyntaxError: 'return' outside function`。**12字以上の行だけ**を
+  寄せるように直し、検証を `py_compile`（symbol table まで見る）に変えた。
+- `check_tables.CALLED_BY` は呼び元を `tools/` 固定で読んでいた。新経路の生成器
+  （`pipeline/extract/<層>/`）を登録した瞬間に `tools/build_operating_conditions.py` を探して落ちた
+  → `generator_path(name)` を足して両方の木から名前で引く。
+- `out_option`（正本を書く生成器は `--out` を受けること。D15）の網も `tools/build_*.py` 固定だった。
+  新経路の11本へ広げた——全部すでに `--out` を持っていたので指摘は増えないが、**次に足す生成器は
+  ここで捕まる**。正本を書く生成器はいま新経路に増えているので、網もそちらへ動かす必要があった。
+
+### 残る PDF 直読み
+
+`build_all`（multiprocessing）・`build_tables`・`build_pins`→`extract_pins`・`build_remap`→
+`extract_remap`・`build_registers`→`extract_registers`（`build_clock_enables`・`build_usbpd_plumbing`
+も委譲）・`extract_products`/`extract_ordering`（`build_all` 経由）・`build_opa_cmp_registers`・
+`build_flash_program_method`・`extract_package_dims`・`scan_errata`・`extract_images`（pixel。原本が要る）。
+次は `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` を `bundle_pages` に
+足すのが先。

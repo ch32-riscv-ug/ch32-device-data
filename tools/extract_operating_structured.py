@@ -2,8 +2,11 @@
 """PoC: extract operating-condition rows from structured-document JSON.
 
 The input contains no domain interpretation; this program never opens a PDF.
-For the PoC it reuses the existing symbol/value rules from build_operating.py so
-we can compare only the effect of inserting the structured-document boundary.
+For the PoC it reuses the existing symbol/value rules so we can compare only the
+effect of inserting the structured-document boundary. Those rules lived in
+`tools/build_operating.py` until 2026-09-09, when they moved to
+`pipeline/extract/datasheet/operating_rows.py` (the frozen tool was retired);
+this PoC follows the move. The D17 report is docs/structured-extraction-poc.ja.md.
 """
 
 from __future__ import annotations
@@ -12,12 +15,16 @@ import argparse
 import csv
 import json
 import re
+import sys
 from pathlib import Path
 
 import jsonschema
 
-import build_operating as operating
 import convert_structured
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent
+                                     / "pipeline" / "extract" / "datasheet"))
+import operating_rows as operating  # noqa: E402
 
 
 COLUMNS = ["symbol", "parameter", "condition", "min", "typ", "max", "unit",

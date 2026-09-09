@@ -170,7 +170,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "memory_configs": ("extract_memory.py", "COLUMNS"),
     "memory_map": ("build_memory_map.py", "COLUMNS"),
     "opa_cmp_registers": ("build_opa_cmp_registers.py", "COLUMNS"),
-    "operating_conditions": ("build_operating.py", "COLUMNS"),
+    "operating_conditions": ("operating_rows.py", "COLUMNS"),
     "option_bytes": ("extract_option_bytes.py", "BYTE_COLUMNS"),
     "option_byte_fields": ("extract_option_bytes.py", "FIELD_COLUMNS"),
     "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
@@ -245,7 +245,7 @@ def out_option(t: dict) -> list[str]:
     **受けないと、抽出を変えて様子を見るのに正本を上書きするしか手が無い。**
     `evidence/README` は「出力先は各ツールが `tools/paths.py` で決めます
     （`--out <dir>` は試験用の上書き）」と全 tool について書いていたが、
-    `build_operating.py` と `build_evt_examples.py` は argparse 自体を持たず、
+    `build_evt_examples.py` は argparse 自体を持たず、
     `--out` を渡しても黙って無視して `evidence/` に書いていた——2026-08-29 に
     それで正本を1つ潰した。文書のほうが正しく、tool が追いついていなかった。
 
@@ -256,7 +256,11 @@ def out_option(t: dict) -> list[str]:
     import ast  # noqa: PLC0415
 
     out = []
-    for path in sorted((paths.REPO / "tools").glob("build_*.py")):
+    # **新経路（`pipeline/extract/<層>/`）の生成器も見る**——正本を書く生成器はいまこちらに
+    # 増えていて、`tools/build_*.py`だけを見ていると網から漏れる（2026-09-09に11本を確認。
+    # 全部`--out`を持っていたので指摘は増えないが、次に足す生成器はここで捕まる）。
+    for path in sorted((paths.REPO / "tools").glob("build_*.py")) + sorted(
+            (paths.REPO / "pipeline" / "extract").rglob("*.py")):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
         except SyntaxError:
@@ -336,8 +340,25 @@ def column_drift(t: dict) -> list[str]:
     return out
 
 
+def generator_path(name: str) -> Path | None:
+    """生成器のファイルを**名前で**引く（`tools/`でも`pipeline/extract/<層>/`でもよい）。
+
+    新経路の生成器は層ごとのdirectoryにあるので、`tools/`固定では見つからない
+    ——`operating_rows.py`（`pipeline/extract/datasheet/`）を`CALLED_BY`に登録したとき
+    `tools/build_operating_conditions.py` を読もうとして落ちた（2026-09-09）。
+    ファイル名は両方の木で一意（`column_definitions`も名前で引いている）。
+    """
+    direct = paths.REPO / "tools" / name
+    if direct.is_file():
+        return direct
+    hits = sorted((paths.REPO / "pipeline" / "extract").rglob(name))
+    return hits[0] if hits else None
+
+
 # regenerate.py に名前が出ない生成器と、それを呼ぶ生成器。
-CALLED_BY = {"build_documents.py": "build_tables.py"}
+CALLED_BY = {"build_documents.py": "build_tables.py",
+             # `operating_rows`は基礎行のライブラリで、正本生成器がimportして呼ぶ。
+             "operating_rows.py": "build_operating_conditions.py"}
 
 
 def regeneration_coverage() -> list[str]:
@@ -358,7 +379,9 @@ def regeneration_coverage() -> list[str]:
         # （`build_documents` は `build_tables` が呼ぶ）。**呼ぶ側が順序に載っていて、
         # 実際にimportしていること**まで確かめる——ただ免除すると穴になる。
         caller = CALLED_BY.get(source)
-        if caller and caller[:-3] in text and stem in (tools / caller).read_text(encoding="utf-8"):
+        caller_path = generator_path(caller) if caller else None
+        if (caller_path is not None and caller[:-3] in text
+                and stem in caller_path.read_text(encoding="utf-8")):
             continue
         out.append(f"{name}: 生成器 {source} が regenerate.py の順序に無い"
                    "——`--full` で再生成されない")

@@ -9,7 +9,8 @@ PoCとの違い:
 1. **入口ゲート**（D16の設計どおり）: `open()`に**原本PDFの実パス**を渡すと、
    mirror上のPDFのSHA-256とbundleのmanifestが持つ原本SHA-256を照合し、
    欠落・不一致なら**停止する**。PDFへのsilent fallbackは無い。
-2. `extract_tables()`を実装（`build_operating`が使う）。
+2. `extract_tables()`を実装（凍結`build_operating`が使っていた。2026-09-09に退役——
+   新経路の同じ面は`bundle_pages.extracted_tables`）。
 3. bundleの置き場は`pipeline/ingest/convert.py`の既定（`.cache/structured-bundles`）。
 
 pageの中身はmanifestのSHA-256と照合してから使う（PoCから継承）。pixelの
