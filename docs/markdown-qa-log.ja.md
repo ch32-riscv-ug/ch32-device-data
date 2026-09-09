@@ -2331,8 +2331,44 @@ candidate を書く D18 工程4の道具）も削除した——走らせる相�
 `extract_remap`・`build_registers`→`extract_registers`（`build_clock_enables`・`build_usbpd_plumbing`
 も委譲）・`extract_products`/`extract_ordering`（`build_all` 経由）・`build_opa_cmp_registers`・
 `build_flash_program_method`・`extract_package_dims`・`scan_errata`・`extract_images`（pixel。原本が要る）。
-次は `extract_registers`——`find_tables`・`extract_text_lines`・`page.search` を `bundle_pages` に
-足すのが先。
+次は `extract_registers`——`find_tables`・`extract_text_lines` を `bundle_pages` に足すのが先。
+
+**訂正（2026-09-09）**: ここに `page.search` も要ると書いていたが、**どの凍結toolも使っていない**。
+`.search(` を grep して数えていたのが誤りで、実際に当たっていたのは**正規表現の**`.search(`
+（`REGISTER_IN_HEADING.search(payload)` など。12本が該当して見えた）。受け手を page に限って
+数え直した結果が下の表。
+
+### 残る凍結toolが使っている pdfplumber の面（実測・2026-09-09）
+
+`pdfplumber` を import する `tools/*.py` は14本。受け手が page の呼び出しだけを数えた。
+
+| 面 | 使う tool 数 | `bundle_pages` |
+|---|---|---|
+| `find_tables` | 8 | ❌ 未実装 |
+| `page_number` | 8 | ✅ ページ record の `number` |
+| `extract_text` | 7 | ✅ `texts` |
+| `extract_text_lines` | 5 | ❌ 未実装 |
+| `width`/`height` | 3 | ✅ ページ record |
+| `chars` | 3 | ✅ `load_geometry` |
+| `crop` | 2 | **実装しない**（pixel。`extract_images`・`convert_structured` は原本が要る） |
+| `extract_words` | 2 | ❌ 未実装 |
+| `page.search` | **0** | 要らない |
+
+tool ごと: `build_flash_program_method`（text）／`build_registers`（text・find_tables）／
+`extract_package_dims`（text）／`scan_errata`（text・page_number）／
+`extract_ordering`・`extract_remap`（find_tables・page_number）／
+`extract_pins`（text_lines・find_tables）／`extract_registers`（text_lines・find_tables・page_number）／
+`extract_products`（text・text_lines・find_tables・chars・page_number）／
+`extract_images`・`convert_structured`・`document_converter`（crop や words を含む。原本が要るか、
+converter 自身）／`build_all`・`build_pins` は page の面を直接は使わない（委譲先が使う）。
+
+**`extract_registers` の退役は単独では終わらない。** これは**ライブラリ**で、`build_registers`・
+`build_clock_enables`・`build_opa_cmp_registers`・`build_usbpd_plumbing`・`build_candidate` の5本が
+呼ぶ。ライブラリだけ移植すると**同じロジックが2つになる**（退役の型は「移植 → byte一致 →
+切替 → 凍結tool削除」で、切替できないと2重になる）。呼ぶ側の `build_registers` 自身も
+`extract_text`・`find_tables` で原本を読むので、**5本まとめて1つの企画**にするのが正しい。
+対象は `registers` 4,932行・`register_fields` 33,365行・`register_blocks` 676行で、
+これまでの退役（最大 `pins` 4,563行）より一桁大きい。
 
 ## X035 V2.3 再突入の分解——3つ必要で、1つ済み・2つは別企画（2026-09-09）
 
