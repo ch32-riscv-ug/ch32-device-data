@@ -252,7 +252,7 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 
 ### `register_layouts.csv`
 
-`tools/build_registers.py` が作ります。(family, 型) → 構造体の形のハッシュ `layout`。同じ `layout`
+`pipeline/extract/rm/extract_registers.py` が作ります。(family, 型) → 構造体の形のハッシュ `layout`。同じ `layout`
 の family はレジスタ定義を共有できます（D-5）。
 
 ### `manifest.csv`

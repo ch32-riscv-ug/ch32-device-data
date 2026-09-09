@@ -635,6 +635,7 @@ sha 照合つき）。既存の第1・2号もそちらへ寄せた（出力は b
 
 `build_clock_enables`・`build_usbpd_plumbing` の「`search`×2〜3」は `re.search` の誤検出で、実体は
 `extract_registers.extract(pdf, …)` への委譲——**`extract_registers` の退役が先**。
+→ **第9号で6本まとめて退役した**（下記）。
 
 **第5〜7号 完了（同日）**: `adc_internal`（19行）・`memory_configs`（67行）・`flash_geometry`（12行）。
 3本とも `extract_text` だけだった（`page.search` は要らなかった）。evidence 段へ移す前に**順序の依存を
@@ -647,6 +648,31 @@ sha 照合つき）。既存の第1・2号もそちらへ寄せた（出力は b
 `build_flash_program_method`）にした。約19秒で全部 byte 一致。**これまで覆っていなかった**
 `pins` 4,563行・`pin_functions` 28,483行が入る。据え置き中に単体で回すときは
 `CH32_HOLD_SOURCES` が要る（`build_pins` が X035DS0.zh を読む）。
+→ 第9号で4本が抜けて **`build_pins`・`build_remap` の2本**になった（退役した4表は合わせて747行で、
+残る覆いは `pins` 4,563・`pin_functions` 28,483・`remap_fields` 287・`remap_routes` 4,836——行数では
+ほとんど減っていない）。
+
+**第9号 完了（同日）**: `extract_registers` 系6本（`extract_registers`（ライブラリ）・`build_registers`・
+`build_clock_enables`・`build_opa_cmp_registers`・`build_usbpd_plumbing`・`build_flash_program_method`）。
+生成する表は8つで **`registers` 4,932行・`register_fields` 33,365行・`register_blocks` 676行・
+`index/register_layouts` 353行・`clock_enables` 429行・`opa_cmp_registers` 293行・`usbpd_plumbing` 13行・
+`flash_program_method` 12行**——これまでの最大（`pins` 4,563行）より一桁大きい。
+**PDFを直接読む legacy の段は `FULL_PATCHED_1` だけになった。**<br>
+**まとめてやる必要があった**: `extract_registers` はライブラリで5本が呼ぶので、そこだけ移植すると
+ロジックが2重に残る。`build_flash_program_method` も巻き込んだ——`ctlr_bit_names` は
+`register_fields.csv` を読むので `build_registers` の後でなければ空になり（R-32）、legacy 段は
+evidence 段より**先**に走るため置いたままにできなかった（`timers` で一度踏んだ形）。<br>
+**足した面**: `bundle_pages.text_lines`（`page.extract_text_lines()`）と
+`bundle_pages.positioned_tables`（`page.find_tables()` の `bbox[1]`＋`extract()`）。見出しと表を
+紙の上下順に混ぜて読むのがこの抽出器の要なので表の上端が要る。どちらも `pdfcompat` と
+**455ページで完全一致**を確認。**`page.search` は要らなかった**（前の記録は grep の誤り。同日訂正）。<br>
+**検算**: ライブラリの `(fields, notes)` が **RM 22版すべてで完全一致**（field 合計 29,924）。
+8つのCSVは全部**正本と byte 一致**。<br>
+**走る条件は変えていない**——この5本は `--full` のときだけ（12 family の RM 全読みで約20分。
+「既定は速い再生成」という約束を守る。凍結時も `--full` 専用の legacy 段に居た）。<br>
+**凍結版のバグ**: `build_opa_cmp_registers.read_manual_fields` も `paths` を shadow していた
+（`build_usbpd_plumbing` と同じ F-54 型。同じ関数の中で使い切っていたので露出していなかった）。
+新経路では変数を作らない。
 
 **第8号 完了（同日）**: `build_operating`（656行）→ `pipeline/extract/datasheet/operating_rows.py`。
 基礎行1,588行と正本`operating_conditions.csv` 2,797行がともに **byte 一致**。`bundle_pages` に

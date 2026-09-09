@@ -82,6 +82,35 @@ def extracted_tables(page: dict) -> list[list[list[str | None]]]:
     return [table["extracted_rows"] for table in page.get("tables", [])]
 
 
+def _boxed(item: dict) -> dict:
+    """bundle の `bbox` を pdfplumber の座標キーへ広げる（`pdfcompat._object` と同じ形）。"""
+    x0, top, x1, bottom = item["bbox"]
+    return {"x0": x0, "top": top, "x1": x1, "bottom": bottom,
+            "width": x1 - x0, "height": bottom - top,
+            **({"text": item["text"]} if "text" in item else {})}
+
+
+def text_lines(page: dict) -> list[dict]:
+    """ページの視覚行（`page.extract_text_lines()` の置き換え）。
+
+    行の順は converter が入れたまま（pdfplumber が返した順）。`top` を持つので、
+    **見出しと表を紙の上下順に混ぜて読む**抽出器が使える。
+    """
+    return [_boxed(line) for line in page.get("lines", [])]
+
+
+def positioned_tables(page: dict) -> list[tuple[float, list[list[str | None]]]]:
+    """ページの表を `(上端, 平坦化行)` で返す（`page.find_tables()` の `table.bbox[1]` と
+    `table.extract()` の置き換え）。
+
+    見出し行と表を1つの列に並べて上から読む抽出器がこれを使う——`extract_registers` は
+    「節見出しが register を決め、そのあとに来る表がその register の field 表」という
+    読み方をするので、**表の上端**が要る。行そのものは `extracted_tables` と同じ
+    `extracted_rows`（pdfplumber が返したまま）。
+    """
+    return [(table["bbox"][1], table["extracted_rows"]) for table in page.get("tables", [])]
+
+
 def captioned_tables(page: dict) -> list[tuple[str, list[list[str | None]]]]:
     """ページの表を`(表題, 平坦化行)`で返す。**pdfplumberには無い面**——`extract_tables()`は
     表題を持たないので、凍結toolは「ページ本文に見出し語が出るか」でしか表を選べなかった。

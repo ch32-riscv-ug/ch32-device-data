@@ -36,9 +36,19 @@ reset を列で持つ。(2) **各章冒頭の絶対アドレス表**（`R32_PWR_
 復位値`）: EVT の base+offset と比べ、一致した block/register を confirmed に、違えば
 conflict。RM の register 復位値もここから採る（`rm_reset`）。
 **RM の読みは遅い**（family 1本 15秒〜数分）ので `--rm-cache` に JSON で置く。
+`regenerate.py` は**渡さない**——cache は原本更新後も無検証で再利用されるため。
+
+RM は `pipeline/extract/bundle_pages.py` から読む（sha 照合つき。凍結
+`tools/build_registers.py` の移植＝退役 第9号）。field 表は
+`pipeline/extract/rm/register_fields.py`（凍結 `tools/extract_registers.py` の移植）。
+EVT のヘッダは mirror からそのまま読む——PDF ではないので構造化の対象外。
+RM は目録の `repositories` で引く（`bundle_pages.rm_bundles`。凍結版の
+`glob("datasheet_zh/*RM.PDF")[0] or glob("datasheet_en/...")` と 12 family 全部で
+同じ文書になることを確かめてある）。
 
 実行:
-    uv run tools/build_registers.py [--mirrors <dir>] [--out tables] [--rm-cache <dir>] [--family F]
+    uv run pipeline/extract/rm/extract_registers.py [--mirrors <dir>] [--out tables]
+        [--rm-cache <dir>] [--family F]
 """
 
 from __future__ import annotations
@@ -52,14 +62,15 @@ import re
 import sys
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import extract_addresses  # noqa: E402
-import extract_registers  # noqa: E402
-
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
+import extract_addresses  # noqa: E402  EVTヘッダのbase（PDFは読まない）
 import paths  # noqa: E402
+import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 BLOCK_COLUMNS = ["family", "block", "type", "layout", "base_address", "#", "confidence", "basis"]
@@ -435,16 +446,30 @@ def field_key(name: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", name.upper())
 
 
-def rm_fields(family_dir: Path, cache: Path | None) -> tuple[dict, str]:
-    manuals = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
-        sorted(family_dir.glob("datasheet_en/*RM.PDF"))
-    if not manuals:
+def rm_bundle(family: str) -> tuple[str, str] | None:
+    """family → (bundle名, 原本のPDF名)。中文版があればそれ、無ければ英語版。
+
+    凍結版の `glob("datasheet_zh/*RM.PDF") or glob("datasheet_en/*RM.PDF")` の先頭と
+    同じ文書になる（目録で引く。退役 第3号で 12 family 全部を確認済み）。
+    """
+    editions = bundle_pages.rm_bundles(family)
+    picked = editions.get("zh") or editions.get("en")
+    if picked is None:
+        return None
+    bundle, document = picked
+    return bundle.name, document
+
+
+def rm_fields(family: str, cache: Path | None) -> tuple[dict, str]:
+    picked = rm_bundle(family)
+    if picked is None:
         return {}, ""
-    cached = cache / f"{family_dir.name}.json" if cache else None
+    bundle, document = picked
+    cached = cache / f"{family}.json" if cache else None
     if cached and cached.exists():
         fields = json.loads(cached.read_text(encoding="utf-8"))
     else:
-        fields, _ = extract_registers.extract(manuals[0], None)
+        fields, _ = register_fields.extract(bundle, None)
         if cached:
             cached.parent.mkdir(parents=True, exist_ok=True)
             cached.write_text(json.dumps(fields, ensure_ascii=False), encoding="utf-8")
@@ -455,7 +480,7 @@ def rm_fields(family_dir: Path, cache: Path | None) -> tuple[dict, str]:
         out.setdefault((rm_key(f["register"]), field_key(f["field"])), f)
     registers = {rm_key(f["register"]): f["register"] for f in fields}
     out["__registers__"] = registers
-    return out, manuals[0].name
+    return out, document
 
 
 # ---------------------------------------------------------------- RM の絶対アドレス表
@@ -466,36 +491,33 @@ ADDR_NAME = re.compile(r"^R(?:8|16|32)_(?P<name>\w+)$")
 HEX32 = re.compile(r"^0x[0-9A-Fa-f]{8}$")
 
 
-def rm_addresses(family_dir: Path, cache: Path | None) -> tuple[list[dict], str]:
-    """[{name, address, reset}] を RM の表から。ページ単位に読んで閉じる（メモリ）。"""
-    manuals = sorted(family_dir.glob("datasheet_zh/*RM.PDF")) or \
-        sorted(family_dir.glob("datasheet_en/*RM.PDF"))
-    if not manuals:
+def rm_addresses(family: str, cache: Path | None) -> tuple[list[dict], str]:
+    """[{name, address, reset}] を RM の表から（各章冒頭の絶対アドレス表）。"""
+    picked = rm_bundle(family)
+    if picked is None:
         return [], ""
-    cached = cache / f"{family_dir.name}.addr.json" if cache else None
+    bundle, document = picked
+    cached = cache / f"{family}.addr.json" if cache else None
     if cached and cached.exists():
-        return json.loads(cached.read_text(encoding="utf-8")), manuals[0].name
-    import pdfplumber  # noqa: PLC0415
+        return json.loads(cached.read_text(encoding="utf-8")), document
     rows: list[dict] = []
-    with pdfplumber.open(manuals[0]) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            if "R32_" in text or "R16_" in text or "R8_" in text:
-                for table in page.find_tables():
-                    for row in table.extract():
-                        cells = [(c or "").replace("\n", "").replace(" ", "").strip() for c in row]
-                        for i, cell in enumerate(cells[:-1]):
-                            m = ADDR_NAME.match(cell)
-                            if m and HEX32.match(cells[i + 1]):
-                                rows.append({"name": m.group("name"),
-                                             "address": int(cells[i + 1], 16),
-                                             "reset": cells[i + 3] if len(cells) > i + 3 else ""})
-                                break
-            page.close()
+    for page in bundle_pages.pages(bundle):
+        text = page.get("text") or ""
+        if "R32_" in text or "R16_" in text or "R8_" in text:
+            for table in bundle_pages.extracted_tables(page):
+                for row in table:
+                    cells = [(c or "").replace("\n", "").replace(" ", "").strip() for c in row]
+                    for i, cell in enumerate(cells[:-1]):
+                        m = ADDR_NAME.match(cell)
+                        if m and HEX32.match(cells[i + 1]):
+                            rows.append({"name": m.group("name"),
+                                         "address": int(cells[i + 1], 16),
+                                         "reset": cells[i + 3] if len(cells) > i + 3 else ""})
+                            break
     if cached:
         cached.parent.mkdir(parents=True, exist_ok=True)
         cached.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
-    return rows, manuals[0].name
+    return rows, document
 
 
 def locate(reg: str, offsets: dict[str, dict], block: str, block_name: str) -> list[tuple[str, int]]:
@@ -628,7 +650,7 @@ def main() -> int:
         structs = read_structs(text)
         bases = extract_addresses.bases(lines)
         banners = read_banners(text)
-        manual, manual_name = ({}, "") if args.no_rm else rm_fields(family_dir, args.rm_cache)
+        manual, manual_name = ({}, "") if args.no_rm else rm_fields(family, args.rm_cache)
         rm_registers = manual.get("__registers__", {})
         evt = f"evt({header.name})"
 
@@ -679,7 +701,7 @@ def main() -> int:
         per_block: dict = {}
         addr_name = ""
         if not args.no_rm:
-            addr_rows, addr_name = rm_addresses(family_dir, args.rm_cache)
+            addr_rows, addr_name = rm_addresses(family, args.rm_cache)
             per_register, per_block, unresolved_addr = check_addresses(addr_rows, blocks_here, regs_here)
             checked = sum(v["ok"] for v in per_register.values())
             bad = sum(len(v["bad"]) for v in per_register.values())

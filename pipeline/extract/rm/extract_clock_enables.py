@@ -23,8 +23,12 @@ bus の呼び名は family で違う（AHB/APB1/APB2 と HB/PB1/PB2 と HB/HB1/H
 食い違えば conflict。GPIO だけ綴りが違い（EVT `GPIOA`、RM `IOPAEN`）、それは
 別名として引く。
 
+RM の field は `pipeline/extract/rm/register_fields.py` が bundle から読む
+（凍結 `tools/extract_registers.py` の移植。退役 第9号）。EVT のヘッダは mirror から
+そのまま読む——PDF ではないので構造化の対象外。
+
 実行:
-    uv run tools/build_clock_enables.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_clock_enables.py [--mirrors <dir>] [--out tables]
 """
 
 from __future__ import annotations
@@ -36,14 +40,15 @@ import re
 import sys
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import extract_addresses  # noqa: E402
-import extract_registers  # noqa: E402
-
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
+import extract_addresses  # noqa: E402  EVTヘッダのbase（PDFは読まない）
 import paths  # noqa: E402
+import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "bus", "register", "offset", "address", "bit",
@@ -80,17 +85,23 @@ def rcc_offsets(text: str) -> dict[str, int]:
     return offsets
 
 
-def rm_fields(family_dir: Path) -> tuple[dict, str]:
-    """{(register, field): bit} — RCC の *PCENR だけ。"""
-    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF"))
-    if not paths:
+def rm_fields(family: str) -> tuple[dict, str]:
+    """{(register, field): bit} — RCC の *PCENR だけ。
+
+    凍結版は `family_dir.glob("datasheet_zh/*RM.PDF")` の先頭を読んでいた。目録
+    （`catalog/documents.csv` の `repositories`）で引く `bundle_pages.rm_bundles` は
+    12 family 全部で同じ文書になることを確かめてある（退役 第3号）。
+    """
+    editions = bundle_pages.rm_bundles(family)
+    if "zh" not in editions:
         return {}, ""
-    fields, _ = extract_registers.extract(paths[0], None)
+    bundle, document = editions["zh"]
+    fields, _ = register_fields.extract(bundle.name, None)
     out: dict = {}
     for f in fields:
         if f["register"].startswith("RCC_") and f["register"].endswith("PCENR"):
             out.setdefault((f["register"], f["field"]), f["bit_offset"])
-    return out, paths[0].name
+    return out, document
 
 
 def main() -> int:
@@ -114,7 +125,7 @@ def main() -> int:
         dev_text = dev_h.read_text(errors="ignore")
         offsets = rcc_offsets(dev_text)
         base = extract_addresses.bases(dev_text.splitlines()).get("RCC_BASE")
-        manual, manual_name = rm_fields(family_dir)
+        manual, manual_name = rm_fields(family)
         for m in PERIPH.finditer(rcc_h.read_text(errors="ignore")):
             name, bus, mask = m.group("name"), m.group("bus"), int(m.group("mask"), 16)
             if name.upper() == "ALL" or mask == 0:

@@ -221,7 +221,7 @@ the headings say 1-wire -- the heading wins and the manual's dissent is recorded
 
 `features.csv` (by `tools/build_feature_tags.py`): one row per (tag, series); `precision` says
 whether the comparison table (`part`) or a datasheet section heading (`datasheet`) decided it.
-`register_layouts.csv` (by `tools/build_registers.py`): (family, type) -> layout hash; equal
+`register_layouts.csv` (by `pipeline/extract/rm/extract_registers.py`): (family, type) -> layout hash; equal
 hashes share register definitions. `manifest.csv`: path, row count and sha256 of every other CSV
 here.
 

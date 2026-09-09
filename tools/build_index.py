@@ -18,7 +18,7 @@
 人が絞り込んで読むのは CSV ではなく viewer（pins.html）の仕事。CSV は機械が読む。
 
 `features.csv` と `register_layouts.csv` も索引だが、それぞれ
-tools/build_feature_tags.py と tools/build_registers.py が書く。
+tools/build_feature_tags.py と pipeline/extract/rm/extract_registers.py が書く。
 
 証拠と違う値を索引が持つのは1箇所だけ: pin 表の remap 値が RM の格子と
 食い違う行（`pin_functions` の basis に `!rm-remap-grid(=remap-N)`）は格子の

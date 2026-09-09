@@ -331,7 +331,7 @@ performance/storage見積り、移行計画とする。これらをreviewして�
 | datasheet本文 | ~~`build_features`~~・~~`build_adc_internal`~~（新経路へ退役済み）, `scan_errata` | page text、heading、原文ID |
 | datasheet表 | `extract_products`, `extract_ordering`, `extract_pins`, `build_pins`, ~~`build_operating`~~（新経路 `operating_rows` へ退役済み）, `build_all` | 物理cell、span、平坦化row、改ページ継続 |
 | RM本文 | ~~`build_memory`~~・~~`build_timers`~~・~~`build_flash_geometry`~~（3本とも新経路へ退役済み） | heading、paragraph、章境界 |
-| RM表 | `extract_registers`, `build_registers`, `extract_remap`, ~~`build_dma_requests`~~（新経路 `extract_dma_requests` へ退役済み） | headingとtableの読み順、row geometry |
+| RM表 | `extract_remap`, ~~`extract_registers`・`build_registers`~~（新経路 `register_fields`・`extract_registers` へ退役済み）, ~~`build_dma_requests`~~（新経路 `extract_dma_requests` へ退役済み） | headingとtableの読み順、row geometry |
 | core/package | ~~`build_debug_data`~~（新経路 `extract_debug_data` へ退役済み）, `extract_package_dims` | text、文書種別 |
 | 画像 | `extract_images` | word/char/drawing geometry＋別asset renderer |
 

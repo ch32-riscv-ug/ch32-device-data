@@ -45,7 +45,7 @@ ROW_LABEL_HEADING = frozenset({"复用功能", "复用功能（1）", "复用功
 # What a register-field table calls its columns. Such a table follows the grids
 # closely and its Description cells are full of pad names, so reading one as a
 # continuation of the last grid attributes every pad it mentions to that grid's
-# field. Its own reader is extract_registers.
+# field. Its own reader is pipeline/extract/rm/register_fields.py.
 FIELD_TABLE_HEADING = frozenset({"位", "名称", "访问", "描述", "复位值", "访问地址",
                                  "Bits", "Bit", "Name", "Access", "Description",
                                  "Resetvalue", "Reset"})

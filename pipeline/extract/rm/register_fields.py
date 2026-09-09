@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
-"""Extract register field definitions from a reference manual.
+"""RM の register field 表 → field 定義（凍結 `tools/extract_registers.py` の移植。退役 第9号）
 
-The EVT header gives a selector's bit positions but never its reset value, and it
-cannot say which encodings are legal. The manual states both in the per-register
-field table that follows each register heading:
+EVT のヘッダは selector の bit 位置を言うが**復位値を言わず**、どの符号化が正当かも言えない。
+RM は register の節見出しの直後に置く field 表で両方を言う:
 
     6.3.2.1 Remap Register 1 (AFIO_PCFR1)
     Bit      | Name          | Access | Description | Reset value
     [26:24]  | SWCFG[2:0]    | RW     | ...         | 0
     15       | ADC_ETRGIN_RM | RW     | ...         | 0
 
-This reads those tables into field definitions for review. It emits candidates only
-and never writes device records.
+この module はその表を field 定義に読む。**候補を出すだけで device record は書かない。**
 
-Usage:
-    uv run tools/extract_registers.py <manual.pdf> [--register AFIO_PCFR1]
-        [--compare <record>.json] [--emit]
+読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき）。凍結版は
+`page.extract_text_lines()` と `page.find_tables()` を `run_patched` の
+`pdfplumber` 差し替え経由で bundle に向けていたが、この版は bundle を直接読む
+——`bundle_pages.text_lines`（視覚行）と `bundle_pages.positioned_tables`
+（`(上端, 平坦化行)`）を第9号で足した。**見出しと表を紙の上下順に混ぜて読む**のが
+この抽出器の要なので、表の上端が要る。
+
+抽出の規則は凍結版から1文字も変えていない（正規表現・見出しの扱い・列見出しの語彙）。
+
+    uv run pipeline/extract/rm/register_fields.py <bundle名 or 原本PDFのパス>
+        [--register AFIO_PCFR1] [--compare <record>.json] [--emit] [--routes]
+
+`<bundle名>` は `CH32V003RM.zh` の形。原本PDFのパスを渡すと、親ディレクトリの
+`datasheet_zh`/`datasheet_en` から言語を読んで bundle 名にする（原本は開かない）。
 """
 
 from __future__ import annotations
@@ -26,7 +35,26 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
+
+import bundle_pages  # noqa: E402
+
+# bundle 名の言語は原本の置き場から決まる（`pdfcompat` と同じ規則）。
+_LANG_DIR = re.compile(r"^datasheet_(zh|en)$")
+
+
+def bundle_name(argument: str) -> str:
+    """`CH32V003RM.zh` はそのまま。原本PDFのパスなら親ディレクトリから言語を読む。"""
+    path = Path(argument)
+    if path.suffix.upper() != ".PDF":
+        return argument
+    found = _LANG_DIR.match(path.parent.name)
+    if not found:
+        raise SystemExit(f"{argument}: 言語が分からない"
+                         "——`datasheet_zh`/`datasheet_en` の下のPDFか、bundle名を渡してください")
+    return f"{path.stem}.{found.group(1)}"
 
 # "6.3.2.1 Remap Register 1 (AFIO_PCFR1)" -- the register name is parenthesised.
 # The Chinese edition writes the same heading with full-width brackets,
@@ -126,75 +154,72 @@ def parse_bits(cell: str) -> tuple[int, int] | None:
     return (int(m.group(1)), 1) if m else None
 
 
-def extract(pdf_path: Path, want: str | None) -> tuple[list[dict], list[str]]:
+def extract(bundle: str, want: str | None) -> tuple[list[dict], list[str]]:
     fields: list[dict] = []
     notes: list[str] = []
     register: str | None = None
     layout: dict[str, int] | None = None
 
-    with pdfplumber.open(pdf_path) as pdf:
-        for page in pdf.pages:
-            # Headings and tables are interleaved, so read them in vertical order.
-            items = [("h", line["top"], line["text"].strip()) for line in page.extract_text_lines() or []]
-            items += [("t", table.bbox[1], table) for table in page.find_tables()]
-            for kind, _, payload in sorted(items, key=lambda x: x[1]):
-                if kind == "h":
-                    # **A heading always replaces the register, even when no name
-                    # can be read from it.** Keeping the previous one is what
-                    # made CH32H417's whole DMA chapter -- 41 trigger-multiplexer
-                    # rows and the DMAy_CFGRx fields -- come out as AFIO_EXTICR2
-                    # fields named TIM1_CH1..TIM9_CH3, which then looked exactly
-                    # like real remap selectors. Dropping the tables is the
-                    # honest outcome: absence beats a plausible wrong owner.
-                    if SECTION.match(payload):
-                        found = REGISTER_IN_HEADING.search(payload)
-                        register = found.group(1) if found else None
-                        layout = None
+    for page in bundle_pages.pages(bundle):
+        # Headings and tables are interleaved, so read them in vertical order.
+        items = [("h", line["top"], line["text"].strip())
+                 for line in bundle_pages.text_lines(page)]
+        items += [("t", top, rows)
+                  for top, rows in bundle_pages.positioned_tables(page)]
+        for kind, _, payload in sorted(items, key=lambda x: x[1]):
+            if kind == "h":
+                # **A heading always replaces the register, even when no name
+                # can be read from it.** Keeping the previous one is what
+                # made CH32H417's whole DMA chapter -- 41 trigger-multiplexer
+                # rows and the DMAy_CFGRx fields -- come out as AFIO_EXTICR2
+                # fields named TIM1_CH1..TIM9_CH3, which then looked exactly
+                # like real remap selectors. Dropping the tables is the
+                # honest outcome: absence beats a plausible wrong owner.
+                if SECTION.match(payload):
+                    found = REGISTER_IN_HEADING.search(payload)
+                    register = found.group(1) if found else None
+                    layout = None
+                continue
+            if register is None or (want and register != want):
+                continue
+            rows = [[flatten(c) for c in row] for row in payload]
+            if not rows:
+                continue
+            found = field_header(rows[0])
+            if found:
+                layout, rows = found, rows[1:]
+            elif layout is None:
+                continue
+            for row in rows:
+                if max(layout[k] for k in ("bit", "name", "access", "reset")) >= len(row):
                     continue
-                if register is None or (want and register != want):
+                bits = parse_bits(row[layout["bit"]])
+                # A field name never contains a space; CH32V003 wraps
+                # ADC_ETRGREG_RM as "ADC_ETRGREG_R" + "M".
+                name = FIELD_NAME.match(row[layout["name"]].replace(" ", ""))
+                if not bits or not name or name.group(1).lower() == "reserved":
                     continue
-                rows = [[flatten(c) for c in row] for row in payload.extract()]
-                if not rows:
-                    continue
-                found = field_header(rows[0])
-                if found:
-                    layout, rows = found, rows[1:]
-                elif layout is None:
-                    continue
-                for row in rows:
-                    if max(layout[k] for k in ("bit", "name", "access", "reset")) >= len(row):
-                        continue
-                    bits = parse_bits(row[layout["bit"]])
-                    # A field name never contains a space; CH32V003 wraps
-                    # ADC_ETRGREG_RM as "ADC_ETRGREG_R" + "M".
-                    name = FIELD_NAME.match(row[layout["name"]].replace(" ", ""))
-                    if not bits or not name or name.group(1).lower() == "reserved":
-                        continue
-                    reset = RESET.match(row[layout["reset"]].replace(" ", "").strip())
-                    if not reset:
-                        notes.append(
-                            f"{register}.{name.group(1)}: reset値を読めず ({row[layout['reset']]!r})"
-                        )
-                    fields.append(
-                        {
-                            "register": register,
-                            "field": name.group(1),
-                            "bit_offset": bits[0],
-                            "bit_width": bits[1],
-                            "reset_value": parse_reset(reset) if reset else None,
-                            "access": row[layout["access"]],
-                            "description": (
-                                row[layout["description"]]
-                                if layout.get("description", len(row)) < len(row)
-                                else ""
-                            ),
-                            "page": page.page_number,
-                        }
+                reset = RESET.match(row[layout["reset"]].replace(" ", "").strip())
+                if not reset:
+                    notes.append(
+                        f"{register}.{name.group(1)}: reset値を読めず ({row[layout['reset']]!r})"
                     )
-            # flush_cache() だけでは extract_text_lines() が作った
-            # get_textmap のlru_cacheが残る。close() はページを再利用不能に
-            # する処理ではなく、両方のキャッシュを捨てる。
-            page.close()
+                fields.append(
+                    {
+                        "register": register,
+                        "field": name.group(1),
+                        "bit_offset": bits[0],
+                        "bit_width": bits[1],
+                        "reset_value": parse_reset(reset) if reset else None,
+                        "access": row[layout["access"]],
+                        "description": (
+                            row[layout["description"]]
+                            if layout.get("description", len(row)) < len(row)
+                            else ""
+                        ),
+                        "page": page["number"],
+                    }
+                )
     return fields, notes
 
 
@@ -277,7 +302,8 @@ def _expand_bits(pattern: str) -> list[list[str]]:
 
 
 def score(fields: list[dict], record: Path) -> None:
-    sys.path.insert(0, str(Path(__file__).parent))
+    # `canonical_field` は凍結 `tools/extract_remap.py` から借りる（`--compare` の
+    # review 経路だけ。`extract_remap` が退役したらその移植先に向け直す）。
     from extract_remap import canonical_field
 
     rec = json.loads(record.read_text(encoding="utf-8"))
@@ -315,16 +341,17 @@ def score(fields: list[dict], record: Path) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("pdf", type=Path)
+    ap.add_argument("document", help="bundle名（CH32V003RM.zh）か原本PDFのパス")
     ap.add_argument("--register", help="この register のみ読む（例: AFIO_PCFR1）")
     ap.add_argument("--compare", type=Path)
     ap.add_argument("--emit", action="store_true")
     ap.add_argument("--routes", action="store_true", help="説明文に書かれた経路を出す")
     args = ap.parse_args()
 
-    fields, notes = extract(args.pdf, args.register)
+    bundle = bundle_name(args.document)
+    fields, notes = extract(bundle, args.register)
     registers = sorted({f["register"] for f in fields})
-    print(f"入力: {args.pdf}", file=sys.stderr)
+    print(f"入力: {bundle}（bundle）", file=sys.stderr)
     print(f"field定義: {len(fields)} 件 / register {len(registers)} 種", file=sys.stderr)
     if args.register or len(registers) <= 12:
         for reg in registers:
