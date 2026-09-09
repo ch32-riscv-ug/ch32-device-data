@@ -82,6 +82,15 @@ def extracted_tables(page: dict) -> list[list[list[str | None]]]:
     return [table["extracted_rows"] for table in page.get("tables", [])]
 
 
+def captioned_tables(page: dict) -> list[tuple[str, list[list[str | None]]]]:
+    """ページの表を`(表題, 平坦化行)`で返す。**pdfplumberには無い面**——`extract_tables()`は
+    表題を持たないので、凍結toolは「ページ本文に見出し語が出るか」でしか表を選べなかった。
+    bundleは表ごとに表題を持つ（converterが対応付けたもの）ので、**表そのもの**を選べる。
+    """
+    return [((table.get("caption") or {}).get("text") or "", table["extracted_rows"])
+            for table in page.get("tables", [])]
+
+
 def documents(kind: str) -> list[dict]:
     """目録の assigned な文書（`kind`で絞る）。文書名順。"""
     with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:

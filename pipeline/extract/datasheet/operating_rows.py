@@ -82,6 +82,24 @@ MARKER = {
         r"|谐\s*振\s*器\s*产\s*生\s*的\s*(?:高|低)\s*速\s*外\s*部\s*时\s*钟"
         r"|(?:\d+\s*位\s*)?ADC\s*特\s*性"),
 }
+# **表題で選ぶ表**（ページの見出し語では届かないもの）。`MARKER`はページ本文に見出し語が
+# 出るページ＋続き1ページの表を読む規則で、pdfplumberの`extract_tables()`が表題を持たない
+# ことに由来する（凍結toolはページ単位でしか選べなかった）。bundleは表ごとに表題を持つので、
+# **表そのもの**を選べる——ページの隣接に依らないので、章が伸びて表がずれても届く。
+#
+# 出力電圧特性の表を足した。全corpus実測: 48表あり、**31表がページ規則では届いていなかった**
+# （版で非対称なのが特に悪く、`CH32V103DS0` は zh だけ届いて en が届かない——片翼だけ増えると
+# zh/en の対応がずれて既存の行が消える。ページ規則を緩める案は実際に34行を消した）。
+# `CH32X035DS0.zh` V2.3 が出力電圧特性をポート群ごとに分けたとき、章が伸びて見出し語が
+# p26→p25 に動き、新しい表（p27）が窓の外に出たのが再突入の詰まりだった。
+#
+# ページ規則で届くページは**そのページの表を全部**見る（従来のまま）。表題で届いた表は
+# **その表だけ**を見る——ページを丸ごと開くと隣の無関係な表まで入る。
+TABLE_CAPTION = re.compile(
+    r"输\s*出\s*电\s*压\s*特\s*性"
+    r"|Output\s+voltage\s+characteristic",
+    re.IGNORECASE)
+
 # ヘッダー名 → 正規列。抽出時のCJK間スペースと脚注を吸収する。
 HEADER_MAP = {
     "symbol": "symbol", "符号": "symbol",
@@ -93,6 +111,10 @@ HEADER_MAP = {
     "unit": "unit", "单位": "unit",
 }
 FOOTNOTE = re.compile(r"[（(]\d+[）)]")
+# 中文だけの表記。`operating_conditions.csv`は**CJKを1文字も含まない英語の表**（表示テキストは
+# 英語版から取る設計。実測: 2,797行の parameter/condition に CJK は0）。zh だけが持つ行を出すときも
+# その性格を保つ——中文の項目名を入れない（下の`zh_only_rows`）。
+CJK = re.compile(r"[\u3000-\u9fff\uff00-\uffef]")
 # **記号は頭字で物理量を名乗る。** 採る／採らないを記号の一覧で決めるのではなく、
 # 「その頭字が言う量に単位が合っているか」で決める（元からある `UNIT_FOR` の
 # 考えを、対象を広げたぶん量も増やして引き継いだもの）。データシートの電気的
@@ -219,7 +241,10 @@ def split_pin_group(cell):
     m = PIN_GROUP.search(flat)
     if not m:
         return cell, ""
-    return flat[:m.start()].strip(), " ".join(m.group("group").split())
+    # 群はピンの並びなので、区切りの全角読点は半角へ（`PC0-PC7， PC14-PC19`）。この表は
+    # CJK を1文字も含まない英語の表なので、群を条件へ置くときに全角が混ざると弾かれてしまう。
+    group = m.group("group").replace("，", ",").replace("、", ",")
+    return flat[:m.start()].strip(), " ".join(group.split())
 
 
 def norm_symbol(cell):
@@ -375,14 +400,19 @@ def read_edition(bundle, lang):
     for page in bundle_pages.pages(bundle):
         text = page.get("text") or ""
         hit = bool(marker.search(text))
-        if not hit and not carry:
+        if not hit and not carry and not any(
+                TABLE_CAPTION.search(cap) for cap, _ in bundle_pages.captioned_tables(page)):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
         # 無い続きページも1ページだけ見る。列の並びが同じ表しか読まないので、
         # 無関係な表を拾っても記号の絞り込みで落ちる。
         carry_from, carry = carry and not hit, hit
-        for tbl in bundle_pages.extracted_tables(page):
+        page_ok = hit or carry_from
+        for caption, tbl in bundle_pages.captioned_tables(page):
+            # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
+            if not page_ok and not TABLE_CAPTION.search(caption):
+                continue
             cols = [norm_header(c) for c in tbl[0]]
             body = tbl[1:]
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
@@ -425,6 +455,8 @@ def read_edition(bundle, lang):
                     "symbol": sym,
                     "parameter": param,
                     "condition": condition,
+                    # ピン群は言語に依らないので、版をまたいで比べられる（`main`の対応付け）。
+                    "_group": group,
                     "min": norm_value(cells.get("min")),
                     "typ": norm_value(cells.get("typ")),
                     "max": norm_value(cells.get("max")),
@@ -550,6 +582,13 @@ def main():
         # 行対応は記号ごとの値照合。中国語版は行の増減（極限行の同居等）や
         # rowspanの空単位があるため、序数でなく値で突き合わせる。
         def agrees(zh, en):
+            # **ピン群が違う行は同じ事実ではない。** 群は`PA0-PA23`のように言語に依らないので
+            # 版をまたいで比べられる。`CH32X035DS0` V2.3（zh）は出力電圧特性をポート群ごとに
+            # 分けたが en は V2.2 の一般I/Oの1組のまま——値だけで突き合わせると en の 6mA の行が
+            # zh の PA 30mA の行と「一致」してしまい、**zh が言っていない条件に confirmed が付く**。
+            # 群が揃っている版どうしなら従来どおり対応する。
+            if (zh.get("_group") or "") != (en.get("_group") or ""):
+                return False
             if zh["min"] != en["min"] or zh["max"] != en["max"]:
                 return False
             # 単位と典型値は、片方の版だけが列を持つことがある（rowspanの空セル、
@@ -560,13 +599,46 @@ def main():
                     return False
             return True
 
+        # **対応付けは二段**。一段目で値の一致する対を全部取り、二段目で残りを
+        # 食い違い（conflict）に回す。1回の貪欲な走査だと、**先に来たen行が
+        # conflictとして候補を消費**し、後から来る「値が一致するはずのen行」が
+        # 相手を失う——`CH32V205DS0`の`V_OL 静态输出低电平`(0.3)が、先行の
+        # `输出低电平`(0.4)行のconflictに食われてconfirmed→referenceに落ちた
+        # （2026-09-09、出力電圧特性の表を表題で拾えるようにしたときに露出）。
+        # 値の一致は曖昧さのない根拠なので先に確定させ、conflictは余りで作る。
+        #
+        # 一致する候補が複数あるときは**条件が同じもの**を優先する。条件の文は
+        # 言語ごとなので一致率は低い（実測: 両方空45%・一致12%・不一致28%）が、
+        # 一致するなら同じ行のことなので、そちらを選ぶ方が正しい。
         remaining = list(zh_rows)
-        for row in en_rows:
-            cands = [z for z in remaining if z["symbol"] == row["symbol"]]
-            exact = next((z for z in cands if agrees(z, row)), None)
+        paired: dict[int, dict] = {}
+        for index, row in enumerate(en_rows):
+            agreeing = [z for z in remaining
+                        if z["symbol"] == row["symbol"] and agrees(z, row)]
+            if not agreeing:
+                continue
+            pick = next((z for z in agreeing if z["condition"] == row["condition"]),
+                        agreeing[0])
+            remaining.remove(pick)
+            paired[index] = pick
+        for index, row in enumerate(en_rows):
+            exact = paired.get(index)
+            # 食い違いの相手も**群が揃っているものだけ**。群が違えば別の適用範囲の話で、
+            # 「同じ事実で値が食い違う」ではない——揃えないと、en の一般I/Oの行が zh の
+            # `PA0-PA23` の行を食って偽のconflictになり、zh の行も消える。
+            # 食い違いの相手は**群が揃い、条件の有無も揃う**ものだけ。群が違えば別の適用範囲、
+            # 条件の有無が違えば別の行のことで、「同じ事実で値が食い違う」ではない。
+            # 全corpus実測: この条件でconflictの候補23件のうち21件は残り、外れる2件は
+            # `CH32V103DS0`の`F_PLL_IN`/`F_PLL_OUT`で**zh側の条件欄に値が流れ込んだ読み違い**
+            # （条件が`'16'`）——en単独のreferenceにするのが正しい。
+            # `CH32X035DS0` V2.3 では、en の一般I/O（条件あり）が zh の`静态输出高电平`
+            # （条件なし・別の表）と突き合わされて偽のconflictになるのを防ぐ。
+            cands = ([] if exact else
+                     [z for z in remaining if z["symbol"] == row["symbol"]
+                      and (z.get("_group") or "") == (row.get("_group") or "")
+                      and bool(z["condition"]) == bool(row["condition"])])
             en_page = row.pop("_page")
             if exact:
-                remaining.remove(exact)
                 # 表示テキストは英語版から取るが、典型値は数値なので言語に
                 # 依らない。英語版が列を落としていれば中国語版で埋める。
                 if not row["typ"] and exact["typ"]:
@@ -584,9 +656,63 @@ def main():
             else:
                 confidence = "reference"
                 basis = f"{datasheet}:en(p.{en_page})"
+            row.pop("_group", None)
             out.append({**row, "series": series, "#": "#",
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
+
+        # **zh だけが持つ「ピン群つき」の行**を`reference`で出す。
+        #
+        # これが無いと、**zh だけが改版された資料の新しい行は原理的に出ない**（表示テキストは英語版から
+        # 取る設計なので、en に無い行は落ちる。実測: 正本2,797行に zh のみ根拠の行は0）。
+        # `CH32X035DS0` V2.3 は出力電圧特性をポート群ごとに分けた——en（まだV2.2）は一般I/Oの1組の
+        # ままなので、この経路が無いと `PA0-PA23 は 50mA` という新しい事実が入らない。
+        #
+        # **ピン群を持つ行に限る**のが要点。群がある＝「en が一般名で言っている同じ規格の、
+        # 適用範囲を分けた版」なので、en の同じ記号の英語名を借りるのが正しい。群が無い zh 余りは
+        # 別の表の別の事実であることが多く（`CH32X035DS0.zh` p32 の`静态输出高电平`は
+        # 一般I/Oの`V_OH`とは別物）、記号だけで英語名を借りると**名前を偽る**。だから出さない。
+        # 条件と借りる名前に CJK があるものも出さない——この表は CJK を1文字も含まない英語の表
+        # （実測: 2,797行の parameter/condition に CJK は0）で、その性格を保つ。
+        # 全corpus実測（V2.2時点）: 群を持つ zh 余りは**0行**——つまりこの経路は
+        # 「ポート群で分けた資料」だけで働き、既存の出力は1バイトも動かない。
+        english = {}
+        for row in en_rows:
+            english.setdefault(row["symbol"], row["parameter"])
+        # 同じ文書で**値まで同じ行が既に出ている**なら足さない。資料が同じ規格を2つの表に
+        # 書くことがあり（`CH32V20x_30xDS0`の`I_L`はzhがp.57とp.58の両方に持つ）、片方が
+        # en と対応して confirmed で出た後に、もう片方を zh のみの reference で足すと
+        # **同じ事実が信頼度違いで2行**になる。
+        already = {(r["symbol"], r["parameter"], r["condition"],
+                    r["min"], r["typ"], r["max"], r["unit"])
+                   for r in out if r["datasheet"] == datasheet}
+        skipped: dict[str, int] = {}
+        for zh in remaining:
+            if not (zh.get("_group") or ""):
+                skipped["ピン群が無い"] = skipped.get("ピン群が無い", 0) + 1
+                continue
+            name = english.get(zh["symbol"])
+            if name is None:
+                skipped["enに記号が無い"] = skipped.get("enに記号が無い", 0) + 1
+                continue
+            if CJK.search(zh["condition"] or "") or CJK.search(name):
+                skipped["中文の表記"] = skipped.get("中文の表記", 0) + 1
+                continue
+            same = (zh["symbol"], name, zh["condition"],
+                    zh["min"], zh["typ"], zh["max"], zh["unit"])
+            if same in already:
+                skipped["既に同じ行がある"] = skipped.get("既に同じ行がある", 0) + 1
+                continue
+            already.add(same)
+            out.append({"symbol": zh["symbol"], "parameter": name,
+                        "condition": zh["condition"], "min": zh["min"],
+                        "typ": zh["typ"], "max": zh["max"], "unit": zh["unit"],
+                        "series": series, "#": "#", "confidence": "reference",
+                        "basis": f"{datasheet}:zh(p.{zh['_page']})",
+                        "datasheet": datasheet})
+        if skipped:
+            print(f"  {datasheet}: zhだけの行のうち出さなかったもの {skipped}",
+                  file=sys.stderr)
 
         heads = {}
         for lang in ("zh", "en"):
