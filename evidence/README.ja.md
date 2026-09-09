@@ -898,11 +898,12 @@ uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLi
 uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_timers.py         # timers（RMのTIMx_CNT見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry（EVTのflash driver＋RMの闪存章をbundleから。数秒）
-uv run pipeline/extract/run_patched.py build_opa_cmp_registers         # opa_cmp_registers（EVTヘッダ＋RMレジスタ表。RM全読みで長い）
-uv run pipeline/extract/run_patched.py build_clock_enables             # clock_enables（EVTのrcc.h＋RMレジスタ表。RM全読みで長い）
+uv run pipeline/extract/rm/extract_opa_cmp_registers.py   # opa_cmp_registers（EVTヘッダ＋RMレジスタ表をbundleから。RM全読みで数分）
+uv run pipeline/extract/rm/extract_clock_enables.py       # clock_enables（EVTのrcc.h＋RMレジスタ表をbundleから。RM全読みで数分）
 uv run pipeline/extract/datasheet/extract_adc_internal.py  # adc_internal（datasheet両言語の散文と電気的特性表をbundleから。数秒）
-uv run pipeline/extract/run_patched.py build_usbpd_plumbing            # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RM）
-uv run pipeline/extract/run_patched.py build_registers  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読み。bundleで約19分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
+uv run pipeline/extract/rm/extract_usbpd_plumbing.py      # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RMをbundleから）
+uv run pipeline/extract/rm/extract_registers.py  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読みをbundleから。約16分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
+uv run pipeline/extract/rm/extract_flash_program_method.py # flash_program_method（register_fieldsの後＝ctlr_bit_names。EVTのflash driver＋RMの闪存章をbundleから）
 uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests（RM zh/en のDMA章の格子をbundleから。数秒）
 uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
 uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）

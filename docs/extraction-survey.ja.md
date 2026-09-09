@@ -10,7 +10,7 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 測定は2段階です。まず精度を測るため、すでに人手で作成した3 record（CH32V003F4P6、CH32X035F8U6、CH32M030C8T7）をground truthとして抽出器の出力と照合しました。次に適用範囲を測るため、mirrorしている全datasheetを掃引しました。
 
-抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`tools/extract_pins.py`](../tools/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`tools/extract_registers.py`](../tools/extract_registers.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
+抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`tools/extract_pins.py`](../tools/extract_pins.py)、[`tools/extract_remap.py`](../tools/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
 
 ## 前提
 
@@ -362,7 +362,7 @@ Bit      | Name          | Access | Description | Reset value
 15       | ADC_ETRGIN_RM | RW     | ...         | 0
 ```
 
-[`tools/extract_registers.py`](../tools/extract_registers.py)がこれを読みます。**EVTヘッダから取れなかった`reset_value`の出所であり、bit位置の第二の独立な出所でもあります。**
+[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)がこれを読みます。**EVTヘッダから取れなかった`reset_value`の出所であり、bit位置の第二の独立な出所でもあります。**
 
 | family | RMに存在 | bit一致 | reset一致 |
 |---|---:|---:|---:|
@@ -693,7 +693,7 @@ package判定は3つの独立な根拠で検証できます。
 ```sh
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <record>.json
 uv run tools/extract_remap.py <manual>.PDF --compare <record>.json
-uv run tools/extract_registers.py <manual>.PDF --compare <record>.json
+uv run pipeline/extract/rm/register_fields.py <manual>.PDF --compare <record>.json
 
 uv run tools/extract_pins.py <datasheet>.PDF --list
 uv run tools/extract_pins.py <datasheet>.PDF --package V006K8U7 --compare <record>.json

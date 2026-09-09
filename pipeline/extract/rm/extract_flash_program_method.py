@@ -27,8 +27,17 @@ EVT header は `PAGE_PG`/`BUF_RST` と**同じ bit を違う名前で呼ぶ**の
 後に `*(uint32_t*)0x40022034 = *(uint32_t*)((addr & ~3) ^ 0x1000)` を書きます。RM に記述は
 無く、consumer の実測では**これが無いと erase も program も無反応**でした。
 
+RM は `pipeline/extract/bundle_pages.py` から読む（sha 照合つき。凍結
+`tools/build_flash_program_method.py` の移植＝退役 第9号）。使うのはページ本文だけ
+（`bundle_pages.texts`）。EVT の driver は mirror からそのまま読む——PDF ではない。
+RM は目録の `repositories` で引く（`bundle_pages.rm_bundles`。凍結版の
+`glob("datasheet_<lang>/*RM.PDF")[0]` と同じ文書になる）。
+
+**`register_fields.csv` を読むので `extract_registers` の後に走る**（`ctlr_bit_names`。
+凍結時は legacy 段で `build_registers` の後、いまは evidence 段で同じ順）。
+
 実行:
-    uv run tools/build_flash_program_method.py [--mirrors <dir>] [--out evidence]
+    uv run pipeline/extract/rm/extract_flash_program_method.py [--mirrors <dir>] [--out evidence]
 """
 
 from __future__ import annotations
@@ -39,10 +48,11 @@ import re
 import sys
 from pathlib import Path
 
-import pdfplumber
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
@@ -82,37 +92,35 @@ MAGIC = re.compile(r"\*\s*\(\s*__IO\s+uint32_t\s*\*\s*\)\s*(0x4002203[0-9A-Fa-f]
                    r"[^;]*?\^\s*(0x[0-9A-Fa-f]+)")
 
 
-def rm_steps(family_dir: Path, language: str = "zh") -> tuple[dict, str] | None:
-    """RMの闪存章から、節ごとの手順のbit列を読む。({節: [bit...]}, ファイル名)。"""
-    found = sorted(family_dir.glob(f"datasheet_{language}/*RM.PDF"))
-    if not found:
+def rm_steps(family: str, language: str = "zh") -> tuple[dict, str] | None:
+    """RMの闪存章から、節ごとの手順のbit列を読む。({節: [bit...]}, 文書名)。"""
+    editions = bundle_pages.rm_bundles(family)
+    if language not in editions:
         return None
+    bundle, document = editions[language]
     steps: dict[str, list[str]] = {}
     section = None
-    with pdfplumber.open(found[0]) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text() or ""
-            page.close()
-            if section is None and not any(n in text for n in RM_NEEDLE):
+    for _number, text in bundle_pages.texts(bundle.name):
+        if section is None and not any(n in text for n in RM_NEEDLE):
+            continue
+        for line in text.splitlines():
+            stripped = line.strip()
+            head = SECTION.search(stripped)
+            # 見出しは短い行。手順行（`4）…`）の中の語は見出しにしない。
+            if head and len(stripped) < 40 and not STEP_LINE.match(stripped):
+                section = head.group(1)
+                steps.setdefault(section, [])
                 continue
-            for line in text.splitlines():
-                stripped = line.strip()
-                head = SECTION.search(stripped)
-                # 見出しは短い行。手順行（`4）…`）の中の語は見出しにしない。
-                if head and len(stripped) < 40 and not STEP_LINE.match(stripped):
-                    section = head.group(1)
-                    steps.setdefault(section, [])
-                    continue
-                if section is None or not STEP_LINE.match(stripped):
-                    continue
-                sequence = steps.setdefault(section, [])
-                for m in STEP_BIT.finditer(stripped):
-                    bit = m.group(1).replace("PGSTRT", "PG_STRT")
-                    if not sequence or sequence[-1] != bit:
-                        sequence.append(bit)
-                if STEP_ADDR.search(stripped) and (not sequence or sequence[-1] != "FLASH_ADDR"):
-                    sequence.append("FLASH_ADDR")
-    return ({k: v for k, v in steps.items() if v}, found[0].name)
+            if section is None or not STEP_LINE.match(stripped):
+                continue
+            sequence = steps.setdefault(section, [])
+            for m in STEP_BIT.finditer(stripped):
+                bit = m.group(1).replace("PGSTRT", "PG_STRT")
+                if not sequence or sequence[-1] != bit:
+                    sequence.append(bit)
+            if STEP_ADDR.search(stripped) and (not sequence or sequence[-1] != "FLASH_ADDR"):
+                sequence.append("FLASH_ADDR")
+    return ({k: v for k, v in steps.items() if v}, document)
 
 
 def buf_load_bits(family_dir: Path) -> int:
@@ -199,12 +207,12 @@ def main() -> int:
     notes: list[str] = []
     for family in families:
         family_dir = args.mirrors / family
-        manual = rm_steps(family_dir)
+        manual = rm_steps(family)
         language = "zh"
         if manual and not manual[0]:
             manual = None
         if manual is None:
-            manual = rm_steps(family_dir, "en")
+            manual = rm_steps(family, "en")
             language = "en"
             if manual and not manual[0]:
                 manual = None

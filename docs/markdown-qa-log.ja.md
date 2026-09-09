@@ -2750,3 +2750,76 @@ V007 の t_D）。
 
 **検査が誤って鳴るのは、鳴らないより悪い。** セッション開始の必須手順に入っている検査が
 毎回鳴ると、本当に原本が動いたときの `★` を読み飛ばすようになる。
+
+## 凍結toolの退役 第9号——`extract_registers` 系6本（2026-09-09）
+
+**PDFを直接読む legacy の段が `FULL_PATCHED_1` だけになった。** 移したのは6本で、
+生成する表は**8つ**（`registers` 4,932行・`register_fields` 33,365行・`register_blocks` 676行・
+`index/register_layouts` 353行・`clock_enables` 429行・`opa_cmp_registers` 293行・
+`usbpd_plumbing` 13行・`flash_program_method` 12行）。**これまでの退役の最大**（`pins` 4,563行）
+より一桁大きい。
+
+### まとめてやる必要があった
+
+`extract_registers` は**ライブラリ**で、`build_registers`・`build_clock_enables`・
+`build_opa_cmp_registers`・`build_usbpd_plumbing`・`build_candidate` が呼ぶ。ライブラリだけ
+移植すると同じロジックが2つ残るので（退役の型は「移植 → byte一致 → 切替 → 凍結tool削除」で、
+切替できないと2重になる）、呼ぶ側までまとめて1つの企画にした。
+
+`build_flash_program_method` も巻き込んだ。**順序の制約があるため**——`ctlr_bit_names` は
+`register_fields.csv` の綴りを写す列なので、`build_registers` の後でなければ空になる（R-32）。
+legacy 段（`--full` 専用）の中では後ろに置けばよかったが、`build_registers` を evidence 段へ
+移すと legacy 段は**先に**走るので、置いたままだと前回の走行の値を読む——`timers` で一度
+踏んだ形（退役 第3号）。使う面が `extract_text` だけだったので一緒に移した。
+
+### 足した面（`bundle_pages`）
+
+- `text_lines(page)` — `page.extract_text_lines()` の置き換え。`bbox` を pdfplumber の
+  座標キーへ広げる（`pdfcompat._object` と同じ形）。
+- `positioned_tables(page)` — `page.find_tables()` の `table.bbox[1]` と `table.extract()`。
+  **見出しと表を紙の上下順に混ぜて読む**のが `extract_registers` の要（節見出しが register を
+  決め、そのあとに来る表がその register の field 表）なので、表の上端が要る。
+
+どちらも `pdfcompat` と**全ページで完全一致**することを確かめた（`CH32V003RM.zh` 194ページと
+`CH32X035RM.en` 261ページ）。
+
+**`page.search` は要らなかった。** 前の記録で「`find_tables`・`extract_text_lines`・`page.search`
+を足すのが先」と書いていたのは grep の誤りで、当たっていたのは正規表現の `.search(` だった
+（同日に訂正済み）。
+
+### 検算
+
+**ライブラリの移植**: 凍結版（`pdfcompat` 経由）と新経路の `(fields, notes)` が
+**RM 22版すべてで完全一致**（field 合計 29,924・note 合計 1,849。JSON を sort_keys で比較）。
+
+**8つのCSV**は全部**正本と byte 一致**——`register_blocks`・`registers`・`register_fields`・
+`index/register_layouts`・`clock_enables`・`opa_cmp_registers`・`usbpd_plumbing`・
+`flash_program_method`。
+
+### 見つけた凍結版のバグ（新経路では作らない）
+
+`build_opa_cmp_registers.read_manual_fields` は `paths` という名のローカル変数を作って
+module import の `paths` を shadow していた——`build_usbpd_plumbing` と同じ形で、あちらは
+`main()` が落ちる実害があって凍結の例外として直した（F-54型）。こちらは同じ関数の中で
+使い切っていたので露出していなかった。新経路では変数を作らない。
+
+### 走る条件は変えていない
+
+この5本は**`--full` のときだけ**走らせる。12 family の RM を丸ごと読むので合わせて約20分かかり、
+「既定（`--full` なし）は速い再生成」という `regenerate.py` の約束を壊す。凍結時も legacy 段
+（`--full` 専用）に居たので、走る条件は同じ。
+
+### パリティの覆い
+
+`run_frozen --batch` は6本から**2本**（`build_pins`・`build_remap`）になった。退役した4表は
+合わせて747行で、残る覆いは `pins` 4,563行・`pin_functions` 28,483行・`remap_fields` 287行・
+`remap_routes` 4,836行——**行数で見ればほとんど減っていない**。4/4 byte 一致。
+
+### 残る PDF 直読み
+
+`build_all`（multiprocessing）・`build_tables`・`build_pins`→`extract_pins`・
+`build_remap`→`extract_remap`・`extract_products`/`extract_ordering`（`build_all` 経由）・
+`extract_package_dims`・`scan_errata`・`extract_images`（pixel。原本が要る）・
+`convert_structured`/`document_converter`（converter 自身）。
+次は `extract_pins`／`extract_remap`（どちらも `extract_text_lines`・`find_tables` で、
+第9号で足した面で足りる）。`build_all` は multiprocessing なので別の企画。

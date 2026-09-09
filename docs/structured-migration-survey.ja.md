@@ -65,7 +65,14 @@ converter・`pipeline/`の実装はしない。**設計案（項目6）と受入
   `build_timers` `extract_images` `extract_ordering` `extract_package_dims` `extract_pins`
   `extract_products` `extract_registers` `extract_remap` `scan_errata`。
   残り2本（`convert_structured` `document_converter`）はPoC側。
-  **D16の移行単位表はこの19本と過不足なく一致した**——表の完全性を実測で確認
+  **D16の移行単位表はこの19本と過不足なく一致した**——表の完全性を実測で確認。
+  **進捗（2026-09-09）: 19本のうち11本が退役済み**（第1〜9号）——`build_dma_requests`
+  `build_features` `build_timers` `build_debug_data` `build_adc_internal` `build_memory`
+  `build_flash_geometry` `build_operating` `extract_registers` `build_registers`
+  （＋凍結対象外だった `build_clock_enables` `build_opa_cmp_registers` `build_usbpd_plumbing`
+  `build_flash_program_method`。委譲していただけなので直読み19本には入っていない）。
+  残る直読みは `build_all` `build_pins` `extract_pins` `extract_remap` `extract_products`
+  `extract_ordering` `extract_package_dims` `scan_errata` `extract_images`（pixel。原本が要る）
 - **PDF APIはpdfplumberのみ**（fitz/pypdf/pdfminer直接importは0件）。版は`uv.lock`が
   0.11.10に固定
 - **CSV正本は53表・165,618行**（catalog 8・evidence 33・index 12。2026-09-01時点）。

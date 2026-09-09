@@ -26,8 +26,14 @@ select、…）。名乗っていないものは空にします——推測で�
 多bit field の値の列挙（`OPA_CFGR1_BKIN_CFG_0` / `_1`）は field ではないので
 載せません（親 field の bits に含まれる）。
 
+RM の field は `pipeline/extract/rm/register_fields.py` が bundle から読む
+（凍結 `tools/extract_registers.py` の移植。退役 第9号）。EVT のヘッダは mirror から
+そのまま読む——PDF ではないので構造化の対象外。RM は目録の `repositories` で引く
+（`bundle_pages.rm_bundles`。凍結版の `glob("datasheet_zh/*RM.PDF")[0]` と 12 family
+全部で同じ文書になることを確かめてある）。
+
 実行:
-    uv run tools/build_opa_cmp_registers.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_opa_cmp_registers.py [--mirrors <dir>] [--out tables]
 """
 
 from __future__ import annotations
@@ -39,14 +45,15 @@ import re
 import sys
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import extract_addresses  # noqa: E402
-import extract_registers  # noqa: E402
-
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
+import extract_addresses  # noqa: E402  EVTヘッダのbase（PDFは読まない）
 import paths  # noqa: E402
+import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "block", "register", "unit", "offset", "address", "field", "bits",
@@ -170,12 +177,19 @@ def resolve(name: str, structs: dict) -> tuple[str, str, str] | None:
     return None
 
 
-def read_manual_fields(family_dir: Path) -> tuple[dict, dict, str]:
-    """RM → ({(register, field): (offset, width)}, {register: unit}, ファイル名)。"""
-    paths = sorted(family_dir.glob("datasheet_zh/*RM.PDF"))
-    if not paths:
+def read_manual_fields(family: str) -> tuple[dict, dict, str]:
+    """RM → ({(register, field): (offset, width)}, {register: unit}, 文書名)。
+
+    凍結版はここで `paths` という名のローカル変数を作って module import の `paths` を
+    shadow していた（`build_usbpd_plumbing` と同じ形。あちらは main() が落ちる実害が
+    あって凍結の例外として直したが、こちらは同じ関数の中で使い切っていたので
+    露出していなかった）。新経路では変数を作らない。
+    """
+    editions = bundle_pages.rm_bundles(family)
+    if "zh" not in editions:
         return {}, {}, ""
-    fields, _ = extract_registers.extract(paths[0], None)
+    bundle, document = editions["zh"]
+    fields, _ = register_fields.extract(bundle.name, None)
     out: dict = {}
     # **レジスタの持ち主は field の説明文が言う。** 見出しは `OPA控制寄存器 2
     # （OPA_CTLR2）` としか書かず、それが CMP のレジスタだと分からない。中の
@@ -198,7 +212,7 @@ def read_manual_fields(family_dir: Path) -> tuple[dict, dict, str]:
         ranked = tally.most_common(2)
         if ranked and (len(ranked) == 1 or ranked[0][1] > ranked[1][1] + 1):
             units[register] = ranked[0][0]
-    return out, units, paths[0].name
+    return out, units, document
 
 
 def main() -> int:
@@ -240,7 +254,7 @@ def main() -> int:
             notes.append(f"{family}: OPA/CMP の bit define が無い"
                          + ("（構造体はある）" if any(b in structs for b in ("OPA", "CMP")) else ""))
             continue
-        manual, units, manual_name = read_manual_fields(args.mirrors / family)
+        manual, units, manual_name = read_manual_fields(family)
         offsets = {(b, m): (o, w) for b, ms in structs.items() for m, o, w in ms}
         for name, ((block, register, field), mask) in sorted(fields.items(),
                                                              key=lambda kv: (kv[1][0], kv[1][1])):

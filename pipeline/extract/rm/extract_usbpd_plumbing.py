@@ -21,8 +21,14 @@ base は `memory_map.csv`、CC pad は `index/pinout.csv` が持っている。�
 名乗らないものは直前の banner コメント（`Bit definition for EXTEN_CTLR0 register`）
 が言う。bit 位置は RM のレジスタ表と突き合わせ、一致で confirmed。
 
+RM の field は `pipeline/extract/rm/register_fields.py` が bundle から読む
+（凍結 `tools/extract_registers.py` の移植。退役 第9号）。EVT のヘッダは mirror から
+そのまま読む——PDF ではないので構造化の対象外。RM は目録の `repositories` で引く
+（`bundle_pages.rm_bundles`。凍結版の `glob("datasheet_zh/*RM.PDF")[0]` と 12 family
+全部で同じ文書になることを確かめてある）。
+
 実行:
-    uv run tools/build_usbpd_plumbing.py [--mirrors <dir>] [--out tables]
+    uv run pipeline/extract/rm/extract_usbpd_plumbing.py [--mirrors <dir>] [--out tables]
     （`clock_enables.csv` を先に作っておく）
 """
 
@@ -35,14 +41,15 @@ import re
 import sys
 from pathlib import Path
 
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import extract_addresses  # noqa: E402
-import extract_registers  # noqa: E402
-
-REPO = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bundle_pages  # noqa: E402
+import extract_addresses  # noqa: E402  EVTヘッダのbase（PDFは読まない）
 import paths  # noqa: E402
+import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
@@ -163,16 +170,18 @@ def main() -> int:
         manual: dict = {}
         manual_name = ""
         if phy:
-            # ローカル変数が module import の `paths` を shadow して、main() 冒頭の
-            # `paths.table(...)` が常に UnboundLocalError で落ちていた（凍結後の
-            # 2026-09-01 に旧新パリティ実行で発覚。CSV を再生成しない限り誰も
-            # 踏まない F-54 型の潜在バグ）。凍結の明示的な例外として改名だけ直す。
-            manuals = sorted((args.mirrors / family / "datasheet_zh").glob("*RM.PDF"))
-            if manuals:
-                fields, _ = extract_registers.extract(manuals[0], None)
+            # 凍結版はここで `paths` という名のローカル変数を作って module import の
+            # `paths` を shadow し、main() 冒頭の `paths.table(...)` が常に
+            # UnboundLocalError で落ちていた（2026-09-01 に旧新パリティ実行で発覚。
+            # CSV を再生成しない限り誰も踏まない F-54 型の潜在バグ）。新経路では
+            # 変数を作らない。
+            editions = bundle_pages.rm_bundles(family)
+            if "zh" in editions:
+                bundle, document = editions["zh"]
+                fields, _ = register_fields.extract(bundle.name, None)
                 manual = {(f["register"], f["field"]): (f["bit_offset"], f["bit_width"])
                           for f in fields if f["register"].startswith(("AFIO_", "EXTEN_"))}
-                manual_name = manuals[0].name
+                manual_name = document
         for en in enables[family]:
             rcc = {"family": family, "peripheral": en["peripheral"],
                    "rcc_register": en["register"], "rcc_bit": en["bit"],

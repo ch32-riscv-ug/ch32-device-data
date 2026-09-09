@@ -9,7 +9,9 @@
 段:
     bundles   convert_all（incremental。原本SHA・tool版が一致すれば跳ばす）
     evidence  新経路の正本生成器（operating_conditions・debug_wiring・
-              option bytes 2表・device_id 2表）
+              option bytes 2表・device_id 2表ほか）。--full では RM を丸ごと読む
+              5本（registers 3表＋register_layouts・opa_cmp_registers・
+              clock_enables・usbpd_plumbing・flash_program_method）も加わる
     index     evidenceから導出する索引（debug_interfaces・conflicts・build_index）
     checks    check_tables / check_counts / check_docs
     legacy    --full: **全CSVの再生成**（D18工程(5)の切替後の正規実行形）——
@@ -60,17 +62,10 @@ FULL_PLAIN_1 = ["build_evt_examples", "build_clock", "build_systick",
 # FULL_PATCHED_2（`build_memory`）は2026-09-09に退役して evidence 段の
 # `pipeline/extract/rm/extract_memory.py` になった。PDFを読む段が1つ減った。
 FULL_PLAIN_2 = ["build_interrupts", "build_memory_map"]
-# build_registersに--rm-cacheを渡さない——cacheは原本更新後も**無検証で再利用され、
-# 正本を古い読みへ戻す**（2026-09-02の初回--fullで実際に踏んだ: 08-26製のcacheが
-# X315 RM改版前のARGB番地0x40023400を返し、registers 9行が偽conflictになった。
-# check_docsが捕捉→revert）。bundle入力ならcache無しでも数分で済む。
-FULL_PATCHED_3 = ["build_opa_cmp_registers", "build_clock_enables",
-                  "build_usbpd_plumbing",
-                  "build_registers",
-                  # build_registers の後でなければならない——`ctlr_bit_names` は
-                  # `register_fields.csv` の綴りをそのまま出す列なので、先に走ると
-                  # 空になる（R-32。登録漏れで --full が拾っていなかった）。
-                  "build_flash_program_method"]
+# FULL_PATCHED_3（`build_opa_cmp_registers`・`build_clock_enables`・
+# `build_usbpd_plumbing`・`build_registers`・`build_flash_program_method`）は
+# 2026-09-09に退役して evidence 段の `pipeline/extract/rm/` になった（退役 第9号）。
+# **PDFを読む legacy の段はこれで `FULL_PATCHED_1` だけになった。**
 FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
                 "build_link_firmware"]
 
@@ -78,8 +73,7 @@ FULL_PLAIN_3 = ["build_eval_boards", "build_sources", "build_evt_variants",
 def legacy_steps() -> list[Step]:
     steps: list[Step] = []
     for patched, names in ((True, FULL_PATCHED_1), (False, FULL_PLAIN_1),
-                           (False, FULL_PLAIN_2),
-                           (True, FULL_PATCHED_3), (False, FULL_PLAIN_3)):
+                           (False, FULL_PLAIN_2), (False, FULL_PLAIN_3)):
         for spec in names:
             name, *extra = spec.split()
             argv = (["pipeline/extract/run_patched.py", name, *extra] if patched
@@ -122,7 +116,23 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("adc_internal", ["pipeline/extract/datasheet/extract_adc_internal.py"]),
             ("device_id_addresses + device_ids",
              ["tools/build_device_ids.py"]),
-        ]),
+        ] + ([
+            # 退役 第9号（2026-09-09）。**`--full` のときだけ**走らせる——この5本は
+            # 12 family の RM を丸ごと読むので合わせて約20分かかり、「既定は速い
+            # 再生成」という約束を壊す。凍結時も legacy 段（`--full` 専用）に居たので
+            # 走る条件は変わっていない。
+            #
+            # 順序は凍結時のまま: `usbpd_plumbing` は `clock_enables.csv` を読み、
+            # `flash_program_method` は `register_fields.csv` を読む（`ctlr_bit_names`）。
+            # 先に走ると空になる（R-32）。
+            ("register_blocks + registers + register_fields + register_layouts",
+             ["pipeline/extract/rm/extract_registers.py"]),
+            ("opa_cmp_registers", ["pipeline/extract/rm/extract_opa_cmp_registers.py"]),
+            ("clock_enables", ["pipeline/extract/rm/extract_clock_enables.py"]),
+            ("usbpd_plumbing", ["pipeline/extract/rm/extract_usbpd_plumbing.py"]),
+            ("flash_program_method",
+             ["pipeline/extract/rm/extract_flash_program_method.py"]),
+        ] if args.full else [])),
         ("index", ([
             ("feature_tags", ["tools/build_feature_tags.py"]),
             ("capabilities", ["tools/build_capabilities.py"]),

@@ -30,7 +30,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import extract_pins  # noqa: E402
-import extract_registers  # noqa: E402
+# 凍結 `tools/extract_registers.py` は退役した（第9号）。field 表の読み手は
+# 新経路の `pipeline/extract/rm/register_fields.py`——同じ関数を持つので別名で入れる。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "extract" / "rm"))
+import register_fields as extract_registers  # noqa: E402
 import extract_remap  # noqa: E402
 import extract_remap_fields  # noqa: E402
 import extract_selectors  # noqa: E402
@@ -110,7 +113,9 @@ def read_silicon(
     routes: list[dict] = []
     for manual in editions:
         edition = manual.parent.name.rpartition("_")[2] or manual.parent.name
-        fields, reg_notes = extract_registers.extract(manual, None)
+        # 新経路は bundle を読むので、原本のパスを bundle 名にする（PDFは開かない）。
+        fields, reg_notes = extract_registers.extract(
+            extract_registers.bundle_name(str(manual)), None)
         for f in fields:
             f["_edition"] = edition
         reg_fields += fields

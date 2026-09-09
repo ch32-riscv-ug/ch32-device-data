@@ -39,13 +39,18 @@ CANDIDATES = REPO / ".cache" / "pipeline-candidates" / "frozen"
 # `build_adc_internal`・`build_memory`・`build_flash_geometry`）は全部退役して新経路になったので、
 # パリティを見る相手が無くなった。残る凍結toolのうち単一プロセス・`--out`持ちで速いものを入れ、
 # **これまでパリティを見ていなかった表**（`pins` 4,563行・`pin_functions` 28,483行・`remap_routes`・
-# `opa_cmp_registers`・`clock_enables`・`usbpd_plumbing`・`flash_program_method`）を覆う。
+# `opa_cmp_registers`・`clock_enables`・`usbpd_plumbing`・`flash_program_method`）を覆った。
 # bundle入力なので6本で約19秒（PDF直読みの頃は1本で数分）。
+#
+# **2026-09-09（退役 第9号）に4本が抜けた**——`build_opa_cmp_registers`・
+# `build_clock_enables`・`build_usbpd_plumbing`・`build_flash_program_method` は
+# 新経路（`pipeline/extract/rm/`）へ移して削除した。残るのは `build_pins`（`pins`
+# 4,563行・`pin_functions` 28,483行）と `build_remap`（`remap_fields`・`remap_routes`）で、
+# **行数で見ればパリティの覆いはほとんど減っていない**（退役した4表は合わせて747行）。
 # **据え置き中（`--hold-sources`）に単体で回すときは`CH32_HOLD_SOURCES`を渡す**——渡さないと
 # pdfcompatのゲートが据え置き文書を拒否し、その文書ぶんが落ちた出力を「不一致」と報告する
 # （`build_pins`のX035DS0.zhで実際に出た）。`regenerate.py --hold-sources`経由なら自動で入る。
-BATCH = ("build_pins", "build_remap", "build_opa_cmp_registers", "build_clock_enables",
-         "build_usbpd_plumbing", "build_flash_program_method")
+BATCH = ("build_pins", "build_remap")
 
 
 def patch_all_modules() -> int:

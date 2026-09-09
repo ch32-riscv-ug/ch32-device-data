@@ -28,7 +28,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
 - `tools/check_docs.py`: **文書が書いている行数と穴の状態**を表と worklist の台帳で検算する。データが正しくても説明が古ければ、利用者が読むのは古いほう（2026-08-29 の監査で見つかった腐りの型）
 - `tools/check_viewer.js`: `pins.html` の表示を DOM 無しで評価して確かめる。**表と文書には検査があるのに表示だけ外**で、series view の Defaults が先頭型番だけを見ていた穴（G1）が残っていた。node が要る唯一の検査
-- `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`tools/extract_registers.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
+- `tools/extract_selectors.py`、`tools/extract_pins.py`、`tools/extract_remap.py`、`pipeline/extract/rm/register_fields.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
 - `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
 - `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
 - `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables evidence`で規則一覧とremap_routes.csvに対する当たり具合を出す
@@ -132,7 +132,7 @@ uv run tools/signal_vocabulary.py --tables tables # signal名の語彙規則と�
 uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h
 uv run tools/extract_pins.py <datasheet>.PDF --package TSSOP20
 uv run tools/extract_remap.py <manual>.PDF
-uv run tools/extract_registers.py <manual>.PDF
+uv run pipeline/extract/rm/register_fields.py <manual>.PDF
 ```
 
 全表の生成順は [evidence/README.ja.md](evidence/README.ja.md) の「生成順」を参照。
