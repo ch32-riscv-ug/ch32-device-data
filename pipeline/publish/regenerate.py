@@ -27,7 +27,8 @@
     uv run pipeline/publish/regenerate.py [--full] [--verify] [--human] [--jobs N] [--list]
 
 既定（--fullなし）は新経路の生成器と索引だけの速い再生成。原本（mirror）が
-更新されたときの全再生成は`--full`（1時間強）。失敗した段で止まる（後続は
+更新されたときの全再生成は`--full`（**約12分**。2026-09-10に原本直読みが無くなって
+1時間強から縮んだ）。失敗した段で止まる（後続は
 走らない）。2回目の実行が全段成功かつ`git status`が空なら再生成は冪等。
 network越しのtool（build_toolchains）と各family repoの画像（extract_images・
 check_images）はここに入れない。
@@ -76,9 +77,12 @@ Step = tuple[str, list[str]]  # (label, argv after the interpreter)
 FULL_ORDER: list[tuple[str, str]] = [
     # `build_all`・`build_tables` は **2026-09-10 に原本を読まなくなった**（退役 第12・13号。
     # 読み手は全部新経路で、この2本は候補と目録を組み立てるだけ）。`run_patched` 経由をやめて
-    # そのまま呼ぶ。`--jobs 1` は互換層の差し替えを効かせるための直列化だったので、
-    # 並列に戻せる——ただし速さの変更は別に測ってからにする。
-    ("plain", "build_all --jobs 1"),
+    # そのまま呼ぶ。
+    #
+    # `--jobs 1` も外した。あれは**互換層の差し替えが worker 子プロセスに効かない**ための
+    # 直列化で、互換層が消えた時点で理由が無い。実測（2026-09-10）: 並列 **6.7秒**・
+    # 直列 24.3秒で、**出力103ファイルは byte 一致**。PDF を読んでいた頃は直列で約35分だった。
+    ("plain", "build_all"),
     ("plain", "build_tables"),
     ("new", "pipeline/extract/datasheet/extract_pin_tables.py"),
     # `build_remap` は `candidates/*.json` と `pin_functions.csv` から作る（原本を読まない）。
@@ -202,7 +206,7 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--full", action="store_true",
-                    help="全CSVを再生成する（旧tool群をbundle入力で。1時間強）")
+                    help="全CSVを再生成する（旧tool群も含めて全部。約12分）")
     ap.add_argument("--verify", action="store_true",
                     help="凍結toolのパリティ一式とエラッタ増分検査も回す")
     ap.add_argument("--human", action="store_true",

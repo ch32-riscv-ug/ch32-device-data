@@ -6,27 +6,29 @@ per variant. Joining the two needs a mapping from a SKU to its column, which is
 either the part number itself or the package the comparison table assigns it.
 
 Reading a reference manual dominates the runtime, so each family is parsed once and
-reused across its SKUs.
+reused across its SKUs. **Since the readers moved to structured bundles (2026-09-10)
+the whole run takes seconds, not tens of minutes** -- 6.7s across six workers, 24.3s
+serial, against about 35 minutes when the same code parsed the PDFs.
 
 **Families are independent and run in parallel.** Each one reads its own documents
 and writes its own `candidates/<part>.json`, sharing nothing, so the only thing the
-parent does is collect the reports. Sequentially the twelve take about 35 minutes
-and the cost is very uneven -- CH32H417 alone is 6m35s where CH32V003 is 1m28s --
-so the longest are started first and the wall clock ends up close to the longest
-single family.
+parent does is collect the reports. The cost used to be very uneven -- with PDF input
+CH32H417 alone was 6m35s where CH32V003 was 1m28s -- so the longest are started first
+and the wall clock ends up close to the longest single family. **The output does not
+depend on `--jobs`**: the families share nothing and the report is sorted at the end
+(measured 2026-09-10: serial and six-way output byte-identical, 103 files).
 
 The worker prints nothing while it runs; its block is printed when it finishes, so
 **families appear in completion order, not in catalogue order**. Interleaving the
 lines live would make them unreadable.
 
-Memory, not cores, is what bounds `--jobs`. A worker walks a whole reference manual.
-That used to mean pdfplumber's parsed page objects plus its per-page text-map LRU
-(581 MiB for one small family before both caches were dropped per page, 360 MiB after);
-**since the readers moved to structured bundles (2026-09-10) a page is plain JSON**,
-so the ceiling is far lower. The default stays well below the core count because
-**on WSL the memory a worker can actually have is not what `free` reports**: `free`
-describes the Linux VM, the Windows host underneath may have far less, and
-overcommitting there thrashes instead of failing.
+Memory used to be what bounds `--jobs`: a worker walks a whole reference manual, and
+with pdfplumber that meant parsed page objects plus a per-page text-map LRU (581 MiB
+for one small family before both caches were dropped per page, 360 MiB after).
+**Since the readers moved to structured bundles a page is plain JSON and the whole
+run peaks at about 66 MiB**, so memory no longer decides anything. The default stays
+below the core count out of caution on WSL, where the memory a worker can actually
+have is not what `free` reports.
 
 Usage:
     uv run tools/build_all.py --out candidates [--family CH32M030] [--limit 5]
@@ -461,18 +463,18 @@ def show(name: str, rows: list[dict], seconds: float, error: str) -> None:
 
 
 def default_jobs() -> int:
-    """How many families to read at once. Deliberately far below the core count.
+    """How many families to read at once. Deliberately below the core count.
 
-    Cores are not the constraint -- memory is, and **on WSL the memory a worker
-    can actually have is not what `free` reports**. `free` describes the Linux
-    VM's own allocation; the Windows host underneath may have much less free, and
-    overcommitting there does not fail loudly, it thrashes. Six workers hung this
-    machine even though `free` showed 8 GB available.
+    This cap was set when memory was the constraint: with pdfplumber (page properties
+    plus the per-page text-map LRU, both dropped per page) one CH32H417 worker peaked
+    at about **360 MiB**, and **on WSL the memory a worker can actually have is not
+    what `free` reports** -- `free` describes the Linux VM's own allocation, the
+    Windows host underneath may have much less, and overcommitting there does not fail
+    loudly, it thrashes. Six workers hung this machine even though `free` showed 8 GB.
 
-With pdfplumber (page properties plus the per-page text-map LRU, both dropped
-    per page) one CH32H417 worker peaked at about **360 MiB**. The readers now read
-    structured bundles, where a page is plain JSON, so the peak is much lower —
-    but the WSL caveat above still decides the default, not the measurement.
+    The readers now take structured bundles, where a page is plain JSON: the whole run
+    peaks at about **66 MiB** and finishes in seconds. Memory no longer decides this,
+    but the cap costs nothing and the WSL caveat is still true, so it stays.
     """
     return max(1, min(6, (os.cpu_count() or 2) - 1))
 

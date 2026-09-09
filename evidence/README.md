@@ -900,7 +900,7 @@ The series block diagrams (`system_*.png`) are not in the original datasheets; t
 
 **The front door is `uv run pipeline/publish/regenerate.py --full`** — it runs
 everything below in dependency order on structured-bundle input and finishes
-with the checks (about an hour; `regenerate.py` without `--full` is the fast
+with the checks (**about 12 minutes**; `regenerate.py` without `--full` is the fast
 new-path-only variant). The list below is for regenerating one table at a time.
 **Since 2026-09-10 no generator reads a PDF directly**, so each can be run as
 it stands (every reader takes structured bundles; the only things that open a

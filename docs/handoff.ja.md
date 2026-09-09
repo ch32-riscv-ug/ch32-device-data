@@ -34,7 +34,7 @@ uv run pipeline/checks/check_sources.py --remote
 入力を数時間おきに追いかけるのは`tools/pull_inputs.py`（**人が回す**。cron/timerから）。
 再生成中は`.cache/regenerate.lock`を見て跳ばし、このリポジトリは作業ツリーがcleanな
 ときだけpullする。**禁止ではなく排他**——数時間おきのpullそのものは良いことで、困るのは
-1時間強の工程の途中で入ることだけ。
+全再生成（約12分）の途中で入ることだけ。
 
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
@@ -124,8 +124,9 @@ cleanになれば次の周期で入る。
 2. `uv run pipeline/ingest/convert_all.py` — 増分変換（原本SHAとtool版が一致する文書は跳ばす。
    RM 600ページで約4分）
 3. `uv run tools/build_sources.py` — 読んだmirrorのcommitを `catalog/sources.csv` に記録
-4. `uv run pipeline/publish/regenerate.py --full --verify --human` — 原本更新時の正規手順（1時間強。
-   bundle→全CSV→索引→検査→凍結toolのparity→図・Markdown・PDFとの差ゼロ検査）。
+4. `uv run pipeline/publish/regenerate.py --full --verify --human` — 原本更新時の正規手順
+   （**約12分**。bundle→全CSV→索引→検査→エラッタ増分→図・Markdown・PDFとの差ゼロ検査。
+   2026-09-10に原本直読みが無くなって1時間強から縮んだ）。
    エージェントのシェルは10分で切れるので `nohup setsid … > log 2>&1 &` で切り離し、ログの
    `=== [段] `／`FAILED`／`全段成功`／`Traceback` を監視する。**実行中は`pipeline/`を編集しない**
    （各段が読む）
