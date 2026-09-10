@@ -602,6 +602,12 @@ def keep_row(row, lang, page_no):
     表の継承（記号セルが空の続き行）は多条件の行には正しいが、別のパラメータが
     続いている場合は記号を取り違える。単位と値で弾けるので弾く。
     """
+    # **min/typ/max がどれも空の行は事実を持たない。** 記号と単位だけの行で、
+    # 説明の折り返しが独立した行として読まれたもの（`t_D` の条件の2行目など）。
+    # 縦結合の取りこぼし（`fill_rowspans`）を先に直したので、これで消えるのは
+    # 本当に値の無い行だけ——実測: この規則を入れる前の正本に該当行は0。
+    if not (row["min"] or row["typ"] or row["max"]):
+        return False
     symbol = row["symbol"]
     if symbol in HEADER_ROW:
         return False          # 表の見出しが本文として読まれたもの。黙って落とす
@@ -691,6 +697,7 @@ def read_edition(bundle, lang):
     # 表題は**跳ばすページの表でも**更新する（最後に見た表題が続く、という意味だから）。
     last_caption = ""
     last_edges: list[float] = []
+    sym = unit = param = group = ""
     for page in bundle_pages.pages(bundle):
         text = page.get("text") or ""
         hit = bool(marker.search(text))
@@ -717,6 +724,7 @@ def read_edition(bundle, lang):
             cols = [norm_header(c) for c in tbl[0]]
             body = tbl[1:]
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
+            fresh = True
             if {"symbol", "min", "condition"} <= set(cols):
                 last_cols, last_edges = cols, edges
             elif (last_cols and len(tbl[0]) == len(last_cols)
@@ -746,14 +754,22 @@ def read_edition(bundle, lang):
                 # 逆に境界を全経路に課すと、版面がわずかに違うページ跨ぎの続きが落ちる
                 # （同実測で既存の21行が消えた）。
                 cols, body = last_cols, tbl
+                fresh = False
             else:
                 continue
             # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まってからで
             # ないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
             filled = fill_rowspans(record, cols)
             body = filled[len(filled) - len(body):]
-            rows, sym, unit, param, group = [], "", "", "", ""
-            for raw in body:
+            # **記号・単位・項目名は続きの断片へ持ち越す。** 表の途中でページが変わると
+            # そこから単位の欄が空になる（資料は「上の行と同じ」を空欄で書く）——
+            # `CH32V103DS0.en` は p.21 の `I_VDD … mA` の続きが p.22 に在り、`I_Vss`・`I_IO` の
+            # 単位が落ちて zh（1ページに収まる）と食い違っていた。新しいヘッダを見つけた
+            # ときだけ捨てる。
+            if fresh:
+                sym, unit, param, group = "", "", "", ""
+            rows = []
+            for index, raw in enumerate(body):
                 cells = dict()
                 extra = []
                 for i, cell in enumerate(raw):
@@ -766,6 +782,14 @@ def read_edition(bundle, lang):
                 this_param = norm_text(cells.get("parameter"))
                 if s:  # 新しい記号の行。継続行は記号と参数を引き継ぐ
                     sym, param, group = s, this_param, pin_group
+                elif (not fresh and index == 0 and param and this_param
+                      and (this_param[0] == "(" or this_param[0].islower())):
+                    # **続きの断片の1行目は、項目名の折り返しの後半**——`t_CONV` の
+                    # `Total conversion time` は前ページで切れ、この断片には
+                    # `(including sampling time)` だけが載る。置き換えると項目名が
+                    # 断片になるので繋ぐ。小文字か括弧で始まるものだけ（データは
+                    # 大文字か数字で始まる。`fold_header_wrap` と同じ見分け方）。
+                    param = f"{param} {this_param}"
                 else:
                     param = this_param or param
                     group = pin_group or group
