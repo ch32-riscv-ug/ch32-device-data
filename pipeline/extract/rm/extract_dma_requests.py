@@ -211,6 +211,13 @@ def read_bundle(bundle: str, family: str) -> list[dict]:
             cells = [[(c or "").strip() for c in row] for row in table["extracted_rows"]]
             if not cells:
                 continue
+            # **自分の表題を持つ表は、前の表の続きではない**（続きの断片は表題を持たない
+            # ——表題は表の先頭の上にあるから）。列数だけで続きと見なすと、たまたま同じ
+            # 列数の別の表が DMA の格子に混ざる。全corpus実測（2026-09-10）で
+            # 列数が一致する表1,928のうち**40が自分の表題を持つ**——`表32-4 用户选择字信息结构`・
+            # `Table 13-2 TIMx internal trigger connections` のような無関係な表だった
+            # （`extract_remap` の F-60 と同じ形）。
+            own_caption = bool(((table.get("caption") or {}).get("text") or "").strip())
             head = cells[0]
             # DMAMUX の番号表（H417）。見出しの無い続き（英語版は次ページへ割れる）は
             # 「数字・名前」が交互に並ぶ行の表として認める。
@@ -260,7 +267,8 @@ def read_bundle(bundle: str, family: str) -> list[dict]:
                         "skip": False}
                 body = cells[1:]
                 page_has_grid = True
-            elif grid and not grid.get("skip") and len(head) == grid["width"]:
+            elif (grid and not grid.get("skip") and not own_caption
+                  and len(head) == grid["width"]):
                 body = cells          # 見出しの無い続き
                 page_has_grid = True
                 continuation = True
