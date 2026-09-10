@@ -116,12 +116,6 @@ pin_functions,,,CH32V103R8T6,part_number=CH32V103R8T6 pad=PC6 signal=TIM3_CH1 ro
 pin_functions,,,CH32V103R8T6,part_number=CH32V103R8T6 pad=PC7 signal=TIM3_CH2 route=remap-1,route,remap-1,rm-remap-grid,remap-3,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-3)
 pin_functions,,,CH32V103R8T6,part_number=CH32V103R8T6 pad=PC8 signal=TIM3_CH3 route=remap-1,route,remap-1,rm-remap-grid,remap-3,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-3)
 pin_functions,,,CH32V103R8T6,part_number=CH32V103R8T6 pad=PC9 signal=TIM3_CH4 route=remap-1,route,remap-1,rm-remap-grid,remap-3,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-3)
-pin_functions,,,CH32V407RET6,part_number=CH32V407RET6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
-pin_functions,,,CH32V407VET6,part_number=CH32V407VET6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
-pin_functions,,,CH32V407WEU6,part_number=CH32V407WEU6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
-pin_functions,,,CH32V467RET6,part_number=CH32V467RET6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
-pin_functions,,,CH32V467VET6,part_number=CH32V467VET6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
-pin_functions,,,CH32V467WEU6,part_number=CH32V467WEU6 pad=PB7 signal=FSMC_NADV route=remap-1,route,remap-1,rm-remap-grid,remap-0,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-0)
 product_attributes,,,CH32H416RDU6,part_number=CH32H416RDU6 attribute=pdusb_usbpd_type_c,value,1 Built-in Rd(4),products:zh,1 built-in Rd(4),#,products:en+!products:zh(=1 built-in Rd(4))
 product_attributes,,,CH32H417WEU6,part_number=CH32H417WEU6 attribute=opa,value,2 (OPA1/3),products:zh,1（OPA1）,#,products:en+!products:zh(=1（OPA1）)
 product_attributes,,,CH32L103C8T6,part_number=CH32L103C8T6 attribute=main_applications_and_features,value,"General-purpose, Pin compatible",products:zh,"General purpose, pin-compatible",#,"products:en+!products:zh(=General purpose, pin-compatible)"

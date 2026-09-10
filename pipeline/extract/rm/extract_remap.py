@@ -248,20 +248,35 @@ def extract(source) -> tuple[list[dict], list[str]]:
 
     if True:
         for page in bundle_pages.pages(bundle_name(str(source))):
-            for table in bundle_pages.tables(page):
-                rows = [[flatten(c) for c in row] for row in table.extract()]
+            for record in page.get("tables", []):
+                caption = ((record.get("caption") or {}).get("text") or "").strip()
+                rows = [[flatten(c) for c in row] for row in record["extracted_rows"]]
                 if not rows or len(rows[0]) < MIN_COLUMNS:
                     continue
                 header = read_header(rows[0]) or read_bare_header(rows, notes)
                 if header:
                     pending, pending_page = header, page["number"]
                     body = rows[1:]
-                elif (pending and not is_header_row(rows[0])
+                elif (pending and not caption and not is_header_row(rows[0])
                       and len(rows[0]) == len(pending) + 1
                       and page["number"] - pending_page <= 1):
                     # A grid split across pages repeats no header on the later part.
                     body = rows
                 else:
+                    # **読めない表は、前の格子を終わらせる。** 見出しが読めないだけで
+                    # 黙って飛ばすと `pending` が生き残り、その表の続き断片が**前の格子の
+                    # field**に付く。CH32V407 の表10-40（FSMC）は列見出しが `FSMCEN=0` で
+                    # `*_RM=値` の形ではないので `read_header` が読めず、次ページの見出し
+                    # 無しの断片25行が直前の `ADC2_ETRGREG_RM`（ADCのトリガ選択）に
+                    # 付いていた——`A16 PD11`・`FSMC_NADV PB7` までADCの経路として出る
+                    # （実測: en 52経路・zh 28経路・FV2x.en 2経路が偽。worklist の F-60）。
+                    #
+                    # 終わらせる合図は**表題を持つこと**。続きの断片は表題を持たない
+                    # （表題は表の先頭の上にあるから）ので、表題があれば別の表と言える。
+                    # `is_header_row`（自分で格子を始める形）も同じく終わらせる——
+                    # 表題の無い表がそれでも自分の格子を始めることがあるため。
+                    if caption or is_header_row(rows[0]):
+                        pending = None
                     continue
                 pending_page = page["number"]
                 for row in body:
