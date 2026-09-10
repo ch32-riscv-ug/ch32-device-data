@@ -49,8 +49,8 @@ HEADER_MAP = dict(operating.HEADER_MAP,
 
 
 def norm_header(cell: str | None) -> str | None:
-    text = operating.FOOTNOTE.sub("", cell or "").replace(" ", "").replace(".", "")
-    return HEADER_MAP.get(text.lower() if text.isascii() else text)
+    """語彙だけ差し替えて `operating_rows` の読み方を使う（正規化を二重に持たない）。"""
+    return operating.norm_header(cell, HEADER_MAP)
 
 
 def align_cols(cols: list, edges: list[float], part: list[float],
