@@ -171,6 +171,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "memory_map": ("build_memory_map.py", "COLUMNS"),
     "opa_cmp_registers": ("extract_opa_cmp_registers.py", "COLUMNS"),
     "operating_conditions": ("operating_rows.py", "COLUMNS"),
+    "absolute_maximum_ratings": ("extract_absolute_maximum.py", "COLUMNS"),
     "option_bytes": ("extract_option_bytes.py", "BYTE_COLUMNS"),
     "option_byte_fields": ("extract_option_bytes.py", "FIELD_COLUMNS"),
     "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
@@ -871,11 +872,10 @@ def main() -> int:
         check("errata", r["id"], r["series"], series, "series", ";")
     for r in t["evt_examples"]:
         check("evt_examples", r["example"], r["family"], families, "families")
-    for r in t["operating_conditions"]:
-        check("operating_conditions", r["symbol"], r["series"], series,
-              "series", ";")
-        check("operating_conditions", r["symbol"], r["datasheet"], documents,
-              "documents")
+    for name in ("operating_conditions", "absolute_maximum_ratings"):
+        for r in t[name]:
+            check(name, r["symbol"], r["series"], series, "series", ";")
+            check(name, r["symbol"], r["datasheet"], documents, "documents")
     for name in ("pins", "pin_functions"):
         for r in t[name]:
             check(name, r["part_number"], r["part_number"], products, "products")

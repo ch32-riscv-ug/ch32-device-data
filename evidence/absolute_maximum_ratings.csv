@@ -1,0 +1,251 @@
+series,symbol,parameter,condition,min,max,unit,#,confidence,basis,datasheet
+CH32H415;CH32H416;CH32H417,I_IO,Sink current on arbitrary I/O and control pins,,,25,mA,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,I_IO,Source current on arbitrary I/O and control pins,,,-25,mA,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,I_VDD33,Total current of all V_DD33/V_DD33A main supply pins,,,400,mA,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,I_VIO,Total current of all V_DDIO/V_IO18 supply pins,,,200,mA,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,I_VSS,Total current of all V_SS common ground pins,,,600,mA,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD12A,USB 3.0 module power supply voltage,,-0.3,1.5,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DD33,External mains supply voltage (including V_DD33A and V_DD33),,-0.3,4.0,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DDIO,Power supply voltage of some conventional I/O pins,,-0.3,4.0,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_DDK,Power supply decoupling terminal of core circuit,,-0.3,1.5,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IN,Input voltage on FT (tolerant 5V) pin.,,-0.3,5.5,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IN,Input voltage on USB 2.0 and Ethernet PHY pins,,-0.3,VDD33+0.3,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IN,Input voltage on USB 3.0 pin,,-0.3,VDD12A+0.3,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IN,Input voltage on other pins (supplied by V_DDIO),,-0.3,VDDIO+0.3,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IN,Input voltage on some high-speed I/O pins (powered by VIO18),,-0.3,VIO18+0.3,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_IO18,Power supply voltage of some high-speed I/O pins,,-0.3,4.0,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,V_REFP,"Positive reference voltage of ADC, HSADC and DAC modules",,-0.3,VDD33A+0.3,V,#,confirmed,CH32H417DS0.PDF:zh(p.81)+CH32H417DS0.PDF:en(p.93),CH32H417DS0.PDF
+CH32L103;CH32M103,I_AVVHV,V_HV pin continuous input current,,,50,mA,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_INJ(PIN),Injection current on other pins,,,+/-5,mA,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_INJ(PIN),NRST pin injection current,,,+/-5,mA,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_INJ(PIN),OSC_IN pin of HSE and OSC_IN pin of LSE injection current,,,+/-5,mA,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_IO,Pour current on arbitrary I/O and control pins,,,25,mA,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_IO,Source current on arbitrary I/O and control pins,,,-25,mA,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_VDD,Total current through V_DD/V_DDA power line (supply current),,,150,mA,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,I_Vss,Total current through V_SS ground line (outgoing current),,,150,mA,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,T_A,Ambient temperature during operation,Chips with a model number ending in 6,-40,85,℃,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,T_A,Ambient temperature during operation,Chips with a model number ending in 7,-40,105,℃,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_DD,External mains supply voltage (including V_DDA and V_DD),CH32L103,-0.3,4.0,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_DD,Output voltage of internal voltage regulator,CH32M103G8R6,-0.3,4.0,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_HO,Output voltage of high-side driver,CH32M103G8R6,-0.4,VHV+0.4,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32L103;CH32M103,V_HREG,Input power supply voltage of internal voltage regulator,CH32M103G8R6,-0.4,28,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_HV,Power supply voltage of high voltage power supply and gate driver,CH32M103G8R6,-0.4,28,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_IN,Input voltage on FT (tolerate 5V) pin.,,VSS-0.3,5.5,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_IN,Voltage on other pins,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.37),CH32L103DS0.PDF
+CH32L103;CH32M103,V_LO,Output voltage of low-side driver,CH32M103G8R6,-0.4,VHV+0.4,V,#,confirmed,CH32L103DS0.PDF:zh(p.31)+CH32L103DS0.PDF:en(p.38),CH32L103DS0.PDF
+CH32M007;CH32V007,I_AVVB,V built-in diode continuous output B current,,,10,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_AVVCC12V,V V pin continuous input current CC12,CH32M007K8U7 CH32M007G8R6,,50,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_AVVHV,V_HV pin continuous input current,,,50,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_INJ(PIN),Injected current on other pins,,,+/-4,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_INJ(PIN),XI pin of HSE,,,+/-4,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_IO,Output current on any I/O and control pin,,,-30,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_IO,Sink current on any I/O and control pin,,,30,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_PEAKVB,V built-in diode 1% duty cycle pulse B output current,,,100,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_VDD,Total current of all V_DD main power pins,CH32V007,,100,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,I_VSS,Total current of all V_SS common ground pins,,,200,mA,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
+CH32M007;CH32V007,T_A,Ambient temperature during operation,Chips with a model number ending in 6,-40,85,℃,#,confirmed,CH32V007DS0.PDF:zh(p.28)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,T_A,Ambient temperature during operation,Chips with a model number ending in 7,-40,105,℃,#,confirmed,CH32V007DS0.PDF:zh(p.28)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_B,High-side bootstrap supply voltage,CH32M007K8U7 CH32M007G8R6,-0.4,63,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_BPEAK,High-side bootstrap 1% duty cycle pulse voltage,,-0.4,67,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_B_S,Voltage difference between high-side bootstrap power supply and floating ground,,-0.4,17,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_CC12V,Power supply voltage of low-side driver and low-voltage regulator,CH32M007K8U7 CH32M007G8R6,-0.4,18,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_DD,External main supply voltage (V_DD),CH32V007,-0.3,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_DD,Output voltage of internal low-voltage regulator,CH32M007K8U7 CH32M007G8R6,-0.3,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_DD,Output voltage of internal voltage regulator,CH32M007E8,-0.3,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_ESD(HBM),Electrostatic discharge voltage (HBM) of,CH32M007,2K,,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HO,Output voltage of high-side driver,CH32M007E8,-0.4,VHV+0.4,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HO,Output voltage of high-side driver,CH32M007K8U7 CH32M007G8R6,VS-0.4,VB+0.4,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HREG,Input power supply voltage of internal voltage regulator,CH32M007E8U7,-0.4,28,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HV,Input power supply voltage of internal high voltage regulator,CH32M007K8U7 CH32M007G8R6,-0.4,56,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HV,Power supply voltage of high voltage,CH32M007E8,-0.4,28,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.38),CH32V007DS0.PDF
+CH32M007;CH32V007,V_IN,Input voltage on the I/O pin,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_LO,Output voltage of low-side driver,CH32M007E8,-0.4,VHV+0.4,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_LO,Output voltage of low-side driver,CH32M007K8U7 CH32M007G8R6,-0.4,VCC12V+0.4,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_S,High-side floating ground voltage,,-1.5,52,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M007;CH32V007,V_SPEAK,High-side suspended 1% duty cycle pulse voltage,,-4.0,56,V,#,confirmed,CH32V007DS0.PDF:zh(p.29)+CH32V007DS0.PDF:en(p.39),CH32V007DS0.PDF
+CH32M030,I_AVVB,V_B built-in diode continuous output current,,,7,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_GND,Total current (outflow current) of all GND common ground pins,,,200,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_INJ(PIN),Sink current on other pins,,,+/-4,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_INJ(PIN),XI pin of HSE,,,+/-4,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_IO,Sink current or source current on HV high-voltage I/O pins,,,+/-5,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_IO,Sink current or source current on MV pre-drive I/O pins,,,+/-80,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_IO,Sink current or source current on other common I/O pins,,,+/-30,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_PEAKVB,V_B built-in diode 1% duty cycle pulse output current,,,70,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,I_VHV,Continuous input current (supply current) for all V_HV pins.,,,60,mA,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,T_A,Ambient temperature at work,"CH32M030C8T7, CH32M030C8U7 CH32M030G8R7, CH32M030K8U7",-40,105,℃,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,T_A,Ambient temperature at work,CH32M030C8U3,-40,125,℃,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,T_S,Ambient temperature during storage,,-40,150,℃,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_B,High-side bootstrap supply voltage,,-0.3,40,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_BPEAK,High-side bootstrap 1% duty cycle pulse voltage,,-0.3,42,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_B_S,Voltage difference between high-side bootstrap power supply and floating ground,,-0.3,12,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_DD33-GND,Power supply voltage of common I/O pin and analog part (V_DD33),,-0.3,3.8,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_DD8-GND,Supply voltage of internal low voltage regulator and MV I/0 pin (V ) DD8,,-0.3,12,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_ESD(HBM),ESD electrostatic discharge voltage (HBM) to external pins USB and PD.,,2K,,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_ESD(HBM),ESD electrostatic discharge voltage to external pins USB and PD (HBM),,4K,,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_HO,Output voltage of high-side driver,,VS-0.3,VB+0.3,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_HV-GND,External main supply voltage (V_HV),,-0.3,30,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_IN,Input voltage on HV high voltage I/O pin PC5,,-0.3,VHV+7,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_IN,Input voltage on common I/O pin,,-0.3,VDD33+0.3,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_IN,Input voltage on high-voltage I/O pin CCx (there may be leakage),,-0.3,28,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_IN,Voltage on HV high voltage I/O pin PB7,,-0.3,40,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.29),CH32M030DS0.PDF
+CH32M030,V_LO,Output voltage of low-side driver,,-0.3,VDD8+0.3,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_S,High side floating ground voltage,,-2,30,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32M030,V_SPEAK,High-side suspended 1% duty cycle pulse voltage,,-5,32,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
+CH32V002,I_INJ(PIN),Injected current on other pins,,,+/-4,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,I_INJ(PIN),XI pin of HSE,,,+/-4,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,I_IO,Output current on any I/O and control pin,,,-30,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,I_IO,Sink current on any I/O and control pin,,,30,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,I_VDD,Total current of all V_DD main power pins,,,100,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,I_VSS,Total current of all V_SS common ground pins,,,200,mA,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.23),CH32V002DS0.PDF
+CH32V002,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.23),CH32V002DS0.PDF
+CH32V002,V_DD-V_SS,External main supply voltage (V_DD),,-0.3,5.5,V,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.23),CH32V002DS0.PDF
+CH32V002,V_ESD(HBM),Electrostatic discharge voltage (HBM) of ordinary I/O pin,,4K,,V,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
+CH32V002,V_IN,Input voltage on the I/O pin,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V002DS0.PDF:zh(p.18)+CH32V002DS0.PDF:en(p.23),CH32V002DS0.PDF
+CH32V003,I_INJ(PIN),Injected current on other pins,,,+/-4,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,I_INJ(PIN),OSC_IN pin of HSE,,,+/-4,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,I_IO,Output current on any I/O and control pin,,,-20,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,I_IO,Sink current on any I/O and control pin,,,20,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,I_VDD,Total current into V_DD power lines (supply current),,,100,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,I_Vs,Total current out of V_SS ground lines (outflow current),,,80,mA,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.16),CH32V003DS0.PDF
+CH32V003,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.16),CH32V003DS0.PDF
+CH32V003,V_DD-V_SS,External main supply voltage (V_DD),,-0.3,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.16),CH32V003DS0.PDF
+CH32V003,V_ESD(HBM),"Electrostatic discharge voltage (human body model, non-contact)",,4K,,V,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,V_IN,Input voltage on other pins,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.16),CH32V003DS0.PDF
+CH32V003,V_IN,Input voltage on the FT (5V tolerant) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.14)+CH32V003DS0.PDF:en(p.16),CH32V003DS0.PDF
+CH32V004,I_INJ(PIN),Injected current on other pins,,,+/-4,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
+CH32V004,I_INJ(PIN),XI pin of HSE,,,+/-4,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
+CH32V004,I_IO,Sink current on any I/O and control pin,,,30,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
+CH32V004,I_IO,Source current on any I/O and control pin,,,-30,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
+CH32V004,I_VDD,Total current of all V_DD main power pins,,,100,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V004,I_VSS,Total current of all V_SS common ground pins,,,200,mA,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
+CH32V004,T_A,Ambient temperature during operation,,-10,70,℃,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V004,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V004,V_DD-V_SS,External main supply voltage (V_DD),,-0.3,5.5,V,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V004,V_ESD(HBM),Electrostatic discharge voltage (HBM) of ordinary I/O pin,,4K,,V,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V004,V_IN,Input voltage on the I/O pin,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V004DS0.PDF:zh(p.17)+CH32V004DS0.PDF:en(p.20),CH32V004DS0.PDF
+CH32V005;CH32V006,I_INJ(PIN),Injected current on other pins,,,+/-4,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,I_INJ(PIN),XI pin of HSE,,,+/-4,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,I_IO,Output current on any I/O and control pin,,,-30,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,I_IO,Sink current on any I/O and control pin,,,30,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,I_VDD,Total current of all V_DD main power pins,,,100,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,I_VSS,Total current of all V_SS common ground pins,,,200,mA,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,T_A,Ambient temperature during operation,Chips with a model number ending in 6,-40,85,℃,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.35),CH32V006DS0.PDF
+CH32V005;CH32V006,T_A,Ambient temperature during operation,Chips with a model number ending in 7,-40,105,℃,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.35),CH32V006DS0.PDF
+CH32V005;CH32V006,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.35),CH32V006DS0.PDF
+CH32V005;CH32V006,V_DD-V_SS,External main supply voltage (V_DD),,-0.3,5.5,V,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.35),CH32V006DS0.PDF
+CH32V005;CH32V006,V_ESD(HBM),Electrostatic discharge voltage (HBM) of ordinary I/O pin,,4K,,V,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
+CH32V005;CH32V006,V_IN,Input voltage on the I/O pin,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V006DS0.PDF:zh(p.25)+CH32V006DS0.PDF:en(p.35),CH32V006DS0.PDF
+CH32V103,I_IO,Input current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
+CH32V103,I_IO,Output current on any I/O and control pin,,,25,mA,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
+CH32V103,I_VDD,Total current into V_DD/V_DDA power lines (source),,,50,mA,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V103,I_Vss,Total current out of V_SS ground lines (sink),,,50,mA,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
+CH32V103,T_A,Operating ambient temperature,,-40,85,℃,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V103,T_S,Storage ambient temperature,,-40,105,℃,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V103,V_DD-V_SS,External main supply voltage (including V_DDA and V_DD),,-0.3,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V103,V_ESD(HBM),"ESD voltage (human body model, non-contact type)",,4000,,V,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V103,V_IN,Input voltage on pins,,VSS-0.3,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.19)+CH32V103DS0.PDF:en(p.21),CH32V103DS0.PDF
+CH32V203,I_INJ(PIN),Injected current on HSE's OSC_IN pin and LSE's OSC_IN pin,,,+/-5,mA,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_INJ(PIN),Injected current on NRST pin,,,+/-5,mA,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_INJ(PIN),Injected current on other pins,,,+/-5,mA,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_VDD,Total current into V_DD/V_DDA/V_I/O power lines (source),,,150,mA,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,I_Vss,Total current out of V_SS ground lines (sink),,,150,mA,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,T_A,Ambient temperature during operation,Chips whose model number ends in 6,-40,85,℃,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.38),CH32V203DS0.PDF
+CH32V203,T_A,Ambient temperature during operation,Chips whose model number ends in 7,-40,105,℃,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.38),CH32V203DS0.PDF
+CH32V203,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.38),CH32V203DS0.PDF
+CH32V203,V_DD-V_SS,External main supply voltage (includingV and V ) DDA DD,,-0.3,4.0,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.38),CH32V203DS0.PDF
+CH32V203,V_ESD(HBM),ESD Electrostatic discharge voltage,,4K,,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_ESD(HBM),"USB pins (PA11, PA12)",,3K,,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_IN,Input voltage on other pins,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_IN,Input voltage on the FT (5V tolerance) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_IO-V_SS,I/O domain supply voltage,,-0.3,4.0,V,#,confirmed,CH32V203DS0.PDF:zh(p.32)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203;CH32V205,I_INJ(PIN),Injected current on HSE's OSC_IN pin and LSE's OSC_IN pin,,,±5,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_INJ(PIN),Injected current on NRST pin,,,±5,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_INJ(PIN),Injected current on other pins,,,±5,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_VDD,Total current into V_DD/V_DDA/V_I/O power lines (source),,,250,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,I_Vss,Total current out of V_SS ground lines (sink),,,250,mA,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
+CH32V203;CH32V205,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.45),CH32V205DS0.PDF
+CH32V203;CH32V205,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.45),CH32V205DS0.PDF
+CH32V203;CH32V205,V_DD-V_SS,"External main supply voltage (including V , V V DDA DD, BAT V , V ) REF+ IO",,-0.3,4.0,V,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.45),CH32V205DS0.PDF
+CH32V203;CH32V205,V_IN,Input voltage on other pins,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.45),CH32V205DS0.PDF
+CH32V203;CH32V205,V_IN,Input voltage on the FT (5V tolerance) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V205DS0.PDF:zh(p.39)+CH32V205DS0.PDF:en(p.45),CH32V205DS0.PDF
+CH32V208,I_INJ(PIN),Injected current on HSE's OSC_IN pin and LSE's OSC_IN pin,,,+/-5,mA,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_INJ(PIN),Injected current on NRST pin,,,+/-5,mA,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_INJ(PIN),Injected current on other pins,,,+/-5,mA,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_VDD,Total current into V_DD/V_DDA/V_IO power lines (source),,,150,mA,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,I_Vss,Total current out of V_SS ground lines (sink),,,150,mA,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V208,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V208,V_DD-V_SS,External main supply voltage (includingV and V ) DDA DD,,-0.3,4.0,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V208,V_ESD(HBM),"Electrostatic discharge voltage (human body model, non-contact)",,4K,,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,V_ESD(HBM),"USB pins (PA11, PA12)",,3K,,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,V_IN,Input voltage on other pins,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V208,V_IN,Input voltage on the FT (5V tolerance) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V208,V_IO-V_SS,I/O domain supply voltage,,-0.3,4.0,V,#,confirmed,CH32V208DS0.PDF:zh(p.22)+CH32V208DS0.PDF:en(p.26),CH32V208DS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_INJ(PIN),Injected current on HSE's OSC_IN pin and LSE's OSC_IN pin,,,+/-5,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_INJ(PIN),Injected current on NRST pin,,,+/-5,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_INJ(PIN),Injected current on other pins,,,+/-5,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_IO,Source current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_VDD,Total current into V_DD/V_DDA/V_IO power lines (source),,,150,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_Vss,Total current out of V_SS ground lines (sink),,,150,mA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,T_A,Ambient temperature during operation,Chips whose model number ends in 6,-40,85,℃,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,T_A,Ambient temperature during operation,Chips whose model number ends in 7,-40,105,℃,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_DD-V_SS,External main supply voltage (includingV and V ) DDA DD,,-0.3,4.0,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_DDK,Voltage at decoupling end of internal power supply LDO,CH32V317,-0.2,1.5,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_DD_ETH-V_SS,Internal 10/100M Ethernet PHY supply voltage,CH32V317,-0.3,4.0,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_ESD(HBM),"Electrostatic discharge voltage (HBM, non-contact)",,4K,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_ESD(HBM),"USB pins (PA11, PA12)",,3K,,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IN,10/100M Ethernet PHY differential pin,CH32V317,VSS-0.3,VDD_ETH+0.3,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on PHY pin of USB and 10M Ethernet,,VSS-0.3,VDD+0.3,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on other pins,,VSS-0.3,VIO+0.3,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on the FT (5V tolerance) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,V_IO-V_SS,I/O supply voltage,,-0.3,4.0,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
+CH32V407;CH32V467,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
+CH32V407;CH32V467,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
+CH32V407;CH32V467,I_VDD,Total current of all V_DD main supply pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
+CH32V407;CH32V467,I_VSS,Total current of all V_SS common ground pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
+CH32V407;CH32V467,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_DD,External main supply voltage (including V_DD and V_DDA),,-0.3,4.0,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_DDK,Power decoupling end of core circuit,,-0.2,1.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on FT (tolerant 5V) pin.,,-0.3,5.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on USB 2.0 and Ethernet PHY pins,,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on other pins (supplied by V_DD),,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,V_REF+,Positive reference voltage of ADC and DAC modules,,-0.3,VDDA+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.44)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32X033;CH32X035,I_GND,Total combined current on all GND common ground pins,,,200,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,I_IO,Sink current on any I/O pins,,,40,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,I_IO,Source current on any I/O pins,,,30,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,I_VDD,Total combined current of all VDD main supply pins,,,150,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,V_DD,Voltage on external mains supply pin VDD,,-0.3,6.0,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,V_ESD(HBM),ESD electrostatic discharge voltage (HBM) on common I/O pins,,4K,,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,V_IN,Voltage on I/O pins,,-0.3,VDD+0.3,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X305;CH32X315,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,I_IO,Source current on any I/O and control pin,,,-25,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,I_VDD,Total current of all V_DD main supply pins,,,250,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,I_VSS,Total current of all V_SS common ground pins,,,250,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.33),CH32X315DS0.PDF
+CH32X305;CH32X315,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.33),CH32X315DS0.PDF
+CH32X305;CH32X315,V_DD,External main supply voltage,,-0.3,4.0,V,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.33),CH32X315DS0.PDF
+CH32X305;CH32X315,V_DDA,Analog part supply voltage,,-0.3,4.0,V,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_DDK,"Core operating voltage, USB3.0 module operating voltage",,-0.2,1.4,V,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_IN,Input voltage on FT (5V tolerant) pin,,-0.3,5.5,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_IN,Input voltage on USB2.0 pin,,-0.3,VDD+0.3,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_IN,Input voltage on USB3.0 pin,CH32X315,-0.3,VDDK+0.3,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_IN,Input voltage on other I/O pins (V_DD supply),,-0.3,VDD+0.3,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_REF+,Positive reference voltage for ADC module,,-0.3,VDDA+0.3,V,#,confirmed,CH32X315DS0.PDF:zh(p.29)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
+CH32X305;CH32X315,V_REF-,Negative reference voltage for ADC module,,-0.3,1.3,V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF

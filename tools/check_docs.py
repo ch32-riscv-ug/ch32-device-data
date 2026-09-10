@@ -50,6 +50,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "pins": ("pins",),
     "pin_functions": ("pin_functions",),
     "operating_conditions": ("operating_conditions",),
+    "absolute_maximum_ratings": ("absolute_maximum_ratings",),
     "features": ("features",),
     "memory_configs": ("memory_configs",),
     "errata": ("errata",),
