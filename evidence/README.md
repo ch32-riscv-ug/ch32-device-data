@@ -499,8 +499,8 @@ page-spanning fragments joined through L1).
   the high byte itself. The classification failing to match exactly one pattern
   stops the build
 
-Rows are `confirmed` when the zh and en editions agree; CH32V407 (zh-only RM)
-stays `reference`.
+Rows are `confirmed` when the zh and en editions agree. ~~CH32V407 stays `reference`~~
+-- **its English RM arrived on 2026-09-04, so all 98 rows are `confirmed`**.
 
 ### `option_byte_fields.csv`
 

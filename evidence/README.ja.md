@@ -490,7 +490,7 @@ family×バイトごとに1行。全11 RMが同じcaptionでこの表を持つ�
   （L103/M030系）。RMが「高バイトはFPECが自動で反码を計算する」と書いていれば
   `; complement auto-computed`を足す。ちょうど1方式に当たらなければ生成が落ちる
 
-zh/enの両版が一致した行がconfirmed。CH32V407（RMがzh単独）はreference。
+zh/enの両版が一致した行がconfirmed。~~CH32V407（RMがzh単独）はreference~~ → **2026-09-04 に V407 の en 版 RM が加わって全98行 confirmed**。
 
 ### `option_byte_fields.csv`
 
