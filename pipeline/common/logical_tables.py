@@ -26,6 +26,7 @@ V20x/30x表4-9で実測）、違うときだけ**x座標の和集合**（許容2
 
 from __future__ import annotations
 
+import functools
 import re
 from collections import Counter
 
@@ -1578,6 +1579,38 @@ def _indexed_bases(table: dict, names: set[str]) -> tuple[set[str], dict[int, st
     return bases, bit_at
 
 
+def _is_doubled(flat: str, name: str) -> bool:
+    """`flat` が `name` を**2つ交錯させたもの**か（長さも文字も過不足なく2倍）。
+
+    候補が2つ以上残ったときの決め手に使う。`CCRCCFCARILCFAIL`（16字）には記述表の
+    `CCRCFAIL`（8字）と `CCRCFAILC`（9字）の両方が部分列として入るが、**2つ交錯**の関係が
+    成り立つのは長さが丁度2倍の前者だけ。
+
+    >>> _is_doubled("CCRCCFCARILCFAIL", "CCRCFAIL")
+    True
+    >>> _is_doubled("CCRCCFCARILCFAIL", "CCRCFAILC")
+    False
+    >>> _is_doubled("SPI1SRPSIT1RST", "SPI1RST"), _is_doubled("ABAB", "AB")
+    (True, True)
+    """
+    if len(flat) != 2 * len(name) or not name:
+        return False
+
+    @functools.lru_cache(maxsize=None)
+    def walk(pos: int, i: int, j: int) -> bool:
+        if pos == len(flat):
+            return i == j == len(name)
+        c = flat[pos]
+        if i < len(name) and name[i] == c and walk(pos + 1, i + 1, j):
+            return True
+        return j < len(name) and name[j] == c and walk(pos + 1, i, j + 1)
+
+    try:
+        return walk(0, 0, 0)
+    finally:
+        walk.cache_clear()
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -1667,6 +1700,14 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
             present = {(c.get("text") or "").replace("\n", "").strip()
                        for c in table["cells"] if c is not cell}
             candidates = [n for n in candidates if n not in present]
+        if len(candidates) > 1:
+            # **丁度2つ交錯している候補**が1つだけならそれ。記述表に `CCRCFAIL` と
+            # `CCRCFAILC` のように片方が他方の接頭辞である名前が並ぶと、部分列の判定では
+            # どちらも通る——`CCRCCFCARILCFAIL` は16字なので8字の方だけが2倍に合う
+            # （2026-09-10。SDIO の状態レジスタで5セル残っていた）。
+            doubled = [n for n in candidates if _is_doubled(flat, n)]
+            if len(doubled) == 1:
+                candidates = doubled
         if len(candidates) == 1:
             cell["text"] = candidates[0]
             fixed += 1
