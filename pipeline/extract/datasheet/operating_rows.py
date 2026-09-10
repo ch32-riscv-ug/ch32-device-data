@@ -616,6 +616,11 @@ def norm_value(cell):
     if paired is not None:
         return paired
     value = FOOTNOTE.sub("", norm_text(cell)).replace(" ", "")
+    # **末尾のコンマは値の一部ではない。** `CH32H417DS0.en` p.113 の `C_b` は版面が
+    # `400,` と刷っている（描画で確認。中文版は `400`）——資料側の誤植で、これを
+    # 落とさないと行ごと消えて H417 の Standard I2C の容性負荷が失われる。
+    # 全corpus実測（2026-09-10）: 値の末尾がコンマのセルはこの1つだけ。
+    value = re.sub(r"[,，]$", "", value)
     return VALUE_FIX.get(value, attach_value_subscript(value))
 
 
@@ -757,6 +762,41 @@ def unreadable_value_column(record: dict, cols: list) -> str:
     return ""
 
 
+# I2C 接口特性表の2段見出し。`符号｜参数｜标准I2C（最小値,最大値）｜快速I2C（…）｜单位` で、
+# **1行が2つの事実**（標準モードと高速モード）を言う。全corpus実測（2026-09-10）:
+# この形は33表（16文書×2版＋`CH32V006DS2.zh`）で、**16文書すべて zh 21行 / en 21行と対称**。
+MODE_HEAD = ("symbol", "parameter", None, None, None, None, "unit")
+MODE_SUB = (None, None, "min", "max", "min", "max", None)
+MODE_COLUMNS = ["symbol", "parameter", "condition", "min", "max", "unit"]
+
+
+def mode_names(rows: list[list]) -> list[str] | None:
+    """2段見出しならモード名の並び（`['Standard I2C', 'Fast I2C']`）。違えば None。"""
+    if len(rows) < 3 or len(rows[0]) != 7:
+        return None
+    if (tuple(norm_header(c) for c in rows[0]) != MODE_HEAD
+            or tuple(norm_header(c) for c in rows[1]) != MODE_SUB):
+        return None
+    names = [" ".join((rows[0][i] or "").split()) for i in (2, 4)]
+    return names if all(names) else None
+
+
+def mode_body(rows: list[list], names: list[str]) -> list[list]:
+    """モードごとに1行ずつへ組み直す（モード名は`条件`の欄に置く）。
+
+    **モードは条件そのもの**なので、`condition` に原文の綴りで置く——表示に出るのは
+    英語版の綴り（`Standard I2C`）で、中文版の綴りは対応付けのときだけ使われる。
+    値の欄は左右2組で、記号・項目名・単位は両方のモードで共有する。
+    """
+    out = []
+    for name, low in zip(names, (2, 4)):
+        for raw in rows:
+            if len(raw) < 7:
+                continue
+            out.append([raw[0], raw[1], name, raw[low], raw[low + 1], raw[6]])
+    return out
+
+
 def read_edition(bundle, lang):
     """対象表の行。行ごとに読み取ったページ番号を `_page` で持つ。
 
@@ -779,6 +819,11 @@ def read_edition(bundle, lang):
     # 表題は**跳ばすページの表でも**更新する（最後に見た表題が続く、という意味だから）。
     last_caption = ""
     last_edges: list[float] = []
+    last_modes: list[str] | None = None      # 2段見出しの表のモード名（続きの断片用）
+    mode_edges: list[float] = []
+    mode_page = -2
+    last_page = -2
+    shape_page = -2   # 条件の列を持たない表・2段見出しの表を読んだ最後のページ
     sym = unit = param = group = ""
     for page in bundle_pages.pages(bundle):
         text = page.get("text") or ""
@@ -794,11 +839,13 @@ def read_edition(bundle, lang):
         # あるページも読む（実測: 66表のうち60はページ規則の外）。
         def has_timing(record):
             rows = record["extracted_rows"]
-            return bool(rows) and timing_header([norm_header(c) for c in rows[0]])
-        if not hit and not carry and not any(
+            return bool(rows) and (timing_header([norm_header(c) for c in rows[0]])
+                                   or mode_names(rows) is not None)
+        # 続きの断片は見出しを持たないので、**その形の表を読んだ次のページ**も開ける。
+        if (not hit and not carry and page["number"] - shape_page > 1 and not any(
                 TABLE_CAPTION.search(cap)
                 or (not ABSMAX_CAPTION.search(cap) and has_timing(rec))
-                for cap, _own, rec, _edges in tables):
+                for cap, _own, rec, _edges in tables)):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
@@ -811,8 +858,8 @@ def read_edition(bundle, lang):
             # 持たない特性表**（とその続きの断片）だけを見る。ページの門を通しても
             # ここで落ちる、というのを一度踏んだ（2026-09-10）。
             timing = not ABSMAX_CAPTION.search(caption) and has_timing(record)
-            continues_timing = (last_cols is not None and timing_header(last_cols)
-                                and not own_caption)
+            continues_timing = ((last_cols is not None and timing_header(last_cols)
+                                 or last_modes is not None) and not own_caption)
             if (not page_ok and not TABLE_CAPTION.search(caption)
                     and not timing and not continues_timing):
                 continue
@@ -821,12 +868,34 @@ def read_edition(bundle, lang):
             body = tbl[1:]
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
             fresh = True
-            if {"symbol", "min", "condition"} <= set(cols):
+            # **2段見出しの I2C 接口特性表**は1行が2つの事実を言うので、モードごとに
+            # 組み直してから普通の行として読む（`mode_body`）。物理の列とは並びが
+            # 違うので、`last_cols`（続きの断片の当て先）には使わない。
+            # **自分の表題を持つ別の表が来たら、2段見出しの表は終わり。** 版面の外枠は
+            # どの表もだいたい同じなので、外枠だけを続きの根拠にすると後ろの無関係な
+            # 断片まで拾う（実測で `t_CONV | Fast I2C` のような行が出た）。
+            if own_caption and mode_names(tbl) is None:
+                last_modes = None
+            synthetic = mode_names(tbl)
+            if synthetic:
+                last_modes, mode_edges, mode_page = synthetic, edges, page["number"]
+                shape_page = page["number"]
+                last_cols = None
+                cols, body = MODE_COLUMNS, mode_body(tbl[2:], synthetic)
+            elif (last_modes and not own_caption and len(tbl[0]) == 7 and edges
+                  and mode_edges and page["number"] - mode_page <= 1
+                  and abs(edges[0] - mode_edges[0]) <= FRAME_TOLERANCE
+                  and abs(edges[-1] - mode_edges[-1]) <= FRAME_TOLERANCE):
+                synthetic = last_modes
+                shape_page = page["number"]
+                cols, body = MODE_COLUMNS, mode_body(tbl, last_modes)
+            elif {"symbol", "min", "condition"} <= set(cols):
                 last_cols, last_edges = cols, edges
             # 条件の列を持たない特性表（`timing_header`）。絶対最大定格表は同じ形だが
             # **別の正本**（`extract_absolute_maximum.py`）が読むので表題で外す。
             elif timing_header(cols) and not ABSMAX_CAPTION.search(caption):
-                last_cols, last_edges = cols, edges
+                last_cols, last_edges, last_page = cols, edges, page["number"]
+                shape_page = page["number"]
             elif (last_cols and not own_caption
                   and len(tbl[0]) == len(last_cols)
                   and (carry_from or TABLE_CAPTION.search(caption)
@@ -834,6 +903,7 @@ def read_edition(bundle, lang):
                        # 版面の外枠が揃っていれば同じ表の続き（列の境界はページごとに
                        # 数pt動くので `same_edges` の 2.0 では届かない）。
                        or (timing_header(last_cols) and edges and last_edges
+                           and page["number"] - last_page <= 1
                            and abs(edges[0] - last_edges[0]) <= FRAME_TOLERANCE
                            and abs(edges[-1] - last_edges[-1]) <= FRAME_TOLERANCE))):
                 # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
@@ -870,23 +940,24 @@ def read_edition(bundle, lang):
             # この抽出器の型では表せない）、借りた並びで読んだ行は `keep_row` の値検査に
             # 全部落ちていた——だから出力は変わらないが、形として閉じておく。
             # それらの表は `extract_low_power` が caption で選んで読む。
-            # 値の欄が断片の全行を覆う1つのセルになっている断片は、どの行の値か
-            # 決められないので読まない（`unreadable_value_column`）。
-            broken = unreadable_value_column(record, cols)
-            if broken:
-                DROPPED.append(f"{lang} p.{page['number']}: {broken} の欄が断片の全行を"
-                               "覆う1つのセル（どの行の値か決められない）")
-                continue
-            # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まってからで
-            # ないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
-            filled = fill_rowspans(record, cols)
-            body = filled[len(filled) - len(body):]
+            if not synthetic:
+                # 値の欄が断片の全行を覆う1つのセルになっている断片は、どの行の値か
+                # 決められないので読まない（`unreadable_value_column`）。
+                broken = unreadable_value_column(record, cols)
+                if broken:
+                    DROPPED.append(f"{lang} p.{page['number']}: {broken} の欄が断片の"
+                                   "全行を覆う1つのセル（どの行の値か決められない）")
+                    continue
+                # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まって
+                # からでないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
+                filled = fill_rowspans(record, cols)
+                body = filled[len(filled) - len(body):]
             # **記号・単位・項目名は続きの断片へ持ち越す。** 表の途中でページが変わると
             # そこから単位の欄が空になる（資料は「上の行と同じ」を空欄で書く）——
             # `CH32V103DS0.en` は p.21 の `I_VDD … mA` の続きが p.22 に在り、`I_Vss`・`I_IO` の
             # 単位が落ちて zh（1ページに収まる）と食い違っていた。新しいヘッダを見つけた
             # ときだけ捨てる。
-            if fresh:
+            if fresh or synthetic:
                 sym, unit, param, group = "", "", "", ""
             rows = []
             for index, raw in enumerate(body):
