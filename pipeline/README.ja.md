@@ -175,8 +175,9 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            render_assetsが画像streamを直接復号して貼る**（11枚が白紙だった）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、
-           **添字が`*`に化けたglyphの警告**（壊れたToUnicode。pdfplumberでも
-           pypdfium2でも同一＝文字層では復元不能——806 glyph／14文書を実測。
+           **添字が`*`になっているglyphの警告**（**原本の版面が`*`を刷っている**
+           ——2026-09-10に該当セルを描画して確認。文字層の問題ではないので
+           どのengineでも、OCRでも復元できない。806 glyph／14文書を実測。
            判定は`pipeline/common/lost_subscripts.py`に一本化し、parity検査が
            印を必須にする））
 checks/    compare_manifest.py（環境差の検証）

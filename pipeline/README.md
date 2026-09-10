@@ -258,11 +258,12 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
            warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
-           some PDFs map subscript glyphs (the DD of V_DD) to `*` in their text
-           layer (broken ToUnicode; identical under pdfplumber and pypdfium2, so
-           no text engine can recover them -- 806 glyphs across 14 documents
-           measured). The shared detector is pipeline/common/lost_subscripts.py
-           and the parity check makes the notice mandatory)
+           some PDFs print a small asterisk where a subscript belongs (`V*` for
+           `V_DD`): the loss is in the document's own typesetting, confirmed on
+           2026-09-10 by rendering the cells, so no text engine and no OCR can
+           recover them -- 806 glyphs across 14 documents measured. The shared
+           detector is pipeline/common/lost_subscripts.py and the parity check
+           makes the notice mandatory)
 checks/    compare_manifest.py (cross-environment reproducibility)
            check_markdown_parity.py (machine check that every body line and table cell
            reaches the Markdown in reading order and that gap notices are present --

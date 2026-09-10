@@ -10,8 +10,8 @@
 2. header/footerの行もコメントとして残っていること（表示から消えるが監査に残る）
 3. 図のcaption行の直後に「再現していない」の印があること（既知の取りこぼしを
    隠さない、の検査）
-4. 添字が`*`に化けたglyph（壊れたToUnicode。`pipeline/common/lost_subscripts`）を
-   持つページの冒頭に、その旨の警告があること
+4. 添字が`*`になっているglyph（**原本の版面が`*`を刷っている**。
+   `pipeline/common/lost_subscripts`）を持つページの冒頭に、その旨の警告があること
 
 実行:
     uv run pipeline/checks/check_markdown_parity.py --all
