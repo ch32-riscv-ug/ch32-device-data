@@ -1651,6 +1651,15 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
                       and not _truncates_index(flat, n)
                       and _only_duplicate_glyphs(flat, n)
                       and _is_subsequence(n, flat)]
+        # **記述表に実在する綴りを、合成した索引付きより優先する。** 合成候補
+        # （`base`＋描画文字の中の数字）は「索引がbit番号でない図」のための後詰めで、
+        # 記述表がその名前をそのまま載せているなら合成する必要が無い。優先しないと
+        # `SPI1SRPSIT1RST` に `SPI1RST`（記述表）と `SPI1RST1`（`SPI1RST`＋文字中の`1`）の
+        # 2つが立って決まらず、**混ざった綴りがそのまま残っていた**（2026-09-10の実測で
+        # 16セル・4文書。`TIM9TRISMT9RST`・`CCRCCFCARILCFAIL`・`CMDSCEMNTDCSENTC` ほか）。
+        literal = [n for n in candidates if n in names]
+        if literal:
+            candidates = literal
         if len(candidates) > 1:
             # `RXFIRFOXEFIIFOEE I`には`RXFIFOEIE`と`RXFIFOFIE`の両方が部分列として入る。1つの
             # レジスタに同じ名前は1度しか現れないので、**同じ図の別セルに既に在る綴り**は候補から
