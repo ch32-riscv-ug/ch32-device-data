@@ -3817,3 +3817,29 @@ conflict 数、`evidence/README` の `registers` 行数を、日英とも数え�
 `conflicts:with_alternative`／`without_alternative` は新しく数える量として `quantities()` に足した。
 
 **入れたあと壊して落ちることを確認**（`109→110`・`21→22`・`4,936→4,900` の3つとも名指しで落ちた）。
+
+## 公開 README の数を全部数え直した——9箇所が古かった（2026-09-10）
+
+前項（信頼度表の confidence・`index/README` の主張）の続きで、**公開している README が
+名指しで書いている数**を機械的に洗った。`check_docs` が見ていたのは26箇所で、残りは野放し。
+
+| 場所 | 書いてあった | 実際 |
+|---|---|---|
+| `evidence/README`（日英） | 証拠は **33 表** | **40** |
+| `evidence/README`（日英） | `member` が空 **1,591行＝4.8%** | **911行** |
+| `evidence/README`（日英） | `dma_requests` は **650行のうち577がconfirmed、73は V407 の reference** | **650行すべて confirmed**（2026-09-04 に V407 の en 版 RM が加わった） |
+| `evidence/README`（日英） | `clock_symbols` **429行**（value 222 / mask 173 / poll 34） | **434行**（223 / 176 / 35） |
+| `evidence/README`（日英） | 設定コードが書いた **303行** / header だけ **126行** | **305 / 129** |
+| `evidence/README`（日英） | `registers` **4,995行** | **4,936** |
+| `index/README`（日英） | conflict を集めたもの **165行** | **185** |
+| `index/README`（日英） | `offset` が空 **1,591 行** | **911** |
+| `README.ja.md` | `af-N` が **4448行** / 両論が並ぶ **85行** | **4,497 / 81** |
+
+`dma_requests` の1件は**数だけでなく説明も古かった**——「V407 は RM が zh 版しかない」は
+2026-09-04 に成り立たなくなっている。同じ日付が `option_bytes` の ref 8 → 0 と F-60 の発生源
+でもあり、**1つの資料到着が3つの説明を同時に古くしていた**。
+
+`check_docs` の `PROSE` を **26 → 62 箇所**にした。新しく数える量は
+`conflicts:with_alternative`／`without_alternative`／`both_values`・`pin_functions:af`・
+`clock_symbols:{value,mask,poll,written,header_only}`。日英の両方を別々に当てるので、
+片方だけ直した状態も落ちる。**壊して落ちることを毎回確認**（今回は6つ試した）。

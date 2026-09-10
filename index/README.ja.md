@@ -138,7 +138,7 @@ commit と読む表の sha256（`manifest.csv` の sha256 を1つ固定しても
 |---|---|
 | `type` | EVT の `*_TypeDef` の名前（`USART`・`DMA_Channel`）。同じ型は family で共有できる（`register_layouts.csv`） |
 | `register` | 構造体メンバー。配列は要素ごと（`EXTICR[1]`。offset は先頭＋添字×幅）、入れ子は `sTxMailBox[0].TXMIR` |
-| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**offset が空の行**は banner の register 名を構造体のメンバーに結べなかった define（1,591 行。bit 位置と define 名は事実なので落とさない） |
+| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**offset が空の行**は banner の register 名を構造体のメンバーに結べなかった define（911 行。bit 位置と define 名は事実なので落とさない） |
 | `field` | 読むための名前（型・register の接頭辞を落とした） |
 | `define` | EVT の綴りそのまま（`RCC_APB2PCENR_USART1EN`）。証拠へ戻る鍵 |
 | `kind` `of_field` `value` | `field`＝ビット領域、`value`＝その領域の列挙値（`of_field` がどの領域か、`value` がその値） |
@@ -202,7 +202,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 ### `conflicts.csv` — 資料どうしの食い違い
 
 `tools/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
-（165行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
+（185行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
 「両版で食い違う仕様を全部」に答えるには全表を grep するしかありませんでした。
 
 | 列 | 中身 |

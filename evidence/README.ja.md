@@ -3,7 +3,7 @@
 [English](README.md)
 
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
-33 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
+40 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
 `PA0-WKUP` と装飾ごと持ちます。資料どうしが食い違えば値を直さず `conflict` にして両方を残します。
 **引く**ための表（語彙で揃えた名前・結合済み・型番ごとに割ったもの）は
@@ -278,7 +278,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
   RMのレジスタ表と同じ形（`RCC_APB2PCENR`）。構造体のメンバーへの対応は`member`列
   （`RCC.APB2PCENR`）に**付くものだけ付けます**。bannerがinstance番号を含むもの（`DMA_CNTR7`→
   `DMA_Channel.CNTR`）は付きますが、CANのメールボックス/フィルタ（`CAN_TXMI0R`・`CAN_F30R2`）や
-  構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（1,591行＝4.8%）。**空でも行は消していません**
+  構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（911行）。**空でも行は消していません**
   ——bit位置とmaskはheaderが言っているとおりです
 - **`kind=value`はfieldの中の値**。`RCC_PLLMULL_3`は`PLLMULL`の値。`of_field`が親、`value`がその値
   （`mask >> lo`）。`kind=field`だけを数えればfieldの数になります
@@ -307,7 +307,7 @@ D-7（DMA channel→周辺）は`dma_requests.csv`。
 **どの周辺の要求がどのDMA channelに繋がるか**（consumerのR-20 D-7）。EVT headerには無く、
 reference manualのDMA章の「DMAx各通道外设映射表」だけが持つ情報です。zh版とen版を別々に読んで
 (family, variant, dma, channel, request)で突き合わせ、両版一致で`confirmed`、片方だけなら`reference`。
-650行のうち577がconfirmed、73のreferenceは全部CH32V407（RMがzh版しかない）。
+650行すべてがconfirmed（~~73のreferenceは全部CH32V407~~ → 2026-09-04 に V407 の en 版 RM が加わって両版そろった）。
 **綴りは資料のまま**（`request`。zh版の綴りで、`TIM1_UP*`の`*`やX315の`_0`/`_1`も残す。en版の綴りが違えば`request_en`）。印の読み（`remap`）と語彙で揃えた`peripheral`は索引の[`index/dma.csv`](../index/README.ja.md)が持ちます。
 
 | 列 | 意味 |
@@ -407,11 +407,11 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **macroを設定しないプロジェクトは既定のvariantで黙って通ります。** CH32V203RBT6にD6のまま組めば、HSE_VALUEが24MHzのまま（正しくは32MHz）、周辺の集合も違う、という形で表に出ません。
 
-**`clock_symbols.csv`の`role`列は、その記号が何なのかを言います。** 観測から決めています——`&= ~X`なら`mask`、`|= X`なら`value`、`while(REG & X)`なら`poll`。429行の内訳は value 222 / mask 173 / poll 34 です。
+**`clock_symbols.csv`の`role`列は、その記号が何なのかを言います。** 観測から決めています——`&= ~X`なら`mask`、`|= X`なら`value`、`while(REG & X)`なら`poll`。434行の内訳は value 223 / mask 176 / poll 35 です。
 
 マスクが要るのは**setterが全部read-modify-writeだから**です。値だけでは書けません。ところが**ベンダのコード自身がフィールドをクリアせずにORしている**ことがあり（CH32V20xは`RCC->CFGR0 |= RCC_HPRE_DIV1`をリセット値に依存して書く）、ソースの観測だけではマスクが揃いません。足りない分はヘッダの形から認定しています——「名前が`_`境界で他の2つ以上の記号の接頭辞になっていて、値が連続した1本のビット列である」。これがちょうど`RCC_HPRE`（対`RCC_HPRE_DIV1..DIV512`）・`RCC_SW`（対`RCC_SW_HSI/HSE/PLL`）・`FLASH_ACTLR_LATENCY`に当たり、`RCC_HSEON`のような単一ビットには当たりません。レジスタの位置はヘッダのbannerコメント（`/*** Bit definition for RCC_CFGR0 register ***/`）から引きます——名前は`RCC_ADCPRE`がCFGR0のものだと言わないので。
 
-出所は`basis`で分かれます: **`evt(device-header+system_ch32*.c)`は設定コードが実際に書いたもの（303行）、`evt(device-header)`はヘッダに定義があるだけ（126行）**です。
+出所は`basis`で分かれます: **`evt(device-header+system_ch32*.c)`は設定コードが実際に書いたもの（305行）、`evt(device-header)`はヘッダに定義があるだけ（129行）**です。
 
 **`confidence=conflict`はヘッダが1行の中で自分と食い違っている記号です。** 5件あります。代表は`FLASH_ACTLR_LATENCY`で、CH32V003/V006/V103/X035が値`0x03`（2bit幅）に対しコメントは`LATENCY[2:0]`（3bit幅）と書きます。名前を信じるか数を信じるかで書けるマスクが変わり、狭い方ではlatency 4が書けません。`basis`に両方の読みを残しています（`+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])`）。**マスクの幅自体もfamilyで違います**: V003/V006/V103/L103/X035が`0x03`、V20x/V307/M030が`0x07`、V205が`0x0F`。
 
