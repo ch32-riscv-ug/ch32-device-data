@@ -47,7 +47,7 @@
 
 ## 一覧
 
-行数・confidence 分布は 2026-08-25（穴埋め後）時点。**pins・pin_functions・operating_conditions・remap_* は 2026-08-28 の監査ぶんを反映**（F-49〜F-53）。検証結果の詳細は下の各節（検証時の行数は当時のもの）。
+**上の表の行数と confidence の内訳は `check_docs` が毎回数え直します**（`ROW_COUNTS`／`check_confidence`。ずれたら生成が落ちるので、いまの正本と必ず一致）。**pins・pin_functions・operating_conditions・remap_* は 2026-08-28 の監査ぶんを反映**（F-49〜F-53）。検証結果の詳細は下の各節——**そちらの行数は検証した当時のもの**で、監査の範囲を記録したものなので更新しません。
 
 **「検査」欄は機械がやっていることだけを書く。** 2026-08-28 に、pins の欄にあった「封装lead数」が実は `check_tables.py` に無く、F-31 で人が一度数えただけだったことが分かった（そのため5型番の lead 欠けが3日間気付かれなかった）。人が一度確かめたことは「既知の穴」欄に、機械が毎回見ることだけを「検査」欄に書く。
 
@@ -110,7 +110,7 @@
 |---|---:|---|---|---|---|
 | pinout（旧 pin_roles） | 24,982（機能行 24,266＋機能の無い lead 716） | 元の行を引き継ぐ | **pin_functions に無い行が入れば失敗**・語彙の穴は**0であることを検査** | **覆い100%**（2026-08-25。最後の26種を原典で所属確認して語彙へ）。pin_functions の conflict 12 を引き継ぐ。`port`/`pin` は alias からも埋まる | ✅ |
 | capabilities（`index/`） | 1,707 | 元の行を引き継ぐ | **product_attributes に (型番, 属性, 値) で戻せること**・`count` が値そのままであること・属性が能力の語彙にあること（無ければ生成が落ちる） | 資料の値のうち素の整数だけが `count` に入る（1,182行。`8+2`・`3/2`・`10@2` は `value` のまま）。**行が無い＝持っていない、と読めるのは family の中だけ**——比較表の `-` は証拠の時点で落ちていて、「その family の比較表にその行が無い」と区別が付かない | ✅ |
-| conflicts（`index/`） | 185 | 元の行を引き継ぐ（全行が `conflict`） | **証拠の `conflict` 行の数と一致すること**・`field` がその表に実在する列であること | 資料が食い違っている箇所を1表に集めたもの。`basis` の DSL から「どの出所が異を唱えるか」（`!<source>`）と「その出所は何と言うか」（`(=<value>)`。新経路の抽出器は`(address=…)`・`(field=…)`のように列名を名指し、値は`alternative`へそのまま写る）を取り出す。**114行に相手の値が入り、76行は空**——`memory_configs` の67行と `timers` の1行は食い違いを散文で記録していて DSL に持たないため（空欄自体が「evidence/README を読め」の意味）、残りは**相手が値を書かない型**（新しいX315 zh版がFlash時間のmaxを載せない等）。`product_attributes` の25行は**言い回しの差が混じる**（`Typical: 72MHz` と `Typ. 72MHz`）ので、仕様の食い違いと同一視しないこと | ✅ |
+| conflicts（`index/`） | 185 | 元の行を引き継ぐ（全行が `conflict`） | **証拠の `conflict` 行の数と一致すること**・`field` がその表に実在する列であること | 資料が食い違っている箇所を1表に集めたもの。`basis` の DSL から「どの出所が異を唱えるか」（`!<source>`）と「その出所は何と言うか」（`(=<value>)`。新経路の抽出器は`(address=…)`・`(field=…)`のように列名を名指し、値は`alternative`へそのまま写る）を取り出す。**109行に相手の値が入り、76行は空**——`memory_configs` の67行と `timers` の1行は食い違いを散文で記録していて DSL に持たないため（空欄自体が「evidence/README を読め」の意味）、残りは**相手が値を書かない型**（新しいX315 zh版がFlash時間のmaxを載せない等）。`product_attributes` の25行は**言い回しの差が混じる**（`Typical: 72MHz` と `Typ. 72MHz`）ので、仕様の食い違いと同一視しないこと | ✅ |
 | debug_interfaces（`index/`） | 27 | confirmed 27 | series ごと1行・`debug_if` の語彙・features の節見出しに戻せること・pads が pinout の SWDIO/SWCLK と一致すること | **全27 seriesが確定**（swio 3・rvswd 11・**both 13**）——datasheetの節見出しと`debug_wiring`（WCH-Link manual）の突き合わせ（2026-09-01にR-29完全解決。未記載だった11 seriesはmanualが埋め、V208もmanualでconfirmed化）。V002/V004はmanualが両対応（SWCLK=PB3）と括るが**pin表にSWCLKが無く見出しも1-wire**——見出しを採り、manualの異議を`!WCH-LinkUserManual.PDF(...)`としてbasisへ（資料側の問題台帳にも記録） | ✅ |
 | features（旧 feature_tags） | 696 | confirmed 687 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
