@@ -212,15 +212,16 @@ family をまたいで「X を持たない型番」を数えないこと。
 | `dissenting` | `basis` で `!` が付いている出所 |
 | `alternative` | その出所が言う値（`basis` の `(=…)`） |
 
-**115行に相手の値が入り、68行は空**です。`memory_configs`（67行）と `timers`（1行）は
+**109行に相手の値が入り、76行は空**です。`memory_configs`（67行）と `timers`（1行）は
 食い違いを散文で記録していて DSL に持たないので、空欄は「[evidence/README.ja.md](../evidence/README.ja.md)
 の該当節を読め」の意味になります。
 
 **`conflict` の印は「事実が食い違っている」と同義ではありません。** `product_attributes` の25行は
 **仕様の差**（`2 (OPA1/3)` と `1（OPA1）`）と**言い回しの差**（`Typical: 72MHz` と `Typ. 72MHz`）が
-混ざり、`operating_conditions` の30行のうち8行は**綴りの差だけ**です（`mS` と `ms`、`0.8VDD` と
-`0.8*VDD`、`VI/O` と `VIO`）。中文版が異を唱えている行の `alternative` は、`basis` が持つ
-**訳した読み**であって原文の綴りではありません。
+混ざります。~~`operating_conditions` の8行は綴りの差だけ~~ → **2026-09-09に対応付けの側で外しました**
+（単位の `mS`/`ms`、値の `0.8VDD`/`0.8*VDD`・`VI/O`/`VIO` を揃えてから突き合わせる）ので、
+いま残る21行は**原文で裁定した資料側の齟齬**です。中文版が異を唱えている行の `alternative` は、
+`basis` が持つ**訳した読み**であって原文の綴りではありません。
 
 `operating_conditions` は1行で min/typ/max/unit の4つを主張していて、争っているのがどれかは
 行ごとに違うので、`field` は空にして `alternative` の側が欄を名指しします（`min=60,typ=82,max=110`）。
