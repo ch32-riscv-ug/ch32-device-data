@@ -148,7 +148,10 @@ CJK = re.compile(r"[\u3000-\u9fff\uff00-\uffef]")
 # 「その頭字が言う量に単位が合っているか」で決める（元からある `UNIT_FOR` の
 # 考えを、対象を広げたぶん量も増やして引き継いだもの）。データシートの電気的
 # 特性表が使う記法は決まっているので、一覧を持つより崩れにくい。
-KEEP = re.compile(r"^(?:[FfTtVIiRCEN]_|C$|E[DLOT0]|ACC_|Du[CT]y_|g_m$|Avg_Slope$|f_|F_)")
+# ADC の誤差は `E` + 種類1字（`ET` 総合・`EO` オフセット・`ED` 微分非線形・`EL` 積分非線形・
+# `EG` 利得）。`EG` だけ綴りが抜けていて4行（2文書×2版）落ちていた（2026-09-10の実測）。
+# `EN`（等価入力電圧雑音）は単位が nV/√Hz で別の量なので、単位の検査で落ちたままにする。
+KEEP = re.compile(r"^(?:[FfTtVIiRCEN]_|C$|E[DGLOT0]|ACC_|Du[CT]y_|g_m$|Avg_Slope$|f_|F_)")
 # **記号セルが2つの記号を畳んでしまった行は採らない。** `t_/t_r(SCK)_f(SCK)` は
 # `t_r(SCK)` と `t_f(SCK)` の2行が、サブスクリプトの折返しで1つになったもので、
 # 値がどちらのものか決められない（`f_/t_SCK_SCK`・`C_/C_L1_L2` も同型）。
@@ -866,7 +869,13 @@ def read_edition(bundle, lang):
             tbl = record["extracted_rows"]
             cols = [norm_header(c) for c in tbl[0]]
             body = tbl[1:]
-            # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
+            # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）。
+            # **`min` を持たない表がある**——`表3-25 ADC误差` は
+            # `符号｜参数｜条件｜典型值｜最大值｜单位`。`min` を必須にしていたため
+            # 11表・両版28行ずつが読めていなかった（2026-09-10の実測。5文書で zh/en とも対称）。
+            # 受けるのは **`典型值`と`最大值`が揃う**形だけ——「値の欄が1つでもあれば」まで
+            # 緩めると、`典型值` しか持たない**低消費電流の表**（A11。`extract_low_power` の
+            # 担当）まで入り、同じ事実が2つの経路から出た（実測で131行・conflict 2件）。
             fresh = True
             # **2段見出しの I2C 接口特性表**は1行が2つの事実を言うので、モードごとに
             # 組み直してから普通の行として読む（`mode_body`）。物理の列とは並びが
@@ -889,7 +898,8 @@ def read_edition(bundle, lang):
                 synthetic = last_modes
                 shape_page = page["number"]
                 cols, body = MODE_COLUMNS, mode_body(tbl, last_modes)
-            elif {"symbol", "min", "condition"} <= set(cols):
+            elif ({"symbol", "min", "condition"} <= set(cols)
+                  or {"symbol", "condition", "typ", "max"} <= set(cols)):
                 last_cols, last_edges = cols, edges
             # 条件の列を持たない特性表（`timing_header`）。絶対最大定格表は同じ形だが
             # **別の正本**（`extract_absolute_maximum.py`）が読むので表題で外す。
