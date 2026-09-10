@@ -3314,3 +3314,45 @@ D19 の最後。`V -V`／`DD SS`（＝ `V_DD-V_SS`）が `V-VDDSS` と読まれ�
 
 `pair_line_subscripts` の `sep` 引数だけは残してある（値の欄では使っていて、記号の欄でも
 `sep="_"` で読めることを doctest で示す）。次の回はここから3点を足すだけで始められる。
+
+## 候補が2つ残ったら長いほうを採る——bit図の混ざりがさらに17セル直った（2026-09-10）
+
+前項の42件を4類型に分けて測ったら、2つ分かった。
+
+### 6件は誤検出だった——索引/範囲つきの名前
+
+`STPNS`|`STSS[30:16]` は境界の `S` が重なるが、記述表に `STS`・`STSS`・`STSSI`・`STSS[30:0]` が
+並んでいて、`STSS[30:16]` は**31bit のフィールドを16bitずつ2つの図に分けた上半分**。
+つまり正当で、`S` の一致は偶然。選別の条件に「範囲（`[..]`）を外すと実名」を足した。
+
+### 決め手は「余りが少ないほう」
+
+`CTIMCETOIMUTECO`（15字）には記述表の `CTIMEOUT`（8字）と `CTIMEOUTC`（9字）の**両方**が
+部分列として入る。前に足した「丁度2倍なら」は長さが奇数なので効かない。
+
+描画文字は「正しい名前＋重複したグリフ」なので、**長い名前ほど多くを説明する**。
+隣のセルも `DTIMEOUTC`（同じ clear ビットの並び）で、`CTIMEOUTC` が正しい。
+候補の長さが全部違うときだけ、いちばん長いものを採るようにした。
+
+### 結果
+
+**17セルが直った**（長くなったセルは0）:
+
+| 出ていた綴り | 直った名前 |
+|---|---|
+| `CTIMCETOIMUTECO` | `CTIMEOUTC` |
+| `CEATCAEEANTADECN` | `CEATAENDC` |
+| `DBCDKEBNCKDECN` | `DBCKENDC` |
+| `DCRCDFCARICLFCA I` | `DCRCFAILC` |
+| `PENDPREENSDERTE1S3E` | `PENDRESET13` |
+| `FACTFA2C2 T` / `FSC2FS2C 2` | `FACT22` / `FSC22` |
+| `TIM11 EN` / `I2C1__RM1` | `TIM11EN` / `I2C1_RM1` |
+
+`markdown parity` 68/68 clean、正本CSVは無変化。
+
+### 残る34件
+
+`SR`|`Res`（`Reserved` の断片）・`SReserSved`（`S` が2つ紛れ込む。`Reserved` に大文字 `S` が
+無いので重複判定を通らない）・`SWPMI`|`I2C3`（zh の bit 図は記述表に無い略記で書く）・
+`5USARTRST`|`T4USART3URST`（数字まで混ざる）。**どれも記述表の名前だけでは決まらない**。
+次に効きそうなのは「隣のセルの綴りを重複の出所として使う」——いまは自セルの中だけ見ている。
