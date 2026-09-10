@@ -725,6 +725,29 @@ schematic-pdf  family単位の回路図PDF                      12
 
 エラッタは今後のdatasheet改版で増えうるため、`pipeline/extract/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
 
+### `absolute_maximum_ratings.csv`
+
+**絶対最大定格**——そこを超えると壊れる限界です。`operating_conditions.csv` の
+**推奨動作範囲とは別の事実**なので、表を分けてあります。どちらも `symbol` が `V_DD` で
+`min`/`max` を持つのに意味は正反対で、混ぜると区別できません（一度混ぜて測ったところ
+`index/parts.csv` の供給電圧が `CH32L103` で `1.8..3.6V` から `-0.3..4.0V` に化けました）。
+生成は `pipeline/extract/datasheet/extract_absolute_maximum.py`。
+
+読むのはデータシートの絶対最大定格表（`表3-1 绝对最大值参数表` /
+`Table 3-1 Absolute maximum ratings`。章番号は文書によって 3-1 と 4-1）だけです。
+全corpus実測で**33表・33版、1文書1表、両版ある16文書はすべて 1/1 の対称**。
+表の形が `operating_conditions` と違い、**`条件` の見出しも `典型值` の列もありません**
+——条件は見出しの無い欄に書かれ、その欄すら無い版もあります。だから `typ` 列を持ちません。
+
+記号・値・文章の読み方（添字の復元、単位が物理量に合うかの検査＝`UNIT_FOR`）は
+`operating_rows.py` と共通です。
+
+**取れていないもの**:
+
+- **記号が物理量を名乗らない行**（en版310行のうち60行）。`∑I_INJ(PIN)`（全I/Oへの注入電流の
+  合計）・`|△V_DD_x|` 系（供給ピン間の電圧差）と、`△` が別の行に落ちた綴りの崩れ
+- **中文版だけが持つ行**（12行）。表示テキストは英語版から取る設計です
+
 ### `operating_conditions.csv`
 
 **電気的特性の章を series ごとに**——クロック・電源電圧・発振器・ADC・Flash・I/O レベル・
@@ -887,6 +910,7 @@ uv run tools/build_tables.py                    # catalog: families/series/produ
 uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions（bundleから。数分かかる）
 uv run tools/build_remap.py                     # remap_fields/remap_routes（candidates から）
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
+uv run pipeline/extract/datasheet/extract_absolute_maximum.py  # absolute_maximum_ratings（絶対最大定格表だけ。operating_conditions とは別の事実）
 uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
 uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
 uv run tools/build_systick.py                   # systick（EVTのcore_riscv.hから）

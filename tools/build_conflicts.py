@@ -59,6 +59,7 @@ KEYS: dict[str, tuple[str, ...]] = {
     "evt_examples": ("family", "example"),
     "link_firmware": ("device", "mcu", "mode", "role"),
     "operating_conditions": ("series", "symbol", "parameter", "condition"),
+    "absolute_maximum_ratings": ("series", "symbol", "parameter", "condition"),
     "remap_fields": ("series", "selector"),
     "remap_routes": ("series", "selector", "value", "signal"),
     "timers": ("family", "timer"),

@@ -125,6 +125,8 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
         ("evidence", [
             ("operating_conditions",
              ["pipeline/extract/datasheet/build_operating_conditions.py"]),
+            ("absolute_maximum_ratings",
+             ["pipeline/extract/datasheet/extract_absolute_maximum.py"]),
             ("debug_wiring",
              ["pipeline/extract/manual/extract_debug_wiring.py"]),
             ("option_bytes + option_byte_fields",

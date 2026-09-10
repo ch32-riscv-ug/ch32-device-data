@@ -553,6 +553,38 @@ def pair_line_subscripts(cell: str | None, sep: str = "",
     return re.sub(r" +(?=[)/,.;])", "", text)
 
 
+def same_unit(a: str | None, b: str | None) -> bool:
+    """単位が同じか。**先頭の `M` だけ大小を保って残りを小文字にする。**
+
+    `m`（ミリ）と `M`（メガ）だけが大小で意味が変わるので、そこだけ残せば
+    `mS`/`ms`・`us`/`uS`・`kHz`/`KHz`・`kΩ`/`KΩ`・`Times`/`times` が揃い、
+    `mΩ`/`MΩ`・`mV`/`MV` は揃わない（単純な大小無視を入れなかった理由がこれ）。
+
+    >>> same_unit("mS", "ms"), same_unit("KHz", "kHz"), same_unit("mV", "MV")
+    (True, True, False)
+    """
+    def canon(u):
+        return "".join(c if i == 0 and c == "M" else c.lower()
+                       for i, c in enumerate(u or ""))
+    return canon(a) == canon(b)
+
+
+def same_value(a: str | None, b: str | None) -> bool:
+    """値が同じか。`*`（掛け算）と `I/O` の綴りの差は無視する。
+
+    `0.8*VDD` と `0.8VDD`、`VI/O` と `VIO` は同じ値の別の書き方。全corpus実測: 値に `/` を
+    含むセルは7つで、うち `I/O` は2つ、残る5つは本物の割り算（`VDD/4`・`VDDA/2`）なので
+    `/` を一律に落とすことはしない。**公開する綴りは変えない**——ここは対応付けのための
+    正規化だけで、揃った結果は `basis` に両版が並ぶ形で見える。
+
+    >>> same_value("0.8*VDD", "0.8VDD"), same_value("VI/O", "VIO"), same_value("VDD/4", "VDD")
+    (True, True, False)
+    """
+    def canon(v):
+        return (v or "").replace("*", "").replace("I/O", "IO")
+    return canon(a) == canon(b)
+
+
 def norm_value(cell):
     paired = pair_line_subscripts(cell)
     if paired is not None:
@@ -850,17 +882,6 @@ def main():
         # `/` を一律に落とすことはしない。`*` を含むセルは42で全部掛け算。
         # **公開する綴りは変えない**（英語版の書き方をそのまま出す）。ここは対応付けの
         # ためだけの正規化で、揃った結果は `basis` に両版が並ぶ形で見える。
-        def same_unit(a, b):
-            def canon(u):
-                return "".join(c if i == 0 and c == "M" else c.lower()
-                               for i, c in enumerate(u or ""))
-            return canon(a) == canon(b)
-
-        def same_value(a, b):
-            def canon(v):
-                return (v or "").replace("*", "").replace("I/O", "IO")
-            return canon(a) == canon(b)
-
         def agrees(zh, en):
             # **ピン群が違う行は同じ事実ではない。** 群は`PA0-PA23`のように言語に依らないので
             # 版をまたいで比べられる。`CH32X035DS0` V2.3（zh）は出力電圧特性をポート群ごとに

@@ -40,6 +40,7 @@ EVIDENCE_TABLES = (
     "features", "errata", "memory_configs", "adc_internal", "flash_geometry",
     "flash_program_method",
     "eval_boards", "evt_examples", "link_firmware", "operating_conditions",
+    "absolute_maximum_ratings",
     "remap_fields", "remap_routes", "timers",
     "register_blocks", "registers", "register_fields", "dma_requests",
     "opa_cmp_registers", "clock_enables", "usbpd_plumbing",
