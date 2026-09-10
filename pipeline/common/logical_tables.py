@@ -1713,6 +1713,13 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
             doubled = [n for n in candidates if _is_doubled(flat, n)]
             if len(doubled) == 1:
                 candidates = doubled
+            elif len({len(n) for n in candidates}) == len(candidates):
+                # **いちばん長い候補**を採る。描画文字は「正しい名前＋重複したグリフ」なので、
+                # 長い名前ほど多くを説明する——`CTIMCETOIMUTECO`（15字）には `CTIMEOUT` と
+                # `CTIMEOUTC` の両方が入るが、余りが少ないのは後者で、隣のセルも `DTIMEOUTC`
+                # （同じ clear ビットの並び）。長さが同じ候補が混じるときは決め手にならないので
+                # 使わない（2026-09-10）。
+                candidates = [max(candidates, key=len)]
         if len(candidates) == 1:
             cell["text"] = candidates[0]
             fixed += 1
