@@ -266,7 +266,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
 | 表 | 1行 | 何が分かるか |
 |---|---|---|
 | `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（548）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
-| `registers` | family × 型 × register 4,995行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
+| `registers` | family × 型 × register 4,936行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
 | `register_fields` | family × register × bit define 33,365行（field 24,792・value 8,573） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。fieldの27.5%（6,829）がRMとbit位置一致、38がconflict |
 
 導出の **layout key**（family × 型 → 構造体の形のハッシュ。同じkeyのfamilyは同じレジスタ定義を共有できる）は索引の[`index/register_layouts.csv`](../index/README.ja.md)にあります。register×fieldを結合して絶対番地を付けた引き口も索引（`index/registers.csv`・`index/register_map.csv`）です。

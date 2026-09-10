@@ -118,6 +118,22 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("docs/worklist.ja.md", r"置き場所がそもそも無い\*\* (?P<n>[\d,]+)行",
      "register_fields_without_member"),
     ("docs/worklist.ja.md", r"証拠の表の conflict は (?P<n>[\d,]+) 行", "conflict_rows"),
+    # 索引の README が名指しで書いている数。**表ごとの conflict の内訳と同じ腐り方**を
+    # した——`index/README` は「115行に相手の値が入り、68行は空」「operating_conditions の
+    # 30行のうち8行は綴りの差」と書いたままで、実際は 109/76、綴りの差は 2026-09-09 に
+    # 対応付けの側で外していた（2026-09-10に発見）。
+    ("index/README.ja.md", r"\*\*(?P<n>[\d,]+)行に相手の値が入り", "conflicts:with_alternative"),
+    ("index/README.ja.md", r"相手の値が入り、(?P<n>[\d,]+)行は空", "conflicts:without_alternative"),
+    ("index/README.md", r"\*\*(?P<n>[\d,]+) rows carry an alternative", "conflicts:with_alternative"),
+    ("index/README.md", r"an alternative and (?P<n>[\d,]+) do not", "conflicts:without_alternative"),
+    ("index/README.ja.md", r"`product_attributes` の(?P<n>[\d,]+)行は", "product_attributes:conflict"),
+    ("index/README.md", r"The (?P<n>[\d,]+) `product_attributes`", "product_attributes:conflict"),
+    ("index/README.ja.md", r"いま残る(?P<n>[\d,]+)行は\*\*原文で裁定", "operating_conditions:conflict"),
+    ("index/README.md", r"so the (?P<n>[\d,]+) that remain are document", "operating_conditions:conflict"),
+    ("index/README.ja.md", r"`memory_configs`（(?P<n>[\d,]+)行）", "memory_configs:conflict"),
+    ("index/README.md", r"`memory_configs` \((?P<n>[\d,]+)\)", "memory_configs:conflict"),
+    ("evidence/README.ja.md", r"family × 型 × register (?P<n>[\d,]+)行", "registers"),
+    ("evidence/README.md", r"family × type × register, (?P<n>[\d,]+) rows", "registers"),
     ("README.ja.md", r"比較表の属性（(?P<n>\d+)種類の綴り", "product_attributes:kinds"),
     ("README.ja.md", r"種類の綴り・(?P<n>[\d,]+)行", "product_attributes"),
     ("docs/worklist.ja.md", r"`index/capabilities.csv`新設（2026-08-29。(?P<n>[\d,]+)行）",
@@ -163,6 +179,13 @@ def quantities() -> dict[str, int]:
                 if c and "confidence" in c and (v or "").strip() == level)
     out["product_attributes:kinds"] = len({r["attribute"] for r in
                                            paths.load("product_attributes")})
+    # `index/conflicts.csv` の `alternative`（相手の値）が埋まった行と空の行。
+    # 空になるのは食い違いを散文で記録している表（`memory_configs`・`timers`）。
+    conflicts = paths.load_index("conflicts")
+    out["conflicts:with_alternative"] = sum(
+        1 for r in conflicts if (r.get("alternative") or "").strip())
+    out["conflicts:without_alternative"] = (len(conflicts)
+                                            - out["conflicts:with_alternative"])
     out["catalog_tables"] = len(paths.CATALOG_TABLES)
     out["evidence_tables"] = len(paths.EVIDENCE_TABLES)
     # 索引は manifest.csv も1表として数える（文書がそう数えている）。
