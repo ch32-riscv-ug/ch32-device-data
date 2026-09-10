@@ -109,6 +109,11 @@ MARKER = {
 # V208 1/1・V20x_30x 2/2・V407 2/2・X035 2/2）——片翼だけ増えると zh/en の対応が崩れて
 # 既存の行が消えるので、これが入れる前提だった。`CH32V006DS2` は zh 4・en 0 だが
 # 目録範囲外の文書（対象SKUがproductsに無い）。
+# 絶対最大定格表は**別の表**（`extract_absolute_maximum.py`）が読む。下の「条件の列を持たない
+# 形」に当てはまってしまうので、表題で外す——同じ行が2つの正本に出ないように。
+ABSMAX_CAPTION = re.compile(
+    r"绝\s*对\s*最\s*大\s*值\s*参\s*数\s*表|Absolute\s+maximum\s+ratings",
+    re.IGNORECASE)
 TABLE_CAPTION = re.compile(
     r"输\s*出\s*电\s*压\s*特\s*性"
     r"|Output\s+voltage\s+characteristic"
@@ -120,6 +125,8 @@ TABLE_CAPTION = re.compile(
 HEADER_MAP = {
     "symbol": "symbol", "符号": "symbol",
     "parameter": "parameter", "参数": "parameter",
+    # 時序表の一部は項目名の欄を`参数及描述`と書く（H417・V20x_30x の DVP/Ethernet）。
+    "参数及描述": "parameter", "parameter&description": "parameter",
     "condition": "condition", "条件": "condition",
     "min": "min", "最小值": "min",
     "typ": "typ", "典型值": "typ",
@@ -675,8 +682,16 @@ def fill_rowspans(record: dict, cols: list) -> list[list]:
                   key=lambda c: c["column_start"])
     if len(head) != len(cols) or not rows:
         return rows
+    # **断片の全行を覆う縦結合は写さない。** 「全部の行で同じ値」と「横罫線の取りこぼし」は
+    # セルの形では区別が付かず、実物は後者だった——`CH32V407DS0.zh` p.61 の続き断片は
+    # 最大値の欄に `5` が1つだけ在り、pdfplumber が5行ぶんの縦結合として記録していた。
+    # 版面を描画すると `5` は2行目（`t_V(BL_NE)`）だけのもので、他の行の欄は空
+    # （罫線はある）。写すと4行に偽の `max=5` が付き、en 版との偽 conflict になる。
+    # 全corpus実測（2026-09-10）: 値を写す表9つのうち、全行を覆う縦結合はこの1つだけ
+    # ——本物の縦結合はどれも表の一部（14行中2行など）を覆う。
     spans = [c for c in record["cells"]
-             if c["row_end"] - c["row_start"] >= 2 and (c.get("text") or "").strip()]
+             if c["row_end"] - c["row_start"] >= 2 and (c.get("text") or "").strip()
+             and not (c["row_start"] == 0 and c["row_end"] >= len(rows))]
     if not spans:
         return rows
     for index, name in enumerate(cols):
@@ -692,6 +707,54 @@ def fill_rowspans(record: dict, cols: list) -> list[list]:
                     rows[r][index] = cell["text"]
                     break
     return rows
+
+
+# 続きの断片が同じ表かを見る版面の外枠の許容差（pt）。列の境界はページごとに数pt動く
+# （`CH32H417DS0.en` の表3-36 は見出しが 408.6、続きが 404.7）ので `same_edges` の 2.0 では
+# 届かない。外枠（左端と右端）だけを 4.0 で見て、中の並びは列数で決める。
+FRAME_TOLERANCE = 4.0
+
+
+def timing_header(cols: list) -> bool:
+    """**条件の列を持たない特性表**の並びか（`符号｜参数｜最小值｜最大值｜单位`）。
+
+    外部バス（FSMC の PSRAM/NOR/NAND/SDRAM）・DVP・Ethernet の MII/RMII/RGMII/SMI の
+    **時序表**がこの形。`条件` の列が無いので `{symbol, min, condition}` の検査に落ち、
+    章ごと読めていなかった（全corpus実測 2026-09-10: **33表・両版で374行ずつ**、
+    CH32H417DS0・CH32V205DS0・CH32V20x_30xDS0・CH32V407DS0 の4文書）。
+
+    **表題の語彙は要らない。** この並びに当てはまる表は全corpusで66（33×2版）あり、
+    **全部がその時序・接口の表**だった——形そのものが選別になっている。ページの見出し語では
+    60/66 が届かないので、この形の表があるページは読む（下の `read_edition`）。
+    """
+    got = set(filter(None, cols))
+    return {"symbol", "parameter", "min", "max", "unit"} <= got and "condition" not in got
+
+
+def unreadable_value_column(record: dict, cols: list) -> str:
+    """値の欄が**断片の全行を覆う1つのセル**になっている列の名前（無ければ空）。
+
+    横罫線を取りこぼすと、pdfplumber は列を丸ごと1つの縦長セルにし、中の文字を
+    **先頭の行に**置く。`CH32V407DS0.zh` p.61 の続き断片がそれで、最大値の欄の `5` は
+    版面では2行目（`t_V(BL_NE)`）のものなのに、1行目（`t_h(A_NWE)`）の値として出た
+    ——en 版は同じ表を正しく読むので、**偽の食い違いが2件**出る。
+
+    どの行のものかは版面にしか無いので、**その断片は読まない**。en 版だけが根拠の
+    `reference` になるのが正しい——「資料が食い違っている」ではなく「片方が読めない」。
+    全corpus実測（2026-09-10）: この形の断片は1つだけ。
+    """
+    rows = record["extracted_rows"]
+    if not rows:
+        return ""
+    for cell in record["cells"]:
+        if cell["row_start"] or cell["row_end"] < len(rows) or len(rows) < 3:
+            continue
+        if not (cell.get("text") or "").strip():
+            continue
+        index = cell["column_start"]
+        if index < len(cols) and cols[index] in VALUE_COLUMNS:
+            return cols[index]
+    return ""
 
 
 def read_edition(bundle, lang):
@@ -727,8 +790,15 @@ def read_edition(bundle, lang):
                 last_caption = caption
             tables.append((last_caption, bool(caption.strip()), record,
                            column_edges(record)))
+        # 条件の列を持たない特性表（時序表）は**見出し語では届かない**ので、その形の表が
+        # あるページも読む（実測: 66表のうち60はページ規則の外）。
+        def has_timing(record):
+            rows = record["extracted_rows"]
+            return bool(rows) and timing_header([norm_header(c) for c in rows[0]])
         if not hit and not carry and not any(
-                TABLE_CAPTION.search(cap) for cap, _, _, _ in tables):
+                TABLE_CAPTION.search(cap)
+                or (not ABSMAX_CAPTION.search(cap) and has_timing(rec))
+                for cap, _own, rec, _edges in tables):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
@@ -737,8 +807,14 @@ def read_edition(bundle, lang):
         carry_from, carry = carry and not hit, hit
         page_ok = hit or carry_from
         for caption, own_caption, record, edges in tables:
-            # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
-            if not page_ok and not TABLE_CAPTION.search(caption):
+            # ページ規則で届いていないページでは、**表題が当たった表**と、**条件の列を
+            # 持たない特性表**（とその続きの断片）だけを見る。ページの門を通しても
+            # ここで落ちる、というのを一度踏んだ（2026-09-10）。
+            timing = not ABSMAX_CAPTION.search(caption) and has_timing(record)
+            continues_timing = (last_cols is not None and timing_header(last_cols)
+                                and not own_caption)
+            if (not page_ok and not TABLE_CAPTION.search(caption)
+                    and not timing and not continues_timing):
                 continue
             tbl = record["extracted_rows"]
             cols = [norm_header(c) for c in tbl[0]]
@@ -747,10 +823,19 @@ def read_edition(bundle, lang):
             fresh = True
             if {"symbol", "min", "condition"} <= set(cols):
                 last_cols, last_edges = cols, edges
+            # 条件の列を持たない特性表（`timing_header`）。絶対最大定格表は同じ形だが
+            # **別の正本**（`extract_absolute_maximum.py`）が読むので表題で外す。
+            elif timing_header(cols) and not ABSMAX_CAPTION.search(caption):
+                last_cols, last_edges = cols, edges
             elif (last_cols and not own_caption
                   and len(tbl[0]) == len(last_cols)
                   and (carry_from or TABLE_CAPTION.search(caption)
-                       or same_edges(edges, last_edges))):
+                       or same_edges(edges, last_edges)
+                       # 版面の外枠が揃っていれば同じ表の続き（列の境界はページごとに
+                       # 数pt動くので `same_edges` の 2.0 では届かない）。
+                       or (timing_header(last_cols) and edges and last_edges
+                           and abs(edges[0] - last_edges[0]) <= FRAME_TOLERANCE
+                           and abs(edges[-1] - last_edges[-1]) <= FRAME_TOLERANCE))):
                 # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
                 # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
                 # このページにしかない。
@@ -785,6 +870,13 @@ def read_edition(bundle, lang):
             # この抽出器の型では表せない）、借りた並びで読んだ行は `keep_row` の値検査に
             # 全部落ちていた——だから出力は変わらないが、形として閉じておく。
             # それらの表は `extract_low_power` が caption で選んで読む。
+            # 値の欄が断片の全行を覆う1つのセルになっている断片は、どの行の値か
+            # 決められないので読まない（`unreadable_value_column`）。
+            broken = unreadable_value_column(record, cols)
+            if broken:
+                DROPPED.append(f"{lang} p.{page['number']}: {broken} の欄が断片の全行を"
+                               "覆う1つのセル（どの行の値か決められない）")
+                continue
             # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まってからで
             # ないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
             filled = fill_rowspans(record, cols)
