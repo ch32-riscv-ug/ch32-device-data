@@ -7,6 +7,8 @@ CH32H415;CH32H416;CH32H417,C_HSADC,Internal sampling and holding capacitance,,,1
 CH32H415;CH32H416;CH32H417,C_L,Load capacitance when buffer is open,,,,50,pF,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32H417DS0.PDF:zh(p.124)+CH32H417DS0.PDF:en(p.140),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_LOAD,Suggested load capacitance with corresponding crystal serial impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32H417DS0.PDF:zh(p.99)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32H417DS0.PDF:zh(p.99)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,DuCy_(HSE),Duty cycle,,,50,,%,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
@@ -271,10 +273,16 @@ CH32H415;CH32H416;CH32H417,t_SU(HSI),HSI oscillator startup stabilization time,,
 CH32H415;CH32H416;CH32H417,t_SU(LSE),Startup time,V_DD33 stabilization,,800,,mS,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(LSI),LSI oscillator startup stabilization time,,,230,,us,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(NWAITV_CLKH),FSMC_NWAIT valid before FSMC_CLK high,,6,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(SDCLKH_DATA),Data input setup time,,3.5,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.114)+CH32H417DS0.PDF:en(p.129),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(SDCLKH_DATA),Data input setup time,,3.0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.114)+CH32H417DS0.PDF:en(p.129),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(SDCLKL_DATA),Data output valid time,,,,2,ns,#,confirmed,CH32H417DS0.PDF:zh(p.115)+CH32H417DS0.PDF:en(p.130),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(SDCLKL_DATA),Data output valid time,,,,4,ns,#,confirmed,CH32H417DS0.PDF:zh(p.116)+CH32H417DS0.PDF:en(p.131),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.108)+CH32H417DS0.PDF:en(p.123),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_V(BL_NE),FSMC_NE low to FSMC_BL valid,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.108)+CH32H417DS0.PDF:en(p.123),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_V(DATA_NADV),FSMC_NADV high to data hold time,,2*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.109)+CH32H417DS0.PDF:en(p.125),CH32H417DS0.PDF
@@ -298,8 +306,10 @@ CH32H415;CH32H416;CH32H417,t_d(CLKH_NWEH),FSMC_CLK high to FSMC_NWE high,,0,,,ns
 CH32H415;CH32H416;CH32H417,t_d(CLKL_ADIV),FSMC_CLK low to FSMC_AD[15:0] invalid,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_ADV),FSMC_CLK low to FSMC_AD[15:0] valid,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_AV),FSMC_CLK low to FSMC_Ax valid (x = 16…25),,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.125),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_d(CLKL_DATA),FSMC_AD[15:0] valid after FSMC_CLK low,,2,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.111)+CH32H417DS0.PDF:en(p.127),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_NADVH),FSMC_CLK low to FSMC_NADV high,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.125),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_NADVL),FSMC_CLK low to FSMC_NADV low,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.125),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_d(CLKL_NBLH),FSMC_CLK low to FSMC_NBL high,,2,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.111)+CH32H417DS0.PDF:en(p.127),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_NEL),FSMC_CLK low to FSMC_NE low,,0,,5,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.125),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_NOEL),FSMC_CLK low to FSMC_NOE low,,2*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_d(CLKL_NWEL),FSMC_CLK low to FSMC_NWE low,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.111)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
@@ -334,6 +344,8 @@ CH32H415;CH32H416;CH32H417,t_h(NOE-D),FSMC_NOE high followed by to FSMC_D[31:0] 
 CH32H415;CH32H416;CH32H417,t_h(NWE-ALE),FSMC_NWE high to FSMC_ALE invalid,,2*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.113)+CH32H417DS0.PDF:en(p.128),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(NWE-D),FSMC_NWE high to FSMC_D[31:0] data invalid,,2*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.113)+CH32H417DS0.PDF:en(p.128),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(RDATA),Input data holding time,,1.2,2.0,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(SDCLKH_DATA),Data input holding time,,1.5,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.114)+CH32H417DS0.PDF:en(p.129),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(SDCLKL_DATA),Data output holding time,,0.5,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.115)+CH32H417DS0.PDF:en(p.130),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(SDCLKL_DATA),Data output holding time,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.116)+CH32H417DS0.PDF:en(p.131),CH32H417DS0.PDF
@@ -341,6 +353,8 @@ CH32H415;CH32H416;CH32H417,t_h(SDCLKL_SDNCAS),SDNCAS holding time,,0,,,ns,#,conf
 CH32H415;CH32H416;CH32H417,t_h(SDCLKL_SDNE),Chip selection holding time,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.114)+CH32H417DS0.PDF:en(p.129),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(SDCLKL_SDNRAS),SDNRAS holding time,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.114)+CH32H417DS0.PDF:en(p.129),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(SDCLKL_SDNWE),SDNWE holding time,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.115)+CH32H417DS0.PDF:en(p.130),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_h(TDATA),Send data holding time,,1.2,2.0,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_prog_page,Page (256 bytes) programming time,,,1.5,3,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
@@ -357,6 +371,12 @@ CH32H415;CH32H416;CH32H417,t_su(TDATA),Send data setup time,,1.2,2.0,,ns,#,confi
 CH32H415;CH32H416;CH32H417,t_v(NWE-D),FSMC_NWE low to FSMC_D[31:0] data valid,,0,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.113)+CH32H417DS0.PDF:en(p.128),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_w(NOE),FSMC_NOE low time,,4*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.113)+CH32H417DS0.PDF:en(p.128),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_w(NWE),FSMC_NWE low time,,4*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.113)+CH32H417DS0.PDF:en(p.128),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(SCKH),SCL clock high level time,Fast I2C,0.6,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(SCKH),SCL clock high level time,Standard I2C,4.0,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(SCKL),SCL clock low level time,Fast I2C,1.2,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(SCKL),SCL clock low level time,Standard I2C,4.7,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.98)+CH32H417DS0.PDF:en(p.113),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode; Use HSI RC clock wakeup,,0.3,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_wustop,Wakeup from Stop mode (Regulator in normal mode),Wakeup time from low-power mode; HSI RC clock wakeup,,4,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_wustop,Wakeup from Standby mode (Regulator in low-power mode),Wakeup time from low-power mode; Regulator wake-up time from low-power mode + HSI RC clock wake-up,,35,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
@@ -367,6 +387,8 @@ CH32L103;CH32M103,C_ADC,Internal sample and hold capacitor,,,4,,pF,#,confirmed,C
 CH32L103;CH32M103,C_IO,I/O pin capacitor,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,40,pF,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32L103DS0.PDF:zh(p.51)+CH32L103DS0.PDF:en(p.61),CH32L103DS0.PDF
+CH32L103;CH32M103,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
 CH32L103;CH32M103,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_HSE,Duty Cycle,,,50,,%,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
@@ -659,6 +681,12 @@ CH32L103;CH32M103,t_SU(HSE),Startup time(2),"V_DD stabilization, 8M",,1.5,,ms,#,
 CH32L103;CH32M103,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(LSE),Startup time,V_DD stabilization,,1000,,ms,#,confirmed,CH32L103DS0.PDF:zh(p.40)+CH32L103DS0.PDF:en(p.48),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(LSI),LSI oscillator startup stabilization time,,,400,,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,t_VDD,V_DD rising speed,,0,,∞,us/V,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.39),CH32L103DS0.PDF
 CH32L103;CH32M103,t_VDD,V_DD falling speed,,70,,∞,us/V,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.39),CH32L103DS0.PDF
 CH32L103;CH32M103,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, DDA C = 50pF, LOAD R = 4kΩ LOAD",,,0.8,us,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
@@ -666,11 +694,21 @@ CH32L103;CH32M103,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /
 CH32L103;CH32M103,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,72,,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_erase_page,Page (256 bytes) erase time,,,6.2,7.5,ms,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,t_erase_sec,Sector (2K bytes) erase time,,,6.2,7.5,ms,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
+CH32L103;CH32M103,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,t_prog_page,Page (256 bytes) programming time,,,2.0,2.5,ms,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_s,Sampling time,,,7.5,,1/fADC,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_s,Sampling time,f_ADC = 14MHz,0.107,,17.1,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_s,Sampling time,f_ADC = 48MHz,,0.156,,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(SCKH),SCL clock high level time,Fast I2C,0.6,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(SCKH),SCL clock high level time,Standard I2C,4.0,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(SCKL),SCL clock low level time,Fast I2C,1.2,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(SCKL),SCL clock low level time,Standard I2C,4.7,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
+CH32L103;CH32M103,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,0.2,,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_wustop,Wakeup from Stop mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,7,,us,#,conflict,CH32L103DS0.PDF:en(p.49)+!CH32L103DS0.PDF:zh(typ=13),CH32L103DS0.PDF
 CH32M007;CH32V007,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.0,,2.0,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
@@ -679,6 +717,8 @@ CH32M007;CH32V007,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed
 CH32M007;CH32V007,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.63),CH32V007DS0.PDF
 CH32M007;CH32V007,C_LOAD,Capacitive load,,,,20,pF,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.64),CH32V007DS0.PDF
 CH32M007;CH32V007,C_LOAD,Recommended load capacitance and corresponding crystal series impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
 CH32M007;CH32V007,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,DuCy_(HSE),Duty cycle,,40,50,60,%,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
@@ -845,23 +885,41 @@ CH32M007;CH32V007,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.
 CH32M007;CH32V007,t_SU(HSE),Startup time,V_DD is stable,,1.5,,ms,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, C DD LOAD = 50pF, R = 4kΩ LOAD",,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.64),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WAKUP,"Setup time from shutdown to wake up,","Input V /2, DD C = 50pF, R = LOAD LOAD",,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.62),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WUSLEEP,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Use HSI RC clock to wakeup,,10,,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); LDO stabilization time + HSI RC clock wake up,,250,,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_erase_page,Page (256 bytes) erase time,,,2.5,3.0,ms,#,conflict,CH32V007DS0.PDF:en(p.51)+!CH32V007DS0.PDF:zh(max=3.1),CH32V007DS0.PDF
 CH32M007;CH32V007,t_erase_sec,Sector (1K bytes) erase time,,,2.7,3.3,ms,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
 CH32M007;CH32V007,t_prog_page,Page (256 bytes) program time,,,1.5,2.0,ms,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_s,Sampling time,,3.5,,35.5,1/fADC,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_s,Sampling time,f_ADC = 16MHz,0.218,,14.97,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_s,Sampling time,f_ADC = 48MHz,0.073,,0.739,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(SCKH),SCL clock high-level time,Fast I2C,0.6,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(SCKH),SCL clock high-level time,Standard I2C,4.0,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(SCKL),SCL clock low-level time,Fast I2C,1.2,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(SCKL),SCL clock low-level time,Standard I2C,4.7,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.38)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
+CH32M007;CH32V007,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V007DS0.PDF:zh(p.39)+CH32V007DS0.PDF:en(p.55),CH32V007DS0.PDF
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~125℃,-2.2,,2.2,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-2.0,,2.0,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.5,,1.5,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,C_ADC,Internal sample and hold capacitance,,,6,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,C_LOAD,Suggested load capacitance and corresponding crystal serial impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
 CH32M030,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,DuCy_(HSE),Duty cycle,,40,50,60,%,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
@@ -1020,6 +1078,12 @@ CH32M030,t_STAB,Power-on time,,,7,,us,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M
 CH32M030,t_SU(HSE),Startup time,V_DD is stable,,2,,ms,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,t_SU(HSI),HSI oscillator startup stabilization time,,,10,,us,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_SU(LSI),LSI oscillator startup stabilization time,,,80,,us,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
+CH32M030,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
 CH32M030,t_VDD,V_DD rise time rate,,3,,∞,us/V,#,reference,CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_VDD,V_DD fall time rate,,20,,∞,us/V,#,reference,CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_WAKEUP,"Off-to-wake time, 0.1%",,,,1,us,#,confirmed,CH32M030DS0.PDF:zh(p.39)+CH32M030DS0.PDF:en(p.48),CH32M030DS0.PDF
@@ -1028,14 +1092,26 @@ CH32M030,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); 
 CH32M030,t_WUSTOP,Wakeup from Stop mode,Wakeup time from low-power mode(1); Wake up with HSI RC clock,,255,,us,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_erase_page,Page (128 bytes) erase time,,3.9,4.5,5.1,ms,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_f(IO)out,Falling time of output high to low level,"CL = 50pF, V_DD33 ≥ 3V",,,12,ns,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
+CH32M030,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
 CH32M030,t_prog_page,Page (128 bytes) program time,,3.9,4.5,5.1,ms,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_s,Sampling time,,5.5,,59.5,1/fADC,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,t_s,Sampling time,f_ADC = 18MHz,0.31,,3.31,us,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
+CH32M030,t_w(SCKH),SCL clock high-level time,Fast I2C,0.6,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_w(SCKH),SCL clock high-level time,Standard I2C,4.0,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_w(SCKL),SCL clock low-level time,Fast I2C,1.2,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_w(SCKL),SCL clock low-level time,Standard I2C,4.7,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
+CH32M030,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32M030DS0.PDF:zh(p.34)+CH32M030DS0.PDF:en(p.43),CH32M030DS0.PDF
 CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.1,,2.1,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -40℃~85℃",-3,,3,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,C_LOAD,Recommended load capacitance and corresponding crystal series impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
+CH32V002,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
 CH32V002,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,DuCy_(HSE),Duty Cycle,,40,50,60,%,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,DuCy_HSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
@@ -1172,23 +1248,41 @@ CH32V002,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V
 CH32V002,t_SU(HSE),Startup time,V_DD is stable,,1.5,,ms,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
+CH32V002,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
 CH32V002,t_VDD,V_DD rising rate,,0,,∞,us/V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
 CH32V002,t_VDD,V_DD falling rate,,40,,∞,us/V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
 CH32V002,t_WUSLEEP,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Use HSI RC clock to wakeup,,10,,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); LDO stabilization time + HSI RC clock wake up,,250,,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_erase_page,Page (256 bytes) erase time,,,2.5,3.0,ms,#,conflict,CH32V002DS0.PDF:en(p.30)+!CH32V002DS0.PDF:zh(max=3.1),CH32V002DS0.PDF
 CH32V002,t_erase_sec,Sector (1K bytes) erase time,,,2.7,3.3,ms,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
+CH32V002,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
 CH32V002,t_prog_page,Page (256 bytes) program time,,,1.5,2.0,ms,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,,3.5,,35.5,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,f_ADC = 16MHz,0.218,,14.97,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_s,Sampling time,f_ADC = 48MHz,0.073,,0.739,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
+CH32V002,t_w(SCKH),SCL clock high-level time,Fast I2C,0.6,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_w(SCKH),SCL clock high-level time,Standard I2C,4.0,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_w(SCKL),SCL clock low-level time,Fast I2C,1.2,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_w(SCKL),SCL clock low-level time,Standard I2C,4.7,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
+CH32V002,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V002DS0.PDF:zh(p.25)+CH32V002DS0.PDF:en(p.34),CH32V002DS0.PDF
 CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃~70℃,-1.2,,1.6,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,C,Recommended load capacitance and corresponding crystal series impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,C_ADC,Internal sample and hold capacitor,,,3,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.31),CH32V003DS0.PDF
+CH32V003,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,DuCy_(HSE),Duty cycle,,40,50,60,%,#,reference,CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
@@ -1371,7 +1465,13 @@ CH32V003,t_SU(HSI),HSI oscillator startup stabilization time,,,10,,us,#,confirme
 CH32V003,t_SU(LSI),LSI oscillator startup stabilization time,,,80,,us,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,t_SU(MI),Data input setup time,Master mode,5,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_SU(NSS),NSS setup time,Slave mode,2tPCLK,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
+CH32V003,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,t_SU(SI),,Slave mode,5,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
+CH32V003,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,t_V(MO),,Master mode (After enable edge),,,5,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_V(SO),Data output valid time,Slave mode (After enable edge),,,5,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
@@ -1383,17 +1483,29 @@ CH32V003,t_dis(SO),Data output disable time,Slave mode,0,,10,ns,#,confirmed,CH32
 CH32V003,t_h(MI),Data input hold time,Master mode,5,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_h(MO),,Master mode (After enable edge),0,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_h(NSS),NSS hold time,Slave mode,2tPCLK,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
+CH32V003,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,t_h(SI),,Slave mode,4,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,t_h(SO),Data output hold time,Slave mode (After enable edge),2,,,ns,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
+CH32V003,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,t_prog,16-bit programming time,T_A = -20℃~85℃,2.4,,3.1,ms,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,t_s,Sampling time,f_ADC = 12 MHz,,0.25,,us,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,t_s,Sampling time,f_ADC = 4 MHz,,0.75,,us,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,t_s,Sampling time,f_ADC = 6 MHz,,0.5,,us,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
+CH32V003,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
+CH32V003,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,30,,us,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V004,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0,",-2.2,,2.2,%,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
 CH32V004,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.26),CH32V004DS0.PDF
 CH32V004,C_LOAD,Recommended load capacitance and corresponding crystal series impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
+CH32V004,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V004,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
 CH32V004,DuCy_(HSE),Duty Cycle,,40,50,60,%,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
 CH32V004,DuCy_HSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
@@ -1523,7 +1635,13 @@ CH32V004,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confi
 CH32V004,t_SU(MI),Data input setup time,HSRXEN = 1,15-0.5*tSCK,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_SU(MI),Data input setup time,Master mode HSRXEN = 0,15,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_SU(NSS),NSS setup time,Slave mode,2*tHCLK,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
+CH32V004,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V004,t_SU(SI),,Slave mode,4,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
+CH32V004,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V004,t_V(MO),,Master mode (After enable edge),,,5,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_V(SO),Data output valid time,Slave mode (After enable edge),,,15,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_VDD,V_DD rising rate,,0,,20000,us/V,#,confirmed,CH32V004DS0.PDF:zh(p.18)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
@@ -1539,14 +1657,24 @@ CH32V004,t_h(MI),Data input hold time,HSRXEN = 1,0.5*tSCK-4,,,ns,#,confirmed,CH3
 CH32V004,t_h(MI),Data input hold time,Master mode HSRXEN = 0,-4,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_h(MO),,Master mode (After enable edge),0,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_h(NSS),NSS hold time,Slave mode,2*tHCLK,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
+CH32V004,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V004,t_h(SI),,Slave mode,4,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_h(SO),Data output hold time,Slave mode (After enable edge),6,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
+CH32V004,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V004,t_prog_page,Page (256 bytes) program time,,,1.5,2.0,ms,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,t_r(IO)out,Output low to high rise time,"CL = 50pF, V_DD = 2.7-5.5V",,,10,ns,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.26),CH32V004DS0.PDF
 CH32V004,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_s,Sampling time,,3.5,,35.5,1/fADC,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_s,Sampling time,f_ADC = 16MHz,0.218,,14.97,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_s,Sampling time,f_ADC = 48MHz,0.073,,0.739,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
+CH32V004,t_w(SCKH),SCL clock high-level time,Fast I2C,0.6,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_w(SCKH),SCL clock high-level time,Standard I2C,4.0,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_w(SCKL),SCL clock low-level time,Fast I2C,1.2,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_w(SCKL),SCL clock low-level time,Standard I2C,4.7,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_w(STO:STA),Time from stop condition to start condition (Bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
+CH32V004,t_w(STO:STA),Time from stop condition to start condition (Bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V004DS0.PDF:zh(p.24)+CH32V004DS0.PDF:en(p.28),CH32V004DS0.PDF
 CH32V005;CH32V006,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.0,,2.0,%,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
 CH32V005;CH32V006,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = Table 3-2 shows the operating temperature range.",-3.0,,3.0,%,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
@@ -1554,6 +1682,8 @@ CH32V005;CH32V006,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V006DS0.PDF:z
 CH32V005;CH32V006,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V006DS0.PDF:zh(p.38)+CH32V006DS0.PDF:en(p.53),CH32V006DS0.PDF
 CH32V005;CH32V006,C_LOAD,Capacitive load,,,,20,pF,#,confirmed,CH32V006DS0.PDF:zh(p.38)+CH32V006DS0.PDF:en(p.55),CH32V006DS0.PDF
 CH32V005;CH32V006,C_LOAD,Recommended load capacitance and corresponding crystal series impedance R_S,R_S = 60Ω(1),,20,,pF,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
+CH32V005;CH32V006,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
 CH32V005;CH32V006,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V006DS0.PDF:zh(p.28)+CH32V006DS0.PDF:en(p.40),CH32V006DS0.PDF
 CH32V005;CH32V006,DuCy_(HSE),Duty cycle,,40,50,60,%,#,confirmed,CH32V006DS0.PDF:zh(p.28)+CH32V006DS0.PDF:en(p.40),CH32V006DS0.PDF
 CH32V005;CH32V006,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
@@ -1713,6 +1843,12 @@ CH32V005;CH32V006,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V006DS0.PDF:zh(p.
 CH32V005;CH32V006,t_SU(HSE),Startup time,V_DD is stable,,1.5,,ms,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
 CH32V005;CH32V006,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
 CH32V005;CH32V006,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
 CH32V005;CH32V006,t_VDD,V_DD fall time rate,,40,,∞,us/V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
 CH32V005;CH32V006,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, DD C = 50pF, LOAD R = 4kΩ LOAD",,,1,us,#,confirmed,CH32V006DS0.PDF:zh(p.38)+CH32V006DS0.PDF:en(p.55),CH32V006DS0.PDF
@@ -1721,16 +1857,28 @@ CH32V005;CH32V006,t_WUSLEEP,Wakeup from Sleep mode,Wakeup time from low-power mo
 CH32V005;CH32V006,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); LDO stabilization time + HSI RC clock wake up,,250,,us,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,t_erase_page,Page (256 bytes) erase time,,,2.5,3.0,ms,#,conflict,CH32V006DS0.PDF:en(p.43)+!CH32V006DS0.PDF:zh(max=3.1),CH32V006DS0.PDF
 CH32V005;CH32V006,t_erase_sec,Sector (1K bytes) erase time,,,2.7,3.3,ms,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
+CH32V005;CH32V006,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
 CH32V005;CH32V006,t_prog_page,Page (256 bytes) program time,,,1.5,2.0,ms,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
 CH32V005;CH32V006,t_s,Sampling time,,3.5,,35.5,1/fADC,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
 CH32V005;CH32V006,t_s,Sampling time,f_ADC = 16MHz,0.218,,14.97,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
 CH32V005;CH32V006,t_s,Sampling time,f_ADC = 48MHz,0.073,,0.739,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(SCKH),SCL clock high-level time,Fast I2C,0.6,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(SCKH),SCL clock high-level time,Standard I2C,4.0,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(SCKL),SCL clock low-level time,Fast I2C,1.2,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(SCKL),SCL clock low-level time,Standard I2C,4.7,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
+CH32V005;CH32V006,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V006DS0.PDF:zh(p.32)+CH32V006DS0.PDF:en(p.46),CH32V006DS0.PDF
 CH32V103,ACC_HSI,Accuracy of HSI oscillator,T_A = -40℃~85℃,-2.5,,2.5,%,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,ACC_HSI,Accuracy of HSI oscillator,T_A = 0℃~70℃,-1.8,,1.8,%,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,Avg_Slope,Average slope,,3.3,4.3,5.3,mV/℃,#,confirmed,CH32V103DS0.PDF:zh(p.32)+CH32V103DS0.PDF:en(p.36),CH32V103DS0.PDF
 CH32V103,C_ADC,Internal sample and hold capacitor,,,30,,pF,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,C_IO,I/O pin capacitor,,,5,,pF,#,confirmed,CH32V103DS0.PDF:zh(p.26)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
+CH32V103,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
 CH32V103,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.26),CH32V103DS0.PDF
 CH32V103,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.26),CH32V103DS0.PDF
 CH32V103,DuCy_(HSE),Duty Cycle,,,50,,%,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.26),CH32V103DS0.PDF
@@ -1901,12 +2049,28 @@ CH32V103,t_SU(HSE),Startup time,V_DD stabilization,,1,2,ms,#,confirmed,CH32V103D
 CH32V103,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,t_SU(LSE),Startup time,V_DD stabilization,,200,500,mS,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.27),CH32V103DS0.PDF
 CH32V103,t_SU(LSI),LSI oscillator startup stabilization time,,,,82,us,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
+CH32V103,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
 CH32V103,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,t_VDD,V_DD fall time rate,,30,,∞,us/V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,t_WUSTDBY,Wake up from Standby mode,Wakeup time from low-power mode; Time to wake regulator up from low-power mode + HSI RC clock wake-up + flash start,,340,,us,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
+CH32V103,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
 CH32V103,t_prog,16-bit programming time,T_A = -40℃~85℃,2.4,2.75,3.2,ms,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
 CH32V103,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,t_s,Sampling time,f_ADC = 14MHz,0.107,,17.1,us,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
+CH32V103,t_w(SCKH),SCL clock high level time,Fast I2C,0.6,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_w(SCKH),SCL clock high level time,Standard I2C,4.0,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_w(SCKL),SCL clock low level time,Fast I2C,1.2,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_w(SCKL),SCL clock low level time,Standard I2C,4.7,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
+CH32V103,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V103DS0.PDF:zh(p.28)+CH32V103DS0.PDF:en(p.32),CH32V103DS0.PDF
 CH32V103,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode; Use HSI RC clock to wakeup,,5.8,,us,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,t_wustop,Wake up from Stop mode (voltage regulator is in Run mode),Wakeup time from low-power mode; HSI RC clock wakeup,,253,,us,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,t_wustop,Wake up from the stop mode (voltage regulator is in low-power mode),Wakeup time from low-power mode; Time to wake regulator up from low-power mode + HSI RC clock wake-up + flash startup,,253,,us,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
@@ -1916,6 +2080,8 @@ CH32V203,C,Recommended load capacitance and corresponding crystal serial,R_S <70
 CH32V203,C,Recommended load capacitance and corresponding crystal series impedance RS,R_S =60Ω(1),,20,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V203DS0.PDF:zh(p.49)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
+CH32V203,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
 CH32V203,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
 CH32V203,DuCy_(HSE),Duty cycle,,,50,,%,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
@@ -2193,6 +2359,12 @@ CH32V203,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed
 CH32V203,t_SU(LSE),Startup time,VDD is stable,,800,,mS,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,t_SU(LSI),LSI oscillator startup stabilization time,LSE disabled,,5,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_SU(LSI),LSI oscillator startup stabilization time,LSE enabled,,230,,us,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
+CH32V203,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_VDD,V_DD fall time rate,,20,,∞,us/V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V_DDA/2, C_LOAD =5pF,R_LOAD =4kΩ",,,368,ns,#,reference,CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
@@ -2200,8 +2372,18 @@ CH32V203,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1) (
 CH32V203,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1) (V203x); LDO stabilization time + HSI RC clock wake up + code load time(2),,4.82,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_erase_page,Page (256 bytes) erase time,,,16,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,t_erase_sec,Sector (4K bytes) erase time,,,16,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
+CH32V203,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,t_prog_page,Page (256 bytes) programming time,,,2,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
+CH32V203,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.44)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
+CH32V203,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1) (V203RBT6); Wake up using HSI RC clock,,2.6,,us,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1) (V203x); Wake up using HSI RC clock,,1.44,,us,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_wustop,Wakeup from Stop mode (voltage regulator is in low-power mode),Wakeup time from low-power mode(1) (V203RBT6); Voltage regulator wakeup time from low-power mode + HSI RC clock wake up,,299,,us,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
@@ -2215,6 +2397,8 @@ CH32V203;CH32V205,C,Recommended load capacitance and corresponding crystal serie
 CH32V203;CH32V205,C,Recommended load capacitance and corresponding crystal serial impedance R_S,R_S =70kΩ,,,15,pF,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,C_ADC,Internal sample and hold capacitor,,,10.3,,pF,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V205DS0.PDF:zh(p.57)+CH32V205DS0.PDF:en(p.66),CH32V205DS0.PDF
+CH32V203;CH32V205,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V205DS0.PDF:zh(p.44)+CH32V205DS0.PDF:en(p.51),CH32V205DS0.PDF
 CH32V203;CH32V205,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32V205DS0.PDF:zh(p.44)+CH32V205DS0.PDF:en(p.51),CH32V205DS0.PDF
 CH32V203;CH32V205,DuCy_(HSE),Duty cycle,,,50,,%,#,reference,CH32V205DS0.PDF:en(p.51),CH32V205DS0.PDF
@@ -2402,6 +2586,12 @@ CH32V203;CH32V205,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,
 CH32V203;CH32V205,t_SU(LSE),Startup time,V_DD is stable,,1000,,mS,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(LSI),LSI oscillator startup stabilization time,,,400,,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(NWAITV_CLKH),FSMC_CLK high before FSMC_NWAIT valid,,6,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.62)+CH32V205DS0.PDF:en(p.71),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU_(NWAITV_CLKH),FSMC_CLK high before FSMC_NWAIT valid,,6,,,ns,#,reference,CH32V205DS0.PDF:en(p.72),CH32V205DS0.PDF
 CH32V203;CH32V205,t_V(A_NE),FSMC_NE low to FSMC_A active,,0,,5,ns,#,confirmed,CH32V205DS0.PDF:zh(p.60)+CH32V205DS0.PDF:en(p.69),CH32V205DS0.PDF
 CH32V203;CH32V205,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32V205DS0.PDF:zh(p.61)+CH32V205DS0.PDF:en(p.70),CH32V205DS0.PDF
@@ -2457,6 +2647,10 @@ CH32V203;CH32V205,t_h(NOE-ALE),FSMC_NOE high to FSMC_ALE invalid,,4*tHCLK,,,ns,#
 CH32V203;CH32V205,t_h(NOE-D),FSMC_NOE high after FSMC_D[15:0] data is valid,,15,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
 CH32V203;CH32V205,t_h(NWE-ALE),FSMC_NWE high to FSMC_ALE invalid,,2*tHCLK,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
 CH32V203;CH32V205,t_h(NWE-D),FSMC_NWE high to FSMC_D[15:0] data invalid,,2*tHCLK,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
+CH32V203;CH32V205,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_h_(CLKH_NWAITV),FSMC_CLK high after FSMC_NWAIT valid,,2,,,ns,#,reference,CH32V205DS0.PDF:en(p.72),CH32V205DS0.PDF
 CH32V203;CH32V205,t_prog_page,Page (256 bytes) programming time,,1.6,2.0,2.5,ms,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,t_s,Power-on time,f_ADC = 80MHz,3.5,,239.5,1/fADC,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
@@ -2465,6 +2659,12 @@ CH32V203;CH32V205,t_su(D-NOE),FSMC_NOE high before FSMC_D[15:0] data is valid,,2
 CH32V203;CH32V205,t_v(NWE-D),FSMC_NWE low to FSMC_D[15:0] data valid,,0,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
 CH32V203;CH32V205,t_w(NOE),FSMC_NOE low time,,4*tHCLK,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
 CH32V203;CH32V205,t_w(NWE),FSMC_NWE low time,,4*tHCLK,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.64)+CH32V205DS0.PDF:en(p.74),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
+CH32V203;CH32V205,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode; Wake up using HSI RC clock,,0.2,,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,t_wustop,Wakeup from Stop mode,Wakeup time from low-power mode; Wake up using HSI RC clock,,15,,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V208,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.33),CH32V208DS0.PDF
@@ -2476,6 +2676,8 @@ CH32V208,C_ADC,Internal sample and hold capacitor,,,40,,pF,#,reference,CH32V208D
 CH32V208,C_ADC,Internal sample and hold,,,8,,pF,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,C_IO,I/O pin capacitance,,,5,,pF,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V208DS0.PDF:zh(p.38)+CH32V208DS0.PDF:en(p.44),CH32V208DS0.PDF
+CH32V208,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V208DS0.PDF:zh(p.26)+CH32V208DS0.PDF:en(p.31),CH32V208DS0.PDF
 CH32V208,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32V208DS0.PDF:zh(p.27)+CH32V208DS0.PDF:en(p.32),CH32V208DS0.PDF
 CH32V208,DuCy_(HSE),Duty cycle,,,50,,%,#,confirmed,CH32V208DS0.PDF:zh(p.26)+CH32V208DS0.PDF:en(p.31),CH32V208DS0.PDF
@@ -2685,6 +2887,12 @@ CH32V208,t_SU(HSE),Startup time,"V_DD is stable, 8M crystal",,2.5,,ms,#,confirme
 CH32V208,t_SU(HSI),HSI oscillator startup,,,10,,us,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.33),CH32V208DS0.PDF
 CH32V208,t_SU(LSE),Startup time,VDD is stable,,800,,mS,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.33),CH32V208DS0.PDF
 CH32V208,t_SU(LSI),LSI oscillator startup stabilization time,,,100,,us,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
+CH32V208,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,t_VDD,V_DD fall time rate,,20,,∞,us/V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,t_VDDA,V_DDA fall time rate,,20,,∞,us/V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
@@ -2693,8 +2901,18 @@ CH32V208,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V_DDA/2, C_L
 CH32V208,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); LDO stabilization time + HSI RC clock wake up + code load time(2) (take 128K as example),,5.0,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,t_erase_page,Page (256 bytes) erase time,T_A = -40℃~85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,t_erase_sec,Sector (4K bytes) erase time,T_A = -40℃~85℃,,16,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,t_prog_page,Page (256 bytes) programming time,T_A = -40℃~85℃,,2,,ms,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.42),CH32V208DS0.PDF
+CH32V208,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.38),CH32V208DS0.PDF
+CH32V208,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
+CH32V208,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,2.6,,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,t_wustop,Wakeup from Stop mode (voltage regulator is in low-power mode),Wakeup time from low-power mode(1); Voltage regulator wakeup time from low-power mode + HSI RC clock wake up,,299,,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,t_wustop,Wakeup from Stop mode (voltage regulator is in Run mode),Wakeup time from low-power mode(1); Wake on HSI RC clock,,23.1,,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
@@ -2705,6 +2923,8 @@ CH32V303;CH32V305;CH32V307;CH32V317,C,Recommended load capacitance and correspon
 CH32V303;CH32V305;CH32V307;CH32V317,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.81)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.82)+CH32V20x_30xDS0.PDF:en(p.92),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.57)+CH32V20x_30xDS0.PDF:en(p.65),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,DuCy_HSE,Duty cycle,,,50,,%,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.57)+CH32V20x_30xDS0.PDF:en(p.65),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.67),CH32V20x_30xDS0.PDF
@@ -2902,6 +3122,12 @@ CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSE),Startup time,VDD is stable,,800,,m
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSI),LSI oscillator startup stabilization time,LSE off,,5,,ms,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSI),LSI oscillator startup stabilization time,LSE on,,230,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(NWAITV_CLKH),FSMC_NWAIT valid before FSMC_CLK high,,6,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.72)+CH32V20x_30xDS0.PDF:en(p.81),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.70)+CH32V20x_30xDS0.PDF:en(p.79),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_V(BL_NE),FSMC_NE low to FSMC_BL valid,,0,,5,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.70)+CH32V20x_30xDS0.PDF:en(p.79),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_V(DATA_NADV),FSMC_NADV high to data hold time,,2*tHCLK,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.71)+CH32V20x_30xDS0.PDF:en(p.80),CH32V20x_30xDS0.PDF
@@ -2961,6 +3187,10 @@ CH32V303;CH32V305;CH32V307;CH32V317,t_h(NOE-D),After FSMC_NOE high to FSMC_D[15:
 CH32V303;CH32V305;CH32V307;CH32V317,t_h(NWE-ALE),FSMC_NWE high to FSMC_ALE invalid,,2*tHCLK,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.84),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_h(NWE-D),FSMC_NWE high to FSMC_D[15:0] data invalid,,2*tHCLK,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.84),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_h(RDATA),Input data hold time,,1.2,2.0,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_h(TDATA),Transmit data hold time,,1.2,2.0,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_ih(CRS_DV),Carrier detect signal hold time,,2,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.77)+CH32V20x_30xDS0.PDF:en(p.86),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_ih(DV),Data valid signal hold time,,10,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.77)+CH32V20x_30xDS0.PDF:en(p.86),CH32V20x_30xDS0.PDF
@@ -2982,6 +3212,12 @@ CH32V303;CH32V305;CH32V307;CH32V317,t_su(TDATA),Transmit data setup time,,1.2,2.
 CH32V303;CH32V305;CH32V307;CH32V317,t_v(NWE-D),FSMC_NWE low to FSMC_D[15:0] data valid,,0,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.84),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_w(NOE),FSMC_NOE low time,,4*tHCLK,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.84),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_w(NWE),FSMC_NWE low time,,4*tHCLK,,,ns,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.84),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,2.4,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.60)+CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_wustop,Wakeup from Stop mode (voltage regulator is in low-power mode),Wakeup time from low-power mode(1); Voltage regulator wake-up time from low-power mode + HSI RC clock wake up,,76.7,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.60)+CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_wustop,Wakeup from Stop mode (voltage regulator is in Run mode),Wakeup time from low-power mode(1); Wake on HSI RC clock,,23.1,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.60)+CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
@@ -2992,6 +3228,8 @@ CH32V407;CH32V467,C,Recommended load capacitance and corresponding crystal serie
 CH32V407;CH32V467,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32V407DS0.PDF:zh(p.69)+CH32V407DS0.PDF:en(p.78),CH32V407DS0.PDF
+CH32V407;CH32V467,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
+CH32V407;CH32V467,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
 CH32V407;CH32V467,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.48)+CH32V407DS0.PDF:en(p.56),CH32V407DS0.PDF
 CH32V407;CH32V467,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.56),CH32V407DS0.PDF
 CH32V407;CH32V467,DuCy_(HSE),Duty cycle,,,50,,%,#,reference,CH32V407DS0.PDF:en(p.56),CH32V407DS0.PDF
@@ -3148,6 +3386,12 @@ CH32V407;CH32V467,t_SU(HSI),HSI oscillator startup stabilization time(1),,,,8,us
 CH32V407;CH32V467,t_SU(LSE),Startup time,V_DD is stable,,800,,mS,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(LSI),LSI oscillator startup stabilization time(1),,,230,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(NWAITV_CLKH),FSMC_CLK high before FSMC_NWAIT valid,,6,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.61)+CH32V407DS0.PDF:en(p.70),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(A_NE),FSMC_NE low to FSMC_A active,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.60)+CH32V407DS0.PDF:en(p.68),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.60)+CH32V407DS0.PDF:en(p.69),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(BL_NE),FSMC_NE low to FSMC_BL active,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.60)+CH32V407DS0.PDF:en(p.68),CH32V407DS0.PDF
@@ -3202,6 +3446,10 @@ CH32V407;CH32V467,t_h(NOE-ALE),FSMC_NOE high to FSMC_ALE invalid,,4*tHCLK,,,ns,#
 CH32V407;CH32V467,t_h(NOE-D),FSMC_NOE high after FSMC_D[15:0] data is valid,,15,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
 CH32V407;CH32V467,t_h(NWE-ALE),FSMC_NWE high to FSMC_ALE invalid,,2*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
 CH32V407;CH32V467,t_h(NWE-D),FSMC_NWE high to FSMC_D[15:0] data invalid,,2*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
+CH32V407;CH32V467,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
 CH32V407;CH32V467,t_prog_page,Page (256 bytes) programming time,T_A = -40℃~85℃,,1,15,ms,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_s,Power-on time,,1.5,,239.5,1/fADC,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,t_su(D-NOE),FSMC_NOE high before FSMC_D[15:0] data is valid,,20,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
@@ -3209,6 +3457,12 @@ CH32V407;CH32V467,t_su(DATA),Data setup time,,2.5,,,ns,#,confirmed,CH32V407DS0.P
 CH32V407;CH32V467,t_v(NWE-D),FSMC_NWE low to FSMC_D[15:0] data valid,,0,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
 CH32V407;CH32V467,t_w(NOE),FSMC_NOE low time,,4*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
 CH32V407;CH32V467,t_w(NWE),FSMC_NWE low time,,4*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.64)+CH32V407DS0.PDF:en(p.73),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
 CH32V407;CH32V467,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,2.4,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_wustop,Wakeup from Stop mode (The voltage regulator is in running mode),Wakeup time from low-power mode(1); Wake up using HSI RC clock,,23.1,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_wustop,Wakeup from Stop mode (The voltage regulator is in low-power mode),Wakeup time from low-power mode(1); Wake-up time of voltage regulator from low power consumption mode+wake-up time of +HSIRC clock,,76.7,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
@@ -3217,6 +3471,8 @@ CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0�
 CH32X033;CH32X035,C_ADC,Internal sample and hold capacitor,,,21,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,C_IO,Single I/O pin capacitor (without double I/O co-seal),,,5,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32X035DS0.PDF:zh(p.34)+CH32X035DS0.PDF:en(p.38),CH32X035DS0.PDF
+CH32X033;CH32X035,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,ED,Differential nonlinearity error,,,±1,±10,LSB,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
 CH32X033;CH32X035,EL,Integral nonlinearity error,,,±4,±20,LSB,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.37),CH32X035DS0.PDF
@@ -3327,14 +3583,30 @@ CH32X033;CH32X035,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference
 CH32X033;CH32X035,t_RSTTEMPO,Power on reset,,4,17,24,ms,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_RSTTEMPO,Other resets,,6,9,20,us,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_SU(HSI),HSI oscillator startup stabilization time,,1.5,,3.5,us,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,t_VDD,V_DD rise time rate,,0.1,,∞,us/V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_VDD,V_DD fall time rate,,10,,∞,us/V,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, DD C = 50pF,R = 5kΩ LOAD LOAD",,,1,us,#,confirmed,CH32X035DS0.PDF:zh(p.34)+CH32X035DS0.PDF:en(p.38),CH32X035DS0.PDF
 CH32X033;CH32X035,t_WUSTDBY,Wakeup from Standby mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,10,,us,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,t_erase_page,Page (256 bytes) erase time,,,2.5,3.0,ms,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,t_erase_sec,Sector (1K bytes) erase time,,,2.7,3.3,ms,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,t_prog_page,Page (256 bytes) programming time,,,1.5,2.0,ms,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,t_s,Sampling time,,,3.5,,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(SCKH),SCL clock high level time,Fast I2C,0.6,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(SCKH),SCL clock high level time,Standard I2C,4.0,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(SCKL),SCL clock low level time,Fast I2C,1.2,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(SCKL),SCL clock low level time,Standard I2C,4.7,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
+CH32X033;CH32X035,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,1,,us,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X033;CH32X035,t_wustop,Wakeup from Stop mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,10,,us,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
 CH32X305;CH32X315,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
@@ -3342,6 +3614,8 @@ CH32X305;CH32X315,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0
 CH32X305;CH32X315,C,Recommended load capacitance and corresponding crystal series impedance R_S,R_S =60Ω(1),,20,,pF,#,reference,CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,C_ADC,Internal sample and hold capacitor,,,4.5,,pF,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
+CH32X305;CH32X315,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
 CH32X305;CH32X315,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,DuCy_(HSE),Duty cycle,,,50,,%,#,reference,CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
@@ -3474,13 +3748,29 @@ CH32X305;CH32X315,t_STAB,Power on time,f_ADC = 16MHz,,,1,us,#,confirmed,CH32X315
 CH32X305;CH32X315,t_SU(HSE),Startup time,"V_DD stable, 20M crystal",,1,,ms,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,t_SU(HSI),HSI oscillator startup stabilization time,,,2,12,us,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
 CH32X305;CH32X315,t_SU(LSI),LSI oscillator startup stabilization time(1),,,230,,us,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(SDA),SDA data setup time,Fast I2C,100,,,ns,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(SDA),SDA data setup time,Standard I2C,250,,,ns,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
 CH32X305;CH32X315,t_VDD,V_DD rise time rate,,0,,∞,us/V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,t_VDD,V_DD fall time rate,,20,,∞,us/V,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,t_erase_block,Block erase time,T_A = -40℃~85℃,,3,,ms,#,reference,CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
 CH32X305;CH32X315,t_erase_sec,Sector erase time,T_A = -40℃~85℃,,3,,ms,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
+CH32X305;CH32X315,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
 CH32X305;CH32X315,t_prog_page,Page (256 bytes) programming time,T_A = -40℃~85℃,,1.5,,ms,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
 CH32X305;CH32X315,t_s,Sampling time,,3.5,,242.5,1/fADC,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,t_s,Sampling time,f_ADC = 80MHz,0.037,,3.031,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(SCKH),SCL clock high time,Fast I2C,0.6,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(SCKH),SCL clock high time,Standard I2C,4.0,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(SCKL),SCL clock low time,Fast I2C,1.2,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(SCKL),SCL clock low time,Standard I2C,4.7,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(STO:STA),Time from stop condition to start condition (bus free),Fast I2C,1.2,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
+CH32X305;CH32X315,t_w(STO:STA),Time from stop condition to start condition (bus free),Standard I2C,4.7,,,us,#,confirmed,CH32X315DS0.PDF:zh(p.38)+CH32X315DS0.PDF:en(p.43),CH32X315DS0.PDF
 CH32X305;CH32X315,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode; Wake up using HSI RC clock,,0.48,,us,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
 CH32X305;CH32X315,t_wustop,Wakeup from Stop mode (LDO is in low-power mode),Wakeup time from low-power mode; LDO wake-up time from low power mode + HSI RC clock wake-up time,,22.05,,us,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
 CH32X305;CH32X315,t_wustop,Wakeup from Stop mode (LDO is in normal mode),Wakeup time from low-power mode; Wake up using HSI RC clock,,6.6,,us,#,confirmed,CH32X315DS0.PDF:zh(p.34)+CH32X315DS0.PDF:en(p.39),CH32X315DS0.PDF
