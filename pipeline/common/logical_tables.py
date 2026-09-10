@@ -1630,7 +1630,12 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
     # 図の**他の名前セルも共有する頭文字**は、その図のフィールド命名の一部（DMA_INTFCRは
     # 全セルが`C`＝clearで始まる）。en版RM p173の記述表は`TCIFx`と接頭辞なしで書くので、
     # bit1に在る`CTCIF1`が偶然`TCIF`+bit1と一致して`TCIF1`へ縮みかけた（索引はチャネル番号で
-    # bit番号ではない）。3セル以上が同じ頭文字なら、その頭文字を落とす候補は認めない。
+    # bit番号ではない）。3セル以上が同じ頭文字なら、**その頭文字を落とすだけの候補**
+    # （`n == flat[1:]`）は認めない。
+    #
+    # 「頭文字が違えば全部拒否」にすると広すぎた——`TUSARTU4RST`（`USART4RST` の交錯）は
+    # 同じ行に T で始まる壊れたセルが3つ並ぶために弾かれ、直せていなかった（2026-09-10）。
+    # 守りたいのは「先頭1字を落として別の名前にする」形だけなので、そこに絞る。
     heads: dict[str, int] = {}
     for cell in table["cells"]:
         if cell["row_start"] < 1:
@@ -1680,7 +1685,7 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         candidates = [n for n in pool
                       if len(n) >= 3 and " " not in n and n != flat
                       and len(flat) <= 2 * len(n) + 2
-                      and not (n[:1] != flat[:1] and heads.get(flat[:1], 0) >= 3)
+                      and not (n == flat[1:] and heads.get(flat[:1], 0) >= 3)
                       and not _truncates_index(flat, n)
                       and _only_duplicate_glyphs(flat, n)
                       and _is_subsequence(n, flat)]
