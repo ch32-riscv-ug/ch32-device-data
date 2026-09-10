@@ -105,6 +105,49 @@ KNOWN_SHARED_LEADS = {
 }
 
 
+# **min ≤ typ ≤ max が崩れている行**は、資料の誤植か、列を1つずらして読んだ跡。
+# 名前で固定して、新しく増えたら落とす（`KNOWN_SHARED_LEADS` と同じ流儀）。
+#
+# `CH32V006DS0` の英語版 p.37 は `V_PVDhyst` を **5 / 20 / 6 mV** と刷っている
+# （2026-09-11に版面を描画して確認）。中文版は 60 で、兄弟の `CH32V002` も 5/20/60 なので
+# **英語版が 0 を落とした誤植**。行はすでに `conflict` で両論を持っている。
+KNOWN_UNORDERED_VALUES = {
+    ("operating_conditions", "CH32V005;CH32V006", "V_PVDhyst", "5", "20", "6"),
+}
+_NUMERIC_VALUE = re.compile(r"^[-+]?(?:\d+(?:\.\d+)?|\.\d+)$")
+
+
+def ordered_values(t: dict) -> list[str]:
+    """`min ≤ typ ≤ max` が数として読める行で成り立っているか。
+
+    **列を1つずらして読むと、たいてい大小が崩れる。** 資料の誤植と区別は付かないので
+    自動では直さず、**名前で固定した例外の外に出たら落とす**。数として読めない値
+    （`0.8*VDD`・`5*tHCLK`・`±10`・`∞`）は比べない——式や記号は大小を言えない。
+    """
+    bad = []
+    for name in ("operating_conditions", "absolute_maximum_ratings"):
+        for row in t.get(name, ()):
+            def number(key):
+                text = (row.get(key) or "").strip()
+                return float(text) if _NUMERIC_VALUE.match(text) else None
+            low, typical, high = number("min"), number("typ"), number("max")
+            pairs = [("min", low, "max", high), ("min", low, "typ", typical),
+                     ("typ", typical, "max", high)]
+            for lo_name, lo, hi_name, hi in pairs:
+                if lo is None or hi is None or lo <= hi:
+                    continue
+                key = (name, row["series"], row["symbol"],
+                       row.get("min", ""), row.get("typ", ""), row.get("max", ""))
+                if key in KNOWN_UNORDERED_VALUES:
+                    continue
+                bad.append(f"{name}: {row['series']} {row['symbol']} は "
+                           f"{lo_name}={lo:g} > {hi_name}={hi:g}"
+                           f"（{row['parameter'][:40]}）——列のずれか資料の誤植。"
+                           "確かめて check_tables.py の KNOWN_UNORDERED_VALUES へ")
+                break
+    return bad
+
+
 def shared_leads(t: dict) -> list[str]:
     """同じ (part_number, pin) を持つ pad の組を数え、記録と突き合わせる。"""
     together: dict[tuple[str, str], list[dict]] = {}
@@ -907,6 +950,7 @@ def main() -> int:
     bad += out_option(t)
     bad += conflict_keys(t)
     bad += shared_leads(t)
+    bad += ordered_values(t)
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)
 
