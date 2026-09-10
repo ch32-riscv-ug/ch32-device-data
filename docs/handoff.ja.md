@@ -66,6 +66,7 @@ git status --short                      # 未commitの変更（commitはユー�
 uv run tools/check_tables.py            # 全表の参照結合・書式・索引⊆証拠・manifest
 uv run tools/check_counts.py            # 比較表の数 vs pin側の数
 uv run tools/check_docs.py              # 文書が書いている行数・穴の状態 vs 実際の表と台帳
+uv run pipeline/checks/check_doctests.py  # 正規化規則の仕様（pipeline/ と tools/ の doctest）
 node tools/check_viewer.js              # pins.html の表示（node が要る唯一の検査）
 uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle→切替済みevidence→index→検査）
 ```
