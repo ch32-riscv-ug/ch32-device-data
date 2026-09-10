@@ -736,8 +736,9 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                    f"{page_link(url, number, f'the PDF, p.{number}')}.", ""]
     if lost_glyphs:
         output += [f"> ⚠ {lost_glyphs} subscript glyph(s) on this page appear as `*` "
-                   "because the PDF's text layer maps them to `*` (broken ToUnicode); "
-                   "the printed page shows the real subscripts -- read "
+                   "**in the PDF itself** -- the original prints a small asterisk where "
+                   "the subscript belongs (`V*` for `V_DD`), so the subscript is lost "
+                   "in the document, not in this rendering. Compare "
                    f"{page_link(url, number, f'the PDF, p.{number}')}.", ""]
     # 描画済みの図領域の**中**にある行・表・画像は、図の下へそのまま流すと
     # 「同じ内容が画像と文字で二重に出る」（preview初公開でユーザーが発見）。
@@ -990,9 +991,9 @@ def export(bundle: Path, out_root: Path, urls: dict[tuple[str, str], str]) -> Pa
         "figure could not be located carries a visible notice instead, and every\n"
         "page links back to the PDF. A table that spans pages is rendered in full\n"
         "on the page where it starts; the following pages carry a visible pointer.\n"
-        "Where the PDF's own text layer maps subscript glyphs to `*` (broken\n"
-        "ToUnicode), the page starts with a notice -- the printed page shows the\n"
-        "real subscripts.\n\n"
+        "Where the PDF itself prints a small asterisk in place of a subscript\n"
+        "(`V*` for `V_DD`), the page starts with a notice -- the subscript is lost\n"
+        "in the original document, not in this rendering.\n\n"
         + "\n".join(links) + "\n", encoding="utf-8")
     return out
 

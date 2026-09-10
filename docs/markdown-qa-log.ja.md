@@ -3510,3 +3510,43 @@ min/max を取るので、**推奨動作範囲と絶対最大定格が同じ表�
 既存の正本は**1バイトも動いていない**（純粋な追加）。登録の儀式は
 `KEYS`・`ROW_COUNTS`・信頼度表・evidence/README（日英）・台帳・`regenerate.py` の6箇所で、
 D19「表の登録儀式の機械化」で入れた検査が漏れを全部名指しした。
+
+## 添字が `*` になるのは PDF の版面そのもの——記録が誤っていた（2026-09-10）
+
+D19 の「下付き修復の取り残し」を片付けようとして、**2026-09-02の特定が誤りだった**ことが
+分かった。当時は「PDFのToUnicodeが添字glyphを`*`に写す破損」と記録していた。根拠は
+「pdfplumberでもpypdfium2でも同じ`*`になる」ことだったが、**どちらもToUnicodeを引くので、
+この観察では版面が`*`である可能性を排除できない**。
+
+### 原本を描画して確かめた
+
+pypdfium2で該当セルだけを切り出して目視した（`scale=10`）。
+
+| 文書・ページ | 文字層 | 版面 |
+|---|---|---|
+| `CH32H417DS0.en` p.104 | `0.45*V*+0.41` | **`0.45*V*+ 0.41`**（添字の位置に小さな `*`） |
+| `CH32V205DS0.en` p.56 | `CL = 50pF, V* = 2.7-3.6V` | **`CL = 50pF, V* = 2.7-3.6V`**（同じ） |
+
+**版面が `*` を刷っている。** 文字層の問題ではなく**資料側の組版の欠落**で、engine を変えても
+OCR でも font 形状解析でも復元できない——`DD` はどこにも無い。
+
+裏づけがもう1つ: **zh と en で件数が完全に同数**（`CH32H417DS0` 224/224・`CH32V203DS0` 28/28・
+`CH32V208DS0` 28/24 …）。同じ組版工程が両版を作っているなら同じ場所で同じ欠落が出る。
+字形の幅も `TimesNewRomanPSMT` の 0.5em で、`*` そのものの幅（添字の `DD` なら倍以上になる）。
+
+### 直したのは記録と、公開していた誤った案内
+
+人向けMarkdownの警告文が **「the printed page shows the real subscripts -- read the PDF」**
+と書いていた。読者が言われたとおり原本を見ても、同じ `*` しか無い。**公開物が嘘を言っていた**
+ので直した:
+
+> ⚠ N subscript glyph(s) on this page appear as `*` **in the PDF itself** — the original
+> prints a small asterisk where the subscript belongs (`V*` for `V_DD`), so the subscript is
+> lost in the document, not in this rendering.
+
+併せて `pipeline/common/lost_subscripts.py` の docstring・`pipeline/README`（日英）・
+`check_markdown_parity` の説明・信頼度表・worklist を直した。`markdown parity` は 68/68 clean
+（警告の有無を見る検査なので文面の変更では落ちない）。
+
+**教訓**: 「2つのengineで同じ結果」は**共通の入力を使っている限り独立な確認ではない**。
+文字層の話をしているときに文字層だけを2回読んでも、版面との食い違いは見えない。
