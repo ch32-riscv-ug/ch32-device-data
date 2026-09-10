@@ -3356,3 +3356,59 @@ D19 の最後。`V -V`／`DD SS`（＝ `V_DD-V_SS`）が `V-VDDSS` と読まれ�
 無いので重複判定を通らない）・`SWPMI`|`I2C3`（zh の bit 図は記述表に無い略記で書く）・
 `5USARTRST`|`T4USART3URST`（数字まで混ざる）。**どれも記述表の名前だけでは決まらない**。
 次に効きそうなのは「隣のセルの綴りを重複の出所として使う」——いまは自セルの中だけ見ている。
+
+## 隣と接する1字を重複の出所として許した——bit図の混ざりが24セル直った（2026-09-10）
+
+前項で「次に効きそうなのは隣のセルの綴りを重複の出所として使うこと」と書いた案を測った。
+`_only_duplicate_glyphs`（落ちる文字は名前自身に在るものだけ）に、**左隣の末尾1字・右隣の
+先頭1字**を足して許す。列の境界を跨いだ字形は pdfplumber が両側のセルに入れるので、
+`CSS_HSE_DIS`|`SReserSved` の `S` のように**名前に無い文字**でも出所が説明できる。
+
+### そのまま入れると9セル壊れた
+
+素の緩和を全corpusに掛けると41セルが変わり、**うち9セルは改悪**だった:
+
+| 変化 | 何が起きたか |
+|---|---|
+| `TXFIFOE` → `TXFITFXOFEI`（3件） | 候補が `TXFIFOE`/`TXFIFOF` の2つに増えて決まらず、**既に直っていたセルが壊れた形に戻った** |
+| `STBITERRC` → `STBITERRIE`（3件） | SDIO_ICR（clear）のセルが、同じページの SDIO_MASK 側の名前へ化けた |
+| `EXTI10` → `EXTI0`（2件） | 左隣 `EXTI11` の末尾 `1` を借りて**索引が変わった**。`EXTI11`\|`EXTI10`\|`EXTI9` の並びで図は正しかった |
+| `ADC2_ETRGINJ_RM` → `ADC2_ETRGINJ_R` | 記述表の Name 列が折り返しで `M` を落としており（`ADC1_ETRGINJ_R⏎M` が隣にある）、**図のほうが正しい** |
+
+### 歯止め3つ
+
+1. **後詰めにする**——自セルの中だけの判定で候補が1つに決まるなら、そちらを使う。緩和は
+   候補が0のときだけ。これで `TXFIFOE` と `STBITERRC` の6件が消える（既存の判定は不変）。
+2. **数字は借りない**——接する1字のうち英字だけを許す。索引が変わる壊れ方（`EXTI10`）は
+   最悪なので、`_only_duplicate_glyphs` の docstring が守ってきた「索引を失わせない」を
+   そのまま数字にも適用する。
+3. **候補が描画文字の接頭辞になる形は認めない**——末尾を落とすだけ（`ADC2_ETRGINJ_RM` →
+   `ADC2_ETRGINJ_R`）は交錯の形ではない。
+
+なお「接する**1字**だけ」も歯止めの一部。2字へ広げると `AWDIE`|`EOCI` の `EOCI` が `EOC` へ
+縮む——記述表には `EOC` と `EOCIE` の両方が在り、正しいのは取りこぼした `EOCIE` のほうで、
+縮めるのは誤り。1字に絞ると `I` の出所が無くなって候補が立たない。
+
+### 結果——24セル、全て原本と照合した
+
+| 直った綴り | 名前 | 根拠 |
+|---|---|---|
+| `SReserSved`・`CReserrved`・`ReserSved`・`ReserGved`・`ReserPved`・`ReserFved`・`Reser Cved`（計13） | `Reserved` | 隣の1字が紛れただけ |
+| `EEOPG`（2件） | `EOP` | FLASH_STATR `FWAKE_FLAG`\|`EOP`\|`WRPRTERR`。`G` は左隣の末尾 |
+| `BIDICOE` | `BIDIOE` | SPI_CTLR1 bit14。`C` は右隣 `CRCEN` の先頭 |
+| `RX_BUS CY` | `RX_BUSY` | USART_STATR bit10。`C` は右隣 `CTS` の先頭 |
+| `DMA IEN` | `DMAEN` | I2C_CTLR2 `LAST`\|`DMAEN`\|`ITBUFEN`。`I` は右隣の先頭 |
+| `EHM ROD`・`EHMO RD`（3件） | `EHMOD` | FLASH_CTLR。`R` は隣の `Reserved` |
+| `TXFIRFOHEIE` | `TXFIFOHEIE` | SDIO_MASK bit14。`R` は右隣 `RXACTIE` の先頭 |
+| `I2C1 URST` | `I2C1RST` | RCC_APB1PRSTR。`U` は右隣 `USART5RST` の先頭 |
+| `WKUP_MD[1 R:0]` | `WKUP_MD[1:0]` | `R` は隣の `Reserved` |
+| `RI ETIE` | `ETIE` | ETH 割り込み許可の bit10（記述表が `10 ETIE` と書く）。`R` は左隣 `PHYLINK_IER` の末尾 |
+
+長くなったセルは0、`markdown parity` は 68/68 clean、正本CSVは無変化。
+
+### 選別の数え直し
+
+「境界で1字が重なる」の選別スクリプトを組み直した（前回のものは残していなかった）。
+名前らしいセルの条件を「2字以上・英数字始まり・英字を含む・空白1つまで・24字以内」と
+置いたところ **518候補 / 両方実名485 / 残り33**——前回の記録（523/477/34）とほぼ同じで、
+差は識別子の絞りの細部。この緩和で**残りは31**になった。
