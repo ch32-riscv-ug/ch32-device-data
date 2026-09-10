@@ -123,6 +123,10 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     # 30行のうち8行は綴りの差」と書いたままで、実際は 109/76、綴りの差は 2026-09-09 に
     # 対応付けの側で外していた（2026-09-10に発見）。
     ("index/README.ja.md", r"\*\*(?P<n>[\d,]+)行に相手の値が入り", "conflicts:with_alternative"),
+    ("docs/table-reliability.ja.md", r"\*\*(?P<n>[\d,]+)行に相手の値が入り",
+     "conflicts:with_alternative"),
+    ("docs/table-reliability.ja.md", r"相手の値が入り、(?P<n>[\d,]+)行は空",
+     "conflicts:without_alternative"),
     ("index/README.ja.md", r"相手の値が入り、(?P<n>[\d,]+)行は空", "conflicts:without_alternative"),
     ("index/README.md", r"\*\*(?P<n>[\d,]+) rows carry an alternative", "conflicts:with_alternative"),
     ("index/README.md", r"an alternative and (?P<n>[\d,]+) do not", "conflicts:without_alternative"),
