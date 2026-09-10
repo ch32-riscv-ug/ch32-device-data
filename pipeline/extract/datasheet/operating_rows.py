@@ -145,7 +145,10 @@ KEEP = re.compile(r"^(?:[FfTtVIiRCEN]_|C$|E[DLOT0]|ACC_|Du[CT]y_|g_m$|Avg_Slope$
 # **記号セルが2つの記号を畳んでしまった行は採らない。** `t_/t_r(SCK)_f(SCK)` は
 # `t_r(SCK)` と `t_f(SCK)` の2行が、サブスクリプトの折返しで1つになったもので、
 # 値がどちらのものか決められない（`f_/t_SCK_SCK`・`C_/C_L1_L2` も同型）。
-MERGED_SYMBOL = re.compile(r"^[A-Za-z]+_/")
+# 添字を行で対応づけられるようになって綴りが変わった（`f_/t_SCK_SCK` → `f_SCK/t_SCK`）ので、
+# **斜線の右にも添字がある**形を足す。`V_POR/PDR` のように斜線が1つの名前の中にあるものは
+# 右側に `_` が無いので残る。
+MERGED_SYMBOL = re.compile(r"^[A-Za-z]+_/|/[A-Za-z]+_")
 # 表の見出しが本文の行として読まれることがある（記号欄が `Symbol`、単位欄が
 # `Unit`）。ページ内で表が続くときに起きる。
 HEADER_ROW = frozenset({"Symbol", "符号", "Parameter", "参数"})
@@ -343,6 +346,15 @@ def split_pin_group(cell):
 def norm_symbol(cell):
     # 添字を挟んで割れた脚注を先に畳む（`V (2⏎OHSAT⏎)` → `V ⏎OHSAT`）。
     cell = FOOTNOTE_SPLIT.sub(lambda m: "\n" + m.group(1), cell or "")
+    # **基底が1行目に並び添字が2行目に並ぶ組版**は、行を`_`で繋ぐだけでは読めない
+    # （`V -V`／`DD SS` は `V_-V_DD_SS` になってしまう）。絶対最大定格表を読み始めて
+    # 実物が出たので呼ぶ（`V_DD-V_SS`・`V_HV-GND`・`|△V_DD_x|`。全corpus 30セル）。
+    # **記号は2行のときだけ**——3行以上は添字そのものが割れた形で、最後の行を添字と
+    # 読むと語順が壊れる（`I⏎LOAD_PG⏎A` は `I_LOAD_PGA`。`I_A_LOAD_PG` になっていた）。
+    if len([x for x in cell.split("\n") if x.strip()]) == 2:
+        paired = pair_line_subscripts(cell, sep="_")
+        if paired is not None:
+            cell = paired
     parts = [p.strip() for p in cell.split("\n") if p.strip()]
     sym = FOOTNOTE.sub("", "_".join(parts))
     # 添字はセル内で改行にも空白にもなる。"F HSE_ext" は F_HSE_ext、
@@ -352,6 +364,11 @@ def norm_symbol(cell):
     sym = re.sub(r"[\s_]+", "_", sym).strip("_")
     # 添字の括弧は版で全角になる（`C_in（LSE）`）。同じ記号として引けるように揃える。
     sym = sym.translate(WIDE_PARENS)
+    # **`I/O` と `IO` は同じ添字**。版で綴りが割れる（zh は `I IO`、en は `I I/O`）ので
+    # 揃えないと同じ事実が別の記号として並ぶ——絶対最大定格表を読み始めて14行が
+    # 相手を失い reference になった。斜線を一律に潰すのは誤り（`V_POR/PDR`・
+    # `f_SCK/t_SCK`・`C_L1/C_L2` は2つの名前を繋ぐ斜線）なので `I/O` だけを揃える。
+    sym = sym.replace("I/O", "IO")
     sym = SYMBOL_FIX.get(sym, sym)
     # 「F_HCLK or F_SYS」のような複合表記（orは英語版、或は中国語版）は、
     # サブスクリプトの折返しで語順が壊れるため HCLK を含めば F_HCLK に畳む。
@@ -384,6 +401,13 @@ def attach_subscript(text: str) -> str:
 def norm_text(cell):
     # 行末のハイフンで割れた語を先に繋ぐ（`high-`⏎`speed`。規則と実測は wrap_rules）
     cell = wrap_rules.join_hyphen_wrap(cell or "")
+    # **基底が本文に並び、添字が最後の行にまとめて置かれる**組版（`Total current of all
+    # V /V power lines (source)`⏎`DD DDA`）。平坦化してから `attach_subscript` で戻すのは
+    # 比較演算子の前の裸の記号だけなので、この形は届かない——行の構造が残るうちに戻す
+    # （絶対最大定格表の `描述` 欄に集中。全corpus 66セル）。
+    paired = pair_line_subscripts(cell, sep="_", flatten=False)
+    if paired is not None:
+        cell = paired
     text = re.sub(r"\s+", " ", cell.replace("\n", " ")).strip()
     for pattern, repl in TEXT_REPAIRS:
         text = pattern.sub(repl, text)
@@ -397,9 +421,12 @@ def norm_text(cell):
 # 取り残される。`CH32H417DS0` の `V_OHSAT` は `V -160`＋添字`DD33A` で、`DD33` と読むと
 # `VDD33-160A` になり、en 版の別ページ（`V -16`＋`DD33A`＋`0`）では `VDD33-16A0` という
 # 壊れた数になっていた——同じ事実が3通りに綴られて偽の食い違いが3件出た。2026-09-09）
-VALUE_SUBSCRIPTS = ("DD33A", "DD33", "DDIO", "DDA", "DD8", "CC12V", "HCLK", "SCK",
-                    "DD", "IO")
-BARE_BASE = re.compile(r"(?<![A-Za-z])([VtIfCRT])(?![A-Za-z])")
+VALUE_SUBSCRIPTS = ("DD33A", "DD12A", "DD33", "DDIO", "DDA", "DD8", "CC12V", "HCLK",
+                    "SCK", "DD", "IO")
+# `I/O` の `I` は基底ではない（語そのもの）。除かないと、折り返しの2行目を添字と
+# 取り違える——`I/O pin voltage when using`⏎`HSADC` が `I_HSADC/O pin voltage when using`
+# になった（`CH32H417DS0`。2026-09-10の実測）。
+BARE_BASE = re.compile(r"(?<![A-Za-z])([VtIfCRT])(?![A-Za-z]|/O)")
 # 小数点のあとに数が続かない＝添字を数の途中から抜いてしまった跡。
 BROKEN_NUMBER = re.compile(r"\d\.(?!\d)|\.\.")
 
@@ -462,34 +489,57 @@ def attach_value_subscript(value: str) -> str:
 #
 # 全corpus実測（2026-09-10）: 値の欄でこの形は**この1セルだけ**。同じ形は記号セルに19件ある
 # （`V -V`/`DD SS` ＝ 絶対最大定格の `V_DD-V_SS`）が、そちらは記号の経路なので触らない。
-VALUE_SUB_TOKEN = re.compile(r"^(?:" + "|".join(VALUE_SUBSCRIPTS) + r"|S|A|SS|IO18)$")
+# 添字らしいトークン: **大文字で始まる短い綴り**（`DD33A`・`SS`・`IO18`・`DD_ETH`・`DD_x`）。
+# 一覧で持つと絶対最大定格表の語彙（`HV`・`DDK`・`DD12A`・`B`・`S`・`DD_ETH`）で足りなくなる。
+# 括弧を含む添字（`ESD(HBM)`・`INJ(PIN)`）はここで落ちて従来の連結へ回る——結果は同じ。
+SUB_TOKEN = re.compile(r"^[A-Z][A-Za-z0-9/]*(?:_[A-Za-z0-9]+)*$")
 
 
-def pair_line_subscripts(cell: str | None, sep: str = "") -> str | None:
-    r"""1行目の基底と2行目の添字を順に対応させる。形が合わなければ None。
+def pair_line_subscripts(cell: str | None, sep: str = "",
+                         flatten: bool = True) -> str | None:
+    r"""**最後の行**の添字を、それより前の行の基底へ順に対応させる。合わなければ None。
 
-    `sep` は基底と添字の間に置く字。値の欄は地続き（`VCC12V+VS`）。記号の欄でも同じ組版が
-    あり（`V -V`／`DD SS` ＝ `V_DD-V_SS`）`sep="_"` で読めるが、**その行が載る絶対最大定格表を
-    まだ読んでいない**ので呼ぶ側は無い（D19に記録）。
+    `sep` は基底と添字の間に置く字。値の欄は地続き（`VCC12V+VS`）、記号と文章の欄は `_`
+    （`V_DD-V_SS`・`T_A = -40℃~85℃`）。`flatten` は値の欄のための空白潰し——文章では
+    残す代わりに、添字を挿した跡に残る `)` `/` の前の空白だけ詰める（`(V )`＋`DD` は
+    `(VDD)`）。
 
     >>> pair_line_subscripts("V +V\nCC12V S")
     'VCC12V+VS'
     >>> pair_line_subscripts("V -V\nDD SS", sep="_")
     'V_DD-V_SS'
-    >>> pair_line_subscripts("V -0.4\nDD") is None      # 基底1つ（従来の経路）
-    True
+    >>> pair_line_subscripts("V -0.3\nSS")
+    'VSS-0.3'
+    >>> pair_line_subscripts("V -GND\nHV", sep="_")
+    'V_HV-GND'
+    >>> pair_line_subscripts("External main supply voltage (V )\nDD",
+    ...                      sep="_", flatten=False)
+    'External main supply voltage (V_DD)'
+    >>> pair_line_subscripts("Total current of all V pins\nSS", sep="_", flatten=False)
+    'Total current of all V_SS pins'
     >>> pair_line_subscripts("3.3") is None
     True
+
+    3行以上でも読む——**添字の行は最後の1行**で、その前は版面の折り返し
+    （`External mains supply voltage⏎(including V and V )⏎DDA DD`）。
+
+    >>> pair_line_subscripts("supply voltage\n(including V and V )\nDDA DD",
+    ...                      sep="_", flatten=False)
+    'supply voltage (including V_DDA and V_DD)'
     """
     lines = [x for x in (cell or "").split("\n") if x.strip()]
-    if len(lines) != 2:
+    if len(lines) < 2:
         return None
-    head = FOOTNOTE.sub("", lines[0])
+    # 脚注は**値と記号の欄でだけ**落とす（`flatten`＝そちらの経路）。文章の欄で落とすと
+    # `R_S = 60Ω(1)` の `(1)` が消えて注記への手がかりを失う（14行が該当）。
+    head = " ".join(lines[:-1])
+    if flatten:
+        head = FOOTNOTE.sub("", head)
     bases = list(BARE_BASE.finditer(head))
-    tokens = [x for x in re.split(r"[\s,]+", lines[1].strip()) if x]
-    if len(bases) < 2 or len(bases) != len(tokens):
+    tokens = [x for x in re.split(r"[\s,]+", lines[-1].strip()) if x]
+    if not bases or len(bases) != len(tokens):
         return None
-    if not all(VALUE_SUB_TOKEN.match(tok) for tok in tokens):
+    if not all(SUB_TOKEN.match(tok) for tok in tokens):
         return None
     out, last = [], 0
     for base, tok in zip(bases, tokens):
@@ -497,7 +547,10 @@ def pair_line_subscripts(cell: str | None, sep: str = "") -> str | None:
         out.append(sep + tok)
         last = base.end(1)
     out.append(head[last:])
-    return "".join(out).replace(" ", "")
+    text = "".join(out)
+    if flatten:
+        return text.replace(" ", "")
+    return re.sub(r" +(?=[)/,.;])", "", text)
 
 
 def norm_value(cell):
@@ -522,7 +575,7 @@ def keep_row(row, lang, page_no):
         return False          # 表の見出しが本文として読まれたもの。黙って落とす
     if not KEEP.match(symbol):
         return False
-    if MERGED_SYMBOL.match(symbol):
+    if MERGED_SYMBOL.search(symbol):
         DROPPED.append(f"{lang} p.{page_no} {symbol}: 2つの記号が1行に畳まれている")
         return False
     unit = row.get("unit") or ""
