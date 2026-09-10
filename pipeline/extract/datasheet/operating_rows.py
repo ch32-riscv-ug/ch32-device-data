@@ -725,9 +725,10 @@ def read_edition(bundle, lang):
             caption = ((record.get("caption") or {}).get("text") or "")
             if caption.strip():
                 last_caption = caption
-            tables.append((last_caption, record, column_edges(record)))
+            tables.append((last_caption, bool(caption.strip()), record,
+                           column_edges(record)))
         if not hit and not carry and not any(
-                TABLE_CAPTION.search(cap) for cap, _, _ in tables):
+                TABLE_CAPTION.search(cap) for cap, _, _, _ in tables):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
@@ -735,7 +736,7 @@ def read_edition(bundle, lang):
         # 無関係な表を拾っても記号の絞り込みで落ちる。
         carry_from, carry = carry and not hit, hit
         page_ok = hit or carry_from
-        for caption, record, edges in tables:
+        for caption, own_caption, record, edges in tables:
             # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
             if not page_ok and not TABLE_CAPTION.search(caption):
                 continue
@@ -746,7 +747,8 @@ def read_edition(bundle, lang):
             fresh = True
             if {"symbol", "min", "condition"} <= set(cols):
                 last_cols, last_edges = cols, edges
-            elif (last_cols and len(tbl[0]) == len(last_cols)
+            elif (last_cols and not own_caption
+                  and len(tbl[0]) == len(last_cols)
                   and (carry_from or TABLE_CAPTION.search(caption)
                        or same_edges(edges, last_edges))):
                 # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
@@ -776,6 +778,13 @@ def read_edition(bundle, lang):
                 fresh = False
             else:
                 continue
+            # **自分の表題を持つ表は、前の表の続きではない**（続きの断片は表題を持たない
+            # ——表題は表の先頭の上にあるから）。F-60 と同じ形で、`extract_remap` では
+            # FSMC の断片が直前の ADC の格子に付いていた。ここでは4表が該当し
+            # （`表3-6-1 运行模式下典型的电流消耗` ほか。列が `典型值` 2本の別の形で、
+            # この抽出器の型では表せない）、借りた並びで読んだ行は `keep_row` の値検査に
+            # 全部落ちていた——だから出力は変わらないが、形として閉じておく。
+            # それらの表は `extract_low_power` が caption で選んで読む。
             # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まってからで
             # ないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
             filled = fill_rowspans(record, cols)
