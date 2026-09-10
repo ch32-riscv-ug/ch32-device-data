@@ -465,11 +465,17 @@ def attach_value_subscript(value: str) -> str:
 VALUE_SUB_TOKEN = re.compile(r"^(?:" + "|".join(VALUE_SUBSCRIPTS) + r"|S|A|SS|IO18)$")
 
 
-def pair_line_subscripts(cell: str | None) -> str | None:
+def pair_line_subscripts(cell: str | None, sep: str = "") -> str | None:
     r"""1行目の基底と2行目の添字を順に対応させる。形が合わなければ None。
+
+    `sep` は基底と添字の間に置く字。値の欄は地続き（`VCC12V+VS`）。記号の欄でも同じ組版が
+    あり（`V -V`／`DD SS` ＝ `V_DD-V_SS`）`sep="_"` で読めるが、**その行が載る絶対最大定格表を
+    まだ読んでいない**ので呼ぶ側は無い（D19に記録）。
 
     >>> pair_line_subscripts("V +V\nCC12V S")
     'VCC12V+VS'
+    >>> pair_line_subscripts("V -V\nDD SS", sep="_")
+    'V_DD-V_SS'
     >>> pair_line_subscripts("V -0.4\nDD") is None      # 基底1つ（従来の経路）
     True
     >>> pair_line_subscripts("3.3") is None
@@ -488,7 +494,7 @@ def pair_line_subscripts(cell: str | None) -> str | None:
     out, last = [], 0
     for base, tok in zip(bases, tokens):
         out.append(head[last:base.end(1)])
-        out.append(tok)
+        out.append(sep + tok)
         last = base.end(1)
     out.append(head[last:])
     return "".join(out).replace(" ", "")
