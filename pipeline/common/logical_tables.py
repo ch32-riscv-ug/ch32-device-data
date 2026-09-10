@@ -1510,7 +1510,7 @@ def _truncates_index(text: str, name: str) -> bool:
             and text[len(name):].strip().isdigit())
 
 
-def _only_duplicate_glyphs(text: str, name: str) -> bool:
+def _only_duplicate_glyphs(text: str, name: str, edges: str = "") -> bool:
     """`text`から`name`へ縮めるとき、**落ちる文字が全て`name`自身に在る**か。
 
     交錯した重複は名前のグリフが二度出る形なので、落ちるのは名前が持つ文字だけになる
@@ -1518,6 +1518,15 @@ def _only_duplicate_glyphs(text: str, name: str) -> bool:
     `HSICAL[7:0]`は**Name列が索引や範囲を書かないだけで図が正しい**——落ちる`1`/`2`/`[7:0]`は
     名前に無い文字なので、この条件で弾ける（この歯止め無しでは905件が索引や範囲を失った）。
     空白は版面の都合なので例外。
+
+    `edges`は**隣のセルと接する1字**（左隣の末尾・右隣の先頭）のうち**英字だけ**。列の境界を
+    跨いだ字形はpdfplumberが両側のセルに入れるので、名前に無い文字でもここから来たなら重複と
+    見なせる（`CSS_HSE_DIS`|`SReserSved`の`S`。`Reserved`に大文字`S`は無い）。歯止めが2つ要る:
+
+    - **接する1字だけ**。2字へ広げると`AWDIE`|`EOCI`の`EOCI`が`EOC`へ縮む（本当は`EOCIE`の
+      取りこぼしで、縮めるのは誤り）。
+    - **数字は借りない**。`EXTI11`|`EXTI10`|`EXTI9`の`EXTI10`が、左隣の末尾`1`を借りて
+      `EXTI0`へ縮んだ（実測。索引が変わるので最悪の壊れ方）。
     """
     counts: dict[str, int] = {}
     for ch in name:
@@ -1527,9 +1536,25 @@ def _only_duplicate_glyphs(text: str, name: str) -> bool:
             continue
         if counts.get(ch):
             counts[ch] -= 1
-        elif ch not in name:
+        elif ch not in name and ch not in edges:
             return False
     return True
+
+
+def _touching_glyphs(table: dict, cell: dict) -> str:
+    """`cell`が隣と接する1字（左隣の末尾＋右隣の先頭）。"""
+    edges = ""
+    for other in table["cells"]:
+        if other is cell or other["row_start"] != cell["row_start"]:
+            continue
+        text = (other.get("text") or "").replace("\n", "").strip()
+        if not text:
+            continue
+        if other["column_end"] == cell["column_start"]:
+            edges += text[-1]
+        elif other["column_start"] == cell["column_end"]:
+            edges += text[0]
+    return edges
 
 
 def _is_subsequence(name: str, text: str) -> bool:
@@ -1682,13 +1707,29 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
             compact = len(flat.replace(" ", ""))
             pool = pool | {base + d for base in bases for d in digits
                            if compact >= 1.5 * (len(base) + len(d))}
-        candidates = [n for n in pool
-                      if len(n) >= 3 and " " not in n and n != flat
-                      and len(flat) <= 2 * len(n) + 2
-                      and not (n == flat[1:] and heads.get(flat[:1], 0) >= 3)
-                      and not _truncates_index(flat, n)
-                      and _only_duplicate_glyphs(flat, n)
-                      and _is_subsequence(n, flat)]
+        def survivors(edges: str) -> list[str]:
+            return [n for n in pool
+                    if len(n) >= 3 and " " not in n and n != flat
+                    and len(flat) <= 2 * len(n) + 2
+                    and not (n == flat[1:] and heads.get(flat[:1], 0) >= 3)
+                    and not _truncates_index(flat, n)
+                    and _only_duplicate_glyphs(flat, n, edges)
+                    and _is_subsequence(n, flat)]
+
+        candidates = survivors("")
+        # 自セルの中だけでは決まらなかったときに限り、**隣と接する1字**を重複の出所として
+        # 許す（`_only_duplicate_glyphs`の`edges`）。後詰めにするのが要——先に混ぜると
+        # `TXFITFXOFEI`に`TXFIFOE`と`TXFIFOF`の2つが立って**既に直っていたセルが戻った**し、
+        # SDIO_ICRの`STBITERRC`が同じページのMASK側の`STBITERRIE`へ化けた（実測）。
+        # 併せて、**候補が描画文字の接頭辞になる形**（`ADC2_ETRGINJ_RM`→`ADC2_ETRGINJ_R`）は
+        # 認めない——末尾を落とすだけの関係は交錯の形ではなく、この例では記述表のName列が
+        # 折り返しで`M`を落としていて図のほうが正しかった。
+        if not candidates:
+            edges = "".join(ch for ch in _touching_glyphs(table, cell)
+                            if ch.isalpha())
+            if edges:
+                candidates = [n for n in survivors(edges)
+                              if not flat.replace(" ", "").startswith(n)]
         # **記述表に実在する綴りを、合成した索引付きより優先する。** 合成候補
         # （`base`＋描画文字の中の数字）は「索引がbit番号でない図」のための後詰めで、
         # 記述表がその名前をそのまま載せているなら合成する必要が無い。優先しないと
