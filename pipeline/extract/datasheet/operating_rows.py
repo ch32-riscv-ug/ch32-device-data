@@ -179,6 +179,12 @@ UNIT_FOR = [
 # 正当で、"F_PCLK1 の max は F_HCLK" はC-5が求めているバス上限そのもの。
 # 確度の典型値は符号が ± で書かれる（CH32M030の ACC_LSI は typ が "±500"）。
 NUMERIC = re.compile(r"^[-+±]?(?:\d+(?:\.\d+)?|\.\d+)$")
+# **典型値が範囲で書かれることがある**（`V_HV` の `6~24 V`・`20~48 V`）。min と max は
+# 別に数で書いてあるのに、`typ` が読めないだけで `keep_row` が**行ごと**落としていた
+# ——全corpus実測で7行、どれも高圧レギュレータ／ゲートドライバの電源電圧（zh/en 対称）。
+# 数と区切り1つだけを許す形なので、条件文（`T_A = -40℃~105℃` は `=` と `℃` を含む）は
+# 通らない。区切りは版で全角（`～`）と半角（`~`）に割れるので `norm_value` で揃える。
+NUMERIC_RANGE = re.compile(r"^[-+]?(?:\d+(?:\.\d+)?|\.\d+)~[-+]?(?:\d+(?:\.\d+)?|\.\d+)$")
 # 式に使ってよい字。空白・`=`・全角はここに無いので、条件文は自動的に外れる。
 FORMULA_CHARS = re.compile(r"^[0-9A-Za-z._+\-*/()]+$")
 # **`*` が演算子の隣か末尾にあるのは、添字が文字層で `*` に化けた跡。**
@@ -196,6 +202,8 @@ def reads_as_value(text: str) -> bool:
 
     >>> [reads_as_value(v) for v in ("3.6", "±500", "∞", "0.8*VDD", "VDD-0.4")]
     [True, True, True, True, True]
+    >>> [reads_as_value(v) for v in ("6~24", "20~48", "-40~85")]
+    [True, True, True]
     >>> [reads_as_value(v) for v in ("F_HCLK", "VREF-", "2*tHCLK")]
     [True, True, True]
     >>> [reads_as_value(v) for v in ("F=8MHzHCLK", "HSI_LP = 0", "关闭", "6～24")]
@@ -203,7 +211,7 @@ def reads_as_value(text: str) -> bool:
     >>> [reads_as_value(v) for v in ("Enableallperipherals", "0.7*V*", "0.45*V+*0.41")]
     [False, False, False]
     """
-    if NUMERIC.match(text) or text == "∞":
+    if NUMERIC.match(text) or NUMERIC_RANGE.match(text) or text == "∞":
         return True
     if not FORMULA_CHARS.match(text) or LOST_SUBSCRIPT.search(text):
         return False
@@ -307,11 +315,19 @@ def same_edges(a: list[float], b: list[float], tol: float = 2.0) -> bool:
             and all(abs(x - y) <= tol for x, y in zip(a, b)))
 
 
-def norm_header(cell):
+def norm_header(cell, mapping: dict | None = None):
+    """ヘッダのセル → 正規列。`mapping` を渡すと語彙を差し替える（絶対最大定格表）。
+
+    **空白は種類を問わず落とす。** ASCII の空白しか落としていなかったので、狭い欄で
+    **語が改行で割れた**ヘッダが読めなかった——`符⏎号`・`最小⏎值`・`Symbo⏎l`。
+    全corpus実測（2026-09-10）で26セル・21表、うち**6表はそのせいで見出しとして通らず**、
+    直前の表の列の並びを借りて読まれていた（`CH32V103DS0.zh` p.26 の `表3-21 输入输出交流特性`
+    は先頭に `MODEx[1:0]配置` の列がある別の形なので、借りると列が1つずれる）。
+    """
     if CONDITION_HEADER.search(cell or ""):
         return "condition"
-    text = FOOTNOTE.sub("", (cell or "")).replace(" ", "").replace(".", "")
-    return HEADER_MAP.get(text.lower() if text.isascii() else text)
+    text = FOOTNOTE.sub("", "".join((cell or "").split())).replace(".", "")
+    return (mapping or HEADER_MAP).get(text.lower() if text.isascii() else text)
 
 
 # 記号セルの末尾に付く**ピン群**（`VOH（PA0-PA23）`・`VOL（PC0-PC7，PC14-…）`）。これは記号の
@@ -586,6 +602,9 @@ def same_value(a: str | None, b: str | None) -> bool:
 
 
 def norm_value(cell):
+    # 範囲の区切りは版で全角と半角に割れる（zh `6～24` / en `6~24`）。揃えないと
+    # 同じ事実が食い違いになり、全角のままでは公開する表にCJK帯の字が入る。
+    cell = (cell or "").replace("～", "~")
     paired = pair_line_subscripts(cell)
     if paired is not None:
         return paired
