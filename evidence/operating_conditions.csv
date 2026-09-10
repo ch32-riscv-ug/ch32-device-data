@@ -693,7 +693,7 @@ CH32M007;CH32V007,T_A,Ambient temperature,Chips with a model number ending in 6,
 CH32M007;CH32V007,T_A,Ambient temperature,Chips with a model number ending in 7,-40,,105,℃,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
 CH32M007;CH32V007,T_J,Junction temperature range,Chips with a model number ending in 6,-40,,105,℃,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
 CH32M007;CH32V007,V_AIN,Switching voltage range,,0,,VDD,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
-CH32M007;CH32V007,V_B,High-side bootstrap supply voltage,,VCC12V-1.2,VCC12V+VS,62,V,#,conflict,CH32V007DS0.PDF:en(p.41)+!CH32V007DS0.PDF:zh(typ=V+VCC12VS),CH32V007DS0.PDF
+CH32M007;CH32V007,V_B,High-side bootstrap supply voltage,,VCC12V-1.2,VCC12V+VS,62,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.41),CH32V007DS0.PDF
 CH32M007;CH32V007,V_B,Output DC bias voltage in PGA mode,"VBEN = 1, VBSEL",,VDD/4,,V,#,confirmed,CH32V007DS0.PDF:zh(p.45)+CH32V007DS0.PDF:en(p.64),CH32V007DS0.PDF
 CH32M007;CH32V007,V_B,Output DC bias voltage in PGA mode,"VBEN = 1, VBSEL = 0",,VDD/2,,V,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.63),CH32V007DS0.PDF
 CH32M007;CH32V007,V_B,Output DC bias voltage in PGA mode,"VBEN = 1, VBSEL = 1",,VDD/4,,V,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.63),CH32V007DS0.PDF
