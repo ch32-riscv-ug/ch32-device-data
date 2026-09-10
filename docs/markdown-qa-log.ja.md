@@ -3610,3 +3610,49 @@ byte 一致することも確かめた。
 資料が食い違っているので両論を `basis` に残す。
 
 正本は **3,178 → 3,209 行**（confirmed 2,998 → 3,061・reference 160 → 127・conflict 20 → 21）。
+
+## 字形の位置からセルを組み直した——綴りでは決まらない30セルが直った（2026-09-10）
+
+`fix_doubled_names` の綴り合わせ（部分列・落ちる文字・候補が1つ）では決まらない壊れ方が
+残っていた——`RXFIRFOXEFIIFOEE I` は `RXFIFOEIE` と `RXFIFOFIE` の**両方**を部分列に持ち、
+`OPA_PSELOAP_PAS_EPLSE` は相手が無い。**どの字形がどのセルの領域に在るかは geometry が
+知っている**ので、そちらから組み直す（`rebuild_from_glyphs`）。
+
+### 箱は「セルの左右 × その行の帯の上下」
+
+**セル自身の箱では足りない。** `apply_bitfield` が縦割れ名を連結したあとの箱は1行目しか
+覆わず、`TIM7RST` が `TIM7` に、`SERDESPLLRDYIE` が `SER` に切れた（実測）。行の帯
+（同じ行のセルの上端の最小・下端の最大）を使うと、全corpusの58対で現在の綴りと一致した。
+
+### 歯止めは「組み直した綴りが記述表の名前であること」
+
+これが無いと `5IACTS14` → `5IACTS1`・`IACTS15` → `ACTS15` のような切れ落ちが通る。
+全corpus実測: 組み直して現在と違う綴りになるセルは**791**、そのうち**記述表の名前になるのは
+30だけ**——残る761は全部この歯止めで落ちる。
+
+### 直った30セル（全部原本と照合した）
+
+| 出ていた綴り | 直った名前 | 件数 |
+|---|---|---:|
+| `RXFIRFOXEFIIFOEE I` / `TXFITFOXEFIIFOEE I` | `RXFIFOEIE` / `TXFIFOEIE` | 6 |
+| `Reserved DT` / `Reserved A` / `Reserved KA` / `ReseYrvedL` / `Y ReservedL` / `ReservedCC4OF` | `Reserved` | 7 |
+| `F_RX_RESET` | `IF_RX_RESET` | 3 |
+| `TXFIRFOHCEIE` / `FLASFH_ST R` | `TXFIFOHEIE` / `FLASH_ST` | 4 |
+| `CMDSRENCDC` / `RXOD RVXEORVRECR` / `NIENC` / `WRST` | `CMDRENDC` / `RXOVERRC` / `NIEN` / `SWRST` | 4 |
+| `OPA_PSELOAP_PAS_EPLSE` / `BBOOT_SMODE` / `UPIPE SON` | `OPA_PSEL` / `BOOT_MODE` / `PIPEON` | 3 |
+| `CMPA 1_TO_IO` / `CMP3_CCAP T` / `RDPRTd` | `CMP1_TO_IO` / `CMP3_CAP` / `RDPRT` | 3 |
+
+紛らわしい3件は記述表で裏を取った——`ReservedCC4OF` は `[15:13] Reserved` と `12 CC4OF` の
+2つのセルが混ざったもの（`CC4OF` は自分のセルに残る）、`FLASH_ST` は bit15 の実名
+（`FLASH low-power status indicator bit`）で `R32_FLASH_STATR` とは別、`PIPEON` は
+そのページの記述表で `PIPE` を含む唯一の名前。
+
+**境界で1字が重なる残りは 31 → 30。** `markdown parity` 68/68 clean、正本CSVは無変化。
+
+### 残る30件の形
+
+`SR`|`Res`（`Reserved` の断片で、字形から組み直しても `SR` のまま＝**版面がそう刷っている**）・
+`SWPMI`|`I2C3`（zh の bit 図は記述表に無い略記）・`5USARTRST`|`T4USART3URST`（組み直すと
+`4USARTRST` になるが**語順が違う**＝記述表の名前にならないので採らない）・`AWDIE`|`EOCI`
+（`EOCIE` の取りこぼし）。**綴りでも字形でも決まらないところまで来た**——次に効くとすれば
+記述表の名前を使わない別の裏づけ（同じレジスタの他版・EVTヘッダの綴り）になる。

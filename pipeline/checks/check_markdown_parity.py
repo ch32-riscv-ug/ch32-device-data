@@ -150,10 +150,14 @@ def check_page(page: dict, text: str, chains: dict[str, dict],
                 line_id, centers = bitfields[item["id"]]
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
                 logical_tables.fix_doubled_names(record, description_names)
+                # 綴りで決まらない残りを、字形の位置から組み直す。
+                logical_tables.rebuild_from_glyphs(record, description_names, chars_for)
             elif item["id"] in cross:
                 # 前ページの番号行で組み直した箱（ページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
                 logical_tables.fix_doubled_names(record, description_names)
+                # 綴りで決まらない残りを、字形の位置から組み直す。
+                logical_tables.rebuild_from_glyphs(record, description_names, chars_for)
             else:
                 # 通常表: exporterと同じ変換（ヘッダ折り返しの畳み込み・境界二重取り除去）を見る。
                 logical_tables.strip_duplicated_span_lines(record)
