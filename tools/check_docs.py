@@ -120,14 +120,6 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("docs/worklist.ja.md", r"証拠の表の conflict は (?P<n>[\d,]+) 行", "conflict_rows"),
     ("README.ja.md", r"比較表の属性（(?P<n>\d+)種類の綴り", "product_attributes:kinds"),
     ("README.ja.md", r"種類の綴り・(?P<n>[\d,]+)行", "product_attributes"),
-    # confidence の分布。**行数より先に動く**（資料の版が変わらなくても、
-    # 読み方を直せば confirmed が増える）ので、書いてあるなら数え直す。
-    ("docs/table-reliability.ja.md", r"\| product_attributes \| [\d,]+ \| confirmed (?P<n>[\d,]+)",
-     "product_attributes:confirmed"),
-    ("docs/table-reliability.ja.md", r"\| product_attributes \|[^|]*\|[^|]*conflict (?P<n>[\d,]+)",
-     "product_attributes:conflict"),
-    ("docs/table-reliability.ja.md", r"\| product_attributes \|[^|]*\|[^|]*ref (?P<n>[\d,]+)",
-     "product_attributes:reference"),
     ("docs/worklist.ja.md", r"`index/capabilities.csv`新設（2026-08-29。(?P<n>[\d,]+)行）",
      "index:capabilities"),
     ("docs/handoff.ja.md", r"目録(?P<n>\d+)表", "catalog_tables"),
@@ -162,7 +154,8 @@ def quantities() -> dict[str, int]:
            paths.CATALOG_TABLES + paths.EVIDENCE_TABLES}
     out.update({f"index:{name}": len(paths.load_index(name)) for name in paths.INDEX_TABLES})
     # 表ごとの confidence の分布と、product_attributes の属性の種類数。
-    for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+    for name in (paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+                 + tuple(f"index:{n}" for n in paths.INDEX_TABLES)):
         table = rows(name)
         for level in ("confirmed", "reference", "conflict"):
             out[f"{name}:{level}"] = sum(
@@ -247,6 +240,51 @@ def check_row_counts(known: dict[str, int]) -> list[str]:
         if name not in covered:
             bad.append(f"check_docs.py: 表 {name} が ROW_COUNTS のどの行にも無い"
                        "——表を足したら table-reliability の行と ROW_COUNTS を足すこと")
+    return bad
+
+
+# 信頼度表の `confidence` 欄が**どの表の分布か**を、左端の綴りから言えない行だけ書く。
+# 左端がそのまま表の名前の行（`pins`・`registers`…）と、`ROW_COUNTS` に居る綴り
+# （`features（旧 feature_tags）`…）は、ここに書かなくてよい。
+CONFIDENCE_NAMES: dict[str, tuple[str, ...]] = {
+    "clock_configs 他 clock_* 5表": ("clock_configs", "clock_prescalers", "clock_sources",
+                                      "clock_symbols", "clock_init"),
+}
+# `confirmed 28,325 / ref 146 / conflict 12`。数を伴わない語（`**全行 conflict**`・
+# `reference（symbols に conflict 5）` の `reference`）は当たらない。
+LEVEL = re.compile(r"(confirmed|conf|reference|ref|conflict)\s+([\d,]+)")
+LEVEL_NAME = {"conf": "confirmed", "ref": "reference"}
+
+
+def check_confidence(known: dict[str, int]) -> list[str]:
+    """信頼度表の `confidence` 欄の内訳と、実際の分布。
+
+    **行数より先に動く**——資料の版が変わらなくても、読み方を直せば confirmed が増え、
+    照合を直せば conflict が減る。`product_attributes` の3つだけを `PROSE` で見ていた頃、
+    `pin_functions` の conflict が **12 と書いたまま実際は 18**（F-60 の6行）になっていた。
+    書いてある表は全部見る。
+    """
+    bad = []
+    for header, cells, number in tables_of(RELIABILITY.read_text(encoding="utf-8")):
+        if len(header) < 3 or header[2] != "confidence" or len(cells) < 3:
+            continue
+        stated = [(LEVEL_NAME.get(k, k), int(n.replace(",", "")))
+                  for k, n in LEVEL.findall(cells[2])]
+        if not stated:
+            continue
+        label = cells[0]
+        names = CONFIDENCE_NAMES.get(label) or ROW_COUNTS.get(label)
+        if names is None:
+            names = (label,) if f"{label}:confirmed" in known else None
+        if names is None:
+            bad.append(f"table-reliability.ja.md:{number}: 「{label}」の confidence が"
+                       "どの表の分布か check_docs.py の CONFIDENCE_NAMES に無い")
+            continue
+        for level, claim in stated:
+            actual = sum(known[f"{n}:{level}"] for n in names)
+            if claim != actual:
+                bad.append(f"table-reliability.ja.md:{number}: 「{label}」の {level} が "
+                           f"{claim:,} と書いてあるが実際は {actual:,}")
     return bad
 
 
@@ -342,8 +380,8 @@ def main() -> int:
 
     known = quantities()
     holes = ledger()
-    bad = (check_row_counts(known) + check_prose(known) + check_holes(holes)
-           + check_liquid())
+    bad = (check_row_counts(known) + check_confidence(known) + check_prose(known)
+           + check_holes(holes) + check_liquid())
     if bad:
         seen: list[str] = []
         for b in bad:
