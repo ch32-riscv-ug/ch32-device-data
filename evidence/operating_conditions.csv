@@ -8,10 +8,10 @@ CH32H415;CH32H416;CH32H417,C_L,Load capacitance when buffer is open,,,,50,pF,#,c
 CH32H415;CH32H416;CH32H417,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32H417DS0.PDF:zh(p.124)+CH32H417DS0.PDF:en(p.140),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_LOAD,Suggested load capacitance with corresponding crystal serial impedance RS,RS = 60Ω(1),,20,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,reference,CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,DuCy_(HSE),Duty cycle,,,50,,%,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,DuCy_LSE,Duty Cycle,,,50,,%,#,reference,CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,DuCy_LSE,Duty Cycle,,,50,,%,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,DuCy_LSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,ED,Differential nonlinear error,,,±2,±4,LSB,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,EL,Integral nonlinear error,,,±3,±4,LSB,#,confirmed,CH32H417DS0.PDF:zh(p.122)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
@@ -149,7 +149,7 @@ CH32H415;CH32H416;CH32H417,I_DDOPAMP,Current consumption,"No load, static mode",
 CH32H415;CH32H416;CH32H417,I_DD_VBAT,"Supply current for backup area (Remove V , V , DD33 DD33A and V and use only DDIO V supply) BAT",Typical current consumption in stop mode (RISC-V5F + RISC-V3F); Low-speed external oscillator and RTC are turned on.,,3.5,,uA,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.100),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_HSE,HSE drive current,,,0.8,,mA,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32H417DS0.PDF:zh(p.87)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,I_L,OSC32_IN input leakage current,,,,±1,uA,#,reference,CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,I_L,OSC32_IN input leakage current,,,,±1,uA,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.101),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_LOAD,Drive current,R = 4kΩ LOAD,,,900,uA,#,confirmed,CH32H417DS0.PDF:zh(p.123)+CH32H417DS0.PDF:en(p.139),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirmed,CH32H417DS0.PDF:zh(p.123)+CH32H417DS0.PDF:en(p.139),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_VREFP,"No load, when V = 3.6V, the input value is 0xF1C. REFP",,,194,,uA,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
@@ -241,8 +241,8 @@ CH32H415;CH32H416;CH32H417,f_S,Sampling rate,,,20,,MHz,#,confirmed,CH32H417DS0.P
 CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,f = 14MHz ADC,,,875,kHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,f = 80MHz ADC,,,4.4,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,g_m,Oscillator transconductance,Startup,,26,,mA/V,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,g_m,Oscillator transconductance,Startup,,30,,uA/V,#,reference,CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,i_2,LSE drive current,,,0.35,,uA,#,reference,CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,g_m,Oscillator transconductance,Startup,,30,,uA/V,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,i_2,LSE drive current,,,0.35,,uA,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_CAL,Calibration time,,,1,,us,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_CAL,Calibration time,f = 14MHz ADC,2,,,us,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_CONV,Total conversion time (including sampling time),,14,,252,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.120)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
@@ -263,7 +263,7 @@ CH32H415;CH32H416;CH32H417,t_RET,Data retention period,,20,,,Years,#,reference,C
 CH32H415;CH32H416;CH32H417,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(HSE),Startup time,"V stabilization, 25M DD33 crystal",,1.5,,ms,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(HSI),HSI oscillator startup stabilization time,,,10,,us,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,t_SU(LSE),Startup time,V stabilization DD33,,800,,mS,#,reference,CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_SU(LSE),Startup time,V stabilization DD33,,800,,mS,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(LSI),LSI oscillator startup stabilization time,,,230,,us,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, DD33A C = 50pF, R = 4kΩ LOAD LOAD",,,1,us,#,confirmed,CH32H417DS0.PDF:zh(p.124)+CH32H417DS0.PDF:en(p.140),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_erase_32k,Block erase time,"DBMODE = 0, single 32K bytes",,3,10,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
@@ -280,17 +280,17 @@ CH32H415;CH32H416;CH32H417,t_s,Sampling time,f = HSADC 100MHz,,10,,ns,#,confirme
 CH32H415;CH32H416;CH32H417,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode; Use HSI RC clock wakeup,,0.3,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_wustop,Wakeup from Stop mode (Regulator in normal mode),Wakeup time from low-power mode; HSI RC clock wakeup,,4,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_wustop,Wakeup from Standby mode (Regulator in low-power mode),Wakeup time from low-power mode; Regulator wake-up time from low-power mode + HSI RC clock wake-up,,35,,us,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
-CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.6,,1.6,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
-CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = Ambient temperature range as shown in Table 3-2-1,-2.2,,2.2,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.6,,1.6,%,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = Ambient temperature range as shown in Table 3-2-1,-2.2,,2.2,%,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,C,Suggested load capacitance with corresponding crystal serial impedance RS,RS =60Ω(1),,20,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,C_ADC,Internal sample and hold capacitor,,,4,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,C_IO,I/O pin capacitor,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,40,pF,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32L103DS0.PDF:zh(p.51)+CH32L103DS0.PDF:en(p.61),CH32L103DS0.PDF
-CH32L103;CH32M103,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,reference,CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
+CH32L103;CH32M103,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
 CH32L103;CH32M103,C_in(LSE),OSC32_IN input capacitance,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
-CH32L103;CH32M103,DuCy_HSE,Duty Cycle,,,50,,%,#,reference,CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
-CH32L103;CH32M103,DuCy_HSI,Duty Cycle,,45,50,55,%,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,DuCy_HSE,Duty Cycle,,,50,,%,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
+CH32L103;CH32M103,DuCy_HSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_LSE,Duty Cycle,,,50,,%,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,DuCy_LSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,ED,Differential nonlinear error,,,±2,±5,LSB,#,confirmed,CH32L103DS0.PDF:zh(p.49)+CH32L103DS0.PDF:en(p.58),CH32L103DS0.PDF
@@ -451,8 +451,8 @@ CH32L103;CH32M103,I_DD,Supply current in sleep mode (when peripherals are powere
 CH32L103;CH32M103,I_DD,Supply current in Run mode,"Data processing code runs from SRAM, FLASH enters low-power mode(1), Setting; HSILP=1; PLLON=1; F (3) HCLK=8MHz; Disable all peripherals",,0.42,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.36)+CH32L103DS0.PDF:en(p.44),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD,Supply current in sleep mode (when peripherals are powered and clock is held),"Data processing code runs from SRAM, FLASH enters low-power mode(1), Setting; HSILP=1; PLLON=1; F (3) HCLK=8MHz; Enable all peripherals",,0.45,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.37)+CH32L103DS0.PDF:en(p.44),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD,Supply current in Run mode,"Data processing code runs from SRAM, FLASH enters low-power mode(1), Setting; HSILP=1; PLLON=1; F (3) HCLK=8MHz; Enable all peripherals",,0.63,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.36)+CH32L103DS0.PDF:en(p.44),CH32L103DS0.PDF
-CH32L103;CH32M103,I_DD(HSI),HSI oscillator power consumption,,,200,,uA,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
-CH32L103;CH32M103,I_DD(HSI),HSI oscillator power consumption,Low-power mode,,24,,uA,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,I_DD(HSI),HSI oscillator power consumption,,,200,,uA,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,I_DD(HSI),HSI oscillator power consumption,Low-power mode,,24,,uA,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD(LSI),LSI oscillator power consumption,,,150,,nA,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD(PLL),PLL power consumption,"Input frequency 8M, Output frequency 96M",,0.15,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DDA,Supply current,f_S = 1MHz Buffer off,,0.45,,mA,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
@@ -466,7 +466,7 @@ CH32L103;CH32M103,I_DDOPAMP,Current consumption,"No load, static mode",,40,,uA,#
 CH32L103;CH32M103,I_DD_VBAT,Supply current for backup domain (Remove VDD and V and DDA use only VBAT supply),"Data processing code runs from FLASH, typical current consumption in Stop and Standby mode; HIS, HSE, LSI, LSE=All disabled; RAMLV=×; R18KS TY=0; R2KS TY=0; LDO_ EC=×; LPDS=×; PDDS=1; LDO=10",,0.37,,,#,reference,CH32L103DS0.PDF:en(p.45),CH32L103DS0.PDF
 CH32L103;CH32M103,I_DD_VBAT,Supply current for backup domain (Remove VDD and V and DDA use only VBAT supply),"Data processing code runs from FLASH, typical current consumption in Stop and Standby mode; HIS, HSE, LSI, LSE=Only enable LSE; RAMLV=×; R18KS TY=0; R2KS TY=0; LDO_ EC=×; LPDS=×; PDDS=1; LDO=10",,0.75,,,#,reference,CH32L103DS0.PDF:en(p.45),CH32L103DS0.PDF
 CH32L103;CH32M103,I_L,OSC_IN input leakage current,,,,±1,uA,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
-CH32L103;CH32M103,I_L,OSC32_IN input leakage current,,,,±1,uA,#,reference,CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
+CH32L103;CH32M103,I_L,OSC32_IN input leakage current,,,,±1,uA,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,I_LOAD,Drive current,R = 10kΩ LOAD,,,360,uA,#,confirmed,CH32L103DS0.PDF:zh(p.51)+CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
 CH32L103;CH32M103,I_LOAD,Drive current,R = 4kΩ LOAD,,,900,uA,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.59),CH32L103DS0.PDF
 CH32L103;CH32M103,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.59),CH32L103DS0.PDF
@@ -568,8 +568,8 @@ CH32L103;CH32M103,t_LOCK,PLL lock time,,,80,200,us,#,confirmed,CH32L103DS0.PDF:z
 CH32L103;CH32M103,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
-CH32L103;CH32M103,t_SU(HSE),Startup time(2),"V stabilization, 8M DD",,1.5,,ms,#,reference,CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
-CH32L103;CH32M103,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,reference,CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(HSE),Startup time(2),"V stabilization, 8M DD",,1.5,,ms,#,confirmed,CH32L103DS0.PDF:zh(p.40)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
+CH32L103;CH32M103,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(LSE),Startup time,V stabilization DD,,1000,,ms,#,confirmed,CH32L103DS0.PDF:zh(p.40)+CH32L103DS0.PDF:en(p.48),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(LSI),LSI oscillator startup stabilization time,,,400,,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_VDD,V rising speed DD,,0,,∞,us/V,#,confirmed,CH32L103DS0.PDF:zh(p.32)+CH32L103DS0.PDF:en(p.39),CH32L103DS0.PDF
@@ -586,20 +586,20 @@ CH32L103;CH32M103,t_s,Sampling time,f = 14MHz ADC,0.107,,17.1,us,#,confirmed,CH3
 CH32L103;CH32M103,t_s,Sampling time,f = 48MHz ADC,,0.156,,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_wusleep,Wakeup from Sleep mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,0.2,,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
 CH32L103;CH32M103,t_wustop,Wakeup from Stop mode,Wakeup time from low-power mode(1); Wake up using HSI RC clock,,7,,us,#,conflict,CH32L103DS0.PDF:en(p.49)+!CH32L103DS0.PDF:zh(typ=13),CH32L103DS0.PDF
-CH32M007;CH32V007,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.0,,2.0,%,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
-CH32M007;CH32V007,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = Table 3-2-1 shows the operating temperature range.",-3.0,,3.0,%,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -10℃~70℃",-2.0,,2.0,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = Table 3-2-1 shows the operating temperature range.",-3.0,,3.0,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.63),CH32V007DS0.PDF
 CH32M007;CH32V007,C_LOAD,Capacitive load,,,,20,pF,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.64),CH32V007DS0.PDF
 CH32M007;CH32V007,C_LOAD,Recommended load capacitance and corresponding crystal series impedance RS,RS = 60Ω(1),,20,,pF,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,C_in(HSE),XI input capacitance,,,5,,pF,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,DuCy_(HSE),Duty cycle,,40,50,60,%,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,DuCy_HSI,Duty cycle,,45,50,55,%,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,DuCy_(HSE),Duty cycle,,40,50,60,%,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,DuCy_LSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,F_HCLK,Internal system bus frequency Or microprocessor main frequency,,,,48,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.40),CH32V007DS0.PDF
-CH32M007;CH32V007,F_HSE_ext,External clock frequency,,3,24,32,MHz,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,F_HSI,Frequency (after calibration),HSI_LP = 0,,24,,MHz,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
-CH32M007;CH32V007,F_HSI,Frequency (after calibration),HSI_LP = 1,30,42,58,KHz,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,F_HSE_ext,External clock frequency,,3,24,32,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,F_HSI,Frequency (after calibration),HSI_LP = 0,,24,,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,F_HSI,Frequency (after calibration),HSI_LP = 1,30,42,58,KHz,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,F_LSI,Frequency,,90,128,172,KHz,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.1)+CH32V007DS0.PDF:en(p.1),CH32V007DS0.PDF
 CH32M007;CH32V007,F_XI,Resonator frequency,,3,24,32,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
@@ -656,8 +656,8 @@ CH32M007;CH32V007,I_DD,Supply current in Standby mode,Typical current consumptio
 CH32M007;CH32V007,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Disable; LSI=Enable; VDD=5V,,11.6,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.47),CH32V007DS0.PDF
 CH32M007;CH32V007,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Enable; VDD=3.3V,,10.7,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.47),CH32V007DS0.PDF
 CH32M007;CH32V007,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Enable; VDD=5V,,11.6,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.47),CH32V007DS0.PDF
-CH32M007;CH32V007,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 0,,200,,uA,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
-CH32M007;CH32V007,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 1,,8.5,,uA,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 0,,200,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 1,,8.5,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,I_DD(LSI),LSI oscillator power consumption,,,550,,nA,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,I_DDA,ADC supply current (Without buffer),f_S = 1MHz,,0.42,,mA,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,I_DDA,ADC supply current (Without buffer),f_S = 3MHz,,1.34,,mA,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
@@ -668,7 +668,7 @@ CH32M007;CH32V007,I_DDOPAMP,Current consumption,"No load, static mode",,420,,uA,
 CH32M007;CH32V007,I_HSE,HSE drive current,"HSE_LP = 0, 20p load",,1.6,,mA,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,I_HSE,HSE drive current,"HSE_LP = 1, 20p load",,0.8,,mA,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,I_HVREG,Load current of internal high voltage regulator (including internal bootstrap),Attention to heat dissipation,,,30,mA,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.41),CH32V007DS0.PDF
-CH32M007;CH32V007,I_L,XI input leakage current,,,,±1,uA,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,I_LOAD,Drive current,R = 4kΩ LOAD,,,1.4,mA,#,confirmed,CH32V007DS0.PDF:zh(p.43)+CH32V007DS0.PDF:en(p.62),CH32V007DS0.PDF
 CH32M007;CH32V007,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirmed,CH32V007DS0.PDF:zh(p.43)+CH32V007DS0.PDF:en(p.62),CH32V007DS0.PDF
 CH32M007;CH32V007,I_Q,V quiescent current HV,Other typical current consumption (Increased CH32M007E8R6 compared to CH32V007); V = 11.5V HV,,52,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.48),CH32V007DS0.PDF
@@ -709,8 +709,8 @@ CH32M007;CH32V007,V_DD,Supply voltage,No less than 2.5V is recommended,2.0,5,5.5
 CH32M007;CH32V007,V_DD,Supply voltage,No less than 2.5V is recommended.,2.0,5,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.45)+CH32V007DS0.PDF:en(p.65),CH32V007DS0.PDF
 CH32M007;CH32V007,V_DD,Supply voltage,f_S > 1MHz,4.5,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,V_DD,Supply voltage,f_S ≤ 1MHz,2.4,,5.5,V,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
-CH32M007;CH32V007,V_HSEH,XI input pin high-level voltage,,0.8VDD,,VDD,V,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,V_HSEL,XI input pin low-level voltage,,0,,0.2VDD,V,#,reference,CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HSEH,XI input pin high-level voltage,,0.8VDD,,VDD,V,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
+CH32M007;CH32V007,V_HSEL,XI input pin low-level voltage,,0,,0.2VDD,V,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,V_HV,Input power supply voltage of internal high voltage regulator,V short to V HV CC12V,6,,17,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.41),CH32V007DS0.PDF
 CH32M007;CH32V007,V_HVREG,Internal high voltage regulator V pin CC12V output voltage,,10,12,13,V,#,confirmed,CH32V007DS0.PDF:zh(p.30)+CH32V007DS0.PDF:en(p.41),CH32V007DS0.PDF
 CH32M007;CH32V007,V_IH,"Standard I/O pin, input high level",,0.3*VDD+0.7,,VDD,V,#,confirmed,CH32V007DS0.PDF:zh(p.37)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
@@ -751,7 +751,7 @@ CH32M007;CH32V007,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference
 CH32M007;CH32V007,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(HSE),Startup time,V is stable DD,,1.5,,ms,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
-CH32M007;CH32V007,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,reference,CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
+CH32M007;CH32V007,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, C DD LOAD = 50pF, R = 4kΩ LOAD",,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.64),CH32V007DS0.PDF
 CH32M007;CH32V007,t_WAKUP,"Setup time from shutdown to wake up,","Input V /2, DD C = 50pF, R = LOAD LOAD",,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.44)+CH32V007DS0.PDF:en(p.62),CH32V007DS0.PDF
@@ -769,7 +769,9 @@ CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85�
 CH32M030,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.5,,1.5,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,C_ADC,Internal sample and hold capacitance,,,6,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
-CH32M030,C_LOAD,Suggested load capacitance and corresponding crystal serial impedance RS,RS = 60Ω(1),,20,,pF,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,C_LOAD,Suggested load capacitance and corresponding crystal serial impedance RS,RS = 60Ω(1),,20,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,DuCy_(HSE),Duty cycle,,40,50,60,%,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,DuTy_LSI,Duty cycle,,45,50,55,%,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,F_HCLK,Internal HB clock frequency,T_A = -40℃~105℃,,,72,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
@@ -778,9 +780,9 @@ CH32M030,F_HSE_ext,External clock frequency,,4,8,25,MHz,#,confirmed,CH32M030DS0.
 CH32M030,F_HSI,Frequency (after calibration),,,8,,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,F_LSI,Frequency,,240,340,450,kHz,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,F_MAIN,System main frequency,,,,72,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.1)+CH32M030DS0.PDF:en(p.1),CH32M030DS0.PDF
-CH32M030,F_XI,Resonator frequency,,4,8,25,MHz,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,F_XI,Resonator frequency,,4,8,25,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,F_max(IO)out,I/O pin output highest frequency,"CL = 50pF, V_DD33 ≥ 3V",,,30,MHz,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
-CH32M030,I_2,HSE drive current,"V_DD33 = 3.3V, 20p load",,0.3,,mA,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,I_2,HSE drive current,"V_DD33 = 3.3V, 20p load",,0.3,,mA,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,I_DD(HSI),HSI oscillator power consumption,,120,180,270,uA,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,I_DD(LSI),LSI oscillator power consumption,,,2,,uA,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,I_DDADC,Supply current,,,1,,mA,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
@@ -841,6 +843,7 @@ CH32M030,I_HV,Supply current in STANDBY mode,"Typical current consumption in Sta
 CH32M030,I_HV,Supply current in STOP mode,"Typical current consumption in Standby mode; V = 12V, V = 9V HV DD8",,123,,uA,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.33),CH32M030DS0.PDF
 CH32M030,I_HV,Supply current in STANDBY mode,"Typical current consumption in Standby mode; V = 12V, V = 9V HV DD8; LSI off",,102,,uA,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.33),CH32M030DS0.PDF
 CH32M030,I_HV,Supply current in STANDBY mode,"Typical current consumption in Standby mode; V = 12V, V = 9V HV DD8; LSI on",,102,,uA,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.33),CH32M030DS0.PDF
+CH32M030,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,I_SINK,Sink current of pin output low-level,"V_DD33 = 3.3V, pin voltage = 0.4V",14,20,27,mA,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,I_SOURCE,Source current of pin output high-level,"V_DD33 = 3.3V, pin voltage = V -0.4V DD33",13,18,24,mA,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,I_VDD33,Load current of low-voltage regulator (including all loads such as common I/O and core regulator),,,,20,mA,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
@@ -849,7 +852,7 @@ CH32M030,I_lkg,Input leakage current,,,0,+/-3,uA,#,confirmed,CH32M030DS0.PDF:zh(
 CH32M030,N_END,Erase times,T_A = 25℃,10K,50K,,time,#,reference,CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,R_BIAS,Bias resistance in QII1 mode,,,90,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.38)+CH32M030DS0.PDF:en(p.47),CH32M030DS0.PDF
 CH32M030,R_BIAS,Bias resistance in QII2 mode,,,90,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.39)+CH32M030DS0.PDF:en(p.47),CH32M030DS0.PDF
-CH32M030,R_F,Feedback resistor (no external),,,250,,kΩ,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,R_PU,Pull-up equivalent resistance,,30,45,60,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,T_OTP,Temperature point of removing over-temperature protection,Cooling process,125,135,150,℃,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,T_OTP,Temperature point of OTP over-temperature protection,Heating process,130,145,160,℃,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
@@ -867,6 +870,8 @@ CH32M030,V_DD8,Output voltage of high voltage regulator,VDD8_SEL[1:0] = 00 and V
 CH32M030,V_DD8,Output voltage of high voltage regulator,VDD8_SEL[1:0] = 01 and V ≥ 8.8V HV,7.8,8.0,8.2,V,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,V_HOH,"Output high, and a single pin outputs 0.2mA source current",5V ≤ V ≤ 12V HV,V-0.5HV,,,V,#,confirmed,CH32M030DS0.PDF:zh(p.31)+CH32M030DS0.PDF:en(p.39),CH32M030DS0.PDF
 CH32M030,V_HOL,"Output low, and a single pin sinks 2mA current.",5V ≤ V ≤ 12V HV,,,0.5,V,#,confirmed,CH32M030DS0.PDF:zh(p.31)+CH32M030DS0.PDF:en(p.39),CH32M030DS0.PDF
+CH32M030,V_HSEH,XI input pin high voltage,,0.8*VDD33,,VDD33,V,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,V_HSEL,XI input pin low voltage,,0,,0.2*VDD33,V,#,confirmed,CH32M030DS0.PDF:zh(p.27)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,V_HV,Supply voltage of internal high-voltage regulator and HV I/O pins,T_A = -40℃~105℃,4.0,,29.0,V,#,confirmed,CH32M030DS0.PDF:zh(p.24)+CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
 CH32M030,V_HV,Supply voltage of internal high-voltage regulator and HV I/O pins,T_A = -40℃~125℃,4.3,,28.0,V,#,reference,CH32M030DS0.PDF:en(p.30),CH32M030DS0.PDF
 CH32M030,V_IH,"Standard I/O pin, input high level voltage",V_DD33 = 3.3V,1.8,,VDD33,V,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
@@ -908,7 +913,7 @@ CH32M030,V_hys,Hysteresis voltage,QII2_HYPSEL[2:0] = 111,,120,,mV,#,confirmed,CH
 CH32M030,V_hys,Schmitt trigger voltage hysteresis,V_DD33 = 3.3V,,300,,mV,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,f_ADC,ADC clock frequency,,,,18,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,f_s,Sampling speed,f = 18MHz ADC,250,,1000,kHz,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
-CH32M030,g_m,Transconductance of oscillator,Startup,,16,,mA/V,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,g_m,Transconductance of oscillator,Startup,,16,,mA/V,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,t_CONV,Total conversion time (including sampling time),,18,,72,1/fADC,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,t_CONV,Total conversion time (including sampling time),f = 18MHz ADC,1,,4,us,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,t_D,"Comparator delay, V INP varies from (V -100mV) to INN (V +100mV). INN",0 ≤ V_DD33 ≤ V INN,,17,50,ns,#,confirmed,CH32M030DS0.PDF:zh(p.41)+CH32M030DS0.PDF:en(p.49),CH32M030DS0.PDF
@@ -919,7 +924,7 @@ CH32M030,t_RET,Data retention period,,10,,,year,#,reference,CH32M030DS0.PDF:en(p
 CH32M030,t_RST,Power-on reset delay,,,3,,ms,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_RST,Other reset delay,,,300,,us,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_STAB,Power-on time,,,7,,us,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
-CH32M030,t_SU(HSE),Startup time,V is stable DD,,2,,ms,#,reference,CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
+CH32M030,t_SU(HSE),Startup time,V is stable DD,,2,,ms,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,t_SU(HSI),HSI oscillator startup stabilization time,,,10,,us,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_SU(LSI),LSI oscillator startup stabilization time,,,80,,us,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,t_VDD,V rise time rate DD,,3,,∞,us/V,#,reference,CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
@@ -937,6 +942,7 @@ CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA 
 CH32V002,ACC_HSI,Accuracy of HSI oscillator (after calibration),"HSI_LP = 0, TA = -40℃~85℃",-3,,3,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,C_ADC,Internal sample and hold capacitance,,,4,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
+CH32V002,C_LOAD,Recommended load capacitance and corresponding crystal series impedance RS,RS = 60Ω(1),,20,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,C_in(HSE),XI input capacitance,,,5,,pF,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,DuCy_(HSE),Duty Cycle,,40,50,60,%,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,DuCy_HSI,Duty Cycle,,45,50,55,%,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
@@ -947,6 +953,7 @@ CH32V002,F_HSI,Frequency (after calibration),HSI_LP = 0,,24,,MHz,#,confirmed,CH3
 CH32V002,F_HSI,Frequency (after calibration),HSI_LP = 1,30,42,58,KHz,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,F_LSI,Frequency,,90,128,172,KHz,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.1)+CH32V002DS0.PDF:en(p.1),CH32V002DS0.PDF
+CH32V002,F_XI,Resonator frequency,,3,24,32,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,I_BUF,ADC buffer own current,ADC_LP = 0,,0.68,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,I_BUF,ADC buffer own current,ADC_LP = 1,,0.13,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, data processing code runs from the internal Flash; HSI/HSE=Runs on the high-speed external clock (HSE) (HSE_SI = 00, HSE_LP = 1); HSI_LP=X; F HCLK=F = 8MHz HCLK; All peripherals disabled",,2.3,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.20)+CH32V002DS0.PDF:en(p.26),CH32V002DS0.PDF
@@ -999,15 +1006,20 @@ CH32V002,I_DD,Supply current in Standby mode,Typical current consumption in Stan
 CH32V002,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Disable; LSI=Enable; VDD=5V,,19.0,,uA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Enable; VDD=3.3V,,18.1,,uA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Enable; VDD=5V,,19.1,,uA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
+CH32V002,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 0,,200,,uA,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
+CH32V002,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 1,,8.5,,uA,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,I_DD(LSI),LSI oscillator power consumption,,,550,,nA,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,I_DDA,ADC supply current (Without buffer),f_S = 1MHz,,0.42,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,I_DDA,ADC supply current (Without buffer),f_S = 3MHz,,1.34,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,I_HSE,HSE drive current,"HSE_LP = 0, 20p load",,1.6,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
+CH32V002,I_HSE,HSE drive current,"HSE_LP = 1, 20p load",,0.8,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,I_lkg,Input leakage current,,,,1,uA,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,R_PD,Pull-down equivalent resistance,,35,45,55,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,R_PU,Pull-up equivalent resistance,,35,45,55,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,T_A,Ambient temperature,,-40,,85,℃,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
@@ -1040,6 +1052,7 @@ CH32V002,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.
 CH32V002,f_S,Sampling rate,,0.06,,3,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_TRIG,External trigger frequency,f = 16MHz ADC,,,900,KHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_TRIG,External trigger frequency,f = 48MHz ADC,,,2.7,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,t_CAL,Calibration time,,,,100,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,t_CAL,Calibration time,f = 16MHz ADC,,,6.25,us,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,t_CONV,Total conversion time (including sampling time),,16,,252,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
@@ -1055,6 +1068,8 @@ CH32V002,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32V002
 CH32V002,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.25),CH32V002DS0.PDF
 CH32V002,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.25),CH32V002DS0.PDF
 CH32V002,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
+CH32V002,t_SU(HSE),Startup time,V is stable DD,,1.5,,ms,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
+CH32V002,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V002DS0.PDF:zh(p.22)+CH32V002DS0.PDF:en(p.30),CH32V002DS0.PDF
 CH32V002,t_VDD,V rising rate DD,,0,,∞,us/V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
 CH32V002,t_VDD,V falling rate DD,,40,,∞,us/V,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.24),CH32V002DS0.PDF
@@ -1073,11 +1088,14 @@ CH32V003,C,Recommended load capacitance and corresponding crystal series impedan
 CH32V003,C_ADC,Internal sample and hold capacitor,,,3,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,C_I/O,I/O pin capacitance,,,5,,pF,#,reference,CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.31),CH32V003DS0.PDF
+CH32V003,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
+CH32V003,DuCy_(HSE),Duty cycle,,40,50,60,%,#,reference,CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,DuCy_LSI,Duty cycle,,45,50,55,%,#,reference,CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,ET,Total data deviation,f = 12 MHz ADC,,2,6,LSB,#,confirmed,CH32V003DS0.PDF:zh(p.26)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,ETF24,f = 24MHz total data deviation ADC,f = 24 MHz ADC,,3,8,LSB,#,confirmed,CH32V003DS0.PDF:zh(p.26)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,F_HCLK,Internal AHB clock frequency,,,,50,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,F_HSE_ext,External clock frequency,,4,24,25,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,F_HSI,Frequency (after calibration),,,24,,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,F_LSI,Frequency,,100,128,150,KHz,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,F_MAIN,System main frequency,,,,48,MHz,#,confirmed,CH32V003DS0.PDF:zh(p.1)+CH32V003DS0.PDF:en(p.1),CH32V003DS0.PDF
@@ -1171,6 +1189,7 @@ CH32V003,I_DD,Supply current in Standby mode,Typical current consumption in Stan
 CH32V003,I_DD(HSI),HSI oscillator power consumption,,120,180,270,uA,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,I_DD(LSI),LSI oscillator power consumption,,,1.5,,uA,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,I_DDOPAMP,Current consumption,"No load, static mode",,273,,uA,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.30),CH32V003DS0.PDF
+CH32V003,I_L,OSC_IN input leakage current,,,,±1,uA,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,I_LOAD,Drive current,,,,1.5,mA,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.30),CH32V003DS0.PDF
 CH32V003,I_lkg,Input leakage current,FT I/O port,,,3,uA,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,I_lkg,Input leakage current,Standard I/O port,,,1,uA,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
@@ -1187,6 +1206,8 @@ CH32V003,V_AIN,Conversion voltage range,,VSS,,VDD,V,#,confirmed,CH32V003DS0.PDF:
 CH32V003,V_DD,Supply voltage,,2.8,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.28),CH32V003DS0.PDF
 CH32V003,V_DD,Standard operating voltage,ADC not used,2.7,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
 CH32V003,V_DD,Standard operating voltage,Use ADC (recommended),2.8,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.17),CH32V003DS0.PDF
+CH32V003,V_HSEH,OSC_IN input pin high level voltage,,0.8VDD,,VDD,V,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
+CH32V003,V_HSEL,OSC_IN input pin low-level voltage,,0,,0.2VDD,V,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,V_IH,"Standard I/O pin, input high level voltage",,0.22*(VDD-2.7)+1.55,,VDD+0.3,V,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,V_IH,"FT I/O pin, input high level voltage",,0.22*(VDD-2.7)+1.55,,5.5,V,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,V_IL,"Standard I/O pin, input low-level voltage",,-0.3,,0.19*(VDD-2.7)+0.65,V,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
@@ -1333,6 +1354,8 @@ CH32V004,I_DD,Supply current in Standby mode,Typical current consumption in Stan
 CH32V004,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Disable; LSI=Enable; VDD=5V,,20.0,,uA,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
 CH32V004,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Disable; VDD=3.3V,,19.1,,uA,#,confirmed,CH32V004DS0.PDF:zh(p.19)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
 CH32V004,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode; Independent watchdog=Enable; LSI=Disable; VDD=5V,,20.1,,uA,#,confirmed,CH32V004DS0.PDF:zh(p.19)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
+CH32V004,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 0,,200,,uA,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
+CH32V004,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 1,,8.5,,uA,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,I_DD(LSI),LSI oscillator power consumption,,,550,,nA,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,I_DDA,ADC supply current (Without buffer),f_S = 1MHz,,0.42,,mA,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,I_DDA,ADC supply current (Without buffer),f_S = 3MHz,,1.34,,mA,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
@@ -1391,6 +1414,7 @@ CH32V004,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V004DS0.PDF:zh(p.18)+C
 CH32V004,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V004DS0.PDF:zh(p.18)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
 CH32V004,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_SU(HSE),Startup time,V is stable DD,,1.5,,ms,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
+CH32V004,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V004DS0.PDF:zh(p.21)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,t_SU(MI),Data input setup time,HSRXEN = 1,15-0.5*tSCK,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
 CH32V004,t_SU(MI),Data input setup time,Master mode HSRXEN = 0,15,,,ns,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
@@ -1494,6 +1518,8 @@ CH32V005;CH32V006,I_DD,Supply current in Standby mode,Typical current consumptio
 CH32V005;CH32V006,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode (Only for CH32V006); Independent watchdog=Disable; LSI=Enable; VDD=5V,,11.6,,uA,#,confirmed,CH32V006DS0.PDF:zh(p.28)+CH32V006DS0.PDF:en(p.40),CH32V006DS0.PDF
 CH32V005;CH32V006,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode (Only for CH32V006); Independent watchdog=Enable; LSI=Enable; VDD=3.3V,,10.7,,uA,#,confirmed,CH32V006DS0.PDF:zh(p.28)+CH32V006DS0.PDF:en(p.39),CH32V006DS0.PDF
 CH32V005;CH32V006,I_DD,Supply current in Standby mode,Typical current consumption in Standby mode (Only for CH32V006); Independent watchdog=Enable; LSI=Enable; VDD=5V,,11.6,,uA,#,confirmed,CH32V006DS0.PDF:zh(p.28)+CH32V006DS0.PDF:en(p.39),CH32V006DS0.PDF
+CH32V005;CH32V006,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 0,,200,,uA,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
+CH32V005;CH32V006,I_DD(HSI),HSI oscillator power consumption,HSI_LP = 1,,8.5,,uA,#,reference,CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,I_DD(LSI),LSI oscillator power consumption,,,550,,nA,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,I_DDA,ADC supply current (Without buffer),f_S = 1MHz,,0.42,,mA,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,I_DDA,ADC supply current (Without buffer),f_S = 3MHz,,1.34,,mA,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
@@ -1579,6 +1605,7 @@ CH32V005;CH32V006,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V006DS0.PDF:z
 CH32V005;CH32V006,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.37),CH32V006DS0.PDF
 CH32V005;CH32V006,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
 CH32V005;CH32V006,t_SU(HSE),Startup time,V is stable DD,,1.5,,ms,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
+CH32V005;CH32V006,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,t_SU(LSI),LSI oscillator startup stabilization time,,,30,100,us,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.42),CH32V006DS0.PDF
 CH32V005;CH32V006,t_VDD,V rise time rate DD,,0,,∞,us/V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
 CH32V005;CH32V006,t_VDD,V fall time rate DD,,40,,∞,us/V,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.36),CH32V006DS0.PDF
@@ -1690,7 +1717,7 @@ CH32V103,I_DD,Supply current in Standby mode,Typical current consumption in Stop
 CH32V103,I_DD,Supply current in Standby mode,Typical current consumption in Stop and Standby mode; The low-speed internal RC oscillator is on and the independent watchdog is off.,,2.7,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.25),CH32V103DS0.PDF
 CH32V103,I_DD,Supply current in Stop mode,"Typical current consumption in Stop and Standby mode; The voltage regulator is in Run mode, and both low- and high-speed internal RC oscillators and external oscillators are turned off (no independent watchdog)",,455,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.22)+CH32V103DS0.PDF:en(p.25),CH32V103DS0.PDF
 CH32V103,I_DD,Supply current in Stop mode,"Typical current consumption in Stop and Standby mode; The voltage regulator is in low power mode, and both low- and high-speed internal RC oscillators and external oscillators are turned off (no independent watchdog)",,1.6,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.22)+CH32V103DS0.PDF:en(p.25),CH32V103DS0.PDF
-CH32V103,I_DD(HSI),HSI oscillator power consumption,,,200,,uA,#,reference,CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
+CH32V103,I_DD(HSI),HSI oscillator power consumption,,,200,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,I_DD(LSI),LSI oscillator power consumption,,,0.6,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,I_DD_VBAT,"Supply current to the Backup domain (remove V and DD V , use only V power) DDA BAT",Typical current consumption in Stop and Standby mode; Low-speed external oscillator and RTC are on,,2.4,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.25),CH32V103DS0.PDF
 CH32V103,I_TKey,Module operating mode,V_DD =3.3V,211,270,421,uA,#,confirmed,CH32V103DS0.PDF:zh(p.32)+CH32V103DS0.PDF:en(p.36),CH32V103DS0.PDF
@@ -1772,7 +1799,7 @@ CH32V103,t_wustop,Wake up from the stop mode (voltage regulator is in low-power 
 CH32V203,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0℃~70℃,-1.6,,1.6,%,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = The working environment temperature range shown in Table 4-2,-2.2,,2.2,%,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,C,Recommended load capacitance and corresponding crystal serial,RS <70kΩ,,,15,pF,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
-CH32V203,C,Recommended load capacitance and corresponding crystal series impedance RS,RS =60Ω(1),,20,,pF,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,C,Recommended load capacitance and corresponding crystal series impedance RS,RS =60Ω(1),,20,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V203DS0.PDF:zh(p.49)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
 CH32V203,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
@@ -1795,8 +1822,8 @@ CH32V203,F_LSE_ext,User external clock frequency,,,32.768,1000,KHz,#,confirmed,C
 CH32V203,F_LSI,Frequency,,25,39,60,KHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,F_LSI,Frequency,applied for V203RBT6,25,32,45,KHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,F_MAIN,System main frequency,,,,144,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.1)+CH32V203DS0.PDF:en(p.1),CH32V203DS0.PDF
-CH32V203,F_OSC_IN,Resonator frequency,,3,8,25,MHz,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
-CH32V203,F_OSC_IN,Resonator frequency,Applied for V203RBT6,,32,,MHz,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,F_OSC_IN,Resonator frequency,,3,8,25,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,F_OSC_IN,Resonator frequency,Applied for V203RBT6,,32,,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,F_PCLK1,Internal PB1 clock frequency,,,,144,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,F_PCLK2,Internal PB2 clock frequency,,,,144,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,F_PLL_IN,PLL input clock,,3,8,25,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
@@ -1805,7 +1832,7 @@ CH32V203,F_PLL_OUT,PLL multiplier output clock,,18,,144,MHz,#,confirmed,CH32V203
 CH32V203,F_PLL_OUT,PLL multiplier output clock,applied for V203RBT6,40,,240,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.7)+CH32V203DS0.PDF:en(p.11),CH32V203DS0.PDF
 CH32V203,F_prog,Programming frequency(1),T_A = The working environment temperature range shown in Table 4-2,,,60,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
-CH32V203,I_2,HSE drive current,,,0.53,,mA,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,I_2,HSE drive current,,,0.53,,mA,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; External clock; F = 144MHz HCLK; All peripherals disabled(2)",,11.7,,mA,#,confirmed,CH32V203DS0.PDF:zh(p.35)+CH32V203DS0.PDF:en(p.42),CH32V203DS0.PDF
 CH32V203,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; External clock; F = 144MHz HCLK; All peripherals disabled(2)",,7.6,,mA,#,confirmed,CH32V203DS0.PDF:zh(p.35)+CH32V203DS0.PDF:en(p.41),CH32V203DS0.PDF
 CH32V203,I_DD,Supply current in Run mode,"Typical current consumption in Run mode, the data processing code runs from the internal Flash; External clock; F = 144MHz HCLK; All peripherals enabled",,11.8,,mA,#,confirmed,CH32V203DS0.PDF:zh(p.35)+CH32V203DS0.PDF:en(p.41),CH32V203DS0.PDF
@@ -1976,7 +2003,7 @@ CH32V203,I_VREF,Reference current,,,160,220,uA,#,confirmed,CH32V203DS0.PDF:zh(p.
 CH32V203,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,reference,CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,R_ADC,Sampling switch resistance,,,0.6,1,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
-CH32V203,R_F,Feedback resistance,,,250,,kΩ,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,R_F,Feedback resistance,,,5,,MΩ,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,R_LOAD,Resistive load,,4,,,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.49)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
 CH32V203,T_A,Ambient temperature,Chips whose model number ends in 6,-40,,85,℃,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
@@ -2035,7 +2062,9 @@ CH32V203,V_hys,Standard I/O pin Schmitt trigger,,150,,,mV,#,confirmed,CH32V203DS
 CH32V203,V_prog,Programming voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,f_S,Sampling rate,,0.05,,1,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
-CH32V203,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,conflict,"CH32V203DS0.PDF:en(p.46)+!CH32V203DS0.PDF:zh(typ=25.3,unit=uA/V)",CH32V203DS0.PDF
+CH32V203,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,g_m,Oscillator transconductance,Startup,,25.3,,uA/V,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
+CH32V203,i_2,LSE drive current,VDD = 3.3V,,0.35,,uA,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,t_CAL,Calibration time,,,100,,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,t_CONV,Total conversion time (including sampling time),,14,,252,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
@@ -2045,8 +2074,9 @@ CH32V203,t_RET,Data retention,,20,,,year,#,reference,CH32V203DS0.PDF:en(p.49),CH
 CH32V203,t_RSTTEMPO,Other resets,,8,10,30,mS,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_RSTTEMPO,Power on reset,,24,28,30,mS,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
-CH32V203,t_SU(HSE),Startup time,"V is stable, 8M crystal DD",,2.5,,ms,#,reference,CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
+CH32V203,t_SU(HSE),Startup time,"V is stable, 8M crystal DD",,2.5,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
+CH32V203,t_SU(LSE),Startup time,VDD is stable,,800,,mS,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,t_SU(LSI),LSI oscillator startup stabilization time,LSE disabled,,5,,ms,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_SU(LSI),LSI oscillator startup stabilization time,LSE enabled,,230,,us,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
 CH32V203,t_VDD,V rise time rate DD,,0,,∞,us/V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
@@ -2067,7 +2097,7 @@ CH32V203,t_wustop,Wakeup from Stop mode (voltage regulator is in Run mode),Wakeu
 CH32V203;CH32V205,ACC_HSI,Accuracy of HSI oscillator (after calibration),Low-power mode,-5,,5,%,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
 CH32V203;CH32V205,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-1,,1,%,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
 CH32V203;CH32V205,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-0.7,,0.7,%,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
-CH32V203;CH32V205,C,Recommended load capacitance and corresponding crystal series impedance RS,RS =60Ω(1),,20,,pF,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,C,Recommended load capacitance and corresponding crystal series impedance RS,RS =60Ω(1),,20,,pF,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,C,Recommended load capacitance and corresponding crystal serial impedance RS,RS =70kΩ,,,15,pF,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,C_ADC,Internal sample and hold capacitor,,,10.3,,pF,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V205DS0.PDF:zh(p.57)+CH32V205DS0.PDF:en(p.66),CH32V205DS0.PDF
@@ -2093,8 +2123,8 @@ CH32V203;CH32V205,F_OSC_IN,Resonator frequency,,3,8,25,MHz,#,confirmed,CH32V205D
 CH32V203;CH32V205,F_PLL_IN,PLL input clock,,3,8,25,MHz,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
 CH32V203;CH32V205,F_PLL_OUT,PLL multiplier output clock,,24,,208,MHz,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,F_USBCLK,USB module clock frequency,USB in use,48,48,48,MHz,#,confirmed,CH32V205RM.PDF:zh(p.19)+CH32V205RM.PDF:en(p.23),CH32V205RM.PDF
-CH32V203;CH32V205,I_2,HSE drive current,"Low power mode, V_DD = 3.3V, 20p load",,0.55,,mA,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
-CH32V203;CH32V205,I_2,HSE drive current,"V_DD = 3.3V, 20p load",,1,,mA,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,I_2,HSE drive current,"Low power mode, V_DD = 3.3V, 20p load",,0.55,,mA,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,I_2,HSE drive current,"V_DD = 3.3V, 20p load",,1,,mA,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,I_DD,"Supply current in Sleep mode(At this time, peripheral power supply and clock hold are maintained)","The data processing code is run from FLASH, FLASH enters low-power mode, LDOTRIM[1:0]=; HSILP=0; PLLON=0; F HCLK=8MHz; All peripherals disabled",,0.4,,mA,#,confirmed,CH32V205DS0.PDF:zh(p.42)+CH32V205DS0.PDF:en(p.49),CH32V205DS0.PDF
 CH32V203;CH32V205,I_DD,Supply current in Run mode,"The data processing code is run from FLASH, FLASH enters low-power mode, LDOTRIM[1:0]=; HSILP=0; PLLON=0; F HCLK=8MHz; All peripherals disabled",,0.7,,mA,#,confirmed,CH32V205DS0.PDF:zh(p.42)+CH32V205DS0.PDF:en(p.49),CH32V205DS0.PDF
 CH32V203;CH32V205,I_DD,"Supply current in Sleep mode(At this time, peripheral power supply and clock hold are maintained)","The data processing code is run from FLASH, FLASH enters low-power mode, LDOTRIM[1:0]=; HSILP=0; PLLON=0; F HCLK=8MHz; All peripherals enabled",,0.8,,mA,#,confirmed,CH32V205DS0.PDF:zh(p.42)+CH32V205DS0.PDF:en(p.49),CH32V205DS0.PDF
@@ -2148,7 +2178,7 @@ CH32V203;CH32V205,N_END,Endurance,T_A = 25℃,300K,,,Times,#,reference,CH32V205D
 CH32V203;CH32V205,N_END,Endurance,T_A = 85℃,100K,,,Times,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,R_ADC,Sampling switch resistance,,,0.2,,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,R_AIN,External input impedance,"For details, refer to Formula 1.",,,50,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
-CH32V203;CH32V205,R_F,Feedback resistance,,,250,,kΩ,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,R_F,Feedback resistance,,,5,,MΩ,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,R_LOAD,Resistive load,,4,,,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.57)+CH32V205DS0.PDF:en(p.66),CH32V205DS0.PDF
 CH32V203;CH32V205,T_A,Ambient temperature,,-40,,85,℃,#,confirmed,CH32V205DS0.PDF:zh(p.40)+CH32V205DS0.PDF:en(p.46),CH32V205DS0.PDF
@@ -2235,7 +2265,7 @@ CH32V203;CH32V205,V_hys,Hysteresis voltage,HYS[1:0] = 11,,±40,,mV,#,confirmed,C
 CH32V203;CH32V205,V_hys,Hysteresis voltage,HYS[1:0] = 11,,±50,,mV,#,reference,CH32V205DS0.PDF:en(p.68),CH32V205DS0.PDF
 CH32V203;CH32V205,f_ADC,ADC clock frequency,,,16,64,MHz,#,conflict,CH32V205DS0.PDF:en(p.63)+!CH32V205DS0.PDF:zh(max=96),CH32V205DS0.PDF
 CH32V203;CH32V205,f_S,Sampling rate,,,1,4,MHz,#,conflict,CH32V205DS0.PDF:en(p.63)+!CH32V205DS0.PDF:zh(max=5.3),CH32V205DS0.PDF
-CH32V203;CH32V205,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,g_m,Oscillator transconductance,Startup,,26,,uA/V,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,i_2,LSE drive current,V_DD = 3.3V,,0.36,,uA,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,t_CAL,Calibration time,,,36,,1/fADC,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
@@ -2250,7 +2280,7 @@ CH32V203;CH32V205,t_RET,Data retention,T_A = 25℃,20,,,Years,#,reference,CH32V2
 CH32V203;CH32V205,t_RET,Data retention,T_A = 85℃,10,,,Years,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,t_RSTTEMPO,Power on reset,,5,6.5,30,mS,#,confirmed,CH32V205DS0.PDF:zh(p.41)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,t_STAB,Sampling time,,,,1,us,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
-CH32V203;CH32V205,t_SU(HSE),Startup time(2),V is stable DD,,1.5,4.5,ms,#,reference,CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
+CH32V203;CH32V205,t_SU(HSE),Startup time(2),V is stable DD,,1.5,4.5,ms,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(LSE),Startup time,V is stable DD,,1000,,mS,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(LSI),LSI oscillator startup stabilization time,,,400,,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.53),CH32V205DS0.PDF
@@ -2383,6 +2413,7 @@ CH32V208,I_DD(BLE),TX,BLE power consumption; +7dBm; Under normal temperature V_D
 CH32V208,I_DD(BLE),TX,BLE power consumption; -18dBm; Under normal temperature V_DD = 3.3V,,6.28,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.25)+CH32V208DS0.PDF:en(p.30),CH32V208DS0.PDF
 CH32V208,I_DD(BLE),TX,BLE power consumption; 0dBm; Under normal temperature V_DD = 3.3V,,12.8,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.25)+CH32V208DS0.PDF:en(p.30),CH32V208DS0.PDF
 CH32V208,I_DD(BLE),RX,BLE power consumption; Under normal temperature V_DD = 3.3V,,15.2,,mA,#,confirmed,CH32V208DS0.PDF:zh(p.25)+CH32V208DS0.PDF:en(p.30),CH32V208DS0.PDF
+CH32V208,I_DD(HSI),HSI oscillator power consumption,,120,180,270,uA,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,I_DD(LSI),LSI oscillator power consumption,,,0.6,,uA,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
 CH32V208,I_DDA,Supply current,,,480,530,uA,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,I_DDOPAMP,Current consumption,"No load, static mode",,195,,uA,#,confirmed,CH32V208DS0.PDF:zh(p.37)+CH32V208DS0.PDF:en(p.43),CH32V208DS0.PDF
@@ -2608,6 +2639,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,I_DD,Supply current in Standby mode,"Typical
 CH32V303;CH32V305;CH32V307;CH32V317,I_DD,Supply current in Standby mode,"Typical current consumption in Stop and Standby mode; Low-speed internal RC oscillator on, independent watchdog off, all RAM not powered",,1.8,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.56)+CH32V20x_30xDS0.PDF:en(p.64),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,I_DD,Supply current in Stop mode,"Typical current consumption in Stop and Standby mode; Voltage regulator in Run mode, low-speed and high-speed internal RC oscillators and external oscillators off (no independent watchdog)",,110,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.56)+CH32V20x_30xDS0.PDF:en(p.64),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,I_DD,Supply current in Stop mode,"Typical current consumption in Stop and Standby mode; Voltage regulator in low-power mode, low-speed and high-speed internal RC oscillators and external oscillators off (no independent watchdog, PVD off), RAM enters low-power mode",,30,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.56)+CH32V20x_30xDS0.PDF:en(p.64),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,I_DD(HSI),HSI oscillator power consumption,,120,180,270,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,I_DD(LSI),LSI oscillator power consumption,,,0.6,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,I_DDA,Supply current,,,480,530,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,I_DDOPAMP,Current consumption,"No load, static mode",,195,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.81)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
@@ -2687,6 +2719,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,t_LOCK1,PLL lock time,,,80,200,us,#,confirme
 CH32V303;CH32V305;CH32V307;CH32V317,t_RET,Data retention,,20,,,year,#,reference,CH32V20x_30xDS0.PDF:en(p.69),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.79)+CH32V20x_30xDS0.PDF:en(p.88),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(HSE),Startup time,"V is stable, 8M crystal DD",,1.5,4,ms,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.58)+CH32V20x_30xDS0.PDF:en(p.66),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSE),Startup time,VDD is stable,,800,,mS,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.67),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSI),LSI oscillator startup stabilization time,LSE off,,5,,ms,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,t_SU(LSI),LSI oscillator startup stabilization time,LSE on,,230,,us,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.68),CH32V20x_30xDS0.PDF
@@ -2706,6 +2739,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,t_wustop,Wakeup from Stop mode (voltage regu
 CH32V407;CH32V467,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = -40℃~85℃,-2.2,,2.2,%,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
 CH32V407;CH32V467,ACC_HSI,Accuracy of HSI oscillator (after calibration),T_A = 0℃~70℃,-1.6,,1.6,%,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
 CH32V407;CH32V467,C,Recommended load capacitance and corresponding crystal serial impedance RS,RS <70kΩ,,,15,pF,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
+CH32V407;CH32V467,C,Recommended load capacitance and corresponding crystal series impedance RS,RS =60Ω(1),,20,,pF,#,reference,CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32V407DS0.PDF:zh(p.69)+CH32V407DS0.PDF:en(p.78),CH32V407DS0.PDF
@@ -2730,6 +2764,7 @@ CH32V407;CH32V467,F_PCLK1,Internal PB1 clock frequency,,,,F_HCLK,MHz,#,confirmed
 CH32V407;CH32V467,F_PCLK2,Internal PB2 clock frequency,,,,F_HCLK,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
 CH32V407;CH32V467,F_PLL_IN,PLL input clock,,5,,32,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
 CH32V407;CH32V467,F_PLL_OUT,PLL multiplier output clock,,100,,400,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
+CH32V407;CH32V467,I_2,HSE drive current,,,0.53,,mA,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,I_DD,Supply current in Run mode,"Typical current consumption of CH32V407 in Run mode, and data processing code runs from internal flash memory; External clock; F = HCLK 120MHz; All peripherals disabled",,18.8,,mA,#,confirmed,CH32V407DS0.PDF:zh(p.47)+CH32V407DS0.PDF:en(p.53),CH32V407DS0.PDF
 CH32V407;CH32V467,I_DD,Supply current in Run mode,"Typical current consumption of CH32V407 in Run mode, and data processing code runs from internal flash memory; External clock; F = HCLK 120MHz; All peripherals enabled",,30.2,,mA,#,confirmed,CH32V407DS0.PDF:zh(p.47)+CH32V407DS0.PDF:en(p.53),CH32V407DS0.PDF
 CH32V407;CH32V467,I_DD,Supply current in Run mode,"Typical current consumption of CH32V407 in Run mode, and data processing code runs from internal flash memory; External clock; F = HCLK 175MHz; All peripherals disabled",,19.6,,mA,#,confirmed,CH32V407DS0.PDF:zh(p.47)+CH32V407DS0.PDF:en(p.53),CH32V407DS0.PDF
@@ -2797,6 +2832,7 @@ CH32V407;CH32V467,I_REFP,V supply current REF+,,,30,,uA,#,reference,CH32V407DS0.
 CH32V407;CH32V467,N_END,Erase times,T_A = 25℃,50K,,,Times,#,reference,CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,R_ADC,Sampling switch resistance,,,0.2,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
+CH32V407;CH32V467,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,R_F,Feedback resistance,,,5,,MΩ,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,R_LOAD,Resistive load,,4,,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,T_A,Ambient temperature at work,,-40,,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
@@ -2844,6 +2880,7 @@ CH32V407;CH32V467,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.17,1.
 CH32V407;CH32V467,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,,150,,,mV,#,confirmed,CH32V407DS0.PDF:zh(p.52)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,f_ADC,ADC clock frequency,,,,30,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,f_S,Sampling rate,,,,2,MHz,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
+CH32V407;CH32V467,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,g_m,Oscillator transconductance,Startup,,25.3,,uA/V,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,i_2,LSE drive current,V_DD = 3.3V,,0.35,,uA,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,t_CAL,Calibration time,,,136,,1/fADC,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
@@ -2854,6 +2891,7 @@ CH32V407;CH32V467,t_LOCK,PLL lock time,,,40,90,us,#,confirmed,CH32V407DS0.PDF:zh
 CH32V407;CH32V467,t_RET,Data retention period,,20,,,Years,#,reference,CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_RSTTEMPO,Other reset,,2,10,30,ms,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,t_RSTTEMPO,Power on reset,,16,28,30,ms,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(HSE),Startup time,"V stable, 25M crystal DD",,1,,ms,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(HSI),HSI oscillator startup stabilization time(1),,,,8,us,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(LSE),Startup time,V is stable DD,,800,,mS,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(LSI),LSI oscillator startup stabilization time(1),,,230,,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF

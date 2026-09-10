@@ -282,6 +282,28 @@ def table_scope(caption: str) -> frozenset:
     return frozenset(TABLE_ACRONYM.findall(PARENTHESISED.sub(" ", caption or "")))
 
 
+def column_edges(record: dict) -> list[float]:
+    """表の列の境界（セルの左端＋表の右端）。続きの断片かを幾何で確かめるのに使う。"""
+    xs = {round(cell["bbox"][0], 1) for cell in record.get("cells", []) if "bbox" in cell}
+    if "bbox" in record:
+        xs.add(round(record["bbox"][2], 1))
+    return sorted(xs)
+
+
+def same_edges(a: list[float], b: list[float], tol: float = 2.0) -> bool:
+    """列の境界がだいたい同じか（同じ表の続きなら版面が同じなので揃う）。
+
+    >>> same_edges([10.0, 50.0, 90.0], [10.4, 50.0, 91.5])
+    True
+    >>> same_edges([10.0, 50.0, 90.0], [10.0, 60.0, 90.0])
+    False
+    >>> same_edges([10.0], [10.0, 50.0])
+    False
+    """
+    return (bool(a) and len(a) == len(b)
+            and all(abs(x - y) <= tol for x, y in zip(a, b)))
+
+
 def norm_header(cell):
     if CONDITION_HEADER.search(cell or ""):
         return "condition"
@@ -537,16 +559,18 @@ def read_edition(bundle, lang):
     # **本物の食い違い**なので、絞りすぎると本物を隠す）。
     # 表題は**跳ばすページの表でも**更新する（最後に見た表題が続く、という意味だから）。
     last_caption = ""
+    last_edges: list[float] = []
     for page in bundle_pages.pages(bundle):
         text = page.get("text") or ""
         hit = bool(marker.search(text))
         tables = []
-        for caption, tbl in bundle_pages.captioned_tables(page):
-            if (caption or "").strip():
+        for record in page.get("tables", []):
+            caption = ((record.get("caption") or {}).get("text") or "")
+            if caption.strip():
                 last_caption = caption
-            tables.append((last_caption, tbl))
+            tables.append((last_caption, record["extracted_rows"], column_edges(record)))
         if not hit and not carry and not any(
-                TABLE_CAPTION.search(cap) for cap, _ in tables):
+                TABLE_CAPTION.search(cap) for cap, _, _ in tables):
             continue
         # 表はページを跨ぐ。CH32V003の "Table 3-23 ADC characteristics" は
         # キャプションがp28で、ADCクロック上限の行はp29にある。キャプションの
@@ -554,7 +578,7 @@ def read_edition(bundle, lang):
         # 無関係な表を拾っても記号の絞り込みで落ちる。
         carry_from, carry = carry and not hit, hit
         page_ok = hit or carry_from
-        for caption, tbl in tables:
+        for caption, tbl, edges in tables:
             # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
             if not page_ok and not TABLE_CAPTION.search(caption):
                 continue
@@ -562,9 +586,10 @@ def read_edition(bundle, lang):
             body = tbl[1:]
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
             if {"symbol", "min", "condition"} <= set(cols):
-                last_cols = cols
-            elif ((carry_from or TABLE_CAPTION.search(caption)) and last_cols
-                  and len(tbl[0]) == len(last_cols)):
+                last_cols, last_edges = cols, edges
+            elif (last_cols and len(tbl[0]) == len(last_cols)
+                  and (carry_from or TABLE_CAPTION.search(caption)
+                       or same_edges(edges, last_edges))):
                 # 続きページの表はヘッダ行を持たない。列数が同じなら直前の
                 # 並びをそのまま当てる。CH32V003のADCクロック上限の行は
                 # このページにしかない。
@@ -575,6 +600,19 @@ def read_edition(bundle, lang):
                 # `CH32V006DS0.zh` p.38 の OPA 特性表の続き（`C_LOAD 50pF`）がそれで、
                 # 落ちると en の 50 が zh の**高速モード表**の 20 と組んで偽の食い違いに
                 # なっていた。
+                #
+                # **`carry_from` の限定も外した**（2026-09-10）。「そのページ自身が見出し語を
+                # 持つ」と `carry_from` は False になるので、**同じページに載った続きの断片**が
+                # 読まれなかった——`CH32V203DS0.zh` p39 は上半分が高速外部時钟の続き
+                # （ヘッダは p38）で下半分が表4-12。zh は下だけ・en は上だけを読み、
+                # `g_m` が 17 mA/V（HSE）と 25.3 uA/V（LSE）で**偽の食い違い**になっていた。
+                # 続きページ（`carry_from`）と表題で届いた表の続きは**列数だけ**で続きと
+                # 見なす（従来どおり）。**同じページに載った続きの断片**は新しく足した経路で、
+                # そちらは**列の境界の一致**も要る——列数だけだと、たまたま同じ列数の別の表を
+                # 続きと見なして**条件の語が値の欄に入る**（`CH32V002DS0` の待機電流で
+                # `typ=5V`・`min=Disable` という行が6つ出た。2026-09-10の実測）。
+                # 逆に境界を全経路に課すと、版面がわずかに違うページ跨ぎの続きが落ちる
+                # （同実測で既存の21行が消えた）。
                 cols, body = last_cols, tbl
             else:
                 continue
