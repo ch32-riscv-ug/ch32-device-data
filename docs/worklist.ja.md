@@ -314,10 +314,17 @@ D18（PDF構造化）は完了したが、**bundle を正しく読めている�
   `ADC2_ETRGINJ_R`。記述表のほうが `M` を落としていた）は認めない。**24セルが直った**（`Reserved` 13件・
   `EOP`・`BIDIOE`・`DMAEN`・`EHMOD`・`TXFIFOHEIE`・`I2C1RST`・`ETIE` ほか。全て原本の bit 図の並びと
   照合済み。長くなったセル0）。<br>
-  **残り31件**——`SR`|`Res`（`Reserved` の断片）・`SWPMI`|`I2C3`（zh の bit 図は記述表に無い略記）・
-  `5USARTRST`|`T4USART3URST`（数字まで混ざる）・`AWDIE`|`EOCI`（`EOCIE` の取りこぼしで、縮めるのは誤り）。
-  **記述表の Name 欄と隣接1字では決まらない**ところまで来た。次に測るなら**字形の座標**——どの字形が
-  どちらのセルの領域に在るかは geometry が知っている（`strip_boundary_dupes` と同じ道具）。
+  → **字形の座標から組み直した**（2026-09-10・`rebuild_from_glyphs`）。箱は「セルの左右 × その行の帯の
+  上下」——セル自身の箱は `apply_bitfield` の連結後に1行目しか覆わず、`TIM7RST` が `TIM7` に切れる。
+  歯止めは**組み直した綴りが記述表の名前であること**で、これが無いと `5IACTS14`→`5IACTS1` のような
+  切れ落ちが通る（組み直して違う綴りになるセル791のうち、名前になるのは30だけ＝761は落ちる）。
+  **30セルが直った**（`RXFIFOEIE`/`TXFIFOEIE` 6・`Reserved` 7・`IF_RX_RESET` 3・`FLASH_ST`/`TXFIFOHEIE` 4 ほか。
+  全部原本と照合）。<br>
+  **残り30件**——`SR`|`Res`（**版面がそう刷っている**。字形から組み直しても `SR`）・`SWPMI`|`I2C3`
+  （zh の bit 図は記述表に無い略記）・`5USARTRST`|`T4USART3URST`（組み直すと `4USARTRST` になるが語順が
+  違い、記述表の名前にならないので採らない）・`AWDIE`|`EOCI`（`EOCIE` の取りこぼし）。
+  **綴りでも字形でも決まらない**ところまで来た。次に効くとすれば記述表の名前を使わない別の裏づけ
+  （同じレジスタの他版・EVTヘッダの綴り）。
 
 ## E. consumerからの依頼
 

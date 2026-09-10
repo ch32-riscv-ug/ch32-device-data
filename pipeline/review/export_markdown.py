@@ -818,10 +818,14 @@ def render_page(page: dict, url: str | None, chains: dict[str, dict],
                 logical_tables.apply_bitfield(record, lines[line_id], centers)
                 # 縦割れ名の連結で末尾が二重になったものを、記述表のName列で検算して直す。
                 logical_tables.fix_doubled_names(record, description_names)
+                # 綴りで決まらない残りを、字形の位置から組み直す。
+                logical_tables.rebuild_from_glyphs(record, description_names, chars_for)
             elif item["id"] in cross:
                 # 前ページ末尾の番号行で組み直す箱（bit図のページ跨ぎ分割）。
                 logical_tables.apply_bitfield(record, None, cross[item["id"]])
                 logical_tables.fix_doubled_names(record, description_names)
+                # 綴りで決まらない残りを、字形の位置から組み直す。
+                logical_tables.rebuild_from_glyphs(record, description_names, chars_for)
             else:
                 # 通常表: `Reset`/`value`に割れたヘッダを戻し、境界グリフの二重取り（`[31:12] R`等）を落とす。
                 logical_tables.strip_duplicated_span_lines(record)

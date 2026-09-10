@@ -1636,6 +1636,59 @@ def _is_doubled(flat: str, name: str) -> bool:
         walk.cache_clear()
 
 
+def _glyphs_in_box(chars: list[dict], box: list[float], tol: float = 0.5) -> str | None:
+    """箱に**中心が**入る字形を、行帯（3pt刻み）→x順で繋いだ綴り。無ければ None。"""
+    x0, top, x1, bottom = box
+    inside = [c for c in chars
+              if x0 - tol <= (c["bbox"][0] + c["bbox"][2]) / 2 <= x1 + tol
+              and top - tol <= (c["bbox"][1] + c["bbox"][3]) / 2 <= bottom + tol
+              and (c.get("text") or "").strip()]
+    if not inside:
+        return None
+    inside.sort(key=lambda c: (round(c["bbox"][1] / 3), c["bbox"][0]))
+    return "".join(c["text"] for c in inside).replace(" ", "")
+
+
+def rebuild_from_glyphs(table: dict, names: set[str], chars) -> int:
+    """記述表の名前でないbit図セルを、**字形の位置**から組み直す（名前になるときだけ）。
+
+    `fix_doubled_names`の綴り合わせでは決まらない壊れ方が残る——`RXFIRFOXEFIIFOEE I` は
+    `RXFIFOEIE` と `RXFIFOFIE` の両方を部分列に持ち、`OPA_PSELOAP_PAS_EPLSE` は相手が無い。
+    どの字形がどのセルの領域に在るかは geometry が知っているので、そちらから組み直す。
+
+    **箱は「セルの左右 × その行の帯の上下」**。セル自身の箱では足りない——`apply_bitfield`が
+    縦割れ名を連結したあとの箱は1行目しか覆わず、`TIM7RST` が `TIM7` に切れる（実測）。
+    行の帯（同じ行のセルの上端の最小・下端の最大）を使うと全corpusの58対で一致した。
+
+    **置き換えるのは組み直した綴りが記述表の名前のときだけ。** これが歯止めで、うまく
+    組めなかった 761 件（`5IACTS14`→`5IACTS1` のような切れ落ち）は全部ここで落ちる。
+    全corpus実測（2026-09-10）: 置き換わるのは**30セル**。冪等（呼ぶ側が1度だけ呼ぶ）。
+    """
+    if chars is None or not names:
+        return 0
+    glyphs = chars() if callable(chars) else chars
+    if not glyphs:
+        return 0
+    rows: dict[int, list[dict]] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] >= 1 and (cell.get("bbox") or cell.get("src_bbox")):
+            rows.setdefault(cell["row_start"], []).append(cell)
+    fixed = 0
+    for cells in rows.values():
+        boxes = [cell.get("bbox") or cell.get("src_bbox") for cell in cells]
+        top = min(b[1] for b in boxes)
+        bottom = max(b[3] for b in boxes)
+        for cell, box in zip(cells, boxes):
+            flat = (cell.get("text") or "").replace("\n", "").strip()
+            if len(flat) < 3 or flat in names:
+                continue
+            found = _glyphs_in_box(glyphs, [box[0], top, box[2], bottom])
+            if found and found != flat and found in names:
+                cell["text"] = found
+                fixed += 1
+    return fixed
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
