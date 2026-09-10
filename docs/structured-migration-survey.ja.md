@@ -41,7 +41,8 @@ converter・`pipeline/`の実装はしない。**設計案（項目6）と受入
 - **複数repositoryが持つ写しは全一致**（例: `CH32FV2x_V3xRM.PDF`はCH32V20xとCH32V307の
   両mirrorにあり、zh/enともSHA-256が一致）
 - zh単独版が3つある: `CH32M030DS2.PDF`・`CH32V006DS2.PDF`（datasheet）、
-  `CH32V407RM.PDF`（RM）。zh/en照合の設計はこの3版を「対応相手なし」として扱う必要がある
+  ~~`CH32V407RM.PDF`（RM）~~。zh/en照合の設計はこの3版を「対応相手なし」として扱う必要がある
+  （**`CH32V407RM` は 2026-09-04 に en 版が mirror に追加され、いまは両版ある**——調査時点の記録）
 - **zh/enで版番号がずれる文書が3つある**（今回の実測で確認）: `CH32M030DS0.PDF`
   zh 1.3 / en 1.2、`CH32X315DS0.PDF` zh 1.2 / en 1.1、`CH32X315RM.PDF` zh 1.2 / en 1.1。
   zh/en照合は「同じ版どうしの突き合わせ」を前提にできない——照合keyは版番号ではなく
@@ -97,7 +98,7 @@ converter・`pipeline/`の実装はしない。**設計案（項目6）と受入
 | 罫線図・タイミング図の表誤認 | 先行PoC 4文書の検出例 | 先行PoCが値抽出前に検出 |
 | 縦書き・回転文字 | 任意DSのpin表（縦書き封装名） | F-53と同根 |
 | zh/en構成差 | CH32H417DS0（A6: 1.4.26節がzh/enで別機能、F-51） | 資料側の実績 |
-| 対応相手のないzh単独版 | CH32M030DS2 / CH32V006DS2 / CH32V407RM | inventory実測 |
+| 対応相手のないzh単独版 | CH32M030DS2 / CH32V006DS2 / ~~CH32V407RM~~（2026-09-04にen版追加） | inventory実測 |
 | 大型RM（時間・容量・検査コスト） | CH32H417RM en 1,042p | inventory実測で最大 |
 | RMのregister格子・結合セル | CH32FV2x_V3xRM | remap格子・複数familyを1冊が扱う |
 

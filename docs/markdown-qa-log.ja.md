@@ -3843,3 +3843,28 @@ conflict 数、`evidence/README` の `registers` 行数を、日英とも数え�
 `conflicts:with_alternative`／`without_alternative`／`both_values`・`pin_functions:af`・
 `clock_symbols:{value,mask,poll,written,header_only}`。日英の両方を別々に当てるので、
 片方だけ直した状態も落ちる。**壊して落ちることを毎回確認**（今回は6つ試した）。
+
+## 「その文書は片版しかない」を検査に載せた（2026-09-10）
+
+README の数を数え直していて、**1つの資料が届くと、それを前提に書いた説明が一斉に古くなる**
+と分かった。2026-09-04 に `CH32V407RM` の en 版が mirror に加わった日に、同時に
+
+- `option_bytes` の reference 8行が消えて全98行 confirmed になり（信頼度表が古いまま）、
+- `pin_functions` に F-60 の conflict 6行が生まれ（信頼度表が古いまま）、
+- `dma_requests` の reference 73行が消えて650行すべて confirmed になった（`evidence/README` が古いまま）
+
+——3つの表が動いたのに、それを説明している文は**どれも直っていなかった**。さらに
+「CH32V407 は RM が zh 単独」という記述が `evidence/README`（日英）・移行調査の2箇所に
+残っていた。
+
+`check_docs.check_single_edition` を足した。「zh単独／zh版しかない／zh-only」等の語の
+**前後40字**に在る文書名を拾い、目録（`catalog/documents.csv` の `version_zh`/`version_en`）で
+両版あるなら落とす。作りで効かせている点が3つ:
+
+- **`~~…~~` の中は見ない**——取り消し線は「当時はそうだった」という記録で、いまの主張ではない
+- **PDF だけ**を見る（EVT の ZIP は元から中文版だけで、そう書いてあるのが正しい）
+- 綴りが `CH32V407` のような**接頭辞**のことがあるので、その接頭辞に当たる PDF が
+  **全部**両版を持つときだけ落とす（`CH32M030` は `CH32M030DS2` が中文版だけなので当たらない）
+
+行の近傍に限るのが要で、限らないと信頼度表の1行（数百字）が行のどこかに語を持つだけで
+無関係な文書名まで拾った（実測で5件の誤検出）。**取り消し線を外すと落ちることを確認**。

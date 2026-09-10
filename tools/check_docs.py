@@ -352,6 +352,51 @@ def check_confidence(known: dict[str, int]) -> list[str]:
     return bad
 
 
+# 「その文書は片方の版しかない」と書いている行の目印（日英）。**取り消し線の中は見ない**
+# ——`~~…~~` は「当時はそうだった」という記録で、いまの主張ではない。
+SINGLE_EDITION = re.compile(r"zh単独|zh版しかない|中文版しかない|zh-only|only in zh")
+STRUCK = re.compile(r"~~.*?~~", re.S)
+DOC_NAME = re.compile(r"CH32[A-Za-z0-9_]+")
+
+
+def check_single_edition() -> list[str]:
+    """「zh単独」と書いてある文書が、本当に片方の版しか無いか。
+
+    **1つの資料が届くと、それを前提に書いた説明が一斉に古くなる。** 2026-09-04 に
+    `CH32V407RM` の en 版が mirror に加わったとき、`evidence/README`（日英）の
+    option_bytes の節・信頼度表・移行調査の3箇所が「V407 は RM が zh 単独」と言ったまま
+    残り、同じ日に `option_bytes` の reference 8行が消え F-60 が生まれていた
+    （2026-09-10 に気づいた）。文書側の版の有無は目録が持っているので、突き合わせる。
+    """
+    # **PDF だけ**を見る。EVT の ZIP は元から中文版しか無く、そう書いてあるのが正しい。
+    editions: dict[str, set[str]] = {}
+    for row in paths.load("documents"):
+        if row["status"] != "assigned" or not row["document"].upper().endswith(".PDF"):
+            continue
+        editions[Path(row["document"]).stem] = {
+            lang for lang in ("zh", "en") if (row[f"version_{lang}"] or "").strip()}
+    bad = []
+    for path in sorted(REPO.glob("**/*.md")):
+        if any(part.startswith(".") for part in path.parts):
+            continue
+        rel = path.relative_to(REPO)
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            plain = STRUCK.sub("", line)
+            # **語の近く**（前後40字）に在る文書名だけを見る。信頼度表の1行は数百字あり、
+            # 行のどこかに語が在るだけで無関係な文書名まで拾ってしまう。
+            for m in SINGLE_EDITION.finditer(plain):
+                window = plain[max(0, m.start() - 40):m.end() + 40]
+                for name in DOC_NAME.findall(window):
+                    # 綴りは `CH32V407` のように接頭辞のことがある。**その接頭辞に当たる
+                    # PDF が全部両版を持つ**なら、片版という主張はもう成り立たない
+                    # （`CH32M030` は `CH32M030DS2` が中文版だけなので当たらない）。
+                    hit = [n for n in editions if n.startswith(name)]
+                    if hit and all(len(editions[n]) == 2 for n in hit):
+                        bad.append(f"{rel}:{number}: {name} は目録では zh/en 両版あるのに "
+                                   "「片方の版しかない」と書いてある")
+    return bad
+
+
 def check_prose(known: dict[str, int]) -> list[str]:
     """文章の中の数。当たった全てが一致し、かつ1件以上当たること。"""
     bad = []
@@ -445,7 +490,7 @@ def main() -> int:
     known = quantities()
     holes = ledger()
     bad = (check_row_counts(known) + check_confidence(known) + check_prose(known)
-           + check_holes(holes) + check_liquid())
+           + check_single_edition() + check_holes(holes) + check_liquid())
     if bad:
         seen: list[str] = []
         for b in bad:
