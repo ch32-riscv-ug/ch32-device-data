@@ -238,6 +238,15 @@ WIDE_PARENS = str.maketrans({"（": "(", "）": ")"})
 SYMBOL_FIX = {"F_HCLK_OrF_SYS": "F_HCLK", "F_HCLK_orF_SYS": "F_HCLK",
               "I_LOAD_PG_A": "I_LOAD_PGA"}
 VALUE_FIX = {"FHCLK": "F_HCLK"}
+# **値の欄に数ではなく語が入ることがある。** 版はそれを各々の言語で書くので、
+# 揃えないと中文版の行が「値として読めない」で丸ごと落ちる——`CH32H417DS0` の
+# `R_HSEXO_ext`（XO ピンの外部プルダウン）は「VIO18 の既定出力 1.8V」の行だけ
+# 典型値が抵抗ではなく`浮空`／`Floating`（＝抵抗を付けない）で、中文版の p.82 が
+# 落ちて英語版だけの `reference` になっていた。
+# 語彙は**この1語だけ**——全corpus実測（2026-09-11）: 値の欄に CJK を持つ行は
+# `浮空` の1行、数を含まない値は他に13種あって**全て記号**（`VDD`・`tHCLK`・
+# `F_HCLK` など）で、語はこの `Floating` だけ。公開する綴りは英語版のもの。
+VALUE_WORDS = {"浮空": "Floating"}
 TEXT_REPAIRS = [
     (re.compile(r"^T = (.+?)\s*A$"), r"T_A = \1"),
     (re.compile(r"usedUSB"), "used USB"),
@@ -612,6 +621,11 @@ def same_value(a: str | None, b: str | None) -> bool:
 
 
 def norm_value(cell):
+    """min/typ/max の欄を1つの値にする。
+
+    >>> [norm_value(v) for v in ("6～24", "400,", "浮空", "FHCLK")]
+    ['6~24', '400', 'Floating', 'F_HCLK']
+    """
     # 範囲の区切りは版で全角と半角に割れる（zh `6～24` / en `6~24`）。揃えないと
     # 同じ事実が食い違いになり、全角のままでは公開する表にCJK帯の字が入る。
     cell = (cell or "").replace("～", "~")
@@ -624,6 +638,8 @@ def norm_value(cell):
     # 落とさないと行ごと消えて H417 の Standard I2C の容性負荷が失われる。
     # 全corpus実測（2026-09-10）: 値の末尾がコンマのセルはこの1つだけ。
     value = re.sub(r"[,，]$", "", value)
+    if value in VALUE_WORDS:
+        return VALUE_WORDS[value]
     return VALUE_FIX.get(value, attach_value_subscript(value))
 
 
