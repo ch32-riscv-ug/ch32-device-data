@@ -133,6 +133,34 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("index/README.ja.md", r"`memory_configs`（(?P<n>[\d,]+)行）", "memory_configs:conflict"),
     ("index/README.md", r"`memory_configs` \((?P<n>[\d,]+)\)", "memory_configs:conflict"),
     ("evidence/README.ja.md", r"family × 型 × register (?P<n>[\d,]+)行", "registers"),
+    ("README.ja.md", r"`pin_functions`の`af-N`が\n  (?P<n>[\d,]+)行", "pin_functions:af"),
+    ("evidence/README.ja.md", r"`route = af-N`（(?P<n>[\d,]+)行）", "pin_functions:af"),
+    ("evidence/README.md", r"`route = af-N` \((?P<n>[\d,]+) rows\)", "pin_functions:af"),
+    ("README.ja.md", r"\*\*(?P<n>[\d,]+)行は表が採った値", "conflicts:both_values"),
+    ("index/README.ja.md", r"`conflict` の印を集めたもの\n（(?P<n>[\d,]+)行）", "index:conflicts"),
+    ("index/README.md", r"anywhere in `catalog/` and `evidence/` \((?P<n>[\d,]+) today\)",
+     "index:conflicts"),
+    ("index/README.ja.md", r"結べなかった define（(?P<n>[\d,]+) 行", "register_fields_without_member"),
+    ("index/README.md", r"tied to a struct member \((?P<n>[\d,]+)\)", "register_fields_without_member"),
+    ("evidence/README.ja.md", r"は`member`が空です（(?P<n>[\d,]+)行）", "register_fields_without_member"),
+    ("evidence/README.md", r"have an empty `member` \((?P<n>[\d,]+) rows\)",
+     "register_fields_without_member"),
+    ("evidence/README.ja.md", r"写した\n(?P<n>\d+) 表です", "evidence_tables"),
+    ("evidence/README.md", r"attached -- (?P<n>\d+) tables", "evidence_tables"),
+    ("evidence/README.ja.md", r"(?P<n>[\d,]+)行の内訳は value", "clock_symbols"),
+    ("evidence/README.ja.md", r"内訳は value (?P<n>[\d,]+)", "clock_symbols:value"),
+    ("evidence/README.ja.md", r"内訳は value [\d,]+ / mask (?P<n>[\d,]+)", "clock_symbols:mask"),
+    ("evidence/README.ja.md", r"/ poll (?P<n>[\d,]+)", "clock_symbols:poll"),
+    ("evidence/README.md", r"breakdown of the (?P<n>[\d,]+) rows is value", "clock_symbols"),
+    ("evidence/README.md", r"rows is value (?P<n>[\d,]+)", "clock_symbols:value"),
+    ("evidence/README.md", r"rows is value [\d,]+ / mask (?P<n>[\d,]+)", "clock_symbols:mask"),
+    ("evidence/README.md", r"/ poll (?P<n>[\d,]+)", "clock_symbols:poll"),
+    ("evidence/README.ja.md", r"設定コードが実際に書いたもの（(?P<n>[\d,]+)行）", "clock_symbols:written"),
+    ("evidence/README.ja.md", r"ヘッダに定義があるだけ（(?P<n>[\d,]+)行）", "clock_symbols:header_only"),
+    ("evidence/README.md", r"configuration code actually wrote \((?P<n>[\d,]+) rows\)",
+     "clock_symbols:written"),
+    ("evidence/README.md", r"merely defined in the header \((?P<n>[\d,]+) rows\)",
+     "clock_symbols:header_only"),
     ("evidence/README.md", r"family × type × register, (?P<n>[\d,]+) rows", "registers"),
     ("README.ja.md", r"比較表の属性（(?P<n>\d+)種類の綴り", "product_attributes:kinds"),
     ("README.ja.md", r"種類の綴り・(?P<n>[\d,]+)行", "product_attributes"),
@@ -186,6 +214,19 @@ def quantities() -> dict[str, int]:
         1 for r in conflicts if (r.get("alternative") or "").strip())
     out["conflicts:without_alternative"] = (len(conflicts)
                                             - out["conflicts:with_alternative"])
+    # 採った値と相手の値が**両方**並ぶ行（`kept` は列ごとの印を持つ表でしか埋まらない）。
+    out["conflicts:both_values"] = sum(
+        1 for r in conflicts
+        if (r.get("kept") or "").strip() and (r.get("alternative") or "").strip())
+    out["pin_functions:af"] = sum(
+        1 for r in paths.load("pin_functions") if (r["route"] or "").startswith("af-"))
+    # `clock_symbols` の内訳（役割と、設定コードが書いたか header にあるだけか）。
+    symbols = paths.load("clock_symbols")
+    for role in ("value", "mask", "poll"):
+        out[f"clock_symbols:{role}"] = sum(1 for r in symbols if r["role"] == role)
+    out["clock_symbols:written"] = sum(
+        1 for r in symbols if "system_ch32" in (r["basis"] or ""))
+    out["clock_symbols:header_only"] = len(symbols) - out["clock_symbols:written"]
     out["catalog_tables"] = len(paths.CATALOG_TABLES)
     out["evidence_tables"] = len(paths.EVIDENCE_TABLES)
     # 索引は manifest.csv も1表として数える（文書がそう数えている）。

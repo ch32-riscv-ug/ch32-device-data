@@ -3,7 +3,7 @@
 [日本語](README.ja.md)
 
 **What the documents say**, copied row by row with its basis (`basis`) and confidence (`confidence`)
-attached -- 33 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
+attached -- 40 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
 `pin_functions.signal` varies between `TX1` / `UTX` / `USART1_TX` exactly as the documents do, and `pad` keeps
 decorations such as `PA0-WKUP`. When documents disagree, the value is not corrected; the row is marked `conflict` and both are kept.
 The tables **to look things up in** (names normalised through the vocabulary, joined, split per part number) are in
@@ -278,7 +278,7 @@ The derived **layout key** (family × type → hash of the structure's shape; fa
   the same form as the RM register tables (`RCC_APB2PCENR`). The mapping to a structure member is in the `member` column
   (`RCC.APB2PCENR`), **attached only where one can be**. Banners containing an instance number (`DMA_CNTR7` →
   `DMA_Channel.CNTR`) get one, but CAN mailboxes/filters (`CAN_TXMI0R`, `CAN_F30R2`) and
-  define groups without a structure (H417's `SERDES_*`/`TKEY_*`, M030's `UART_*`/`CMP_*`) have an empty `member` (1,591 rows = 4.8%). **Rows are not dropped when it is empty**
+  define groups without a structure (H417's `SERDES_*`/`TKEY_*`, M030's `UART_*`/`CMP_*`) have an empty `member` (911 rows). **Rows are not dropped when it is empty**
   -- the bit position and mask are as the header says
 - **`kind=value` is a value within a field.** `RCC_PLLMULL_3` is a value of `PLLMULL`. `of_field` is the parent, `value` is its value
   (`mask >> lo`). Counting only `kind=field` gives the number of fields
@@ -307,7 +307,7 @@ D-7 (DMA channel → peripheral) is `dma_requests.csv`.
 **Which peripheral's request connects to which DMA channel** (consumer's R-20 D-7). Not in the EVT headers;
 only the "DMAx各通道外设映射表" (DMAx per-channel peripheral mapping table) in the DMA chapter of the reference manual has this information. The zh and en editions are read separately and matched on
 (family, variant, dma, channel, request); agreement of both editions gives `confirmed`, one edition only gives `reference`.
-Of 650 rows, 577 are confirmed; the 73 reference rows are all CH32V407 (whose RM exists only in zh).
+All 650 rows are confirmed (~~73 reference rows for CH32V407~~ -- its English RM arrived on 2026-09-04, so both editions now agree).
 **Spelling is as in the documents** (`request`: the zh edition's spelling, keeping the `*` of `TIM1_UP*` and X315's `_0`/`_1`; where the en edition spells it differently, `request_en`). The reading of the marks (`remap`) and the vocabulary-normalised `peripheral` are in the index's [`index/dma.csv`](../index/README.md).
 
 | Column | Meaning |
@@ -407,11 +407,11 @@ The address is included because the register name does not determine the locatio
 
 **A project that sets no macro silently builds with the default variant.** Building CH32V203RBT6 as D6 leaves HSE_VALUE at 24MHz (correctly 32MHz) and gives a different set of peripherals, in ways that do not show up in the tables.
 
-**The `role` column of `clock_symbols.csv` says what the symbol is.** It is decided from observation -- `&= ~X` gives `mask`, `|= X` gives `value`, `while(REG & X)` gives `poll`. The breakdown of the 429 rows is value 222 / mask 173 / poll 34.
+**The `role` column of `clock_symbols.csv` says what the symbol is.** It is decided from observation -- `&= ~X` gives `mask`, `|= X` gives `value`, `while(REG & X)` gives `poll`. The breakdown of the 434 rows is value 223 / mask 176 / poll 35.
 
 Masks are needed because **the setters are all read-modify-write**. Values alone cannot be written. However, **the vendor's own code sometimes ORs without clearing the field** (CH32V20x writes `RCC->CFGR0 |= RCC_HPRE_DIV1` relying on the reset value), so observing the source alone does not yield a complete set of masks. The shortfall is recognised from the shape of the header -- "the name is a prefix, at a `_` boundary, of two or more other symbols, and the value is a single contiguous run of bits". This matches exactly `RCC_HPRE` (versus `RCC_HPRE_DIV1..DIV512`), `RCC_SW` (versus `RCC_SW_HSI/HSE/PLL`) and `FLASH_ACTLR_LATENCY`, and does not match single bits such as `RCC_HSEON`. The register location is taken from the header's banner comment (`/*** Bit definition for RCC_CFGR0 register ***/`) -- because the name does not say that `RCC_ADCPRE` belongs to CFGR0.
 
-The source is distinguished by `basis`: **`evt(device-header+system_ch32*.c)` is what the configuration code actually wrote (303 rows); `evt(device-header)` is merely defined in the header (126 rows)**.
+The source is distinguished by `basis`: **`evt(device-header+system_ch32*.c)` is what the configuration code actually wrote (305 rows); `evt(device-header)` is merely defined in the header (129 rows)**.
 
 **`confidence=conflict` is a symbol whose header contradicts itself within one line.** There are 5. The representative is `FLASH_ACTLR_LATENCY`: on CH32V003/V006/V103/X035 the value is `0x03` (2 bits wide) while the comment says `LATENCY[2:0]` (3 bits wide). The mask you can write changes depending on whether you trust the name or the number, and the narrower one cannot write latency 4. Both readings are kept in `basis` (`+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])`). **The mask width itself also differs by family**: `0x03` on V003/V006/V103/L103/X035, `0x07` on V20x/V307/M030, `0x0F` on V205.
 

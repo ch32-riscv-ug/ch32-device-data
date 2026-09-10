@@ -122,7 +122,7 @@ One row per (register, bit define): `evidence/registers` (struct offsets) joined
 the EVT `*_TypeDef` stem; `register` the struct member, arrays per element (`EXTICR[1]`, offset =
 first + index x width) and nested structs flattened (`sTxMailBox[0].TXMIR`). `field` is the
 readable name, `define` the EVT spelling (`RCC_APB2PCENR_USART1EN`). Rows with an empty
-`offset` are defines whose banner could not be tied to a struct member (1,591). `access` /
+`offset` are defines whose banner could not be tied to a struct member (911). `access` /
 `reset` come from the reference manual where the bit position matched (`confirmed`).
 
 ### `register_map.csv` -- absolute addresses
@@ -177,7 +177,7 @@ rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree
 
-One row per `conflict` mark anywhere in `catalog/` and `evidence/` (165 today), by
+One row per `conflict` mark anywhere in `catalog/` and `evidence/` (185 today), by
 `tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
 keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
 "show me every spec the two editions disagree on" meant grepping all of them.
