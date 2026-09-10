@@ -629,6 +629,46 @@ def keep_row(row, lang, page_no):
     return True
 
 
+VALUE_COLUMNS = ("min", "typ", "max")
+
+
+def fill_rowspans(record: dict, cols: list) -> list[list]:
+    """**縦に結合された値のセル**を、覆われている行にも写した `extracted_rows`。
+
+    資料は「2つの条件で同じ値」を値の欄の縦結合で書く——`t_erase_32k` の
+    `DBMODE = 0, single 32K bytes` と `DBMODE = 1, single 64K bytes` は `3`/`10 ms` を
+    共有し、`V_DDA` の「ADC を使う／使わない」は `2.4`/`3.6 V` を共有する。
+    `extracted_rows` は結合セルを先頭の行にだけ置くので、覆われた行が**値ゼロ**になり、
+    正本に「単位だけの行」として出ていた（実測: 全corpus 10行・18セル・5文書の zh/en 対称。
+    2026-09-10に原本を描画して、版面が確かに縦結合であることを確かめた）。
+
+    写すのは**min/typ/max の欄だけ**。記号と項目名は呼ぶ側が自前で継いでいて（継ぎ方が
+    違う——記号は空欄なら前の行、項目名は空欄でなければ更新）、ここで写すと二重になる。
+    """
+    rows = [list(r) for r in record["extracted_rows"]]
+    head = sorted((c for c in record["cells"] if c["row_start"] == 0),
+                  key=lambda c: c["column_start"])
+    if len(head) != len(cols) or not rows:
+        return rows
+    spans = [c for c in record["cells"]
+             if c["row_end"] - c["row_start"] >= 2 and (c.get("text") or "").strip()]
+    if not spans:
+        return rows
+    for index, name in enumerate(cols):
+        if name not in VALUE_COLUMNS:
+            continue
+        start = head[index]["column_start"]
+        for r in range(1, len(rows)):
+            if index >= len(rows[r]) or (rows[r][index] or "").strip():
+                continue
+            for cell in spans:
+                if (cell["column_start"] <= start < cell["column_end"]
+                        and cell["row_start"] < r < cell["row_end"]):
+                    rows[r][index] = cell["text"]
+                    break
+    return rows
+
+
 def read_edition(bundle, lang):
     """対象表の行。行ごとに読み取ったページ番号を `_page` で持つ。
 
@@ -659,7 +699,7 @@ def read_edition(bundle, lang):
             caption = ((record.get("caption") or {}).get("text") or "")
             if caption.strip():
                 last_caption = caption
-            tables.append((last_caption, record["extracted_rows"], column_edges(record)))
+            tables.append((last_caption, record, column_edges(record)))
         if not hit and not carry and not any(
                 TABLE_CAPTION.search(cap) for cap, _, _ in tables):
             continue
@@ -669,10 +709,11 @@ def read_edition(bundle, lang):
         # 無関係な表を拾っても記号の絞り込みで落ちる。
         carry_from, carry = carry and not hit, hit
         page_ok = hit or carry_from
-        for caption, tbl, edges in tables:
+        for caption, record, edges in tables:
             # ページ規則で届いていないページでは、**表題が当たった表だけ**を見る。
             if not page_ok and not TABLE_CAPTION.search(caption):
                 continue
+            tbl = record["extracted_rows"]
             cols = [norm_header(c) for c in tbl[0]]
             body = tbl[1:]
             # 条件列は動作条件表にしかない（絶対最大定格表は符号+描述のみ）
@@ -707,6 +748,10 @@ def read_edition(bundle, lang):
                 cols, body = last_cols, tbl
             else:
                 continue
+            # 縦に結合された値のセルを、覆われている行にも写す。列の並びが決まってからで
+            # ないと写す先が分からないので、続きの断片は `last_cols` の並びで写す。
+            filled = fill_rowspans(record, cols)
+            body = filled[len(filled) - len(body):]
             rows, sym, unit, param, group = [], "", "", "", ""
             for raw in body:
                 cells = dict()

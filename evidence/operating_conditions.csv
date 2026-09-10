@@ -267,9 +267,9 @@ CH32H415;CH32H416;CH32H417,t_SU(LSE),Startup time,V_DD33 stabilization,,800,,mS,
 CH32H415;CH32H416;CH32H417,t_SU(LSI),LSI oscillator startup stabilization time,,,230,,us,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_WAKUP,"Setup time from shutdown to wake up, 0.1%","Input V /2, DD33A C = 50pF, R = 4kΩ LOAD LOAD",,,1,us,#,confirmed,CH32H417DS0.PDF:zh(p.124)+CH32H417DS0.PDF:en(p.140),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_erase_32k,Block erase time,"DBMODE = 0, single 32K bytes",,3,10,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,t_erase_32k,Block erase time,"DBMODE = 1, single 64K bytes",,,,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_erase_32k,Block erase time,"DBMODE = 1, single 64K bytes",,3,10,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_erase_sec,Sector erase time,"DBMODE = 0, single 4K bytes",,3,10,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,t_erase_sec,Sector erase time,"DBMODE = 1, single 8K bytes",,,,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_erase_sec,Sector erase time,"DBMODE = 1, single 8K bytes",,3,10,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_prog_page,Page (256 bytes) programming time,,,1.5,3,ms,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_s,Sampling time,,1.5,,239.5,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_s,Sampling time,,3.5,,239.5,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
@@ -1733,7 +1733,7 @@ CH32V103,V_25,Voltage at 25°C,,1.1,1.34,1.6,V,#,confirmed,CH32V103DS0.PDF:zh(p.
 CH32V103,V_AIN,Conversion voltage range,,0,,VDDA,V,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,V_BAT,Backup operating voltage,Cannot be more than V_DD,1.8,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_DD,Standard operating voltage,,2.7,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
-CH32V103,V_DDA,Analog operating voltage (ADC is used),,3.0,,,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
+CH32V103,V_DDA,Analog operating voltage (ADC is used),,3.0,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_DDA,Supply voltage,,3.0,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,V_DDA,Analog operating voltage (ADC is not used),Must be the same potential as V_DD.,2.7,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.20)+CH32V103DS0.PDF:en(p.22),CH32V103DS0.PDF
 CH32V103,V_HSEH,OSC_IN input pin high level voltage,,0.8VDD,,VDD,V,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.26),CH32V103DS0.PDF
@@ -2015,7 +2015,7 @@ CH32V203,V_AIN,Conversion voltage range,,0,,VREF+,V,#,confirmed,CH32V203DS0.PDF:
 CH32V203,V_BAT,Backup operating voltage,,1.8,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DD,Standard operating voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DD,Standard operating voltage,Use USB,3.0,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
-CH32V203,V_DDA,Analog operating voltage (ADC is used),,,,,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
+CH32V203,V_DDA,Analog operating voltage (ADC is used),,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
 CH32V203,V_DDA,Supply voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,V_DDA,Supply voltage,,2.4,3.3,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.48)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
 CH32V203,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to VSS.",2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.33)+CH32V203DS0.PDF:en(p.39),CH32V203DS0.PDF
@@ -2440,7 +2440,7 @@ CH32V208,V_BAT,Backup operating voltage,,1.8,,3.6,V,#,confirmed,CH32V208DS0.PDF:
 CH32V208,V_DD,Standard operating voltage,,2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,V_DD,USB operating voltage,,3.0,,3.6,V,#,reference,CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,V_DD,Standard operating voltage,Use USB or ETH,3.0,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
-CH32V208,V_DDA,Analog operating voltage (ADC is used),,,,,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
+CH32V208,V_DDA,Analog operating voltage (ADC is used),,2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
 CH32V208,V_DDA,Supply voltage,,2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,V_DDA,Supply voltage,,2.4,3.3,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.37)+CH32V208DS0.PDF:en(p.43),CH32V208DS0.PDF
 CH32V208,V_DDA,Analog operating voltage (ADC is not used),"V must be the same as DDA V , V cannot be I/O REF+ higher than V , V is DDA REF- equal to VSS.",2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.23)+CH32V208DS0.PDF:en(p.27),CH32V208DS0.PDF
