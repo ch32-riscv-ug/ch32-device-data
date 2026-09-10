@@ -42,11 +42,14 @@ gains a PDF, the rules, and the working conventions for the structured-PDF pipel
 uv run tools/check_tables.py
 uv run tools/check_counts.py
 uv run tools/check_docs.py
+uv run pipeline/checks/check_doctests.py
 node tools/check_viewer.js
 ```
 
 The first three need only the standard library (`uv` resolves pdfplumber for the extractors, not
-for these). `check_viewer.js` evaluates `pins.html`'s script without a DOM and needs `node`.
+for these). `check_doctests.py` runs the doctests of `pipeline/` and `tools/`, which are the
+specification of the normalisation rules, so it imports the extractors and needs their packages.
+`check_viewer.js` evaluates `pins.html`'s script without a DOM and needs `node`.
 
 The tools need third-party packages (pdfplumber) and run through uv, which resolves
 them from `pyproject.toml` and `uv.lock`.

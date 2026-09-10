@@ -13,7 +13,7 @@
               5本（registers 3表＋register_layouts・opa_cmp_registers・
               clock_enables・usbpd_plumbing・flash_program_method）も加わる
     index     evidenceから導出する索引（debug_interfaces・conflicts・build_index）
-    checks    check_tables / check_counts / check_docs
+    checks    check_tables / check_counts / check_docs / check_doctests
     legacy    --full: **全CSVの再生成**（D18工程(5)の切替後の正規実行形）——
               旧`tools/`の生成器（**もう原本は読まない**。読み手は全部新経路）と
               退役済みの生成器を、依存順どおりに走らせて正本へ書かせる。
@@ -181,6 +181,9 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("check_baseline", ["tools/check_baseline.py"]),
             ("check_counts", ["tools/check_counts.py"]),
             ("check_docs", ["tools/check_docs.py"]),
+            # 正規化の規則の仕様は doctest で、規則を直すたびに例を足してきたのに
+            # **その例はどこでも走っていなかった**（2026-09-11・12ファイル103例）。
+            ("check_doctests", ["pipeline/checks/check_doctests.py"]),
         ]),
     ]
     if args.verify:
