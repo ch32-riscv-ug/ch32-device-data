@@ -428,7 +428,54 @@ def attach_value_subscript(value: str) -> str:
     return value
 
 
+# **添字を次の行にまとめて置く組版**。基底が1行目に並び、その添字が2行目に同じ順で並ぶ:
+#
+#     V +V        ← 基底2つ（V と V）
+#     CC12V S     ← その添字2つ（CC12V と S）＝ `V_CC12V + V_S`
+#
+# 平坦化してから添字を戻す `attach_value_subscript` はこれを解けない——`V+VCC12VS` からでは
+# `CC12V` がどちらの `V` の添字か決まらず、`CH32V007DS0.zh` の `V_B` が `V+VCC12VS` のまま出て
+# en 版（`VCC12V+VS`。行が別々なので正しく戻る）と**偽の食い違い**になっていた。行の構造が
+# 残っているうちに対応させれば曖昧さが無い。
+#
+# 全corpus実測（2026-09-10）: 値の欄でこの形は**この1セルだけ**。同じ形は記号セルに19件ある
+# （`V -V`/`DD SS` ＝ 絶対最大定格の `V_DD-V_SS`）が、そちらは記号の経路なので触らない。
+VALUE_SUB_TOKEN = re.compile(r"^(?:" + "|".join(VALUE_SUBSCRIPTS) + r"|S|A|SS|IO18)$")
+
+
+def pair_line_subscripts(cell: str | None) -> str | None:
+    r"""1行目の基底と2行目の添字を順に対応させる。形が合わなければ None。
+
+    >>> pair_line_subscripts("V +V\nCC12V S")
+    'VCC12V+VS'
+    >>> pair_line_subscripts("V -0.4\nDD") is None      # 基底1つ（従来の経路）
+    True
+    >>> pair_line_subscripts("3.3") is None
+    True
+    """
+    lines = [x for x in (cell or "").split("\n") if x.strip()]
+    if len(lines) != 2:
+        return None
+    head = FOOTNOTE.sub("", lines[0])
+    bases = list(BARE_BASE.finditer(head))
+    tokens = [x for x in re.split(r"[\s,]+", lines[1].strip()) if x]
+    if len(bases) < 2 or len(bases) != len(tokens):
+        return None
+    if not all(VALUE_SUB_TOKEN.match(tok) for tok in tokens):
+        return None
+    out, last = [], 0
+    for base, tok in zip(bases, tokens):
+        out.append(head[last:base.end(1)])
+        out.append(tok)
+        last = base.end(1)
+    out.append(head[last:])
+    return "".join(out).replace(" ", "")
+
+
 def norm_value(cell):
+    paired = pair_line_subscripts(cell)
+    if paired is not None:
+        return paired
     value = FOOTNOTE.sub("", norm_text(cell)).replace(" ", "")
     return VALUE_FIX.get(value, attach_value_subscript(value))
 

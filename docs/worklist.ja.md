@@ -174,10 +174,15 @@ CH32H415, CH32H416, **CH32H417**, CH32M007, **CH32M030**, CH32M103, CH32V002, CH
 D18（PDF構造化）は完了したが、**bundle を正しく読めているのに正本が惜しい**箇所が残る。
 どれも「原本の読み取り」ではなく「読んだものの解釈」の問題で、D18の完了条件とは別軸。
 
-- [ ] **添字の復元が版で違う結果になる** — `CH32V007DS0` の `V_B` は zh が `VCC12V+VS`・
-  en が `V+VCC12VS`。同じ式の添字を別の位置に戻していて、綴りの正規化では揃わない
-  （`index/conflicts.csv` に1行残る）。`attach_value_subscript` は「長いほうから当てる・数が
-  壊れない読みを採る」で動いているが、**基準記号が複数ある式**は当てる先を決められない。
+- [x] ✅ **添字の復元が版で違う結果になる** — `CH32V007DS0` の `V_B`。**2026-09-10に直した**。
+  zh のセルは2行組み（1行目に基底2つ `V +V`、2行目にその添字2つ `CC12V S`）で、
+  `attach_value_subscript` が**平坦化してから**戻すために `CC12V` の宛先を決められなかった。
+  行の構造が残っているうちに対応させる `pair_line_subscripts` を足した。値の欄でこの形は
+  全corpusでこの1セルだけ。行数不変で `V_B` が conflict → confirmed（conflicts 192 → 191）。
+- [ ] **絶対最大定格の `V_DD-V_SS` 行が落ちている（19件）** — 上と同じ2行組みが**記号セル**にもあり
+  （`V -V`／`DD SS`）、`V-VDDSS` と読まれて `KEEP` の白名簿に無いので行ごと落ちる。
+  電源電圧の絶対最大定格（−0.3〜5.5V）が正本に無い。記号側にも同じ対応付けを入れれば読めるが、
+  **19行の追加**になるので1行ずつ原文と照合してから。
 - [ ] **表を跨ぐ zh/en 照合** — `CH32V203DS0` の `g_m` は en の HSE 表（17 mA/V）が zh の LSE 表
   （25.3 uA/V）と組んで偽の食い違いになる。**表の範囲**（`table_scope`。表題の大文字略語）で
   絞る仕組みは入れたが、高速/低速の表題はどちらも略語を持たないので同じ `{}` になる。
@@ -1097,7 +1102,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 |---|---|---|
 | **電気特性・低消費電力**（絶対最大定格・動作/待機/スリープ電流・Flash 書換回数と保持期間・各低消費モードのウェイクアップ時間・GPIO 駆動能力と入力閾値・ADC 精度） | ✅ **実装**（2026-08-29） | **抽出器を書く仕事ではなく語彙を広げる仕事だった。** `build_operating.py` は**すでに電気的特性表と絶対最大定格表を歩いていて**、`KEEP` 正規表現で落としているだけだった。**304 → 1,588行**（記号187種・全27 series・confirmed 1,379 / ref 179 / conflict 30）。内訳は 電圧・しきい値 489／時間 393／クロック 195／電流 148／抵抗 70／容量 66／温度 34／ADC 誤差 32／Flash 寿命 21。監査が名指しした項目はほぼ入った——`N_END`（書換 300K回）・`t_RET`（保持 20年）・`I_DDA`・`t_SU(HSI/LSI/HSE)`・`t_STAB`・`V_IH`/`V_IL`/`V_OL`/`V_hys`/`I_lkg`・`t_s`/`t_CONV`/`f_S`/`R_ADC`/`C_ADC`・`ED`/`EL`/`EO`/`ET`・`t_prog_page`/`t_erase_*`・`T_J`。<br>**やり方**: (1) `KEEP` を記号の一覧ではなく**頭字＝物理量**にし、単位で弾く（`UNIT_FOR` を拡張。`T_S_*`・`t_RET`・`N_END` は具体規則を先に置く先勝ち）、(2) 値の判定を `reads_as_value` に書き直して**式**（`0.22*(VDD-2.7)+1.55`）と記号（`VREF-`）と `∞` を採る、(3) 値の欄の**添字修復**`attach_value_subscript`（`V-0.4DD` → `VDD-0.4`）、(4) 見出し行（`Symbol`）と2記号が畳まれた行を落とす。<br>**検証**: 既存 304 行は**1行も欠けず確度も根拠も不変**（純粋な追加）。probe が落とした87通りの値を全部新しい規則に通して45採用・42却下を1件ずつ確認。単位と物理量の不一致 0。データ列の CJK 0。`index/parts.csv` と生成 README は**無変化**（クロック・電圧の読み方に影響なし）。<br>**残り**: (a) ~~消費電流とウェイクアップ時間~~——A11 として切り出し、**2026-09-01に受入済み**、(b) **添字が `*` に化けた式**（19通り。推測になるので埋めない）、(c) conflict 30 のうち**8件は綴りの差**（`mS`/`ms`・`0.8VDD`/`0.8*VDD`・`VI/O`/`VIO`）で、単位の大小を無視する正規化は `MΩ`/`mΩ` を潰すため入れていない |
 | **機械可読な列定義**（`meta/columns.csv`。型・単位・主キー・空欄の意味） | ⬜ 保留。**要求は本物だが置き場所が違う** | 空欄の意味が混ざっている（該当しない／資料にない／未解決／variant 依存／0個／索引では意図的に省略）という指摘はそのとおり。ただし51表・約500列の台帳を人が別ファイルに書くと、**それ自体が次に腐るもの**になる。`check_tables.column_drift` がすでに「ヘッダ＝生成器の `*COLUMNS` 定数」を毎回見ているので、足すなら**定数の隣に型と空欄理由を書き、そこから生成する**形にしたい。着手前に consumer がどの列で困っているかを聞く |
-| **出所・矛盾の縦持ち索引**（`claim_id, subject, predicate, value, source, ...`） | 🔧 **安い部分を実装**（2026-08-29）→ `index/conflicts.csv` | `basis` が1セル内の DSL なので横断で引けない、というのは事実。まず `confidence=conflict` の行だけを集める索引を作った（**証拠の表の conflict は 192 行**。memory_configs 67・register_fields 38・operating_conditions **22**（A11受入とX315 zh改版で2026-09-01に30→40、そのあと出力電圧特性表の照合をピン群で守って 2026-09-09 に 28）・product_attributes 25・pin_functions 18（2026-09-04 に V407 の en 版 RM が加わり、FSMC_NADV の格子読みが zh/en で割れて 12→18。F-60）・clock_symbols 5・opa_cmp_registers 5・registers 4・option_byte_fields 3（R-30の新表。8→4は2026-09-02の裁定）・adc_internal 2・flash_geometry 1・flash_program_method 1・timers 1。この数は `check_docs.py` と `check_tables.py` が数え直す）。`basis` から `!<出所>` と `(=<値>)`（新経路の `(address=…)`・`(field=…)` 形も）を取り出すので、**116行は「表が採った値」と「相手が言う値」が横に並ぶ**（例: CH32V407 `RCC_CFGR2.UTMI1ON` は EVT が bit31・RM が bit30）。残る76行は、食い違いを散文で記録している表（memory_configs・timers の68行）と、**相手が「値を書かない」型**（新しいX315 zh版がFlash時間のmaxを載せない等）。**分かったこと**: `product_attributes` の25行は仕様の差と**言い回しの差**（`Typical: 72MHz` / `Typ. 72MHz`）が混ざっていて、conflict の印が「本当の食い違い」と同義ではない表がある。claim 表まで広げるかは、この索引が使われるかを見てから |
+| **出所・矛盾の縦持ち索引**（`claim_id, subject, predicate, value, source, ...`） | 🔧 **安い部分を実装**（2026-08-29）→ `index/conflicts.csv` | `basis` が1セル内の DSL なので横断で引けない、というのは事実。まず `confidence=conflict` の行だけを集める索引を作った（**証拠の表の conflict は 191 行**。memory_configs 67・register_fields 38・operating_conditions **21**（A11受入とX315 zh改版で2026-09-01に30→40、そのあと出力電圧特性表の照合をピン群で守って 2026-09-09 に 28）・product_attributes 25・pin_functions 18（2026-09-04 に V407 の en 版 RM が加わり、FSMC_NADV の格子読みが zh/en で割れて 12→18。F-60）・clock_symbols 5・opa_cmp_registers 5・registers 4・option_byte_fields 3（R-30の新表。8→4は2026-09-02の裁定）・adc_internal 2・flash_geometry 1・flash_program_method 1・timers 1。この数は `check_docs.py` と `check_tables.py` が数え直す）。`basis` から `!<出所>` と `(=<値>)`（新経路の `(address=…)`・`(field=…)` 形も）を取り出すので、**115行は「表が採った値」と「相手が言う値」が横に並ぶ**（例: CH32V407 `RCC_CFGR2.UTMI1ON` は EVT が bit31・RM が bit30）。残る76行は、食い違いを散文で記録している表（memory_configs・timers の68行）と、**相手が「値を書かない」型**（新しいX315 zh版がFlash時間のmaxを載せない等）。**分かったこと**: `product_attributes` の25行は仕様の差と**言い回しの差**（`Typical: 72MHz` / `Typ. 72MHz`）が混ざっていて、conflict の印が「本当の食い違い」と同義ではない表がある。claim 表まで広げるかは、この索引が使われるかを見てから |
 | **版間差分のデータ化** | ⬜ 保留 | git 履歴はあり、`catalog/sources.csv` が読んだミラーの commit を持つので材料は揃っている。**D7（生成の Actions 化）と一緒にやるのが自然**——差分を出す主体が定期実行だから |
 | **ブート・書込み・保護設定の意味索引**（option byte・BOOT 条件・読み出し保護・IAP・debug 無効化・reset source） | ⬜ 保留。**consumer が現れてから** | register field は `index/registers.csv` に揃っているので、足りないのは目的別の語彙だけ。ただし**いま作ると語彙を推測で決めることになる**（どの粒度で引きたいかは使う側が決める） |
 | **パッケージ実装情報**（辺ごとの lead 数・番号方向・exposed pad 寸法・推奨ランド・courtyard） | ⬜ 保留 | PCB や部品ライブラリの生成まで見るなら要るが、consumer からの依頼が無い。画像 C1〜C3 と同じ扱い |
