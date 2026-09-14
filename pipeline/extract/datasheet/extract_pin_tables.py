@@ -90,6 +90,32 @@ def canon_variant(name: str) -> str:
     return FOOTNOTE.sub("", name.replace("×", "X")).strip().upper()
 
 
+# **機能列の役目を版面の見出しどおりに直す台帳**（`curated/pin-table-columns.json` の
+# `function_column`）。見出しが列の役目を決めるので、版が見出しを取り違えると同じセルが
+# 版ごとに違う route になる——`CH32H417DS0` の `Table 2-1-3`（CH32H415）は機能列が1つしか
+# 無く、中文版は `引脚功能（2）`（＝pin function）、英語版は `Remapping function(3)` と刷る。
+# **セルの中身は両版で1字も違わない**（`ADC_IN0/OPA3_OUT0/TIM2_CH1_ETR(AF1)/…`）。
+# 同じ文書の 2-1-1・2-1-2 は同じ内容を `引脚功能(2)`／`Pin function(2)` の列に置き、
+# 脚注も (2) が pin function・(3) が重映射なので、**英語版の見出しが誤り**と裁定した
+# （2026-09-15。両版の版面を pypdfium2 で描画して確認）。直さないと H415 の
+# アナログ系45機能が en 側だけ route 無しになり、両版が食い違う行として並ぶ。
+# 全corpus実測: 機能列が `remap` だけの pin 表は**この1表だけ**（64表中）。
+def retitle_function_column(layout: dict, override: dict, bundle: str,
+                            label: str) -> None:
+    """台帳が言うなら、1つしかない機能列の役目を付け替える。"""
+    role = override.get("function_column")
+    if not role or role in layout:
+        return
+    others = [k for k in ("default", "remap") if k in layout]
+    if len(others) != 1:
+        # 機能列が2つある表は見出しで区別できているので触らない。台帳の書き間違いを
+        # 黙って通さないために、当たらなかったことは言う。
+        print(f"{bundle} {label}: function_column={role} は当たらなかった"
+              f"（機能列 {others}）", file=sys.stderr)
+        return
+    layout[role] = layout.pop(others[0])
+
+
 def read_edition(bundle: str, document: str) -> tuple[dict, dict, dict]:
     """One edition's pin tables.
 
@@ -123,6 +149,7 @@ def read_edition(bundle: str, document: str) -> tuple[dict, dict, dict]:
             # The curated list is authoritative; the parser only found where
             # the columns are, not always what they are called.
             variants = fixed + variants[len(fixed):]
+        retitle_function_column(layout, overrides.get(label, {}), bundle, label)
         parsed.append((label, title, rows, variants, layout))
     # **pad 欄を先に直す。** 折り返しを読み落とした `PC14-` を同じ版の他の表の
     # 綴りへ寄せる（`extract_pins.complete_truncated_pads`）。機能は pad をキーに

@@ -1,5 +1,5 @@
 {
- "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, position by position. A '-' marks a column the table grid contains but the printed table does not, which pdfplumber picks up from a stray rule.",
+ "_description": "Pin-table column headings that the PDF text layer loses, read off the rendered page instead. Keyed by datasheet file name and table label; the list replaces the headings the parser recovered, position by position. A '-' marks a column the table grid contains but the printed table does not, which pdfplumber picks up from a stray rule. Besides `columns`, an entry may carry `function_column`: the role of the table's single alternate-function column when the printed heading names the wrong one (the parser reads the role off the heading).",
  "_verification": "Each entry was checked by rendering the page with pypdfium2 and reading the heading visually, then confirming the data columns line up with the parsed grid.",
  "CH32V208DS0.PDF": {
   "Table 3-1": {
@@ -51,6 +51,14 @@
    "note": "中文版も同じ組版。紙面は4列で、4列目は LQFP48 と QFN48X7 を1セルに積んだ見出し（両packageが同じpin番号を共有）。テキスト層では2列に割れ、QFN48X7 側が空列になる。英語版（Table 3-1-1）にだけ直しを当てていたため、中文側の QFN48X7 が0 pinになり、その封装の機能行が全部 en 片翼（reference）に落ちていた",
    "verified_by": "page-image",
    "page": 24
+  }
+ },
+ "CH32H417DS0.PDF": {
+  "Table 2-1-3": {
+   "function_column": "default",
+   "note": "英語版だけが機能列を `Remapping function(3)` と刷る。中文版の同じ表（表2-1-3）は `引脚功能（2）`で、セルの中身は両版で1字も違わない（`ADC_IN0/OPA3_OUT0/TIM2_CH1_ETR(AF1)/…`）。同じ文書の 2-1-1・2-1-2 は同じ内容を `引脚功能(2)`／`Pin function(2)` の列に置き、脚注も (2) が pin function・(3) が重映射なので英語版の見出しが誤り。直さないと H415 のアナログ系45機能が en 側だけ route 無しになり、両版が食い違う行として並ぶ",
+   "verified_by": "page-image",
+   "page": 60
   }
  }
 }
