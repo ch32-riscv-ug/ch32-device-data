@@ -780,6 +780,14 @@ def unwrap(cell: str, known: frozenset[str] = frozenset()) -> str:
 CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 
 
+# **`(AFn)` はそこで語が終わる。** 区切りの `/` を落とした版がある——`CH32H417DS0.zh`
+# p.29 の `PF8` は `TIM11_CH3(AF13)QSPI1_SIO0(AF10)` と刷る（英語版は同じ2つを改行で分けて
+# いて正しく読める）。分けないと `TIM11_CH3(AF13)Q` という在りもしない綴りが `default` の
+# 機能として出て、続く `SPI1_SIO0` が頭の `Q` を失う。全corpus実測（2026-09-15）:
+# `(AFn)` の直後に区切りが一切無い箇所はこの1つだけ。
+AF_RUN = re.compile(r"(\((?:AF|af)\d+\))(?=[A-Za-z])")
+
+
 def signals(cell: str, known: frozenset[str] = frozenset(),
             names: frozenset[str] = frozenset()) -> list[str]:
     """Split a cell into signal tokens. '-' is the table's empty marker, not a
@@ -790,11 +798,19 @@ def signals(cell: str, known: frozenset[str] = frozenset(),
     VDD33", which is prose about the pin rather than a name for it; the pin's own
     column says VDD33 next to it. A stray leading space is a different thing and
     is trimmed.
+
+    >>> signals("HSADC_IN4/SPI1_MOSI(AF3)")
+    ['HSADC_IN4', 'SPI1_MOSI(AF3)']
+    >>> signals("TIM11_CH3(AF13)QSPI1_SIO0(AF10)")
+    ['TIM11_CH3(AF13)', 'QSPI1_SIO0(AF10)']
+    >>> signals("-/VDD33")
+    ['VDD33']
     """
     # Twice, because a footnote can be split across the break it marks: CH32X035
     # wraps the "(3)" of A3(3) as "A3(" / "3)", which no pass over the raw cell
     # can see.
     joined = FOOTNOTE.sub("", unwrap(FOOTNOTE.sub("", cell), known))
+    joined = AF_RUN.sub(r"\1/", joined)
     return [part
             for s in (t.strip() for t in joined.split("/"))
             if s and s != "-" and " " not in s and not CJK.search(s)

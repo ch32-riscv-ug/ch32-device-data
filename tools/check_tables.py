@@ -148,6 +148,37 @@ def ordered_values(t: dict) -> list[str]:
     return bad
 
 
+def timer_channels(t: dict) -> list[str]:
+    """`index/timers.channels` が pin に出ているチャネル番号と噛み合っているか。
+
+    番号は**1から連番**（全corpus実測 2026-09-15: 55 の timer×family すべて）。
+    これを見ておくと、**役目の綴りが崩れたときに索引の数が黙って化ける**のを捕まえる
+    ——`CH3(AF13)Q`（区切りの無い `(AFn)`）で `CH32H417 TIM11` が **313 チャネル**、
+    `CH1_3`（`_3` は CH32V407 の remap 変種の番号）で `CH32V407 TIM1` が **13 チャネル**
+    と出ていた。どちらも数字を全部繋いだのが原因で、行は正しそうな顔をしている。
+    """
+    seen: dict[tuple[str, str], set[int]] = {}
+    for r in t["index:pinout"]:
+        if not (r["peripheral"].startswith("TIM") and r["role"].startswith("CH")):
+            continue
+        found = re.match(r"CH(\d+)", r["role"])
+        if found:
+            seen.setdefault((r["family"], r["peripheral"]), set()).add(int(found.group(1)))
+    bad = []
+    for key, numbers in sorted(seen.items()):
+        ordered = sorted(numbers)
+        if ordered != list(range(1, len(ordered) + 1)):
+            bad.append(f"index:timers: {key[0]} {key[1]} のチャネル番号が "
+                       f"1からの連番でない（{ordered}）——役目の綴りが崩れている疑い")
+    stated = {(r["family"], r["timer"]): r["channels"] for r in t["index:timers"]}
+    for key, numbers in sorted(seen.items()):
+        want = str(max(numbers))
+        if key in stated and stated[key] != want:
+            bad.append(f"index:timers: {key[0]} {key[1]} の channels が "
+                       f"{stated[key]!r} だが pin に出ているのは {want}")
+    return bad
+
+
 def shared_leads(t: dict) -> list[str]:
     """同じ (part_number, pin) を持つ pad の組を数え、記録と突き合わせる。"""
     together: dict[tuple[str, str], list[dict]] = {}
@@ -951,6 +982,7 @@ def main() -> int:
     bad += conflict_keys(t)
     bad += shared_leads(t)
     bad += ordered_values(t)
+    bad += timer_channels(t)
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)
 

@@ -307,7 +307,13 @@ def timers_rows(timers: list[dict], pinout: list[dict]) -> list[dict]:
         rows.append({**{k: t[k] for k in ("family", "timer", "kind", "counter_width_bits",
                                           "update_vector", "condition", "confidence", "basis")},
                      # **pin に出ている最大のチャネル番号**で、silicon の上限ではない。
-                     "channels": max((int(re.sub(r"\D", "", c) or 0) for c in plain), default=""),
+                     # 番号は `CH` の**直後の数字だけ**を読む。役目の綴りには番号の後ろに
+                     # 続きが付くものがあり（`CH1_ETR` はチャネル1と外部トリガの兼用、
+                     # `CH1_3` の `_3` は CH32V407 の remap 変種の番号）、数字を全部
+                     # 繋ぐと `CH1_3` が 13 チャネルになる（実測: `CH32V407 TIM1` が
+                     # 13 と出ていた。2026-09-15）。
+                     "channels": max((int(m.group(1)) for c in plain
+                                      if (m := re.match(r"CH(\d+)", c))), default=""),
                      "complementary": "1" if any(c.endswith("N") for c in seen) else ""})
     rows.sort(key=lambda r: (r["family"], r["timer"]))
     return rows
