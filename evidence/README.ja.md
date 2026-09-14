@@ -45,7 +45,7 @@ consumer はこれらを直接読んでよく、列は索引と同じ扱いで�
 | `main` | 主功能（复位后）/ Main function (after reset) | リセット直後にそのpadがやっていること | **動く** | 4,510 |
 | `default` | 默认复用功能 / Default alternate function / 引脚功能 | remapレジスタを触らず（値0のまま）**AFモードにしたら**出る機能 | **動かない** | 9,335 |
 | `remap-N` | 重映射功能 | AFIOのremapフィールドに N を書く | 動かない | 9,869 |
-| `af-N` | 同じ列にAF番号が併記される（`SDA(AF7)`） | そのpadのAF番号に N を書く | 動かない | 4,497 |
+| `af-N` | 同じ列にAF番号が併記される（`SDA(AF7)`） | そのpadのAF番号に N を書く | 動かない | 4,531 |
 | `alias` | pad名の欄の括弧（`LO1\n(PA0)`） | **機能ではない**。そのpadの**GPIOとしての名前**を資料が別名として添えたもの | — | 30 |
 | 空 | — | 経路番号が資料になく要確認 | — | 242 |
 
@@ -563,7 +563,7 @@ CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義�
 
 ### `pin_alternate.csv`
 
-**AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4,497行）のNの
+**AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4,531行）のNの
 書き込み先で、1行1（family, pad）。`tools/build_pin_alternate.py`。
 
 CH32V205・CH32X315・CH32H417の3 familyは**AFIO remapを持たない世代**で、
