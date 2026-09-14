@@ -384,6 +384,35 @@ D18（PDF構造化）は完了したが、**bundle を正しく読めている�
   小表）で切れている。次に効くとすれば**入れ子表をまたぐ連鎖**で、これは全corpusに掛かる
   変更なので単独で測ってから入る。
 
+### 2026-09-15 pin 表の機能列を版面どおりに読ませた（F-64 の母数を測って出てきたもの）
+
+F-64（同じ pad・同じ signal の zh/en 差が `conflict` にならない）の母数を測ったら、
+**片版だけの行 199 のうち 72 対が「相手の版にも対になる行がある」**で、その中身が
+2種類に割れた。大きいほう（45対）は資料の食い違いではなく**見出しの取り違え**だった。
+
+- **45対**: `CH32H415REU6` のアナログ系機能（`ADC_IN0`・`OPA3_OUT0`・`SWCLK`・`USBHS_DP` ほか）が
+  zh では `route=default`、en では `route` 空。**両版のセルは1字も違わない**——違うのは
+  機能列の見出しだけで、`CH32H417DS0` の `表2-1-3`（CH32H415）は zh が `引脚功能（2）`、
+  en が `Remapping function(3)` と刷る。見出しが列の役目を決めるので、同じセルが版ごとに
+  違う route になっていた。**取り込み前から在った**（今回の改版とは無関係）。<br>
+  **英語版の見出しが誤り**と裁定した——同じ文書の 2-1-1・2-1-2 は同じ内容を
+  `引脚功能(2)`／`Pin function(2)` の列に置き、脚注も (2) が pin function・(3) が重映射
+  （zh の注3は「重映射功能下划线后的数值…」でこの列の書き方ではない）。両版の版面を
+  pypdfium2 で描画して確認。`curated/pin-table-columns.json` に `function_column` を足して
+  上書き（`curated/figure-captions.json` が同じ文書の英語版の誤植を既に持っているのと同じ型）。<br>
+  全corpus実測: 機能列が `remap` だけの pin 表は**64表中この1表だけ**。台帳が当たらなかった
+  ときは黙らず言う（`function_column=… は当たらなかった（機能列 []）`。実際に当ててみて確認）。<br>
+  **正本**: `pin_functions` 28,518 → 28,473 行（90行が45行の confirmed に畳まれた）、
+  `index/pinout` 25,017 → 24,972 行。人向け README から H415 の `(no route stated)` 列が消えた。
+- **残る27対が F-64 の本体**（全部 `CH32H417DS0`。英語版がまだ改版されていないため）——
+  同じ pad・同じ signal で AF 番号だけ違うもの7対（`PE14 LTDC_CLK af-13`/`af-14`・
+  `PE14 SDRAM_A3 af-14`/`af-15`）と、同じ pad・同じ AF 番号で signal 名だけ違うもの20対
+  （`PB13 QSPI2_SIOX0`/`SIOX2`・`PB9 SDRAM_DQM2`/`SDRAM_CKE1`・`PC6 SPI2_MCK`/`I2S2_MCK`・
+  `PF8 QSPI1_SIO0`/`SPI1_SIO0`）。**`PE14` は行ごと1列ずれている**（zh の af-14 が en の
+  af-13、zh の af-15 が en の af-14）ので、どちらの見方でも同じ1つの食い違い。
+  これらは本物の資料の食い違いなので `conflict` に載せるべきだが、鍵の設計を決めるのが先
+  （F-64 に記録）。
+
 ### 2026-09-15 CH32H417 中文版の改版を取り込んだ（DS V1.8→V1.9・RM V1.7→V1.8）
 
 mirror（`ch32-riscv-ug/CH32H417` a95806a・2026-09-10）が中文版の2文書を差し替えた。
@@ -1101,7 +1130,7 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-61 | **選択ビットが `*_RM` でない remap 格子を丸ごと読み飛ばしている**。列見出しが `FSMCEN=0`/`DVPEN=1` のような**周辺の有効化ビット**や、`FSMCEN=1&USBHS2EN=1&RB_UD_RST_SIE=0` のような**3つのビットの論理積**で、`COLUMN_HEADER`（`*_RM\d?=値`）に当たらない | 全corpus実測（2026-09-10）で**19表**——CH32V407RM 5/5（zh/en 対称）・CH32FV2x_V3xRM 4/4・CH32L103RM.zh 1。その格子の経路は remap_routes に入らず、datasheet の pin 表だけが根拠になる | ツール | ⬜ **記録のみ**。`(field, value)` の対では**論理積の条件を表せない**（`FSMCEN=1&USBHS2EN=1&RB_UD_RST_SIE=0` は3ビットの組）ので、モデルを決めずに読むと嘘の経路になる。F-60 の修理でこれらの表が**前の格子に混ざることは無くなった**（読み飛ばしても害は無い状態） |
 | F-62 | **`CH32H417DS0` の英語版が I2C の容性負荷を `400,` と刷っている**（`C_b` の Standard I2C の最大値。中文版は `400`）。値の末尾のコンマは値の一部ではないので落とす（全corpus実測でこの1セルだけ）——落とさないと `reads_as_value` に掛かって行ごと消え、H417 の Standard I2C の容性負荷が失われる | 1セル | 資料 | ⬜ **記録のみ**（2026-09-10。版面を描画して誤植と確認。抽出側は末尾のコンマを落として読む） |
 | F-63 | **`CH32V006DS0` の英語版が `V_PVDhyst` を `5 / 20 / 6 mV` と刷っている**（typ が max より大きい）。中文版は `60` で、兄弟の `CH32V002` も `5/20/60` なので**英語版が 0 を落とした誤植** | 1行（すでに `conflict` で両論を持つ） | 資料 | ⬜ **記録のみ**（2026-09-11。版面を描画して確認。`check_tables.ordered_values` の`KNOWN_UNORDERED_VALUES` に名前で固定した） |
-| F-64 | **同じ pad・同じ signal で AF 番号だけが食い違う zh/en の差が `conflict` にならない**。`pin_functions` の鍵が `(part_number, pad, signal, route)` で `route`（＝`af-N`）を含むため、`PE14 LTDC_CLK af-13`(en) と `af-14`(zh) は**別の行**になり、どちらも `reference` で並ぶ。`index/conflicts.csv` に出ず、conflict の総数にも数えられない。人向け README では同じ signal が2つの AF 列に現れる | CH32H417 の改版で顕在化（2026-09-15。`PB13`/`PB14` の QSPI2 データ線の綴り・`PE14` の `LTDC_CLK` と `SDRAM_A3` の AF 番号）。**全corpusの母数は未測** | ツール | ⬜ **未着手**。直すなら鍵から `route` を外して「同じ pad の同じ signal は1つの事実」と見る形。ただし `route` が `main`/`default`/`remap-N`/`af-N` の4種を兼ねているので、**AF 番号の差だけを食い違いと見る**のか、`remap-N` との違いも含めるのかを先に決める。まず母数を測ること |
+| F-64 | **同じ pad・同じ signal で AF 番号だけが食い違う zh/en の差が `conflict` にならない**。`pin_functions` の鍵が `(part_number, pad, signal, route)` で `route`（＝`af-N`）を含むため、`PE14 LTDC_CLK af-13`(en) と `af-14`(zh) は**別の行**になり、どちらも `reference` で並ぶ。`index/conflicts.csv` に出ず、conflict の総数にも数えられない。人向け README では同じ signal が2つの AF 列に現れる | **全corpus実測（2026-09-15）: 27対、全部 `CH32H417DS0`**（英語版がまだ改版されていないため）。内訳は AF 番号だけ違うもの7対（`PE14 LTDC_CLK af-13`/`af-14`・`PE14 SDRAM_A3 af-14`/`af-15`）と、同じ AF 番号で signal 名だけ違うもの20対（`PB13 QSPI2_SIOX0`/`SIOX2`・`PB9 SDRAM_DQM2`/`SDRAM_CKE1`・`PC6 SPI2_MCK`/`I2S2_MCK`・`PF8 QSPI1_SIO0`/`SPI1_SIO0`）。`PE14` は行ごと1列ずれているのでどちらの見方でも同じ1つの食い違い。**母数を測る過程で見出しの取り違え45対を別に見つけて直した**（同日。`curated` の `function_column`） | ツール | ⬜ **未着手**。直すなら鍵から `route` を外して「同じ pad の同じ signal は1つの事実」と見る形。ただし `route` が `main`/`default`/`remap-N`/`af-N` の4種を兼ねているので、**AF 番号の差だけを食い違いと見る**のか、`remap-N` との違いも含めるのかを先に決める。まず母数を測ること |
 | F-65 | **目録の自動更新が凍結台帳を同じcommitに入れていない経路がある**。`catalog/toolchains.csv` が origin の自動commit `fdb0e20`（update tool versions）で書き換わり、台帳が置いていかれた。handoff が「目録の自動更新は台帳も同じcommitに含める」と決めている型の抜けで、**次に正本を触った人のcommitが赤くなる**（実際に 2026-09-15 の資料取り込みで混ざった） | 1表 | ツール | ⬜ **未着手**（2026-09-15。今回の `--record` で台帳は揃えたが、自動化側は直していない。`update.yml` が `catalog/documents.csv` に対して行っているのと同じ `check_baseline --record` を、toolchains を書く自動化にも入れるのが直し方） |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | ✅ 2件実装・1件は回答（`route`の`main`/`default`を文書化）。[記録](worklist-archive.ja.md) |
 | R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | ✅ **全5件実装**（2026-08-25）。[記録](worklist-archive.ja.md) |
