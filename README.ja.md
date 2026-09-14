@@ -45,7 +45,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   と同じだと思うと`millis()`が動かない
 - `tools/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
   AF番号の書き込み先を`evidence/pin_alternate.csv`にする。`pin_functions`の`af-N`が
-  4,497行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
+  4,531行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
   EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
 - `tools/build_interrupts.py`: 割り込みベクタ表を`evidence/interrupts.csv`にする。
   **出所はreference manualではなくEVTのdevice header**で、`IRQn_Type`列挙が
