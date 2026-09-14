@@ -1649,6 +1649,40 @@ def _glyphs_in_box(chars: list[dict], box: list[float], tol: float = 0.5) -> str
     return "".join(c["text"] for c in inside).replace(" ", "")
 
 
+# bit図は2ビット以上の欄に**欄の中の範囲**を添えて刷る（`EPTYPE` の下に `[1:0]`）。
+_CELL_RANGE = re.compile(r"\[\d+:\d+\]$")
+
+
+def _rebuilt_name(found: str, flat: str, names: set[str]) -> bool:
+    """字形から組み直した綴り `found` を、いまのセル `flat` の代わりに採ってよいか。
+
+    記述表の名前そのものなら採る。**bit図が添える範囲**は記述表が書かないことが
+    あるので（`CH32FV2x_V3xRM.en` p.373 の USBD_EPRx は図が `EPTYPE⏎[1:0]`・
+    `STAT_RX⏎[1:0]` と刷り、記述表の名称欄は `EPTYPE`・`STAT_RX`）、範囲を外して
+    照合したものも採る。
+
+    ただし**字が同じで空白だけが違う**セルは触らない——`IACTS [31:16]` は既に正しく、
+    版面がその空白を刷っている。全corpus実測（2026-09-11）: 範囲を外すと名前になる
+    組み直しは18件で、**16件がこの空白だけの差**（`INTRSET [79:64]` 系）、
+    残る2件が上の p.373 の崩れたセル。
+
+    >>> names = {"EPTYPE", "IACTS", "CTR_RX"}
+    >>> _rebuilt_name("CTR_RX", "CTRC_RTXR", names)
+    True
+    >>> _rebuilt_name("EPTYPE[1:0]", "EPTYPEEP[T1:Y0]P E", names)
+    True
+    >>> _rebuilt_name("IACTS[31:16]", "IACTS [31:16]", names)
+    False
+    >>> _rebuilt_name("5IACTS1", "5IACTS14", names)
+    False
+    """
+    if found in names:
+        return True
+    return bool(_CELL_RANGE.search(found)
+                and _CELL_RANGE.sub("", found) in names
+                and found.replace(" ", "") != flat.replace(" ", ""))
+
+
 def rebuild_from_glyphs(table: dict, names: set[str], chars) -> int:
     """記述表の名前でないbit図セルを、**字形の位置**から組み直す（名前になるときだけ）。
 
@@ -1660,9 +1694,13 @@ def rebuild_from_glyphs(table: dict, names: set[str], chars) -> int:
     縦割れ名を連結したあとの箱は1行目しか覆わず、`TIM7RST` が `TIM7` に切れる（実測）。
     行の帯（同じ行のセルの上端の最小・下端の最大）を使うと全corpusの58対で一致した。
 
-    **置き換えるのは組み直した綴りが記述表の名前のときだけ。** これが歯止めで、うまく
-    組めなかった 761 件（`5IACTS14`→`5IACTS1` のような切れ落ち）は全部ここで落ちる。
-    全corpus実測（2026-09-10）: 置き換わるのは**30セル**。冪等（呼ぶ側が1度だけ呼ぶ）。
+    **置き換えるのは組み直した綴りが記述表の名前のときだけ**（範囲の添字の扱いは
+    `_rebuilt_name`）。これが歯止めで、うまく組めなかった 761 件（`5IACTS14`→`5IACTS1`
+    のような切れ落ち）は全部ここで落ちる。**語彙をこのページの外へ広げてはいけない**——
+    全corpus実測（2026-09-11）: 文書全体の名前を許すと 86 セルが**壊れる**
+    （`SWIER0`→`SWIE` 45・`TCIF8`→`TCIF` 9・`G1I0F`→`10` ほか。切れ落ちが別のフィールドの
+    名前に当たってしまう）。
+    全corpus実測（2026-09-11）: 置き換わるのは**32セル**。冪等（呼ぶ側が1度だけ呼ぶ）。
     """
     if chars is None or not names:
         return 0
@@ -1683,7 +1721,7 @@ def rebuild_from_glyphs(table: dict, names: set[str], chars) -> int:
             if len(flat) < 3 or flat in names:
                 continue
             found = _glyphs_in_box(glyphs, [box[0], top, box[2], bottom])
-            if found and found != flat and found in names:
+            if found and found != flat and _rebuilt_name(found, flat, names):
                 cell["text"] = found
                 fixed += 1
     return fixed
