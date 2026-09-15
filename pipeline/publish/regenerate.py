@@ -134,6 +134,9 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             # 凍結tool `build_dma_requests` の退役（2026-09-09）: bundle 入力で byte 一致を確認して
             # 新経路へ切替。毎回走る（数秒）。
             ("dma_requests", ["pipeline/extract/rm/extract_dma_requests.py"]),
+            # F-61。**`pin_functions` より後**——その series の pin 表が裏付ける行だけ
+            # 出すので、同じ走行の pin 表を読む必要がある（legacy 段で作られる）。
+            ("pin_conditions", ["pipeline/extract/rm/extract_pin_conditions.py"]),
             # 凍結tool `build_features` の退役（2026-09-09）: 同じく byte 一致で切替。
             ("features", ["pipeline/extract/datasheet/extract_features.py"]),
             # 退役の第3・4号（2026-09-09）。`timers` は legacy 段では `evt_variants` より**前**に

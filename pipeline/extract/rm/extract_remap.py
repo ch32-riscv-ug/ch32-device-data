@@ -196,15 +196,41 @@ def caption_peripheral(caption: str) -> str | None:
 # （F-68。2026-09-15の監査で336行）。周辺名は field から決まるが、`UHSIF_PORT_RM` の
 # 周辺は `UHSIF` で、`SD0` は `SDIO_SD0` ではなく `SDIO_D0` なので、**field ごとに書く**。
 # 対応はすべて pin 表の綴りと突き合わせて確かめた（`SDMMC_SDCK` は pin 表もそう綴る）。
+# **周辺ごとの整え方**（落とす字がある周辺だけ regex を持つ）。`FSMC` は field からは
+# 引かれない——表題から周辺を決める `extract_pin_conditions` が使う（`D4` → `FSMC_D4`）。
+PERIPHERAL_LABEL: dict[str, "re.Pattern | None"] = {
+    "DVP": None,                      # D0 → DVP_D0（表10-42）
+    "SDMMC": None,                    # D0 → SDMMC_D0、SDCK → SDMMC_SDCK
+    "UHSIF": None,                    # PORT9 → UHSIF_PORT9（表9-33）
+    "LTDC": re.compile(r"[\[\]]"),    # B[0] → LTDC_B0（表10-45）
+    "SDIO": None,                     # CMD → SDIO_CMD、SD0 → SDIO_D0（表10-43）
+    "FSMC": None,                     # D4 → FSMC_D4（CH32V407RM 表10-40）
+}
 GRID_LABEL_PERIPHERAL = {
-    "DVP_RM": ("DVP", None),                      # D0 → DVP_D0（表10-42）
-    "SDMMC_RM": ("SDMMC", None),                  # D0 → SDMMC_D0、SDCK → SDMMC_SDCK
-    "UHSIF_PORT_RM": ("UHSIF", None),             # PORT9 → UHSIF_PORT9（表9-33）
-    "LTDC_RM": ("LTDC", re.compile(r"[\[\]]")),   # B[0] → LTDC_B0（表10-45）
-    "SDIO_RM": ("SDIO", None),                    # CMD → SDIO_CMD、SD0 → SDIO_D0（表10-43）
+    "DVP_RM": "DVP", "SDMMC_RM": "SDMMC", "UHSIF_PORT_RM": "UHSIF",
+    "LTDC_RM": "LTDC", "SDIO_RM": "SDIO",
 }
 # `SDIO` の格子だけ、データ線を `SD0` と書く（pin 表は `SDIO_D0`）。
 SDIO_DATA = re.compile(r"^SD(\d+)$")
+
+
+def qualify_signal(peripheral: str | None, signal: str) -> str:
+    """裸の行ラベルを、その周辺の pin 表と同じ綴りにする。対応が無ければそのまま。
+
+    >>> qualify_signal("SDIO", "SD0"), qualify_signal("SDIO", "CMD")
+    ('SDIO_D0', 'SDIO_CMD')
+    >>> qualify_signal("FSMC", "D4"), qualify_signal("DVP", "D2")
+    ('FSMC_D4', 'DVP_D2')
+    >>> qualify_signal(None, "CH1"), qualify_signal("SDIO", "SDIO_CK")
+    ('CH1', 'SDIO_CK')
+    """
+    drop = PERIPHERAL_LABEL.get(peripheral)
+    if peripheral not in PERIPHERAL_LABEL or signal_vocabulary.split(signal) is not None:
+        return signal
+    text = drop.sub("", signal) if drop else signal
+    if peripheral == "SDIO":
+        text = SDIO_DATA.sub(r"D\1", text)
+    return f"{peripheral}_{text}"
 
 
 def qualify_grid_signal(field: str, signal: str) -> str:
@@ -217,14 +243,7 @@ def qualify_grid_signal(field: str, signal: str) -> str:
     >>> qualify_grid_signal("TIM1_RM", "CH1")
     'CH1'
     """
-    found = GRID_LABEL_PERIPHERAL.get(field)
-    if not found or signal_vocabulary.split(signal) is not None:
-        return signal
-    peripheral, drop = found
-    text = drop.sub("", signal) if drop else signal
-    if peripheral == "SDIO":
-        text = SDIO_DATA.sub(r"D\1", text)
-    return f"{peripheral}_{text}"
+    return qualify_signal(GRID_LABEL_PERIPHERAL.get(field), signal)
 
 
 def read_bare_header(rows: list[list[str]], notes: list[str],

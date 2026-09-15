@@ -3,7 +3,7 @@
 [日本語](README.ja.md)
 
 **What the documents say**, copied row by row with its basis (`basis`) and confidence (`confidence`)
-attached -- 40 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
+attached -- 41 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
 `pin_functions.signal` varies between `TX1` / `UTX` / `USART1_TX` exactly as the documents do, and `pad` keeps
 decorations such as `PA0-WKUP`. When documents disagree, the value is not corrected; the row is marked `conflict` and both are kept.
 The tables **to look things up in** (names normalised through the vocabulary, joined, split per part number) are in
@@ -363,6 +363,45 @@ Three columns need care when reading.
 **`valid_values` is a lower bound.** It is the union of three documents -- the values the RM remap grid lists, the values the datasheet pin table shows as actually having a route, and the values the EVT header enumerates as constants. The grid writes "don't care" digits as `x`, so it can overshoot (CH32X035's `USART4_RM=1xx` expands to 4 values); conversely, values no document mentions are dropped. **A value that is not enumerated is not necessarily unusable**, but every enumerated value is attested by some document. Every route appearing in `remap_routes.csv` is included here.
 
 What `tools/check_tables.py` checks reading the tables alone: `bits` is in `register:bit` form, has no duplicates, and agrees with the `register` column; `valid_values` fits within the width of `bits`; `reset_value` is among `valid_values`; **every `remap_routes.value` is among `remap_fields.valid_values`**.
+
+### `pin_conditions.csv`
+
+Where a signal's pad depends on **which peripherals are enabled**, not on an AFIO remap field.
+
+`index/pinout.csv` lists two `default` pads for the same signal in 34 (series, signal) pairs
+across 6 series -- `SDIO_D0` on both `PC8` and `PB14`, `I2S3_MCK` on both `PC7` and `PA8`.
+Neither is a remap you select by writing `AFIO->PCFR1`: the reference manual prints a grid whose
+columns are RCC clock-enable bits and a few register bits outside AFIO, and the pad follows
+whichever column holds. This table is that grid, one row per `(series, signal, condition, pad)`.
+
+**How to read a condition.** `condition` is the manual's own conjunction, `&`-separated, each
+term `NAME=0` or `NAME=1` (`SDIOEN=1&ETHMACEN=1`). A row applies when every term holds, and
+**the row with the most terms wins** -- `SDIOEN=1&ETHMACEN=1` is contained in `SDIOEN=1`, so when
+both hold the pad is the one the longer condition names. The grid states the other side too, so
+the choice is decidable inside this table without going back to the manual.
+
+**Only signals whose pad moves are listed.** A grid also lines up the signals whose pad is the
+same in every column (8 of the 10 SDIO lines); that says the pad does not move, which
+`pinout.csv` already says. For a signal not listed here, read the pad from `pinout.csv` as usual.
+
+**Terms are not all AFIO-free.** CH32V407's DVP and SDIO grids mix an AFIO selector with the
+enable bits (`DVPEN=1&DVP_RM=0` next to `DVPEN=1&USBHS1EN=1&RB_UD_RST_SIE=0` and `DVP_RM=1`).
+Those AFIO-only columns also appear in `remap_routes.csv`; they are repeated here because the
+interaction -- which of the two wins when both are set -- is what `remap_routes.csv` cannot say.
+
+**An empty `pad` means the document says the signal is unavailable under that condition**
+(`SPI3_NSS` under `SPI3EN=1&ETHMACEN=1`, printed as `Invaild` in the English manual). It never
+means the cell could not be read: unreadable cells produce no row.
+
+**Every row is backed by that series' pin table.** A reference manual covers a whole family, so
+its grid would otherwise claim SDIO and DVP for CH32V203/V208, which have neither. A signal is
+published for a series only when `pin_functions.csv` carries every pad the grid names for it --
+all of them or none, so a listed signal always keeps at least two conditions to choose between.
+
+The same facts are also in `errata.csv` as prose, from the datasheet notes
+(`v30x-sdio-d0d1-default-map` and five siblings), including the lot-number ranges the manual's
+grid does not mention. The two agree; they are not yet joined, so `basis` here names only the
+reference manual.
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 
