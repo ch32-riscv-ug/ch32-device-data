@@ -228,11 +228,11 @@ CH32V407;CH32V467,V_REF+,Positive reference voltage of ADC and DAC modules,,-0.3
 CH32X033;CH32X035,I_GND,Total combined current on all GND common ground pins,,,200,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,I_IO,Sink current on any I/O pins,,,40,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,I_IO,Source current on any I/O pins,,,30,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
-CH32X033;CH32X035,I_VDD,Total combined current of all VDD main supply pins,,,150,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,I_VDD,Total combined current of all V_DD main supply pins,,,150,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
-CH32X033;CH32X035,V_DD,Voltage on external mains supply pin VDD,,-0.3,6.0,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
-CH32X033;CH32X035,V_ESD(HBM),ESD electrostatic discharge voltage (HBM) on common I/O pins,,4K,,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,V_DD,Voltage on external mains supply pin V_DD,,-0.3,6.0,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
+CH32X033;CH32X035,V_ESD(HBM),ESD electrostatic discharge voltage on common I/O pins (HBM),,4K,,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,V_IN,Voltage on I/O pins,,-0.3,VDD+0.3,V,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X305;CH32X315,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
 CH32X305;CH32X315,I_IO,Source current on any I/O and control pin,,,-25,mA,#,confirmed,CH32X315DS0.PDF:zh(p.30)+CH32X315DS0.PDF:en(p.34),CH32X315DS0.PDF
