@@ -67,10 +67,17 @@ FIELD_BASIS = "candidates(evt-header+rm-register-table+rm-remap-grid:en)"
 # manual's reading of it and the SDK offers no macro to write it. CH32V20x's
 # USART4..USART8 are the only fields in any family that come this way.
 MANUAL_BASIS = "candidates(rm-register-table+rm-remap-grid:en)"
-ROUTE_BASIS = "candidates(datasheet-pin-table+rm-remap-grid:en)"
-# The default route is read off the pin table's own default column, not the
-# remap grid, which usually starts at value 1.
-DEFAULT_BASIS = "candidates(datasheet-pin-table-default:en)"
+# **経路の basis は候補が記録した出所から組む**（`build_candidate.route_sources`）。
+# 値が既定値かどうかで決め打っていたので、remap 格子の表を1つも持たない family
+# （`CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも0経路）でも `rm-remap-grid` を
+# 名乗っていた——CH32X035 の234行のうち186行がそれだった（F-66。2026-09-15）。
+# 出所が記録されていない古い候補は、既定値かどうかの従来の読みに落とす。
+def route_basis(sources) -> str:
+    return f"candidates({'+'.join(sources)}:en)"
+
+
+LEGACY_ROUTE_BASIS = ["datasheet-pin-table", "rm-remap-grid"]
+LEGACY_DEFAULT_BASIS = ["datasheet-pin-table-default"]
 
 
 def bits_of(selector: dict) -> str:
@@ -86,7 +93,7 @@ def main() -> int:
 
     fields: dict = {}
     disagreements: list[str] = []
-    routes: set = set()
+    routes: dict = {}
     for path in sorted(args.candidates.glob("ch32*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         part = data.get("part_number", path.stem.upper())
@@ -137,8 +144,11 @@ def main() -> int:
                 if not selection:
                     continue
                 for value in selection.get("values") or []:
-                    routes.add((series, selection.get("selector", ""),
-                                value, fn.get("signal", ""), pad))
+                    key = (series, selection.get("selector", ""),
+                           value, fn.get("signal", ""), pad)
+                    said = selection.get("sources") or (
+                        LEGACY_DEFAULT_BASIS if value == 0 else LEGACY_ROUTE_BASIS)
+                    routes.setdefault(key, set()).update(said)
 
     field_rows = sorted(fields.values(),
                         key=lambda r: (r["series"], r["selector"]))
@@ -147,12 +157,17 @@ def main() -> int:
         row["confidence"] = "reference"
         row["basis"] = MANUAL_BASIS if row.pop("_from_manual") else FIELD_BASIS
     route_rows = []
-    for (s, sel, value, signal, pad) in sorted(routes):
+    for key in sorted(routes):
+        (s, sel, value, signal, pad) = key
+        # 出所は SKU ごとに集まる。**1つの SKU でも格子が言っていれば言っている**
+        # ——同じ series の別 package で pad が出ていないだけのことがある。
+        order = ["datasheet-pin-table-default", "datasheet-pin-table", "rm-remap-grid"]
+        said = [name for name in order if name in routes[key]]
         route_rows.append(
             {"series": s, "selector": sel, "value": value, "signal": signal,
              "pad": pad,
              "confidence": "reference",
-             "basis": DEFAULT_BASIS if value == 0 else ROUTE_BASIS}
+             "basis": route_basis(said)}
         )
 
     if manual_only:
