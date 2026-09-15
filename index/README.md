@@ -177,7 +177,7 @@ rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree
 
-One row per `conflict` mark anywhere in `catalog/` and `evidence/` (208 today), by
+One row per `conflict` mark anywhere in `catalog/` and `evidence/` (207 today), by
 `tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
 keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
 "show me every spec the two editions disagree on" meant grepping all of them.
@@ -189,7 +189,7 @@ keeps both and marks the row `conflict`. Those marks were spread over eleven tab
 | `dissenting` | the sources marked `!` in `basis` |
 | `alternative` | what those sources state, from `(=...)` in `basis` |
 
-**132 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
+**131 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
 their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
 table's section of [evidence/README.md](../evidence/README.md)".
 
@@ -197,7 +197,7 @@ table's section of [evidence/README.md](../evidence/README.md)".
 rows mix real differences (`2 (OPA1/3)` against `1 (OPA1)`) with wording (`Typical: 72MHz`
 against `Typ. 72MHz`). ~~Eight `operating_conditions` rows were spelling only~~ -- those were
 taken out of the comparison on 2026-09-09 (units `mS`/`ms` and values `0.8VDD`/`0.8*VDD`,
-`VI/O`/`VIO` are normalized before matching), so the 21 that remain are document
+`VI/O`/`VIO` are normalized before matching), so the 20 that remain are document
 disagreements adjudicated against the original. For a Chinese dissent, `alternative` is the
 translated reading the basis carries, not the original spelling.
 
