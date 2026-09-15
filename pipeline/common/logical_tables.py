@@ -2796,6 +2796,24 @@ def _continues(previous_page: dict, page: dict,
     return compatible(fragment_edges(previous_table), fragment_edges(table))
 
 
+def _nested_in(table: dict, other: dict) -> bool:
+    """`table` の箱が `other` の箱の中に収まっているか（説明セルの中の小表）。
+
+    >>> box = lambda *v: {"bbox": list(v)}
+    >>> _nested_in(box(20, 20, 30, 30), box(10, 10, 40, 40))
+    True
+    >>> _nested_in(box(10, 10, 40, 40), box(20, 20, 30, 30))
+    False
+    >>> _nested_in({}, box(10, 10, 40, 40))
+    False
+    """
+    a, b = table.get("bbox"), other.get("bbox")
+    if not a or not b:
+        return False
+    return (a[0] >= b[0] - 1.0 and a[1] >= b[1] - 1.0
+            and a[2] <= b[2] + 1.0 and a[3] <= b[3] + 1.0)
+
+
 def document_chains(pages: list[dict]) -> dict[str, dict]:
     """全ページの表 → {table_id: {"chain": [(page, table), ...], "start": bool}}。
 
@@ -2829,8 +2847,20 @@ def document_chains(pages: list[dict]) -> dict[str, dict]:
                     and _continues(previous_page, page, open_chain[-1][1], table)):
                 open_chain.append((page["number"], table))
             else:
-                open_chain = [(page["number"], table)]
-                chains.append(open_chain)
+                # **説明セルの中の入れ子表に連鎖を奪わせない。** 表の中の表は
+                # ページ末尾に来ることがあり（`CH32FV2x_V3xRM.en` p.375 の
+                # `EPTYPE[1:0]`/`EP_KIND` の小表は USBD_EPRx の説明セルの中にある）、
+                # そのまま `open_chain` を置き換えると**次ページの続きが宙に浮く**——
+                # 続きの断片は見出し行を持たないので `description_names` が名称列を
+                # 見つけられず、bit図の組み直しの正解表がそのページで途切れる。
+                # 全corpus実測（2026-09-15）: 連鎖を奪う位置の入れ子表は142で、
+                # これで実際に連鎖が伸びるのは**9表**。
+                nested = (open_chain is not None
+                          and open_chain[-1][0] == page["number"]
+                          and _nested_in(table, open_chain[-1][1]))
+                chains.append([(page["number"], table)])
+                if not nested:
+                    open_chain = chains[-1]
         if not tables:
             open_chain = None
         previous_page = page
