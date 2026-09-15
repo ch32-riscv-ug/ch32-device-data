@@ -159,7 +159,8 @@ def build(header: Path, manuals: Path | list[Path] | None, datasheet: Path,
 
 
 def route_sources(pin: dict, fn: dict, value: int,
-                  grid_value_of: dict, grid_at_pad: dict) -> list[str]:
+                  grid_value_of: dict, grid_at_pad: dict,
+                  said_value_of: dict, said_at_pad: dict) -> list[str]:
     """その経路を実際に言っている出所。
 
     pin 表はその機能がそこに在るから経路になっている——常に出所。RM の remap 格子は
@@ -173,26 +174,30 @@ def route_sources(pin: dict, fn: dict, value: int,
     手前が `SDIO_`。同じ pad・同じ値のときだけ見るので取り違えない。
 
     >>> grid = {("TIM3_CH1", "PB4"): {1}}
-    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 1, grid, {})
+    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 1, grid, {}, {}, {})
     ['datasheet-pin-table', 'rm-remap-grid']
-    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 2, grid, {})
+    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 2, grid, {}, {}, {})
     ['datasheet-pin-table']
-    >>> route_sources({"pad": "PC6"}, {"signal": "TIM3_CH1"}, 0, grid, {})
+    >>> route_sources({"pad": "PC6"}, {"signal": "TIM3_CH1"}, 0, grid, {}, {}, {})
     ['datasheet-pin-table-default']
     >>> route_sources({"pad": "PC12"}, {"signal": "SDIO_CK"}, 0, {},
-    ...               {"PC12": {("CK", 0)}})
+    ...               {"PC12": {("CK", 0)}}, {}, {})
     ['datasheet-pin-table-default', 'rm-remap-grid']
     """
     first = "datasheet-pin-table-default" if value == 0 else "datasheet-pin-table"
-    says = grid_value_of.get((canonical_signal(fn["signal"]), pin["pad"])) or set()
-    if value not in says:
+    def said_by(exact: dict, at_pad: dict) -> bool:
+        if value in (exact.get((canonical_signal(fn["signal"]), pin["pad"])) or set()):
+            return True
         signal = fn["signal"]
-        bare = {label for label, at in grid_at_pad.get(pin["pad"], ())
-                if at == value and label != signal
-                and signal.endswith(label) and signal[:-len(label)].endswith("_")}
-        if not bare:
-            return [first]
-    return [first, "rm-remap-grid"]
+        return any(label != signal and signal.endswith(label)
+                   and signal[:-len(label)].endswith("_")
+                   for label, at in at_pad.get(pin["pad"], ()) if at == value)
+    out = [first]
+    if said_by(grid_value_of, grid_at_pad):
+        out.append("rm-remap-grid")
+    if said_by(said_value_of, said_at_pad):
+        out.append("rm-field-description")
+    return out
 
 
 def join(
@@ -235,6 +240,11 @@ def join(
         field_names.setdefault(key, f["field"])
 
     values_of: dict[str, set[int]] = collections.defaultdict(set)
+    # **格子と説明文を分けて持つ。** 両方を混ぜた集合を「RM remap格子」と呼んでいたので、
+    # 格子を1つも持たない manual（`CH32X035RM`・`CH32V205RM`・`CH32X315RM`）でも
+    # 格子を名乗っていた（F-67。2026-09-15の監査）。
+    grid_values_of: dict[str, set[int]] = collections.defaultdict(set)
+    described_values_of: dict[str, set[int]] = collections.defaultdict(set)
     # Which signals the manual's routes name per field, and the manual's own
     # spelling of the field. Both are needed to admit a manual-only selector.
     signals_of: dict[str, set[str]] = collections.defaultdict(set)
@@ -253,6 +263,8 @@ def join(
     for r in routes:
         key = canonical_field(r["field"])
         values_of[key].add(r["value"])
+        (grid_values_of if r.get("_source") == "grid"
+         else described_values_of)[key].add(r["value"])
         field_of_route.setdefault((canonical_signal(r["signal"]), r["value"], r["pad"]), key)
         by_pad_value[(r["pad"], r["value"])].add((key, r["signal"]))
         signals_of[key].add(canonical_signal(r["signal"]))
@@ -491,11 +503,19 @@ def join(
     grid_pads_at: dict[tuple[str, int], set[str]] = collections.defaultdict(set)
     # 裸の行ラベルを pad から引くための索引（`route_sources`）。
     grid_at_pad: dict[str, set[tuple[str, int]]] = collections.defaultdict(set)
+    # **説明文が述べた経路**も同じ形で持つ。RM は格子と説明文の2通りで述べるのに、
+    # `basis` は格子しか名乗れなかった（F-69。`CH32X035RM` は格子を持たず、
+    # 経路はすべて `R32_AFIO_PCFR1` の説明文が述べている）。
+    said_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
+    said_at_pad: dict[str, set[tuple[str, int]]] = collections.defaultdict(set)
     for r in routes:
         if r.get("_source") == "grid":
             grid_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
             grid_pads_at[(canonical_signal(r["signal"]), r["value"])].add(r["pad"])
             grid_at_pad[r["pad"]].add((r["signal"], r["value"]))
+        else:
+            said_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
+            said_at_pad[r["pad"]].add((r["signal"], r["value"]))
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
@@ -547,8 +567,8 @@ def join(
             # 値が既定値かどうかで決め打つと、格子が1行も無い family
             # （`CH32X035RM` は zh/en とも remap 格子の表を持たない）でも
             # `rm-remap-grid` を名乗ってしまう（F-66）。
-            "sources": route_sources(pin, fn, fn["_selector_value"],
-                                     grid_value_of, grid_at_pad),
+            "sources": route_sources(pin, fn, fn["_selector_value"], grid_value_of,
+                                     grid_at_pad, said_value_of, said_at_pad),
         }
         if how != "signal":
             fn["_selector_resolved_by"] = how
@@ -578,7 +598,8 @@ def join(
             fn["selection"] = {
                 "selector": selector_id(selector["controller"], selector["field"]),
                 "values": [0],
-                "sources": route_sources(pin, fn, 0, grid_value_of, grid_at_pad),
+                "sources": route_sources(pin, fn, 0, grid_value_of, grid_at_pad,
+                                         said_value_of, said_at_pad),
             }
             used.add(key)
             attested[key].add(0)
@@ -659,7 +680,8 @@ def join(
         # spelled them out as separate defines. Taking the union keeps every value
         # a document actually states, and in particular keeps remap_routes.value a
         # subset of valid_values, which check_tables.py enforces.
-        grid = set(values_of.get(key, []))
+        grid = set(grid_values_of.get(key, []))
+        described = set(described_values_of.get(key, []))
         pins_say = set(attested.get(key, ()))
         evt = set(evt_values.get(key, ()))
         # Only where the header actually enumerated values. Its fallback is every
@@ -670,7 +692,7 @@ def join(
             else set()
         )
         spelled = set(enumerated_of.get(key, ()))
-        found = grid | pins_say | header_says | evt | spelled
+        found = grid | described | pins_say | header_says | evt | spelled
         limit = 1 << len(bits)
         over = sorted(v for v in found if v >= limit)
         if over:
@@ -679,14 +701,28 @@ def join(
             )
             found -= set(over)
         out["valid_values"] = sorted(found | {0}) or [0]
+        # **格子と説明文を分けて名乗る。** 混ぜた集合を「RM remap格子」と呼んでいたので、
+        # 格子を持たない manual でも格子を名乗っていた（F-67）。
         out["_valid_values_source"] = "+".join(
             name
             for name, source in (
-                ("RM remap格子", grid), ("datasheet pin表", pins_say),
+                ("RM remap格子", grid), ("RM経路説明文", described),
+                ("datasheet pin表", pins_say),
                 ("ヘッダ", header_says), ("EVTデコーダ", evt), ("RM説明文", spelled),
             )
             if source
         ) or "既定値のみ"
+        # `remap_fields` の `basis` はこれを読む（`build_remap`）。固定文字列だと
+        # 格子を持たない family の22行が `rm-remap-grid` を名乗り続ける（F-67）。
+        out["sources"] = [
+            name
+            for name, source in (
+                ("evt-header", header_says or evt), ("rm-register-table", spelled),
+                ("rm-remap-grid", grid), ("rm-field-description", described),
+                ("datasheet-pin-table", pins_say),
+            )
+            if source
+        ] or ["rm-register-table"]
         if evt - (grid | pins_say | header_says):
             out["_values_only_from_evt"] = sorted(evt - (grid | pins_say | header_says))
         if grid and pins_say - grid:

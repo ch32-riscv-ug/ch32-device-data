@@ -170,8 +170,28 @@ def read_header(row: list[str]) -> list[tuple[str, list[int]] | None] | None:
 BARE_VALUE = re.compile(r"^[01xX]+$")
 
 
-def read_bare_header(rows: list[list[str]],
-                     notes: list[str]) -> list[tuple[str, list[int]] | None] | None:
+# 表題が名乗る周辺。`表10-22 CAN1复用功能重映射` の `CAN1`（中文は語の後ろが漢字なので
+# 語境界を求めない）。`表`/`Table` と番号は拾わない。
+CAPTION_PERIPHERAL = re.compile(r"(?<![A-Za-z0-9])([A-Z][A-Z0-9]{1,7})(?![A-Za-z])")
+
+
+def caption_peripheral(caption: str) -> str | None:
+    """表題が名乗る周辺名。無ければ None。
+
+    >>> caption_peripheral("表10-22 CAN1复用功能重映射")
+    'CAN1'
+    >>> caption_peripheral("Table 10-16 USART1 alternate function remapping")
+    'USART1'
+    >>> caption_peripheral("表10-1 引脚定义") is None
+    True
+    """
+    found = [t for t in CAPTION_PERIPHERAL.findall(caption or "")
+             if t not in ("TABLE", "AF", "IO", "RM")]
+    return found[0] if len(set(found)) == 1 else None
+
+
+def read_bare_header(rows: list[list[str]], notes: list[str],
+                     caption: str = "") -> list[tuple[str, list[int]] | None] | None:
     """値だけの列見出しを、行ラベルが名乗る周辺名で field に結び付ける。
 
     CH32L103 の格子は列見出しに field 名を書かず、値だけを並べます:
@@ -206,6 +226,15 @@ def read_bare_header(rows: list[list[str]],
         columns.append(expand(text))
     if sum(1 for c in columns if c is not None) < 2:
         return None
+    # **表題が名乗るなら、それが周辺名。** 行ラベルからの推測は当てにならない——
+    # `表10-22 CAN1复用功能重映射` の行ラベルは `TX`/`RX` で、
+    # `signal_vocabulary.split('TX')` は既定で `USART1` を返すので、CAN の格子が
+    # `USART1_RM` として取り込まれていた（F-70。2026-09-15の監査）。
+    # 全corpus実測: 値だけの見出しの格子は22表で、表題と行ラベルが食い違うのは
+    # この1表だけ（残る21表は同じ周辺を指す）。
+    named = caption_peripheral(caption)
+    if named:
+        return [None if c is None else (f"{named}_RM", c) for c in columns]
     peripherals = set()
     for row in rows[1:]:
         label = flatten(row[0])
@@ -265,7 +294,7 @@ def extract(source) -> tuple[list[dict], list[str]]:
                 rows = [[flatten(c) for c in row] for row in record["extracted_rows"]]
                 if not rows or len(rows[0]) < MIN_COLUMNS:
                     continue
-                header = read_header(rows[0]) or read_bare_header(rows, notes)
+                header = read_header(rows[0]) or read_bare_header(rows, notes, caption)
                 if header:
                     pending, pending_page = header, page["number"]
                     body = rows[1:]

@@ -114,6 +114,7 @@ def main() -> int:
                 "reset_value": "" if sel.get("reset_value") is None
                                else str(sel["reset_value"]),
                 "_from_manual": bool(sel.get("_from_manual")),
+                "_sources": tuple(sel.get("sources") or ()),
             }
             known = fields.get(key)
             if known is None:
@@ -129,8 +130,11 @@ def main() -> int:
                         | {int(v) for v in entry["valid_values"].split(";") if v}
                     )
                 )
-                if {k: v for k, v in merged.items() if k != "valid_values"} == {
-                    k: v for k, v in entry.items() if k != "valid_values"
+                merged["_sources"] = tuple(sorted(set(known["_sources"])
+                                                  | set(entry["_sources"])))
+                skip = ("valid_values", "_sources")
+                if {k: v for k, v in merged.items() if k not in skip} == {
+                    k: v for k, v in entry.items() if k not in skip
                 }:
                     fields[key] = merged
                 else:
@@ -153,15 +157,23 @@ def main() -> int:
     field_rows = sorted(fields.values(),
                         key=lambda r: (r["series"], r["selector"]))
     manual_only = [r for r in field_rows if r["_from_manual"]]
+    # `basis` に出す順は経路と同じ並びにする。
+    ORDER = ["evt-header", "rm-register-table", "rm-remap-grid",
+             "rm-field-description", "datasheet-pin-table"]
     for row in field_rows:
         row["confidence"] = "reference"
-        row["basis"] = MANUAL_BASIS if row.pop("_from_manual") else FIELD_BASIS
+        said = row.pop("_sources", None)
+        row.pop("_from_manual", None)
+        # 出所は候補が記録したものから組む。記録の無い古い候補だけ従来の決め打ちに落とす。
+        row["basis"] = (route_basis([n for n in ORDER if n in said])
+                        if said else MANUAL_BASIS)
     route_rows = []
     for key in sorted(routes):
         (s, sel, value, signal, pad) = key
         # 出所は SKU ごとに集まる。**1つの SKU でも格子が言っていれば言っている**
         # ——同じ series の別 package で pad が出ていないだけのことがある。
-        order = ["datasheet-pin-table-default", "datasheet-pin-table", "rm-remap-grid"]
+        order = ["datasheet-pin-table-default", "datasheet-pin-table",
+                 "rm-remap-grid", "rm-field-description"]
         said = [name for name in order if name in routes[key]]
         route_rows.append(
             {"series": s, "selector": sel, "value": value, "signal": signal,
