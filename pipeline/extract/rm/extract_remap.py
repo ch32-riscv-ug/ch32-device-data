@@ -190,6 +190,43 @@ def caption_peripheral(caption: str) -> str | None:
     return found[0] if len(set(found)) == 1 else None
 
 
+# **格子の行ラベルは、その格子が扱う周辺の中でだけ意味を持つ。** 表は `SD0`・`B[0]`・
+# `PORT9` と書き、datasheet の pin 表は `SDIO_D0`・`LTDC_B0`・`UHSIF_PORT9` と書く。
+# 揃えないと格子が pin 表の行と結び付かず、**格子が言っていることを `basis` が言えない**
+# （F-68。2026-09-15の監査で336行）。周辺名は field から決まるが、`UHSIF_PORT_RM` の
+# 周辺は `UHSIF` で、`SD0` は `SDIO_SD0` ではなく `SDIO_D0` なので、**field ごとに書く**。
+# 対応はすべて pin 表の綴りと突き合わせて確かめた（`SDMMC_SDCK` は pin 表もそう綴る）。
+GRID_LABEL_PERIPHERAL = {
+    "DVP_RM": ("DVP", None),                      # D0 → DVP_D0（表10-42）
+    "SDMMC_RM": ("SDMMC", None),                  # D0 → SDMMC_D0、SDCK → SDMMC_SDCK
+    "UHSIF_PORT_RM": ("UHSIF", None),             # PORT9 → UHSIF_PORT9（表9-33）
+    "LTDC_RM": ("LTDC", re.compile(r"[\[\]]")),   # B[0] → LTDC_B0（表10-45）
+    "SDIO_RM": ("SDIO", None),                    # CMD → SDIO_CMD、SD0 → SDIO_D0（表10-43）
+}
+# `SDIO` の格子だけ、データ線を `SD0` と書く（pin 表は `SDIO_D0`）。
+SDIO_DATA = re.compile(r"^SD(\d+)$")
+
+
+def qualify_grid_signal(field: str, signal: str) -> str:
+    """格子の裸の行ラベルを、pin 表と同じ綴りにする。対応が無ければそのまま。
+
+    >>> qualify_grid_signal("SDIO_RM", "SD0"), qualify_grid_signal("SDIO_RM", "CMD")
+    ('SDIO_D0', 'SDIO_CMD')
+    >>> qualify_grid_signal("LTDC_RM", "B[0]"), qualify_grid_signal("UHSIF_PORT_RM", "PORT9")
+    ('LTDC_B0', 'UHSIF_PORT9')
+    >>> qualify_grid_signal("TIM1_RM", "CH1")
+    'CH1'
+    """
+    found = GRID_LABEL_PERIPHERAL.get(field)
+    if not found or signal_vocabulary.split(signal) is not None:
+        return signal
+    peripheral, drop = found
+    text = drop.sub("", signal) if drop else signal
+    if peripheral == "SDIO":
+        text = SDIO_DATA.sub(r"D\1", text)
+    return f"{peripheral}_{text}"
+
+
 def read_bare_header(rows: list[list[str]], notes: list[str],
                      caption: str = "") -> list[tuple[str, list[int]] | None] | None:
     """値だけの列見出しを、行ラベルが名乗る周辺名で field に結び付ける。
@@ -358,7 +395,8 @@ def extract(source) -> tuple[list[dict], list[str]]:
                                         {
                                             "field": field,
                                             "value": value,
-                                            "signal": signal,
+                                            # 裸の行ラベルは pin 表の綴りへ（F-68）。
+                                            "signal": qualify_grid_signal(field, signal),
                                             "pad": pad,
                                             "page": page["number"],
                                             **({"_pad_from_prose": True} if from_prose else {}),
