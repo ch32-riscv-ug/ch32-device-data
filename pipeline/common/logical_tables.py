@@ -1765,6 +1765,46 @@ def _indexed_run(table: dict, bases: set[str]) -> set[tuple[int, int]]:
     return safe
 
 
+def _respill_index(text: str, right: str, names: set[str]) -> str | None:
+    """**索引の数字が右のセルへこぼれた**形を直す。無理なら None。
+
+    bit図の名前が自分の1bit欄より広いと、末尾の索引の字形が隣の欄へ落ちる。
+    `CH32H417RM.en` p.38 の RCC リセット欄は版面が
+    `USART5RST｜USART4RST｜USART3RST｜USART2RST｜SPI4RST` と刷るのに、
+    各セルは**左隣の索引**を頭に持って出てくる（`3USARTRST`・`2SPI4RST`）。
+
+    2通りある。**自分の索引が残っているなら頭を落とすだけ**（`2SPI4RST`→`SPI4RST`）。
+    落ちているなら**右隣の頭の数字が自分の索引**なので、それで記述表の名前を引く
+    （`3USARTRST` ＋ 右隣の頭 `2` → `USART2RST`）。どちらも候補が1つに決まるときだけ。
+
+    全corpus実測（2026-09-15）: 前者1セル・後者1セル・候補が複数になるものは0。
+
+    >>> names = {"SPI4RST", "USART2RST", "USART3RST", "USART5RST"}
+    >>> _respill_index("2SPI4RST", "USART", names)
+    'SPI4RST'
+    >>> _respill_index("3USARTRST", "2SPI4RST", names)
+    'USART2RST'
+    >>> _respill_index("3USARTRST", "SPI4RST", names) is None
+    True
+    >>> _respill_index("USART5RST", "4X", names) is None
+    True
+    """
+    lead = re.fullmatch(r"(\d+)([A-Za-z][A-Za-z0-9_]*)", text)
+    if not lead:
+        return None
+    body = lead.group(2)
+    if len(body) >= 3 and body in names:
+        return body
+    spill = re.match(r"(\d+)", right or "")
+    if not spill:
+        return None
+    bare = re.sub(r"\d", "", body)
+    found = {n for n in names
+             if re.sub(r"\d", "", n) == bare
+             and "".join(c for c in n if c.isdigit()) == spill.group(1)}
+    return found.pop() if len(found) == 1 else None
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -1800,6 +1840,23 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
     # 索引が連番で揃っている行のセルは、それ自体が正しい（`_indexed_run`）。
     settled = _indexed_run(table, bases)
     fixed = 0
+    # **索引の数字が右のセルへこぼれた形**は行の並びが要るので先に直す（`_respill_index`）。
+    rows: dict[int, list[dict]] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] >= 1:
+            rows.setdefault(cell["row_start"], []).append(cell)
+    for row, cells in rows.items():
+        cells.sort(key=lambda c: c["column_start"])
+        texts = [(c.get("text") or "").replace("\n", "").strip() for c in cells]
+        for index, cell in enumerate(cells):
+            if (row, cell["column_start"]) in settled or texts[index] in names:
+                continue
+            found = _respill_index(texts[index],
+                                   texts[index + 1] if index + 1 < len(texts) else "",
+                                   names)
+            if found:
+                cell["text"] = found
+                fixed += 1
     for cell in table["cells"]:
         if (cell["row_start"], cell["column_start"]) in settled:
             continue
