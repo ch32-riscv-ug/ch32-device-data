@@ -1656,7 +1656,11 @@ def main() -> int:
 
     # 割り込みは family ごとに1つの列挙で、番号は variant で入れ替わる。
     # 同じ (family, condition) の中では番号が1つの名前しか指さないこと。
+    # **逆向きも見る**——同じ名前が2つの番号に出るのも、1つの割り込みが2行に
+    # なった印（番号→名前だけだと、名前が重なる側を捕まえられない）。
+    # 全corpus実測（2026-09-15）: どちらの向きも重複0。
     seen_irq: dict[tuple[str, int, str], str] = {}
+    seen_name: dict[tuple[str, str, str], str] = {}
     for r in t["interrupts"]:
         check("interrupts", r["name"], r["family"], families, "families")
         if r["kind"] not in ("exception", "irq"):
@@ -1671,6 +1675,12 @@ def main() -> int:
                        f"{seen_irq[key]} と {r['name']} で重なる"
                        f"（condition={r['condition'] or 'なし'}）")
         seen_irq[key] = r["name"]
+        by_name = (r["family"], r["name"], r["condition"])
+        if by_name in seen_name and seen_name[by_name] != r["number"]:
+            bad.append(f"interrupts: {r['family']} の {r['name']} が "
+                       f"{seen_name[by_name]} 番と {r['number']} 番の両方に出る"
+                       f"（condition={r['condition'] or 'なし'}）")
+        seen_name[by_name] = r["number"]
     # 例外の番号は全部、周辺割り込みの番号より小さい。境目の番号は family で
     # 違う（CH32H417 は 32 番から。IPC と HSEM がプロセッサ側の枠にいる）ので、
     # 番号そのものではなく2群が交ざらないことを見る。
