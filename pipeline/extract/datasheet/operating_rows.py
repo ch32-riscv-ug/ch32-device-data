@@ -1077,7 +1077,20 @@ def read_edition(bundle, lang):
                     # `(including sampling time)` だけが載る。置き換えると項目名が
                     # 断片になるので繋ぐ。小文字か括弧で始まるものだけ（データは
                     # 大文字か数字で始まる。`fold_header_wrap` と同じ見分け方）。
-                    param = f"{param} {this_param}"
+                    #
+                    # **前のページで既に出した行にも書き戻す**（F-71）。切れているのは
+                    # これから読む行だけではない——同じ項目名で**もう出した行**が全部
+                    # 切れている。`CH32X035DS0.en` V2.3 は版面のページ割りが変わって
+                    # 表3-5 の `T_S_vrefint` が p.26 で `ADC sampling time when` まで、
+                    # 続きの `reading the internal reference voltage` が p.27 の断片に
+                    # なった。書き戻す先は**末尾から同じ項目名が続く範囲**だけ——それが
+                    # 前の断片で出した行そのもの。
+                    whole = f"{param} {this_param}"
+                    for prior in reversed(found):
+                        if prior["parameter"] != param:
+                            break
+                        prior["parameter"] = whole
+                    param = whole
                 else:
                     param = this_param or param
                     group = pin_group or group
