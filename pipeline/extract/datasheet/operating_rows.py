@@ -643,6 +643,49 @@ def norm_value(cell):
     return VALUE_FIX.get(value, attach_value_subscript(value))
 
 
+# 1つのセルが**2つの記号を並べる**形。版面は基底を `/` で、添字を空白で並べる:
+#
+#     t /t            f /t            C /C
+#     r(SDA) r(SCL)   SCK SCK         L1 L2
+#
+# 平坦化すると `t_/t_r(SDA)_r(SCL)` のような在りもしない綴りになり、`MERGED_SYMBOL` が
+# 行ごと落としていた（全corpus実測: 192セル・169行）。**位置で対にすれば2つの記号**で、
+# 値はその行が1つ持つ——`SDA と SCL の立ち上がり時間 max 1000ns` は両方に掛かる。
+# 量が違う組（`f_SCK`/`t_SCK` は周波数と周期）は分けたあと `keep_row` の単位検査が
+# 落とす——`t_SCK` に `MHz` は付かない。**だから分けるだけでよく、ここで量を判断しない。**
+BASE_PIECE = re.compile(r"[A-Za-z][A-Za-z0-9]{0,3}")
+
+
+def paired_symbols(cell: str | None) -> list[str]:
+    r"""1つのセルが並べている記号を、基底と添字の位置で対にして返す。
+
+    >>> paired_symbols("t /t\nr(SDA) r(SCL)")
+    ['t_r(SDA)', 't_r(SCL)']
+    >>> paired_symbols("f /t\nSCK SCK")
+    ['f_SCK', 't_SCK']
+    >>> paired_symbols("t /\nsu(HSYNC)\nt\nsu(VSYNC)")
+    ['t_su(HSYNC)', 't_su(VSYNC)']
+    >>> paired_symbols("V\nDD")
+    []
+    """
+    lines = [l.strip() for l in (cell or "").splitlines() if l.strip()]
+    bases: list[str] = []
+    subs: list[str] = []
+    if len(lines) == 2:
+        bases = [b.strip() for b in lines[0].split("/")]
+        subs = lines[1].split()
+    elif len(lines) >= 4 and len(lines) % 2 == 0:
+        # 同じ内容が1行ずつに割れた版（`t /` `su(HSYNC)` `t` `su(VSYNC)`）。
+        bases = [lines[i].rstrip("/").strip() for i in range(0, len(lines), 2)]
+        subs = [lines[i] for i in range(1, len(lines), 2)]
+    if len(bases) < 2 or len(bases) != len(subs):
+        return []
+    if not all(BASE_PIECE.fullmatch(b) for b in bases):
+        return []
+    found = [norm_symbol(f"{base}\n{sub}") for base, sub in zip(bases, subs)]
+    return found if all(found) and len(set(found)) == len(found) else []
+
+
 DROPPED: list[str] = []
 
 
@@ -1018,6 +1061,21 @@ def read_edition(bundle, lang):
                 # 記号は`V_OH`のまま引けて、群ごとの行が別の条件として並ぶ。
                 if group:
                     condition = f"{group}, {condition}" if condition else group
+                # 1つのセルが2つの記号を並べている行は、記号ごとに行を開く
+                # （`paired_symbols`）。値はその行が1つ持ち、両方に掛かる。
+                fan = (paired_symbols(symbol_cell)
+                       if s and MERGED_SYMBOL.search(s) else [])
+                for piece in fan:
+                    rows.append({
+                        "symbol": piece, "parameter": param, "condition": condition,
+                        "_group": group,
+                        "min": norm_value(cells.get("min")),
+                        "typ": norm_value(cells.get("typ")),
+                        "max": norm_value(cells.get("max")),
+                        "unit": unit,
+                    })
+                if fan:
+                    continue
                 rows.append({
                     "symbol": sym,
                     "parameter": param,
