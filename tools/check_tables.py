@@ -157,9 +157,15 @@ def timer_channels(t: dict) -> list[str]:
     `CH1_3`（`_3` は CH32V407 の remap 変種の番号）で `CH32V407 TIM1` が **13 チャネル**
     と出ていた。どちらも数字を全部繋いだのが原因で、行は正しそうな顔をしている。
     """
+    # **`build_index` と同じ数え方でなければ意味がない。** あちらは相補出力（`CH1N`）を
+    # 除いて最大値を採るので、ここで含めると「検査は落ちるのに、言われたとおり
+    # `build_index` を回しても直らない」ことになる（2026-09-15の監査で指摘。いまは
+    # 最大値が一致するので表面化していなかった）。
     seen: dict[tuple[str, str], set[int]] = {}
     for r in t["index:pinout"]:
         if not (r["peripheral"].startswith("TIM") and r["role"].startswith("CH")):
+            continue
+        if r["role"].endswith("N"):
             continue
         found = re.match(r"CH(\d+)", r["role"])
         if found:
@@ -477,18 +483,34 @@ def workflow_ledger() -> list[str]:
     flows = root / ".github" / "workflows"
     if not flows.is_dir():
         return []
-    # commit する段があり、そこで正本の置き場（か `-A`）を add している workflow。
-    adds = re.compile(r"git add\s+(-A\b|[^\n]*\b(?:catalog|evidence|index)/)")
+    # **commit するかどうかで見る。** `git add` だけを見ていたら抜け道が4つあった
+    # （2026-09-15の監査: `.yaml` 拡張子・`git commit -a`・コメント行の `--record`・
+    # staging だけで commit しない workflow を誤って落とす）。正本を commit する
+    # workflow だけを対象にし、台帳を**走らせている**ことと**同じcommitに入れている**
+    # ことの両方を見る——F-65 は後者が抜けて起きた。
+    commits = re.compile(r"^\s*(?:-\s*)?git commit\b", re.M)
+    stages = re.compile(r"git add\s+(?:-A\b|-a\b|\.|[^\n]*\b(?:catalog|evidence|index)/)")
+    commits_all = re.compile(r"git commit\b[^\n]*\s-[a-zA-Z]*a")
+    # `#` より後ろに書かれた `--record` は**コメントか文字列**で、走らない
+    # （`run: echo "# was check_baseline.py --record"` で通ってしまっていた）。
+    records = re.compile(r"^[^#\n]*check_baseline\.py --record", re.M)
+    ledger = re.compile(r"git add\s+(?:-A\b|-a\b|\.|[^\n]*pipeline/baseline/tables\.csv)")
     out = []
-    for path in sorted(flows.glob("*.yml")):
+    for path in sorted(list(flows.glob("*.yml")) + list(flows.glob("*.yaml"))):
         text = path.read_text(encoding="utf-8")
-        if not adds.search(text):
+        if not commits.search(text):
             continue
-        if "check_baseline.py --record" in text:
+        if not (stages.search(text) or commits_all.search(text)):
             continue
-        out.append(f".github/workflows/{path.name}: 正本を commit するのに "
-                   "`check_baseline.py --record` を走らせていない"
-                   "——台帳が置いていかれ、次の走行が赤くなる")
+        name = f".github/workflows/{path.name}"
+        if not records.search(text):
+            out.append(f"{name}: 正本を commit するのに "
+                       "`check_baseline.py --record` を走らせていない"
+                       "——台帳が置いていかれ、次の走行が赤くなる")
+        elif not (ledger.search(text) or commits_all.search(text)):
+            out.append(f"{name}: `check_baseline.py --record` は走らせているが "
+                       "`pipeline/baseline/tables.csv` を同じcommitに入れていない"
+                       "——台帳が置いていかれるのは同じこと")
     return out
 
 

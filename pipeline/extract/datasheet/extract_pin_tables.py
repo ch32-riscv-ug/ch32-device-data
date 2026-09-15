@@ -104,12 +104,17 @@ def retitle_function_column(layout: dict, override: dict, bundle: str,
                             label: str) -> None:
     """台帳が言うなら、1つしかない機能列の役目を付け替える。"""
     role = override.get("function_column")
-    if not role or role in layout:
+    if not role:
         return
     others = [k for k in ("default", "remap") if k in layout]
+    if role in layout:
+        # 既にその役目の列が在る＝台帳が要らない表。**黙って通さない**——台帳の
+        # 書き間違い（別の表を名指した、資料が直った）はここで言う。
+        print(f"{bundle} {label}: function_column={role} は既に在る"
+              f"（機能列 {others}）——台帳の行が要らなくなっていないか",
+              file=sys.stderr)
+        return
     if len(others) != 1:
-        # 機能列が2つある表は見出しで区別できているので触らない。台帳の書き間違いを
-        # 黙って通さないために、当たらなかったことは言う。
         print(f"{bundle} {label}: function_column={role} は当たらなかった"
               f"（機能列 {others}）", file=sys.stderr)
         return
