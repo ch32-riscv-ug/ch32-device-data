@@ -257,6 +257,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "packages": ("build_tables.py", "PACKAGE_COLUMNS"),
     "pin_alternate": ("build_pin_alternate.py", "COLUMNS"),
     "pin_functions": ("extract_pin_tables.py", "FUNCTION_COLUMNS"),
+    "pin_conditions": ("extract_pin_conditions.py", "COLUMNS"),
     "pins": ("extract_pin_tables.py", "PIN_COLUMNS"),
     "product_attributes": ("build_tables.py", "ATTRIBUTE_COLUMNS"),
     "products": ("build_tables.py", "PRODUCT_COLUMNS"),
@@ -623,6 +624,63 @@ def routes_backed_by_pins(t: dict) -> list[str]:
            "別の表・別の列を読んでいる疑い（build_all.choose_table）"]
     for (series, signal), count in sorted(missing.items(), key=lambda kv: -kv[1])[:10]:
         out.append(f"  {series} の {signal}: {count} 行")
+    return out
+
+
+# 条件の項（`SDIOEN=1`・`RB_UC_RST_SIE=0`）。`&` で並ぶ。
+CONDITION_TERM = re.compile(r"^[A-Z][A-Za-z0-9_]*=[01]$")
+
+
+def pin_conditions_sane(t: dict) -> list[str]:
+    """`pin_conditions` が「条件で pad が決まる」表として読めるか。
+
+    この表は **(series, signal) ごとに条件を並べて、項の多い行が勝つ**という読み方で
+    しか意味を持たない（`evidence/README.md`）。読み方が成り立つことを形で確かめる:
+
+    - 条件は `NAME=0|1` を `&` で並べたもので、**同じ名前が2回出ない**
+      （`SDIOEN=1&SDIOEN=0` は成り立たない条件で、勝ち負けが決まらない）
+    - `(series, signal, condition)` は一意（同じ条件に2つの pad が付かない）
+    - **1つの signal に条件が2つ以上**——1つしか無い行は「条件で動く」と言えず、
+      `pinout` が既に言っていることと変わらない（抽出器が畳むはずのもの）
+    - pad は `P<港><番号>` か空（空＝資料が「その条件では使えない」と書いている）
+    - **pin 表が裏付ける**: pad があれば (signal, pad) が、無ければ signal が、
+      その series の `pin_functions` に在ること
+    """
+    series_of = {r["part_number"]: r["series"] for r in t["products"]}
+    pairs: dict[str, set] = collections.defaultdict(set)
+    signals: dict[str, set] = collections.defaultdict(set)
+    for r in t["pin_functions"]:
+        series = series_of.get(r["part_number"])
+        if series:
+            pairs[series].add((r["signal"], r["pad"]))
+            signals[series].add(r["signal"])
+    out: list[str] = []
+    seen: set[tuple[str, str, str]] = set()
+    per_signal: dict[tuple[str, str], int] = collections.Counter()
+    for r in t["pin_conditions"]:
+        where = f"{r['series']} の {r['signal']} ({r['condition']})"
+        terms = r["condition"].split("&")
+        if not r["condition"] or not all(CONDITION_TERM.match(x) for x in terms):
+            out.append(f"pin_conditions: {where} の条件が `NAME=0|1` の連言でない")
+        names = [x.split("=")[0] for x in terms]
+        if len(set(names)) != len(names):
+            out.append(f"pin_conditions: {where} の条件に同じビットが2回出る")
+        key = (r["series"], r["signal"], r["condition"])
+        if key in seen:
+            out.append(f"pin_conditions: {where} が重複している")
+        seen.add(key)
+        per_signal[(r["series"], r["signal"])] += 1
+        if r["pad"] and not GPIO_NAME.match(r["pad"]):
+            out.append(f"pin_conditions: {where} の pad {r['pad']!r} が pad の形でない")
+        backed = ((r["signal"], r["pad"]) in pairs[r["series"]] if r["pad"]
+                  else r["signal"] in signals[r["series"]])
+        if not backed:
+            out.append(f"pin_conditions: {where} の pad {r['pad'] or '(なし)'} を "
+                       "その series の pin_functions が裏付けない")
+    for (series, signal), count in sorted(per_signal.items()):
+        if count < 2:
+            out.append(f"pin_conditions: {series} の {signal} の条件が1つしかない"
+                       "——条件で pad が動くと言えない")
     return out
 
 
@@ -1075,6 +1133,8 @@ def main() -> int:
     bad += remap_selector_coverage(t)
     # 経路の pad と signal が、その series の pin 表にあること（別の表を読んでいない）。
     bad += routes_backed_by_pins(t)
+    # 有効化ビットで pad が動く行（F-61）。条件の形と、pin 表が裏付けること。
+    bad += pin_conditions_sane(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に

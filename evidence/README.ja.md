@@ -3,7 +3,7 @@
 [English](README.md)
 
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
-40 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
+41 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
 `PA0-WKUP` と装飾ごと持ちます。資料どうしが食い違えば値を直さず `conflict` にして両方を残します。
 **引く**ための表（語彙で揃えた名前・結合済み・型番ごとに割ったもの）は
@@ -363,6 +363,47 @@ AFIO route selectorの定義と、値→経路の対応です。pin_functions.cs
 **`valid_values`は下限です**。3つの資料の和を採っています——RMのremap格子が挙げる値、datasheet pin表が実際に経路を持つと示した値、EVTヘッダが定数として列挙している値。格子は「どちらでもよい」桁を`x`で書くので過大に出ることがあり（CH32X035の`USART4_RM=1xx`が4通りに展開される）、逆にどの資料も触れていない値は落ちます。**列挙されていない値が使えないとは限りません**が、列挙されている値はいずれかの資料が実証しています。`remap_routes.csv`に出る経路はすべてここに含まれます。
 
 `tools/check_tables.py`が表だけを読んで検査する内容: `bits`が`register:bit`形式であること・重複がないこと・`register`列と一致すること、`valid_values`が`bits`の幅に収まること、`reset_value`が`valid_values`に含まれること、**`remap_routes.value`がすべて`remap_fields.valid_values`に含まれること**。
+
+### `pin_conditions.csv`
+
+signal の pad が、AFIO の重映射 field ではなく**どの周辺を有効にしたか**で決まる箇所です。
+
+`index/pinout.csv` には同じ signal の `default` が2つ載る組が 34 あります（6 series。
+`SDIO_D0` が `PC8` と `PB14`、`I2S3_MCK` が `PC7` と `PA8`）。どちらも `AFIO->PCFR1` を
+書いて選ぶ重映射ではありません——application manual は列見出しが RCC のクロック有効化
+ビットと AFIO 外のいくつかのビットである格子を刷っていて、成り立っている列の pad が
+効きます。この表はその格子で、1行が `(series, signal, condition, pad)` です。
+
+**条件の読み方。** `condition` は資料の綴りの連言で、`&` で並ぶ各項が `NAME=0` か
+`NAME=1` です（`SDIOEN=1&ETHMACEN=1`）。項が全部成り立つ行が効き、**項の多い行が
+勝ちます**——`SDIOEN=1&ETHMACEN=1` は `SDIOEN=1` を含むので、両方成り立つときの pad は
+長いほうの行が言うものです。同じ格子が言っている相手側も出すので、**勝ち負けはこの表の
+中だけで決まります**（資料に戻らなくてよい）。
+
+**載せるのは pad が条件で動く signal だけです。** 格子は動かない signal も並べますが
+（SDIO の10本のうち8本）、それは「pad は動かない」と言っているだけで `pinout.csv` が
+既に言っていることです。ここに無い signal の pad は、これまでどおり `pinout.csv` を
+見てください。
+
+**項は AFIO 抜きとは限りません。** CH32V407 の DVP と SDIO の格子は AFIO の selector と
+有効化ビットを混ぜます（`DVPEN=1&DVP_RM=0` の隣に
+`DVPEN=1&USBHS1EN=1&RB_UD_RST_SIE=0` と `DVP_RM=1`）。AFIO だけの列は
+`remap_routes.csv` にもありますが、**両方が立ったときどちらが勝つか**は
+`remap_routes.csv` では言えないので、ここでは繰り返して持ちます。
+
+**`pad` が空なのは「その条件ではその signal は使えない」と資料が書いているとき**です
+（`SPI3EN=1&ETHMACEN=1` のときの `SPI3_NSS`。英語版の綴りは `Invaild`）。読めなかった
+という意味ではありません——読めなかったセルは行になりません。
+
+**全行がその series の pin 表に裏付けられています。** application manual は family 単位
+なので、そのままでは SDIO も DVP も無い CH32V203/V208 にまで同じことを言ってしまいます。
+その格子がその signal について挙げる pad を `pin_functions.csv` が**全部**載せている
+series にだけ出すので、載っている signal は必ず条件を2つ以上持ちます。
+
+同じ事実は `errata.csv` にも散文で入っています（datasheet の注記から採った
+`v30x-sdio-d0d1-default-map` ほか6件。格子が書いていない**批号の範囲**まで持つ）。
+内容は一致しますが**出所としてはまだ結んでいない**ので、ここの `basis` は
+application manual だけを名乗ります。
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 

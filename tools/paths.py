@@ -47,7 +47,7 @@ EVIDENCE_TABLES = (
     "interrupts", "memory_map", "systick", "clock_configs", "clock_prescalers",
     "clock_sources", "clock_symbols", "clock_init", "evt_variants", "debug_data",
     "debug_wiring", "option_bytes", "option_byte_fields",
-    "device_id_addresses", "device_ids",
+    "device_id_addresses", "device_ids", "pin_conditions",
 )
 
 # Evidence tables copied from EVT headers, whose names are already the machine

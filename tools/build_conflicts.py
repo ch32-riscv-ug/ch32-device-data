@@ -62,6 +62,7 @@ KEYS: dict[str, tuple[str, ...]] = {
     "absolute_maximum_ratings": ("series", "symbol", "parameter", "condition"),
     "remap_fields": ("series", "selector"),
     "remap_routes": ("series", "selector", "value", "signal"),
+    "pin_conditions": ("series", "signal", "condition"),
     "timers": ("family", "timer"),
     "register_blocks": ("family", "block"),
     "registers": ("family", "type", "register"),
@@ -130,6 +131,7 @@ ASSERTS: dict[str, str] = {
     "pin_functions": "route",
     "product_attributes": "value",
     "register_fields": "bits",
+    "pin_conditions": "pad",
     "opa_cmp_registers": "bits",
 }
 # `operating_conditions` はここに載せない。1行が min/typ/max/unit の4つを主張して

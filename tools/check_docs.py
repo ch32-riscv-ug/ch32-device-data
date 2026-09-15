@@ -74,6 +74,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "systick": ("systick",),
     "evt_variants": ("evt_variants",),
     "pin_alternate": ("pin_alternate",),
+    "pin_conditions": ("pin_conditions",),
     "clock_configs 他 clock_* 5表": ("clock_configs", "clock_prescalers", "clock_sources",
                                      "clock_symbols", "clock_init"),
     "evt_examples": ("evt_examples",),
