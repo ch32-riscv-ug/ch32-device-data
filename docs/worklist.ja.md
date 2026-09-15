@@ -21,7 +21,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | PDF構造化 | 3 | 1（D19 抽出の品質課題。**D18は2026-09-10に完了**——PDFを直接読む生成器が実行経路から居なくなった） |
 | consumerからの依頼 | 10 | 2（**R-28〜R-30を2026-09-01にch32rvから受領、翌日までに3件とも資料から取れるぶん完結**。R-29は完全解決（debug_wiring＋全27 series確定）、R-28は**納品受け入れ済**（実測6台と全一致・gap 7はch32rv曰く未発売＝接続でき次第）、R-30はRMから取れるぶん完結（option 2表＋WRPR粒度。残りは実測照合）。R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
 | 表示（G系） | 12 | 0 |
-| 既知の穴（F系） | 55 | 10（下の F 台帳で ✅ が付いていない行の数。資料側の記録が F-7・F-33・F-43〜46・F-51・F-62・F-63。F-4 と F-24 は残りだけが資料側で実害なし。**ツール側の穴は1**——F-61（論理積の条件を `(field, value)` で表せない remap 格子。2026-09-15に半分修理し、残りはモデル待ち）。F-66（`basis` が実際に効いた出所を言っていない）は同日に修理した。F-64（signal を先に合わせて食い違いを対にする）と F-65（自動更新に台帳の再記録を足し、`workflow_ledger` で機械化）は 2026-09-15 に修理。F-60 は 2026-09-10 に修理（見出しを読めない表が前の格子を終わらせていなかった）。F-57・F-58 は 2026-08-29、F-59 は 2026-09-04 に解決） |
+| 既知の穴（F系） | 55 | 14（下の F 台帳で ✅ が付いていない行の数。資料側の記録が F-7・F-33・F-43〜46・F-51・F-62・F-63。F-4 と F-24 は残りだけが資料側で実害なし。**ツール側の穴は5**——F-61（論理積の条件を `(field, value)` で表せない remap 格子。2026-09-15に半分修理し、残りはモデル待ち）と、同日の**サブエージェント監査が見つけた4つ**（F-67 `remap_fields` の固定 basis・F-68 格子が言っているのに basis が言わない336行・F-69 RM 説明文を名乗る語彙が無い362行・F-70 CAN の格子が `USART1_RM` として取り込まれている）。F-66（`basis` が実際に効いた出所を言っていない）は同日に修理した。F-64（signal を先に合わせて食い違いを対にする）と F-65（自動更新に台帳の再記録を足し、`workflow_ledger` で機械化）は 2026-09-15 に修理。F-60 は 2026-09-10 に修理（見出しを読めない表が前の格子を終わらせていなかった）。F-57・F-58 は 2026-08-29、F-59 は 2026-09-04 に解決） |
 
 （2026-08-25 棚卸し＋2026-08-28 の監査ぶん。次にやる順は [次の作業](#次の作業優先順) にある）
 
@@ -320,9 +320,12 @@ D18（PDF構造化）は完了したが、**bundle を正しく読めている�
 
 - [x] ✅ **doctest がどの検査でも走っていなかった** — 2026-09-11。正規化の規則
   （`norm_value`・`same_unit`・`reads_as_value`・`wrap_rules`・`signal_vocabulary` ほか）は
-  **doctest が仕様**で、規則を直すたびに例を足してきたのに、**その例は `regenerate.py` の
-  checks 段にも載っていなかった**——各ファイルを直に叩いたときだけ通る状態で、規則を
-  書き換えて例のほうを直し忘れても誰も落ちない。12ファイル・103例。<br>
+  **doctest が仕様**で、規則を直すたびに例を足してきたのに、**その半分はどの検査でも
+  走っていなかった**。当時12ファイル・103例のうち、`check.yml` が6ファイル61例を名指しで
+  走らせており、残る6ファイル42例（`operating_rows` 26・`build_conflicts` 6・
+  `extract_absolute_maximum` 3・`crosscheck_languages` 3・`extract_low_power` 2・
+  `convert_structured` 2）だけがファイルを直に叩いたときしか走らなかった
+  （**「全部走っていなかった」は誤りで、2026-09-15の監査で判明。訂正**）。<br>
   `pipeline/checks/check_doctests.py` を足して checks 段に載せた。落とすのは3つ:
   例の失敗・import できない・**`>>>` を書いてあるのに例が1件も集まらない**。
   3つめは実際に踏んだ罠で、`doctest.testmod` は `inspect.getmodule(obj) is module` で
@@ -474,13 +477,19 @@ D19 の最後の項目で「次に効くとすれば入れ子表をまたぐ連�
   `Years`。`same_unit` で `year`/`time` だけ末尾の `s` を落として比べる（`ms`・`us` の `s` は
   接頭辞の一部なので一律には落とさない）。これを入れないと**8件の偽 conflict**が立った。
 - **電源の立ち上がり速度**（`us/V`）は `^t_VDDA?$` しか見ておらず、`t_VDD33`・`t_VDD33A`・
-  `t_VHV`・`t_VCC12V` の10行が落ちていた。`^t_V` に広げ、時間そのものの `t_V…`
-  （`t_V(BL_NE)` は ns）も通す。
+  `t_VHV`・`t_VCC12V` が落ちていた。`^t_V` に広げ、時間そのものの `t_V…`
+  （`t_V(BL_NE)` は ns）も通す。**ただしこの4記号は正本に1行も増えていない**——
+  その表（`CH32H417DS0` の `表3-3 上电和掉电条件` ほか）は読み取りの窓の外にあり、
+  単位以前に到達していない（2026-09-15の監査で判明。規則の抜けは塞いだが行は増えない）。
 - **ミリオーム**は抵抗の単位（`R_ONN`/`R_ONP` は 28/42 mΩ）。`[kKM]?Ω` に `m` を足した。
+  **これも正本は増えない**——`R_ONN`/`R_ONP` は `CH32V006DS2.zh` にしか無く、その文書は catalog の範囲外（同上）。
 - **`C`/`R` で始まるが静電容量・抵抗でない名前**——OPA の `C_MRR`（dB）・`C_MIR`（V）、
   温度センサの `R_TS`（℃）。それぞれ名指しの規則を先に置いた。
 - **資料が `V` で始まる名前を付けた時間**——`V_F(RST)`/`V_NF(RST)`（「RST 输入可被滤波脉宽」＝ns。
-  両版とも `VF(RST)` と刷る）。綴りは資料どおりに保ち、単位だけ許す。
+  両版とも `VF(RST)` と刷る）。綴りは資料どおりに保ち、単位だけ許す。**これも行は増えない**
+  （その表が窓の外。同上）。<br>
+  **実際に行が増えたのは3つだけ**——漢字の単位（`t_RET`・`N_END`）、`C`/`R` で始まる別量
+  （`C_MRR` 9・`C_MIR` 5・`R_TS` 1）、別のクロックの数で書く単位（`f_TRIG` 13・`t_LOCK` 1・`f_s` 1）。
 - **別のクロックの数で書く単位**——`1/fADC`（ADC クロック何個ぶん）・`fADC`・`1/FPLL_IN`。
   資料は同じ上限を `875 kHz` と `16 1/fADC` の両方で書く。名前に `_` が入る形も許す。
 
@@ -526,8 +535,8 @@ D19 の最後の項目で「次に効くとすれば入れ子表をまたぐ連�
   register 配列を模さない限り不変量にならない。
 - **`memory_map` の領域名が一意** → **既に在った**（`check_tables` が
   `(family, kind, region, condition)` で見ている）。`kind` が鍵に要るのは、`FLASH` が
-  linker script 由来の `link-origin`（0x00000000）と header 由来の `memory`（0x08000000）の
-  2行を持つから（全11 family）。
+  linker script 由来の `link-origin` と header 由来の `memory`（0x08000000）の2行を持つから
+  （**FLASH を持つ12 family すべて**。`CH32H417` は `link-origin` が条件つきで2行あり計3行）。
 - **割り込み番号が一意** → **番号→名前は既に在ったが、名前→番号は見ていなかった**。
   同じ名前が2つの番号に出るのも「1つの割り込みが2行になった」印なので、既存のループに
   1つ足した。全corpus実測: どちらの向きも重複0。壊して落ちることを確認
@@ -572,7 +581,9 @@ D19 の最後の項目で「次に効くとすれば入れ子表をまたぐ連�
   `PB11` と `PB13` の**両方**に af-11 で載る（zh なら PB11〜PB14 が SIOX0〜3 の連番）。
   `SDRAM_CKE1`/`SDRAM_DQM2` も中文版が `PB9` と `PE6` で入れ替えている。
 - **23組が対になった**（全部 `CH32H417DS0`。英語版がまだ改版されていないため）——
-  AF 番号だけ違う6組と、同じ AF 番号で名前だけ違う17組。
+  AF 番号だけ違う**7組**（`PE14 LTDC_CLK` 4・`PE14 SDRAM_A3` 3）と、同じ AF 番号で
+  名前だけ違う**16組**（`PB13` 4・`PB14` 4・`PB9` 3・`PC6` 3・`PE6` 2）。
+  （**6/17 と書いていたのは誤りで、2026-09-15の監査で訂正**）
   `pin_functions` 28,471 → 28,448 行（conflict 12 → 35・reference 105 → 59）、
   `index/conflicts` 185 → 208 行。**同じ pad に両版の余りが残っている組は0**
   （対にできるものは全部対になった）。残る `reference` 59 行は本当に片版だけの機能。
@@ -619,7 +630,7 @@ F-64（同じ pad・同じ signal の zh/en 差が `conflict` にならない）
   （zh の注3は「重映射功能下划线后的数值…」でこの列の書き方ではない）。両版の版面を
   pypdfium2 で描画して確認。`curated/pin-table-columns.json` に `function_column` を足して
   上書き（`curated/figure-captions.json` が同じ文書の英語版の誤植を既に持っているのと同じ型）。<br>
-  全corpus実測: 機能列が `remap` だけの pin 表は**64表中この1表だけ**。台帳が当たらなかった
+  全corpus実測: 機能列が `remap` だけの pin 表は**この1表だけ**（抽出器が読む pin 表は62。`CH32M030DS2`・`CH32V006DS2` の2表を足した64でも結論は同じ。**64表と書いていたのは読む表の数ではなく、2026-09-15の監査で訂正**）。台帳が当たらなかった
   ときは黙らず言う（`function_column=… は当たらなかった（機能列 []）`。実際に当ててみて確認）。<br>
   **正本**: `pin_functions` 28,518 → 28,473 行（90行が45行の confirmed に畳まれた）、
   `index/pinout` 25,017 → 24,972 行。人向け README から H415 の `(no route stated)` 列が消えた。
@@ -1351,7 +1362,11 @@ R-19・R-24とその追補を実装する過程で見つかったが、依頼の
 | F-63 | **`CH32V006DS0` の英語版が `V_PVDhyst` を `5 / 20 / 6 mV` と刷っている**（typ が max より大きい）。中文版は `60` で、兄弟の `CH32V002` も `5/20/60` なので**英語版が 0 を落とした誤植** | 1行（すでに `conflict` で両論を持つ） | 資料 | ⬜ **記録のみ**（2026-09-11。版面を描画して確認。`check_tables.ordered_values` の`KNOWN_UNORDERED_VALUES` に名前で固定した） |
 | F-64 | **同じ pad・同じ signal で AF 番号だけが食い違う zh/en の差が `conflict` にならない**。`pin_functions` の鍵が `route`（＝`af-N`）を含むため、`PE14 LTDC_CLK af-13`(en) と `af-14`(zh) は**別の行**になり、どちらも `reference` で並んでいた | 23組（`CH32H417DS0` のみ。英語版がまだ改版されていないため） | ツール | ✅ **2026-09-15に修理**（`extract_pin_tables.pair_dissent`）。**signal を先に合わせ、名前で当たらないものだけ route で当てる**——機能の identity は名前のほうで、AF 番号はその値だから。route を先に見ると zh の `LTDC_CLK(AF14)` が en の `SDRAM_A3(AF14)` と当たって在りもしない食い違いになる（中文版 V1.9 は `LTDC_CLK` を AF13→AF14、`SDRAM_A3` を AF14→AF15 と**それぞれ1つ繰り上げた**だけ。両版のセルを読んで確認）。出すのは原典（中文版）の読みで、英語版の言い分は `basis` に `+!pin-table:en(=af-13)`／`+!pin-table:en:signal(=QSPI2_SIOX0)` で残す。**中文版が正しいことは版面で裏が取れる**——英語版のままだと `QSPI2_SIOX0` が `PB11` と `PB13` の**両方**に af-11 で載る（zh なら PB11〜PB14 が SIOX0〜3 の連番）。`index/conflicts` 185 → 208 行 |
 | F-65 | **目録の自動更新が凍結台帳を同じcommitに入れていない経路がある**。`catalog/toolchains.csv` が origin の自動commit `fdb0e20`（update tool versions）で書き換わり、台帳が置いていかれた。**次に正本を触った人のcommitが赤くなる**（実際に 2026-09-15 の資料取り込みで混ざり、取り込みが動かした表と区別する手間が要った） | 1表 | ツール | ✅ **2026-09-15に修理**。`toolchains.yml` に `check_baseline.py --record` を足し、commit に `pipeline/baseline/tables.csv` を含めた（`update.yml` が `catalog/documents.csv` に対して既にやっていたのと同じ形）。**同じ抜けを機械で捕まえる `check_tables.workflow_ledger` を新設**——正本の置き場（か `-A`）を `git add` する workflow は `check_baseline.py --record` を走らせること。正本を commit する workflow は2つだけと掃いて確かめ、両方外して落ちることも確認 |
-| F-66 | **`remap_routes` の `basis` が、実際に効いた出所を言っていない**。`build_remap` は経路の `basis` を **`value == 0` かどうかだけ**で決めていて、既定値の行は`candidates(datasheet-pin-table-default:en)`、それ以外は一律`candidates(datasheet-pin-table+rm-remap-grid:en)` を名乗っていた | `CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも remap 格子から**0経路**なのに、CH32X035 の234行のうち186行が `rm-remap-grid` を名乗っていた（2026-09-15実測） | ツール | ✅ **2026-09-15に修理**。経路ごとの出所を `build_candidate.route_sources` が記録し（`selection.sources`）、`build_remap` がそれで `basis` を組む。**格子の行ラベルが裸のときは pin の signal の末尾として引く**——`SDIO_RM` の格子は `CK`・`SD0` と書き、pin 表は `SDIO_CK`（全corpus実測: 格子経路1,637のうち207が裸）。同じ pad・同じ値のときだけ見るので取り違えない。<br>**行は1つも動かず `basis` だけが1,611行**——`rm-remap-grid` を**外した**のが578行（格子が言っていない。X035 の186行を含む）、**足した**のが1,033行（既定値の欄を格子も書いていた。`SDIO_RM=0` の列など）。格子を名乗る series からX035・V205・X315・X305・X033 が消えた |
+| F-66 | **`remap_routes` の `basis` が、実際に効いた出所を言っていない**。`build_remap` は経路の `basis` を **`value == 0` かどうかだけ**で決めていて、既定値の行は`candidates(datasheet-pin-table-default:en)`、それ以外は一律`candidates(datasheet-pin-table+rm-remap-grid:en)` を名乗っていた | `CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも remap 格子から**0経路**なのに、CH32X035 の234行のうち186行が `rm-remap-grid` を名乗っていた（2026-09-15実測） | ツール | ✅ **2026-09-15に修理**。経路ごとの出所を `build_candidate.route_sources` が記録し（`selection.sources`）、`build_remap` がそれで `basis` を組む。**格子の行ラベルが裸のときは pin の signal の末尾として引く**——`SDIO_RM` の格子は `CK`・`SD0` と書き、pin 表は `SDIO_CK`（全corpus実測: 格子経路1,637のうち207が裸）。同じ pad・同じ値のときだけ見るので取り違えない。<br>**行は1つも動かず `basis` だけが1,611行**——`rm-remap-grid` を**外した**のが578行（格子が言っていない。X035 の186行を含む）、**足した**のが1,033行（既定値の欄を格子も書いていた。`SDIO_RM=0` の列など）。格子を名乗る series から**X035（186行）と X033（66行）が消えた**——V205 はそもそも経路0行、X315・X305 は1行だけで元から格子を名乗っていなかった（**5つ挙げていたのは誤りで、2026-09-15の監査で訂正**） |
+| F-67 | **`remap_fields.csv` の `basis` が固定文字列で、格子を持たない family でも `rm-remap-grid` を名乗る**。F-66 で経路表は直したが、フィールド表の `FIELD_BASIS`/`MANUAL_BASIS` は `build_remap.py` の定数のまま | 287行中**22行**（CH32X035 10・CH32X033 10・CH32X315 1・CH32X305 1。2026-09-15の監査） | ツール | ⬜ **未着手**。経路と同じく、候補側が記録した出所から組めばよい |
+| F-68 | **`remap_routes` の `basis` が、格子が言っているのに言っていないことにする**（F-66 の直しが狭すぎた）。`route_sources` の照合が (signal, pad) の完全一致か「裸ラベルが signal の末尾」しか見ないため、綴りの違いで落ちる | **336行**（2026-09-15の監査）: `SDIO_D0` と格子の `SD0` 32・`LTDC_G4` と `G[4]` 96・UHSIF の PORT22以降 26・`ETH_MII_RXD0` と `ETH_RXD0` 38・pad の綴り（`PC14-OSC32_IN` と `PC14`）86・`T2CH1ETR` と `TIM2_CH1`＋`TIM2_ETR` 58 | ツール | ⬜ **未着手**。過剰な主張は消えたが、不足した主張に置き換わっている。`canonical_signal` を両側に掛け、pad は綴りの前方一致で見るのが直し方 |
+| F-69 | **RM の「レジスタ説明文」を `basis` が名乗れない**。`build_candidate` は説明文由来の経路を `_source == "description"` と印を付けているのに、`route_sources` は格子しか見ない | **362行**（CH32X035 166・CH32X033 71・CH32V407 60・CH32V467 59・L103/M103 6。2026-09-15の監査）。CH32X035 の経路は `R32_AFIO_PCFR1` の説明文が述べているのに `datasheet-pin-table` しか名乗らない | ツール | ⬜ **未着手**。`rm-field-description` のような語を足すのが直し方 |
+| F-70 | **`CH32L103`/`CH32M103` の CAN 重映射の格子が `USART1_RM` として取り込まれている**。表10-22 の列見出しが値だけ（`00｜10｜11`）なので `read_bare_header` が行ラベル `TX`/`RX` から周辺名を引き、`signal_vocabulary.split('TX')` が `USART1` を返す | 偽の `USART1_RM` grid 経路6件（TX/PA12・RX/PA11 @0、TX/PB9・RX/PB8 @2、TX/PD1・RX/PD0 @3）。正本の CAN 行は別経路で正しく出ているが、それは `route_sources` が field を見ないため偶然（2026-09-15の監査） | ツール | ⬜ **未着手**。`read_bare_header` が表題（`CAN复用功能重映射`）を周辺名の手がかりにするのが直し方 |
 | R-25 | consumerからの表の追加依頼3件（2026-08-25受領） | — | 依頼 | ✅ 2件実装・1件は回答（`route`の`main`/`default`を文書化）。[記録](worklist-archive.ja.md) |
 | R-26 | consumerからの追加テーブル依頼4件＋参考1件（2026-08-25受領） | — | 依頼 | ✅ **全5件実装**（2026-08-25）。[記録](worklist-archive.ja.md) |
 

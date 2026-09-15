@@ -2,10 +2,20 @@
 """`pipeline/` と `tools/` の doctest を走らせる。
 
 正規化の規則（`norm_value`・`same_unit`・`reads_as_value`・`wrap_rules` ほか）は
-**doctest が仕様**で、規則を直すたびに例を足してきた。ところが**その例はどの検査でも
-走っていなかった**——`uv run` で通るのは各ファイルを直に叩いたときだけで、
-`regenerate.py` の checks 段にも CI にも載っていない（2026-09-11に気づいた。
-12ファイル・103例）。規則を書き換えて例のほうを直し忘れても、誰も落ちない。
+**doctest が仕様**で、規則を直すたびに例を足してきた。ところが**その半分はどの検査でも
+走っていなかった**——`.github/workflows/check.yml` が6ファイル（`signal_vocabulary`・
+`figure_captions`・`lost_subscripts`・`review_sidecar`・`logical_tables`・`wrap_rules`。
+2026-08-28 と 09-02 に足したもの）を名指しで走らせていたが、残る6ファイル42例
+（`operating_rows` 26・`build_conflicts` 6・`extract_absolute_maximum` 3・
+`crosscheck_languages` 3・`extract_low_power` 2・`convert_structured` 2）は
+**ファイルを直に叩いたときしか走らなかった**（2026-09-11に気づき、09-15の監査で
+「全部走っていなかった」が誤りと判明。当時12ファイル・103例）。
+規則を書き換えて例のほうを直し忘れても、その6ファイルでは誰も落ちない。
+
+**名指しの列挙をやめて全部を掃く**のがこの検査の値打ちで、`check.yml` の6段は
+これに包含される。ただし**この検査は CI に載っていない**——`pipeline/` の module を
+import するので pdfplumber が要り、`check` job は何も install しない。CI に載せるなら
+依存を入れるか、`regenerate.py` を回す job に移す必要がある（未了）。
 
 検査は2つ:
 

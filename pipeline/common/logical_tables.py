@@ -1840,6 +1840,16 @@ def _join_wrapped_rows(table: dict, names: set[str]) -> int:
     for column in columns:
         top[column]["text"] = joined[column]
         top[column]["row_end"] = max(top[column]["row_end"], bottom[column]["row_end"])
+        # **箱も下段まで伸ばす。** 伸ばさないと、この後に走る `rebuild_from_glyphs` の
+        # 「セルの左右 × 行の帯」が1行目しか覆わず、`SPI1_RM[2:0]` を字形から
+        # `SPI1_RM` に組み直して**範囲の添字を落とす**（記述表に `SPI1_RM` が在るので
+        # 歯止めも通ってしまう）。`CH32X035RM` の en p.71・zh p.67 で実際に落ちていた
+        # ——`apply_bitfield` の連結で同じことが起きると `rebuild_from_glyphs` の説明が
+        # 警告している型で、そこは行の帯で救われていたが、**行ごと畳むとその帯も潰れる**。
+        above, below = top[column].get("bbox"), bottom[column].get("bbox")
+        if above and below:
+            top[column]["bbox"] = [min(above[0], below[0]), min(above[1], below[1]),
+                                   max(above[2], below[2]), max(above[3], below[3])]
         table["cells"].remove(bottom[column])
     # 下段が消えて空いた行を詰める（bit番号行＋1段になる）。
     for cell in table["cells"]:
