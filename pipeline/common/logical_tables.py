@@ -1805,6 +1805,51 @@ def _respill_index(text: str, right: str, names: set[str]) -> str | None:
     return found.pop() if len(found) == 1 else None
 
 
+def _join_wrapped_rows(table: dict, names: set[str]) -> int:
+    """**名前が2段に割れたまま残った bit図**を繋ぐ。繋いだセルの数を返す。
+
+    `apply_bitfield` の縦連結は「跨るセルがある」か「上段が同じ綴りの繰り返し」でしか
+    働かない。`CH32H417RM.zh` p.35 の RCC クロック使能欄は**下段**が繰り返しで
+    （上段 `SWPMI｜I2C3｜DAC｜…`／下段 `EN｜EN｜EN｜…`）どちらにも当たらず、
+    2段のフィールド行と見なされていた。**繋いだ綴りが記述表の名前になるか**で決める
+    ——2段のまま正しい図（TIM の CCMR は上段が出力名・下段が入力名）は、繋いでも
+    名前にならないので当たらない。
+
+    全corpus実測（2026-09-15）: 当たるのは19表・257セルで、**名前にならない列は
+    corpus 全体で1つだけ**（`CH32X035RM.en` p.71 の `TIM1_RM[`。原本の側が切れている）。
+    だから「外れは1列まで」を条件にする。
+    """
+    rows: dict[int, list[dict]] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] >= 1:
+            rows.setdefault(cell["row_start"], []).append(cell)
+    ids = sorted(rows)
+    if len(ids) != 2:
+        return 0
+    top = {c["column_start"]: c for c in rows[ids[0]]}
+    bottom = {c["column_start"]: c for c in rows[ids[1]]}
+    columns = sorted(set(top) & set(bottom))
+    if len(columns) < 4:
+        return 0
+    joined = {c: ((top[c].get("text") or "").strip()
+                  + (bottom[c].get("text") or "").strip()) for c in columns}
+    missed = [c for c in columns
+              if joined[c] not in names and _CELL_RANGE.sub("", joined[c]) not in names]
+    if len(missed) > 1:
+        return 0
+    for column in columns:
+        top[column]["text"] = joined[column]
+        top[column]["row_end"] = max(top[column]["row_end"], bottom[column]["row_end"])
+        table["cells"].remove(bottom[column])
+    # 下段が消えて空いた行を詰める（bit番号行＋1段になる）。
+    for cell in table["cells"]:
+        if cell["row_start"] >= 1:
+            cell["row_start"] = 1
+            cell["row_end"] = 2
+    table["row_count"] = 2
+    return len(columns)
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -1820,6 +1865,8 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
     if not names or table.get("_undoubled"):
         return 0
     table["_undoubled"] = True
+    # 名前が2段に割れたままの図は、綴りを見る前に繋ぐ（`_join_wrapped_rows`）。
+    _join_wrapped_rows(table, names)
     bases, bit_at = _indexed_bases(table, names)
     # 図の**他の名前セルも共有する頭文字**は、その図のフィールド命名の一部（DMA_INTFCRは
     # 全セルが`C`＝clearで始まる）。en版RM p173の記述表は`TCIFx`と接頭辞なしで書くので、
