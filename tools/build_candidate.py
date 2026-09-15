@@ -158,6 +158,43 @@ def build(header: Path, manuals: Path | list[Path] | None, datasheet: Path,
     return join(selectors, reg_fields, routes, pins, evt_values, notes)
 
 
+def route_sources(pin: dict, fn: dict, value: int,
+                  grid_value_of: dict, grid_at_pad: dict) -> list[str]:
+    """その経路を実際に言っている出所。
+
+    pin 表はその機能がそこに在るから経路になっている——常に出所。RM の remap 格子は
+    **同じ (signal, pad) をその値で名指ししているとき**だけ出所（格子の表を持たない
+    family がある: `CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも0経路）。
+    既定値の行は pin 表の「默认映射」の欄が根拠なので、そこだけ綴りを分ける。
+
+    **格子の行ラベルは裸のことがある**（`SDIO_RM` の格子は `CK`・`SD0`、`DVP_RM` は
+    `D0`。全corpus実測 2026-09-15: 格子経路1,637のうち207が裸）。その場合ラベルは
+    pin の signal の**末尾**で、手前は周辺名＋`_` になる——`SDIO_CK`.endswith(`CK`) で
+    手前が `SDIO_`。同じ pad・同じ値のときだけ見るので取り違えない。
+
+    >>> grid = {("TIM3_CH1", "PB4"): {1}}
+    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 1, grid, {})
+    ['datasheet-pin-table', 'rm-remap-grid']
+    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 2, grid, {})
+    ['datasheet-pin-table']
+    >>> route_sources({"pad": "PC6"}, {"signal": "TIM3_CH1"}, 0, grid, {})
+    ['datasheet-pin-table-default']
+    >>> route_sources({"pad": "PC12"}, {"signal": "SDIO_CK"}, 0, {},
+    ...               {"PC12": {("CK", 0)}})
+    ['datasheet-pin-table-default', 'rm-remap-grid']
+    """
+    first = "datasheet-pin-table-default" if value == 0 else "datasheet-pin-table"
+    says = grid_value_of.get((canonical_signal(fn["signal"]), pin["pad"])) or set()
+    if value not in says:
+        signal = fn["signal"]
+        bare = {label for label, at in grid_at_pad.get(pin["pad"], ())
+                if at == value and label != signal
+                and signal.endswith(label) and signal[:-len(label)].endswith("_")}
+        if not bare:
+            return [first]
+    return [first, "rm-remap-grid"]
+
+
 def join(
     selectors: list[dict],
     reg_fields: list[dict],
@@ -452,10 +489,13 @@ def join(
     # 同じ (signal, pad) を**格子自身が別の値で名指ししている**ときだけ直します。
     grid_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
     grid_pads_at: dict[tuple[str, int], set[str]] = collections.defaultdict(set)
+    # 裸の行ラベルを pad から引くための索引（`route_sources`）。
+    grid_at_pad: dict[str, set[tuple[str, int]]] = collections.defaultdict(set)
     for r in routes:
         if r.get("_source") == "grid":
             grid_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
             grid_pads_at[(canonical_signal(r["signal"]), r["value"])].add(r["pad"])
+            grid_at_pad[r["pad"]].add((r["signal"], r["value"]))
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
@@ -503,6 +543,12 @@ def join(
         fn["selection"] = {
             "selector": selector_id(selector["controller"], selector["field"]),
             "values": [fn["_selector_value"]],
+            # **その経路を実際に言っている出所。** `basis` はここから組む——
+            # 値が既定値かどうかで決め打つと、格子が1行も無い family
+            # （`CH32X035RM` は zh/en とも remap 格子の表を持たない）でも
+            # `rm-remap-grid` を名乗ってしまう（F-66）。
+            "sources": route_sources(pin, fn, fn["_selector_value"],
+                                     grid_value_of, grid_at_pad),
         }
         if how != "signal":
             fn["_selector_resolved_by"] = how
@@ -532,6 +578,7 @@ def join(
             fn["selection"] = {
                 "selector": selector_id(selector["controller"], selector["field"]),
                 "values": [0],
+                "sources": route_sources(pin, fn, 0, grid_value_of, grid_at_pad),
             }
             used.add(key)
             attested[key].add(0)
