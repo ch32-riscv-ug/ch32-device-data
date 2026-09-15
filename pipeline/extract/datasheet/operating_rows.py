@@ -171,12 +171,28 @@ UNIT_FOR = [
     (re.compile(r"^T_S_"), re.compile(r"^(?:[munp]?s|1/f[A-Za-z]+)$", re.I)),
     (re.compile(r"^t_RET$"), re.compile(r"^years?$", re.I)),
     (re.compile(r"^N_"), re.compile(r"^times?$", re.I)),
-    (re.compile(r"^t_VDDA?$"), re.compile(r"^[munp]?s/V$", re.I)),
-    (re.compile(r"^[Ff]_"), re.compile(r"^[MmKk]?Hz$")),
-    (re.compile(r"^[Tt]_"), re.compile(r"^(?:[munp]?s|1/f[A-Za-z]+|℃)$", re.I)),
+    # 電源の立ち上がり速度は `t_V…` で単位が `us/V`。`t_VDD`/`t_VDDA` だけを見ていたので
+    # `t_VDD33`・`t_VDD33A`・`t_VHV`・`t_VCC12V` の10行が落ちていた（2026-09-15実測）。
+    # 時間そのものの `t_V…`（`t_V(BL_NE)` は ns）も在るので、両方の形を許す。
+    (re.compile(r"^t_V"), re.compile(r"^(?:[munp]?s(?:/V)?|1/f[A-Za-z]+)$", re.I)),
+    # `V_F(RST)`/`V_NF(RST)` は**資料が `V` で始まる名前を付けた時間**
+    # （「RST 输入可被滤波脉宽」＝ns。両版とも `VF(RST)` と刷る。綴りは資料どおりに保つ）。
+    (re.compile(r"^V_N?F\(RST\)$"), re.compile(r"^[munp]?s$", re.I)),
+    # `C`/`R` で始まるが静電容量・抵抗でない名前。OPA の同相除去比（dB）と同相入力範囲（V）、
+    # 温度センサの測定範囲（℃）で、下の `^C`・`^R_` の規則より先に置く。
+    (re.compile(r"^C_MRR$"), re.compile(r"^dB$")),
+    (re.compile(r"^C_MIR$"), re.compile(r"^m?V$")),
+    (re.compile(r"^R_TS$"), re.compile(r"^℃$")),
+    # **別のクロックの数で書く単位**（`1/fADC`＝ADC クロック何個ぶん、`fADC`＝その分数）。
+    # 資料は同じ上限を `875 kHz` と `16 1/fADC` の両方で書く（`f_TRIG`）。名前に `_` が
+    # 入る形もある（`1/FPLL_IN`）。2026-09-15実測: これで拾えるのは `f_TRIG` 27・
+    # `f_s` 2・`t_LOCK` 2 行。
+    (re.compile(r"^[Ff]_"), re.compile(r"^(?:[MmKk]?Hz|(?:1/)?f[A-Za-z_]+)$")),
+    (re.compile(r"^[Tt]_"), re.compile(r"^(?:[munp]?s|1/f[A-Za-z_]+|℃)$", re.I)),
     (re.compile(r"^V_|^V$"), re.compile(r"^m?V$")),
     (re.compile(r"^[Ii]_"), re.compile(r"^[munp]?A$", re.I)),
-    (re.compile(r"^R_"), re.compile(r"^[kKM]?Ω$")),
+    # ミリオームも抵抗の単位（全橋スイッチの導通抵抗 `R_ONN`/`R_ONP` は 28/42 mΩ）。
+    (re.compile(r"^R_"), re.compile(r"^[kKmM]?Ω$")),
     (re.compile(r"^C"), re.compile(r"^[munp]?F$", re.I)),
     (re.compile(r"^E"), re.compile(r"^LSB$", re.I)),
     (re.compile(r"^ACC_"), re.compile(r"^(?:%|ppm)$")),
@@ -246,7 +262,11 @@ VALUE_FIX = {"FHCLK": "F_HCLK"}
 # 語彙は**この1語だけ**——全corpus実測（2026-09-11）: 値の欄に CJK を持つ行は
 # `浮空` の1行、数を含まない値は他に13種あって**全て記号**（`VDD`・`tHCLK`・
 # `F_HCLK` など）で、語はこの `Floating` だけ。公開する綴りは英語版のもの。
-VALUE_WORDS = {"浮空": "Floating"}
+# 単位の欄も同じ——`年`（`Years`）・`次`（`Times`）は中文版だけが漢字で書く。
+# 英語版の綴りに揃えないと、単位の規則（`UNIT_FOR` の `^t_RET$`＝`years?`、
+# `^N_`＝`times?`）に当たらず**中文版の行だけ丸ごと落ちる**（実測: `t_RET` 24行・
+# `N_END` 25行）。揃った結果は `basis` に両版が並ぶ形で見える。
+VALUE_WORDS = {"浮空": "Floating", "年": "Years", "次": "Times"}
 TEXT_REPAIRS = [
     (re.compile(r"^T = (.+?)\s*A$"), r"T_A = \1"),
     (re.compile(r"usedUSB"), "used USB"),
@@ -595,12 +615,20 @@ def same_unit(a: str | None, b: str | None) -> bool:
     `mS`/`ms`・`us`/`uS`・`kHz`/`KHz`・`kΩ`/`KΩ`・`Times`/`times` が揃い、
     `mΩ`/`MΩ`・`mV`/`MV` は揃わない（単純な大小無視を入れなかった理由がこれ）。
 
+    **語で書く単位は単複が揃わない**——`Data retention period` の単位を
+    `CH32V003DS0.en` は `year`、`CH32H417DS0.en` は `Years` と刷る。`year`/`time` だけ
+    末尾の `s` を落として比べる（`ms`・`us` の `s` は接頭辞の一部なので、
+    一律に落とすことはしない。語を名指しするのはそのため）。
+
     >>> same_unit("mS", "ms"), same_unit("KHz", "kHz"), same_unit("mV", "MV")
+    (True, True, False)
+    >>> same_unit("year", "Years"), same_unit("Times", "time"), same_unit("ms", "m")
     (True, True, False)
     """
     def canon(u):
-        return "".join(c if i == 0 and c == "M" else c.lower()
+        text = "".join(c if i == 0 and c == "M" else c.lower()
                        for i, c in enumerate(u or ""))
+        return text[:-1] if text in ("years", "times") else text
     return canon(a) == canon(b)
 
 
