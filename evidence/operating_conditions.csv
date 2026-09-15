@@ -157,7 +157,7 @@ CH32H415;CH32H416;CH32H417,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirm
 CH32H415;CH32H416;CH32H417,I_VREFP,"No load, when V = 3.6V, the input value is 0xF1C. REFP",,,194,,uA,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_VREFP,"No load, when VREFP = 3.6V, the input value is 0x555 (worst)",,,331,,uA,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,I_VREFP,"No load, input value 0x800",,,58,,uA,#,reference,CH32H417DS0.PDF:en(p.138),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,N_END,Endurance,T_A = 25℃,50K,,,Times,#,reference,CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,N_END,Endurance,T_A = 25℃,50K,,,Times,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,R_AIN,External input impedance,,,,0.4,kΩ,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
@@ -242,6 +242,8 @@ CH32H415;CH32H416;CH32H417,f_MDC,MDC clock frequency,,,,2.5,MHz,#,confirmed,CH32
 CH32H415;CH32H416;CH32H417,f_PixCLK,Pixel clock input frequency,,,,150,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.116)+CH32H417DS0.PDF:en(p.131),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_S,Sampling rate,,0.06,,5,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_S,Sampling rate,,,20,,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.121)+CH32H417DS0.PDF:en(p.137),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,f_ADC = 14MHz,,,875,kHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,f_TRIG,External trigger frequency,f_ADC = 80MHz,,,4.4,MHz,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,g_m,Oscillator transconductance,Startup,,26,,mA/V,#,confirmed,CH32H417DS0.PDF:zh(p.88)+CH32H417DS0.PDF:en(p.102),CH32H417DS0.PDF
@@ -265,7 +267,7 @@ CH32H415;CH32H416;CH32H417,t_Iatr,Conventional trigger conversion delay,f_ADC = 
 CH32H415;CH32H416;CH32H417,t_Iatr,Conventional trigger conversion delay,f_ADC = 80MHz,,,0.025,us,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_LOCK,PLL lock time,,,40,90,us,#,confirmed,CH32H417DS0.PDF:zh(p.89)+CH32H417DS0.PDF:en(p.103),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_R,TXC/RXC rising time,,,,2.0,ns,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.134),CH32H417DS0.PDF
-CH32H415;CH32H416;CH32H417,t_RET,Data retention period,,20,,,Years,#,reference,CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
+CH32H415;CH32H416;CH32H417,t_RET,Data retention period,,20,,,Years,#,confirmed,CH32H417DS0.PDF:zh(p.90)+CH32H417DS0.PDF:en(p.104),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32H417DS0.PDF:zh(p.119)+CH32H417DS0.PDF:en(p.135),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(ADV_CLKH),FSMC_AD[15:0] valid data before FSMC_CLK high,,8,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.110)+CH32H417DS0.PDF:en(p.126),CH32H417DS0.PDF
 CH32H415;CH32H416;CH32H417,t_SU(DATA_NE),Data to FSMC_NE high build time,,3*tHCLK,,,ns,#,confirmed,CH32H417DS0.PDF:zh(p.108)+CH32H417DS0.PDF:en(p.123),CH32H417DS0.PDF
@@ -402,6 +404,8 @@ CH32L103;CH32M103,C_L1,Suggested load capacitance with corresponding crystal ser
 CH32L103;CH32M103,C_L2,Suggested load capacitance with corresponding crystal serial impedance R_S,R_S = 70KΩ,,,15,pF,#,confirmed,CH32L103DS0.PDF:zh(p.40)+CH32L103DS0.PDF:en(p.48),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,40,pF,#,confirmed,CH32L103DS0.PDF:zh(p.50)+CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
 CH32L103;CH32M103,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32L103DS0.PDF:zh(p.51)+CH32L103DS0.PDF:en(p.61),CH32L103DS0.PDF
+CH32L103;CH32M103,C_MRR,Common mode rejection ratio,@1kHz,,90,,dB,#,reference,CH32L103DS0.PDF:en(p.60),CH32L103DS0.PDF
+CH32L103;CH32M103,C_MRR,Common mode rejection ratio,@1kHz,,96,,dB,#,reference,CH32L103DS0.PDF:en(p.59),CH32L103DS0.PDF
 CH32L103;CH32M103,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32L103DS0.PDF:zh(p.45)+CH32L103DS0.PDF:en(p.54),CH32L103DS0.PDF
 CH32L103;CH32M103,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
@@ -598,8 +602,8 @@ CH32L103;CH32M103,I_Q,Total static current of V and HV V HREG,V = V = 24V HV HRE
 CH32L103;CH32M103,I_Q,Total static current of V and HV V HREG,V = V = 6V HV HREG,,41,,uA,#,confirmed,CH32L103DS0.PDF:zh(p.38)+CH32L103DS0.PDF:en(p.46),CH32L103DS0.PDF
 CH32L103;CH32M103,I_lkg,Standard I/O pin input leakage current,,,,1,uA,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,I_lkg,FT I/O pin input leakage current,,,,3,uA,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
-CH32L103;CH32M103,N_END,Endurance,T_A = 25℃,300K,,,Times,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
-CH32L103;CH32M103,N_END,Endurance,T_A = 70℃,100K,,,Times,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
+CH32L103;CH32M103,N_END,Endurance,T_A = 25℃,300K,,,Times,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
+CH32L103;CH32M103,N_END,Endurance,T_A = 70℃,100K,,,Times,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
@@ -669,6 +673,8 @@ CH32L103;CH32M103,V_hys,FT I/O Schmitt trigger voltage hysteresis,,90,,,mV,#,con
 CH32L103;CH32M103,V_hys,Hysteresis voltage,,,±15,,mV,#,confirmed,CH32L103DS0.PDF:zh(p.52)+CH32L103DS0.PDF:en(p.61),CH32L103DS0.PDF
 CH32L103;CH32M103,f_ADC,ADC clock frequency,,,14,48,MHz,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,f_S,Sampling rate,,0.05,,2.4,MHz,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
+CH32L103;CH32M103,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
+CH32L103;CH32M103,f_TRIG,External trigger frequency,,,,22,1/fADC,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,f_TRIG,External trigger frequency,f_ADC = 14MHz,,,875,KHz,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,f_TRIG,External trigger frequency,f_ADC = 48MHz,,,2.2,MHz,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32L103DS0.PDF:zh(p.39)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
@@ -689,8 +695,8 @@ CH32L103;CH32M103,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confir
 CH32L103;CH32M103,t_Iatr,Regular trigger conversion latency,f_ADC = 14MHz,,,0.143,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_Iatr,Regular trigger conversion latency,f_ADC = 48MHz,,,0.042,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_LOCK,PLL lock time,,,80,200,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
-CH32L103;CH32M103,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
-CH32L103;CH32M103,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
+CH32L103;CH32M103,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
+CH32L103;CH32M103,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,confirmed,CH32L103DS0.PDF:zh(p.42)+CH32L103DS0.PDF:en(p.50),CH32L103DS0.PDF
 CH32L103;CH32M103,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32L103DS0.PDF:zh(p.48)+CH32L103DS0.PDF:en(p.57),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(HSE),Startup time(2),"V_DD stabilization, 8M",,1.5,,ms,#,confirmed,CH32L103DS0.PDF:zh(p.40)+CH32L103DS0.PDF:en(p.47),CH32L103DS0.PDF
 CH32L103;CH32M103,t_SU(HSI),HSI oscillator startup stabilization time,,,,8,us,#,confirmed,CH32L103DS0.PDF:zh(p.41)+CH32L103DS0.PDF:en(p.49),CH32L103DS0.PDF
@@ -831,8 +837,8 @@ CH32M007;CH32V007,I_Q,V and V combined CC12V HV quiescent current (high voltage 
 CH32M007;CH32V007,I_Q,V and V combined CC12V HV quiescent current (high voltage regulator enabled),"Other typical current consumption (Increased CH32M007K8U7 and CH32M007G8R6 compared to CH32V007); V = 48V, V to capacitor HV CC12V",,185,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.48),CH32V007DS0.PDF
 CH32M007;CH32V007,I_Q,V and V combined CC12V HV quiescent current (high voltage regulator enabled),Other typical current consumption (Increased CH32M007K8U7 and CH32M007G8R6 compared to CH32V007); V = V = 15V CC12V HV,,115,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.48),CH32V007DS0.PDF
 CH32M007;CH32V007,I_Q,V and V combined CC12V HV quiescent current (high voltage regulator enabled),Other typical current consumption (Increased CH32M007K8U7 and CH32M007G8R6 compared to CH32V007); V = V = 6V CC12V HV,,105,,uA,#,confirmed,CH32V007DS0.PDF:zh(p.34)+CH32V007DS0.PDF:en(p.48),CH32V007DS0.PDF
-CH32M007;CH32V007,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,reference,CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
-CH32M007;CH32V007,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,reference,CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
@@ -883,6 +889,7 @@ CH32M007;CH32V007,V_hys,Hysteresis voltage,,,20,60,mV,#,reference,CH32V007DS0.PD
 CH32M007;CH32V007,V_hys,Hysteresis voltage,,,±24,,mV,#,confirmed,CH32V007DS0.PDF:zh(p.45)+CH32V007DS0.PDF:en(p.65),CH32V007DS0.PDF
 CH32M007;CH32V007,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,f_S,Sampling rate,,0.06,,3,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
+CH32M007;CH32V007,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,f_TRIG,External trigger frequency,f_ADC = 16MHz,,,900,KHz,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,f_TRIG,External trigger frequency,f_ADC = 48MHz,,,2.7,MHz,#,confirmed,CH32V007DS0.PDF:zh(p.41)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
@@ -900,8 +907,8 @@ CH32M007;CH32V007,t_Iat,Injection trigger conversion delay,f_ADC = 48MHz,,,0.042
 CH32M007;CH32V007,t_Iatr,Conventional trigger conversion delay,,,,2,1/fADC,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_Iatr,Conventional trigger conversion,f_ADC = 16MHz,,,0.125,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.59),CH32V007DS0.PDF
 CH32M007;CH32V007,t_Iatr,Conventional trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
-CH32M007;CH32V007,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
-CH32M007;CH32V007,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
+CH32M007;CH32V007,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.51),CH32V007DS0.PDF
 CH32M007;CH32V007,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V007DS0.PDF:zh(p.42)+CH32V007DS0.PDF:en(p.60),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(HSE),Startup time,V_DD is stable,,1.5,,ms,#,confirmed,CH32V007DS0.PDF:zh(p.35)+CH32V007DS0.PDF:en(p.49),CH32V007DS0.PDF
 CH32M007;CH32V007,t_SU(HSI),HSI oscillator startup stabilization time,,,3,8,us,#,confirmed,CH32V007DS0.PDF:zh(p.36)+CH32V007DS0.PDF:en(p.50),CH32V007DS0.PDF
@@ -1031,8 +1038,8 @@ CH32M030,I_SOURCE,Source current of pin output high-level,"V_DD33 = 3.3V, pin vo
 CH32M030,I_VDD33,Load current of low-voltage regulator (including all loads such as common I/O and core regulator),,,,20,mA,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,I_VDD8,Load current of high voltage regulator (including all loads such as MVI/O and low voltage regulator),,,,35,mA,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,I_lkg,Input leakage current,,,0,+/-3,uA,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
-CH32M030,N_END,Erase times,T_A = 125℃,1K,5K,,time,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
-CH32M030,N_END,Erase times,T_A = 25℃,10K,50K,,time,#,reference,CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
+CH32M030,N_END,Erase times,T_A = 125℃,1K,5K,,time,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
+CH32M030,N_END,Erase times,T_A = 25℃,10K,50K,,time,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
 CH32M030,R_BIAS,Bias resistance in QII1 mode,,,90,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.38)+CH32M030DS0.PDF:en(p.47),CH32M030DS0.PDF
 CH32M030,R_BIAS,Bias resistance in QII2 mode,,,90,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.39)+CH32M030DS0.PDF:en(p.47),CH32M030DS0.PDF
 CH32M030,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
@@ -1095,6 +1102,7 @@ CH32M030,V_hys,Hysteresis voltage,QII2_HYPSEL[2:0] = 110,,60,,mV,#,confirmed,CH3
 CH32M030,V_hys,Hysteresis voltage,QII2_HYPSEL[2:0] = 111,,120,,mV,#,confirmed,CH32M030DS0.PDF:zh(p.40)+CH32M030DS0.PDF:en(p.49),CH32M030DS0.PDF
 CH32M030,V_hys,Schmitt trigger voltage hysteresis,V_DD33 = 3.3V,,300,,mV,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,f_ADC,ADC clock frequency,,,,18,MHz,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
+CH32M030,f_s,Sampling speed,,1/72,,1/18,fADC,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,f_s,Sampling speed,f_ADC = 18MHz,250,,1000,kHz,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
 CH32M030,g_m,Transconductance of oscillator,Startup,,16,,mA/V,#,confirmed,CH32M030DS0.PDF:zh(p.28)+CH32M030DS0.PDF:en(p.34),CH32M030DS0.PDF
 CH32M030,t_CONV,Total conversion time (including sampling time),,18,,72,1/fADC,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
@@ -1103,7 +1111,7 @@ CH32M030,t_D,"Comparator delay, V INP varies from (V -100mV) to INN (V +100mV). 
 CH32M030,t_D,"Comparator delay, V INP varies from (V -100mV) to INN (V +100mV). INN",V = 1.2V INN,,30,,ns,#,confirmed,CH32M030DS0.PDF:zh(p.40)+CH32M030DS0.PDF:en(p.49),CH32M030DS0.PDF
 CH32M030,t_D,"Comparator delay, V INP varies from (V -10mV) to INN (V +10mV). INN",V = 1.2V INN,,40,,ns,#,confirmed,CH32M030DS0.PDF:zh(p.40)+CH32M030DS0.PDF:en(p.48),CH32M030DS0.PDF
 CH32M030,t_ME,Whole erase time,,3.9,4.5,5.1,ms,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.35),CH32M030DS0.PDF
-CH32M030,t_RET,Data retention period,,10,,,year,#,reference,CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
+CH32M030,t_RET,Data retention period,,10,,,year,#,confirmed,CH32M030DS0.PDF:zh(p.29)+CH32M030DS0.PDF:en(p.36),CH32M030DS0.PDF
 CH32M030,t_RST,Power-on reset delay,,,3,,ms,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_RST,Other reset delay,,,300,,us,#,confirmed,CH32M030DS0.PDF:zh(p.25)+CH32M030DS0.PDF:en(p.31),CH32M030DS0.PDF
 CH32M030,t_STAB,Power-on time,,,7,,us,#,confirmed,CH32M030DS0.PDF:zh(p.37)+CH32M030DS0.PDF:en(p.45),CH32M030DS0.PDF
@@ -1222,8 +1230,8 @@ CH32V002,I_HSE,HSE drive current,"HSE_LP = 0, 20p load",,1.6,,mA,#,confirmed,CH3
 CH32V002,I_HSE,HSE drive current,"HSE_LP = 1, 20p load",,0.8,,mA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
 CH32V002,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.28),CH32V002DS0.PDF
 CH32V002,I_lkg,Input leakage current,,,,1,uA,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
-CH32V002,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
-CH32V002,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
+CH32V002,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
+CH32V002,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
@@ -1263,6 +1271,7 @@ CH32V002,V_REFINT,Internal reference voltage,T_A = -40℃~85℃,1.18,1.2,1.22,V,
 CH32V002,V_hys,Schmitt trigger voltage hysteresis,,150,,,mV,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_S,Sampling rate,,0.06,,3,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
+CH32V002,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_TRIG,External trigger frequency,f_ADC = 16MHz,,,900,KHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,f_TRIG,External trigger frequency,f_ADC = 48MHz,,,2.7,MHz,#,confirmed,CH32V002DS0.PDF:zh(p.28)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V002DS0.PDF:zh(p.21)+CH32V002DS0.PDF:en(p.29),CH32V002DS0.PDF
@@ -1278,8 +1287,8 @@ CH32V002,t_Iat,Injection trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,con
 CH32V002,t_Iatr,Conventional trigger conversion delay,,,,2,1/fADC,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
 CH32V002,t_Iatr,Conventional trigger conversion,f_ADC = 16MHz,,,0.125,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.38),CH32V002DS0.PDF
 CH32V002,t_Iatr,Conventional trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
-CH32V002,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
-CH32V002,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
+CH32V002,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
+CH32V002,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,confirmed,CH32V002DS0.PDF:zh(p.23)+CH32V002DS0.PDF:en(p.31),CH32V002DS0.PDF
 CH32V002,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.25),CH32V002DS0.PDF
 CH32V002,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V002DS0.PDF:zh(p.19)+CH32V002DS0.PDF:en(p.25),CH32V002DS0.PDF
 CH32V002,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V002DS0.PDF:zh(p.29)+CH32V002DS0.PDF:en(p.39),CH32V002DS0.PDF
@@ -1325,6 +1334,8 @@ CH32V003,C,Recommended load capacitance and corresponding crystal series impedan
 CH32V003,C_ADC,Internal sample and hold capacitor,,,3,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,C_IO,I/O pin capacitance,,,5,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.31),CH32V003DS0.PDF
+CH32V003,C_MIR,Common mode input voltage,,0,,VDD,V,#,reference,CH32V003DS0.PDF:en(p.30),CH32V003DS0.PDF
+CH32V003,C_MRR,Common mode rejection ratio,@1KHz,,81,,dB,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.30),CH32V003DS0.PDF
 CH32V003,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V003DS0.PDF:zh(p.22)+CH32V003DS0.PDF:en(p.25),CH32V003DS0.PDF
 CH32V003,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
@@ -1432,7 +1443,7 @@ CH32V003,I_L,OSC_IN input leakage current,,,,±1,uA,#,confirmed,CH32V003DS0.PDF:
 CH32V003,I_LOAD,Drive current,,,,1.5,mA,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.30),CH32V003DS0.PDF
 CH32V003,I_lkg,Input leakage current,FT I/O port,,,3,uA,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
 CH32V003,I_lkg,Input leakage current,Standard I/O port,,,1,uA,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.23),CH32V003DS0.PDF
-CH32V003,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,reference,CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
+CH32V003,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
 CH32V003,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V003DS0.PDF:zh(p.18)+CH32V003DS0.PDF:en(p.21),CH32V003DS0.PDF
 CH32V003,R_LOAD,Resistive load,,4,,,kΩ,#,confirmed,CH32V003DS0.PDF:zh(p.27)+CH32V003DS0.PDF:en(p.31),CH32V003DS0.PDF
@@ -1501,7 +1512,7 @@ CH32V003,t_CONV,Total conversion time (including sampling time),f_ADC = 6 MHz,2.
 CH32V003,t_ERASE,Page (64 bytes) erase time,T_A = -20℃~85℃,2.4,,3.1,ms,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,t_ERASE_64,Page (64 bytes) programming time,T_A = -20℃~85℃,2.4,,3.1,ms,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,t_ME,Whole chip erase time,T_A = -20℃~85℃,2.4,,3.1,ms,#,confirmed,CH32V003DS0.PDF:zh(p.19)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
-CH32V003,t_RET,Data retention,,10,,,year,#,reference,CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
+CH32V003,t_RET,Data retention,,10,,,year,#,confirmed,CH32V003DS0.PDF:zh(p.20)+CH32V003DS0.PDF:en(p.22),CH32V003DS0.PDF
 CH32V003,t_RSTTEMPO,Power on reset,,1,1.5,21,mS,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.18),CH32V003DS0.PDF
 CH32V003,t_RSTTEMPO,Other resets,,,300,,uS,#,confirmed,CH32V003DS0.PDF:zh(p.15)+CH32V003DS0.PDF:en(p.18),CH32V003DS0.PDF
 CH32V003,t_STAB,Power-on time,,,7,,us,#,confirmed,CH32V003DS0.PDF:zh(p.25)+CH32V003DS0.PDF:en(p.29),CH32V003DS0.PDF
@@ -1634,7 +1645,7 @@ CH32V004,I_HSE,HSE drive current,"HSE_LP = 0, 20p load",,1.6,,mA,#,confirmed,CH3
 CH32V004,I_HSE,HSE drive current,"HSE_LP = 1, 20p load",,0.8,,mA,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
 CH32V004,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.23),CH32V004DS0.PDF
 CH32V004,I_lkg,Standard I/O input leakage current,,,,1,uA,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.26),CH32V004DS0.PDF
-CH32V004,N_END,Erase and write times,T_A = 25℃,100K,,,Time,#,reference,CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
+CH32V004,N_END,Erase and write times,T_A = 25℃,100K,,,Time,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,R_F,Feedback resistor (no external),,,250,,kΩ,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
@@ -1665,6 +1676,7 @@ CH32V004,V_hys,Standard I/O Schmitt trigger voltage hysteresis,,150,,,mV,#,confi
 CH32V004,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,f_S,Sampling rate,,0.06,,3,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,f_SCK,SPI clock frequency,Master mode,,,24,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.31),CH32V004DS0.PDF
+CH32V004,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,f_TRIG,External trigger frequency,f_ADC = 16MHz,,,900,KHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,f_TRIG,External trigger frequency,f_ADC = 48MHz,,,2.7,MHz,#,confirmed,CH32V004DS0.PDF:zh(p.27)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V004DS0.PDF:zh(p.20)+CH32V004DS0.PDF:en(p.24),CH32V004DS0.PDF
@@ -1681,7 +1693,7 @@ CH32V004,t_Iat,Injection trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,con
 CH32V004,t_Iatr,Conventional trigger conversion delay,,,,2,1/fADC,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_Iatr,Conventional trigger conversion delay,f_ADC = 16MHz,,,0.125,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
 CH32V004,t_Iatr,Conventional trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
-CH32V004,t_RET,Data retention period,,10,,,Year,#,reference,CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
+CH32V004,t_RET,Data retention period,,10,,,Year,#,confirmed,CH32V004DS0.PDF:zh(p.22)+CH32V004DS0.PDF:en(p.25),CH32V004DS0.PDF
 CH32V004,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V004DS0.PDF:zh(p.18)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
 CH32V004,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V004DS0.PDF:zh(p.18)+CH32V004DS0.PDF:en(p.21),CH32V004DS0.PDF
 CH32V004,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V004DS0.PDF:zh(p.28)+CH32V004DS0.PDF:en(p.32),CH32V004DS0.PDF
@@ -1832,8 +1844,8 @@ CH32V005;CH32V006,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32V006DS0
 CH32V005;CH32V006,I_LOAD,Drive current,R_LOAD = 4kΩ,,,1.4,mA,#,confirmed,CH32V006DS0.PDF:zh(p.37)+CH32V006DS0.PDF:en(p.53),CH32V006DS0.PDF
 CH32V005;CH32V006,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirmed,CH32V006DS0.PDF:zh(p.37)+CH32V006DS0.PDF:en(p.53),CH32V006DS0.PDF
 CH32V005;CH32V006,I_lkg,Input leakage current,,,,1,uA,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
-CH32V005;CH32V006,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,reference,CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
-CH32V005;CH32V006,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,reference,CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
+CH32V005;CH32V006,N_END,Erase and write times,T_A = 25℃,300K,,,Times,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
+CH32V005;CH32V006,N_END,Erase and write times,T_A = 70℃,100K,,,Times,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
 CH32V005;CH32V006,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,R_F,Feedback resistor (No external),,,250,,kΩ,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
@@ -1886,6 +1898,7 @@ CH32V005;CH32V006,V_REFINT,Internal reference voltage,T_A = -40℃~105℃,1.18,1
 CH32V005;CH32V006,V_hys,Schmitt trigger voltage hysteresis,,150,,,mV,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
 CH32V005;CH32V006,f_ADC,ADC clock frequency,,,16,48,MHz,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,f_S,Sampling rate,,0.06,,3,MHz,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
+CH32V005;CH32V006,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,f_TRIG,External trigger frequency,f_ADC = 16MHz,,,900,KHz,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,f_TRIG,External trigger frequency,f_ADC = 48MHz,,,2.7,MHz,#,confirmed,CH32V006DS0.PDF:zh(p.35)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,g_m,Oscillator transconductance,Startup,,21,,mA/V,#,confirmed,CH32V006DS0.PDF:zh(p.29)+CH32V006DS0.PDF:en(p.41),CH32V006DS0.PDF
@@ -1901,8 +1914,8 @@ CH32V005;CH32V006,t_Iat,Injection trigger conversion delay,f_ADC = 48MHz,,,0.042
 CH32V005;CH32V006,t_Iatr,Conventional trigger conversion delay,,,,2,1/fADC,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
 CH32V005;CH32V006,t_Iatr,Conventional trigger conversion delay,f_ADC = 16MHz,,,0.125,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
 CH32V005;CH32V006,t_Iatr,Conventional trigger conversion delay,f_ADC = 48MHz,,,0.042,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.50),CH32V006DS0.PDF
-CH32V005;CH32V006,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
-CH32V005;CH32V006,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
+CH32V005;CH32V006,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
+CH32V005;CH32V006,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,confirmed,CH32V006DS0.PDF:zh(p.30)+CH32V006DS0.PDF:en(p.43),CH32V006DS0.PDF
 CH32V005;CH32V006,t_RSTTEMPO,Other reset,,,300,,us,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.37),CH32V006DS0.PDF
 CH32V005;CH32V006,t_RSTTEMPO,Power-on reset,RST_MODE[1:0] = 11,,2,,ms,#,confirmed,CH32V006DS0.PDF:zh(p.26)+CH32V006DS0.PDF:en(p.37),CH32V006DS0.PDF
 CH32V005;CH32V006,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V006DS0.PDF:zh(p.36)+CH32V006DS0.PDF:en(p.51),CH32V006DS0.PDF
@@ -2048,6 +2061,7 @@ CH32V103,I_DD(LSI),LSI oscillator power consumption,,,0.6,,uA,#,confirmed,CH32V1
 CH32V103,I_DD_VBAT,"Supply current to the Backup domain (remove V and DD V , use only V power) DDA BAT",Typical current consumption in Stop and Standby mode; Low-speed external oscillator and RTC are on,,2.4,,uA,#,confirmed,CH32V103DS0.PDF:zh(p.23)+CH32V103DS0.PDF:en(p.25),CH32V103DS0.PDF
 CH32V103,I_TKey,Module operating mode,V_DD =3.3V,211,270,421,uA,#,confirmed,CH32V103DS0.PDF:zh(p.32)+CH32V103DS0.PDF:en(p.36),CH32V103DS0.PDF
 CH32V103,I_lkg,Input leakage current,,,,±1,uA,#,confirmed,CH32V103DS0.PDF:zh(p.26)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
+CH32V103,N_END,Endurance,T_A = 25℃,10K,80K,,Times,#,confirmed,CH32V103DS0.PDF:zh(p.26)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
 CH32V103,R_ADC,Sampling switch resistance,,,0.6,1.3,KΩ,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,R_AIN,External input impedance,,,,58,KΩ,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,R_PD,Weak pull-down equivalent group,,30,42,55,KΩ,#,confirmed,CH32V103DS0.PDF:zh(p.26)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
@@ -2102,6 +2116,7 @@ CH32V103,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,,,330,,mV,#,c
 CH32V103,V_prog,Programming voltage,,2.7,,5.5,V,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
 CH32V103,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,f_S,Sampling rate,,,,1,MHz,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
+CH32V103,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,f_TRIG,External trigger frequency,f_ADC = 14MHz,,,875,KHz,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,g_m,Oscillator transconductance,Startup,,13.5,,uA/V,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.27),CH32V103DS0.PDF
 CH32V103,g_m,Oscillator transconductance,Startup,,4.6,,mA/V,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.27),CH32V103DS0.PDF
@@ -2114,7 +2129,9 @@ CH32V103,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V
 CH32V103,t_Iat,Injected trigger conversion latency,f_ADC = 14MHz,,,0.143,us,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,t_Iatr,Regular trigger conversion latency,f_ADC = 14MHz,,,0.143,us,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
+CH32V103,t_LOCK,PLL lock time,,,,1000,1/FPLL_IN,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.28),CH32V103DS0.PDF
 CH32V103,t_ME,Mass erase time,T_A = -40℃~85℃,2.4,2.75,3.2,ms,#,confirmed,CH32V103DS0.PDF:zh(p.25)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
+CH32V103,t_RET,Data retention period,,10,,,Years,#,confirmed,CH32V103DS0.PDF:zh(p.26)+CH32V103DS0.PDF:en(p.29),CH32V103DS0.PDF
 CH32V103,t_RSTTEMPO,Reset duration,,16,,44,mS,#,confirmed,CH32V103DS0.PDF:zh(p.21)+CH32V103DS0.PDF:en(p.23),CH32V103DS0.PDF
 CH32V103,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V103DS0.PDF:zh(p.31)+CH32V103DS0.PDF:en(p.35),CH32V103DS0.PDF
 CH32V103,t_SU(HSE),Startup time,V_DD stabilization,,1,2,ms,#,confirmed,CH32V103DS0.PDF:zh(p.24)+CH32V103DS0.PDF:en(p.27),CH32V103DS0.PDF
@@ -2158,6 +2175,9 @@ CH32V203,C,Recommended load capacitance and corresponding crystal serial,R_S <70
 CH32V203,C,Recommended load capacitance and corresponding crystal series impedance RS,R_S =60Ω(1),,20,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V203DS0.PDF:zh(p.49)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
+CH32V203,C_MIR,Common mode input voltage,Compatible with ADC,0,,VDDA,V,#,confirmed,CH32V203DS0.PDF:zh(p.48)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
+CH32V203,C_MIR,Common mode input voltage,Incompatible with ADC,0,,3.3,V,#,confirmed,CH32V203DS0.PDF:zh(p.48)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
+CH32V203,C_MRR,Common mode rejection ratio,@1KHz,,96,,dB,#,confirmed,CH32V203DS0.PDF:zh(p.49)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
 CH32V203,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V203DS0.PDF:zh(p.45)+CH32V203DS0.PDF:en(p.53),CH32V203DS0.PDF
 CH32V203,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
@@ -2358,7 +2378,7 @@ CH32V203,I_L,OSC_IN input leakage current,,,,±1,uA,#,confirmed,CH32V203DS0.PDF:
 CH32V203,I_L,OSC32_IN input leakage current,,,,±1,uA,#,confirmed,CH32V203DS0.PDF:zh(p.38)+CH32V203DS0.PDF:en(p.45),CH32V203DS0.PDF
 CH32V203,I_LOAD,Drive current,,,,600,uA,#,confirmed,CH32V203DS0.PDF:zh(p.48)+CH32V203DS0.PDF:en(p.58),CH32V203DS0.PDF
 CH32V203,I_VREF,Reference current,,,160,220,uA,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
-CH32V203,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,reference,CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
+CH32V203,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,R_ADC,Sampling switch resistance,,,0.6,1,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
@@ -2420,6 +2440,7 @@ CH32V203,V_hys,Standard I/O pin Schmitt trigger,,150,,,mV,#,confirmed,CH32V203DS
 CH32V203,V_prog,Programming voltage,,2.4,,3.6,V,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,f_S,Sampling rate,,0.05,,1,MHz,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
+CH32V203,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.46),CH32V203DS0.PDF
 CH32V203,g_m,Oscillator transconductance,Startup,,25.3,,uA/V,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
 CH32V203,i_2,LSE drive current,VDD = 3.3V,,0.35,,uA,#,confirmed,CH32V203DS0.PDF:zh(p.39)+CH32V203DS0.PDF:en(p.47),CH32V203DS0.PDF
@@ -2428,7 +2449,7 @@ CH32V203,t_CONV,Total conversion time (including sampling time),,14,,252,1/fADC,
 CH32V203,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
 CH32V203,t_LOCK,PLL lock time,,,,200,us,#,confirmed,CH32V203DS0.PDF:zh(p.40)+CH32V203DS0.PDF:en(p.48),CH32V203DS0.PDF
-CH32V203,t_RET,Data retention,,20,,,year,#,reference,CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
+CH32V203,t_RET,Data retention,,20,,,year,#,confirmed,CH32V203DS0.PDF:zh(p.41)+CH32V203DS0.PDF:en(p.49),CH32V203DS0.PDF
 CH32V203,t_RSTTEMPO,Other resets,,8,10,30,mS,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_RSTTEMPO,Power on reset,,24,28,30,mS,#,confirmed,CH32V203DS0.PDF:zh(p.34)+CH32V203DS0.PDF:en(p.40),CH32V203DS0.PDF
 CH32V203,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V203DS0.PDF:zh(p.47)+CH32V203DS0.PDF:en(p.56),CH32V203DS0.PDF
@@ -2556,8 +2577,8 @@ CH32V203;CH32V205,I_L,OSC32_IN input leakage current,,,,±1,uA,#,confirmed,CH32V
 CH32V203;CH32V205,I_LOAD,Drive current,R_LOAD = 4kΩ,,,900,uA,#,confirmed,CH32V205DS0.PDF:zh(p.56)+CH32V205DS0.PDF:en(p.66),CH32V205DS0.PDF
 CH32V203;CH32V205,I_LOAD_PGA,PGA mode drive current,,,,500,uA,#,confirmed,CH32V205DS0.PDF:zh(p.56)+CH32V205DS0.PDF:en(p.66),CH32V205DS0.PDF
 CH32V203;CH32V205,I_REFP,V supply current REF+,,,175,,uA,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
-CH32V203;CH32V205,N_END,Endurance,T_A = 25℃,300K,,,Times,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
-CH32V203;CH32V205,N_END,Endurance,T_A = 85℃,100K,,,Times,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
+CH32V203;CH32V205,N_END,Endurance,T_A = 25℃,300K,,,Times,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
+CH32V203;CH32V205,N_END,Endurance,T_A = 85℃,100K,,,Times,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,R_ADC,Sampling switch resistance,,,0.2,,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,R_AIN,External input impedance,"For details, refer to Formula 1.",,,50,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V205DS0.PDF:zh(p.45)+CH32V205DS0.PDF:en(p.52),CH32V205DS0.PDF
@@ -2658,8 +2679,8 @@ CH32V203;CH32V205,t_D,Comparator delay. V_INP varies from (V_INN -100mV),0≤ V_
 CH32V203;CH32V205,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,t_LOCK,PLL lock time,,,80,200,us,#,confirmed,CH32V205DS0.PDF:zh(p.46)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
-CH32V203;CH32V205,t_RET,Data retention,T_A = 25℃,20,,,Years,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
-CH32V203;CH32V205,t_RET,Data retention,T_A = 85℃,10,,,Years,#,reference,CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
+CH32V203;CH32V205,t_RET,Data retention,T_A = 25℃,20,,,Years,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
+CH32V203;CH32V205,t_RET,Data retention,T_A = 85℃,10,,,Years,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,t_RSTTEMPO,Power on reset,,5,6.5,30,mS,#,confirmed,CH32V205DS0.PDF:zh(p.41)+CH32V205DS0.PDF:en(p.47),CH32V205DS0.PDF
 CH32V203;CH32V205,t_STAB,Sampling time,,,,1,us,#,confirmed,CH32V205DS0.PDF:zh(p.55)+CH32V205DS0.PDF:en(p.63),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(ADV_CLKH),FSMC_CLK high before FSMC_AD[15:0] valid data,,8,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.62)+CH32V205DS0.PDF:en(p.71),CH32V205DS0.PDF
@@ -2766,6 +2787,8 @@ CH32V208,C_ADC,Internal sample and hold capacitor,,,40,,pF,#,reference,CH32V208D
 CH32V208,C_ADC,Internal sample and hold,,,8,,pF,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,C_IO,I/O pin capacitance,,,5,,pF,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V208DS0.PDF:zh(p.38)+CH32V208DS0.PDF:en(p.44),CH32V208DS0.PDF
+CH32V208,C_MIR,Common mode input voltage,,0,,VDDA-0.9,V,#,confirmed,CH32V208DS0.PDF:zh(p.37)+CH32V208DS0.PDF:en(p.43),CH32V208DS0.PDF
+CH32V208,C_MRR,Common mode rejection ratio,@1KHz,,96,,dB,#,confirmed,CH32V208DS0.PDF:zh(p.37)+CH32V208DS0.PDF:en(p.43),CH32V208DS0.PDF
 CH32V208,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V208DS0.PDF:zh(p.33)+CH32V208DS0.PDF:en(p.39),CH32V208DS0.PDF
 CH32V208,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V208DS0.PDF:zh(p.26)+CH32V208DS0.PDF:en(p.31),CH32V208DS0.PDF
@@ -2888,7 +2911,7 @@ CH32V208,I_LOAD,Drive current,,,,600,uA,#,confirmed,CH32V208DS0.PDF:zh(p.37)+CH3
 CH32V208,I_VREF,Reference current,,,160,220,uA,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,I_lkg,Input leakage current,FT I/O port,,,3,uA,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,I_lkg,Input leakage current,Standard I/O port,,,1,uA,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
-CH32V208,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,N_END,Endurance,T_A = 25℃,10K,80K,,times,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,R_ADC,Sampling switch resistance,,,0.6,1,kΩ,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V208DS0.PDF:zh(p.27)+CH32V208DS0.PDF:en(p.32),CH32V208DS0.PDF
@@ -2962,6 +2985,7 @@ CH32V208,V_hys,FT I/O pin Schmitt trigger voltage hysteresis,,90,,,mV,#,referenc
 CH32V208,V_prog,Programming voltage,,2.4,,3.6,V,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,f_ADC,ADC clock frequency,,,,14,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,f_S,Sampling rate,,0.05,,1,MHz,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
+CH32V208,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.41),CH32V208DS0.PDF
 CH32V208,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32V208DS0.PDF:zh(p.27)+CH32V208DS0.PDF:en(p.32),CH32V208DS0.PDF
 CH32V208,g_m,Oscillator transconductance,Startup,,25.3,,uA/V,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.33),CH32V208DS0.PDF
 CH32V208,i_2,LSE drive current,VDD = 3.3V,,0.35,,uA,#,confirmed,CH32V208DS0.PDF:zh(p.28)+CH32V208DS0.PDF:en(p.33),CH32V208DS0.PDF
@@ -2969,7 +2993,7 @@ CH32V208,t_CONV,Total conversion time (including sampling time),,14,,252,1/fADC,
 CH32V208,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.42),CH32V208DS0.PDF
 CH32V208,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.42),CH32V208DS0.PDF
 CH32V208,t_LOCK,PLL lock time,,,,200,us,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.34),CH32V208DS0.PDF
-CH32V208,t_RET,Data retention,,20,,,year,#,reference,CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
+CH32V208,t_RET,Data retention,,20,,,year,#,confirmed,CH32V208DS0.PDF:zh(p.29)+CH32V208DS0.PDF:en(p.35),CH32V208DS0.PDF
 CH32V208,t_RSTTEMPO,Other resets,,8,10,30,mS,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
 CH32V208,t_RSTTEMPO,Power on reset,,24,28,30,mS,#,confirmed,CH32V208DS0.PDF:zh(p.24)+CH32V208DS0.PDF:en(p.28),CH32V208DS0.PDF
 CH32V208,t_STAB,Power-on time,,,,1,us,#,confirmed,CH32V208DS0.PDF:zh(p.36)+CH32V208DS0.PDF:en(p.42),CH32V208DS0.PDF
@@ -3019,6 +3043,9 @@ CH32V303;CH32V305;CH32V307;CH32V317,C,Recommended load capacitance and correspon
 CH32V303;CH32V305;CH32V307;CH32V317,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.81)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.82)+CH32V20x_30xDS0.PDF:en(p.92),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,C_MIR,Common mode input voltage,,0,,VDDA,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.81)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,C_MRR,Common mode rejection ratio,@1kHz,,96,,dB,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.81)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,C_MRR,Common mode rejection,@1kHz,,96,,dB,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.82)+CH32V20x_30xDS0.PDF:en(p.91),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.64)+CH32V20x_30xDS0.PDF:en(p.73),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.57)+CH32V20x_30xDS0.PDF:en(p.65),CH32V20x_30xDS0.PDF
@@ -3198,6 +3225,7 @@ CH32V303;CH32V305;CH32V307;CH32V317,f_ADC,ADC clock frequency,,,,14,MHz,#,confir
 CH32V303;CH32V305;CH32V307;CH32V317,f_MDC,MDC clock frequency,,,,2.5,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.76)+CH32V20x_30xDS0.PDF:en(p.85),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,f_PixCLK,Pixel clock input frequency,,,,144,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.75)+CH32V20x_30xDS0.PDF:en(p.85),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,f_S,Sampling rate,,0.05,,1,MHz,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
+CH32V303;CH32V305;CH32V307;CH32V317,f_TRIG,External trigger frequency,,,,16,1/fADC,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.78)+CH32V20x_30xDS0.PDF:en(p.87),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.58)+CH32V20x_30xDS0.PDF:en(p.66),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,g_m,Oscillator transconductance,Startup,,25.3,,uA/V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.67),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,i_2,LSE drive current,VDD = 3.3V,,0.35,,uA,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.59)+CH32V20x_30xDS0.PDF:en(p.67),CH32V20x_30xDS0.PDF
@@ -3337,6 +3365,7 @@ CH32V407;CH32V467,C,Recommended load capacitance and corresponding crystal serie
 CH32V407;CH32V467,C_ADC,Internal sample and hold capacitor,,,8,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,C_LOAD,Capacitive load,,,,30,pF,#,confirmed,CH32V407DS0.PDF:zh(p.69)+CH32V407DS0.PDF:en(p.78),CH32V407DS0.PDF
+CH32V407;CH32V467,C_MRR,Common mode rejection ratio,@1kHz,,96,,dB,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
 CH32V407;CH32V467,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32V407DS0.PDF:zh(p.54)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
 CH32V407;CH32V467,C_in(HSE),OSC_IN input capacitance,,,5,,pF,#,confirmed,CH32V407DS0.PDF:zh(p.48)+CH32V407DS0.PDF:en(p.56),CH32V407DS0.PDF
@@ -3425,12 +3454,13 @@ CH32V407;CH32V467,I_L,OSC_IN input leakage current,,,,±1,uA,#,confirmed,CH32V40
 CH32V407;CH32V467,I_L,OSC32_IN input leakage current,,,,±1,uA,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.56),CH32V407DS0.PDF
 CH32V407;CH32V467,I_LOAD,Drive current,,,,600,uA,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
 CH32V407;CH32V467,I_REFP,V supply current REF+,,,30,,uA,#,reference,CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
-CH32V407;CH32V467,N_END,Erase times,T_A = 25℃,50K,,,Times,#,reference,CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
+CH32V407;CH32V467,N_END,Erase times,T_A = 25℃,50K,,,Times,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,R_ADC,Sampling switch resistance,,,0.2,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.49)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,R_F,Feedback resistance,,,5,,MΩ,#,confirmed,CH32V407DS0.PDF:zh(p.50)+CH32V407DS0.PDF:en(p.57),CH32V407DS0.PDF
 CH32V407;CH32V467,R_LOAD,Resistive load,,4,,,kΩ,#,confirmed,CH32V407DS0.PDF:zh(p.68)+CH32V407DS0.PDF:en(p.77),CH32V407DS0.PDF
+CH32V407;CH32V467,R_TS,Measurement range of temperature,,-40,,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.66)+CH32V407DS0.PDF:en(p.75),CH32V407DS0.PDF
 CH32V407;CH32V467,T_A,Ambient temperature at work,,-40,,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
 CH32V407;CH32V467,T_J,Junction temperature,,-40,,105,℃,#,confirmed,CH32V407DS0.PDF:zh(p.45)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
 CH32V407;CH32V467,T_S_vrefint,ADC sampling time when reading the internal reference voltage,,8,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
@@ -3485,7 +3515,7 @@ CH32V407;CH32V467,t_CONV,Total conversion time (including sampling time),,14,,25
 CH32V407;CH32V467,t_Iat,Injected trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,t_Iatr,Regular trigger conversion latency,,,,2,1/fADC,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,t_LOCK,PLL lock time,,,40,90,us,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.58),CH32V407DS0.PDF
-CH32V407;CH32V467,t_RET,Data retention period,,20,,,Years,#,reference,CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
+CH32V407;CH32V467,t_RET,Data retention period,,20,,,Years,#,confirmed,CH32V407DS0.PDF:zh(p.51)+CH32V407DS0.PDF:en(p.59),CH32V407DS0.PDF
 CH32V407;CH32V467,t_RSTTEMPO,Other reset,,2,10,30,ms,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,t_RSTTEMPO,Power on reset,,16,28,30,ms,#,confirmed,CH32V407DS0.PDF:zh(p.46)+CH32V407DS0.PDF:en(p.52),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(ADV_CLKH),FSMC_CLK high before FSMC_AD[15:0] valid data,,8,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.61)+CH32V407DS0.PDF:en(p.70),CH32V407DS0.PDF
@@ -3591,6 +3621,7 @@ CH32X033;CH32X035,ACC_HSI,Accuracy of HSI oscillator (after calibration),TA = 0�
 CH32X033;CH32X035,C_ADC,Internal sample and hold capacitor,,,21,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,C_IO,Single I/O pin capacitor (without double I/O co-seal),,,5,,pF,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,C_LOAD,Capacitive load,,,,50,pF,#,confirmed,CH32X035DS0.PDF:zh(p.34)+CH32X035DS0.PDF:en(p.38),CH32X035DS0.PDF
+CH32X033;CH32X035,C_MRR,Common mode rejection ratio,@1kHz,,110,,dB,#,reference,CH32X035DS0.PDF:en(p.38),CH32X035DS0.PDF
 CH32X033;CH32X035,C_b,Capacitive load for each bus,Fast I2C,,,400,pF,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,C_b,Capacitive load for each bus,Standard I2C,,,400,pF,#,confirmed,CH32X035DS0.PDF:zh(p.29)+CH32X035DS0.PDF:en(p.32),CH32X035DS0.PDF
 CH32X033;CH32X035,DuCy_HSI,Duty cycle,,45,50,55,%,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
@@ -3631,8 +3662,8 @@ CH32X033;CH32X035,I_PD,PA0-PA15 pins weak pull-down current,V_DD = 5V,60,150,350
 CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 3.3V,12,30,65,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,I_PU,Standard I/O pin weak pull-up current,V_DD = 5V,25,60,140,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,I_lkg,Input leakage current,,-2,,2,uA,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,N_END,Number of erasures,T_A = 25℃,300K,,,Times,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,N_END,Number of erasures,T_A = 70℃,100K,,,Times,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,N_END,Number of erasures,T_A = 25℃,300K,,,Times,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,N_END,Number of erasures,T_A = 70℃,100K,,,Times,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,R_ADC,Sampling switch resistance,,0.5,0.6,1.5,kΩ,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,R_LOAD,Resistive load,,5,,,kΩ,#,confirmed,CH32X035DS0.PDF:zh(p.34)+CH32X035DS0.PDF:en(p.38),CH32X035DS0.PDF
 CH32X033;CH32X035,T_S_vrefint,ADC sampling time when reading the internal reference voltage,Slow sampling recommended,,,11,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.27),CH32X035DS0.PDF
@@ -3698,8 +3729,8 @@ CH32X033;CH32X035,t_CONV,Total conversion time (including sampling time),,17,,24
 CH32X033;CH32X035,t_D,Comparator delay. V varies from INP (V -100mV) to INN (V +100mV) change INN,0 ≤ VINN ≤ V_DD,,15,50,ns,#,confirmed,CH32X035DS0.PDF:zh(p.35)+CH32X035DS0.PDF:en(p.39),CH32X035DS0.PDF
 CH32X033;CH32X035,t_Iat,Injected trigger conversion latency,,,1,,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
 CH32X033;CH32X035,t_Iatr,Regular trigger conversion latency,,,1,,1/fADC,#,confirmed,CH32X035DS0.PDF:zh(p.33)+CH32X035DS0.PDF:en(p.36),CH32X035DS0.PDF
-CH32X033;CH32X035,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
-CH32X033;CH32X035,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,reference,CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,t_RET,Data retention period,T_A = 25℃,20,,,Years,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
+CH32X033;CH32X035,t_RET,Data retention period,T_A = 70℃,10,,,Years,#,confirmed,CH32X035DS0.PDF:zh(p.26)+CH32X035DS0.PDF:en(p.29),CH32X035DS0.PDF
 CH32X033;CH32X035,t_RSTTEMPO,Power on reset,,4,17,24,ms,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_RSTTEMPO,Other resets,,6,9,20,us,#,confirmed,CH32X035DS0.PDF:zh(p.24)+CH32X035DS0.PDF:en(p.26),CH32X035DS0.PDF
 CH32X033;CH32X035,t_SU(HSI),HSI oscillator startup stabilization time,,1.5,,3.5,us,#,confirmed,CH32X035DS0.PDF:zh(p.25)+CH32X035DS0.PDF:en(p.28),CH32X035DS0.PDF
@@ -3811,7 +3842,7 @@ CH32X305;CH32X315,I_DDK,"In Run mode, V supplies DDK current","In Run mode, usin
 CH32X305;CH32X315,I_L,XI input leakage current,,,,±1,uA,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,I_lkg,Input leakage current,FT I/O port,,,3,uA,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
 CH32X305;CH32X315,I_lkg,Input leakage current,Standard I/O port,,,1,uA,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
-CH32X305;CH32X315,N_END,Erase times,T_A = 25℃,50K,,,Times,#,reference,CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
+CH32X305;CH32X315,N_END,Erase times,T_A = 25℃,50K,,,Times,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
 CH32X305;CH32X315,R_ADC,Sampling switch resistance,,,0.6,1.5,kΩ,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,R_AIN,External input impedance,,,,50,kΩ,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,R_F,Feedback resistance,,,250,,kΩ,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
@@ -3859,6 +3890,7 @@ CH32X305;CH32X315,V_hys,Standard I/O pin Schmitt trigger voltage hysteresis,,,24
 CH32X305;CH32X315,f_ADC,ADC clock frequency,,,16,80,MHz,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,f_S,Sampling rate,,0.06,,5,MHz,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,f_TRIG,External trigger frequency,,,,4.4,MHz,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
+CH32X305;CH32X315,f_TRIG,External trigger frequency,,,,18,1/fADC,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,g_m,Oscillator transconductance,Startup,,17,,mA/V,#,confirmed,CH32X315DS0.PDF:zh(p.33)+CH32X315DS0.PDF:en(p.38),CH32X315DS0.PDF
 CH32X305;CH32X315,t_CAL,Calibration time,f_ADC = 16MHz,,,31.875,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,t_CONV,Total conversion time (including sampling time),,0.2,,3.188,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
@@ -3867,7 +3899,7 @@ CH32X305;CH32X315,t_Iat,Injection trigger conversion delay,,,,2,1/fADC,#,confirm
 CH32X305;CH32X315,t_Iat,Injection trigger conversion delay,f_ADC = 80MHz,,,0.025,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,t_Iatr,Normal trigger conversion delay,,,,2,1/fADC,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
 CH32X305;CH32X315,t_Iatr,Normal trigger conversion delay,f_ADC = 80MHz,,,0.025,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
-CH32X305;CH32X315,t_RET,Data retention period,,20,,,Years,#,reference,CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
+CH32X305;CH32X315,t_RET,Data retention period,,20,,,Years,#,confirmed,CH32X315DS0.PDF:zh(p.35)+CH32X315DS0.PDF:en(p.40),CH32X315DS0.PDF
 CH32X305;CH32X315,t_RSTTEMPO,Other reset,,2,20,30,ms,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,t_RSTTEMPO,Power on reset,,16,28,30,ms,#,confirmed,CH32X315DS0.PDF:zh(p.31)+CH32X315DS0.PDF:en(p.35),CH32X315DS0.PDF
 CH32X305;CH32X315,t_STAB,Power on time,f_ADC = 16MHz,,,1,us,#,confirmed,CH32X315DS0.PDF:zh(p.42)+CH32X315DS0.PDF:en(p.47),CH32X315DS0.PDF
