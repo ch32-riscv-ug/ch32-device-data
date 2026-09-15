@@ -463,6 +463,35 @@ def regeneration_coverage() -> list[str]:
     return out
 
 
+def workflow_ledger() -> list[str]:
+    """正本を commit する workflow が、凍結台帳を同じcommitに入れているか。
+
+    **人が触らずに変わる表**（`catalog/documents.csv`・`catalog/toolchains.csv`）を書く
+    自動化は、台帳を置いていくと**自分が作った変更で次のCIが赤くなる**。常時赤い検査は
+    読まれなくなるので、handoff はそれを決まりにしている。`update.yml` は守っていたが
+    `toolchains.yml` は守っておらず、その commit（`fdb0e20`）のずれが**無関係な資料
+    取り込みの走行で表面化**して、取り込みが動かした表と区別する手間が要った
+    （2026-09-15）。決まりを文章ではなく検査で持つ。
+    """
+    root = Path(__file__).resolve().parents[1]
+    flows = root / ".github" / "workflows"
+    if not flows.is_dir():
+        return []
+    # commit する段があり、そこで正本の置き場（か `-A`）を add している workflow。
+    adds = re.compile(r"git add\s+(-A\b|[^\n]*\b(?:catalog|evidence|index)/)")
+    out = []
+    for path in sorted(flows.glob("*.yml")):
+        text = path.read_text(encoding="utf-8")
+        if not adds.search(text):
+            continue
+        if "check_baseline.py --record" in text:
+            continue
+        out.append(f".github/workflows/{path.name}: 正本を commit するのに "
+                   "`check_baseline.py --record` を走らせていない"
+                   "——台帳が置いていかれ、次の走行が赤くなる")
+    return out
+
+
 def pin_numbering(t: dict) -> list[str]:
     """封装の公称 lead 数と、pins が持つ番号の連番が一致するか。
 
@@ -983,6 +1012,7 @@ def main() -> int:
     bad += shared_leads(t)
     bad += ordered_values(t)
     bad += timer_channels(t)
+    bad += workflow_ledger()
     # 封装の公称 lead 数と番号の連番。pin 表とは別の出所で読みを測る。
     bad += pin_numbering(t)
 

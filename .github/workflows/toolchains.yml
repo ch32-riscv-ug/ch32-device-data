@@ -48,11 +48,25 @@ jobs:
       - name: Check table joins
         run: python tools/check_tables.py
 
+      # The freeze ledger follows the table in the same commit, for the same
+      # reason the catalogue job re-records it: toolchains.csv is written here
+      # without a person touching the repository, so a ledger left behind turns
+      # check.yml red on the next push for a change this job made itself -- and
+      # a check that is always red stops being read.
+      # (Found 2026-09-15: this job's commit fdb0e20 had bumped a tool version
+      # and left the ledger behind, and the failure first surfaced in an
+      # unrelated source-intake run, where it had to be told apart from the
+      # tables that intake really moved.)
+      # 台帳は同じcommitに入れる。この表は人が触らずに変わるので、置いていくと
+      # **自分が作った変更で次のCIが赤くなる**。update.yml と同じ考え。
+      - name: Re-record the freeze ledger for the table this job moved
+        run: python tools/check_baseline.py --record
+
       - name: Commit changes
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add catalog/toolchains.csv
+          git add catalog/toolchains.csv pipeline/baseline/tables.csv
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
