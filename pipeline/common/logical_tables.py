@@ -1727,6 +1727,44 @@ def rebuild_from_glyphs(table: dict, names: set[str], chars) -> int:
     return fixed
 
 
+def _indexed_run(table: dict, bases: set[str]) -> set[tuple[int, int]]:
+    """**索引の連番が揃っている行のセル**の (row, column)。それ自体が正しいので触らない。
+
+    `flat == base + そのセルの列のbit番号` という歯止めは**1bit幅のセルにしか効かない**
+    ——`AFIO_EXTICR` は1フィールドが2bitを占めるので列のbit番号が引けず（`EXTI10` は
+    bit21:20）、記述表も `EXTI0`・`EXTIx` としか綴らないために `EXTI10` が
+    「左隣の `1` を借りた `EXTI0`」に見えてしまう。行を見れば決まる——
+    `EXTI15 EXTI14 EXTI13 EXTI12 EXTI11 EXTI10 EXTI9 EXTI8` と**公差1で並んでいる**。
+
+    >>> cells = [{"row_start": 1, "column_start": c, "column_end": c + 2,
+    ...           "text": f"EXTI{15 - i}"} for i, c in enumerate(range(0, 16, 2))]
+    >>> sorted(_indexed_run({"cells": cells}, {"EXTI"}))[:3]
+    [(1, 0), (1, 2), (1, 4)]
+    >>> _indexed_run({"cells": [{"row_start": 1, "column_start": 0,
+    ...                          "column_end": 1, "text": "EXTI7"}]}, {"EXTI"})
+    set()
+    """
+    rows: dict[int, list[tuple[int, str, int]]] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] < 1:
+            continue
+        text = (cell.get("text") or "").replace("\n", "").strip()
+        found = re.fullmatch(r"([A-Za-z][A-Za-z_]*)(\d+)", text)
+        if found and found.group(1) in bases:
+            rows.setdefault(cell["row_start"], []).append(
+                (cell["column_start"], found.group(1), int(found.group(2))))
+    safe: set[tuple[int, int]] = set()
+    for row, found in rows.items():
+        for base in {b for _, b, _ in found}:
+            same = sorted((c, n) for c, b, n in found if b == base)
+            if len(same) < 2:
+                continue
+            steps = {b[1] - a[1] for a, b in zip(same, same[1:])}
+            if steps <= {1} or steps <= {-1}:
+                safe |= {(row, c) for c, _ in same}
+    return safe
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -1759,8 +1797,12 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         head = (cell.get("text") or "").replace("\n", "").strip()[:1]
         if head.isalpha():
             heads[head] = heads.get(head, 0) + 1
+    # 索引が連番で揃っている行のセルは、それ自体が正しい（`_indexed_run`）。
+    settled = _indexed_run(table, bases)
     fixed = 0
     for cell in table["cells"]:
+        if (cell["row_start"], cell["column_start"]) in settled:
+            continue
         # 判定は**描画後の形**で行う——`apply_bitfield`の連結は改行を残すことがあり
         # （`HSYNCS\nCS`）、`cell_html`が識別子として地続きに繋いで`HSYNCSCS`になる。
         flat = (cell.get("text") or "").replace("\n", "").strip()
@@ -1816,8 +1858,13 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         # 認めない——末尾を落とすだけの関係は交錯の形ではなく、この例では記述表のName列が
         # 折り返しで`M`を落としていて図のほうが正しかった。
         if not candidates:
-            edges = "".join(ch for ch in _touching_glyphs(table, cell)
-                            if ch.isalpha())
+            # 借りる字は**数字も許す**。当初は「数字を借りると索引が変わる」と
+            # 英字だけに絞っていたが、それは `EXTI10`→`EXTI0` を止めるためで、いまは
+            # `_indexed_run` が行の連番で直に守る。全corpus実測（2026-09-15）: 数字も
+            # 許すと6セルが直り（`5IACTS14`→`IACTS14` ほか3・`PEND9 SET8`→`PENDSET8` 2・
+            # `MR2 M98`→`MR28`）、壊れるのは `EXTI10` の2件だけで、それは `_indexed_run`
+            # が止める。
+            edges = "".join(_touching_glyphs(table, cell))
             if edges:
                 candidates = [n for n in survivors(edges)
                               if not flat.replace(" ", "").startswith(n)]
