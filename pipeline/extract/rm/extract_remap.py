@@ -60,7 +60,11 @@ import signal_vocabulary  # noqa: E402
 # 名前の末尾に数字が付くことがある——2レジスタに割れた field の高位半分
 # （CH32V407 の `USART1_RM1`）。`_RM` だけを要求すると高位の行が見えず、
 # 列の値が低位ビットだけになる。
-COLUMN_HEADER = re.compile(r"(?P<field>[A-Z0-9]+(?:_[A-Z0-9]+)*_RM\d?)=(?P<value>[01xX]+)")
+# field は**英字で始まる**。数字も許すと、同じセルに前の条件が続くとき
+# （`DVPEN=1DVP_RM=0默认映射`）その `1` を巻き込んで `1DVP_RM` という在りもしない
+# field を作る（2026-09-15、下の緩和で露出）。全corpus実測: 数字で始まる field は0。
+COLUMN_HEADER = re.compile(
+    r"(?P<field>[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*_RM\d?)=(?P<value>[01xX]+)")
 # What the grid calls its first column. A continuation page does not repeat it.
 ROW_LABEL_HEADING = frozenset({"复用功能", "复用功能（1）", "复用功能(1)",
                                "Alternatefunction", "AlternateFunction", "AF"})
@@ -122,7 +126,15 @@ def read_header(row: list[str]) -> list[tuple[str, list[int]] | None] | None:
             continue
         found = COLUMN_HEADER.findall(text)
         if not found:
-            return None
+            # **読めない列は、その列だけ落とす。** 見出しに1つでも `*_RM=値` でない
+            # 列があると表ごと捨てていたが、CH32V407 の DVP/SDIO の格子は
+            # `DVP_RM=0 默认映射｜DVPEN=1&USBHS1EN=1&RB_UD_RST_SIE=0｜DVP_RM=1 重映射`
+            # のように**3列のうち2列は普通の `*_RM`** で、1列だけが論理積の条件
+            # （F-61）。表ごと捨てると読める2列まで失う。論理積の列は `(field, value)`
+            # で表せないので**読まない**（そこに経路を出さない）——落とすのであって
+            # 推測はしない。空セルと同じ `None` にすれば本文の列は揃ったままになる。
+            columns.append(None)
+            continue
         if len(found) == 1:
             field, value = found[0]
             columns.append((field, expand(value)))
