@@ -258,18 +258,66 @@ def merge_cells(zh: dict, en: dict, remap: dict | None = None) -> dict:
     return merged
 
 
+def pair_dissent(only_zh: set, only_en: set) -> list[tuple[tuple, tuple, str]]:
+    """片版だけの機能を対にする——**同じ pad で両版が違うことを言っている**組。
+
+    **signal を先に合わせる。** 機能の identity は名前のほうで、AF 番号はその値だから
+    ——`CH32H417DS0` の中文版 V1.9 は `PE14` の `LTDC_CLK` を AF13→AF14、`SDRAM_A3` を
+    AF14→AF15 と**それぞれ1つずつ繰り上げた**（挿入ではない。両版のセルを読んで確認）。
+    route を先に見ると、zh の `LTDC_CLK(AF14)` が en の `SDRAM_A3(AF14)` と当たって
+    「AF14 の機能名が変わった」という**在りもしない食い違い**になる。
+    名前で当たらないものだけ route で当てる（`PB13` の af-11 は zh `QSPI2_SIOX2`・
+    en `QSPI2_SIOX0` で、名前では当たらない）。
+
+    >>> pair_dissent({("LTDC_CLK", "af-14")}, {("LTDC_CLK", "af-13")})
+    [(('LTDC_CLK', 'af-14'), ('LTDC_CLK', 'af-13'), 'route')]
+    >>> pair_dissent({("QSPI2_SIOX2", "af-11")}, {("QSPI2_SIOX0", "af-11")})
+    [(('QSPI2_SIOX2', 'af-11'), ('QSPI2_SIOX0', 'af-11'), 'signal')]
+    >>> pair_dissent({("A", "af-1")}, {("B", "af-2")})
+    []
+    """
+    pairs = []
+    left_zh, left_en = set(only_zh), set(only_en)
+    for index, field in ((0, "route"), (1, "signal")):
+        for fn in sorted(left_zh):
+            same = [o for o in left_en if o[index] == fn[index]]
+            # **1つに決まるときだけ採る。** 候補が複数なら、どちらの行の話かを
+            # 決める根拠が無い（推測になる）ので片版の `reference` のまま残す。
+            if len(same) != 1:
+                continue
+            left_zh.discard(fn)
+            left_en.discard(same[0])
+            pairs.append((fn, same[0], field))
+    return pairs
+
+
 def merge_function_sets(zh: dict, en: dict) -> dict:
     """Cross-edition judgement per (tkey, cvar, pad): {(signal, route): (conf, basis)}."""
     merged: dict = {}
     for key in set(zh) | set(en):
         zh_set, en_set = zh.get(key, set()), en.get(key, set())
         entry = {}
-        for fn in zh_set | en_set:
-            in_zh, in_en = fn in zh_set, fn in en_set
-            conf = "confirmed" if in_zh and in_en else "reference"
-            basis = "+".join(s for s, hit in
-                             (("pin-table:zh", in_zh), ("pin-table:en", in_en)) if hit)
-            entry[fn] = (conf, basis)
+        for fn in zh_set & en_set:
+            entry[fn] = ("confirmed", "pin-table:zh+pin-table:en")
+        # **同じ pad で両版が違うことを言っている組は `conflict`。** 出すのは原典
+        # （中文版）の読みで、英語版の言い分は `basis` に `!` 付きで残す——資料が
+        # 食い違っているので、どちらかを黙って捨てない。全corpus実測（2026-09-15）:
+        # 27組で全部 `CH32H417DS0`（英語版がまだ改版されていないため）。中文版が
+        # 正しいことは版面で裏が取れる——英語版のままだと `QSPI2_SIOX0` が `PB11` と
+        # `PB13` の**両方**に af-11 で載る（zh なら PB11〜PB14 が SIOX0〜3 の連番）。
+        only_zh, only_en = zh_set - en_set, en_set - zh_set
+        paired_en = set()
+        for fn, other, field in pair_dissent(only_zh, only_en):
+            said = other[0] if field == "signal" else other[1]
+            named = ":signal" if field == "signal" else ""
+            entry[fn] = ("conflict",
+                         f"pin-table:zh+!pin-table:en{named}(={said})")
+            only_zh = only_zh - {fn}
+            paired_en.add(other)
+        for fn in only_zh:
+            entry[fn] = ("reference", "pin-table:zh")
+        for fn in only_en - paired_en:
+            entry[fn] = ("reference", "pin-table:en")
         merged[key] = entry
     return merged
 
