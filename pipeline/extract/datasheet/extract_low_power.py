@@ -360,6 +360,19 @@ def fold_page_continuations(grid: list[list[str | None]], row_pages: list[int],
     切れ、p100の行は`…held)`だけになる（operating_conditionsで101行の括弧不対応）。
     記号列が空（同じ記号ブロックの継続）で、上の直近の非空セルから`_continues`と
     判定できる列だけ繋ぐ。繋いだ数を返す。
+
+    `_continues`は綴りの見分けなので、**続きなのに続きに見えない**形がある
+    （F-71。`Runs on the … (HSI).`＋`Uses HB prescaler to reduce the frequency.` は
+    上が`.`で終わり下が大文字で始まる）。ページ境界に限って、綴りに拠らない
+    2つの根拠を足した:
+
+    - **値を1つも持たない行は行ではない**（`tail_only`）。続き断片の先頭行が上の行の
+      各セルの尻尾だけを載せることがあり（`Supply current in`＋`STOP mode 2(2)`、
+      `只开启`＋`LSI`）、データ行になれない以上、非空セルは上のセルの続きしかない
+    - **まだ閉じていない rowspan のセルはページをまたぐ**（`open_rowspan`）。
+      項目名の列が続きだと分かった行は同じ塊の中にいるので、そこで上のセルが
+      2行以上に跨っている条件列も続き。**自分の行だけを覆うセル**
+      （`F = 8MHz HCLK` のような行ごとの条件）は跨っていないので当たらない
     """
     columns = [schema["parameter"], *schema["conditions"]]
     symbol = schema["symbol"]
@@ -380,6 +393,9 @@ def fold_page_continuations(grid: list[list[str | None]], row_pages: list[int],
         # 列は、pdfplumberがrowspanセルを行ごとに割ると`Accuracy of HSI oscillator (after`＋
         # `calibration)`のように値のある行へ続きが落ちるので、**上が括弧未閉じのときだけ**繋ぐ。
         targets = columns if (boundary or not has_values) else [schema["parameter"]]
+        tail_only = boundary and not has_values
+        # 項目名の列を先に見る（`columns`の先頭）ので、条件の列を見るときには決まっている。
+        continued_block = False
         for c in targets:
             if c >= len(row) or not (row[c] or "").strip():
                 continue
@@ -388,7 +404,10 @@ def fold_page_continuations(grid: list[list[str | None]], row_pages: list[int],
                 s -= 1
             if s < 0:
                 continue
-            if not boundary and has_values:
+            open_rowspan = boundary and continued_block and s < r - 1
+            if tail_only or open_rowspan:
+                pass
+            elif not boundary and has_values:
                 if not (_unbalanced(grid[s][c] or "") and not (row[c] or "").strip()[:1].isupper()):
                     continue
             elif not _continues(grid[s][c], row[c], strict=not boundary):
@@ -396,6 +415,8 @@ def fold_page_continuations(grid: list[list[str | None]], row_pages: list[int],
             grid[s][c] = (grid[s][c] or "").rstrip() + "\n" + (row[c] or "").strip()
             row[c] = None
             folded += 1
+            if c == schema["parameter"]:
+                continued_block = True
     return folded
 
 

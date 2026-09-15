@@ -320,14 +320,20 @@ def read_row_layout(rows: list[list[str]]) -> list[dict] | None:
                             if r and MODEL.match(identifier(r[0]))) < 2:
         return None
     width = max(len(r) for r in rows)
-    # 見出しは縦に何段か重なる。**最後の段が見出しそのもので、その上は群の名前。**
-    # 繋いだ文字列だけを持つと `Communication interface CAN` の
-    # `Communication interface` を後から剥がせない（worklist の F-20）。
+    # 見出しは縦に何段か重なる。
     stacks = [[rows[j][c] for j in range(first) if c < len(rows[j]) and rows[j][c]]
               for c in range(width)]
     # 段の切れ目のハイフン（`General-`／`purpose timer`）は語の折り返し——wrap_rules で繋ぐ
     labels = [wrap_rules.join_lines(stack).strip() or f"col{c}" for c, stack in enumerate(stacks)]
-    groups = [wrap_rules.join_lines(stack[:-1]).strip() for stack in stacks]
+    # **この並びに群は無い**（G13）。型番が行の表では属性は**列**で、段は1つのセルの
+    # 折り返しでしかない——「最後の段が見出し・その上は群」と読むと、折り返し位置が
+    # 変わるたびに表示名が変わる（`CH32X035DS0.en` V2.3 で `Type-C Source Sink`／`DRP`
+    # が `Type-C Source`／`Sink DRP` に動き、README の行名が `DRP` → `Sink DRP` と
+    # 化けた）。全corpus実測: この並びで出る「群」は50種あって**全部が折り返しの
+    # 上半分**（`看 门`／`看 门 狗`、`Code`／`Code FLASH`、`Serial`／`Serial port`）で、
+    # 本物の群は1つも無い。`Communication interface CAN` のような本物は
+    # `read_column_layout` 側——あちらの段は**別々のラベル列**で、本物の階層。
+    groups = [""] * width
     products: list[dict] = []
     carried: list[str] = [""] * width
     for row in rows[first:]:
