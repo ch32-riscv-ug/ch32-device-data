@@ -398,10 +398,24 @@ its grid would otherwise claim SDIO and DVP for CH32V203/V208, which have neithe
 published for a series only when `pin_functions.csv` carries every pad the grid names for it --
 all of them or none, so a listed signal always keeps at least two conditions to choose between.
 
-The same facts are also in `errata.csv` as prose, from the datasheet notes
-(`v30x-sdio-d0d1-default-map` and five siblings), including the lot-number ranges the manual's
-grid does not mention. The two agree; they are not yet joined, so `basis` here names only the
-reference manual.
+**The datasheet says the same thing in prose, and is read as a second source.** Its notes run
+`the default mapping of SDIO_D0 and SDIO_D1 is automatically changed to PB14 and PB15`, with the
+bits in the first half of the same sentence (`bit[14]ETHMACEN=1 and bit[10]SDIOEN=1`; CH32V407's
+English edition writes `bit [14] (ETHMACEN) and bit [10] (SDIOEN) ... are both set to 1`). A note
+is added to `basis` as `ds:<lang>(...)` only when the signal, the pad **and the set of condition
+terms** all match -- the order of the terms differs between documents, so they are compared as
+sets. Three notes (`I2S3_SD`, `I2S3_MCK`, `SPI3_MOSI`) state the condition as prose rather than
+bits ("if 10M Ethernet and I2S3 are used at the same time") and so corroborate nothing.
+
+**`errata` names the lot-number qualification, when there is one.** Only the datasheet says that
+the automatic change applies to some lots and not others, and `errata.csv` already holds those
+ranges in one normalised spelling, so this column carries that row's `id` rather than repeating
+the range. Which errata row is decided the same way `scan_errata` decides it -- the errata's
+`match` regex against `<mirror-relative path> <note>` -- and then narrowed to errata rows whose
+`series` names this row's series. A row with a note but no `errata` id has no lot qualification
+recorded: CH32V407's notes state no lot range at all, and for CH32V317 the errata rows do not
+name that series even though the datasheet is titled for it (`v30x-vio-min-1v2` does name V317,
+so the omission may be deliberate; it is left for a person to settle).
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 

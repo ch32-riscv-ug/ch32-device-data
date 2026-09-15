@@ -400,10 +400,25 @@ signal の pad が、AFIO の重映射 field ではなく**どの周辺を有効
 その格子がその signal について挙げる pad を `pin_functions.csv` が**全部**載せている
 series にだけ出すので、載っている signal は必ず条件を2つ以上持ちます。
 
-同じ事実は `errata.csv` にも散文で入っています（datasheet の注記から採った
-`v30x-sdio-d0d1-default-map` ほか6件。格子が書いていない**批号の範囲**まで持つ）。
-内容は一致しますが**出所としてはまだ結んでいない**ので、ここの `basis` は
-application manual だけを名乗ります。
+**datasheet が同じことを散文で言っていて、2つ目の資料として読んでいます。**
+注記は `SDIO_D0和SDIO_D1默认映射自动改到PB14和PB15`／`the default mapping of SDIO_D0
+and SDIO_D1 is automatically changed to PB14 and PB15` の形で、条件は同じ文の前半に
+あります（`bit[14]ETHMACEN=1与bit[10]SDIOEN=1`。`CH32V407DS0` の英語版だけは
+`bit [14] (ETHMACEN) and bit [10] (SDIOEN) … are both set to 1`）。`basis` に
+`ds:<言語>(…)` を足すのは、**signal・pad・条件の項の集合が全部一致したときだけ**です
+——項の順は資料で違うので集合で比べます。3つの注記（`I2S3_SD`・`I2S3_MCK`・
+`SPI3_MOSI`）は条件をビットで書かず「10M以太网とI2S3を同時に使うと」と書くので、
+裏付けにはなりません。
+
+**`errata` 列は、ロット依存があるときその行の `id` を指します。** 「自動で変わるのは
+一部の批号だけ」と言っているのは datasheet だけで、その範囲は `errata.csv` が正規化して
+1箇所に持っているので、範囲そのものは写さず `id` で繋ぎます。どの errata の行かは
+`scan_errata` と同じ契約で決め（`match` を `<mirror相対パス> <注記>` に当てる）、さらに
+**その errata が行の series を名指していること**で絞ります。注記が付いているのに `errata`
+が空な行は、ロットの条件が記録されていないという意味です——`CH32V407DS0` の注記には
+そもそも批号の条件が無く、`CH32V317` は datasheet の表題が `CH32V303/305/307/317` なのに
+errata の `series` が名指していません（`v30x-vio-min-1v2` だけは V317 を含むので、
+**除外が意図的かは人が決める話**として残してあります）。
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 

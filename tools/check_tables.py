@@ -645,6 +645,11 @@ def pin_conditions_sane(t: dict) -> list[str]:
     - pad は `P<港><番号>` か空（空＝資料が「その条件では使えない」と書いている）
     - **pin 表が裏付ける**: pad があれば (signal, pad) が、無ければ signal が、
       その series の `pin_functions` に在ること
+    - `errata` が空か、`errata.csv` に在る `id` で、**その errata がこの series を
+      名指している**こと（`match` は文書を限定しない綴りなので、当てるだけだと
+      `v30x-dvp-d5-default-map` が CH32V407 の注記にも当たる）
+    - `errata` が入るのは**注記が裏付けた行だけ**（`basis` に `ds:` を持つ行）——
+      ロットの条件は「自動で pad が変わる」という注記に付くもので、既定側には付かない
     """
     series_of = {r["part_number"]: r["series"] for r in t["products"]}
     pairs: dict[str, set] = collections.defaultdict(set)
@@ -654,6 +659,7 @@ def pin_conditions_sane(t: dict) -> list[str]:
         if series:
             pairs[series].add((r["signal"], r["pad"]))
             signals[series].add(r["signal"])
+    errata_series = {r["id"]: set(r["series"].split(";")) for r in t["errata"]}
     out: list[str] = []
     seen: set[tuple[str, str, str]] = set()
     per_signal: dict[tuple[str, str], int] = collections.Counter()
@@ -677,6 +683,15 @@ def pin_conditions_sane(t: dict) -> list[str]:
         if not backed:
             out.append(f"pin_conditions: {where} の pad {r['pad'] or '(なし)'} を "
                        "その series の pin_functions が裏付けない")
+        if r["errata"]:
+            if r["errata"] not in errata_series:
+                out.append(f"pin_conditions: {where} の errata {r['errata']!r} が errata.csv にない")
+            elif r["series"] not in errata_series[r["errata"]]:
+                out.append(f"pin_conditions: {where} の errata {r['errata']} は "
+                           "この series を名指していない")
+            if "ds:" not in r["basis"]:
+                out.append(f"pin_conditions: {where} に errata が付いているが、"
+                           "datasheet の注記が裏付けていない（`basis` に `ds:` が無い）")
     for (series, signal), count in sorted(per_signal.items()):
         if count < 2:
             out.append(f"pin_conditions: {series} の {signal} の条件が1つしかない"
