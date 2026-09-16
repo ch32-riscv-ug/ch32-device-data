@@ -691,8 +691,11 @@ def pinout_reference(data: Data, family: str) -> list[str]:
     """ピン配置図はデータシートの中にある。READMEには並べず、
     どのパッケージがどの型番のものかだけを示して原典へ送る。
 
-    画像として切り出す仕組み（tools/extract_images.py）はあるが、切り出し
-    品質の調整が済むまで生成物は使わない。
+    画像として切り出す仕組み（tools/extract_images.py）はあるが、生成物は
+    まだ使わない。**切り出し品質は2026-09-16に閉じた**（worklist C1。133枚で
+    切れている画像0・名前と版面の見出しの食い違い0）ので、残るのは採否の判断
+    ——構成図が27シリーズ中10枚しかないこと（C3）と、画像をミラー側
+    リポジトリに置く運用のほう。
     """
     import check_images
     package_of = {p["part_number"]: p["package"] for p in data.products}

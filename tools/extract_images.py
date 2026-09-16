@@ -476,16 +476,20 @@ def expand_label(label, parts_by_series):
 
 
 def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
-                 required=None, lead_of_name=None):
+                 required=None, lead_of_name=None, done=None):
     """ピン配置章の図。
 
     見出しの置き方がデータシートごとに違う（図の上に置く版、下に置く版、
     1行に2つ横並びで置く版）ため、**先に図の塊を検出**してから、縦に最も
     近い見出しを対応付ける。横並びは、同じ塊に複数の見出しがぶら下がる形で
     現れるので、見出しのx位置の中間で塊を割る。
+
+    ``done`` は**文書をまたいで持ち回る**。同じピン配置を複数のデータシートが
+    描くことがあり（`CH32V002F4P6` の TSSOP20 は V002・V004・V006 の3冊にある）、
+    文書ごとに持つと**あとの文書が代表型番の図を上書きしてしまう**。
     """
     inside = False
-    done = {}            # ファイル名 → 代表型番の図で作ったか
+    done = {} if done is None else done   # (family, ファイル名) → 代表型番の図か
     lead_of_name = lead_of_name or {}
 
     # 1周目: ピン配置章のページから、図の塊と見出しを集める。
@@ -511,7 +515,8 @@ def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
                                  if h not in hits]
                     if hits:
                         labels.append((w["top"], w["bottom"],
-                                       (w["x0"] + w["x1"]) / 2, hits))
+                                       (w["x0"] + w["x1"]) / 2, hits,
+                                       w["text"]))
                         label_rects.append((w["x0"], w["top"],
                                             w["x1"], w["bottom"]))
         if labels:
@@ -585,6 +590,10 @@ def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
                 per_piece[index2].append(label)
 
             owned = {}
+            # 版面に刷られている見出しそのもの。`hits` は展開後の型番なので、
+            # 出力を見て「名前と図の見出しが合っているか」を確かめるには原文が要る
+            # （`CH32V103Cx` は C6T6・C8T6・C8U6 の3つに展開される）。
+            printed = {tuple(label[3]): label[4] for label in near}
             for index2, piece in enumerate(pieces):
                 mine = sorted(per_piece[index2], key=lambda l: l[2])
                 if not mine:
@@ -622,12 +631,14 @@ def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
                     # ら、先に作ったものを差し替える（名前と図中の型番が
                     # 食い違わないようにする）。
                     is_lead = lead_of_name.get(name) in parts
-                    if name in done and (done[name] or not is_lead):
+                    key = (family, name)
+                    if key in done and (done[key] or not is_lead):
                         continue
                     dest = MIRRORS / family / "image" / name
                     if save_crop(page, bbox, dest, dry_run):
-                        out.append((dest, f"p.{page.page_number} {parts[0]}"))
-                        done[name] = is_lead
+                        out.append((dest, f"p.{page.page_number} "
+                                          f"{printed[parts]}"))
+                        done[key] = is_lead
     return done
 
 
@@ -700,6 +711,8 @@ def main():
                 if path.exists():
                     path.unlink()
 
+    # 代表型番の図で作ったかは**文書をまたいで**覚える（find_pinouts の docstring）。
+    pinout_done: dict = {}
     for (family, datasheet), ds_series in sorted(series_of_datasheet.items()):
         if args.family and family != args.family:
             continue
@@ -716,7 +729,7 @@ def main():
             if "pinout" in kinds:
                 find_pinouts(pdf, group_of_part, parts_by_series, written,
                              args.dry_run, family, need.get(family),
-                             lead_of_name)
+                             lead_of_name, pinout_done)
             if "package" in kinds:
                 find_packages(pdf, packages, written, args.dry_run)
         print(f"== {family}/{datasheet}: {len(written)} 枚")
