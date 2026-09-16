@@ -772,7 +772,7 @@ def fill_rowspans(record: dict, cols: list) -> list[list]:
     写すのは**min/typ/max の欄だけ**。記号と項目名は呼ぶ側が自前で継いでいて（継ぎ方が
     違う——記号は空欄なら前の行、項目名は空欄でなければ更新）、ここで写すと二重になる。
     """
-    rows = [list(r) for r in record["extracted_rows"]]
+    rows = [list(r) for r in repaired_description(record, cols)]
     head = sorted((c for c in record["cells"] if c["row_start"] == 0),
                   key=lambda c: c["column_start"])
     if len(head) != len(cols) or not rows:
@@ -884,6 +884,51 @@ def mode_body(rows: list[list], names: list[str]) -> list[list]:
             if len(raw) < 7:
                 continue
             out.append([raw[0], raw[1], name, raw[low], raw[low + 1], raw[6]])
+    return out
+
+
+def repaired_description(record: dict, roles: list) -> list[list[str]]:
+    """`extracted_rows` の**説明の欄だけ**を converter が直した綴りに差し替えた格子。
+
+    版面は記号の右下に小さく添字を刷るので、pdfplumber が返す `extracted_rows` では
+    添字が語をまたいで離れる（F-74）:
+
+        extracted_rows: `Input V /2,⏎DDA⏎C = 50pF,⏎LOAD⏎R = 4kΩ⏎LOAD`
+        cells[].text  : `Input VDDA/2,⏎CLOAD = 50pF,⏎RLOAD = 4kΩ`
+
+    converter の下付き結合（`cells[].text`）は綴りとして正しいので、そちらを採る。
+    **記号・値・単位の欄は触らない**——`norm_symbol` は「改行が下付きの境界」という
+    `extracted_rows` の性質に立っていて（`I⏎DD`→`I_DD`）、繋いだ形を渡すと `I_DD` 系が
+    丸ごと落ちる（converter 1.7.0 で実測 1,207 行）。
+
+    差し替えるのは**役割が `parameter`／`condition` と決まった列だけ**（`roles` は呼ぶ側が
+    決めた列の割り当て——見出しを持たない続き断片では前の断片から継いだもの）。役割が
+    決まらない列を触ると記号の欄を巻き込む: 限定しないと `I⏎DD` が `IDD` になって `KEEP` に
+    落ち、**128 行が消えた**（実測）。
+    """
+    rows = record["extracted_rows"]
+    cells = record.get("cells") or []
+    if not rows or not cells:
+        return rows
+    columns = [i for i, role in enumerate(roles)
+               if role in ("parameter", "condition") and i > 0]
+    if not columns:
+        return rows
+    text_at: dict[tuple[int, int], str] = {}
+    for cell in cells:
+        text = cell.get("text")
+        if text is not None:
+            text_at[(cell["row_start"], cell["column_start"])] = text
+    out = []
+    for r, row in enumerate(rows):
+        fixed = list(row)
+        for c in columns:
+            if c >= len(row) or not row[c]:
+                continue
+            other = text_at.get((r, c))
+            if other is not None and other != row[c]:
+                fixed[c] = other
+        out.append(fixed)
     return out
 
 
