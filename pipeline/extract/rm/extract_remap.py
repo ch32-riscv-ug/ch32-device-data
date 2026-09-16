@@ -213,6 +213,26 @@ GRID_LABEL_PERIPHERAL = {
 # `SDIO` の格子だけ、データ線を `SD0` と書く（pin 表は `SDIO_D0`）。
 SDIO_DATA = re.compile(r"^SD(\d+)$")
 
+# **行ラベルが文章の格子**（F-68 の残り。**まだ使っていない**）。ADC の外部トリガの表は
+# 行が1つで、ラベルが `ADC外部触发规则转换`／`ADC external trigger rule conversion` という
+# 文（pad も `…与PD3相连` と文の中にある）。**どちらのトリガかは field が言っている**ので、
+# 文を読まずに field から綴りを決められる。全corpus実測: 文がラベルの格子は canonical field
+# で3種だけで、どれもその pad の pin 表にちょうど1つ対応する signal が居る——
+# `ADC1_ETRGINJ` は `ADC_IETR`／`AETR2`（＝`ADC1_IETR`）、`ADC1_ETRGREG` は
+# `ADC_RETR`／`AETR`（＝`ADC1_RETR`）、`ADC1_ETRGIN`（CH32M030 だけ。規則と注入を
+# 分けない）は `ADC_ETR`（＝`ADC1_ETR`）。同じ pad に居る `ADC_IN4` は入力チャネルで
+# 別物なので、この対応では当たらない（当ててはいけない）。
+#
+# **繋ぐと `remap_routes` が資料の食い違いを抱える**ので、繋ぐ前に別の決めごとが要る
+# （F-73）——`CH32M030` の `ADC_ETR` は RM の表6-15 が `ADC_ETRGIN_RM=0 默认映射`→PB6、
+# datasheet の pin 表が PA14=default・PB6=remap-1 と**逆**を書く。繋ぐと同じ値に pad が
+# 2つ並ぶ（`remap_routes` に `conflict` の持ち方が無い）。対応表はここに置いておく。
+GRID_PROSE_SIGNAL = {
+    "ADC1_ETRGREG": "ADC1_RETR",
+    "ADC1_ETRGINJ": "ADC1_IETR",
+    "ADC1_ETRGIN": "ADC1_ETR",
+}
+
 
 def qualify_signal(peripheral: str | None, signal: str) -> str:
     """裸の行ラベルを、その周辺の pin 表と同じ綴りにする。対応が無ければそのまま。
@@ -402,12 +422,20 @@ def extract(source) -> tuple[list[dict], list[str]]:
                         if column is None or col >= len(row):
                             continue
                         field, values = column
+                        # **どのトリガかは field が言っている**ので、そこから綴りを
+                        # 決められる文章の行は決める（`GRID_PROSE_SIGNAL`）。決めないと
+                        # pin 表の `ADC_RETR` と結び付かず、格子が言っているのに `basis`
+                        # が言わない（F-68）。**列ごとに決める**——行の field は列で
+                        # 決まるので、行の頭ではまだ分からない（`pending` を回す前に
+                        # `field` を読むと、その行が最初なら未束縛で落ちる。実測:
+                        # `CH32H417` がそれで family ごと空になった）。
+                        spelled = names
                         pads, from_prose = pads_in(row[col])
                         if from_prose and pads:
                             notes.append(
                                 f"{field}={values} {signal_cell}: 文章から pad を推定 ({row[col]!r})"
                             )
-                        for signal in names:
+                        for signal in spelled:
                             for pad in pads:
                                 for value in values:
                                     routes.append(
