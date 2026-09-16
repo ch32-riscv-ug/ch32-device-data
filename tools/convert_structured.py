@@ -24,9 +24,6 @@ import re
 from importlib.metadata import version
 from pathlib import Path
 
-import jsonschema
-import pdfplumber
-
 import paths
 
 
@@ -156,6 +153,10 @@ def captions(lines: list[dict], lang: str) -> list[dict]:
 
 def convert(pdf_path: Path, lang: str, requested_pages: str | None,
             whole_chapter: bool) -> dict:
+    # **PDF を開くときに import する。** module の頭で import すると、この file の
+    # doctest を走らせるだけで pdfplumber が要る——`check_doctests` を標準ライブラリ
+    # だけの CI job に載せられなくなる（実測: 18 file 中この2つだけが要っていた）。
+    import pdfplumber  # noqa: PLC0415
     digest = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
     with pdfplumber.open(pdf_path) as pdf:
         if whole_chapter:
@@ -235,6 +236,7 @@ def convert(pdf_path: Path, lang: str, requested_pages: str | None,
             "pages": output_pages,
             "tables": output_tables,
         }
+    import jsonschema  # noqa: PLC0415  pdfplumber と同じ理由（上）
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
     jsonschema.Draft202012Validator(schema).validate(document)
     return document

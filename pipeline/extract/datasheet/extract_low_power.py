@@ -65,7 +65,6 @@ sys.path.insert(0, str(REPO / "pipeline" / "common"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import operating_rows as operating  # noqa: E402  記号/値の正規化（規則は凍結時のまま）
-import convert_all  # noqa: E402
 import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 import review_sidecar  # noqa: E402
 import logical_tables  # noqa: E402
@@ -579,6 +578,10 @@ def collect_rows() -> list[dict]:
         ds_series.setdefault(p["datasheet"], set()).add(p["series"])
 
     jobs: dict[str, dict] = {}
+    # **ここで import する。** module の頭で読むと `convert.py` 経由で pdfplumber が
+    # 要り、この file の doctest を走らせるだけで重い依存が要る——`check_doctests` を
+    # 標準ライブラリだけの CI job に載せられなくなる。
+    import convert_all  # noqa: PLC0415
     for job in convert_all.targets():
         if job["document_type"] != "datasheet":
             continue

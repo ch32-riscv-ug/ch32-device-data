@@ -83,26 +83,20 @@ jobs:
       - name: Check the viewer
         run: node tools/check_viewer.js
 
-      # The vocabulary rules are documented by their doctests, so nothing else
-      # notices when a rule is added and the examples are not. `AETR2` had gone
-      # on asserting it was undecided for as long as it took someone to run the
-      # doctest by hand.
-      - name: Signal vocabulary doctests
-        run: python -m doctest tools/signal_vocabulary.py -o FAIL_FAST
-
-      # The structured-path classifiers (which lines are figure captions, which
-      # `*` glyphs are lost subscripts) are likewise documented only by their
-      # doctests -- run them so a changed rule without a changed example fails.
-      - name: Structured-path classifier doctests
-        run: |
-          python -m doctest pipeline/common/figure_captions.py -o FAIL_FAST
-          python -m doctest pipeline/common/lost_subscripts.py -o FAIL_FAST
-          python -m doctest pipeline/common/review_sidecar.py -o FAIL_FAST
-          # 行の詰め直し（ページ境界で空になった行を消す）は添字計算で、
-          # 間違えても文字は消えず rowspan がずれるだけなので parity では出ない。
-          python -m doctest pipeline/common/logical_tables.py -o FAIL_FAST
-          # 行末ハイフンの結合規則（正本の条件文・比較表の見出しに効く）
-          python -m doctest tools/wrap_rules.py -o FAIL_FAST
+      # The normalisation rules (vocabulary, figure captions, lost subscripts,
+      # line rejoining, symbol/value spelling) are documented by their doctests
+      # and by nothing else, so a rule changed without its examples fails here.
+      # This used to be two steps naming six files by hand, which is how the
+      # other twelve files -- 100 of the 161 examples, including every rule in
+      # operating_rows and extract_remap -- went unrun in CI. The check sweeps
+      # `pipeline/` and `tools/` instead of naming anything, and fails when a
+      # file containing `>>>` yields no examples (a real trap: doctest.testmod
+      # silently collects nothing from a second module instance).
+      #
+      # Standard library only: two modules used to pull pdfplumber in at import
+      # time and now import it where they open a PDF.
+      - name: Doctests
+        run: python pipeline/checks/check_doctests.py
 
       # Everything derivable without a PDF must already be committed in its
       # regenerated form. This used to cover catalog/documents.csv only, and the
