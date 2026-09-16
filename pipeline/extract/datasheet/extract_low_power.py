@@ -237,6 +237,31 @@ def _condition_text(state: dict, schema: dict, value_column: int | None,
     return "; ".join(parts)
 
 
+def swap_description(grid: list[list[str | None]], text_grid: list[list[str | None]],
+                     schema: dict) -> int:
+    """記述の欄（項目名・条件）を `text` 側の綴りに入れ替える。替えた数を返す。
+
+    converter の下付き結合は綴りとして正しく、`text_split` 側で起きる「添字が語を
+    またいで離れる」壊れ方が無い（F-74）。**記号・値・単位は触らない**——記号の
+    正規化は `text_split` の改行が下付きの境界だという前提に立っている。
+
+    2つの格子は同じ `merge_cells` から作るので行数・列数が揃う。揃わなければ何も
+    しない（安全側）。
+    """
+    if len(grid) != len(text_grid):
+        return 0
+    columns = [schema["parameter"], *schema["conditions"]]
+    swapped = 0
+    for row, other in zip(grid, text_grid):
+        for column in columns:
+            if column >= len(row) or column >= len(other):
+                continue
+            if other[column] is not None and other[column] != row[column]:
+                row[column] = other[column]
+                swapped += 1
+    return swapped
+
+
 def parse_table(table: list[list[str | None]], schema: dict,
                 lang: str, row_pages: list[int], table_context: str) -> list[dict]:
     width = schema["width"]
@@ -299,21 +324,32 @@ def parse_table(table: list[list[str | None]], schema: dict,
     return output
 
 
-def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[list[list[str | None]],
-                                                               list[int]]:
+def join_fragments(fragments: list[tuple[int, dict]]) -> tuple[
+        list[list[str | None]], list[list[str | None]], list[int]]:
     """同じ論理表の物理断片を1つの格子に結合する（共通L1層の部品を使う）。
 
     列の対応付け規則（列数が同じなら位置・違えばx和集合）と、その根拠の実測は
     `pipeline/common/logical_tables.py`に移した。
 
-    **読むのは`text_split`**——converterが下付きを戻す前の、版面が割ったままの綴り。
-    この抽出器が使う`operating_rows`の正規化は**その改行が下付きの境界だという前提**で
-    書かれていて（`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）、繋いだ形を渡すと
-    `I_DD`系の行が丸ごと落ちる（converter 1.7.0で実測。1,207行）。`text`側の
-    geometry結合は綴りとしては正しいので、説明列をそちらへ移すのは別の改善として扱う
-    （`_merge_subscripts`の正規表現より確かなはずだが、1,200行の差分確認が要る）。
+    **構造を決めるのは`text_split`**——converterが下付きを戻す前の、版面が割ったままの
+    綴り。この抽出器が使う`operating_rows`の正規化は**その改行が下付きの境界だという
+    前提**で書かれていて（`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）、繋いだ形を
+    渡すと`I_DD`系の行が丸ごと落ちる（converter 1.7.0で実測。1,207行）。
+
+    **説明の欄だけは`text`側を返す**（2つ目の格子。F-74）。converterの下付き結合は
+    綴りとしては正しく、条件文の添字が語をまたいで離れる壊れ方はそちらでは起きない:
+
+        text      : `Input VDDA/2,⏎CLOAD = 50pF,⏎RLOAD = 4kΩ`
+        text_split: `Input V /2,⏎DDA⏎C = 50pF,⏎LOAD⏎R = 4kΩ⏎LOAD`
+
+    2つは**同じセルから作るので形が揃う**（`merge_cells`は1度だけ呼ぶ）。列の割り当てと
+    ページ跨ぎの畳み込みは`text_split`側だけで決め、決まったあとで記述の欄の中身を
+    入れ替える（`read_edition`）——構造の判断は1文字も変わらない。
     """
-    return logical_tables.text_grid(logical_tables.merge_cells(fragments), "text_split")
+    merged = logical_tables.merge_cells(fragments)
+    split, row_pages = logical_tables.text_grid(merged, "text_split")
+    joined, _ = logical_tables.text_grid(merged, "text")
+    return split, joined, row_pages
 
 
 def _unbalanced(text: str) -> bool:
@@ -473,12 +509,16 @@ def read_edition(name: str, pdf: Path, lang: str,
     rows: list[dict] = []
     for logical_id in order:
         parts = fragments[logical_id]
-        joined, row_pages = join_fragments(parts)
+        joined, merged_text, row_pages = join_fragments(parts)
         schema = infer_schema(joined)
         if schema is None:
             print(f"    {name} {logical_id}: 列割り当てを決められない"
                   f"（{len(parts)}断片）", file=sys.stderr)
             continue
+        # **記述の欄だけ `text` 側の綴りに入れ替える**（F-74）。列の割り当ては
+        # `text_split` 側で決めたあとなので、構造の判断は変わらない。畳み込みは
+        # 入れ替えた**あと**に掛ける——続きの尻尾も `text` 側の綴りで繋ぐため。
+        swap_description(joined, merged_text, schema)
         fold_page_continuations(joined, row_pages, schema)
         context = next((caption_context(t) for _, t in parts if t.get("caption")), "")
         for row in parse_table(joined, schema, lang, row_pages, context):

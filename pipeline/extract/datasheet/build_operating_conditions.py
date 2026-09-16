@@ -90,7 +90,7 @@ class FoldedCells:
         for parts in fragments.values():
             if len(parts) < 2:
                 continue   # 続き断片が無い表は割れない
-            joined, row_pages = extract_low_power.join_fragments(parts)
+            joined, _text, row_pages = extract_low_power.join_fragments(parts)
             schema = extract_low_power.infer_schema(joined)
             if schema is None:
                 continue
@@ -157,6 +157,12 @@ STRAY_SUBSCRIPT = re.compile(
 SPACED_SUBSCRIPT = re.compile(
     r"(?<![A-Za-z0-9_])(?P<sym>[A-Z]) *(?:[（(]\d+[）)])? *"
     r"(?P<sub>[A-Za-z][A-Za-z0-9+]*)(?P<eq> *=)")
+# **繋がってはいるが下線を持たない綴り**（`VDDA`・`CLOAD`）。converter の下付き結合は
+# 基底と添字をそのまま連結するので下線が入らないが、この表の綴りは下線形が正
+# （実測: 条件と項目名の中で下線あり 1,759・下線なし 67）。`symbol` 列も下線形なので、
+# 揃えないと同じものが2通りに見える。**corpus に実在する綴りのときだけ**動かす。
+JOINED_SUBSCRIPT = re.compile(
+    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z])(?P<sub>[A-Z][A-Z0-9]+)(?![A-Za-z0-9_])")
 # 添字が `=` と値の**間**に落ちる形（`F = SYSCLK 16MHz`）。読み順が
 # 「基底 → 等号 → 添字 → 値」になったもの。
 MIDDLE_SUBSCRIPT = re.compile(
@@ -179,7 +185,8 @@ def reattach_condition_subscripts(rows: list[dict]) -> int:
     known = attested_symbols(rows)
     fixed = 0
     for row in rows:
-        text = row.get("condition") or ""
+      for column in ("condition", "parameter"):
+        text = row.get(column) or ""
         def swap(m: re.Match) -> str:
             whole = f"{m.group('sym')}_{m.group('sub')}"
             if whole not in known:
@@ -193,10 +200,13 @@ def reattach_condition_subscripts(rows: list[dict]) -> int:
             if whole not in known:
                 return m.group(0)
             return f"{whole}{m.group('eq')}{m.group('value').rstrip()}"
-        changed = MIDDLE_SUBSCRIPT.sub(
-            middle, SPACED_SUBSCRIPT.sub(join, STRAY_SUBSCRIPT.sub(swap, text)))
+        def underscore(m: re.Match) -> str:
+            whole = f"{m.group('sym')}_{m.group('sub')}"
+            return whole if whole in known else m.group(0)
+        changed = JOINED_SUBSCRIPT.sub(underscore, MIDDLE_SUBSCRIPT.sub(
+            middle, SPACED_SUBSCRIPT.sub(join, STRAY_SUBSCRIPT.sub(swap, text))))
         if changed != text:
-            row["condition"] = changed
+            row[column] = changed
             fixed += 1
     return fixed
 
