@@ -125,6 +125,65 @@ def complete_truncated_cells(base: list[dict]) -> int:
     return fixed
 
 
+# **条件の添字が値の後ろに落ちる。** 版面は `F` の右下に小さく `HCLK` を刷るので、
+# セルの文字列にすると読み順が「基底 → 値 → 添字」になり `F = 16MHz HCLK` と出る。
+# 式として読めないので記号のうしろへ戻す（`F_HCLK = 16MHz`）。
+#
+# **根で直すほうが良いのは分かっている**——`logical_tables.reattach_cell_subscripts` が
+# geometry（小さいフォント・低い基線）から同じ直しをしていて、いまは人向け Markdown に
+# しか効いていない。CSV 経路が読むのは `text_split`（版面が割ったままの綴り）で、
+# `operating_rows` の正規化が**その改行を添字の境界だという前提**で書かれているため
+# （`I⏎DD`→`I_DD`）、繋いだ側に替えると `I_DD` 系が丸ごと落ちる（converter 1.7.0 で
+# 実測1,207行。`extract_low_power.join_fragments` にその記録がある）。列ごとに読む元を
+# 分ける改修は別に立てる必要があるので、ここでは**条件の欄だけ**を綴りで直す。
+#
+# **歯止めは corpus の綴り**。`<記号>_<添字>` がこの表のどこかで実際に使われている
+# ときだけ動かす——推測で新しい記号を作らない。全corpus実測: 当たるのは 702 箇所・
+# 10 綴りで、どれも `symbol` 列か他の条件文に実在する（`F_HCLK` 19・`R_LOAD` 12・
+# `V_DD33A` 10・`V_HV` 6・`V_CM` 3・`F_CORE` 2・`V_REFP` 2・`F_SYSCLK` 1・`V_CC12V` 1・
+# `V_INN` は条件文に11）。
+STRAY_SUBSCRIPT = re.compile(
+    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z])(?P<eq> *= *)(?P<value>[-+0-9.]+ *[A-Za-zΩ℃%/]*)"
+    r" +(?P<sub>[A-Z][A-Z0-9]+)(?![A-Za-z0-9_])")
+# 添字が `=` の**手前**に、空白1つ隔てて残る形（`F HCLK=144MHz`）。同じ歯止めで直す。
+# 全corpus実測: 338 行が当たり、綴りは4つ——`F_HCLK` 278・`F_CORE` 42 は corpus に実在し、
+# `F_V5F` 84・`F_V3F` 76 は**どこにも実在しない**（CH32H417 の2つのコアの名前で、綴りが
+# この壊れた形にしか出てこない）。推測で新しい記号を作らないので後者は動かさない。
+SPACED_SUBSCRIPT = re.compile(
+    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z]) +(?P<sub>[A-Za-z][A-Za-z0-9+]*)(?P<eq> *=)")
+
+
+def attested_symbols(rows: list[dict]) -> set[str]:
+    """この表が実際に使っている `記号_添字` の綴り。"""
+    out = {r.get("symbol", "") for r in rows}
+    for r in rows:
+        for column in ("condition", "parameter"):
+            out.update(re.findall(r"(?<![A-Za-z0-9_])[A-Z]_[A-Z][A-Za-z0-9_]*",
+                                  r.get(column) or ""))
+    return {s for s in out if s}
+
+
+def reattach_condition_subscripts(rows: list[dict]) -> int:
+    """値の後ろに落ちた添字を記号のうしろへ戻す。直した欄の数を返す。"""
+    known = attested_symbols(rows)
+    fixed = 0
+    for row in rows:
+        text = row.get("condition") or ""
+        def swap(m: re.Match) -> str:
+            whole = f"{m.group('sym')}_{m.group('sub')}"
+            if whole not in known:
+                return m.group(0)
+            return f"{whole}{m.group('eq')}{m.group('value').rstrip()}"
+        def join(m: re.Match) -> str:
+            whole = f"{m.group('sym')}_{m.group('sub')}"
+            return m.group(0) if whole not in known else f"{whole}{m.group('eq')}"
+        changed = SPACED_SUBSCRIPT.sub(join, STRAY_SUBSCRIPT.sub(swap, text))
+        if changed != text:
+            row["condition"] = changed
+            fixed += 1
+    return fixed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=None,
@@ -146,6 +205,11 @@ def main() -> int:
     print(f"括弧未閉じの基礎行をbundleの結合gridで補完: {completed} 欄", file=sys.stderr)
 
     combined = base + added
+    # **値の後ろに落ちた添字を戻す**（`F = 16MHz HCLK` → `F_HCLK = 16MHz`）。
+    # 重複を畳む前に直す——直すと同じ主張の行が畳めることがある。
+    reattached = reattach_condition_subscripts(combined)
+    print(f"条件の添字を記号のうしろへ戻した: {reattached} 行", file=sys.stderr)
+
     seen: set[tuple] = set()
     rows = []
     for r in combined:
