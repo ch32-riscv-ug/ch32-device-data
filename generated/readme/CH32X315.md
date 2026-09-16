@@ -71,14 +71,14 @@ Only the 6 rows that differ between these 3 products; the other 17 are the same 
 
 ## Packages & pinout drawings
 
-Pinout drawings are in the datasheet (chapter *Pinouts*):
+Pinout drawings are in the datasheet (chapter *Pinouts*); each link opens at the page that carries the drawing:
 
 | Package | Products | Datasheet | Outline |
 |---|---|---|---|
-| LQFP64 | CH32X305RCT6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
-| QFN48 | CH32X315CCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN48.png) |
-| QFN76 | CH32X315MCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN76.png) |
-| QFN68X7 | CH32X315WCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68X7.png) |
+| LQFP64 | CH32X305RCT6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF#page=17) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF#page=14) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
+| QFN48 | CH32X315CCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF#page=17) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF#page=14) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN48.png) |
+| QFN76 | CH32X315MCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF#page=16) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF#page=13) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN76.png) |
+| QFN68X7 | CH32X315WCU6 | [en](https://ch32-riscv-ug.github.io/CH32X315/datasheet_en/CH32X315DS0.PDF#page=16) / [zh](https://ch32-riscv-ug.github.io/CH32X315/datasheet_zh/CH32X315DS0.PDF#page=13) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68X7.png) |
 
 ## Pin maps & alternate functions
 

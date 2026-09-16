@@ -127,7 +127,7 @@ class Data:
         except FileNotFoundError:
             self.errata = []
         # B4 で足した節が読むもの。無くても頁は組めるようにしておく。
-        for name in ("eval_boards", "memory_map", "sources", "families"):
+        for name in ("eval_boards", "memory_map", "sources", "families", "figures"):
             try:
                 setattr(self, name, load(name))
             except FileNotFoundError:
@@ -707,14 +707,21 @@ def pinout_reference(data: Data, family: str) -> list[str]:
     # 持っているのは封装ごとの外形図と datasheet へのリンクだけで、
     # どの足が何かは下の `Pin maps & alternate functions`（worklist G6）。
     out = ["## Packages & pinout drawings", "",
-           "Pinout drawings are in the datasheet (chapter *Pinouts*):", "",
+           "Pinout drawings are in the datasheet (chapter *Pinouts*); "
+           "each link opens at the page that carries the drawing:", "",
            "| Package | Products | Datasheet | Outline |", "|---|---|---|---|"]
     documents = {d["document"]: d for d in data.documents}
+    # C2: 型番 → その図が在る版面（`evidence/figures.csv`）。無ければ従来どおり
+    # 文書の先頭へ送る。
+    pages = {(r["part_number"], lang): r[f"page_{lang}"]
+             for r in getattr(data, "figures", []) if r["kind"] == "pinout"
+             for lang in ("zh", "en") if r[f"page_{lang}"]}
     for _, parts in sorted(groups, key=lambda g: g[1][0]):
         product = next(p for p in data.products if p["part_number"] == parts[0])
         document = documents.get(product["datasheet"], {})
         links = " / ".join(
-            f"[{lang}]({document[f'mirror_url_{lang}']})"
+            f"[{lang}]({document[f'mirror_url_{lang}']}"
+            f"{'#page=' + pages[(parts[0], lang)] if (parts[0], lang) in pages else ''})"
             for lang in ("en", "zh") if document.get(f"mirror_url_{lang}"))
         package = package_of[parts[0]]
         out.append(f"| {package} | {', '.join(parts)} "

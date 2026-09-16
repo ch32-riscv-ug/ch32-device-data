@@ -63,6 +63,7 @@ KEYS: dict[str, tuple[str, ...]] = {
     "remap_fields": ("series", "selector"),
     "remap_routes": ("series", "selector", "value", "signal"),
     "pin_conditions": ("series", "signal", "condition"),
+    "figures": ("part_number", "kind"),
     "timers": ("family", "timer"),
     "register_blocks": ("family", "block"),
     "registers": ("family", "type", "register"),
@@ -139,6 +140,9 @@ ASSERTS: dict[str, str] = {
 # `operating_conditions` はここに載せない。1行が min/typ/max/unit の4つを主張して
 # いて、争っているのがどれかは行ごとに違う（`basis` の `(min=60,typ=82,…)` が
 # 名指ししている）。1つの列を決め打つと、min の食い違いを max の話として書く。
+#
+# `figures` も載せない。主張しているのは `page_zh`・`page_en` の2つで、**両版で
+# 違うのが当たり前**（版面の割り付けが違う）——この表は構造上 `conflict` を持たない。
 
 
 # 相手の値の書き方は表で3通りある。1つの値を争う表は `(=<値>)`、欄ごとに

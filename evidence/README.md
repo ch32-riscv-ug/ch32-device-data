@@ -3,7 +3,7 @@
 [日本語](README.ja.md)
 
 **What the documents say**, copied row by row with its basis (`basis`) and confidence (`confidence`)
-attached -- 41 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
+attached -- 42 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
 `pin_functions.signal` varies between `TX1` / `UTX` / `USART1_TX` exactly as the documents do, and `pad` keeps
 decorations such as `PA0-WKUP`. When documents disagree, the value is not corrected; the row is marked `conflict` and both are kept.
 The tables **to look things up in** (names normalised through the vocabulary, joined, split per part number) are in
@@ -765,6 +765,33 @@ so with family as the primary key the `1.4.17` of different documents would coll
 The programming interface (worklist A8) also appears here -- `1-wire Serial Debug Interface (SDI)`
 (CH32V002/V003/V004/V006/V007) and `2-wire SDI Serial Debug Interface`
 (CH32L103, V103, V203, V30x, X035) stand as section headings.
+
+### `figures.csv`
+
+**Which datasheet page carries a part's drawing.** One row per `(part_number, kind)`; `kind` is
+`pinout` today. The generated READMEs turn this into `#page=N` links, so a reader following the
+package table lands on the drawing instead of the front cover.
+
+**`page_zh` and `page_en` are separate columns because the two editions paginate differently**
+(CH32V103R8T6's pinout is page 11 in Chinese and page 13 in English). That is not a disagreement,
+so this table never carries `conflict`: `confirmed` means both editions draw it, `reference` that
+only one does. Every one of the 103 catalogued part numbers is `confirmed` today.
+
+**One drawing can stand for several part numbers.** The heading above a drawing is not always a
+whole part number: it may be masked (`CH32V103Cx` covers C6T6, C8T6 and C8U6), drop the
+temperature-grade digit (`CH32V006E8R` for `...E8R6`), or join several with slashes
+(`CH32V303RxT6/CH32V303RCT7`). Each expands to the catalogued part numbers it matches, one row
+each, all pointing at the same page.
+
+**The page is the one the heading sits on**, found by walking the pinout chapter
+(`2.1 Pinouts` / `2.1 引脚排列`) in reading order. A drawing that sits above the next section's
+heading still belongs to the chapter -- CH32V003's SOP8 drawing is at the top of the page whose
+rest is `2.2 Pin Description`.
+
+What `tools/check_tables.py` checks: the part number is catalogued and `document` is that part's
+datasheet; pages are positive integers and at least one edition is filled; `confidence` matches
+how many editions filled; the `p.N` in `basis` agrees with the columns; and **every catalogued
+part number has a `pinout` row**.
 
 ### `eval_boards.csv`
 

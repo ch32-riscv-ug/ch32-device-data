@@ -243,6 +243,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "evt_variants": ("build_evt_variants.py", "COLUMNS"),
     "families": ("build_tables.py", "FAMILY_COLUMNS"),
     "features": ("extract_features.py", "COLUMNS"),
+    "figures": ("extract_figures.py", "COLUMNS"),
     "flash_geometry": ("extract_flash_geometry.py", "COLUMNS"),
     "flash_program_method": ("extract_flash_program_method.py", "COLUMNS"),
     "interrupts": ("build_interrupts.py", "COLUMNS"),
@@ -800,6 +801,66 @@ def pin_conditions_sane(t: dict) -> list[str]:
     return out
 
 
+# `figures` が持つ図の種類。いまは `pinout` だけ（worklist C2）——
+# パッケージ外形図・システムブロック図を足すならここに足す。
+FIGURE_KINDS = frozenset({"pinout"})
+
+
+def figures_sane(t: dict) -> list[str]:
+    """`figures` が「型番からその図の版面を引く表」として読めるか。
+
+    この表は生成 README がページ直リンクを作るためだけに在るので、**引けない行が
+    1つでもあると壊れたリンクになる**。形を4つ確かめる:
+
+    - `part_number` は目録に在り、`document` は**その型番のデータシート**
+    - ページは正の整数で、`page_zh`・`page_en` のどちらかは必ず埋まっている
+    - `confidence` はページの数と一致する（両版なら `confirmed`、片版なら `reference`）
+    - `basis` の `p.N` が列と同じ番号を言っている（列と DSL の二重持ちが離れない）
+
+    そして**被覆**——`catalog/products.csv` の全型番に `pinout` の行が在ること。
+    ピン配置図を持たない型番はいま0件なので、例外はここに名前で置く決まりにする
+    （資料が図を描かない型番が出てきたら、人が見てからここへ足す）。
+    """
+    documents = {r["part_number"]: r["datasheet"] for r in t["products"]}
+    out: list[str] = []
+    covered: set[str] = set()
+    for r in t["figures"]:
+        where = f"{r['part_number']} の {r['kind']}"
+        if r["part_number"] not in documents:
+            out.append(f"figures: {where} の型番が products に無い")
+        elif r["document"] != documents[r["part_number"]]:
+            out.append(f"figures: {where} の document {r['document']!r} が "
+                       f"その型番のデータシート {documents[r['part_number']]!r} と違う")
+        if r["kind"] not in FIGURE_KINDS:
+            out.append(f"figures: {where} の kind が {sorted(FIGURE_KINDS)} のどれでもない")
+        pages = {}
+        for lang in ("zh", "en"):
+            value = r[f"page_{lang}"]
+            if not value:
+                continue
+            if not value.isdigit() or int(value) < 1:
+                out.append(f"figures: {where} の page_{lang} {value!r} がページ番号でない")
+            else:
+                pages[lang] = int(value)
+        if not pages:
+            out.append(f"figures: {where} がどちらの版のページも持たない")
+        want = "confirmed" if len(pages) > 1 else "reference"
+        if r["confidence"] != want:
+            out.append(f"figures: {where} は {len(pages)} 版が持つので "
+                       f"{want} のはずだが {r['confidence']!r}")
+        said = {lang: int(page) for lang, page
+                in re.findall(r":(zh|en)\(p\.(\d+)\)", r["basis"])}
+        if said != pages:
+            out.append(f"figures: {where} の basis {r['basis']!r} が "
+                       f"列のページ {pages} と違う")
+        if r["kind"] == "pinout":
+            covered.add(r["part_number"])
+    for part in sorted(documents):
+        if part not in covered:
+            out.append(f"figures: {part} のピン配置図の行が無い")
+    return out
+
+
 def remap_selector_coverage(t: dict) -> list[str]:
     """`remap-N` の行が selector まで辿れているか、記録した実測値と突き合わせる。
 
@@ -1251,6 +1312,7 @@ def main() -> int:
     bad += routes_backed_by_pins(t)
     # 有効化ビットで pad が動く行（F-61）。条件の形と、pin 表が裏付けること。
     bad += pin_conditions_sane(t)
+    bad += figures_sane(t)
     # 格子と pin 表が同じ pad に別の値を与える食い違い（F-73）。
     bad += remap_conflicts(t)
     # 2つの資料が言っていれば confirmed（F-75）。
