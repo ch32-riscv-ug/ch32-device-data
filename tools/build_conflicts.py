@@ -131,6 +131,8 @@ ASSERTS: dict[str, str] = {
     "pin_functions": "route",
     "product_attributes": "value",
     "register_fields": "bits",
+    # 格子が既定の pad について異を唱えた経路（F-73）。食い違っているのは値。
+    "remap_routes": "value",
     "pin_conditions": "pad",
     "opa_cmp_registers": "bits",
 }

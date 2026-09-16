@@ -577,12 +577,29 @@ def join(
             # PA14 が default・PB6 が remap-1 と書く。zh/en とも各資料の中では一致）。
             clash = pin_pads_at.get(
                 (canonical_signal(fn["signal"]), corrected), set()) - {pad}
-            if others or clash:
+            # **格子が pin 表の言う値を別の pad に置いているなら訂正しない。** 訂正すると
+            # 「pin 表の値も格子の値もこの pad のものではない」ことになる——pad ごとの
+            # 誤りではなく**対応そのもの**が食い違っている印で、どちらが正しいかは
+            # 決められない。SKU の封装に依らないので、pin 表側の `clash` が見えない
+            # package（`CH32M030G8R7` は PA14 を封装していない）でも同じ判断になる。
+            # 実測: `CH32V103` の TIM3 は pin 表が `remap-1` と書くのに格子が値1を
+            # 使わない（0/2/3 だけ）ので当たらず、従来どおり訂正が効く（12行）。
+            # `CH32M030` の `ADC_ETR` は格子が値1を PA14 に置くので当たる。
+            swapped = grid_pads_at.get(
+                (canonical_signal(fn["signal"]), stated), set()) - {pad}
+            if others or clash or swapped:
                 why = ("列見出しの誤植の疑い" if others
-                       else "pin表は同じ値を別のpadに与えている＝資料の食い違い")
+                       else "pin表と格子が対応そのもので食い違っている")
+                if not others:
+                    # **資料どうしの食い違い**（格子の誤植ではない）。値は pin 表を
+                    # 保つが、格子が異を唱えたことを経路に持たせる——`build_remap` が
+                    # `confidence=conflict` と `basis` の `!rm-remap-grid(value=N)` に
+                    # する（F-73）。`others` のほうは格子の中の誤植なので、資料の
+                    # 主張として残さない。
+                    fn["_grid_disputes"] = corrected
                 notes.append(
                     f"[join] {pin['pad']} {fn['signal']}: 格子は値{corrected}と言うが"
-                    f"同じ値に {sorted(others or clash)} も居る（{why}）。"
+                    f"{sorted(others or clash or swapped)} も居る（{why}）。"
                     f"pin表の値{stated}を保った")
             else:
                 fn["_selector_value"] = corrected
@@ -617,6 +634,9 @@ def join(
             # `rm-remap-grid` を名乗ってしまう（F-66）。
             "sources": route_sources(pin, fn, fn["_selector_value"], grid_value_of,
                                      grid_at_pad, said_value_of, said_at_pad),
+            # 格子が別の値だと言っているなら、その値。異論の記録（F-73）。
+            **({"disputed_by_grid": fn["_grid_disputes"]}
+               if "_grid_disputes" in fn else {}),
         }
         if how != "signal":
             fn["_selector_resolved_by"] = how

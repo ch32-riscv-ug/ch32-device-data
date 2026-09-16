@@ -177,7 +177,7 @@ rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree
 
-One row per `conflict` mark anywhere in `catalog/` and `evidence/` (207 today), by
+One row per `conflict` mark anywhere in `catalog/` and `evidence/` (208 today), by
 `tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
 keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
 "show me every spec the two editions disagree on" meant grepping all of them.
@@ -189,7 +189,7 @@ keeps both and marks the row `conflict`. Those marks were spread over eleven tab
 | `dissenting` | the sources marked `!` in `basis` |
 | `alternative` | what those sources state, from `(=...)` in `basis` |
 
-**131 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
+**132 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
 their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
 table's section of [evidence/README.md](../evidence/README.md)".
 
