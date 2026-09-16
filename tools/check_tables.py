@@ -627,6 +627,35 @@ def routes_backed_by_pins(t: dict) -> list[str]:
     return out
 
 
+# `remap_routes` の異論（F-73）。`!<出所>(value=<値>)`。
+REMAP_DISSENT = re.compile(r"\+!(?P<source>[a-z-]+)\(value=(?P<value>\d+)\)")
+
+
+def remap_conflicts(t: dict) -> list[str]:
+    """`remap_routes` の `conflict` が、異を唱えた出所と値を `basis` に書いているか。
+
+    この表の食い違いは pin 表と RM の格子が**同じ pad に別の selector 値**を与える形
+    （F-73。`CH32M030` の `ADC_ETR` は pin 表が値1・格子が値0）。散文の記録が無いので、
+    `!rm-remap-grid(value=N)` を書かないと `index/conflicts.csv` の `alternative` が
+    空になり、consumer からは「食い違っているのは分かるが相手の言い分が分からない」に
+    なる。印と確度が両方向で揃うこと、**異論の値が採った値と違うこと**まで見る。
+    """
+    out = []
+    for r in t["remap_routes"]:
+        where = f"{r['series']} の {r['signal']} ({r['selector']}={r['value']}, {r['pad']})"
+        found = REMAP_DISSENT.search(r["basis"] or "")
+        if r["confidence"] == "conflict" and not found:
+            out.append(f"remap_routes: {where} は conflict なのに "
+                       "`basis` が異を唱えた出所を書いていない")
+        if found and r["confidence"] != "conflict":
+            out.append(f"remap_routes: {where} の `basis` は異論を書いているのに "
+                       f"confidence が {r['confidence']!r}")
+        if found and found.group("value") == r["value"]:
+            out.append(f"remap_routes: {where} の異論の値が採った値と同じ"
+                       "——食い違っていない")
+    return out
+
+
 # 条件の項（`SDIOEN=1`・`RB_UC_RST_SIE=0`）。`&` で並ぶ。
 CONDITION_TERM = re.compile(r"^[A-Z][A-Za-z0-9_]*=[01]$")
 
@@ -1150,6 +1179,8 @@ def main() -> int:
     bad += routes_backed_by_pins(t)
     # 有効化ビットで pad が動く行（F-61）。条件の形と、pin 表が裏付けること。
     bad += pin_conditions_sane(t)
+    # 格子と pin 表が同じ pad に別の値を与える食い違い（F-73）。
+    bad += remap_conflicts(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に

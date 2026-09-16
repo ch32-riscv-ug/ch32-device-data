@@ -348,7 +348,7 @@ pairs cross-checked 391  agree 352  more on the pin side (superset from a shared
 
 ### `remap_fields.csv` / `remap_routes.csv`
 
-AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）ですが、**根拠ごとの一致記録がファイルに残っていないため全行reference**です。EVTとRMの突き合わせを記録付きで再実行して確定へ昇格するのが次の課題です。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
+AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）ですが、**根拠ごとの一致記録がファイルに残っていないためほぼ全行reference**です。EVTとRMの突き合わせを記録付きで再実行して確定へ昇格するのが次の課題です。1行だけ `conflict` があります——RM の重映射格子と datasheet の pin 表が**同じ pad に別の selector 値**を与えるところで、値は pin 表を保ち、格子の言い分を `basis` に `!rm-remap-grid(value=N)` と書きます（他の表と同じ `!<出所>(<列>=<値>)` の DSL）。いまは `CH32M030` の `ADC_ETR` で、RM 表6-15 は `ADC_ETRGIN_RM=0`（既定）を PB6・`=1` を PA14 に置き、pin 表は PA14 を既定・PB6 を `ADC_ETR_1` と書きます。**zh/en とも各資料の中では一致**しているので、版の食い違いではなく資料どうしの食い違いです。`index/conflicts.csv` が格子の値を `alternative` に持ちます。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
 
 読み方に注意が要る列が3つあります。
 

@@ -72,8 +72,19 @@ MANUAL_BASIS = "candidates(rm-register-table+rm-remap-grid:en)"
 # （`CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも0経路）でも `rm-remap-grid` を
 # 名乗っていた——CH32X035 の234行のうち186行がそれだった（F-66。2026-09-15）。
 # 出所が記録されていない古い候補は、既定値かどうかの従来の読みに落とす。
-def route_basis(sources) -> str:
-    return f"candidates({'+'.join(sources)}:en)"
+def route_basis(sources, disputed: int | None = None) -> str:
+    """`basis` の綴り。格子が別の値だと言っているならそれも書く（F-73）。
+
+    食い違いの書き方は他の表と同じ DSL——`!<出所>(<列>=<値>)` で「その出所は何と
+    言うか」を持つ。`index/conflicts.csv` はこれを読んで `alternative` 列に写す。
+
+    >>> route_basis(["datasheet-pin-table", "rm-field-description"])
+    'candidates(datasheet-pin-table+rm-field-description:en)'
+    >>> route_basis(["datasheet-pin-table"], disputed=0)
+    'candidates(datasheet-pin-table:en)+!rm-remap-grid(value=0)'
+    """
+    out = f"candidates({'+'.join(sources)}:en)"
+    return out if disputed is None else f"{out}+!rm-remap-grid(value={disputed})"
 
 
 LEGACY_ROUTE_BASIS = ["datasheet-pin-table", "rm-remap-grid"]
@@ -94,6 +105,7 @@ def main() -> int:
     fields: dict = {}
     disagreements: list[str] = []
     routes: dict = {}
+    disputed: dict = {}   # 経路の鍵 → 格子が言う別の値（F-73）
     for path in sorted(args.candidates.glob("ch32*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         part = data.get("part_number", path.stem.upper())
@@ -153,6 +165,11 @@ def main() -> int:
                     said = selection.get("sources") or (
                         LEGACY_DEFAULT_BASIS if value == 0 else LEGACY_ROUTE_BASIS)
                     routes.setdefault(key, set()).update(said)
+                    # 格子が別の値だと言っている経路（F-73）。**SKU ごとに集まる**ので
+                    # 1つでも異論があれば残す（同じ series の別 package で pad が
+                    # 出ていないだけのことがある、という `said` と同じ理由）。
+                    if selection.get("disputed_by_grid") is not None:
+                        disputed[key] = selection["disputed_by_grid"]
 
     field_rows = sorted(fields.values(),
                         key=lambda r: (r["series"], r["selector"]))
@@ -175,11 +192,14 @@ def main() -> int:
         order = ["datasheet-pin-table-default", "datasheet-pin-table",
                  "rm-remap-grid", "rm-field-description"]
         said = [name for name in order if name in routes[key]]
+        # **格子が異を唱えた経路は `conflict`。** 他の証拠表と同じ作法で、片方に寄せず
+        # 両論を残す（値は pin 表を保ち、格子の言い分を `basis` に書く。F-73）。
+        against = disputed.get(key)
         route_rows.append(
             {"series": s, "selector": sel, "value": value, "signal": signal,
              "pad": pad,
-             "confidence": "reference",
-             "basis": route_basis(said)}
+             "confidence": "reference" if against is None else "conflict",
+             "basis": route_basis(said, against)}
         )
 
     if manual_only:

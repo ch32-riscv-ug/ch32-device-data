@@ -76,7 +76,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `tools/build_conflicts.py`: 全表の`conflict`の印を`index/conflicts.csv`に集める。
   証拠は食い違いを片方に寄せず両論を残す規則だが、その記録が11の表に散っていて
   「両版で食い違う仕様を全部」に答えられなかった。`basis`のDSLから「どの出所が
-  異を唱えるか」と「その出所は何と言うか」を取り出すので、**104行は表が採った値と
+  異を唱えるか」と「その出所は何と言うか」を取り出すので、**105行は表が採った値と
   相手の値が横に並ぶ**
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと
