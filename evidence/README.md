@@ -346,6 +346,15 @@ pairs cross-checked 391  agree 352  more on the pin side (superset from a shared
 
 "More on the pin side" is the shared-pinout share; "fewer on the pin side" are instances not brought out on that package (`CMP2`, `LPTIM1`, whose inputs may be internal only). **That "on no pin at all" is 0** is the guarantee that every peripheral the comparison table counts can be looked up from pins.
 
+**`CH32V006K8U6` reads the `CH32V006K8U7` column.** It is the one catalogued part the datasheet's
+comparison and ordering tables never print (worklist F-76), yet its pins are stated: the pin-definition
+table is captioned `CH32V006 pin definitions (except CH32V006F4U6)`, which scopes it to the whole
+series minus one named part, and the QFN32 per-package column simply happens to be headed by the
+105C grade. Where a heading is written without the grade digit (`CH32V006E8R`) both grades already
+read it; this is the same situation with the heading spelt in full. `resolve()` takes that column
+only when exactly one heading's own part number has this part's package and the caption does not
+exclude it -- the rows it produces are byte-identical to `CH32V006K8U7`'s.
+
 ### `remap_fields.csv` / `remap_routes.csv`
 
 Definitions of the AFIO route selectors and the value → route mapping. A `remap-N` in pin_functions.csv is resolved by following remap_routes (selector × value → signal/pad) → remap_fields (which bits of which register). The source is candidates/ (a join of EVT headers + RM register tables + RM remap grid + datasheet pin tables), and **`confidence` says whether two documents agree**: `confirmed` where the datasheet's pin table and the reference manual both state the route (4,354 rows), `reference` where only one does (483). The manual may state it as a grid or inside a register-field description; which of the two does not change the count, because disagreement here is between documents rather than between a manual's editions -- no route in the corpus is stated differently by a manual's Chinese and English editions. Rows whose value was taken from the grid against the pin table stay `reference`: the pin table puts the signal on that pad but does not say that value (CH32V103's TIM3 writes `_1` on both PB4 and PC6, and the manual places them at 2 and 3). `remap_fields.csv` deliberately carries no per-row confidence: its row is a composite whose columns have different provenance -- `bits`/`register`/`field` are the union of the EVT header and the manual (a register only one names is a gap in the other, not a conflict), `valid_values` is a lower bound drawn from six sources, and `reset_value` comes from the manual alone. One confidence for the row would read as "two documents agree" about the lower bound too. What is pinned instead is the claim a consumer writes: if the header and the manual give the same register different bits, the row becomes `conflict` with the manual's reading in `basis` as `!rm-register-table(bits=...)`. Across the corpus that happens **0 times** (27 cases are the manual spelling a register differently and 16 are the manual completing bits the header lacks; both are handled). One row is `conflict`: where the RM's remap grid and the datasheet's pin table give the same pad a different selector value, the pin table's value is kept and the grid's is written into `basis` as `!rm-remap-grid(value=N)`, the same `!<source>(<column>=<value>)` DSL every other table uses. Today that is CH32M030's `ADC_ETR`: the manual's Table 6-15 puts `ADC_ETRGIN_RM=0` (default) on PB6 and `=1` on PA14, while the pin table has PA14 as the default and PB6 as `ADC_ETR_1`. Both editions of each document agree with themselves, so this is a disagreement between documents, not between translations. `index/conflicts.csv` carries it with the grid's value in `alternative`. The H41x/X315 line uses AF numbers rather than remap and is out of scope (held by `af-N` in pin_functions).
@@ -790,8 +799,14 @@ rest is `2.2 Pin Description`.
 
 What `tools/check_tables.py` checks: the part number is catalogued and `document` is that part's
 datasheet; pages are positive integers and at least one edition is filled; `confidence` matches
-how many editions filled; the `p.N` in `basis` agrees with the columns; and **every catalogued
-part number has a `pinout` row**.
+how many editions filled; the `p.N` in `basis` agrees with the columns; and **every part number the
+datasheet's own tables list has a `pinout` row**.
+
+That last qualifier exists for `CH32V006K8U6`, the one catalogued part no datasheet lists (worklist
+F-76). Its pins are stated -- the pin-definition table is captioned for the whole series
+(`CH32V006 pin definitions (except CH32V006F4U6)`) -- but the drawing above the QFN32 pinout is
+headed `CH32V006K8U7` and nothing else, so **no drawing is claimed for it here**. Read the K8U7 page;
+the two differ only in temperature grade.
 
 ### `eval_boards.csv`
 

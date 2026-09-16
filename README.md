@@ -3,7 +3,7 @@
 [日本語](README.ja.md)
 
 Machine-extracted data about WCH's CH32 microcontrollers (12 families, 27 series,
-103 part numbers), built from the primary sources -- datasheets in both languages,
+104 part numbers), built from the primary sources -- datasheets in both languages,
 reference manuals and the EVT packages -- plus the tools that generate the README of
 each family repository from it. The tables come in three kinds
 ([docs/data-layout.ja.md](docs/data-layout.ja.md), Japanese):

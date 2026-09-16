@@ -822,6 +822,13 @@ def figures_sane(t: dict) -> list[str]:
     （資料が図を描かない型番が出てきたら、人が見てからここへ足す）。
     """
     documents = {r["part_number"]: r["datasheet"] for r in t["products"]}
+    # 図を要求するのは**データシートの表がその型番を載せている**ときだけ。
+    # `CH32V006K8U6` は比較表にも订购情報にも無く（EVT だけが名乗る。F-76）、
+    # ピン配置図の見出しも `CH32V006K8U7` としか刷られていない——「図が無い」の
+    # ほうが版面どおりで、落とすべきは「載っているのに図が引けない」型番だけ。
+    drawn = {r["part_number"] for r in t["products"]
+             if "products:" in r["part_number_basis"]
+             or "ordering:" in r["part_number_basis"]}
     out: list[str] = []
     covered: set[str] = set()
     for r in t["figures"]:
@@ -855,7 +862,7 @@ def figures_sane(t: dict) -> list[str]:
                        f"列のページ {pages} と違う")
         if r["kind"] == "pinout":
             covered.add(r["part_number"])
-    for part in sorted(documents):
+    for part in sorted(drawn):
         if part not in covered:
             out.append(f"figures: {part} のピン配置図の行が無い")
     return out

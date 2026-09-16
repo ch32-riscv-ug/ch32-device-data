@@ -30,6 +30,18 @@ One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only t
 
 One row per orderable part number. Holds only product-specific values such as flash, GPIO count and temperature; **dimensions are looked up in packages.csv by package name**. `listed_as` is the abbreviation used in the comparison table (`CH32V208CB` -> `CH32V208CBU6`; the wildcard `C6x6` -> C6T6/C6U6).
 
+**One part is here that no datasheet lists: `CH32V006K8U6`** (worklist F-76). WCH ships it -- the official
+`CH32V006K8U6-EVT-R0` board, the EVT project files (`EVT/EXAM/APPLICATION/WUI/wui_demo.wvproj` and `.template`
+declare `MCU=CH32V006K8U6`, and it is the only CH32V005/V006/V007 part number the whole EVT tree names), the EVT
+device header comment, and probe-rs 0.32.0's target list -- but the comparison table and the ordering table print
+only the 105C grade `K8U7`. Its row carries what said so: `part_number_basis` is `evt:project+silicon:wch-linke`
+(the consumer measured chip ID `0x00600600`, flash 63488 and the UID on the board; see `curated/parts-measured.json`),
+and the remaining columns come from **`rule:pn-temp-grade-sibling`** -- the part number differing only in the final
+temperature-grade digit. Measured across the catalog, all five sibling pairs whose two digits are both grades agree
+on every other column; the one pair that does not (`CH32M030C8U3`/`C8U7`) has `3`, which is a package variant and
+not a grade, so the rule requires both digits to be grades. A row is never created from silicon alone: some WCH
+document must name the part first.
+
 `flash_bytes` is **the region that executes with zero wait** (the amount that goes into `FLASH` in the linker script).
 The CH32V303/305/307 datasheets have "Code FLASH（字节）480K" and "Flash（字节）256K" in
 separate columns; the former is the whole program flash on the die, the latter is the zero-wait region.
