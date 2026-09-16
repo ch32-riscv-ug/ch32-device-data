@@ -1,0 +1,15 @@
+{
+  "_comment": "Part numbers WCH ships silicon for but has not put in a datasheet comparison table, measured on the physical part and reported by the ArduinoCore-CH32 consumer (worklist F-76). tools/build_tables.py folds these in as the basis `silicon:wch-linke`. This file NEVER creates a row on its own: a row appears only when a WCH document (today: an EVT project file) also names the part, so what is recorded here corroborates values, it does not invent parts.",
+  "verified": "2026-09-16",
+  "method": "chip ID, flash size and UID read over WCH-LinkE from the official evaluation board, while generating boards.txt for ArduinoCore-CH32",
+  "measured": {
+    "CH32V006K8U6": {
+      "board": "CH32V006K8U6-EVT-R0",
+      "programmer": "WCH-LinkE 497F8F06CE2F",
+      "chip_id": "0x00600620",
+      "chip_id_dont_care_bits": "[7:4]",
+      "flash_bytes": 63488,
+      "uid": "f799abcd5fc7bc61"
+    }
+  }
+}

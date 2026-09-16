@@ -420,7 +420,7 @@ def series_in(text, known):
 
 
 def find_architecture(pdf, datasheet_series, out, dry_run, family,
-                      required=None, corrections=None):
+                      required=None, corrections=None, destination=MIRRORS):
     """第1章のシステムブロック図。キャプション直下から次の見出しまで。"""
     done = set()
     corrections = corrections or {}
@@ -449,7 +449,7 @@ def find_architecture(pdf, datasheet_series, out, dry_run, family,
                 name = f"architecture_{s}.png"
                 if required and name not in required:
                     continue
-                dest = MIRRORS / family / "image" / name
+                dest = destination / family / "image" / name
                 if save_crop(page, bbox, dest, dry_run):
                     out.append((dest, f"p.{page.page_number}"))
                     done.add(s)
@@ -476,7 +476,8 @@ def expand_label(label, parts_by_series):
 
 
 def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
-                 required=None, lead_of_name=None, done=None):
+                 required=None, lead_of_name=None, done=None,
+                 destination=MIRRORS):
     """ピン配置章の図。
 
     見出しの置き方がデータシートごとに違う（図の上に置く版、下に置く版、
@@ -634,7 +635,7 @@ def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
                     key = (family, name)
                     if key in done and (done[key] or not is_lead):
                         continue
-                    dest = MIRRORS / family / "image" / name
+                    dest = destination / family / "image" / name
                     if save_crop(page, bbox, dest, dry_run):
                         out.append((dest, f"p.{page.page_number} "
                                           f"{printed[parts]}"))
@@ -642,7 +643,7 @@ def find_pinouts(pdf, group_of_part, parts_by_series, out, dry_run, family,
     return done
 
 
-def find_packages(pdf, packages, out, dry_run):
+def find_packages(pdf, packages, out, dry_run, destination=MIRRORS):
     """パッケージ章の外形図。見出し `4.1 TSSOP20 package` の直下。"""
     done = set()
     for page in pdf.pages:
@@ -656,7 +657,7 @@ def find_packages(pdf, packages, out, dry_run):
             bottom = (heads[i + 1][0] if i + 1 < len(heads)
                       else body_bounds(page)[1])
             bbox = region_bbox(page, line_bottom + 4, bottom)
-            dest = MIRRORS / "WCH-common" / "image" / f"package_{package}.png"
+            dest = destination / "WCH-common" / "image" / f"package_{package}.png"
             if save_crop(page, bbox, dest, dry_run):
                 out.append((dest, f"p.{page.page_number}"))
                 done.add(package)
@@ -671,7 +672,14 @@ def main():
     ap.add_argument("--kind", choices=("architecture", "pinout", "package"),
                     action="append",
                     help="この種類だけ処理する（既定は全部）")
+    ap.add_argument("--out", type=Path, default=None,
+                    help="ミラーではなくこのディレクトリへ書き出す（測定用）")
     args = ap.parse_args()
+    # **`--out` のときはミラーに一切触らない。** 切り出しの質を測るのに本番の
+    # 書き出しを走らせると、消す段（下の「生成対象を先に消す」）がミラーの画像を
+    # 消してしまう——2026-09-16 に実際に 13 repository の 52 枚を消した。
+    # 測るだけの実行がミラーを変えられない形にしておく。
+    destination = args.out if args.out else MIRRORS
 
     corrections = caption_corrections()
     products = load("products")
@@ -699,7 +707,7 @@ def main():
     need = {family: {n for n in names if n.split("_")[0] in kinds}
             for family, names in need.items()}
 
-    if not args.dry_run:
+    if not args.dry_run and not args.out:
         for family, names in sorted(need.items()):
             # --family 指定時は WCH-common を消さない。そのファミリーの
             # データシートに載っているパッケージしか作り直せないため。
@@ -725,16 +733,16 @@ def main():
             if "architecture" in kinds:
                 find_architecture(pdf, sorted(ds_series), written, args.dry_run,
                                   family, need.get(family),
-                                  corrections.get(datasheet))
+                                  corrections.get(datasheet), destination)
             if "pinout" in kinds:
                 find_pinouts(pdf, group_of_part, parts_by_series, written,
                              args.dry_run, family, need.get(family),
-                             lead_of_name, pinout_done)
+                             lead_of_name, pinout_done, destination)
             if "package" in kinds:
-                find_packages(pdf, packages, written, args.dry_run)
+                find_packages(pdf, packages, written, args.dry_run, destination)
         print(f"== {family}/{datasheet}: {len(written)} 枚")
         for dest, note in written:
-            print(f"   {dest.relative_to(MIRRORS)}  ({note})")
+            print(f"   {dest.relative_to(destination)}  ({note})")
 
 
 if __name__ == "__main__":

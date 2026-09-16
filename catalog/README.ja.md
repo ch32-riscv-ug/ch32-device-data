@@ -30,6 +30,18 @@ toolchains を生成します。確度・根拠の読み方は
 
 1行1注文型番。flash・GPIO数・温度など製品固有の値だけを持ち、**寸法系はpackage名でpackages.csvを参照**します。`listed_as`は比較表での略記（`CH32V208CB`→`CH32V208CBU6`、ワイルドカード`C6x6`→C6T6/C6U6）。
 
+**どの datasheet にも載っていない型番が1つあります——`CH32V006K8U6`**（worklist F-76）。WCH は
+実際に出荷していて、公式ボード `CH32V006K8U6-EVT-R0`・EVT の project ファイル
+（`EVT/EXAM/APPLICATION/WUI/wui_demo.wvproj` と `.template` が `MCU=CH32V006K8U6` と宣言。EVT ツリー全体で
+CH32V005/V006/V007 の型番を名乗るのはこの1つだけ）・EVT の device header のコメント・probe-rs 0.32.0 の
+ターゲット一覧が名乗ります。いっぽう比較表と订购情報は 105℃ グレードの `K8U7` しか刷りません。
+行にはそう言っている出所だけを書きます——`part_number_basis` は `evt:project+silicon:wch-linke`
+（consumer がボードで chip ID `0x00600600`・flash 63488・UID を実測。`curated/parts-measured.json`）で、
+残りの列は **`rule:pn-temp-grade-sibling`**（末尾の温度グレードの桁だけが違う型番）から来ます。
+目録で実測すると、**両方の桁がグレードである5組はそれ以外の列が完全に一致**し、一致しない唯一の組
+（`CH32M030C8U3`/`C8U7`）の `3` はグレードではなく封装の変種——だから規則は両方の桁がグレードで
+あることを条件にします。実機だけでは行を作りません。WCH の資料がその型番を名乗っていることが先です。
+
 `flash_bytes`は**零等待で実行できる領域**（linker scriptの`FLASH`に入る量）です。
 CH32V303/305/307のdatasheetは「Code FLASH（字节）480K」と「Flash（字节）256K」を
 別の列で持っていて、前者はdie上のprogram flash全体、後者が零等待領域です。

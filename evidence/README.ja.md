@@ -346,6 +346,15 @@ pairs cross-checked 391  agree 352  more on the pin side (superset from a shared
 
 `pin側が多い`が共有pinoutの分、`pin側が少ない`はその封装に出ていないinstance（`CMP2`・`LPTIM1`で、入力が内部だけの可能性がある）。**`pin に1つも出ない`が0であること**が、比較表が数える周辺は必ずpinから引けるという保証です。
 
+**`CH32V006K8U6` は `CH32V006K8U7` の列を読みます。** 比較表にも订购情報にも刷られていない唯一の
+目録型番（worklist F-76）ですが、ピンは述べられています——引脚定义の表は
+`CH32V006引脚定义（除CH32V006F4U6以外）` と表題が series 全体から1型番だけを除いた形で、QFN32 の
+封装ごとの列がたまたま 105℃ グレードの綴りで見出しを持っているだけです。見出しがグレードの桁を
+落とした綴り（`CH32V006E8R`）のときは既に両グレードがその列を読んでいて、これはその綴りが
+省略されていない場合にあたります。`resolve()` がこの列を採るのは、**見出しの型番の封装がこの型番と
+同じ列が丁度1つ**で、かつ表題がこの型番を除外していないときだけ。出てくる行は `CH32V006K8U7` と
+1バイト違いません。
+
 ### `remap_fields.csv` / `remap_routes.csv`
 
 AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）で、**`confidence` は「2つの資料が一致したか」を言います**——datasheet の pin 表と application manual の両方が述べている経路が `confirmed`（4,354行）、片方だけが `reference`（483行）。manual の述べ方（格子か、レジスタ説明文か）は数に影響しません——食い違いが起きるのは**資料のあいだ**で、同じ manual の zh/en が経路について食い違うことは全corpusで一度もないからです。**値を格子から採った経路は `reference` のまま**です（pin 表はその pad にその signal が在るとは言っていますが、その値だとは言っていません。`CH32V103` の TIM3 は pin 表が PB4 と PC6 の両方に `_1` と書き、manual が値2と値3に置く）。`remap_fields.csv` には**行ごとの確度を付けていません**——行が複合で、列ごとに出所が違うからです。`bits`/`register`/`field` は EVT header と manual の和集合（片方しか名指さない register は他方の抜けで、食い違いではない）、`valid_values` は6つの出所から集めた**下限**、`reset_value` は manual だけ。1つの確度を付けると下限まで「2つの資料が一致」と読めてしまいます。代わりに consumer が実際に書く `bits` を固定してあります——header と manual が**同じ register に違う bit**を言ったらその行は `conflict` になり、manual の言い分が `basis` の `!rm-register-table(bits=…)` に残ります。全corpusで **0 件**です（27件は manual が register を別の綴りで書いたもの、16件は manual が header に無い bit を補ったもので、どちらも処理済み）。**末尾の `:xx` はその経路を述べた manual の版**です。長らく `:en` の決め打ちで、両版を読んでいるのに**中文版しか言っていない経路も `en` を名乗っていました**（説明文由来の503経路。格子由来では en のみが29）。manual が述べていない行には印が付きません。1行だけ `conflict` があります——RM の重映射格子と datasheet の pin 表が**同じ pad に別の selector 値**を与えるところで、値は pin 表を保ち、格子の言い分を `basis` に `!rm-remap-grid(value=N)` と書きます（他の表と同じ `!<出所>(<列>=<値>)` の DSL）。いまは `CH32M030` の `ADC_ETR` で、RM 表6-15 は `ADC_ETRGIN_RM=0`（既定）を PB6・`=1` を PA14 に置き、pin 表は PA14 を既定・PB6 を `ADC_ETR_1` と書きます。**zh/en とも各資料の中では一致**しているので、版の食い違いではなく資料どうしの食い違いです。`index/conflicts.csv` が格子の値を `alternative` に持ちます。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
@@ -769,8 +778,13 @@ C6T6・C8T6・C8U6 を覆う）・温度グレードの桁を省いた形（`CH3
 
 `tools/check_tables.py` が表だけで見ていること: 型番が目録に在り `document` がその型番の
 データシートであること・ページが正の整数で片版以上が埋まっていること・`confidence` が埋まった
-版の数と一致すること・`basis` の `p.N` が列と同じであること・そして**目録の全型番に `pinout` の
-行が在ること**。
+版の数と一致すること・`basis` の `p.N` が列と同じであること・そして**データシートの表が載せている
+型番すべてに `pinout` の行が在ること**。
+
+最後の限定は `CH32V006K8U6`——どの datasheet も載せていない唯一の目録型番（worklist F-76）——の
+ためにあります。ピンは述べられています（引脚定义の表は `CH32V006引脚定义（除CH32V006F4U6以外）` と
+series 全体を表題にしている）が、QFN32 のピン配置図の見出しは `CH32V006K8U7` としか刷られていないので、
+**この表はこの型番の図を主張しません**。K8U7 のページを読んでください。違いは温度グレードだけです。
 
 ### `eval_boards.csv`
 

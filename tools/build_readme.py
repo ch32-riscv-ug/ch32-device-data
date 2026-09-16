@@ -435,6 +435,13 @@ def comparison_section(data: Data, series: dict) -> list[str]:
     the old README served with images -- which product of this series to pick.
     """
     products = data.series_products(series["series"])
+    # **比較表に載っていない型番は並べない。** この節は資料の比較表を転置した
+    # ものなので、そこに行を持たない型番（`CH32V006K8U6`。EVT だけが名乗る。
+    # worklist F-76）を足すと、列が全部 `-` になって「その周辺を持たない」と
+    # 読めてしまう。ピン配置とパッケージの節には出るので、消えるわけではない。
+    stated = {r["part_number"] for r in data.attributes}
+    missing = [p["part_number"] for p in products if p["part_number"] not in stated]
+    products = [p for p in products if p["part_number"] in stated]
     if len(products) < 2:
         return []
     parts = [p["part_number"] for p in products]
@@ -514,6 +521,10 @@ def comparison_section(data: Data, series: dict) -> list[str]:
     # 差があるのは3行）。差が無い series では畳まずそのまま出す。
     differing = [row for row in body if len(set(row[1])) > 1]
     out = [f"### {series['series']} product comparison", ""]
+    if missing:
+        out += [f"{', '.join(missing)} is not in the datasheet's comparison table, "
+                "so it has no column here; every value it does have is in "
+                "`catalog/products.csv`.", ""]
     if differing and len(differing) < len(body):
         out += [f"Only the {len(differing)} rows that differ between these "
                 f"{len(parts)} products; the other {len(body) - len(differing)} "
@@ -716,12 +727,20 @@ def pinout_reference(data: Data, family: str) -> list[str]:
     pages = {(r["part_number"], lang): r[f"page_{lang}"]
              for r in getattr(data, "figures", []) if r["kind"] == "pinout"
              for lang in ("zh", "en") if r[f"page_{lang}"]}
+
+    def page_of(parts: list[str], lang: str) -> str:
+        """この群のどれかが持つ版面。**代表型番が図を持つとは限らない**——
+        `CH32V006K8U6` は datasheet に図が無いので（F-76）、群の先頭で引くと
+        QFN32 の行だけページ直リンクを失う。"""
+        for part in parts:
+            if (part, lang) in pages:
+                return "#page=" + pages[(part, lang)]
+        return ""
     for _, parts in sorted(groups, key=lambda g: g[1][0]):
         product = next(p for p in data.products if p["part_number"] == parts[0])
         document = documents.get(product["datasheet"], {})
         links = " / ".join(
-            f"[{lang}]({document[f'mirror_url_{lang}']}"
-            f"{'#page=' + pages[(parts[0], lang)] if (parts[0], lang) in pages else ''})"
+            f"[{lang}]({document[f'mirror_url_{lang}']}{page_of(parts, lang)})"
             for lang in ("en", "zh") if document.get(f"mirror_url_{lang}"))
         package = package_of[parts[0]]
         out.append(f"| {package} | {', '.join(parts)} "

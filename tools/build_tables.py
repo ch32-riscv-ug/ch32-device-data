@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -628,6 +629,115 @@ def build_rows(family: Path, datasheet_name: str, dims: dict) -> list[dict]:
     return rows
 
 
+# ---------------------------------------------------------------- EVT が名乗る型番
+
+# WCH は MounRiver の project（`*.wvproj`）と `.template` に対象 MCU を書く。
+EVT_MCU = (re.compile(r'"mcu"\s*:\s*"(CH32[A-Za-z0-9]+)"'),
+           re.compile(r'^\s*MCU\s*=\s*(CH32[A-Za-z0-9]+)\s*$', re.M))
+
+
+def evt_part_numbers() -> dict[str, list[str]]:
+    """EVT の project ファイルが名乗る**完全な**型番 → それを書いているファイル。
+
+    同じ欄には温度グレードの桁を落とした綴り（`CH32V006K8U`。`EVT/PUB/SCHPCB` の
+    ディレクトリ名と同じ形）も混ざるので、`FULL_PART` に当たるものだけを採る。
+    """
+    found: dict[str, list[str]] = collections.defaultdict(list)
+    for repo in sorted(MIRRORS.glob("CH32*")):
+        evt = repo / "EVT"
+        if not evt.is_dir():
+            continue
+        for path in sorted(evt.rglob("*")):
+            if not path.is_file() or (path.suffix.lower() != ".wvproj"
+                                      and path.name != ".template"):
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for pattern in EVT_MCU:
+                for part in pattern.findall(text):
+                    if FULL_PART.match(part):
+                        found[part].append(str(path.relative_to(MIRRORS)))
+    return {part: sorted(set(files)) for part, files in found.items()}
+
+
+def load_measured_parts() -> dict[str, dict]:
+    """curated/parts-measured.json — 実機で読んだ値（F-76）。
+
+    **この file だけでは行にならない。** WCH の資料（いまは EVT の project）が
+    その型番を名乗っているときに、値を裏づけるためだけに効く。
+    """
+    path = REPO / "curated" / "parts-measured.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8")).get("measured", {})
+
+
+def temp_grade_sibling(part: str, rows: list[dict]) -> dict | None:
+    """末尾の温度グレードの桁だけが違う、正本の行。
+
+    型番の構造規則は最後の桁を温度グレードだと言う（`TEMP_GRADE`）ので、その桁
+    以外が同じ2つの型番は**同じ製品の温度違い**。全corpus実測: 末尾1桁だけが違う
+    組は6つで、**両方の桁がグレード（6/7）の5組は他の列がすべて一致**する
+    （`CH32L103K8U6/7`・`CH32V006E8R6/7`・`CH32V007E8R6/7`・`CH32V007K8U6/7`・
+    `CH32V303RCT6/7`）。残る1組 `CH32M030C8U3`/`C8U7` は `3` がグレードではなく
+    封装の変種で、封装が実際に違う（`QFN48X7_A` と `QFN48`）——だから**両方の桁が
+    グレードであること**を条件にする。
+    """
+    if not FULL_PART.match(part) or part[-1] not in TEMP_GRADE:
+        return None
+    found = [r for r in rows
+             if r["part_number"][:-1] == part[:-1]
+             and r["part_number"][-1] in TEMP_GRADE
+             and r["part_number"] != part]
+    return found[0] if len(found) == 1 else None
+
+
+def evt_only_rows(rows: list[dict], declared: dict[str, list[str]],
+                  measured: dict[str, dict]) -> list[dict]:
+    """資料の比較表・订购情報に無く、**EVT だけが名乗る**型番の行（F-76）。
+
+    `CH32V006K8U6` がこれ——`CH32V006EVT.ZIP` の `wui_demo.wvproj` と `.template` が
+    `MCU=CH32V006K8U6` と書き、公式の評価ボード `CH32V006K8U6-EVT-R0` が在るのに、
+    `CH32V006DS0` は `K8U7` しか書かない（全corpus走査で `K8U6` は0件）。
+
+    **勝手には作らない。** 出すのは温度グレードの兄弟が正本に在るときだけで、
+    他の列はその兄弟から来る（`temp_grade_sibling`）。兄弟が無いものは報告して
+    捨てる——`CH32V307RVT6` は10以上の `.template` が名乗るが資料のどこにも無く、
+    `CH32V307RCT6` とは容量の字が違うので EVT 側の誤記と見るほうが素直。
+    """
+    known = {r["part_number"] for r in rows}
+    out: list[dict] = []
+    for part in sorted(declared):
+        if part in known:
+            continue
+        sibling = temp_grade_sibling(part, rows)
+        if sibling is None:
+            print(f"{part}: EVT が名乗るが資料に無く、温度グレードの兄弟も無い"
+                  f"（{declared[part][0]}）", file=sys.stderr)
+            continue
+        fact = measured.get(part, {})
+        row = {"part_number": part, "family": sibling["family"],
+               "datasheet": sibling["datasheet"], "listed_as": ""}
+        judge_field(row, "part_number",
+                    [("evt:project", part),
+                     ("silicon:wch-linke", part if fact else None)])
+        row["part_number"] = part
+        m = SERIES.match(part)
+        judge_field(row, "series", [("rule:part-number-structure", m.group(1) if m else None)])
+        # 封装は兄弟から来る。型番の字（`U`→`QFN`）が言うのは**封装の系統**だけで
+        # ピン数までは決めないので、既存の行と同じく**検査**として当てる。
+        judge_field(row, "package",
+                    [("rule:pn-temp-grade-sibling", sibling["package"])],
+                    package_letter_check(part, sibling["package"]))
+        for field in ("flash_bytes", "sram_bytes", "gpio_count"):
+            judge_field(row, field,
+                        [("rule:pn-temp-grade-sibling", sibling[field]),
+                         ("silicon:wch-linke", str(fact[field]) if field in fact else None)])
+        judge_field(row, "temperature", [("rule:pn-temp-grade", TEMP_GRADE[part[-1]])])
+        judge_field(row, "packing", [])
+        out.append(row)
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
@@ -655,6 +765,9 @@ def main() -> int:
     if not rows:
         print("対象がありません", file=sys.stderr)
         return 1
+    # 資料の表に無く EVT だけが名乗る型番（F-76）。属性・封装の証拠は持たないので、
+    # それらを畳む `attribute_rows`/`package_rows` より前に足しても何も足さない。
+    rows.extend(evt_only_rows(rows, evt_part_numbers(), load_measured_parts()))
     # Rows sort by the row's identity -- part number alone is not guaranteed
     # unique (one model can appear in several datasheets), so the full key keeps
     # regeneration and later insertions reproducible with no tie left to chance.

@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-WCHのCH32シリーズ（12 family・27 series・103型番）について、一次資料（datasheet 中英両版・
+WCHのCH32シリーズ（12 family・27 series・104型番）について、一次資料（datasheet 中英両版・
 reference manual・EVT）から**機械抽出したCSV**と、そこから各familyリポジトリのREADMEを
 生成するtoolを置く独立データリポジトリです。表は3つに分かれます（[docs/data-layout.ja.md](docs/data-layout.ja.md)）:
 

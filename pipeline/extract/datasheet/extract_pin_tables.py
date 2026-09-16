@@ -327,12 +327,34 @@ def merge_function_sets(zh: dict, en: dict) -> dict:
     return merged
 
 
-def resolve(part: str, package: str, cells: dict, titles: dict) -> tuple | None:
+def variant_package(variant: str, catalogued: list[tuple[str, str]]) -> str | None:
+    """The package of the part number a column heading names, or None if unclear.
+
+    A heading is the tail of a part number (`V006K8U7`), sometimes with the
+    temperature grade dropped so it stands for both (`V006E8R`). Both grades of
+    one variant share a package, so an ambiguous heading still yields one answer.
+    """
+    packages = {pkg for part, pkg in catalogued
+                if part.upper().endswith(variant)
+                or part.rstrip("0123456789").upper().endswith(variant)}
+    return packages.pop() if len(packages) == 1 else None
+
+
+def resolve(part: str, package: str, cells: dict, titles: dict,
+            catalogued: list[tuple[str, str]] = ()) -> tuple | None:
     """The (tkey, cvar) column that defines this product's pins.
 
     The same ladder build_all.choose_column climbs: a column named after the part
     itself wins; otherwise the package name finds the column and the captions
     arbitrate when several tables print that package.
+
+    A last rung catches the part the datasheet's own tables never name -- today
+    only `CH32V006K8U6`, which WCH ships and declares in the EVT but left out of
+    the comparison table (worklist F-76). Its table is captioned for the whole
+    series (`CH32V006引脚定义（除CH32V006F4U6以外）`), so the pins are stated; only
+    the per-package column happens to be headed by the 105C grade `V006K8U7`.
+    The rung looks up the package of each heading's own part number and takes the
+    column when exactly one matches and the caption does not exclude this part.
     """
     bare = part[4:] if part.startswith("CH32") else part
     for key, cell in cells.items():
@@ -352,6 +374,13 @@ def resolve(part: str, package: str, cells: dict, titles: dict) -> tuple | None:
                      if extract_pins.scope_allows(part, titles.get(k[0], [])) is None]
         if len(undecided) == 1:
             return undecided[0]
+    # 見出しが封装ではなく代表の型番で名乗る表では、上の段は空振りする。
+    # **その見出しの型番の封装**で引き直す。表題がこの型番を除外していないことが条件。
+    by_heading = [k for k, cell in cells.items()
+                  if variant_package(cell["variant"].upper(), catalogued) == package
+                  and extract_pins.scope_allows(part, titles.get(k[0], [])) is not False]
+    if len(by_heading) == 1:
+        return by_heading[0]
     return None
 
 
@@ -461,7 +490,8 @@ def main() -> int:
         names = {tkey: number for ed in editions.values()
                  for tkey, (number, _) in ed[2].items()}
         for part, package in sorted(products[(family, datasheet)]):
-            key = resolve(part, package, cells, titles)
+            key = resolve(part, package, cells, titles,
+                          products[(family, datasheet)])
             if key is None:
                 unresolved.append(f"{part} ({family}/{datasheet} package={package})")
                 continue
