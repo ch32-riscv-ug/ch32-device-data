@@ -412,10 +412,11 @@ the automatic change applies to some lots and not others, and `errata.csv` alrea
 ranges in one normalised spelling, so this column carries that row's `id` rather than repeating
 the range. Which errata row is decided the same way `scan_errata` decides it -- the errata's
 `match` regex against `<mirror-relative path> <note>` -- and then narrowed to errata rows whose
-`series` names this row's series. A row with a note but no `errata` id has no lot qualification
-recorded: CH32V407's notes state no lot range at all, and for CH32V317 the errata rows do not
-name that series even though the datasheet is titled for it (`v30x-vio-min-1v2` does name V317,
-so the omission may be deliberate; it is left for a person to settle).
+`series` names this row's series. A row with a note but no `errata` id has no lot qualification:
+the document states none. CH32V407's notes give no lot range, and CH32V317 has its own pin table
+(Table 3-2) with its own notes, which state the automatic change with no lot range either -- only
+the notes belonging to the CH32V303/305/307 pin table (Table 3-1) and to the model-agnostic
+alternate-function table (Table 3-4, prefaced "not specific to any model") carry one.
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 

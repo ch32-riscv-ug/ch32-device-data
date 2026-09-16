@@ -415,10 +415,10 @@ and SDIO_D1 is automatically changed to PB14 and PB15` の形で、条件は同�
 1箇所に持っているので、範囲そのものは写さず `id` で繋ぎます。どの errata の行かは
 `scan_errata` と同じ契約で決め（`match` を `<mirror相対パス> <注記>` に当てる）、さらに
 **その errata が行の series を名指していること**で絞ります。注記が付いているのに `errata`
-が空な行は、ロットの条件が記録されていないという意味です——`CH32V407DS0` の注記には
-そもそも批号の条件が無く、`CH32V317` は datasheet の表題が `CH32V303/305/307/317` なのに
-errata の `series` が名指していません（`v30x-vio-min-1v2` だけは V317 を含むので、
-**除外が意図的かは人が決める話**として残してあります）。
+が空な行は、**資料がロットの条件を書いていない**という意味です——`CH32V407DS0` の注記には
+そもそも批号の条件が無く、`CH32V317` は**自分の pin 表（表3-2）と自分の注記**を持っていて
+そちらにも批号の句がありません。批号つきの注記は `CH32V303/305/307` の pin 表（表3-1）と、
+型番非依存と断っている複用功能の表（表3-4）に付くものです。
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 
