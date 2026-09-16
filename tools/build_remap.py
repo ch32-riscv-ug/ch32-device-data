@@ -159,6 +159,8 @@ def main() -> int:
                                else str(sel["reset_value"]),
                 "_from_manual": bool(sel.get("_from_manual")),
                 "_sources": tuple(sel.get("sources") or ()),
+                # header と manual が同じ register に違う bit を言った印（F-76）。
+                "_bits_disagree": ";".join(sel.get("_bits_disagree") or ()),
             }
             known = fields.get(key)
             if known is None:
@@ -215,12 +217,24 @@ def main() -> int:
     ORDER = ["evt-header", "rm-register-table", "rm-remap-grid",
              "rm-field-description", "datasheet-pin-table"]
     for row in field_rows:
-        row["confidence"] = "reference"
+        row["confidence"] = "reference"   # 下で `conflict` に上書きされることがある
         said = row.pop("_sources", None)
         row.pop("_from_manual", None)
+        # **header と manual が同じ register に違う bit を言ったら `conflict`。**
+        # `bits` は header を採り、manual の言い分を `basis` に残す（他の表と同じ
+        # `!<出所>(<列>=<値>)` の DSL）。全corpus実測（2026-09-16）で 0 件だが、
+        # 起きたら `remap_fields.bits` が信用できないので、覚書ではなくデータに出す。
+        against = row.pop("_bits_disagree", "")
+        if against:
+            row["confidence"] = "conflict"
+            disagreements.append(
+                f"{row['series']} {row['selector']}: bit位置が header と manual で"
+                "食い違う（`remap_fields.bits` は header を採った）")
         # 出所は候補が記録したものから組む。記録の無い古い候補だけ従来の決め打ちに落とす。
         row["basis"] = (route_basis([n for n in ORDER if n in said])
                         if said else MANUAL_BASIS)
+        if against:
+            row["basis"] += f"+!rm-register-table(bits={against})"
     route_rows = []
     for key in sorted(routes):
         (s, sel, value, signal, pad) = key

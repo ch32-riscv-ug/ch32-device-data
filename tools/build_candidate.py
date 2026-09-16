@@ -734,6 +734,15 @@ def join(
             if register in order:
                 mine = [b for r, b in bits if r == register]
                 if mine != rm:
+                    # **EVT header と application manual が同じ register について
+                    # 違う bit を言う**——起きたら selector の bits が信用できない。
+                    # 全corpus実測（2026-09-16）で **0 件**なので、`remap_fields` の
+                    # `bits` は2つの資料が一致した値だと言える。数で固定するために
+                    # 覚書だけでなく selector にも印を残す（`check_tables` が読む）。
+                    # **header を採り、manual の言い分を残す**（この分岐は header の
+                    # bits をそのまま使う）。`remap_fields` が `conflict` になる。
+                    s.setdefault("_bits_disagree", []).append(
+                        ";".join(f"{register}:{b}" for b in rm))
                     notes.append(
                         f"[join] {selector_id(controller, s['field'])}: "
                         f"{register} の bit位置が資料間で不一致 header={mine} RM={rm}"
@@ -771,6 +780,8 @@ def join(
             "field": s["field"],
             "bits": [{"register": register, "bit": bit} for register, bit in bits],
         }
+        if s.get("_bits_disagree"):
+            out["_bits_disagree"] = s["_bits_disagree"]
         if s.get("_from_manual"):
             # Not in the EVT header at all. A consumer that reaches registers
             # through the SDK's macros has none for this field, so the basis has

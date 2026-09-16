@@ -631,6 +631,43 @@ def routes_backed_by_pins(t: dict) -> list[str]:
 REMAP_DISSENT = re.compile(r"\+!(?P<source>[a-z-]+)\(value=(?P<value>\d+)\)")
 
 
+# `remap_fields` の異論（F-76）。`!<出所>(bits=<register>:<bit>;…)`。
+FIELD_DISSENT = re.compile(r"\+!(?P<source>[a-z-]+)\(bits=(?P<bits>[^)]*)\)")
+
+
+def remap_field_conflicts(t: dict) -> list[str]:
+    """`remap_fields` の `conflict` が、異を唱えた出所と bits を `basis` に書いているか。
+
+    **この表には行ごとの `confidence` を付けていない**（全行 `reference`。`conflict` を
+    除く）。行が複合で、列ごとに出所が違うから——`bits`/`register`/`field` は EVT header と
+    application manual の**和集合**（片方しか名指さない register は他方の抜けで食い違いでは
+    ない）、`valid_values` は6つの出所の和で**下限**、`reset_value` は manual だけ。
+    1つの `confidence` を付けると `valid_values` の下限まで「2つの資料が一致」と読めて
+    しまう。
+
+    **`conflict` にするのは1つだけ**: header と manual が**同じ register に違う bit**を
+    言ったとき。consumer が実際に書くのは `bits` なので、そこが食い違えば値が信用でき
+    ない。`bits` は header を採り、manual の言い分を `basis` に残す。
+    全corpus実測（2026-09-16）で **0 件**——覚書ではなくデータに出して数で固定する。
+    """
+    out = []
+    for r in t["remap_fields"]:
+        where = f"{r['series']} の {r['selector']}"
+        found = FIELD_DISSENT.search(r["basis"] or "")
+        if not r["bits"]:
+            out.append(f"remap_fields: {where} に bits が無い")
+        if r["confidence"] == "conflict" and not found:
+            out.append(f"remap_fields: {where} は conflict なのに "
+                       "`basis` が異を唱えた出所を書いていない")
+        if found and r["confidence"] != "conflict":
+            out.append(f"remap_fields: {where} の `basis` は異論を書いているのに "
+                       f"confidence が {r['confidence']!r}")
+        if found and found.group("bits") == r["bits"]:
+            out.append(f"remap_fields: {where} の異論の bits が採った bits と同じ"
+                       "——食い違っていない")
+    return out
+
+
 def remap_confidence(t: dict) -> list[str]:
     """`remap_routes` の確度が `basis` の顔ぶれと揃っているか。
 
@@ -1218,6 +1255,8 @@ def main() -> int:
     bad += remap_conflicts(t)
     # 2つの資料が言っていれば confirmed（F-75）。
     bad += remap_confidence(t)
+    # bits が空でないことと、conflict が異論を書いていること（F-76）。
+    bad += remap_field_conflicts(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に
