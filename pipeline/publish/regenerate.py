@@ -129,6 +129,8 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
              ["pipeline/extract/datasheet/extract_absolute_maximum.py"]),
             ("debug_wiring",
              ["pipeline/extract/manual/extract_debug_wiring.py"]),
+            # C2。目録の型番と bundle だけを読むので、どこに置いても同じ（数秒）。
+            ("figures", ["pipeline/extract/datasheet/extract_figures.py"]),
             ("option_bytes + option_byte_fields",
              ["pipeline/extract/rm/extract_option_bytes.py"]),
             # 凍結tool `build_dma_requests` の退役（2026-09-09）: bundle 入力で byte 一致を確認して

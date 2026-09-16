@@ -121,6 +121,7 @@ tools/ docs/
 | `operating_conditions` | `evidence/` | `symbol` は付与識別子（`parameter` が隣）。README に印 |
 | `remap_fields` | `evidence/` | `selector` は付与識別子。そのまま |
 | `pin_conditions` | `evidence/` | 2026-09-16 新設（F-61）。`signal` は pin 表の綴りへ揃えた行ラベル、`condition` は資料の綴りの連言。**導出列は無い**——「項の多い行が勝つ」という読み方は README に書き、列にはしない |
+| `figures` | `evidence/` | 2026-09-16 新設（C2）。型番ごとに「ピン配置図がどの版面か」。**`page_zh`・`page_en` は別の列**——両版で割り付けが違うのは食い違いではないので、この表は構造上 `conflict` を持たない |
 | `remap_routes` | `evidence/` | `peripheral`/`role` 列を外す（→ `index/series/<S>/routes.csv`） |
 | `timers` | `evidence/` | `channels`/`complementary` を外す（→ `index/families/<F>/timers.csv`）。RM の `kind`/`counter_width_bits`/`update_vector`/`condition` は残す |
 | `register_blocks` `registers` `register_fields` | `evidence/` | `register_fields` に `define` 列。`registers` の平坦化 `register` は残し、`member_path`（元の入れ子）を足す |

@@ -65,14 +65,14 @@ Only the 8 rows that differ between these 4 products; the other 7 are the same f
 
 ## Packages & pinout drawings
 
-Pinout drawings are in the datasheet (chapter *Pinouts*):
+Pinout drawings are in the datasheet (chapter *Pinouts*); each link opens at the page that carries the drawing:
 
 | Package | Products | Datasheet | Outline |
 |---|---|---|---|
-| LQFP48 | CH32V103C6T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP48.png) |
-| LQFP48 | CH32V103C8T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP48.png) |
-| QFN48X7 | CH32V103C8U6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN48X7.png) |
-| LQFP64M | CH32V103R8T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64M.png) |
+| LQFP48 | CH32V103C6T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF#page=13) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF#page=11) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP48.png) |
+| LQFP48 | CH32V103C8T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF#page=13) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF#page=11) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP48.png) |
+| QFN48X7 | CH32V103C8U6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF#page=13) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF#page=11) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN48X7.png) |
+| LQFP64M | CH32V103R8T6 | [en](https://ch32-riscv-ug.github.io/CH32V103/datasheet_en/CH32V103DS0.PDF#page=13) / [zh](https://ch32-riscv-ug.github.io/CH32V103/datasheet_zh/CH32V103DS0.PDF#page=11) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64M.png) |
 
 ## Pin maps & alternate functions
 
