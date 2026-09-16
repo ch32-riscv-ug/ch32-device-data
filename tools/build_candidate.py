@@ -173,6 +173,14 @@ def route_sources(pin: dict, fn: dict, value: int,
     pin の signal の**末尾**で、手前は周辺名＋`_` になる——`SDIO_CK`.endswith(`CK`) で
     手前が `SDIO_`。同じ pad・同じ値のときだけ見るので取り違えない。
 
+    **pad の綴りも揃える**（F-68）。pin 表は pad の名前に別の機能を継ぎ足して刷り
+    （`PA0-WKUP`・`PC13-TAMPER-RTC`）、格子は港とピン番号だけを書く。揃えないと
+    同じ pad が結び付かず、格子が言っているのに `basis` が言わない（実測 86 行）。
+
+    **合成名は格子の2行に当たる**（F-68）。datasheet はタイマのチャネルと外部トリガが
+    同じ pad を共有するとき1つの signal で書き（`TIM2_CH1_ETR`）、格子は `TIM2_CH1` と
+    `TIM2_ETR` を別の行にして同じ pad を置く（`signal_vocabulary.combined_parts`）。
+
     >>> grid = {("TIM3_CH1", "PB4"): {1}}
     >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 1, grid, {}, {}, {})
     ['datasheet-pin-table', 'rm-remap-grid']
@@ -183,15 +191,27 @@ def route_sources(pin: dict, fn: dict, value: int,
     >>> route_sources({"pad": "PC12"}, {"signal": "SDIO_CK"}, 0, {},
     ...               {"PC12": {("CK", 0)}}, {}, {})
     ['datasheet-pin-table-default', 'rm-remap-grid']
+    >>> route_sources({"pad": "PA0-WKUP"}, {"signal": "TIM2_ETR"}, 1,
+    ...               {("TIM2_ETR", "PA0"): {1}}, {}, {}, {})
+    ['datasheet-pin-table', 'rm-remap-grid']
+    >>> route_sources({"pad": "PC1"}, {"signal": "T2CH1ETR"}, 2,
+    ...               {("TIM2_CH1", "PC1"): {2}}, {}, {}, {})
+    ['datasheet-pin-table', 'rm-remap-grid']
     """
     first = "datasheet-pin-table-default" if value == 0 else "datasheet-pin-table"
+    pad = signal_vocabulary.port_pin(pin["pad"])
+    spellings = [canonical_signal(fn["signal"])]
+    spellings += signal_vocabulary.combined_parts(fn["signal"])
+    # 格子は Ethernet の端子に接口の種類を挟まない（`ETH_MII_RXD0` と `ETH_RXD0`）。
+    spellings += [canonical_signal(s)
+                  for s in signal_vocabulary.interface_stripped(fn["signal"])]
     def said_by(exact: dict, at_pad: dict) -> bool:
-        if value in (exact.get((canonical_signal(fn["signal"]), pin["pad"])) or set()):
+        if any(value in (exact.get((s, pad)) or set()) for s in spellings):
             return True
         signal = fn["signal"]
         return any(label != signal and signal.endswith(label)
                    and signal[:-len(label)].endswith("_")
-                   for label, at in at_pad.get(pin["pad"], ()) if at == value)
+                   for label, at in at_pad.get(pad, ()) if at == value)
     out = [first]
     if said_by(grid_value_of, grid_at_pad):
         out.append("rm-remap-grid")
@@ -519,9 +539,26 @@ def join(
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
+    # **pin 表が (signal, 値) をどの pad に与えているか**（訂正の前の綴りで）。
+    # 格子の値を採るときの歯止めに使う（下）。`routed` ではなく**全 function**から
+    # 作る——既定の行は `_selector_value` を持たない（`route` が `default`）ので
+    # `routed` に入らず、既定の pad が見えなくなる。
+    pin_pads_at: dict[tuple[str, int], set[str]] = collections.defaultdict(set)
+    for pin in pins:
+        for fn in pin["functions"]:
+            route = fn.get("route") or ""
+            if route == "default":
+                value = 0
+            elif route.startswith("remap-") and route[6:].isdigit():
+                value = int(route[6:])
+            else:
+                continue
+            pin_pads_at[(canonical_signal(fn["signal"]), value)].add(
+                signal_vocabulary.port_pin(pin["pad"]))
     for pin, fn in routed:
         stated = fn["_selector_value"]
-        says = grid_value_of.get((canonical_signal(fn["signal"]), pin["pad"]))
+        pad = signal_vocabulary.port_pin(pin["pad"])
+        says = grid_value_of.get((canonical_signal(fn["signal"]), pad))
         if says and stated not in says and len(says) == 1:
             corrected = next(iter(says))
             # **格子の誤植への歯止め。** CH32V407 の I3C 格子は列見出しを
@@ -530,11 +567,22 @@ def join(
             # **別の pad が既に居る**なら列が重複している証拠なので、訂正しない
             # （1つの selector 値は 1 pad を選ぶ——それが remap の意味）。
             others = grid_pads_at.get(
-                (canonical_signal(fn["signal"]), corrected), set()) - {pin["pad"]}
-            if others:
+                (canonical_signal(fn["signal"]), corrected), set()) - {pad}
+            # **pin 表が同じ (signal, 値) を別の pad に与えているなら訂正しない。**
+            # 訂正すると同じ値に pad が2つ並ぶ——1つの selector 値は 1 pad を選ぶので、
+            # 並んだ時点でどちらかが誤り。これは格子の誤植ではなく**資料どうしの
+            # 食い違い**なので、片方に寄せず pin 表の値を保って覚書に残す
+            # （実測1件: `CH32M030` の `ADC_ETR` は RM 表6-15 が
+            # `ADC_ETRGIN_RM=0 默认映射`→PB6 と書き、datasheet の pin 表は
+            # PA14 が default・PB6 が remap-1 と書く。zh/en とも各資料の中では一致）。
+            clash = pin_pads_at.get(
+                (canonical_signal(fn["signal"]), corrected), set()) - {pad}
+            if others or clash:
+                why = ("列見出しの誤植の疑い" if others
+                       else "pin表は同じ値を別のpadに与えている＝資料の食い違い")
                 notes.append(
                     f"[join] {pin['pad']} {fn['signal']}: 格子は値{corrected}と言うが"
-                    f"同じ値に {sorted(others)} も居る（列見出しの誤植の疑い）。"
+                    f"同じ値に {sorted(others or clash)} も居る（{why}）。"
                     f"pin表の値{stated}を保った")
             else:
                 fn["_selector_value"] = corrected

@@ -292,6 +292,78 @@ def is_pad_name(signal: str) -> bool:
     return bool(GPIO_NAME.match(signal))
 
 
+# **pin 表は pad の名前に別の機能を継ぎ足して刷る**（`PA0-WKUP`・`PC13-TAMPER-RTC`・
+# `PC14-OSC32_IN`・`PC15-OSC32_OUT`）。RM の重映射格子は港とピン番号だけを書くので、
+# 揃えないと同じ pad が結び付かない（F-68。実測 86 行）。全corpus実測: `-` を含む pad は
+# 6 綴りで、5つがこの形、残る `VREF-` は `-` が名前の一部（港+番号で始まらないので当たらない）。
+PORT_PIN = re.compile(r"^(P[A-H]\d{1,2})-")
+
+# **datasheet は1つの signal で書く**——タイマのチャネルと外部トリガが同じ pad を
+# 共有するとき（`TIM2_CH1_ETR`、`CH32V003` の pin 表は `T2CH1ETR`）。RM の重映射格子は
+# `TIM2_CH1` と `TIM2_ETR` を別の行にし、**どの列でも同じ pad** を置く（`CH32V003RM`
+# の表7-9 は4列とも `PD4`/`PC5`/`PC1`/`PC1` で一致。pin 表は同じ pad に `T2CH1ETR` を
+# 1つ置く）。同じことを言っているので、格子と突き合わせるときだけ分けて見る。
+# **公開する綴りは分けない**——signal は資料のまま（合成名の扱いは `build_candidate`
+# の `COMBINED_SIGNAL` が別に記録している）。
+COMBINED_ROLE = re.compile(r"^(?P<channel>CH\d+N?)_(?P<trigger>ETR)$")
+
+
+def port_pin(pad: str) -> str:
+    """pad の綴りから、港とピン番号だけの名前。その形でなければそのまま。
+
+    >>> port_pin("PA0-WKUP"), port_pin("PC13-TAMPER-RTC"), port_pin("PC14-OSC32_IN")
+    ('PA0', 'PC13', 'PC14')
+    >>> port_pin("PB7"), port_pin("VREF-")
+    ('PB7', 'VREF-')
+    """
+    found = PORT_PIN.match(pad or "")
+    return found.group(1) if found else pad
+
+
+# **pin 表は Ethernet の端子に接口の種類を挟む**（`ETH_MII_RXD0`・`ETH_RMII_CRS_DV`）が、
+# RM の重映射格子は挟まずに書く（`ETH_RXD0`・`ETH_CRS_DV`）。原文で確かめた——
+# `CH32FV2x_V3xRM` の表10-41 は `ETH_RXD0` を `ETH_RM=0`→PC4・`=1`→PD9 に置き、pin 表は
+# その PC4 に `ETH_MII_RXD0`(default) と `ETH_RMII_RXD0`(default) を、PD9 に両方の
+# `remap-1` を置く。**MII と RMII は同じ `ETH_RM` で一緒に動く**。
+# **RGMII は外す**——同じ PC4 に `ETH_RGMII_TXD1`(default) が居るのに `remap-1` の行が
+# 無く、`ETH_RM` で動くという裏が資料に無い（役割名が違うので実際には当たらないが、
+# 当たらない理由を綴りの偶然に頼らない）。格子の綴りは全corpusで6つだけ
+# （`ETH_RX_DV`・`ETH_CRS_DV`・`ETH_RXD0`〜`RXD3`。CH32V20x と CH32V307 の RM）。
+ETH_INTERFACE = re.compile(r"^ETH_(?:MII|RMII)_(?P<role>.+)$")
+
+
+def interface_stripped(signal: str) -> list[str]:
+    """接口の種類を挟まない綴り。挟んでいなければ空。
+
+    >>> interface_stripped("ETH_MII_RXD0"), interface_stripped("ETH_RMII_CRS_DV")
+    (['ETH_RXD0'], ['ETH_CRS_DV'])
+    >>> interface_stripped("ETH_RGMII_TXD1"), interface_stripped("ETH_MDC")
+    ([], [])
+    """
+    m = ETH_INTERFACE.match(signal or "")
+    return [f"ETH_{m.group('role')}"] if m else []
+
+
+def combined_parts(signal: str) -> list[str]:
+    """合成名を、格子が書く2つの名前へ。合成名でなければ空。
+
+    >>> combined_parts("TIM2_CH1_ETR")
+    ['TIM2_CH1', 'TIM2_ETR']
+    >>> combined_parts("T2CH1ETR")
+    ['TIM2_CH1', 'TIM2_ETR']
+    >>> combined_parts("TIM2_CH1"), combined_parts("USART2_CTS")
+    ([], [])
+    """
+    found = split(signal)
+    if not found:
+        return []
+    peripheral, role = found
+    m = COMBINED_ROLE.match(role)
+    if not m:
+        return []
+    return [f"{peripheral}_{m.group('channel')}", f"{peripheral}_{m.group('trigger')}"]
+
+
 def canonical_peripheral(token: str) -> str:
     """Spell a peripheral with its instance number present where one is implied."""
     m = INSTANCE.match(token)
@@ -418,13 +490,35 @@ def canonical(signal: str) -> str | None:
     return f"{pair[0]}_{pair[1]}" if pair else None
 
 
+# **同じ端子を資料が別の役割名で書くところ**（突き合わせのときだけ寄せる）。`LPTIM` の
+# 入力は RM の重映射格子が `LPT_IN1`/`LPT_IN2`、datasheet の pin 表が `LPTIM_CH1`/
+# `LPTIM_CH2`。**同じ pad・同じ値**であることを原文で確かめた——`CH32L103RM` 表10-15 は
+# `LPT_IN1`=PB12(値0)/PB5(値1)・`LPT_IN2`=PB13/PB7、pin 表は `LPTIM_CH1`=PB12(default)/
+# PB5(remap-1)・`LPTIM_CH2`=PB13/PB7 で完全に一致する（同じ表の `LPT_ETR`/`LPT_OUT` は
+# pin 表も同じ綴りなので寄せる必要が無い）。寄せ先は datasheet の綴り——索引 `pinout` の
+# 語彙がそちらで、公開する `signal` は資料のまま。
+ROLE_ALIAS = {
+    ("LPTIM", "IN1"): "CH1",
+    ("LPTIM", "IN2"): "CH2",
+}
+
+
 def comparable(signal: str) -> str:
     """The name to match two documents on, falling back to the verbatim spelling.
 
     Used for joining, where a name no rule covers must still compare equal to
     itself rather than collapsing every unknown into one bucket.
+
+    >>> comparable("LPT_IN1"), comparable("LPTIM_CH1")
+    ('LPTIM_CH1', 'LPTIM_CH1')
+    >>> comparable("LPT_ETR"), comparable("VDD")
+    ('LPTIM_ETR', 'VDD')
     """
-    return canonical(signal) or signal
+    pair = split(signal)
+    if not pair:
+        return signal
+    peripheral, role = pair
+    return f"{peripheral}_{ROLE_ALIAS.get(pair, role)}"
 
 
 def _rules() -> list[tuple[str, str]]:
