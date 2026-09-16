@@ -36,7 +36,9 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "tools"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract" / "datasheet"))
+sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 
+import convert_all  # noqa: E402  bundle の一覧（`extract_low_power` は遅延importに移した）
 import extract_low_power  # noqa: E402
 import operating_rows as operating  # noqa: E402  基礎行の組み立て（規則は凍結時のまま）
 import paths  # noqa: E402
@@ -68,7 +70,7 @@ class FoldedCells:
     bundle（L1）側の結合gridには在るので、この層で全文に差し替える。"""
 
     def __init__(self) -> None:
-        self.jobs = {job["name"]: job for job in extract_low_power.convert_all.targets()
+        self.jobs = {job["name"]: job for job in convert_all.targets()
                      if job["document_type"] == "datasheet"}
         self._cells: dict[str, dict[int, list[str]]] = {}
 

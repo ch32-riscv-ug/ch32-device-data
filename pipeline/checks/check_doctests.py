@@ -13,11 +13,12 @@
 規則を書き換えて例のほうを直し忘れても、その6ファイルでは誰も落ちない。
 
 **名指しの列挙をやめて全部を掃く**のがこの検査の値打ちで、`check.yml` の6段は
-これに包含される。ただし**この検査は CI に載っていない**——`pipeline/` の module を
-import するので pdfplumber が要り、`check` job は何も install しない。CI に載せるなら
-依存を入れるか、`regenerate.py` を回す job に移す必要がある（未了）。
+これに包含される。**2026-09-16 に CI へ載せ、その6段を1段に畳んだ**——「pdfplumber が
+要るから載せられない」と書いてあったが、実測すると 18 file のうち要るのは2つだけで
+（`extract_low_power` が `convert_all` 経由、`convert_structured` が直接）、どちらも
+**PDF を開くところで import する**ようにしたら標準ライブラリだけで走るようになった。
 
-検査は2つ:
+検査は3つ:
 
 1. **例が全部通ること。**
 2. **`>>>` を書いてあるファイルから例が1つも集まらない、が起きないこと。**
@@ -27,6 +28,11 @@ import するので pdfplumber が要り、`check` job は何も install しな�
    `sys.modules` に載っている**先に import された同名モジュール**の方が返り、
    例が**0件のまま黙って通る**。だから `import_module` で sys.modules と同じ実体を
    使い、そのうえで「`>>>` があるのに0件」を落とす。
+3. **古いバイトコードを読まないこと。** `__pycache__` に前の綴りの `.pyc` が残って
+   いると、import は**そちらの doctest を試す**。実際に踏んだ（2026-09-16）——期待値を
+   1文字だけ書き換えて壊したあと戻したのに、サイズが同じままなので `.pyc` が使われ
+   「壊れたまま」と出続けた。コンパイル先を毎回まっさらな一時ディレクトリに向ける。
+   CI は毎回 checkout するので起きないが、ローカルで検査を信じられなくなる。
 
 実行:
     uv run pipeline/checks/check_doctests.py
@@ -38,6 +44,7 @@ import doctest
 import importlib
 import io
 import contextlib
+import tempfile
 import sys
 from pathlib import Path
 
@@ -63,7 +70,18 @@ def modules() -> list[tuple[Path, str]]:
 
 
 def main() -> int:
-    files = modules()
+    # **古いバイトコードを読まない。** この検査は module を import するので、
+    # `__pycache__` に前の綴りの `.pyc` が残っていると**そちらの doctest を試す**。
+    # 実際に踏んだ（2026-09-16）——doctest の期待値を1文字だけ書き換えて壊したあと
+    # 戻したのに、`.pyc` が同じサイズのまま残っていて「壊れたまま」と出続けた。
+    # コンパイル先を毎回まっさらな一時ディレクトリに向ければ起こらない。
+    with tempfile.TemporaryDirectory(prefix="doctest-pycache-") as cache:
+        sys.pycache_prefix = cache
+        importlib.invalidate_caches()
+        return run(modules())
+
+
+def run(files: list[tuple[Path, str]]) -> int:
     for path, _ in files:
         sys.path.insert(0, str(path.parent))
     bad: list[str] = []
