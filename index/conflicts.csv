@@ -205,5 +205,5 @@ registers,CH32H417,,,family=CH32H417 type=CAN register=FAFIFOR,,,rm-address(CH32
 registers,CH32H417,,,family=CH32H417 type=CAN register=FMCFGR,,,rm-address(CH32H417RM.PDF),0x40006608,#,evt(ch32h417.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF)+!rm-address(CH32H417RM.PDF)(=0x40006608)
 registers,CH32H417,,,family=CH32H417 type=CAN register=FSCFGR,,,rm-address(CH32H417RM.PDF),0x40006610,#,evt(ch32h417.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF)+!rm-address(CH32H417RM.PDF)(=0x40006610)
 registers,CH32H417,,,family=CH32H417 type=CAN register=FWR,,,rm-address(CH32H417RM.PDF),0x40006620,#,evt(ch32h417.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF)+!rm-address(CH32H417RM.PDF)(=0x40006620)
-remap_routes,,CH32M030,,series=CH32M030 selector=afio-adc-etrgin-remap value=1 signal=ADC_ETR,value,1,rm-remap-grid,value=0,#,candidates(datasheet-pin-table:en)+!rm-remap-grid(value=0)
+remap_routes,,CH32M030,,series=CH32M030 selector=afio-adc-etrgin-remap value=1 signal=ADC_ETR,value,1,rm-remap-grid,value=0,#,candidates(datasheet-pin-table)+!rm-remap-grid(value=0)
 timers,CH32V307,,,family=CH32V307 timer=TIM5,,,,,#,rm(CH32FV2x_V3xRM.PDF:p242)

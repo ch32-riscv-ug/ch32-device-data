@@ -631,6 +631,41 @@ def routes_backed_by_pins(t: dict) -> list[str]:
 REMAP_DISSENT = re.compile(r"\+!(?P<source>[a-z-]+)\(value=(?P<value>\d+)\)")
 
 
+def remap_confidence(t: dict) -> list[str]:
+    """`remap_routes` の確度が `basis` の顔ぶれと揃っているか。
+
+    **2つの資料が言っていれば `confirmed`**（F-75。datasheet の pin 表と application
+    manual。manual の述べ方が格子か説明文かは問わない——食い違いが起きるのは資料の
+    あいだで、同じ manual の zh/en が経路について食い違うことは全corpusで無い）。
+    片方しか言っていなければ `reference`。`conflict` は別の判断なので見ない。
+
+    確度と `basis` がずれると「2つの資料が裏付けた経路」を数えられなくなるので、
+    両方向で見る。
+    """
+    out = []
+    for r in t["remap_routes"]:
+        if r["confidence"] == "conflict":
+            continue
+        found = re.search(r"candidates\(([^:)]*)", r["basis"] or "")
+        said = set(found.group(1).split("+")) if found else set()
+        both = bool(said & build_remap_sources("datasheet")) and bool(
+            said & build_remap_sources("manual"))
+        where = f"{r['series']} の {r['signal']} ({r['selector']}={r['value']}, {r['pad']})"
+        if both and r["confidence"] != "confirmed":
+            # 値を格子から採った経路は pin 表がその値を言っていないので除く。
+            continue
+        if not both and r["confidence"] == "confirmed":
+            out.append(f"remap_routes: {where} は confirmed なのに "
+                       f"`basis` が資料を1つしか名乗っていない（{sorted(said)}）")
+    return out
+
+
+def build_remap_sources(kind: str) -> frozenset:
+    import build_remap  # noqa: PLC0415
+    return (build_remap.DATASHEET_SOURCES if kind == "datasheet"
+            else build_remap.MANUAL_SOURCES)
+
+
 def remap_conflicts(t: dict) -> list[str]:
     """`remap_routes` の `conflict` が、異を唱えた出所と値を `basis` に書いているか。
 
@@ -1181,6 +1216,8 @@ def main() -> int:
     bad += pin_conditions_sane(t)
     # 格子と pin 表が同じ pad に別の値を与える食い違い（F-73）。
     bad += remap_conflicts(t)
+    # 2つの資料が言っていれば confirmed（F-75）。
+    bad += remap_confidence(t)
 
     # register_*: EVT header から機械的に集めたレジスタマップ（R-20 の機械収集ぶん）。
     # blocks の型は layouts にあること、registers/fields の (family, 型) も layouts に
