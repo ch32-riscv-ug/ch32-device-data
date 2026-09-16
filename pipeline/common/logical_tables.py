@@ -1860,6 +1860,112 @@ def _join_wrapped_rows(table: dict, names: set[str]) -> int:
     return len(columns)
 
 
+def _subsequence(need: str, have: str) -> bool:
+    """`need` の字が `have` の中に順番どおり在るか。
+
+    >>> _subsequence("USARTRST", "5USARTRST")
+    True
+    >>> _subsequence("INTENSTA", "Reserved")
+    False
+    """
+    rest = iter(have)
+    return all(c in rest for c in need)
+
+
+def _index_family(table: dict, names: set[str], bit_at: dict[int, str],
+                  settled: set[tuple[int, int]]) -> int:
+    """**索引だけが違う名前が並ぶ行**で、間に挟まれた壊れたセルを族から決める。
+
+    bit図の1行が `USART5RST｜USART4RST｜USART3RST｜USART2RST` のように並ぶとき、
+    bit 位置と索引の差は行の中で一定になる。両端が読めていれば間は族が決める——
+    `CH32H417RM.en` p.38 の RCC リセット欄は bit20 の `USART5RST` と bit17 の
+    `USART2RST` が正しく、間の bit19・bit18 が `5USARTRST`・`T4USART3URST` と
+    壊れていた。`_respill_index` が届かない形（自分の索引が右へ落ち、**かつ右隣も
+    壊れている**ので埋める数字が取れない）で、綴り合わせでも字形の組み直しでも
+    決まらなかったもの（worklist D19）。
+
+    **決め手は「壊れたセルの中に、族が言う綴りの字が順番どおり在る」こと**——
+    `USART4RST` の索引以外の字 `USARTRST` は `5USARTRST` の中に在る。無い綴りは
+    作らない。素朴に族で埋めると 122 セルが当たるが、その大半は版面どおりの
+    `Reserved`（`INTENSTA` の族の中の bit4 など）で、**この部分列の条件だけで全部
+    落ちる**（`INTEN` は `Reserved` の中に順番どおり無い）。実測: 全corpus 3セル。
+
+    見るのは**族の両端の間**だけ。行全体へ広げると1セル増えるが、それは
+    `FBM1514131211`（5つのラベルが1セルに潰れたもの）が `FBM11` に化ける誤りだった。
+
+    **族が言う綴りが記述表に在ることは求めない。** このページの記述表は
+    `USART4RST` を持たない（H417 p.38 の名前は2つだけ）し、`LCK11` はその文書の
+    どこにも綴られていない。ここで綴りを決めているのは**その行そのもの**——
+    版面が `USART5RST｜…｜USART2RST` と並べ、bit と索引の差が一定であること——で、
+    外の語彙を引いてくる話ではない（引いても結果は同じ3セルだと実測した）。
+    `Reserved` を記述表に持たないページ（H417 p.114・p.461）でも、上の部分列の
+    条件が守る。
+
+    >>> cells = [{"row_start": 0, "column_start": c, "column_end": c + 1,
+    ...           "text": str(20 - c)} for c in range(4)]
+    >>> cells += [{"row_start": 1, "column_start": 0, "column_end": 1, "text": "USART5RST"},
+    ...           {"row_start": 1, "column_start": 1, "column_end": 2, "text": "5USARTRST"},
+    ...           {"row_start": 1, "column_start": 2, "column_end": 3, "text": "T4USART3URST"},
+    ...           {"row_start": 1, "column_start": 3, "column_end": 4, "text": "USART2RST"}]
+    >>> table = {"cells": cells}
+    >>> bits = {c["column_start"]: c["text"] for c in cells if c["row_start"] == 0}
+    >>> _index_family(table, set(), bits, set())
+    2
+    >>> [c["text"] for c in cells if c["row_start"] == 1]
+    ['USART5RST', 'USART4RST', 'USART3RST', 'USART2RST']
+
+    `Reserved` は**記述表に無いページでも**動かない——部分列の条件が守る
+    （`names` を空にして、もう一枚の歯止め `flat in names` を無効にした形）:
+
+    >>> cells = [{"row_start": 0, "column_start": c, "column_end": c + 1,
+    ...           "text": str(14 - c)} for c in range(3)]
+    >>> cells += [{"row_start": 1, "column_start": 0, "column_end": 1, "text": "INTEN14"},
+    ...           {"row_start": 1, "column_start": 1, "column_end": 2, "text": "Reserved"},
+    ...           {"row_start": 1, "column_start": 2, "column_end": 3, "text": "INTEN12"}]
+    >>> bits = {c["column_start"]: c["text"] for c in cells if c["row_start"] == 0}
+    >>> _index_family({"cells": cells}, set(), bits, set())
+    0
+    """
+    spelt = re.compile(r"([A-Za-z_]+)(\d{1,2})([A-Za-z_]*)")
+    per_row: dict[int, dict[int, dict]] = {}
+    for cell in table["cells"]:
+        if cell["row_start"] < 1 or cell["column_end"] - cell["column_start"] != 1:
+            continue
+        bit = bit_at.get(cell["column_start"], "")
+        if bit.isdigit():
+            per_row.setdefault(cell["row_start"], {})[int(bit)] = cell
+    fixed = 0
+    for row, by_bit in per_row.items():
+        families: dict[tuple[str, str], dict[int, int]] = {}
+        for bit, cell in by_bit.items():
+            found = spelt.fullmatch((cell.get("text") or "").replace("\n", "").strip())
+            if found:
+                key = (found.group(1), found.group(3))
+                families.setdefault(key, {})[bit] = int(found.group(2))
+        for (prefix, suffix), members in families.items():
+            if len(members) < 2:
+                continue
+            offsets = {bit - index for bit, index in members.items()}
+            if len(offsets) != 1:
+                continue
+            offset = offsets.pop()
+            for bit in range(min(members), max(members) + 1):
+                cell = by_bit.get(bit)
+                if cell is None or bit in members:
+                    continue
+                if (row, cell["column_start"]) in settled:
+                    continue
+                flat = (cell.get("text") or "").replace("\n", "").strip()
+                if flat in names:
+                    continue
+                want = f"{prefix}{bit - offset}{suffix}"
+                if not _subsequence(prefix + suffix, flat.replace(" ", "")):
+                    continue
+                cell["text"] = want
+                fixed += 1
+    return fixed
+
+
 def fix_doubled_names(table: dict, names: set[str]) -> int:
     """bit図のセルで**末尾のブロックが二重になった名前**を、記述表のName列と照合して直す。
 
@@ -2016,6 +2122,10 @@ def fix_doubled_names(table: dict, names: set[str]) -> int:
         if len(candidates) == 1:
             cell["text"] = candidates[0]
             fixed += 1
+    # **綴り合わせの後**に置く。族の両端が読めていることが条件なので、端そのものが
+    # 壊れているうちは働けない——`CH32H417RM.en` p.38 の bit20 はこの時点までは
+    # `USART5URST`（`U` が1つ余分）で、族の一員として数えられなかった。
+    fixed += _index_family(table, names, bit_at, settled)
     return fixed
 
 
