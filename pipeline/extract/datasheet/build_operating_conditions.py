@@ -147,12 +147,21 @@ def complete_truncated_cells(base: list[dict]) -> int:
 STRAY_SUBSCRIPT = re.compile(
     r"(?<![A-Za-z0-9_])(?P<sym>[A-Z])(?P<eq> *= *)(?P<value>[-+0-9.]+ *[A-Za-zΩ℃%/]*)"
     r" +(?P<sub>[A-Z][A-Z0-9]+)(?![A-Za-z0-9_])")
-# 添字が `=` の**手前**に、空白1つ隔てて残る形（`F HCLK=144MHz`）。同じ歯止めで直す。
-# 全corpus実測: 338 行が当たり、綴りは4つ——`F_HCLK` 278・`F_CORE` 42 は corpus に実在し、
+# 添字が `=` の**手前**に、空白を隔てて残る形（`F HCLK=144MHz`）。同じ歯止めで直す。
+# **間に脚注の印が挟まることがある**（`F (3) HCLK=1MHz`）——版面では記号の右肩に脚注、
+# 右下に添字が刷ってあり、読み順が「基底 → 脚注 → 添字」になる。印は落として繋ぐ
+# （`symbol` 列でも `FOOTNOTE` を落としているのと同じ扱い）。
+# 全corpus実測: 綴りは4つ——`F_HCLK`・`F_CORE` は corpus に実在し、
 # `F_V5F` 84・`F_V3F` 76 は**どこにも実在しない**（CH32H417 の2つのコアの名前で、綴りが
 # この壊れた形にしか出てこない）。推測で新しい記号を作らないので後者は動かさない。
 SPACED_SUBSCRIPT = re.compile(
-    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z]) +(?P<sub>[A-Za-z][A-Za-z0-9+]*)(?P<eq> *=)")
+    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z]) *(?:[（(]\d+[）)])? *"
+    r"(?P<sub>[A-Za-z][A-Za-z0-9+]*)(?P<eq> *=)")
+# 添字が `=` と値の**間**に落ちる形（`F = SYSCLK 16MHz`）。読み順が
+# 「基底 → 等号 → 添字 → 値」になったもの。
+MIDDLE_SUBSCRIPT = re.compile(
+    r"(?<![A-Za-z0-9_])(?P<sym>[A-Z])(?P<eq> *= *)(?P<sub>[A-Z][A-Z0-9]+) +"
+    r"(?P<value>[-+0-9.]+ *[A-Za-zΩ℃%/]*)(?![A-Za-z0-9_])")
 
 
 def attested_symbols(rows: list[dict]) -> set[str]:
@@ -179,7 +188,13 @@ def reattach_condition_subscripts(rows: list[dict]) -> int:
         def join(m: re.Match) -> str:
             whole = f"{m.group('sym')}_{m.group('sub')}"
             return m.group(0) if whole not in known else f"{whole}{m.group('eq')}"
-        changed = SPACED_SUBSCRIPT.sub(join, STRAY_SUBSCRIPT.sub(swap, text))
+        def middle(m: re.Match) -> str:
+            whole = f"{m.group('sym')}_{m.group('sub')}"
+            if whole not in known:
+                return m.group(0)
+            return f"{whole}{m.group('eq')}{m.group('value').rstrip()}"
+        changed = MIDDLE_SUBSCRIPT.sub(
+            middle, SPACED_SUBSCRIPT.sub(join, STRAY_SUBSCRIPT.sub(swap, text)))
         if changed != text:
             row["condition"] = changed
             fixed += 1
