@@ -139,8 +139,10 @@ def read_silicon(
         # with 35 pads at value 1 where its grid says one (PC2).
         for r in grid:
             r.setdefault("_source", "grid")
+            r.setdefault("_edition", edition)
         for r in described:
             r.setdefault("_source", "description")
+            r.setdefault("_edition", edition)
         notes.append(
             f"[register:{edition}] field {len(fields)} 件 / 格子経路 {len(grid)} 件 / "
             f"説明文経路 {len(described)} 件"
@@ -160,7 +162,8 @@ def build(header: Path, manuals: Path | list[Path] | None, datasheet: Path,
 
 def route_sources(pin: dict, fn: dict, value: int,
                   grid_value_of: dict, grid_at_pad: dict,
-                  said_value_of: dict, said_at_pad: dict) -> list[str]:
+                  said_value_of: dict, said_at_pad: dict,
+                  editions: bool = False):
     """その経路を実際に言っている出所。
 
     pin 表はその機能がそこに在るから経路になっている——常に出所。RM の remap 格子は
@@ -197,6 +200,14 @@ def route_sources(pin: dict, fn: dict, value: int,
     >>> route_sources({"pad": "PC1"}, {"signal": "T2CH1ETR"}, 2,
     ...               {("TIM2_CH1", "PC1"): {2}}, {}, {}, {})
     ['datasheet-pin-table', 'rm-remap-grid']
+
+    **どの版が言ったか**も返せる（`editions=True`）。`basis` の版の印は長らく `:en` の
+    決め打ちで、**中文版しか言っていない経路も `en` を名乗っていた**（実測: 説明文由来の
+    経路は zh のみ 503・en のみ 465、格子由来は en のみ 29）。
+
+    >>> route_sources({"pad": "PB4"}, {"signal": "TIM3_CH1"}, 1,
+    ...               {("TIM3_CH1", "PB4"): {1: {"zh"}}}, {}, {}, {}, editions=True)
+    {'datasheet-pin-table': set(), 'rm-remap-grid': {'zh'}}
     """
     first = "datasheet-pin-table-default" if value == 0 else "datasheet-pin-table"
     pad = signal_vocabulary.port_pin(pin["pad"])
@@ -205,19 +216,32 @@ def route_sources(pin: dict, fn: dict, value: int,
     # 格子は Ethernet の端子に接口の種類を挟まない（`ETH_MII_RXD0` と `ETH_RXD0`）。
     spellings += [canonical_signal(s)
                   for s in signal_vocabulary.interface_stripped(fn["signal"])]
-    def said_by(exact: dict, at_pad: dict) -> bool:
-        if any(value in (exact.get((s, pad)) or set()) for s in spellings):
-            return True
+
+    def said_by(exact: dict, at_pad: dict):
+        """その出所がこの経路を言っていれば版の集合、言っていなければ None。
+
+        索引は `値 → 版の集合` の dict。doctest は版を持たない素の集合を渡すので、
+        どちらでも読めるようにしてある（版が無ければ空集合を返す）。
+        """
+        for s in spellings:
+            slot = exact.get((s, pad))
+            if slot and value in slot:
+                return set(slot[value]) if isinstance(slot, dict) else set()
         signal = fn["signal"]
-        return any(label != signal and signal.endswith(label)
-                   and signal[:-len(label)].endswith("_")
-                   for label, at in at_pad.get(pad, ()) if at == value)
-    out = [first]
-    if said_by(grid_value_of, grid_at_pad):
-        out.append("rm-remap-grid")
-    if said_by(said_value_of, said_at_pad):
-        out.append("rm-field-description")
-    return out
+        found = at_pad.get(pad) or {}
+        pairs = found.items() if isinstance(found, dict) else ((e, ()) for e in found)
+        for (label, at), editions_said in pairs:
+            if (at == value and label != signal and signal.endswith(label)
+                    and signal[:-len(label)].endswith("_")):
+                return set(editions_said)
+        return None
+    out = {first: set()}
+    for name, exact, at_pad in (("rm-remap-grid", grid_value_of, grid_at_pad),
+                                ("rm-field-description", said_value_of, said_at_pad)):
+        found = said_by(exact, at_pad)
+        if found is not None:
+            out[name] = found
+    return out if editions else list(out)
 
 
 def join(
@@ -519,23 +543,27 @@ def join(
     # （CH32X035 は RM に格子の表が無く、register field の説明文だけ。CH32V30x の
     # 格子は I2S3 の経路を書いていない——F-6）、「格子に無い＝無効」ではない。
     # 同じ (signal, pad) を**格子自身が別の値で名指ししている**ときだけ直します。
-    grid_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
+    grid_value_of: dict[tuple[str, str], dict[int, set[str]]] = {}
     grid_pads_at: dict[tuple[str, int], set[str]] = collections.defaultdict(set)
     # 裸の行ラベルを pad から引くための索引（`route_sources`）。
-    grid_at_pad: dict[str, set[tuple[str, int]]] = collections.defaultdict(set)
+    grid_at_pad: dict[str, dict[tuple[str, int], set[str]]] = {}
     # **説明文が述べた経路**も同じ形で持つ。RM は格子と説明文の2通りで述べるのに、
     # `basis` は格子しか名乗れなかった（F-69。`CH32X035RM` は格子を持たず、
     # 経路はすべて `R32_AFIO_PCFR1` の説明文が述べている）。
-    said_value_of: dict[tuple[str, str], set[int]] = collections.defaultdict(set)
-    said_at_pad: dict[str, set[tuple[str, int]]] = collections.defaultdict(set)
+    said_value_of: dict[tuple[str, str], dict[int, set[str]]] = {}
+    said_at_pad: dict[str, dict[tuple[str, int], set[str]]] = {}
+    # **どの版が言ったかも持つ。** `basis` の版の印は長らく `:en` の決め打ちで、
+    # 中文版しか言っていない経路も `en` を名乗っていた（F-75）。値 → 版の集合で持つ。
     for r in routes:
+        edition = r.get("_edition") or ""
+        exact, at_pad = ((grid_value_of, grid_at_pad) if r.get("_source") == "grid"
+                         else (said_value_of, said_at_pad))
+        exact.setdefault((canonical_signal(r["signal"]), r["pad"]), {}).setdefault(
+            r["value"], set()).add(edition)
+        at_pad.setdefault(r["pad"], {}).setdefault(
+            (r["signal"], r["value"]), set()).add(edition)
         if r.get("_source") == "grid":
-            grid_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
             grid_pads_at[(canonical_signal(r["signal"]), r["value"])].add(r["pad"])
-            grid_at_pad[r["pad"]].add((r["signal"], r["value"]))
-        else:
-            said_value_of[(canonical_signal(r["signal"]), r["pad"])].add(r["value"])
-            said_at_pad[r["pad"]].add((r["signal"], r["value"]))
 
     used: set[str] = set()
     attested: dict[str, set[int]] = collections.defaultdict(set)
@@ -632,11 +660,18 @@ def join(
             # 値が既定値かどうかで決め打つと、格子が1行も無い family
             # （`CH32X035RM` は zh/en とも remap 格子の表を持たない）でも
             # `rm-remap-grid` を名乗ってしまう（F-66）。
-            "sources": route_sources(pin, fn, fn["_selector_value"], grid_value_of,
-                                     grid_at_pad, said_value_of, said_at_pad),
+            # 出所 → その出所がこの経路を言っている版（pin 表は版を持たないので空）。
+            "sources": {name: sorted(said) for name, said in route_sources(
+                pin, fn, fn["_selector_value"], grid_value_of, grid_at_pad,
+                said_value_of, said_at_pad, editions=True).items()},
             # 格子が別の値だと言っているなら、その値。異論の記録（F-73）。
             **({"disputed_by_grid": fn["_grid_disputes"]}
                if "_grid_disputes" in fn else {}),
+            # **値を格子から採った経路**。pin 表はこの pad にこの signal が在るとは
+            # 言っているが、**その値だとは言っていない**ので、確度を「2つの資料が
+            # 一致」に数えない（F-75）。`CH32V103` の TIM3 が該当——pin 表は PB4 と
+            # PC6 の両方に `_1` と書き、RM が値2と値3に置く（F-27）。
+            **({"value_from_grid": True} if fn.get("_value_from_grid") else {}),
         }
         if how != "signal":
             fn["_selector_resolved_by"] = how
@@ -666,8 +701,9 @@ def join(
             fn["selection"] = {
                 "selector": selector_id(selector["controller"], selector["field"]),
                 "values": [0],
-                "sources": route_sources(pin, fn, 0, grid_value_of, grid_at_pad,
-                                         said_value_of, said_at_pad),
+                "sources": {name: sorted(said) for name, said in route_sources(
+                    pin, fn, 0, grid_value_of, grid_at_pad,
+                    said_value_of, said_at_pad, editions=True).items()},
             }
             used.add(key)
             attested[key].add(0)

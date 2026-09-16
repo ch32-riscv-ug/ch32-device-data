@@ -72,19 +72,49 @@ MANUAL_BASIS = "candidates(rm-register-table+rm-remap-grid:en)"
 # （`CH32X035RM`・`CH32V205RM`・`CH32X315RM` は zh/en とも0経路）でも `rm-remap-grid` を
 # 名乗っていた——CH32X035 の234行のうち186行がそれだった（F-66。2026-09-15）。
 # 出所が記録されていない古い候補は、既定値かどうかの従来の読みに落とす。
-def route_basis(sources, disputed: int | None = None) -> str:
+def route_basis(sources, disputed: int | None = None, editions=()) -> str:
     """`basis` の綴り。格子が別の値だと言っているならそれも書く（F-73）。
 
     食い違いの書き方は他の表と同じ DSL——`!<出所>(<列>=<値>)` で「その出所は何と
     言うか」を持つ。`index/conflicts.csv` はこれを読んで `alternative` 列に写す。
 
-    >>> route_basis(["datasheet-pin-table", "rm-field-description"])
-    'candidates(datasheet-pin-table+rm-field-description:en)'
+    **末尾の版の印は、その経路を述べた application manual の版**。長らく `:en` の
+    決め打ちで、**中文版しか言っていない経路も `en` を名乗っていた**（F-75。実測:
+    説明文由来は zh のみ 503・en のみ 465、格子由来は en のみ 29）。manual が
+    どちらも述べていなければ印は付かない（pin 表は版を持たない）。
+
+    >>> route_basis(["datasheet-pin-table", "rm-field-description"], editions=["en", "zh"])
+    'candidates(datasheet-pin-table+rm-field-description:en+zh)'
+    >>> route_basis(["datasheet-pin-table-default"])
+    'candidates(datasheet-pin-table-default)'
     >>> route_basis(["datasheet-pin-table"], disputed=0)
-    'candidates(datasheet-pin-table:en)+!rm-remap-grid(value=0)'
+    'candidates(datasheet-pin-table)+!rm-remap-grid(value=0)'
     """
-    out = f"candidates({'+'.join(sources)}:en)"
+    tag = f":{'+'.join(sorted(editions))}" if editions else ""
+    out = f"candidates({'+'.join(sources)}{tag})"
     return out if disputed is None else f"{out}+!rm-remap-grid(value={disputed})"
+
+
+# **2つの資料が言っていれば `confirmed`。** この表の出所は「datasheet の pin 表」と
+# 「application manual」（格子と説明文の2通りの述べ方）で、食い違いが起きるのは
+# **資料のあいだ**（F-73 がまさにそれ）。同じ manual の zh/en が経路について食い違う
+# ことは全corpusで一度も無いので、版の一致を確度に数えても本物の食い違いを見つける
+# 力にならない——だから「2つの資料が一致」を confirmed の意味に採る（2026-09-16、
+# ユーザー判断）。片方しか言っていなければ `reference` のまま。
+DATASHEET_SOURCES = frozenset({"datasheet-pin-table", "datasheet-pin-table-default"})
+MANUAL_SOURCES = frozenset({"rm-remap-grid", "rm-field-description"})
+
+
+def route_confidence(sources) -> str:
+    """出所の顔ぶれから確度を決める。
+
+    >>> route_confidence(["datasheet-pin-table", "rm-remap-grid"])
+    'confirmed'
+    >>> route_confidence(["datasheet-pin-table-default"])
+    'reference'
+    """
+    said = set(sources)
+    return "confirmed" if (said & DATASHEET_SOURCES) and (said & MANUAL_SOURCES) else "reference"
 
 
 LEGACY_ROUTE_BASIS = ["datasheet-pin-table", "rm-remap-grid"]
@@ -106,6 +136,8 @@ def main() -> int:
     disagreements: list[str] = []
     routes: dict = {}
     disputed: dict = {}   # 経路の鍵 → 格子が言う別の値（F-73）
+    editions: dict = {}   # 経路の鍵 → それを述べた manual の版（F-75）
+    from_grid: set = set()   # 値を格子から採った経路（pin 表はその値を言っていない）
     for path in sorted(args.candidates.glob("ch32*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
         part = data.get("part_number", path.stem.upper())
@@ -165,11 +197,16 @@ def main() -> int:
                     said = selection.get("sources") or (
                         LEGACY_DEFAULT_BASIS if value == 0 else LEGACY_ROUTE_BASIS)
                     routes.setdefault(key, set()).update(said)
+                    if isinstance(said, dict):
+                        for who in said.values():
+                            editions.setdefault(key, set()).update(who)
                     # 格子が別の値だと言っている経路（F-73）。**SKU ごとに集まる**ので
                     # 1つでも異論があれば残す（同じ series の別 package で pad が
                     # 出ていないだけのことがある、という `said` と同じ理由）。
                     if selection.get("disputed_by_grid") is not None:
                         disputed[key] = selection["disputed_by_grid"]
+                    if selection.get("value_from_grid"):
+                        from_grid.add(key)
 
     field_rows = sorted(fields.values(),
                         key=lambda r: (r["series"], r["selector"]))
@@ -198,8 +235,10 @@ def main() -> int:
         route_rows.append(
             {"series": s, "selector": sel, "value": value, "signal": signal,
              "pad": pad,
-             "confidence": "reference" if against is None else "conflict",
-             "basis": route_basis(said, against)}
+             "confidence": ("conflict" if against is not None
+                            else "reference" if key in from_grid
+                            else route_confidence(said)),
+             "basis": route_basis(said, against, editions.get(key, ()))}
         )
 
     if manual_only:
