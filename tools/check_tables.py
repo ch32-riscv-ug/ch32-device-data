@@ -67,15 +67,12 @@ KNOWN_ROLE_GAPS: dict[str, int] = {}
 #            格子が書かない」＝資料側と記録してあったが、**V407/V467 の格子が同じ
 #            `SPI3_REMAP` の下に I2S3 を名指ししていた**ので、周辺の対応
 #            （I2S3 = I2S モードの SPI3）を語彙に入れて決めた
-#   UHSIF_*  CH32H417 の PF12/PF13/PE7。**中文版だけ**が remap 欄に
-#            `UHSIF_PORT0_1` と書き、英語版の同じ欄は空。RM 格子は値1を
-#            PC1→PORT3 のようにずらして書き、この3 pad を値0（既定）に
-#            当てているので、中文版の主張を裏づける行がない（F-51。資料側）
-KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {
-    ("CH32H417", "UHSIF_PORT0"): 1,
-    ("CH32H417", "UHSIF_PORT1"): 1,
-    ("CH32H417", "UHSIF_PORT2"): 1,
-}
+#   ~~UHSIF_*~~  CH32H417 の PF12/PF13/PE7 は **2026-09-23 に資料側で解けた**（F-51）。
+#            中文版だけが remap 欄に `UHSIF_PORT0_1` と書き、英語版の同じ欄は空で、
+#            RM 格子も値1を PC1→PORT3 のようにずらして当てていたので裏づける行が
+#            無かった。**英語版 RM の 1.7→1.8 改版**で格子が値1を PF12/PF13/PE7 に
+#            当てるようになり、`remap_routes` に3行（全部 confirmed）が入って穴が閉じた。
+KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {}
 
 # catalog/toolchains.csv の語彙。上流（MounRiver）の綴りではなく、こちらで
 # 正規化した名前（build_toolchains.py の OS_NAME / ARCH_NAME / KIND_ORDER と対）。

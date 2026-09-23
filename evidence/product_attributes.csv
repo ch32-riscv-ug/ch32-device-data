@@ -15,7 +15,7 @@ CH32H415REU6,12,adc_tkey_channels,15+2,ADC/TKey,ADC/TKey Channels,ADC/TKey 通�
 CH32H415REU6,13,hsadc_units,1,HSADC,HSADC Units,HSADC 单元数,HSADC Units,#,confirmed,products:zh+products:en
 CH32H415REU6,14,hsadc_channels,4,HSADC,HSADC Channels,HSADC 通道数,HSADC Channels,#,confirmed,products:zh+products:en
 CH32H415REU6,15,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32H415REU6,16,opa,2 (OPA1/3),,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32H415REU6,16,opa,2(OPA1/3),,OPA,OPA,OPA,#,confirmed,products:zh+products:en
 CH32H415REU6,17,cmp,1,,CMP,CMP,CMP,#,confirmed,products:zh+products:en
 CH32H415REU6,18,dfsdm,1,,DFSDM,DFSDM,DFSDM,#,confirmed,products:zh+products:en
 CH32H415REU6,19,rng,1,,RNG,RNG,RNG,#,confirmed,products:zh+products:en
@@ -26,17 +26,17 @@ CH32H415REU6,23,usart,8,,USART,USART,USART,#,confirmed,products:zh+products:en
 CH32H415REU6,24,spi_i2s,4/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
 CH32H415REU6,25,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
 CH32H415REU6,26,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32H415REU6,27,can,3,,CAN(5),CAN,CAN(5),#,confirmed,products:zh+products:en
+CH32H415REU6,27,can,3,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
 CH32H415REU6,28,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
 CH32H415REU6,29,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
 CH32H415REU6,30,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
 CH32H415REU6,31,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
-CH32H415REU6,32,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
+CH32H415REU6,32,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),#,confirmed,products:zh+products:en
 CH32H415REU6,33,pdusb_usbpd_type_c,1,PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,confirmed,products:zh+products:en
 CH32H415REU6,34,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
-CH32H416RDU6,0,sram_core_1_hs_itcm,128K,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,#,confirmed,products:zh+products:en
-CH32H416RDU6,1,sram_core_1_hs_dtcm,256K,SRAM,SRAM Core 1 HS DTCM,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,#,confirmed,products:zh+products:en
-CH32H416RDU6,2,sram_shared_code_and_data_area,512K,SRAM,SRAM Shared code and data area,SRAM 共享代码和数据区,SRAM Shared code and data area,#,confirmed,products:zh+products:en
+CH32H416RDU6,0,sram_core_1_hs_itcm,128KB,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,#,confirmed,products:zh+products:en
+CH32H416RDU6,1,sram_core_1_hs_dtcm,256KB,SRAM,SRAM Core 1 HS DTCM,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,#,confirmed,products:zh+products:en
+CH32H416RDU6,2,sram_shared_code_and_data_area,512KB,SRAM,SRAM Shared code and data area,SRAM 共享代码和数据区,SRAM Shared code and data area,#,confirmed,products:zh+products:en
 CH32H416RDU6,3,timer_adtm_16_bit,2,Timer,Timer ADTM (16-bit),定时器 高级（16位）,Timer ADTM (16-bit),#,confirmed,products:zh+products:en
 CH32H416RDU6,4,timer_gptm_16_bit,4,Timer,Timer GPTM (16-bit),定时器 通用（16位）,Timer GPTM (16-bit),#,confirmed,products:zh+products:en
 CH32H416RDU6,5,timer_gptm_32_bit,4,Timer,Timer GPTM (32-bit),定时器 通用（32位）,Timer GPTM (32-bit),#,confirmed,products:zh+products:en
@@ -62,13 +62,13 @@ CH32H416RDU6,24,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+pro
 CH32H416RDU6,25,qspi,1 (QSPI2),,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:en
 CH32H416RDU6,26,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
 CH32H416RDU6,27,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32H416RDU6,28,can,3,,CAN(5),CAN,CAN(5),#,confirmed,products:zh+products:en
+CH32H416RDU6,28,can,3,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
 CH32H416RDU6,29,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
 CH32H416RDU6,30,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
 CH32H416RDU6,31,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
 CH32H416RDU6,32,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
-CH32H416RDU6,33,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
-CH32H416RDU6,34,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
+CH32H416RDU6,33,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),#,confirmed,products:zh+products:en
+CH32H416RDU6,34,pdusb_usbss_usb3_0,1,PDUSB,PDUSB USBSS (USB3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB3.0),#,confirmed,products:zh+products:en
 CH32H416RDU6,35,pdusb_usbpd_type_c,1 Built-in Rd(4),PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,conflict,products:en+!products:zh(=1 built-in Rd(4))
 CH32H416RDU6,36,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
 CH32H417MEU6,0,sram_core_1_hs_itcm,128KB,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,#,confirmed,products:zh+products:en
@@ -87,7 +87,7 @@ CH32H417MEU6,12,adc_tkey_channels,9+2,ADC/TKey,ADC/TKey Channels,ADC/TKey 通道
 CH32H417MEU6,13,hsadc_units,1,HSADC,HSADC Units,HSADC 单元数,HSADC Units,#,confirmed,products:zh+products:en
 CH32H417MEU6,14,hsadc_channels,4,HSADC,HSADC Channels,HSADC 通道数,HSADC Channels,#,confirmed,products:zh+products:en
 CH32H417MEU6,15,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32H417MEU6,16,opa,2 (OPA1/3),,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32H417MEU6,16,opa,2(OPA1/3),,OPA,OPA,OPA,#,confirmed,products:zh+products:en
 CH32H417MEU6,17,cmp,1,,CMP,CMP,CMP,#,confirmed,products:zh+products:en
 CH32H417MEU6,18,dfsdm,1,,DFSDM,DFSDM,DFSDM,#,confirmed,products:zh+products:en
 CH32H417MEU6,19,rng,1,,RNG,RNG,RNG,#,confirmed,products:zh+products:en
@@ -100,16 +100,16 @@ CH32H417MEU6,25,qspi,1 (QSPI2),,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:
 CH32H417MEU6,26,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
 CH32H417MEU6,27,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
 CH32H417MEU6,28,uhsif,1,,UHSIF,UHSIF,UHSIF,#,confirmed,products:zh+products:en
-CH32H417MEU6,29,can,3,,CAN(5),CAN,CAN(5),#,confirmed,products:zh+products:en
+CH32H417MEU6,29,can,3,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
 CH32H417MEU6,30,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
 CH32H417MEU6,31,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
 CH32H417MEU6,32,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
 CH32H417MEU6,33,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
-CH32H417MEU6,34,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
-CH32H417MEU6,35,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
+CH32H417MEU6,34,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),#,confirmed,products:zh+products:en
+CH32H417MEU6,35,pdusb_usbss_usb3_0,1,PDUSB,PDUSB USBSS (USB3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB3.0),#,confirmed,products:zh+products:en
 CH32H417MEU6,36,pdusb_usbpd_type_c,1,PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,confirmed,products:zh+products:en
-CH32H417MEU6,37,serdes,1,,SerDes(4),SerDes,SerDes(4),#,confirmed,products:zh+products:en
-CH32H417MEU6,38,ethernet,MAC+10/100M PHY,,Ethernet(5),Ethernet,Ethernet(5),#,confirmed,products:zh+products:en
+CH32H417MEU6,37,serdes,1,,SerDes,SerDes,SerDes,#,confirmed,products:zh+products:en
+CH32H417MEU6,38,ethernet,MAC+10/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
 CH32H417MEU6,39,fmc_fsmc,1(2),FMC,FMC FSMC,FMC FSMC,FMC FSMC,#,confirmed,products:zh+products:en
 CH32H417MEU6,40,fmc_sdram,1,FMC,FMC SDRAM,FMC SDRAM,FMC SDRAM,#,confirmed,products:zh+products:en
 CH32H417MEU6,41,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
@@ -142,17 +142,17 @@ CH32H417QEU6,25,qspi,2,,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:en
 CH32H417QEU6,26,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
 CH32H417QEU6,27,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
 CH32H417QEU6,28,uhsif,1,,UHSIF,UHSIF,UHSIF,#,confirmed,products:zh+products:en
-CH32H417QEU6,29,can,3,,CAN(5),CAN,CAN(5),#,confirmed,products:zh+products:en
+CH32H417QEU6,29,can,3,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
 CH32H417QEU6,30,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
 CH32H417QEU6,31,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
 CH32H417QEU6,32,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
 CH32H417QEU6,33,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
 CH32H417QEU6,34,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,#,confirmed,products:zh+products:en
-CH32H417QEU6,35,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
-CH32H417QEU6,36,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
+CH32H417QEU6,35,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),#,confirmed,products:zh+products:en
+CH32H417QEU6,36,pdusb_usbss_usb3_0,1,PDUSB,PDUSB USBSS (USB3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB3.0),#,confirmed,products:zh+products:en
 CH32H417QEU6,37,pdusb_usbpd_type_c,1,PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,#,confirmed,products:zh+products:en
-CH32H417QEU6,38,serdes,1,,SerDes(4),SerDes,SerDes(4),#,confirmed,products:zh+products:en
-CH32H417QEU6,39,ethernet,MAC+10/100M PHY,,Ethernet(5),Ethernet,Ethernet(5),#,confirmed,products:zh+products:en
+CH32H417QEU6,38,serdes,1,,SerDes,SerDes,SerDes,#,confirmed,products:zh+products:en
+CH32H417QEU6,39,ethernet,MAC+10/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
 CH32H417QEU6,40,fmc_fsmc,1,FMC,FMC FSMC,FMC FSMC,FMC FSMC,#,confirmed,products:zh+products:en
 CH32H417QEU6,41,fmc_sdram,1,FMC,FMC SDRAM,FMC SDRAM,FMC SDRAM,#,confirmed,products:zh+products:en
 CH32H417QEU6,42,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
@@ -172,7 +172,7 @@ CH32H417WEU6,12,adc_tkey_channels,7+2,ADC/TKey,ADC/TKey Channels,ADC/TKey 通道
 CH32H417WEU6,13,hsadc_units,1,HSADC,HSADC Units,HSADC 单元数,HSADC Units,#,confirmed,products:zh+products:en
 CH32H417WEU6,14,hsadc_channels,4,HSADC,HSADC Channels,HSADC 通道数,HSADC Channels,#,confirmed,products:zh+products:en
 CH32H417WEU6,15,dac_unit,1 (DAC2),,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32H417WEU6,16,opa,2 (OPA1/3),,OPA,OPA,OPA,#,conflict,products:en+!products:zh(=1（OPA1）)
+CH32H417WEU6,16,opa,1(OPA1),,OPA,OPA,OPA,#,confirmed,products:zh+products:en
 CH32H417WEU6,17,cmp,1,,CMP,CMP,CMP,#,confirmed,products:zh+products:en
 CH32H417WEU6,18,dfsdm,1,,DFSDM,DFSDM,DFSDM,#,confirmed,products:zh+products:en
 CH32H417WEU6,19,rng,1,,RNG,RNG,RNG,#,confirmed,products:zh+products:en
@@ -185,13 +185,13 @@ CH32H417WEU6,25,qspi,1 (QSPI2),,QSPI,QSPI,QSPI,#,confirmed,products:zh+products:
 CH32H417WEU6,26,i2c,4,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
 CH32H417WEU6,27,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
 CH32H417WEU6,28,uhsif,1(1),,UHSIF,UHSIF,UHSIF,#,confirmed,products:zh+products:en
-CH32H417WEU6,29,can,3,,CAN(5),CAN,CAN(5),#,confirmed,products:zh+products:en
+CH32H417WEU6,29,can,3,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
 CH32H417WEU6,30,sdmmc,1,,SDMMC,SDMMC,SDMMC,#,confirmed,products:zh+products:en
 CH32H417WEU6,31,sai,1,,SAI,SAI,SAI,#,confirmed,products:zh+products:en
 CH32H417WEU6,32,swpmi,1,,SWPMI,SWPMI,SWPMI,#,confirmed,products:zh+products:en
-CH32H417WEU6,33,pdusb_usbhs_usb_2_0,1,PDUSB,PDUSB USBHS (USB 2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB 2.0),#,confirmed,products:zh+products:en
-CH32H417WEU6,34,pdusb_usbss_usb_3_0,1,PDUSB,PDUSB USBSS (USB 3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB 3.0),#,confirmed,products:zh+products:en
-CH32H417WEU6,35,ethernet,MAC+10/100M PHY,,Ethernet(5),Ethernet,Ethernet(5),#,confirmed,products:zh+products:en
+CH32H417WEU6,33,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),#,confirmed,products:zh+products:en
+CH32H417WEU6,34,pdusb_usbss_usb3_0,1,PDUSB,PDUSB USBSS (USB3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB3.0),#,confirmed,products:zh+products:en
+CH32H417WEU6,35,ethernet,MAC+10/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
 CH32H417WEU6,36,fmc_fsmc,1(2),FMC,FMC FSMC,FMC FSMC,FMC FSMC,#,confirmed,products:zh+products:en
 CH32H417WEU6,37,fmc_sdram,1(3),FMC,FMC SDRAM,FMC SDRAM,FMC SDRAM,#,confirmed,products:zh+products:en
 CH32H417WEU6,38,pioc,1,,PIOC,PIOC,PIOC,#,confirmed,products:zh+products:en
