@@ -1152,9 +1152,12 @@ def errata_rows() -> list[dict]:
     """curated/errata.csv, carried into tables/ with its judgement attached.
 
     source_zh / source_en record where the statement appears in each
-    datasheet edition (PDF page numbers, verified via pipeline/extract/scan_errata.py).
-    Both editions agreeing makes the row confirmed; a single edition stays
-    reference.  The match column only serves scan_errata and is dropped.
+    edition (PDF page numbers, verified via pipeline/extract/scan_errata.py) --
+    a datasheet, an application manual (`CH32H417RM.PDF p.374`), a **past
+    edition** when WCH later removed the note (`CH32H417DS0.PDF@V1.8 p.4`), or
+    `measured <date> (...)` for a bench measurement.  Both editions agreeing
+    makes the row confirmed; a single edition stays reference.  The match
+    column only serves scan_errata and is dropped.
     """
     path = REPO / "curated" / "errata.csv"
     if not path.exists():

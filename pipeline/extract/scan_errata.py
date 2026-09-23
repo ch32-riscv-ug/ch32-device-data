@@ -64,6 +64,43 @@ def load_known():
     return known
 
 
+def source_kind(row: dict) -> str:
+    """その行の出所が**いまの資料に文として在るはず**かどうか。
+
+    - `measured` … 実機で測った行（`source_zh` が `measured 2026-09-22 (…)`）。
+      資料に文が無いのが正しい（x035 の open-drain 2件）
+    - `edition` … 出所が**過去の版**を名指す行（`CH32H417DS0.PDF@V1.8 p.4`）。
+      WCH がその注記を後の版で消したもので、いまの版に無いのが正しい
+    - `rm` … 出所が application manual の行。既定の走査（DS のみ）では見えないので、
+      `--rm` の全走査でだけ判定する
+    - `document` … それ以外。いまの資料のどこかに `match` が当たらなければ
+      **台帳が根拠を失っている**
+
+    >>> source_kind({"source_zh": "measured 2026-09-22 (x)", "source_en": ""})
+    'measured'
+    >>> source_kind({"source_zh": "CH32H417DS0.PDF@V1.8 p.4", "source_en": ""})
+    'edition'
+    >>> source_kind({"source_zh": "CH32H417RM.PDF p.374", "source_en": "CH32H417RM.PDF p.440"})
+    'rm'
+    >>> source_kind({"source_zh": "CH32X315DS0.PDF p.6", "source_en": "CH32X315DS0.PDF p.8"})
+    'document'
+    """
+    sources = [row.get(f"source_{lang}", "").strip() for lang in ("zh", "en")]
+    sources = [x for x in sources if x]
+    if sources and all(x.startswith("measured ") for x in sources):
+        return "measured"
+    if sources and all("@V" in x.split(" ", 1)[0] for x in sources):
+        return "edition"
+    if sources and all("RM" in x.split(" ", 1)[0] for x in sources):
+        return "rm"
+    return "document"
+
+
+def load_kinds() -> dict[str, str]:
+    with (REPO / "curated/errata.csv").open(encoding="utf-8") as f:
+        return {row["id"]: source_kind(row) for row in csv.DictReader(f)}
+
+
 def scan_pdf(bundle, lang):
     """ページ全文に対して finditer し、行またぎのマッチも文脈窓で拾う。"""
     hits = []
@@ -134,10 +171,33 @@ def main():
     print()
     print(f"既知 {len(known_ids)} 件中 {len(known_ids) - len(missing)} 件を"
           f"データシート上で確認")
-    if missing:
-        print(f"未確認(要手動確認): {sorted(missing)}")
+    # **未確認を種類で分ける。** 以前はまとめて印字するだけで終了コードに効かず、
+    # `--verify` は緑のまま通っていた——台帳の行が根拠を失っても誰も気づかない
+    # （2026-09-23: `h41x-*` の2件は CH32H417DS0 V1.9 で注記ごと消えていた）。
+    # 実測の行と過去の版を名指す行は、いまの資料に無いのが正しい。
+    kinds = load_kinds()
+    by_kind: dict[str, list[str]] = {}
+    for kid in sorted(missing):
+        by_kind.setdefault(kinds.get(kid, "document"), []).append(kid)
+    if by_kind.get("measured"):
+        print(f"未確認・実測の行（資料に文が無いのが正しい）: {by_kind['measured']}")
+    if by_kind.get("edition"):
+        print(f"未確認・過去の版を名指す行（いまの版に無いのが正しい）: {by_kind['edition']}")
+    # 判定するのは**その走査が見た資料を引く行**だけ。既定（DS のみ）は `document`、
+    # `--rm` の全走査は `rm` も。`--only` で絞った走査では判定しない。
+    judged = [] if args.only else (["document", "rm"] if args.rm else ["document"])
+    orphaned = [kid for kind in judged for kid in by_kind.get(kind, [])]
+    if by_kind.get("rm") and not args.rm:
+        print(f"未確認・manual を引く行（`--rm` の走査で判定する）: {by_kind['rm']}")
+    if orphaned:
+        print(f"**根拠を失った行**（資料を引くのに match がどこにも当たらない）: {orphaned}")
+        print("  資料が注記を消したなら出所を `<文書>@V<版> p.N` にして過去の版を名指す。"
+              "引き方の誤りなら match か出所を直す。")
+    elif args.only and (by_kind.get("document") or by_kind.get("rm")):
+        print("未確認(絞った走査のため判定しない): "
+              f"{by_kind.get('document', []) + by_kind.get('rm', [])}")
     print(f"NEW 候補: {new_count} 件")
-    return 1 if new_count else 0
+    return 1 if (new_count or orphaned) else 0
 
 
 if __name__ == "__main__":
