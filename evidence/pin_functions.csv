@@ -224,7 +224,7 @@ CH32H415REU6,PB13,DVP_HSYNC,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH3
 CH32H415REU6,PB13,I2S2_CK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB13,LPTIM2_OC,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB13,PB13,main,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
-CH32H415REU6,PB13,QSPI2_SIOX2,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX0),2-1-3,CH32H417DS0.PDF
+CH32H415REU6,PB13,QSPI2_SIOX2,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB13,SPI2_SCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB13,TIM1_CH1N,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB13,TIM8_BKIN2,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
@@ -235,7 +235,7 @@ CH32H415REU6,PB14,DVP_VSYNC,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH
 CH32H415REU6,PB14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB14,LTDC_G0,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB14,PB14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
-CH32H415REU6,PB14,QSPI2_SIOX3,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX1),2-1-3,CH32H417DS0.PDF
+CH32H415REU6,PB14,QSPI2_SIOX3,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB14,SDIO_D0,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB14,SPI2_MISO,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PB14,TIM1_CH2N,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
@@ -494,7 +494,7 @@ CH32H415REU6,PE13,SPI4_MISO,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH3
 CH32H415REU6,PE13,TIM12_CH2,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PE13,TIM1_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PE14,I3C_SCL,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
-CH32H415REU6,PE14,LTDC_CLK,af-14,#,conflict,pin-table:zh+!pin-table:en(=af-13),2-1-3,CH32H417DS0.PDF
+CH32H415REU6,PE14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PE14,PE14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PE14,QSPI2_SIO2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
 CH32H415REU6,PE14,SDIO_D6,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-3,CH32H417DS0.PDF
@@ -1040,7 +1040,7 @@ CH32H416RDU6,PE9,PE9,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS
 CH32H416RDU6,PE9,QSPI1_SIOX2,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PE9,SDIO_D1,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PE9,TIM1_CH1,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
-CH32H416RDU6,PE9,USART8_RTS,af-11,#,reference,pin-table:zh,2-1-2,CH32H417DS0.PDF
+CH32H416RDU6,PE9,USART8_RTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF10,DVP_D11,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF10,HSADC_IN6,default,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF10,LTDC_DE,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
@@ -1048,7 +1048,6 @@ CH32H416RDU6,PF10,PF10,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417
 CH32H416RDU6,PF10,QSPI2_SIO2,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF10,TIM10_ETR,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF10,USART8_CK,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
-CH32H416RDU6,PF10,USART8_CTS,af-11,#,reference,pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF12,I2C4_SCL,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF12,OPA2_N1,default,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF12,PF12,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
@@ -1083,7 +1082,6 @@ CH32H416RDU6,PF8,HSADC_IN4,default,#,confirmed,pin-table:zh+pin-table:en,2-1-2,C
 CH32H416RDU6,PF8,PF8,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF8,QSPI1_SIO0,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF8,QSPI2_SIO0,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
-CH32H416RDU6,PF8,QSPI2_SIO0,af-8,#,reference,pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF8,SAI_SCK_B,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF8,SPI1_MOSI,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF8,TIM10_CH1,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
@@ -1098,7 +1096,6 @@ CH32H416RDU6,PF9,SPI1_MISO,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32
 CH32H416RDU6,PF9,TIM10_CH2,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF9,TIM11_CH4,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,PF9,USART8_CTS,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
-CH32H416RDU6,PF9,USART8_RTS,af-11,#,reference,pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
 CH32H416RDU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32H417DS0.PDF
@@ -1341,7 +1338,7 @@ CH32H417MEU6,PB12,FSMC_A12,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417MEU6,PB12,FSMC_A21,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB12,I2C2_SMBA,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB12,I2S2_WS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PB12,LPTIM2_CH2,af-13,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PB12,LPTIM2_CH2,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB12,LTDC_VSYNC,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB12,PB12,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB12,QSPI2_SIOX1,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1364,7 +1361,7 @@ CH32H417MEU6,PB13,FSMC_A22,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417MEU6,PB13,I2S2_CK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB13,LPTIM2_OC,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB13,PB13,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PB13,QSPI2_SIOX2,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX0),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PB13,QSPI2_SIOX2,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB13,SDMMC_D0,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB13,SDRAM_A8,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB13,SPI2_SCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1381,7 +1378,7 @@ CH32H417MEU6,PB14,FSMC_A23,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417MEU6,PB14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB14,LTDC_G0,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB14,PB14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PB14,QSPI2_SIOX3,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX1),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PB14,QSPI2_SIOX3,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB14,SDIO_D0,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB14,SDRAM_A9,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB14,SDRAM_BA0,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1429,7 +1426,7 @@ CH32H417MEU6,PB8,PB8,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417MEU6,PB8,PIOC_IO0,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB8,SDIO_D4,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB8,SDRAM_A3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PB8,SDRAM_CKE0,af-3,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PB8,SDRAM_CKE0,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB8,SWCLK,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB8,TIM10_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB8,TIM4_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1447,7 +1444,7 @@ CH32H417MEU6,PB9,PB9,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417MEU6,PB9,PIOC_IO1,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB9,SDIO_D5,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB9,SDRAM_A4,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PB9,SDRAM_CKE1,af-3,#,conflict,pin-table:zh+!pin-table:en:signal(=SDRAM_DQM2),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PB9,SDRAM_CKE1,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB9,SPI2_NSS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB9,SWDIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PB9,SWIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1526,7 +1523,7 @@ CH32H417MEU6,PC11,SDMMC_STR,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,
 CH32H417MEU6,PC11,SDMMC_STR,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC11,SDRAM_D25,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC11,SDRAM_DQM1,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PC11,SDRAM_DQM2,af-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PC11,SDRAM_DQM2,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC11,SPI3_MISO,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC11,TIM9_CH4,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC11,UHSIF_PORT33,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1596,7 +1593,7 @@ CH32H417MEU6,PC3,UHSIF_PORT2,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1
 CH32H417MEU6,PC3,UHSIF_PORT5,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC6,DVP_D0,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC6,FSMC_D8,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PC6,I2S2_MCK,af-5,#,conflict,pin-table:zh+!pin-table:en:signal(=SPI2_MCK),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PC6,I2S2_MCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC6,LTDC_HSYNC,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC6,PC6,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PC6,RGMII_RXD3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1903,7 +1900,7 @@ CH32H417MEU6,PE10,TIM1_CH2N,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417MEU6,PE10,UHSIF_PORT5,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE10,UHSIF_PORT5,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE10,UHSIF_PORT5,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PE10,USART8_CTS,af-11,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PE10,USART8_CTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE11,FSMC_D8,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE11,LTDC_G3,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE11,PE11,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1944,11 +1941,11 @@ CH32H417MEU6,PE13,TIM1_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417MEU6,PE13,UHSIF_PORT8,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,FSMC_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,I3C_SCL,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PE14,LTDC_CLK,af-14,#,conflict,pin-table:zh+!pin-table:en(=af-13),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PE14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,PE14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,QSPI2_SIO2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,SDIO_D6,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PE14,SDRAM_A3,af-15,#,conflict,pin-table:zh+!pin-table:en(=af-14),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PE14,SDRAM_A3,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,SDRAM_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,SPI4_MOSI,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE14,TIM12_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -1996,7 +1993,6 @@ CH32H417MEU6,PE5,FSMC_A21,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417MEU6,PE5,LTDC_G0,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE5,PE5,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE5,SAI_SCK_A,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PE5,SDRAM_CKE0,af-9,#,reference,pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE5,SDRAM_D27,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE5,SDRAM_RAS_N,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE5,SERDES_RXP,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2012,7 +2008,7 @@ CH32H417MEU6,PE6,LTDC_G1,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H
 CH32H417MEU6,PE6,PE6,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE6,SAI_SD_A,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE6,SDRAM_D28,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417MEU6,PE6,SDRAM_DQM2,af-7,#,conflict,pin-table:zh+!pin-table:en:signal(=SDRAM_CKE1),2-1-1,CH32H417DS0.PDF
+CH32H417MEU6,PE6,SDRAM_DQM2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE6,SERDES_RXN,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE6,SPI4_MOSI,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417MEU6,PE6,TIM12_CH4,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2413,7 +2409,7 @@ CH32H417QEU6,PB12,FSMC_A12,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417QEU6,PB12,FSMC_A21,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB12,I2C2_SMBA,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB12,I2S2_WS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PB12,LPTIM2_CH2,af-13,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PB12,LPTIM2_CH2,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB12,LTDC_VSYNC,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB12,PB12,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB12,QSPI2_SIOX1,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2436,7 +2432,7 @@ CH32H417QEU6,PB13,FSMC_A22,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417QEU6,PB13,I2S2_CK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB13,LPTIM2_OC,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB13,PB13,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PB13,QSPI2_SIOX2,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX0),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PB13,QSPI2_SIOX2,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB13,SDMMC_D0,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB13,SDRAM_A8,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB13,SPI2_SCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2453,7 +2449,7 @@ CH32H417QEU6,PB14,FSMC_A23,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PB14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB14,LTDC_G0,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB14,PB14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PB14,QSPI2_SIOX3,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX1),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PB14,QSPI2_SIOX3,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB14,SDIO_D0,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB14,SDRAM_A9,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB14,SDRAM_BA0,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2565,7 +2561,7 @@ CH32H417QEU6,PB8,PB8,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417QEU6,PB8,PIOC_IO0,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB8,SDIO_D4,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB8,SDRAM_A3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PB8,SDRAM_CKE0,af-3,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PB8,SDRAM_CKE0,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB8,SWCLK,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB8,TIM10_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB8,TIM4_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2583,7 +2579,7 @@ CH32H417QEU6,PB9,PB9,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417QEU6,PB9,PIOC_IO1,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB9,SDIO_D5,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB9,SDRAM_A4,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PB9,SDRAM_CKE1,af-3,#,conflict,pin-table:zh+!pin-table:en:signal(=SDRAM_DQM2),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PB9,SDRAM_CKE1,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB9,SPI2_NSS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB9,SWDIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PB9,SWIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2662,7 +2658,7 @@ CH32H417QEU6,PC11,SDMMC_STR,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,
 CH32H417QEU6,PC11,SDMMC_STR,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC11,SDRAM_D25,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC11,SDRAM_DQM1,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PC11,SDRAM_DQM2,af-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PC11,SDRAM_DQM2,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC11,SPI3_MISO,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC11,TIM9_CH4,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC11,UHSIF_PORT33,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -2761,7 +2757,7 @@ CH32H417QEU6,PC5,PC5,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417QEU6,PC5,SDRAM_CKE0,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC6,DVP_D0,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC6,FSMC_D8,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PC6,I2S2_MCK,af-5,#,conflict,pin-table:zh+!pin-table:en:signal(=SPI2_MCK),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PC6,I2S2_MCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC6,LTDC_HSYNC,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC6,PC6,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PC6,RGMII_RXD3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3080,7 +3076,7 @@ CH32H417QEU6,PE10,TIM1_CH2N,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417QEU6,PE10,UHSIF_PORT5,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE10,UHSIF_PORT5,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE10,UHSIF_PORT5,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE10,USART8_CTS,af-11,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE10,USART8_CTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE11,FSMC_D8,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE11,LTDC_G3,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE11,PE11,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3121,11 +3117,11 @@ CH32H417QEU6,PE13,TIM1_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PE13,UHSIF_PORT8,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,FSMC_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,I3C_SCL,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE14,LTDC_CLK,af-14,#,conflict,pin-table:zh+!pin-table:en(=af-13),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,PE14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,QSPI2_SIO2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,SDIO_D6,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE14,SDRAM_A3,af-15,#,conflict,pin-table:zh+!pin-table:en(=af-14),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE14,SDRAM_A3,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,SDRAM_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,SPI4_MOSI,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE14,TIM12_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3182,7 +3178,6 @@ CH32H417QEU6,PE5,FSMC_A21,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PE5,LTDC_G0,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE5,PE5,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE5,SAI_SCK_A,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE5,SDRAM_CKE0,af-9,#,reference,pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE5,SDRAM_D27,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE5,SDRAM_RAS_N,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE5,SERDES_RXP,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3198,7 +3193,7 @@ CH32H417QEU6,PE6,LTDC_G1,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H
 CH32H417QEU6,PE6,PE6,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE6,SAI_SD_A,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE6,SDRAM_D28,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE6,SDRAM_DQM2,af-7,#,conflict,pin-table:zh+!pin-table:en:signal(=SDRAM_CKE1),2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE6,SDRAM_DQM2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE6,SERDES_RXN,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE6,SPI4_MOSI,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE6,TIM12_CH4,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3214,7 +3209,7 @@ CH32H417QEU6,PE7,QSPI1_SIOX0,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,C
 CH32H417QEU6,PE7,SDRAM_D4,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE7,TIM1_ETR,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE7,UHSIF_PORT2,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE7,UHSIF_PORT2,remap-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE7,UHSIF_PORT2,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE7,USART8_RX,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE8,FSMC_D5,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE8,OPA2_N0,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3234,7 +3229,7 @@ CH32H417QEU6,PE9,SDIO_D1,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H4
 CH32H417QEU6,PE9,SDRAM_D6,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE9,TIM1_CH1,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PE9,UHSIF_PORT4,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PE9,USART8_RTS,af-11,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PE9,USART8_RTS,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF0,DVP_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF0,ETH_PHY_LED0,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF0,LTDC_R1,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3264,7 +3259,6 @@ CH32H417QEU6,PF10,QSPI2_SIO2,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH
 CH32H417QEU6,PF10,SDRAM_D22,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF10,TIM10_ETR,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF10,USART8_CK,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PF10,USART8_CTS,af-11,#,reference,pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF11,I2C4_SMBA,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF11,OPA2_P1,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF11,PF11,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3277,14 +3271,14 @@ CH32H417QEU6,PF12,PIOC_IO0,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PF12,SDRAM_CAS_N,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF12,TIM12_CH3,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF12,UHSIF_PORT0,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PF12,UHSIF_PORT0,remap-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PF12,UHSIF_PORT0,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,DVP_PCLK,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,I2C4_SDA,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,PF13,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,PIOC_IO1,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,TIM12_CH4,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF13,UHSIF_PORT1,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PF13,UHSIF_PORT1,remap-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417QEU6,PF13,UHSIF_PORT1,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF14,DVP_D5,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF14,FSMC_NADV,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF14,LTDC_B5,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3375,7 +3369,6 @@ CH32H417QEU6,PF8,HSADC_IN4,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,C
 CH32H417QEU6,PF8,PF8,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF8,QSPI1_SIO0,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF8,QSPI2_SIO0,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PF8,QSPI2_SIO0,af-8,#,reference,pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF8,SAI_SCK_B,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF8,SDRAM_D20,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF8,SPI1_MOSI,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3393,7 +3386,6 @@ CH32H417QEU6,PF9,SPI1_MISO,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417QEU6,PF9,TIM10_CH2,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF9,TIM11_CH4,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,PF9,USART8_CTS,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417QEU6,PF9,USART8_RTS,af-11,#,reference,pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,SSRXA,SSRXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,SSRXB,SSRXB,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417QEU6,SSTXA,SSTXA,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3556,7 +3548,7 @@ CH32H417WEU6,PB12,FSMC_A12,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417WEU6,PB12,FSMC_A21,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB12,I2C2_SMBA,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB12,I2S2_WS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PB12,LPTIM2_CH2,af-13,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PB12,LPTIM2_CH2,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB12,LTDC_VSYNC,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB12,PB12,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB12,QSPI2_SIOX1,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3579,7 +3571,7 @@ CH32H417WEU6,PB13,FSMC_A22,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32H417WEU6,PB13,I2S2_CK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB13,LPTIM2_OC,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB13,PB13,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PB13,QSPI2_SIOX2,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX0),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PB13,QSPI2_SIOX2,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB13,SDMMC_D0,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB13,SDRAM_A8,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB13,SPI2_SCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3596,7 +3588,7 @@ CH32H417WEU6,PB14,FSMC_A23,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417WEU6,PB14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB14,LTDC_G0,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB14,PB14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PB14,QSPI2_SIOX3,af-11,#,conflict,pin-table:zh+!pin-table:en:signal(=QSPI2_SIOX1),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PB14,QSPI2_SIOX3,af-11,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB14,SDIO_D0,af-9,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB14,SDRAM_A9,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB14,SDRAM_BA0,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3619,7 +3611,7 @@ CH32H417WEU6,PB8,PB8,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417WEU6,PB8,PIOC_IO0,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB8,SDIO_D4,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB8,SDRAM_A3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PB8,SDRAM_CKE0,af-3,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PB8,SDRAM_CKE0,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB8,SWCLK,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB8,TIM10_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB8,TIM4_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3637,7 +3629,7 @@ CH32H417WEU6,PB9,PB9,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS
 CH32H417WEU6,PB9,PIOC_IO1,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB9,SDIO_D5,af-10,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB9,SDRAM_A4,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PB9,SDRAM_CKE1,af-3,#,conflict,pin-table:zh+!pin-table:en:signal(=SDRAM_DQM2),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PB9,SDRAM_CKE1,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB9,SPI2_NSS,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB9,SWDIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PB9,SWIO,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3716,7 +3708,7 @@ CH32H417WEU6,PC11,SDMMC_STR,remap-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,
 CH32H417WEU6,PC11,SDMMC_STR,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC11,SDRAM_D25,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC11,SDRAM_DQM1,af-0,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PC11,SDRAM_DQM2,af-1,#,reference,pin-table:zh,2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PC11,SDRAM_DQM2,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC11,SPI3_MISO,af-6,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC11,TIM9_CH4,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC11,UHSIF_PORT33,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -3786,7 +3778,7 @@ CH32H417WEU6,PC3,UHSIF_PORT2,remap-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1
 CH32H417WEU6,PC3,UHSIF_PORT5,remap-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC6,DVP_D0,af-13,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC6,FSMC_D8,af-4,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PC6,I2S2_MCK,af-5,#,conflict,pin-table:zh+!pin-table:en:signal(=SPI2_MCK),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PC6,I2S2_MCK,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC6,LTDC_HSYNC,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC6,PC6,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PC6,RGMII_RXD3,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
@@ -4094,11 +4086,11 @@ CH32H417WEU6,PE13,TIM1_CH3,af-1,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32H417WEU6,PE13,UHSIF_PORT8,default,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,FSMC_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,I3C_SCL,af-3,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PE14,LTDC_CLK,af-14,#,conflict,pin-table:zh+!pin-table:en(=af-13),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PE14,LTDC_CLK,af-14,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,PE14,main,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,QSPI2_SIO2,af-7,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,SDIO_D6,af-8,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
-CH32H417WEU6,PE14,SDRAM_A3,af-15,#,conflict,pin-table:zh+!pin-table:en(=af-14),2-1-1,CH32H417DS0.PDF
+CH32H417WEU6,PE14,SDRAM_A3,af-15,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,SDRAM_D11,af-12,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,SPI4_MOSI,af-5,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF
 CH32H417WEU6,PE14,TIM12_CH3,af-2,#,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32H417DS0.PDF

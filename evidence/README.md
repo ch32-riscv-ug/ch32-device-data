@@ -647,7 +647,7 @@ so they were placed in [register-map-survey](../docs/register-map-survey.ja.md#å
 
 ### `pin_alternate.csv`
 
-**Where to write the AF number.** The destination of the N in `route = af-N` (4,507 rows) of `pin_functions.csv`,
+**Where to write the AF number.** The destination of the N in `route = af-N` (4,499 rows) of `pin_functions.csv`,
 one row per (family, pad). `tools/build_pin_alternate.py`.
 
 The 3 families CH32V205, CH32X315 and CH32H417 are **the generation without AFIO remap**;

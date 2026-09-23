@@ -45,7 +45,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   と同じだと思うと`millis()`が動かない
 - `tools/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
   AF番号の書き込み先を`evidence/pin_alternate.csv`にする。`pin_functions`の`af-N`が
-  4,507行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
+  4,499行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
   EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
 - `tools/build_interrupts.py`: 割り込みベクタ表を`evidence/interrupts.csv`にする。
   **出所はreference manualではなくEVTのdevice header**で、`IRQn_Type`列挙が
@@ -68,7 +68,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   配布物の版番号（`wchlink.wcfg`）と実機が申告する`major.minor`の対応は
   `wcfg = major*10 + minor`で、`tools/read_link_version.py`が実機から読んだ値と
   突き合わせる（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
-- `tools/build_capabilities.py`: 比較表の属性（156種類の綴り・1,714行）を
+- `tools/build_capabilities.py`: 比較表の属性（154種類の綴り・1,714行）を
   「型番 × 能力」の縦持ち索引`index/capabilities.csv`にする。`index/parts.csv`は
   横長なので13種類しか列に持てない。属性→能力の対応は**総当たりの辞書**で、
   辞書に無い属性が現れたら生成が落ちる（`adc`はチャネル数、`adc_unit`はユニット数、
@@ -76,7 +76,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `tools/build_conflicts.py`: 全表の`conflict`の印を`index/conflicts.csv`に集める。
   証拠は食い違いを片方に寄せず両論を残す規則だが、その記録が11の表に散っていて
   「両版で食い違う仕様を全部」に答えられなかった。`basis`のDSLから「どの出所が
-  異を唱えるか」と「その出所は何と言うか」を取り出すので、**105行は表が採った値と
+  異を唱えるか」と「その出所は何と言うか」を取り出すので、**81行は表が採った値と
   相手の値が横に並ぶ**
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと

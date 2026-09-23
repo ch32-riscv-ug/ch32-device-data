@@ -628,7 +628,7 @@ CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義�
 
 ### `pin_alternate.csv`
 
-**AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4,507行）のNの
+**AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4,499行）のNの
 書き込み先で、1行1（family, pad）。`tools/build_pin_alternate.py`。
 
 CH32V205・CH32X315・CH32H417の3 familyは**AFIO remapを持たない世代**で、

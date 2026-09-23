@@ -12,7 +12,7 @@ CH32H415REU6,CH32H415,CH32H417,hsadc-channel,,count,4,4,hsadc_channels,#,confirm
 CH32H415REU6,CH32H415,CH32H417,i2c,,count,4,4,i2c,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
-CH32H415REU6,CH32H415,CH32H417,opa,,text,,2 (OPA1/3),opa,#,confirmed,products:zh+products:en
+CH32H415REU6,CH32H415,CH32H417,opa,,text,,2(OPA1/3),opa,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,pioc,,count,1,1,pioc,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,rng,,count,1,1,rng,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,rtc,,marker,,√,rtc,#,confirmed,products:zh+products:en
@@ -31,7 +31,7 @@ CH32H415REU6,CH32H415,CH32H417,timer-general,32bit,count,4,4,timer_gptm_32_bit,#
 CH32H415REU6,CH32H415,CH32H417,timer-lptim,,count,2,2,timer_lptim,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,usart,,count,8,8,usart,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,usb-fs,otg,count,1,1,pdusb_usbfs_otg_fs,#,confirmed,products:zh+products:en
-CH32H415REU6,CH32H415,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb_2_0,#,confirmed,products:zh+products:en
+CH32H415REU6,CH32H415,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,usb-pd,,count,1,1,pdusb_usbpd_type_c,#,confirmed,products:zh+products:en
 CH32H415REU6,CH32H415,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,adc,with-tkey,count,2,2,adc_tkey_units,#,confirmed,products:zh+products:en
@@ -55,9 +55,9 @@ CH32H416RDU6,CH32H416,CH32H417,rtc,,marker,,√,rtc,#,confirmed,products:zh+prod
 CH32H416RDU6,CH32H416,CH32H417,sai,,count,1,1,sai,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,sdmmc,,count,1,1,sdmmc,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,spi-i2s,,text,,3/2,spi_i2s,#,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-dtcm,text,,256K,sram_core_1_hs_dtcm,#,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-itcm,text,,128K,sram_core_1_hs_itcm,#,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,sram,shared,text,,512K,sram_shared_code_and_data_area,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-dtcm,text,,256KB,sram_core_1_hs_dtcm,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,core1-hs-itcm,text,,128KB,sram_core_1_hs_itcm,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,sram,shared,text,,512KB,sram_shared_code_and_data_area,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,swpmi,,count,1,1,swpmi,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,systick,32bit,count,2,2,timer_systick_32_bit,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,timer-advanced,16bit,count,2,2,timer_adtm_16_bit,#,confirmed,products:zh+products:en
@@ -67,9 +67,9 @@ CH32H416RDU6,CH32H416,CH32H417,timer-general,32bit,count,4,4,timer_gptm_32_bit,#
 CH32H416RDU6,CH32H416,CH32H417,timer-lptim,,count,2,2,timer_lptim,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,usart,,count,7,7,usart,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,usb-fs,otg,count,1,1,pdusb_usbfs_otg_fs,#,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb_2_0,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,usb-pd,,text,,1 Built-in Rd(4),pdusb_usbpd_type_c,#,conflict,products:en+!products:zh(=1 built-in Rd(4))
-CH32H416RDU6,CH32H416,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb_3_0,#,confirmed,products:zh+products:en
+CH32H416RDU6,CH32H416,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb3_0,#,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,adc,with-tkey,count,2,2,adc_tkey_units,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,adc-channel,with-tkey,text,,9+2,adc_tkey_channels,#,confirmed,products:zh+products:en
@@ -86,7 +86,7 @@ CH32H417MEU6,CH32H417,CH32H417,hsadc-channel,,count,4,4,hsadc_channels,#,confirm
 CH32H417MEU6,CH32H417,CH32H417,i2c,,count,4,4,i2c,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
-CH32H417MEU6,CH32H417,CH32H417,opa,,text,,2 (OPA1/3),opa,#,confirmed,products:zh+products:en
+CH32H417MEU6,CH32H417,CH32H417,opa,,text,,2(OPA1/3),opa,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,pioc,,count,1,1,pioc,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,qspi,,text,,1 (QSPI2),qspi,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,rng,,count,1,1,rng,#,confirmed,products:zh+products:en
@@ -109,9 +109,9 @@ CH32H417MEU6,CH32H417,CH32H417,timer-lptim,,count,2,2,timer_lptim,#,confirmed,pr
 CH32H417MEU6,CH32H417,CH32H417,uhsif,,count,1,1,uhsif,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,usart,,count,8,8,usart,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,usb-fs,otg,count,1,1,pdusb_usbfs_otg_fs,#,confirmed,products:zh+products:en
-CH32H417MEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb_2_0,#,confirmed,products:zh+products:en
+CH32H417MEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,usb-pd,,count,1,1,pdusb_usbpd_type_c,#,confirmed,products:zh+products:en
-CH32H417MEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb_3_0,#,confirmed,products:zh+products:en
+CH32H417MEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb3_0,#,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,adc,with-tkey,count,2,2,adc_tkey_units,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,adc-channel,with-tkey,text,,16+2,adc_tkey_channels,#,confirmed,products:zh+products:en
@@ -152,9 +152,9 @@ CH32H417QEU6,CH32H417,CH32H417,timer-lptim,,count,2,2,timer_lptim,#,confirmed,pr
 CH32H417QEU6,CH32H417,CH32H417,uhsif,,count,1,1,uhsif,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,usart,,count,8,8,usart,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,usb-fs,otg,count,1,1,pdusb_usbfs_otg_fs,#,confirmed,products:zh+products:en
-CH32H417QEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb_2_0,#,confirmed,products:zh+products:en
+CH32H417QEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,usb-pd,,count,1,1,pdusb_usbpd_type_c,#,confirmed,products:zh+products:en
-CH32H417QEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb_3_0,#,confirmed,products:zh+products:en
+CH32H417QEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb3_0,#,confirmed,products:zh+products:en
 CH32H417QEU6,CH32H417,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,adc,with-tkey,count,2,2,adc_tkey_units,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,adc-channel,with-tkey,text,,7+2,adc_tkey_channels,#,confirmed,products:zh+products:en
@@ -171,7 +171,7 @@ CH32H417WEU6,CH32H417,CH32H417,hsadc-channel,,count,4,4,hsadc_channels,#,confirm
 CH32H417WEU6,CH32H417,CH32H417,i2c,,count,4,4,i2c,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
-CH32H417WEU6,CH32H417,CH32H417,opa,,text,,2 (OPA1/3),opa,#,conflict,products:en+!products:zh(=1（OPA1）)
+CH32H417WEU6,CH32H417,CH32H417,opa,,text,,1(OPA1),opa,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,pioc,,count,1,1,pioc,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,qspi,,text,,1 (QSPI2),qspi,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,rng,,count,1,1,rng,#,confirmed,products:zh+products:en
@@ -192,8 +192,8 @@ CH32H417WEU6,CH32H417,CH32H417,timer-general,32bit,count,4,4,timer_gptm_32_bit,#
 CH32H417WEU6,CH32H417,CH32H417,timer-lptim,,count,2,2,timer_lptim,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,uhsif,,text,,1(1),uhsif,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,usart,,count,7,7,usart,#,confirmed,products:zh+products:en
-CH32H417WEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb_2_0,#,confirmed,products:zh+products:en
-CH32H417WEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb_3_0,#,confirmed,products:zh+products:en
+CH32H417WEU6,CH32H417,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,#,confirmed,products:zh+products:en
+CH32H417WEU6,CH32H417,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb3_0,#,confirmed,products:zh+products:en
 CH32H417WEU6,CH32H417,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,#,confirmed,products:zh+products:en
 CH32L103C8T6,CH32L103,CH32L103,adc-channel,,text,,10+3,adc,#,confirmed,products:zh+products:en
 CH32L103C8T6,CH32L103,CH32L103,can,,count,1,1,communication_interface_can,#,confirmed,products:zh+products:en
