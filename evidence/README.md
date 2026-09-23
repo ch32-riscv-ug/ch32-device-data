@@ -841,6 +841,10 @@ One row per erratum (lot-dependent behaviour, hardware cautions). The source is 
 
 Since errata can grow with future datasheet revisions, `pipeline/extract/scan_errata.py` scans all datasheets, matches against the known ones (identified by the regular expressions in the `match` column of curated/errata.csv), and reports any unknown text as `NEW` (exit code 1). When NEW appears, add a row to curated/errata.csv and re-run to confirm NEW: 0.
 
+**The scan also fails when a known row loses its basis** -- a row that cites a document whose `match` no longer finds anything. Two kinds of row are exempt because the current text is *supposed* to be absent: bench measurements (`basis` `measured:…`) and rows pinned to a **past edition** (`basis` `CH32H417DS0.PDF@V1.8:zh(p.4)`). The latter exist because WCH sometimes deletes a note in a later revision without saying the limitation is gone: CH32H417DS0 V1.3-V1.8 stated that lots whose 5th digit is 0 lack GPHA/Ethernet/SerDes/CAN and that the blue-marked parts of the clock tree do not apply to them; **V1.9 dropped both notes**. Chips from those lots are still in the field, so the rows stay, citing the edition that said it.
+
+Rows citing an application manual (`CH32H417RM.PDF p.374` -- the four `h41x-*-lot3` rows, "5th digit of lot number < 3") are checked only by the full `--rm` scan.
+
 ### `absolute_maximum_ratings.csv`
 
 **Absolute maximum ratings** -- the limits beyond which the part is damaged. This is a

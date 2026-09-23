@@ -819,6 +819,10 @@ schematic-pdf  family単位の回路図PDF                      12
 
 エラッタは今後のdatasheet改版で増えうるため、`pipeline/extract/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
 
+**既知の行が根拠を失ったときも走査は落ちます**——資料を引く行なのに、その `match` がどこにも当たらない場合です。いまの文に無いのが**正しい**2種類は除外します: 実機で測った行（`basis` が `measured:…`）と、**過去の版を名指す行**（`basis` が `CH32H417DS0.PDF@V1.8:zh(p.4)`）。後者があるのは、WCH が後の版で注記を消しても制約が無くなったとは言わないことがあるからです——CH32H417DS0 は V1.3〜V1.8 で「批号第5位が0の製品は GPHA・Ethernet・SerDes・CAN を持たない」「クロックツリーの青い部分はそれらに当てはまらない」と書いていましたが、**V1.9 で両方を消しました**。そのロットのチップは市中に残っているので、行は言っていた版を引いて残します。
+
+application manual を引く行（`CH32H417RM.PDF p.374`——「批号第五位小于3」の `h41x-*-lot3` 4件）は、`--rm` の全走査でだけ判定します。
+
 ### `absolute_maximum_ratings.csv`
 
 **絶対最大定格**——そこを超えると壊れる限界です。`operating_conditions.csv` の

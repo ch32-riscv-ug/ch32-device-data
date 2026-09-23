@@ -65,7 +65,7 @@
 | figures | 103 | **全行 confirmed**（ref 0 / conflict 0） | 型番と document の対応・ページが正の整数・**confidence がページの数と一致**・**`basis` の `p.N` が列と同じ**・**全型番に行が在ること**（`figures_sane`。2026-09-16 に実装。4通りに壊して落ちることを確認） | **なし**——目録の 103 型番すべてが両版にピン配置図を持つ | 🟢 |
 | features | 397 | confirmed 386 / ref 11 | 結合 | 節番号の振り方が版で違う datasheet あり（数だけ記録） | ✅ |
 | memory_configs | 67 | **全行 conflict** | products と往復 | conflict は**意図した記録**: EVT ヘッダの `FLASH_OBR` フィールド幅（2bit）と RM 中文版（3bit）が食い違う。5通りの組合せに3bit要るので中文版が正、と basis に両論併記 | 🟡 |
-| errata | 23 | 列ごと | 結合・scan_errata で増分監視 | curated（人手）。両版のページ番号は照合済み。**2026-09-16、`CH32X035DS0.en` V2.3 で `x035-adc-ch-i2c-unavailable` の英語の言い回しが変わった**（`I2C function is not available` → `not applicable`）。`match` の正規表現に `applicable` を足し、同時に scan が挙げた en p.8（ADC の章。中文版 p.8 と対応）を `source_en` に足して 3 → 4 ページにした——中文版と件数が揃った | ✅ |
+| errata | 27 | 列ごと | 結合・scan_errata で増分監視・**資料を引く行の `match` が空振りしたら落ちる**（2026-09-24。実測の行と過去の版を名指す行は除外。壊して落ちることを確認） | curated（人手）。両版のページ番号は照合済み。**2026-09-16、`CH32X035DS0.en` V2.3 で `x035-adc-ch-i2c-unavailable` の英語の言い回しが変わった**（`I2C function is not available` → `not applicable`）。`match` の正規表現に `applicable` を足し、同時に scan が挙げた en p.8（ADC の章。中文版 p.8 と対応）を `source_en` に足して 3 → 4 ページにした——中文版と件数が揃った | ✅ |
 
 ### RM から（単一出所）
 
