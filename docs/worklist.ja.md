@@ -810,6 +810,22 @@ SDIO `DTMODE` の注記が「**CH32F20x_D8** のロット番号下6桁」と別�
 棚卸しは別件。x035 の2件の `description` の綴り（curated と HEAD の生成物が違った件）は**人の
 判断待ちのまま**。
 
+### 2026-09-25 CH32L103 の FLASH_OBR を実機で決着させた（F-77）
+
+`register_fields` の CH32L103 `FLASH_OBR` `DATA0`/`DATA1` は、EVT header（`[17:10]`/`[25:18]`）と RM
+（`[19:12]`/`[27:20]`）が食い違って `conflict` だった。ArduinoCore-CH32 側で ch32rv から data0=0x5a・
+data1=0xc3 を書いて `FLASH_OBR`（0x4002201C）を読むと **0x0c35acfc**——RM の位置で 0x5a/0xc3、header の位置
+では 0x6b/0x0d。**header が2ビットずれている。** 同じ手順で V203（0x030d68fc）と V003（0x030d6bdc）は
+`[17:10]` で 0x5a/0xc3 になり、header と RM が一致している系列の配置と同じ（記録: wch-protocols `856ba44`）。
+
+入れ方（ユーザーの裁定・案 A）: **証拠は資料の言い分の表なので `conflict` のまま**、`basis` に
+`obr-readback:wch-linke(=19:12)` を足す（実測は `curated/register-fields-measured.json`。この file は行を
+作らず、資料が既に述べている位置を決めるだけ）。**索引 `index/registers.csv` は測った位置を採る**——
+F-41 で格子の値を採るのと同じ規則。資料側の問題台帳に F-77 として1行。
+
+**残り**: CH32V205 は同じ食い違い（EVT `[17:10]` / RM `[19:12]`）でまだ測っていない。USER の範囲
+（EVT `[7:2]` / RM bit7）は USER が既定の 0xFF で今回の測定では決まらない。
+
 ## E. consumerからの依頼
 
 `ArduinoCore-CH32`が`docs/research/`で出している依頼。上流はこのrepositoryなので、
@@ -1732,6 +1748,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | F-44 | CH32X035 EVT header | `OPA_CTLR2_CMP_LOCK`のmaskが`0x2000`（bit13＝`PSEL3`と衝突）。RMはbit31 | `opa_cmp_registers`でconflict。使うとCMP3の正入力選択を壊す |
 | F-45 | CH32L103 / CH32V205 EVT header | `ITRIMN`/`ITRIMP`が5bit（RMは6bit）、`HYS1_H`/`HYS2_H`がbit29/30（RMは19/29） | conflict＋両論 |
 | F-46 | CH32V20x / V30x datasheet | 温度センサ`Avg_Slope`の最大値がzh 4.8 / en 4.7 mV/℃ | `adc_internal`でconflict＋両論 |
+| F-77 | CH32L103 EVT header | `FLASH_OBR_DATA0`/`DATA1` を `[17:10]`/`[25:18]` に置く（RM は `[19:12]`/`[27:20]`）。**実機で RM が正しい**と決着（2026-09-25。data0=0x5a・data1=0xc3 を書いて OBR=0x0c35acfc）。V203・V003 は同じ手順で `[17:10]` 配置 | `register_fields` は conflict のまま実測を basis に足し、索引が RM の位置を採る。**CH32V205 も同じ食い違い**（未測定） |
 | F-76 | CH32V006 datasheet | `CH32V006K8U6`（-40..85℃ の QFN32）を名指していない。**WCH 自身の EVT**（`wui_demo.wvproj` の `MCU=CH32V006K8U6`）・実機・probe-rs 0.32.0 は知っている。62K/8K の品だけ「上流に6グレード・DS0に7グレード」という系統的なずれで、`CH32V007K8U6` は documented | 2026-09-16 に**目録へ入れた**（`evt:project`＋`silicon:wch-linke`＋兄弟の規則。F-76）。資料側の欠落そのものは残るので、WCHへ報告する材料 |
 | E-3 | CH32V30x RM en版 / EVT header | `RAM_CODE_MOD`をen版は`[9:8]`（2bit）、zh版は`[9:7]`（3bit）。5通りの組合せに3bit要るのでzh版が正。`ch32v30x.h`/`ch32v4x7.h`の`FLASH_OBR_RAM_CODE_MOD`も2bit | `memory_configs`は全行conflict＋両論 |
 | E-3 | CH32X315 EVT `Link.ld` | コメントが`CH32V4x7RM.PDF Table 32-3`を指して576K/136Kを挙げるが、X315のheaderにその構成は無い | 読まない（`build_memory`のnotes） |

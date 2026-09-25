@@ -1,0 +1,27 @@
+{
+  "_comment": "Register field positions measured on physical silicon where the device header and the reference manual disagree. pipeline/extract/rm/extract_registers.py appends the measurement to the evidence row's basis as `<method>:<probe>(=<bits>)`; the row stays `conflict` because the documents still disagree. tools/build_index.py adopts the measured bits in index/registers.csv (the same rule as F-41, where the index takes the RM grid's value). This file never creates a field; it only settles a position a document already states.",
+  "measured": [
+    {
+      "family": "CH32L103",
+      "register": "FLASH_OBR",
+      "field": "DATA0",
+      "bits": "19:12",
+      "method": "obr-readback",
+      "probe": "wch-linke",
+      "date": "2026-09-25",
+      "how": "ch32rv wrote option bytes data0=0x5a, data1=0xc3 on a CH32L103C8T6, then FLASH_OBR (0x4002201C) read 0x0c35acfc: [19:12]=0x5a, [27:20]=0xc3; the header's [17:10]/[25:18] would give 0x6b/0x0d. The same procedure on V203 (0x030d68fc) and V003 (0x030d6bdc) gives 0x5a/0xc3 at [17:10]/[25:18].",
+      "record": "wch-protocols 856ba44 captures/fixtures/wire-linke-p4-2026-09-25/extra/"
+    },
+    {
+      "family": "CH32L103",
+      "register": "FLASH_OBR",
+      "field": "DATA1",
+      "bits": "27:20",
+      "method": "obr-readback",
+      "probe": "wch-linke",
+      "date": "2026-09-25",
+      "how": "see DATA0",
+      "record": "wch-protocols 856ba44 captures/fixtures/wire-linke-p4-2026-09-25/extra/"
+    }
+  ]
+}

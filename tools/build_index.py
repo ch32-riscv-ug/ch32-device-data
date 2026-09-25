@@ -194,6 +194,35 @@ def routes_rows(remap_fields: list[dict], remap_routes: list[dict]) -> tuple[lis
 
 # ---------------------------------------------------------------- registers
 
+# 資料どうしが食い違う field を実機で測った位置（`register_fields` の basis に
+# `obr-readback:wch-linke(=19:12)` の形で載る）。索引はこれを採る——F-41 で格子の値を
+# 採るのと同じ規則で、証拠の行は `conflict` のまま両論と実測を持ち続ける。
+MEASURED_BITS = re.compile(r"(?:^|\+)[a-z][a-z0-9-]*:[a-z][a-z0-9-]*\(=(?P<bits>\d+(?::\d+)?)\)")
+
+
+def measured_bits(basis: str) -> str | None:
+    """basis が実測の位置を持っていればその bits。
+
+    >>> measured_bits("evt(ch32l103.h)+!rm(CH32L103RM.PDF)(=19:12)+obr-readback:wch-linke(=19:12)")
+    '19:12'
+    >>> measured_bits("evt(ch32l103.h)+!rm(CH32L103RM.PDF)(=19:12)") is None
+    True
+    """
+    m = MEASURED_BITS.search(basis)
+    return m.group("bits") if m else None
+
+
+def bits_mask(bits: str) -> str:
+    """`19:12` → `0xff000`・`7` → `0x80`。
+
+    >>> bits_mask("19:12"), bits_mask("7")
+    ('0xff000', '0x80')
+    """
+    hi, _, lo = bits.partition(":")
+    lo = lo or hi
+    return f"{((1 << (int(hi) - int(lo) + 1)) - 1) << int(lo):#x}"
+
+
 def registers_rows(registers: list[dict], fields: list[dict]) -> list[dict]:
     """register ごとの offset に、その register の bit define を並べる。
 
@@ -223,12 +252,16 @@ def registers_rows(registers: list[dict], fields: list[dict]) -> list[dict]:
             offset = reg["offset"]
             if element:
                 offset = f"{int(reg['offset'], 16) + int(element.group('i')) * int(reg['width_bits']) // 8:#05x}"
+        bits, mask = f["bits"], f["mask"]
+        adopted = measured_bits(f["basis"]) if f["kind"] == "field" else None
+        if adopted:
+            bits, mask = adopted, bits_mask(adopted)
         rows.append({"family": f["family"], "type": type_name, "register": register,
                      "offset": offset,
                      "width_bits": reg["width_bits"] if reg else "",
                      "count": reg["count"] if reg else "",
                      "field": f["field"], "define": f["define"], "kind": f["kind"],
-                     "of_field": f["of_field"], "bits": f["bits"], "mask": f["mask"],
+                     "of_field": f["of_field"], "bits": bits, "mask": mask,
                      "value": f["value"], "description": f["description"],
                      "access": f["rm_access"], "reset": f["rm_reset"],
                      "confidence": f["confidence"], "basis": f["basis"]})

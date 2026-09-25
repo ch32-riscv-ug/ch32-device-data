@@ -125,6 +125,15 @@ readable name, `define` the EVT spelling (`RCC_APB2PCENR_USART1EN`). Rows with a
 `offset` are defines whose banner could not be tied to a struct member (911). `access` /
 `reset` come from the reference manual where the bit position matched (`confirmed`).
 
+**Where the header and the manual put a field at different bits and a bench measurement has
+settled it, this index takes the measured position** (`bits`/`mask`), while the row keeps
+`confidence=conflict` and a `basis` that shows both documents and the measurement -- the same
+rule as `pinout.csv` taking the RM remap grid's value. Today that is CH32L103 `FLASH_OBR`
+`DATA0`/`DATA1`: the header says `[17:10]`/`[25:18]`, the manual `[19:12]`/`[27:20]`, and
+writing data bytes 0x5a/0xc3 then reading `FLASH_OBR` over WCH-LinkE showed the manual is right
+(`basis` ends `obr-readback:wch-linke(=19:12)`). `evidence/register_fields.csv` keeps the header's
+bits, because it records what the documents say.
+
 ### `register_map.csv` -- absolute addresses
 
 One row per (family, block, register): `evidence/register_blocks` base addresses x `registers`,
