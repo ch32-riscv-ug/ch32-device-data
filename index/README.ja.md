@@ -134,6 +134,14 @@ commit と読む表の sha256（`manifest.csv` の sha256 を1つ固定しても
 1行1（register, bit define）。`evidence/registers`（構造体の offset）に `evidence/register_fields`
 （bit define）を並べたもの。field を持たない register も1行（`field` 空）。
 
+**header と manual が field の位置を違えて書き、実機の測定で決着したものは、この索引が
+測った位置を採ります**（`bits`/`mask`）。行は `confidence=conflict` のままで、`basis` に両方の資料と
+実測が並びます——`pinout.csv` が RM の remap 格子の値を採るのと同じ規則です。いまは CH32L103 の
+`FLASH_OBR` の `DATA0`/`DATA1` だけで、header は `[17:10]`/`[25:18]`、manual は `[19:12]`/`[27:20]`。
+データバイトに 0x5a/0xc3 を書いて WCH-LinkE で `FLASH_OBR` を読むと manual が正しかった
+（`basis` の末尾が `obr-readback:wch-linke(=19:12)`）。`evidence/register_fields.csv` は資料の言い分を
+記録する表なので header の bits のまま残します。
+
 | 列 | 中身 |
 |---|---|
 | `type` | EVT の `*_TypeDef` の名前（`USART`・`DMA_Channel`）。同じ型は family で共有できる（`register_layouts.csv`） |

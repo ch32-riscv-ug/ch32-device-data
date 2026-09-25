@@ -619,6 +619,20 @@ def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
 
 # ---------------------------------------------------------------- main
 
+def load_measured() -> dict[tuple[str, str, str], dict]:
+    """curated/register-fields-measured.json — 資料どうしが食い違う field の実測（2026-09-25）。
+
+    **行は作らない。** 資料が既に述べている field の位置を決めるためだけに効き、
+    証拠の行は `conflict` のまま `basis` に `<method>:<probe>(=<bits>)` が加わる。
+    索引（`tools/build_index.py`）がその位置を採る。
+    """
+    path = REPO / "curated" / "register-fields-measured.json"
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {(m["family"], m["register"], m["field"]): m for m in data.get("measured", [])}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
@@ -633,6 +647,7 @@ def main() -> int:
     if args.family:
         families = [x for x in families if x in set(args.family)]
 
+    measured = load_measured()
     blocks_out: list[dict] = []
     regs_out: list[dict] = []
     fields_out: list[dict] = []
@@ -795,6 +810,9 @@ def main() -> int:
                     elif span:
                         confidence = "conflict"
                         basis.append(f"!rm({manual_name})(={lo + width - 1}:{lo})")
+                fact = measured.get((family, register, fname)) if kind == "field" else None
+                if fact:
+                    basis.append(f"{fact['method']}:{fact['probe']}(={fact['bits']})")
                 fields_out.append({
                     "family": family, "register": register, "type": type_name,
                     "member": (f"{member['struct']}.{member['name']}"
