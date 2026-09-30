@@ -510,6 +510,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 
 ## Errata
 
+- Only UNIID1 and UNIID2 (the low 64 bits) of the unique ID differ between chips; UNIID3 is not unique although the reference manual describes a 96-bit unique identifier. UNIID3 reads 0xFFFFFFFF on the measured V003, V006, X035 and L103 chips, and the same 0xE339E339 on a V203 and a V307. Use UNIID1|UNIID2 as the chip's unique value. *(applies: CH32L103, CH32V003, CH32V006, CH32V203, CH32V307, CH32X035; )*
 - The blue-dashed sections of the clock tree (Figure 2-4) are not applicable to these CH32V203RB lots (they only apply when the 5th-to-last lot digit is greater than 0). *(applies: CH32V203; 5th-to-last digit of lot number = 0 (CH32V203RB))*
 - CH32V203RB uses a 32MHz external crystal or clock (HSE); no load capacitors are needed with an external crystal as they are built in. *(applies: CH32V203; CH32V203RB (all lots))*
 

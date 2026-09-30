@@ -166,7 +166,7 @@ errata,#,Separator between the data columns and the provenance columns; every va
 errata,description_confidence,"Confidence of `description`: confirmed when the page is recorded in both language datasheets: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty
 errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty
 esig,family,Family key; joins catalog families.family.,name,never empty
-esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the 96-bit unique ID, `UNIID1` lowest).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty
+esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the ID words, `UNIID1` lowest; measured chips differ only in UNIID1|UNIID2, see erratum `esig-uniid3-not-unique`).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty
 esig,address,Absolute address to read the register at (factory-programmed system area; CH32M030 uses a different base).,hex,never empty
 esig,width_bits,"Register width in bits, from the `R16_`/`R32_` prefix.",integer,never empty
 esig,unit,"Unit of the value read: `KiB` for `FLACAP` (flash capacity in Kbytes, per the field description).",enum(KiB),no unit (a raw ID word)
