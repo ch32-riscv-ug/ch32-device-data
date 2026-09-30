@@ -25,11 +25,10 @@ The tables **to look things up in** (names normalised through the vocabulary, jo
 Columns derived through the vocabulary (`peripheral`, `role`, `port`, `gpio`, and `channels` counted from pins) are
 **not** here; they are in the index.
 
-**Tables that can be read as is (stable)**: `interrupts`, `memory_map`, `systick`,
-`clock_*` (5 tables), `evt_variants`, `clock_enables` and `pin_alternate`, copied from EVT headers, plus
-`flash_geometry`, `flash_program_method`, `adc_internal` and `debug_data`, need no vocabulary work because their names are machine vocabulary from the start.
-**Consumers read their copies in [`index/`](../index/README.md)**, which is the whole public surface (since 2026-09-30); reading them here is
-a transition allowance that ends once the consumers have moved. No evidence table is a contract.
+**No evidence table is a contract.** Consumers read [`index/`](../index/README.md) only, which is the whole
+public surface; the evidence tables it publishes are copied there under the same name (listed in
+`tools/paths.py` `PUBLISHED` and in the index README). The "stable" mark these tables used to carry was
+retired on 2026-10-01, once every consumer had moved to `index/`.
 
 ## Each file
 

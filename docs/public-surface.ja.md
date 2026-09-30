@@ -116,7 +116,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 2. ~~このリポジトリ: 写しと `VERSION` を生成し、検査を足し、README を直す~~（2026-09-30）
 3. consumer へ連絡: 公開の commit と、上の「index で足りる」対応表（commit の後）
 4. consumer が読み先を移す。**猶予期間は evidence の旧 path も残る**（evidence は消さない。ただし契約ではない）
-5. 移り終わったら `paths.STABLE_EVIDENCE` と `evidence/README` の「安定」印を消す
+5. ~~移り終わったら `paths.STABLE_EVIDENCE` と `evidence/README` の「安定」印を消す~~（2026-10-01。ch32rv ed7a703・core は 5339df5 に固定して移行、wch-protocols は元から `index/` だけ）
 
 ## 決めたこと（ユーザー、2026-09-30）
 
@@ -130,5 +130,5 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 
 - 機械で読める列の説明 `index/columns.csv`（表・列・意味・書式・空欄の意味）。いまは README の文章だけ
 - ~~`routes.controller`~~（2026-09-30 に追加）・~~consumer への連絡~~（2026-09-30）
-- core が `alias` の読みを H41x・M007・M103 で確かめた結果を送ってくる（pinout の `port`/`gpio` で足りなければ直す）
-- 移り終わった後の「安定」印の撤去（`paths.STABLE_EVIDENCE`・evidence/README）
+- ~~core の `alias` の確認~~（2026-09-30。pinout の `port`/`gpio` と全件一致。併せて OSC_IN/OSC_OUT の `port`/`gpio` を埋めた＝5339df5）
+- ~~移り終わった後の「安定」印の撤去~~（2026-10-01）

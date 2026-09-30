@@ -471,8 +471,6 @@ def check_holes(open_or_not: dict[str, bool]) -> list[str]:
 # consumer に「直接読んでよい」と約束している証拠の表の一覧。README ごとに段落の書き出しを持ち、
 # そこから空行までを一覧とみなす。
 STABLE_LISTS = (
-    ("evidence/README.md", "**Tables that can be read as is (stable)**", "stable"),
-    ("evidence/README.ja.md", "**そのまま読める表（安定）**", "stable"),
     # 公開面へ写した表の一覧（`paths.PUBLISHED`）。落とした列は次の段落に書く（一覧に混ぜない）。
     ("index/README.md", "## Copied from catalog and evidence", "published"),
     ("index/README.ja.md", "## 目録・証拠からの写し", "published"),
@@ -487,16 +485,16 @@ def check_stable_lists() -> list[str]:
     `flash_program_method` を安定に加えたとき、`paths.py` と `evidence/README`（日英）は
     直したが `index/README` の「Contract for consumers」を直し忘れ、ch32rv と core が
     別々の一覧を基準にしていた（2026-09-30、dev-wch-3e が気づいた）。同じ日に公開面を
-    `index/` の下だけにしたので、index/README（日英）は写した表（`paths.PUBLISHED`）を並べ、
-    evidence/README（日英）は移行が終わるまで安定表（`paths.STABLE_EVIDENCE`）を並べる。
+    `index/` の下だけにしたので、index/README（日英）が写した表（`paths.PUBLISHED`）を並べる
+    （安定表の一覧は 2026-10-01 に全 consumer が移り終えて無くなった）。
     `clock_*` は `clock_` で始まる表の全部と読む。
     """
-    expected = {"stable": set(paths.STABLE_EVIDENCE), "published": set(paths.PUBLISHED)}
+    expected = {"published": set(paths.PUBLISHED)}
     names = set(paths.CATALOG_TABLES) | set(paths.EVIDENCE_TABLES)
     bad = []
     for name, anchor, kind in STABLE_LISTS:
         want = expected[kind]
-        source = "paths.STABLE_EVIDENCE" if kind == "stable" else "paths.PUBLISHED"
+        source = "paths.PUBLISHED"
         text = (REPO / name).read_text(encoding="utf-8")
         at = text.find(anchor)
         if at < 0:
