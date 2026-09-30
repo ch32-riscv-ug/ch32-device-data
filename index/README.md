@@ -31,6 +31,7 @@ therefore copied in here (see [Copied from catalog and evidence](#copied-from-ca
 | Part names, series, families, packages, cores | [`products.csv`](products.csv), [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) (copies) |
 | Chip ID, option bytes, flash geometry and programming | [`device_ids.csv`](device_ids.csv), [`option_bytes.csv`](option_bytes.csv), [`option_byte_fields.csv`](option_byte_fields.csv), [`flash_geometry.csv`](flash_geometry.csv), [`flash_program_method.csv`](flash_program_method.csv) (copies) |
 | Clock tree, interrupts, memory map, operating conditions, errata | see [Copied from catalog and evidence](#copied-from-catalog-and-evidence) |
+| What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
 | Version of the public surface | [`VERSION`](VERSION) |
 
@@ -82,6 +83,10 @@ row.
 - **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (CSV and
   `VERSION`) with its row count and sha256.
 - **Read columns by name, not by position.** Column order is not part of the contract.
+- **[`columns.csv`](columns.csv) describes every column** of every table here: `meaning`, `format`
+  (`text`, `name`, `integer`, `decimal`, `hex`, `bits`, `reg-bits`, `list(;)`, `list(,)`, `list(|)`, `url`, `path`,
+  `marker`, or `enum(a|b|...)`) and what an `empty` cell means. `tools/check_tables.py` checks it against the
+  data (every column covered, enum values, integer/hex shapes, `never empty`), so it cannot silently go stale.
 - **[`VERSION`](VERSION) is one integer.** A change that can break a consumer -- removing or renaming a
   column, changing how a column is written, renaming a family or another key -- raises it first. Adding
   tables, columns or rows does not. Changes are recorded in [docs/worklist.ja.md](../docs/worklist.ja.md)
