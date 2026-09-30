@@ -146,7 +146,9 @@ cannot read are not listed; their count is pinned to 0 in `tools/check_tables.py
 
 One row per (series, selector, value, signal): `evidence/remap_fields` (register and bits of the
 selector) joined with `evidence/remap_routes` (signal and pad per value), plus `peripheral`,
-`role`, `port`, `gpio`. `register` reads `PCFR1|PCFR2` when a field spans two registers.
+`role`, `port`, `gpio`. `controller` is the block that owns the selector's register (`afio`, or
+`extend` for the EXTEN block; from `remap_fields`, added 2026-09-30 for R-33). `register` reads
+`PCFR1|PCFR2` when a field spans two registers.
 
 ### `registers.csv` -- family x type x register x field
 

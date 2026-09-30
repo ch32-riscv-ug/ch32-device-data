@@ -157,7 +157,8 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 
 1行1（series, selector, 値, 信号）。`evidence/remap_fields`（selector の register・bit）と
 `evidence/remap_routes`（値ごとの信号と pad）を結び、`peripheral`/`role`/`port`/`gpio` を付けたもの。
-`register` が `PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき）。
+`controller` は selector の register を持つ block（`afio`、EXTEN block なら `extend`。`remap_fields` から。
+2026-09-30 に R-33 で追加）。`register` が `PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき）。
 `peripheral`/`role` が空の行は語彙で読めない綴り（GPIO 名を信号に書く X315 の `PD0` 1行）。
 
 ### `registers.csv` — family × 型 × register × field

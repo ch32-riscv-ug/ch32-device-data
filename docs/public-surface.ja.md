@@ -79,7 +79,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | `evidence/pins`（`pad`・`kind`） | `index/pinout` | pins の (型番, pad, kind) は**全行** pinout にある |
 | `evidence/pin_functions`（`pad`・`signal`・`route`） | `index/pinout` | route の remap・default・af は同数。**違いが2つ**: `main` 行（pad 自身の GPIO 名）は `port`/`gpio` 列になった。`alias` 行（30行）は無く、括弧の別名から `port`/`gpio` を埋めている。core の「機能名で呼ばれる pad → port 名」は `port`/`gpio` で引ける見込みだが、core 側で確かめてもらう |
 | `evidence/register_fields`（`register`・`field`・`kind`・`bits`） | `index/registers` | 同じ行が `(type, register)` に割って入っている（`ADC_CTLR3` → `ADC`＋`CTLR3`、`AFIO_EXTICR1` → `AFIO`＋`EXTICR1`）。`bits` の `hi:lo` も同じ |
-| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。**`controller` 列だけ routes に無い**——core が要ると言えば routes へ写す（索引の列を足すだけで事実は足さない。VERSION は上げない） |
+| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。`controller` 列は core の依頼で 2026-09-30 に routes へ足した（`remap_fields` から写しただけ。VERSION は 1 のまま） |
 | `evidence/timers`（regcheck） | `index/timers` | index は evidence の上位（`channels`・`complementary` 付き） |
 | `evidence/register_blocks`・`errata`・`operating_conditions`・`device_ids`・`option_bytes`・`option_byte_fields` | `index/` の同名の写し | 公開した（`operating_conditions` は `datasheet` 列が無い） |
 | 前の「安定」evidence 表・`catalog/` の鍵表 | `index/` の同名の写し | 公開した（`products` は packing の列、`clock_configs` は `evt_copies` が無い） |
@@ -129,5 +129,6 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 ## 残り
 
 - 機械で読める列の説明 `index/columns.csv`（表・列・意味・書式・空欄の意味）。いまは README の文章だけ
-- `routes.controller`（core が要ると言えば）
-- consumer への連絡（commit の後）と、移り終わった後の「安定」印の撤去
+- ~~`routes.controller`~~（2026-09-30 に追加）・~~consumer への連絡~~（2026-09-30）
+- core が `alias` の読みを H41x・M007・M103 で確かめた結果を送ってくる（pinout の `port`/`gpio` で足りなければ直す）
+- 移り終わった後の「安定」印の撤去（`paths.STABLE_EVIDENCE`・evidence/README）
