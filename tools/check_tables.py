@@ -1155,6 +1155,74 @@ def index_checks(t: dict) -> list[str]:
     return bad
 
 
+# `index/columns.csv` の `format` の語彙。値を検査できるものは実データで確かめる。
+COLUMN_FORMATS = re.compile(
+    r"^(text|name|integer|decimal|hex|bits|reg-bits|list\(;\)|list\(,\)|list\(\|\)|url|path|marker|enum\(.+\))$")
+FORMAT_CHECKS = {
+    "integer": re.compile(r"^-?\d+$"),
+    "hex": re.compile(r"^0x[0-9a-fA-F]+$"),
+    "marker": re.compile(r"^#$"),
+}
+
+
+def column_dictionary() -> list[str]:
+    """`index/columns.csv` が公開面の全列をちょうど1行ずつ説明し、その説明が実データと合うこと。
+
+    列の意味は README の文章にもあるが、consumer が機械で読める形はこれだけ。**説明は人が書く**
+    ので、書いたとおりかを値で確かめる——`enum(a|b)` なら値の集合がそれに収まる、`integer`/`hex` なら
+    全部その形、`empty` が `never empty` なら空欄が無い。データが変わって説明が古くなればここで落ちる。
+    列を足したら行も足す（足さないと落ちる）。
+    """
+    path = paths.INDEX / "columns.csv"
+    if not path.exists():
+        return ["公開面: index/columns.csv が無い"]
+    with path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames != ["table", "column", "meaning", "format", "empty"]:
+            return [f"columns.csv: ヘッダが違う（{reader.fieldnames}）"]
+        described = list(reader)
+    bad = []
+    actual: dict[str, list[str]] = {}
+    for p in sorted(paths.INDEX.glob("*.csv")):
+        if p.stem in ("manifest", "columns"):
+            continue
+        with p.open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            actual[p.stem] = [list(reader.fieldnames or []), list(reader)]
+    seen = collections.Counter((r["table"], r["column"]) for r in described)
+    want = {(name, c) for name, (header, _) in actual.items() for c in header}
+    if dup := sorted(k for k, n in seen.items() if n > 1):
+        bad.append(f"columns.csv: 同じ列が2回ある: {dup[:5]}")
+    if missing := sorted(want - set(seen)):
+        bad.append(f"columns.csv: 説明の無い列 {len(missing)}: {missing[:8]}")
+    if extra := sorted(set(seen) - want):
+        bad.append(f"columns.csv: 表に無い列 {len(extra)}: {extra[:8]}")
+    cjk = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")  # 公開する表に日本語・中国語を入れない
+    for r in described:
+        where = f"columns.csv: {r['table']}.{r['column']}"
+        if any(cjk.search(v) for v in r.values()):
+            bad.append(f"{where} にCJKがある（公開面は英語）")
+        if not r["meaning"].strip() or not r["empty"].strip():
+            bad.append(f"{where} の meaning か empty が空")
+        if not COLUMN_FORMATS.match(r["format"]):
+            bad.append(f"{where} の format {r['format']!r} が語彙に無い")
+            continue
+        if r["table"] not in actual or r["column"] not in actual[r["table"]][0]:
+            continue
+        values = [row[r["column"]] for row in actual[r["table"]][1]]
+        present = [v for v in values if v != ""]
+        if r["empty"].strip() == "never empty" and len(present) != len(values):
+            bad.append(f"{where} は never empty と書いてあるが空欄が {len(values) - len(present)} 行ある")
+        if r["format"].startswith("enum("):
+            allowed = set(r["format"][len("enum("):-1].split("|"))
+            if stray := sorted(set(present) - allowed):
+                bad.append(f"{where} の値 {stray[:5]} が enum に無い")
+        elif (check := FORMAT_CHECKS.get(r["format"])) and (
+                wrong := sorted({v for v in present if not check.match(v)})):
+            bad.append(f"{where} は {r['format']} なのに {wrong[:3]}")
+    return bad
+
+
 def published_surface(tables: Path | None) -> list[str]:
     """index/ が公開面の全部であること（docs/public-surface.ja.md）。
 
@@ -1182,10 +1250,11 @@ def published_surface(tables: Path | None) -> list[str]:
             bad.append(f"公開面: index/{name}.csv の列が元の表（落とす列 {list(dropped)} を除く）と違う")
         elif [[r[c] for c in header] for r in source] != [[r[c] for c in header] for r in copy]:
             bad.append(f"公開面: index/{name}.csv の行が元の表と違う——tools/build_index.py を回す")
-    known = set(paths.INDEX_TABLES) | set(paths.PUBLISHED) | {"manifest"}
+    known = set(paths.INDEX_TABLES) | set(paths.PUBLISHED) | {"manifest", "columns"}
     for p in sorted(paths.INDEX.glob("*.csv")):
         if p.stem not in known:
             bad.append(f"公開面: index/{p.name} は索引の表でも写しでもない（paths.py に無い）")
+    bad += column_dictionary()
     version = paths.INDEX / "VERSION"
     text = version.read_text(encoding="utf-8").strip() if version.exists() else ""
     if not re.fullmatch(r"[1-9]\d*", text):

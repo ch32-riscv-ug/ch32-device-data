@@ -236,7 +236,7 @@ def quantities() -> dict[str, int]:
     out["clock_symbols:header_only"] = len(symbols) - out["clock_symbols:written"]
     out["catalog_tables"] = len(paths.CATALOG_TABLES)
     out["evidence_tables"] = len(paths.EVIDENCE_TABLES)
-    # 索引は manifest.csv も1表として数える（文書がそう数えている）。目録・証拠の写し
+    # 索引は manifest.csv と columns.csv も1表として数える（文書がそう数えている）。目録・証拠の写し
     # （`paths.PUBLISHED`）は index/ に在っても索引の表ではないので別に数える。
     out["published_copies"] = len(paths.PUBLISHED)
     out["index_tables"] = (len(list(paths.INDEX.glob("*.csv")))

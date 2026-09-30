@@ -91,7 +91,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 - **lock**: commit ＋ `index/manifest.csv` の sha256 を1つ（manifest に全ファイルの sha256 がある）。
   wch-protocols の読み方がこれ。core の regcheck 分も同じ lock に入る
 - **列の書き方**: 表の README（index の表は `index/README`、写しは元の表の `catalog/README`・`evidence/README`）に
-  ある。**列は名前で読む**——位置では読まない（ch32rv は今いくつかの表を位置で読んでいる）。約束するのは
+  ある。機械で読める形は `index/columns.csv`（2026-10-01）。**列は名前で読む**——位置では読まない（ch32rv は今いくつかの表を位置で読んでいる）。約束するのは
   列の名前と意味で、並び順ではない。機械で読める列の説明（`columns.csv`）は「残り」
 - **confidence**: 公開面の行は全部このリポジトリの答え。`conflict` は「資料が食い違い、basis の根拠で片方を
   採った」という印で、値は採用した値。使うか捨てるかは consumer が決める（ch32rv の flash は conflict で
@@ -128,7 +128,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 
 ## 残り
 
-- 機械で読める列の説明 `index/columns.csv`（表・列・意味・書式・空欄の意味）。いまは README の文章だけ
+- ~~機械で読める列の説明 `index/columns.csv`~~（2026-10-01。463列・38表。人が書き、`check_tables.column_dictionary` が実データと突き合わせる）
 - ~~`routes.controller`~~（2026-09-30 に追加）・~~consumer への連絡~~（2026-09-30）
 - ~~core の `alias` の確認~~（2026-09-30。pinout の `port`/`gpio` と全件一致。併せて OSC_IN/OSC_OUT の `port`/`gpio` を埋めた＝5339df5）
 - ~~移り終わった後の「安定」印の撤去~~（2026-10-01）

@@ -29,6 +29,7 @@ consumer が要る目録・証拠の表はここへ写してあります（[目�
 | 型番・series・family・パッケージ・コアの名前 | [`products.csv`](products.csv)・[`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv)（写し） |
 | chip ID・option bytes・flash の形と書き方 | [`device_ids.csv`](device_ids.csv)・[`option_bytes.csv`](option_bytes.csv)・[`option_byte_fields.csv`](option_byte_fields.csv)・[`flash_geometry.csv`](flash_geometry.csv)・[`flash_program_method.csv`](flash_program_method.csv)（写し） |
 | クロック・割り込み・メモリマップ・動作条件・エラッタ | [目録・証拠からの写し](#目録証拠からの写し) |
+| ここの全列の意味・書き方・空欄の意味 | [`columns.csv`](columns.csv) |
 | 全ファイルの sha256 | [`manifest.csv`](manifest.csv) |
 | 公開面の版 | [`VERSION`](VERSION) |
 
@@ -74,6 +75,10 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 - **固定は commit と `manifest.csv` の sha256。** manifest がここの全ファイル（CSV と `VERSION`）の行数と
   sha256 を持ちます
 - **列は名前で読む。** 列の並び順は契約に入りません
+- **[`columns.csv`](columns.csv) がここの全表・全列を説明します**: `meaning`（意味）、`format`（`text`・`name`・`integer`・
+  `decimal`・`hex`・`bits`・`reg-bits`・`list(;)`・`list(,)`・`list(|)`・`url`・`path`・`marker`・`enum(a|b|...)`）、`empty`
+  （空欄の意味）。`tools/check_tables.py` が実データと突き合わせる（全列を覆う・enum の値・integer/hex の形・`never empty`）ので、
+  黙って古くなりません
 - **[`VERSION`](VERSION) は整数1つ。** consumer を壊しうる変更——列の削除・改名、列の書き方の変更、
   family などの鍵の改名——は先にこれを上げます。表・列・行を足すだけなら上げません。変更は
   [worklist](../docs/worklist.ja.md) とこの README に記録します
