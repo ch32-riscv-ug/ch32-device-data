@@ -464,6 +464,49 @@ def check_holes(open_or_not: dict[str, bool]) -> list[str]:
     return bad
 
 
+# consumer に「直接読んでよい」と約束している証拠の表の一覧。README ごとに段落の書き出しを持ち、
+# そこから空行までを一覧とみなす。
+STABLE_LISTS = (
+    ("evidence/README.md", "**Tables that can be read as is (stable)**"),
+    ("evidence/README.ja.md", "**そのまま読める表（安定）**"),
+    ("index/README.md", "## Contract for consumers"),
+)
+TABLE_NAME = re.compile(r"`([a-z][a-z0-9_]*\*?)`")
+
+
+def check_stable_lists() -> list[str]:
+    """README が並べる「安定」の証拠の表が `paths.STABLE_EVIDENCE` と同じであること。
+
+    **契約の一覧は consumer が読む場所ごとに書いてある。** 2026-09-06 に
+    `flash_program_method` を安定に加えたとき、`paths.py` と `evidence/README`（日英）は
+    直したが `index/README` の「Contract for consumers」を直し忘れ、ch32rv と core が
+    別々の一覧を基準にしていた（2026-09-30、dev-wch-3e が気づいた）。`clock_*` は
+    `clock_` で始まる安定表の全部と読む。
+    """
+    stable = set(paths.STABLE_EVIDENCE)
+    bad = []
+    for name, anchor in STABLE_LISTS:
+        text = (REPO / name).read_text(encoding="utf-8")
+        at = text.find(anchor)
+        if at < 0:
+            bad.append(f"{name}: 安定表の一覧の書き出し {anchor!r} が見つからない"
+                       "——check_docs.py の STABLE_LISTS を直すこと")
+            continue
+        paragraph = re.split(r"\n\s*\n", text[at + len(anchor):].lstrip("\n"), maxsplit=1)[0]
+        listed: set[str] = set()
+        for token in TABLE_NAME.findall(paragraph):
+            if token.endswith("*"):
+                listed |= {t for t in stable if t.startswith(token[:-1])}
+            else:
+                listed.add(token)
+        listed &= set(paths.EVIDENCE_TABLES) | stable
+        if missing := sorted(stable - listed):
+            bad.append(f"{name}: 安定表の一覧に無い: {', '.join(missing)}（paths.STABLE_EVIDENCE にはある）")
+        if extra := sorted(listed - stable):
+            bad.append(f"{name}: 安定表の一覧に余分: {', '.join(extra)}（paths.STABLE_EVIDENCE に無い）")
+    return bad
+
+
 def check_liquid() -> list[str]:
     """コミットするMarkdownにLiquidが特別扱いする並びが無いこと。
 
@@ -496,7 +539,8 @@ def main() -> int:
     known = quantities()
     holes = ledger()
     bad = (check_row_counts(known) + check_confidence(known) + check_prose(known)
-           + check_single_edition() + check_holes(holes) + check_liquid())
+           + check_single_edition() + check_holes(holes) + check_stable_lists()
+           + check_liquid())
     if bad:
         seen: list[str] = []
         for b in bad:
