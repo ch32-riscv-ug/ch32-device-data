@@ -130,7 +130,7 @@ one row**, so `port`+`gpio` -> lead is a single lookup.
 |---|---|
 | `pin` | lead number; exposed pad is `EP` |
 | `pad` | as the datasheet spells it (`PA0-WKUP`, `LO1`, `VDD_VIO_1`) |
-| `port`, `gpio` | the pad read as a GPIO (`A`, `0`), decorations dropped; also filled from a parenthesised alias (`LO1 (PA0)`); empty for non-GPIO pads |
+| `port`, `gpio` | the pad read as a GPIO (`A`, `0`), decorations dropped; also filled from a parenthesised alias (`LO1 (PA0)`) and from a GPIO name the pin table lists with no route on a function-named pad (`OSC_IN` -> `PD0`), unless another lead of the part carries that GPIO (100-pin packages, where `PD0` is its own lead); empty for non-GPIO pads |
 | `kind` | `gpio` / `power` / `analog` / `other` / `nc` (a lead the datasheet marks as not connected -- it has a number but no pad name, type or function) |
 | `peripheral`, `role` | normalised function (`USART1`, `TX`) |
 | `signal` | the datasheet's spelling (`USART1_TX` / `TX1` / `UTX`) |
@@ -155,7 +155,12 @@ selector) joined with `evidence/remap_routes` (signal and pad per value), plus `
 One row per (register, bit define): `evidence/registers` (struct offsets) joined with
 `evidence/register_fields`. Registers without defines get one row with `field` empty. `type` is
 the EVT `*_TypeDef` stem; `register` the struct member, arrays per element (`EXTICR[1]`, offset =
-first + index x width) and nested structs flattened (`sTxMailBox[0].TXMIR`). `field` is the
+first + index x width) and nested structs flattened (`sTxMailBox[0].TXMIR`). **`register` is the
+header's own spelling, so the same register can be spelled differently across families**: AFIO's
+EXTI configuration is an array `EXTICR[0]`..`EXTICR[3]` in most families (`EXTICR[0]`/`[1]` on X035),
+one member `EXTICR` on V003/V006/M030, and two members `EXTICR1`/`EXTICR2` on H417 (offsets
+0x03c/0x040). The names are not normalised (that would invent names the header does not have);
+to find "the k-th word" of such a register, order the rows of that `type` by `offset`. `field` is the
 readable name, `define` the EVT spelling (`RCC_APB2PCENR_USART1EN`). Rows with an empty
 `offset` are defines whose banner could not be tied to a struct member (911). `access` /
 `reset` come from the reference manual where the bit position matched (`confirmed`).
