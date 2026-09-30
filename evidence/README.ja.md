@@ -591,7 +591,7 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 
 ### `esig.csv`
 
-**flash 容量と 96 bit の UID を読む番地**（依頼 R-35: `getFlashChipSize()`・チップ ID）。RM の電子署名（ESIG）の章の表から、1行1（family, register）: `FLACAP`（16 bit、flash 容量、単位 KiB）と `UNIID1`〜`UNIID3`（32 bit の語が3つ、`UNIID1` が下位）。工場で書かれる読み出し専用の語で EVT の構造体が無いので `registers`/`register_map` には現れない。幅は `R16_`/`R32_` の接頭辞、単位は field の説明（`以Kbyte为单位` / `in unit of Kbyte`）から。RM の両版を読み、番地と幅が一致すれば `confirmed`（いまは48行すべて）。**CH32M030 だけ `0x1ffff3a0` 起点**、他の family は `0x1ffff7e0`。`check_tables` は全 family に4行、`FLACAP` が 16 bit・KiB、UID の3語が 4 byte 間隔であることを見る。
+**flash 容量と 96 bit の UID を読む番地**（依頼 R-35: `getFlashChipSize()`・チップ ID）。RM の電子署名（ESIG）の章の表から、1行1（family, register）: `FLACAP`（16 bit、flash 容量、単位 KiB）と `UNIID1`〜`UNIID3`（32 bit の語が3つ、`UNIID1` が下位）。工場で書かれる読み出し専用の語で EVT の構造体が無いので `registers`/`register_map` には現れない。幅は `R16_`/`R32_` の接頭辞、単位は field の説明（`以Kbyte为单位` / `in unit of Kbyte`）から。RM の両版を読み、番地と幅が一致すれば `confirmed`（いまは48行すべて）。**CH32M030 だけ `0x1ffff3a0` 起点**、他の family は `0x1ffff7e0`。`check_tables` は全 family に4行、`FLACAP` が 16 bit・KiB、UID の3語が 4 byte 間隔であることを見る。**実測では固有なのは `UNIID1`|`UNIID2` だけ**——`UNIID3` は全1か、別チップで同じ値（エラッタ `esig-uniid3-not-unique`、2026-10-01）。
 
 ### `device_ids.csv`
 
