@@ -25,11 +25,9 @@
 語彙で導出した列（`peripheral`・`role`・`port`・`gpio`、pin から数えた `channels`）は
 ここには**無く**、索引にあります。
 
-**そのまま読める表（安定）**: EVT ヘッダから写した `interrupts`・`memory_map`・`systick`・
-`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`と、
-`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` は、名前が最初から機械の語彙なので語彙の変換が要りません。
-**consumer は [`index/`](../index/README.ja.md) に置いた写しを読みます**（2026-09-30 から `index/` の下が公開面の全部）。ここを直接読むのは
-consumer が移り終わるまでの猶予で、証拠の表はどれも契約ではありません。
+**証拠の表はどれも契約ではありません。** consumer が読むのは [`index/`](../index/README.ja.md) の下だけで、そこが公開面の
+全部です。公開する証拠の表は同じ名前で `index/` に写してあります（一覧は `tools/paths.py` の `PUBLISHED` と
+索引の README）。以前の「安定」印は、全 consumer が `index/` へ移り終えた 2026-10-01 に外しました。
 
 ## 各ファイル
 

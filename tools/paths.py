@@ -50,15 +50,6 @@ EVIDENCE_TABLES = (
     "device_id_addresses", "device_ids", "pin_conditions", "figures",
 )
 
-# Evidence tables consumers used to read in place (docs/data-layout.ja.md §2).
-# They are now copied into index/ (PUBLISHED below); this list stays until the
-# consumers have moved, then goes (docs/public-surface.ja.md).
-STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
-                   "clock_prescalers", "clock_sources", "clock_symbols",
-                   "clock_init", "evt_variants", "clock_enables", "pin_alternate",
-                   "flash_geometry", "flash_program_method",
-                   "adc_internal", "debug_data")
-
 # Index tables: one combined file each (all parts / all families). People filter
 # them in the viewer (pins.html); CSV is for programs, so there are no per-part
 # copies to keep in step.
