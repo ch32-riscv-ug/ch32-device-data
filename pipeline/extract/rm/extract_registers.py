@@ -78,7 +78,28 @@ REGISTER_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count
                     "rm_register", "rm_reset", "rm_address_check", "#", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "register", "type", "member", "field", "define", "kind", "of_field",
                  "bits", "mask", "value", "description", "rm_access", "rm_reset",
-                 "#", "confidence", "basis"]
+                 "#", "confidence", "basis", "rm_access_confidence", "rm_access_basis"]
+
+# **RM の access の語彙。** どの RM も冒頭の表で定義する（CH32H417RM.en p.2: `RO` Read-only,
+# changed by hardware / `RZ` read clears / `WO` write only / `WA` write in Safe mode / `WZ` write, auto
+# clear / `RW` / `RWA` / `RW1` write 1 valid / `RW0` write 0 valid / `RW1Z` write 1 to clear）。
+# `W1`・`W0`・`RWO`・`R0` は定義に無い——本文の誤植（`0` と `O` の取り違えほか）で、綴りは資料の
+# まま残し、`check_tables` が名前で固定する。
+ACCESS_TERMS = ("RW1Z", "RWA", "RW1", "RW0", "RWO", "RW", "RO", "R0", "RZ",
+                "WO", "W0", "W1", "WA", "WZ")
+ACCESS_TOKEN = re.compile(r"(?<![A-Z0-9])(" + "|".join(ACCESS_TERMS) + r")(?![A-Z0-9])")
+
+
+def access_term(cell: str) -> str:
+    """access のセルから語を1つ。**en 版の表は説明の文字がこのセルに落ちる**ことがある
+    （`RW t`・`1 0 RW0 o a`・`I RW i`）ので、語彙の語がちょうど1つあればそれを採り、
+    無いか2つ以上なら読めなかったとして空を返す（`CFGCANM`・`Reserved` は別の行の誤読）。
+
+    >>> access_term("RW"), access_term("1 0 RW0 o a"), access_term("I RW i"), access_term("CFGCANM")
+    ('RW', 'RW0', 'RW', '')
+    """
+    found = ACCESS_TOKEN.findall(cell or "")
+    return found[0] if len(found) == 1 else ""
 LAYOUT_COLUMNS = ["family", "type", "layout", "registers", "fields", "size_bytes",
                   "#", "confidence", "basis"]
 
@@ -460,12 +481,19 @@ def rm_bundle(family: str) -> tuple[str, str] | None:
     return bundle.name, document
 
 
-def rm_fields(family: str, cache: Path | None) -> tuple[dict, str]:
-    picked = rm_bundle(family)
+def rm_fields(family: str, cache: Path | None, lang: str | None = None) -> tuple[dict, str]:
+    """RM の field 定義。`lang` を省くと zh 版（無ければ en 版）＝従来どおり。`lang="en"` は
+    access を両版で照合するための英語版（zh 版しか無い family、en 版しか無い family は空）。"""
+    if lang is None:
+        picked = rm_bundle(family)
+    else:
+        editions = bundle_pages.rm_bundles(family)
+        picked = ((editions[lang][0].name, editions[lang][1])
+                  if lang in editions and "zh" in editions else None)
     if picked is None:
         return {}, ""
     bundle, document = picked
-    cached = cache / f"{family}.json" if cache else None
+    cached = cache / (f"{family}.json" if lang is None else f"{family}.{lang}.json") if cache else None
     if cached and cached.exists():
         fields = json.loads(cached.read_text(encoding="utf-8"))
     else:
@@ -666,6 +694,10 @@ def main() -> int:
         bases = extract_addresses.bases(lines)
         banners = read_banners(text)
         manual, manual_name = ({}, "") if args.no_rm else rm_fields(family, args.rm_cache)
+        # access を両版で照合する英語版（R-33 の調べ、2026-10-01）。bit の位置の照合は従来どおり
+        # zh 版だけで、行の confidence・basis は bit の位置の確度のまま。access の確度と出所は
+        # `rm_access_confidence`・`rm_access_basis` に置く（`products` の列ごとの確度と同じ形）。
+        manual_en, manual_en_name = ({}, "") if args.no_rm else rm_fields(family, args.rm_cache, "en")
         rm_registers = manual.get("__registers__", {})
         evt = f"evt({header.name})"
 
@@ -798,10 +830,22 @@ def main() -> int:
                 bits = "" if span is None else (f"{span[0]}" if span[0] == span[1]
                                                 else f"{span[1]}:{span[0]}")
                 confidence, basis = "reference", [evt]
-                rm_access = rm_reset = ""
+                rm_access = rm_reset = access_confidence = access_basis = ""
                 said = manual.get((rm_key(register), field_key(fname))) if kind == "field" else None
                 if said:
                     rm_access = said.get("access") or ""
+                    if rm_access:
+                        other = manual_en.get((rm_key(register), field_key(fname)))
+                        en_access = access_term(other.get("access") or "") if other else ""
+                        zh_basis = f"{manual_name}:zh"
+                        if not en_access:
+                            access_confidence, access_basis = "reference", zh_basis
+                        elif en_access == rm_access:
+                            access_confidence = "confirmed"
+                            access_basis = f"{zh_basis}+{manual_en_name}:en"
+                        else:
+                            access_confidence = "conflict"
+                            access_basis = f"{zh_basis}+!{manual_en_name}:en(={en_access})"
                     rm_reset = "" if said.get("reset_value") is None else str(said["reset_value"])
                     lo, width = said["bit_offset"], said["bit_width"]
                     if span and (lo, lo + width - 1) == span:
@@ -823,6 +867,7 @@ def main() -> int:
                     "field": fname, "define": name, "kind": kind, "of_field": of_field,
                     "bits": bits, "mask": f"{mask:#x}", "value": value,
                     "description": d["comment"], "rm_access": rm_access, "rm_reset": rm_reset,
+                    "rm_access_confidence": access_confidence, "rm_access_basis": access_basis,
                     "confidence": confidence, "basis": "+".join(basis),
                 })
         for why, n in unresolved.items():

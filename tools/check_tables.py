@@ -1245,6 +1245,59 @@ def column_dictionary() -> list[str]:
     return bad
 
 
+# RM が冒頭の表で定義する access の語（CH32H417RM.en p.2 ほか、どの RM も同じ）。
+ACCESS_VOCABULARY = {"RO", "RZ", "WO", "WA", "WZ", "RW", "RWA", "RW1", "RW0", "RW1Z"}
+# **定義に無い綴りを資料がそのまま刷っている field**（2026-10-01 に全数を原文で確かめた）。
+# 証拠は資料の綴りを訂正しないので、名前と数で固定する——増えても減っても落とす。
+# `0` と `O` の取り違え（`R0`=RO?、`RWO`=RW0?、`W0`=WO?）と、定義に無い `W1`。
+# 両版とも同じ誤植なのが 12 件、zh だけが誤り en は定義どおりなのが 4 件
+# （H417 `VIO18_SR`/`RMVF`、V205 `FWAKE_FLAG` は `rm_access_confidence=conflict`）。
+KNOWN_ACCESS_MISPRINTS = {
+    ("CH32H417", "PWR_CSR", "VIO18_SR"): "R0",
+    ("CH32H417", "RCC_RSTSCKR", "RMVF"): "W0",
+    ("CH32L103", "FLASH_STATR", "FWAKE_FLAG"): "RWO",  # 説明は「写0清零」＝RW0
+    **{("CH32L103", "LPTIM_ICR", f): "W1"
+       for f in ("CMPMCF", "ARRMCF", "EXTTRIGCF", "CMPOKCF", "ARROKCF", "UPCF", "DOWNCF")},
+    ("CH32V003", "SPI_HSCR", "HSRXEN"): "W0",
+    ("CH32V003", "SPI_STATR", "OVR"): "RWO",
+    ("CH32V006", "CMP_KEY", "CMP_KEY"): "W0",  # 鍵＝書き込み専用（WO）
+    ("CH32V006", "POLL_KEY", "POLL_KEY"): "W0",
+    ("CH32V103", "SPI_STATR", "OVR"): "RWO",
+    ("CH32V205", "FLASH_STATR", "FWAKE_FLAG"): "RWO",  # en は RW0
+}
+
+
+def access_vocabulary(t: dict) -> list[str]:
+    """`register_fields.rm_access` が RM の定義する語か、名前で固定した誤植か。
+
+    access は RM 自身が語彙を定義しているので、定義に無い綴りは誤植と言える（bit の位置と違い、
+    資料どうしを比べなくても分かる）。新しい誤植は台帳に足すまで落ち、資料が直ったら台帳から外す。
+    `rm_access_confidence` は en 版と照合した結果で、conflict なら basis に en の綴りがある。
+    """
+    bad = []
+    seen = {}
+    for r in t["register_fields"]:
+        access = r["rm_access"]
+        if not access or access in ACCESS_VOCABULARY:
+            continue
+        key = (r["family"], r["register"], r["field"])
+        seen[key] = access
+        if KNOWN_ACCESS_MISPRINTS.get(key) != access:
+            bad.append(f"register_fields: {'/'.join(key)} の access {access!r} は RM の語彙に無い"
+                       "——原文で確かめて KNOWN_ACCESS_MISPRINTS に足すか、抽出を直す")
+    for key in sorted(set(KNOWN_ACCESS_MISPRINTS) - set(seen)):
+        bad.append(f"register_fields: {'/'.join(key)} の誤植が消えた——資料が直ったなら"
+                   " KNOWN_ACCESS_MISPRINTS から外す")
+    for r in t["register_fields"]:
+        if r["rm_access_confidence"] == "conflict" and "+!" not in r["rm_access_basis"]:
+            bad.append(f"register_fields: {r['family']}/{r['register']}/{r['field']} は access が"
+                       " conflict なのに basis に en の綴りが無い")
+        if bool(r["rm_access"]) != bool(r["rm_access_confidence"]):
+            bad.append(f"register_fields: {r['family']}/{r['register']}/{r['field']} の access と"
+                       " その確度の片方だけが埋まっている")
+    return bad
+
+
 def published_surface(tables: Path | None) -> list[str]:
     """index/ が公開面の全部であること（docs/public-surface.ja.md）。
 
@@ -1400,6 +1453,7 @@ def main() -> int:
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
     bad += published_surface(args.tables)
+    bad += access_vocabulary(t)
     # 生成器が --full の順序に載っているか。載らない生成器は原本が動いても走らない。
     bad += regeneration_coverage()
     bad += out_option(t)

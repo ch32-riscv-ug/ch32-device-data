@@ -410,11 +410,13 @@ registers,bits,Bit position `hi:lo` or a single bit; a bench-measured position o
 registers,mask,Mask of the define.,hex,register has no bit defines
 registers,value,"Value within the parent field (`mask >> lo`), for `value` rows.",integer,not a `value` row
 registers,description,EVT one-line description of the define.,text,the header gives no description
-registers,access,"Access type from the reference manual, where the bit position matched.",enum(R0|RO|RW|RW0|RW1|RW1Z|RWO|W0|W1|WO|WZ),not matched against the reference manual
+registers,access,"Access type from the Chinese edition of the reference manual, spelled as printed; the manual defines RO, RZ, WO, WA, WZ, RW, RWA, RW1, RW0, RW1Z, and a few fields print other spellings (W1, W0, RWO, R0) that are misprints kept as printed.",enum(R0|RO|RW|RW0|RW1|RW1Z|RWO|W0|W1|WO|WZ),not matched against the reference manual
 registers,reset,Reset value from the reference manual (a register-level value on rows without a field; may contain `X`).,text,not stated or not matched against the reference manual
 registers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty
 registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty
 registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty
+registers,access_confidence,"Confidence of `access` alone, checked against the English edition: confirmed = both editions print the same term; reference = the English edition's field could not be read; conflict = the editions print different terms (both are in `access_basis` and in conflicts.csv).",enum(confirmed|conflict|reference),no access stated (no reference manual row for the field)
+registers,access_basis,"Editions that state `access`, joined by `+`; `!<document>:en(=X)` gives the English edition's differing term.",text,no access stated
 routes,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty
 routes,selector,Remap selector identifier assigned by this repository (e.g. `afio-tim2-remap`).,name,never empty
 routes,controller,"Block that owns the selector's register: `afio`, or `extend` for the EXTEN block.",enum(afio|extend),never empty
