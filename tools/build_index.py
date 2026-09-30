@@ -53,6 +53,7 @@ from extract_dma_requests import REMAPPED, TYPO, peripheral_of  # noqa: E402  �
 # **pad 名には役割が継ぎ足されることがある**（`PA0-WKUP`・`PC13-TAMPER-RTC`）。
 # GPIO としての読み（port と番号）はその装飾を落として取る。
 GPIO_PAD = re.compile(r"^P(?P<port>[A-H])(?P<gpio>\d{1,2})(?:[-_]|$)")
+GPIO_NAME = re.compile(r"P[A-H]\d{1,2}")
 GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
 
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
@@ -110,6 +111,24 @@ def pinout_rows(products: list[dict], pins: list[dict], functions: list[dict],
     # （`pin_functions` では `route=alias` の行）。`port`/`gpio` はそこから採る。
     alias_of = {(fn["part_number"], fn["pad"]): fn["signal"]
                 for fn in functions if fn["route"] == "alias"}
+    # **機能名の pad が、GPIO 名を route の無い機能として持つもの。** `OSC_IN` の行に
+    # `PD0`（route 空）と書く datasheet がある（L103・V20x/V30x・V103・V407 ほか 81 pad）。
+    # その pad の GPIO としての読みなので `port`/`gpio` に採る——ただし**同じ型番の別の lead が
+    # その GPIO を名乗っていない**ときだけ。100ピン封装では `PD0` が独立した lead（V307VCT6 の
+    # 81番）で、`OSC_IN`（12番）の `PD0` は別の足の話なので、採ると1つの GPIO を2本が名乗る。
+    # 同じ lead に `OSC_IN` と `PD0` が並ぶ形（V203CCT6 の5番）は同じ足なので採ってよい。
+    leads_of: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+    for pin in pins:
+        port, gpio = gpio_of(pin["pad"], alias_of.get((pin["part_number"], pin["pad"]), ""))
+        if port:
+            leads_of[(pin["part_number"], f"P{port}{gpio}")].add(pin["pin"])
+    lead_of = {(p["part_number"], p["pad"]): p["pin"] for p in pins}
+    for fn in functions:
+        key = (fn["part_number"], fn["pad"])
+        if (fn["route"] == "" and key not in alias_of and not GPIO_PAD.match(fn["pad"])
+                and GPIO_NAME.fullmatch(fn["signal"])
+                and leads_of[(fn["part_number"], fn["signal"])] <= {lead_of.get(key)}):
+            alias_of[key] = fn["signal"]
     # remap selector と値: (series, signal, pad) → {value: [selector]}
     selectors: dict[tuple[str, str, str], dict[str, list[str]]] = collections.defaultdict(
         lambda: collections.defaultdict(list))

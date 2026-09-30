@@ -126,7 +126,7 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 |---|---|
 | `pin` | lead 番号。露出パッドは `EP` |
 | `pad` | 資料の綴り（`PA0-WKUP`・`LO1`・`VDD_VIO_1`） |
-| `port` `gpio` | GPIO としての読み（`A`・`0`）。装飾を落とし、括弧の別名（`LO1 (PA0)`）からも埋める。GPIO でなければ空 |
+| `port` `gpio` | GPIO としての読み（`A`・`0`）。装飾を落とし、括弧の別名（`LO1 (PA0)`）と、機能名の pad に pin 表が route 無しで書く GPIO 名（`OSC_IN` → `PD0`）からも埋める。後者は同じ型番の別の lead がその GPIO を持つとき（100ピン封装で `PD0` が独立した lead）は埋めない。GPIO でなければ空 |
 | `kind` | `gpio` / `power` / `analog` / `other` / `nc`（`evidence/pins` の付与列）。`nc` は資料が「使わない」と書いた足で、番号だけがあり pad 名も型も機能も無い |
 | `peripheral` `role` | 語彙で揃えた機能（`USART1`・`TX`）。周辺名の特殊な綴りは下の表 |
 | `signal` | 資料の綴り（`USART1_TX` / `TX1` / `UTX`） |
@@ -165,6 +165,11 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 
 1行1（register, bit define）。`evidence/registers`（構造体の offset）に `evidence/register_fields`
 （bit define）を並べたもの。field を持たない register も1行（`field` 空）。
+
+**`register` はヘッダの綴りのままなので、同じレジスタが family で違う綴りになる。** AFIO の EXTI 設定は
+多くの family で配列 `EXTICR[0]`〜`EXTICR[3]`（X035 は `[0]`/`[1]`）、V003/V006/M030 は1メンバーの
+`EXTICR`、H417 は2メンバーの `EXTICR1`/`EXTICR2`（offset 0x03c/0x040）。名前は揃えない（ヘッダに無い名前を
+作ることになる）。「その register の k 番目の語」は、同じ `type` の行を `offset` で並べて引く。
 
 **header と manual が field の位置を違えて書き、実機の測定で決着したものは、この索引が
 測った位置を採ります**（`bits`/`mask`）。行は `confidence=conflict` のままで、`basis` に両方の資料と
