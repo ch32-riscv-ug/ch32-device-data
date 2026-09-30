@@ -8,6 +8,10 @@ The tables **to look things up in**. `tools/build_index.py` derives them from th
 verifies on every run that each index row can be traced back to evidence rows. The three-way
 split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese).
 
+**Everything under `index/` is the public surface, and nothing outside it is** (see
+[Contract for consumers](#contract-for-consumers)). Catalog and evidence tables that consumers need are
+therefore copied in here (see [Copied from catalog and evidence](#copied-from-catalog-and-evidence)).
+
 ## Where to look
 
 | Question | Table |
@@ -24,7 +28,11 @@ split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanes
 | DMA request -> channel | [`dma.csv`](dma.csv) |
 | Timers, with the channels that reach pins | [`timers.csv`](timers.csv) |
 | Which families share a register layout | [`register_layouts.csv`](register_layouts.csv) |
+| Part names, series, families, packages, cores | [`products.csv`](products.csv), [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) (copies) |
+| Chip ID, option bytes, flash geometry and programming | [`device_ids.csv`](device_ids.csv), [`option_bytes.csv`](option_bytes.csv), [`option_byte_fields.csv`](option_byte_fields.csv), [`flash_geometry.csv`](flash_geometry.csv), [`flash_program_method.csv`](flash_program_method.csv) (copies) |
+| Clock tree, interrupts, memory map, operating conditions, errata | see [Copied from catalog and evidence](#copied-from-catalog-and-evidence) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
+| Version of the public surface | [`VERSION`](VERSION) |
 
 Every table is **one combined file** (every part, every family) and generators read it as is.
 CSV is for programs; people filter by part or feature in the viewer ([`pins.html`](../pins.html),
@@ -68,12 +76,37 @@ row.
 
 ## Contract for consumers
 
-Read: every table in `catalog/`, the combined tables in `index/`, and the evidence tables the
-evidence README marks *stable* (those copied from EVT headers: `interrupts`, `memory_map`,
-`clock_*`, `systick`, `evt_variants`, `clock_enables`, `pin_alternate`, `memory_configs`,
-`flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`). Other evidence tables may change shape. Pin by commit plus
-the sha256 of the files you read (or the single sha256 of `manifest.csv`). Column changes are
-recorded in [docs/worklist.ja.md](../docs/worklist.ja.md) and in this README.
+- **Read only files under `index/`.** `catalog/` and `evidence/` are this repository's working layers and
+  may change shape at any time; what consumers need from them is copied here. If something you need is
+  not here, ask for it to be published (a data request) rather than reading around the surface.
+- **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (CSV and
+  `VERSION`) with its row count and sha256.
+- **Read columns by name, not by position.** Column order is not part of the contract.
+- **[`VERSION`](VERSION) is one integer.** A change that can break a consumer -- removing or renaming a
+  column, changing how a column is written, renaming a family or another key -- raises it first. Adding
+  tables, columns or rows does not. Changes are recorded in [docs/worklist.ja.md](../docs/worklist.ja.md)
+  and in this README.
+- **`confidence` is for you to act on.** Every row is this repository's answer; `conflict` means the sources
+  disagree and `basis` says which one was kept (both sides are in [`conflicts.csv`](conflicts.csv)).
+  Whether to use or drop such rows is the consumer's decision.
+- What is guaranteed is the shape (columns, their meaning and spelling rules), provenance on every row,
+  the invariants `tools/check_tables.py` checks, and regeneration when the sources change -- **not** that
+  every row is true: where a document is wrong, the row is wrong and says so through `confidence`/`basis`.
+
+## Copied from catalog and evidence
+
+`tools/build_index.py` copies these tables row for row (`paths.PUBLISHED`); `tools/check_tables.py`
+checks that each copy equals its source. Column meanings are in the [catalog README](../catalog/README.md)
+and the [evidence README](../evidence/README.md) under the same table name.
+Catalog: `families`, `series`, `products`, `packages`, `cores`.
+From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_configs`, `clock_prescalers`,
+`clock_sources`, `clock_symbols`, `clock_init`, `clock_enables`, `pin_alternate`.
+Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
+`device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`.
+
+Columns left out of the copies (internal bookkeeping): `products` drops its packing columns,
+`clock_configs` drops the count of agreeing EVT copies, `operating_conditions` drops the datasheet name
+(it is in `basis`).
 
 ## Tables
 

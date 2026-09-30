@@ -13,7 +13,12 @@
     register_map.csv   family × block × register → 絶対番地
     dma.csv            family × DMA 要求 → channel、peripheral と印の読み
     timers.csv         family × timer。pin に出ているチャネル数を足したもの
+    <目録・証拠の名前>.csv  公開面へ写した目録と証拠の表（`paths.PUBLISHED`）。行はそのまま、
+                       consumer に要らない列だけを落とす
     manifest.csv       index/ の全ファイルと sha256（consumer が固定する鍵）
+
+**index/ の下が公開面の全部**（docs/public-surface.ja.md）。consumer は index/ の外を読まない
+ので、目録と証拠のうち公開する表は写しを置く。
 
 人が絞り込んで読むのは CSV ではなく viewer（pins.html）の仕事。CSV は機械が読む。
 
@@ -417,14 +422,33 @@ def parts_rows(products: list[dict], packages: list[dict], attributes: list[dict
     return rows
 
 
+# ---------------------------------------------------------------- published copies
+
+def published_rows(name: str) -> tuple[list[dict], list[str]]:
+    """公開面へ写す目録・証拠の表: 行はそのまま、`paths.PUBLISHED` が名指す列を落とす。"""
+    with paths.table(name).open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+        header = list(reader.fieldnames or [])
+    dropped = paths.PUBLISHED[name]
+    if missing := [c for c in dropped if c not in header]:
+        raise SystemExit(f"{name}: 落とす列 {missing} が表に無い——paths.PUBLISHED を直すこと")
+    return rows, [c for c in header if c not in dropped]
+
+
 # ---------------------------------------------------------------- manifest
+
+def manifest_files(root: Path) -> list[Path]:
+    """manifest が覆うファイル: index/ の CSV と VERSION（README と manifest 自身は除く）。"""
+    return sorted(p for p in root.rglob("*")
+                  if p.is_file() and (p.suffix == ".csv" or p.name == "VERSION")
+                  and p.name != "manifest.csv")
+
 
 def write_manifest(out: Path | None) -> Path:
     root = out if out is not None else paths.INDEX
     rows = []
-    for p in sorted(root.rglob("*.csv")):
-        if p.name == "manifest.csv":
-            continue
+    for p in manifest_files(root):
         data = p.read_bytes()
         rows.append({"path": p.relative_to(root).as_posix(), "rows": data.count(b"\n") - 1,
                      "sha256": hashlib.sha256(data).hexdigest()})
@@ -441,12 +465,13 @@ def main() -> int:
     ap.add_argument("--only", help="作る表（カンマ区切り。既定は全部）")
     ap.add_argument("--out", type=Path, default=None, help="override the output directory (tests)")
     args = ap.parse_args()
-    only = set(args.only.split(",")) if args.only else set(paths.INDEX_TABLES)
+    only = (set(args.only.split(",")) if args.only
+            else set(paths.INDEX_TABLES) | set(paths.PUBLISHED))
 
     def emit(name: str, rows: list[dict], columns: list[str]) -> None:
         dest = paths.index(name, args.out)
         paths.write(dest, rows, columns)
-        tally = collections.Counter(r["confidence"] for r in rows)
+        tally = collections.Counter(r.get("confidence", "-") for r in rows)
         print(f"{dest}: {len(rows)} 行  {dict(tally)}", file=sys.stderr)
 
     products = paths.load("products")
@@ -482,6 +507,19 @@ def main() -> int:
     if "parts" in only:
         emit("parts", parts_rows(products, paths.load("packages"), paths.load("product_attributes"),
                                  paths.load("operating_conditions")), PARTS_COLUMNS)
+    for name in paths.PUBLISHED:
+        if name in only:
+            # `paths.write` は `#` 列を必ず埋めるが、目録の表には `#` が無い。元の表と同じ
+            # 書き方（csv の既定）で書くので、列を落とさない表は元と byte 一致になる。
+            rows, columns = published_rows(name)
+            dest = paths.index(name, args.out)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            with dest.open("w", encoding="utf-8", newline="") as f:
+                w = csv.DictWriter(f, fieldnames=columns, extrasaction="ignore")
+                w.writeheader()
+                w.writerows(rows)
+            print(f"{dest}: {len(rows)} 行（{paths.table(name).relative_to(paths.REPO)} の写し）",
+                  file=sys.stderr)
     dest = write_manifest(args.out)
     print(f"{dest}: index/ の全ファイルの sha256", file=sys.stderr)
     return 0

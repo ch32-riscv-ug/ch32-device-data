@@ -50,12 +50,13 @@ EVIDENCE_TABLES = (
     "device_id_addresses", "device_ids", "pin_conditions", "figures",
 )
 
-# Evidence tables copied from EVT headers, whose names are already the machine
-# vocabulary: consumers may read them directly (docs/data-layout.ja.md §2).
+# Evidence tables consumers used to read in place (docs/data-layout.ja.md §2).
+# They are now copied into index/ (PUBLISHED below); this list stays until the
+# consumers have moved, then goes (docs/public-surface.ja.md).
 STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
                    "clock_prescalers", "clock_sources", "clock_symbols",
                    "clock_init", "evt_variants", "clock_enables", "pin_alternate",
-                   "memory_configs", "flash_geometry", "flash_program_method",
+                   "flash_geometry", "flash_program_method",
                    "adc_internal", "debug_data")
 
 # Index tables: one combined file each (all parts / all families). People filter
@@ -64,6 +65,25 @@ STABLE_EVIDENCE = ("interrupts", "memory_map", "systick", "clock_configs",
 INDEX_TABLES = ("parts", "pinout", "routes", "registers", "register_map", "dma",
                 "timers", "features", "capabilities", "conflicts", "register_layouts",
                 "debug_interfaces")
+
+# index/ is the whole public surface (docs/public-surface.ja.md): consumers read
+# nothing outside it. Catalog and evidence tables it publishes are copied in by
+# build_index.py, row for row, minus the columns named here (internal bookkeeping
+# a consumer has no use for). The copy keeps the source's name.
+PUBLISHED: dict[str, tuple[str, ...]] = {
+    # catalog keys
+    "families": (), "series": (), "cores": (), "packages": (),
+    "products": ("packing", "packing_confidence", "packing_basis"),
+    # evidence copied from EVT headers (the former "stable" set)
+    "interrupts": (), "memory_map": (), "systick": (), "evt_variants": (),
+    "clock_configs": ("evt_copies",), "clock_prescalers": (), "clock_sources": (),
+    "clock_symbols": (), "clock_init": (), "clock_enables": (), "pin_alternate": (),
+    "flash_geometry": (), "flash_program_method": (), "adc_internal": (), "debug_data": (),
+    # evidence published on request (R-33, R-34)
+    "device_ids": (), "option_bytes": (), "option_byte_fields": (), "register_blocks": (),
+    "errata": (), "operating_conditions": ("datasheet",),
+}
+assert not set(PUBLISHED) & set(INDEX_TABLES)
 
 
 def where(name: str) -> Path:
@@ -81,7 +101,7 @@ def table(name: str, out: Path | None = None) -> Path:
 
 
 def index(name: str, out: Path | None = None) -> Path:
-    if name not in INDEX_TABLES:
+    if name not in INDEX_TABLES and name not in PUBLISHED:
         raise KeyError(f"unknown index table {name!r}")
     return (out if out is not None else INDEX) / f"{name}.csv"
 
