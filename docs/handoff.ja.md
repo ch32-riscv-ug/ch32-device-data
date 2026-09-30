@@ -173,7 +173,7 @@ cleanになれば次の周期で入る。
   register_blocks・register_fields・remap_fields・operating_conditions・errata、bench `regcheck.py`＝
   remap_fields・timers・register_fields（X035 EXTICR、ADC `CH32_ADC_CLK_CTLR3`＝clock_prescalers・register_fields
   を含む）。**公開面の設計（置き場・lock・confidence列・列の書き方・family名・schema版）はユーザーが未決**——
-  consumerからの公開要望は worklist に受けて、設計を先に決めて実装しない
+  consumerからの公開要望は worklist に受けて、設計を先に決めて実装しない。案は [public-surface.ja.md](public-surface.ja.md)（2026-09-30）
 - 資料どうしが食い違ったら**片方に寄せず`conflict`＋両論を`basis`に**。
   RMが書いていない値を推測で埋めない
 - 穴は**名前と数で固定**する（`KNOWN_ROLE_GAPS`・`KNOWN_SHARED_LEADS`・`check_counts.KNOWN`・
