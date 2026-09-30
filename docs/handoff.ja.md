@@ -166,6 +166,14 @@ cleanになれば次の周期で入る。
 - **索引（`index/`）に事実を足さない。** 直すのは語彙か抽出（証拠 `evidence/`）。
   証拠の綴りは資料どおりに残し、訂正しない（食い違いは `conflict`）。区分の定義は
   [data-layout.ja.md](data-layout.ja.md)
+- **consumerは公開面からだけ読む**（ユーザー方針、2026-09-30、dev-wch-3e経由で受領）。公開面は今のところ
+  [index/README.md の「Contract for consumers」](../index/README.md#contract-for-consumers)（`catalog/`＋`index/`＋
+  「安定」印の`evidence/`表）。契約外の表やpathの決め打ちで読ませない——必要なデータは正式に整備して
+  公開面へ載せる。core（arduinocore-ch32）が契約外で読んでいる表: `generate.py`＝pins・pin_functions・
+  register_blocks・register_fields・remap_fields・operating_conditions・errata、bench `regcheck.py`＝
+  remap_fields・timers・register_fields（X035 EXTICR、ADC `CH32_ADC_CLK_CTLR3`＝clock_prescalers・register_fields
+  を含む）。**公開面の設計（置き場・lock・confidence列・列の書き方・family名・schema版）はユーザーが未決**——
+  consumerからの公開要望は worklist に受けて、設計を先に決めて実装しない
 - 資料どうしが食い違ったら**片方に寄せず`conflict`＋両論を`basis`に**。
   RMが書いていない値を推測で埋めない
 - 穴は**名前と数で固定**する（`KNOWN_ROLE_GAPS`・`KNOWN_SHARED_LEADS`・`check_counts.KNOWN`・
