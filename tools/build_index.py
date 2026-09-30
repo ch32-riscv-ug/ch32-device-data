@@ -58,7 +58,7 @@ GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
                   "peripheral", "role", "signal", "route", "selector", "value", "af",
                   "#", "confidence", "basis"]
-ROUTES_COLUMNS = ["series", "selector", "register", "bits", "value", "peripheral", "role",
+ROUTES_COLUMNS = ["series", "selector", "controller", "register", "bits", "value", "peripheral", "role",
                   "signal", "pad", "port", "gpio", "#", "confidence", "basis"]
 REGISTERS_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
                      "field", "define", "kind", "of_field", "bits", "mask", "value",
@@ -188,6 +188,7 @@ def routes_rows(remap_fields: list[dict], remap_routes: list[dict]) -> tuple[lis
             undecided[r["signal"]] += 1
         port, gpio = gpio_of(r["pad"])
         rows.append({"series": r["series"], "selector": r["selector"],
+                     "controller": field.get("controller", ""),
                      "register": field.get("register", ""), "bits": field.get("bits", ""),
                      "value": r["value"],
                      "peripheral": pair[0] if pair else "", "role": pair[1] if pair else "",
