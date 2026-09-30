@@ -38,7 +38,7 @@ uv run pipeline/checks/check_sources.py --remote
 
 ## いまの正本は `catalog/`・`evidence/`・`index/`
 
-このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠42表）・`index/`（索引13表）と、そこから生成する各family
+このrepositoryの成果物は **`catalog/`（目録8表）・`evidence/`（証拠42表）・`index/`（**公開面**。索引13表＋目録・証拠の写し26表。[public-surface.ja.md](public-surface.ja.md)）と、そこから生成する各family
 リポジトリのREADME**。一次資料（datasheet zh/en・reference manual・EVT）を
 `/home/mt/dev_wch/<FAMILY>/` のmirrorから機械抽出し、出所を`basis`、確度を
 `confidence`に残す。

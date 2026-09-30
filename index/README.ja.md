@@ -7,6 +7,9 @@
 新しい事実は足していません——`tools/check_tables.py` が「索引の行は証拠に戻せる」ことを毎回見ます。
 区分の定義は [docs/data-layout.ja.md](../docs/data-layout.ja.md)。
 
+**`index/` の下が公開面の全部で、その外は公開面ではありません**（[consumer の契約](#consumer-の契約)）。
+consumer が要る目録・証拠の表はここへ写してあります（[目録・証拠からの写し](#目録証拠からの写し)）。
+
 ## 何がどこにあるか
 
 | 知りたいこと | 表 |
@@ -23,7 +26,11 @@
 | DMA 要求 → channel | [`dma.csv`](dma.csv) |
 | タイマの素性（チャネル数つき） | [`timers.csv`](timers.csv) |
 | family をまたいで同じレジスタ配置か | [`register_layouts.csv`](register_layouts.csv) |
+| 型番・series・family・パッケージ・コアの名前 | [`products.csv`](products.csv)・[`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv)（写し） |
+| chip ID・option bytes・flash の形と書き方 | [`device_ids.csv`](device_ids.csv)・[`option_bytes.csv`](option_bytes.csv)・[`option_byte_fields.csv`](option_byte_fields.csv)・[`flash_geometry.csv`](flash_geometry.csv)・[`flash_program_method.csv`](flash_program_method.csv)（写し） |
+| クロック・割り込み・メモリマップ・動作条件・エラッタ | [目録・証拠からの写し](#目録証拠からの写し) |
 | 全ファイルの sha256 | [`manifest.csv`](manifest.csv) |
+| 公開面の版 | [`VERSION`](VERSION) |
 
 どの表も**結合した1ファイル**（全型番・全family）で、generator はこれを読みます。
 CSV は機械が読むもので、人が型番や機能で絞り込んで見るのは viewer（[`pins.html`](../pins.html)。
@@ -61,10 +68,34 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 
 ## consumer の契約
 
-読んでよいもの: `catalog/` の全表、`index/` の正本、`evidence/` のうち README で「安定」と印の
-ある表（EVT ヘッダ由来）。それ以外の証拠の表は形を変えることがあります。固定は
-commit と読む表の sha256（`manifest.csv` の sha256 を1つ固定してもよい）。列を変えたら
-[worklist](../docs/worklist.ja.md) に記録し、この README の列表を更新します。
+- **読むのは `index/` の下だけ。** `catalog/` と `evidence/` はこのリポジトリの作業の層で、形はいつでも
+  変わります。consumer が要るものはここへ写してあります。ここに無いものが要るときは、外を読まずに
+  公開を依頼してください（データの依頼）
+- **固定は commit と `manifest.csv` の sha256。** manifest がここの全ファイル（CSV と `VERSION`）の行数と
+  sha256 を持ちます
+- **列は名前で読む。** 列の並び順は契約に入りません
+- **[`VERSION`](VERSION) は整数1つ。** consumer を壊しうる変更——列の削除・改名、列の書き方の変更、
+  family などの鍵の改名——は先にこれを上げます。表・列・行を足すだけなら上げません。変更は
+  [worklist](../docs/worklist.ja.md) とこの README に記録します
+- **`confidence` の扱いは consumer が決める。** どの行もこのリポジトリの答えで、`conflict` は資料が
+  食い違ったこと、`basis` はどちらを採ったかを言います（両論は [`conflicts.csv`](conflicts.csv)）
+- 保証するのは形（列・意味・綴りの規則）、全行の出所、`tools/check_tables.py` が見る不変条件、原本が
+  変わったときの再生成です。**全行が正しいことは保証しません**——資料が誤っていれば行も誤り、その
+  ことを `confidence`/`basis` で言います
+
+## 目録・証拠からの写し
+
+`tools/build_index.py` がこれらを行ごとそのまま写します（`paths.PUBLISHED`）。写しが元と等しいことは
+`tools/check_tables.py` が見ます。列の意味は同じ名前の表を [目録の README](../catalog/README.ja.md) と
+[証拠の README](../evidence/README.ja.md) で引いてください。
+目録: `families`・`series`・`products`・`packages`・`cores`。
+EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・`clock_configs`・`clock_prescalers`・
+`clock_sources`・`clock_symbols`・`clock_init`・`clock_enables`・`pin_alternate`。
+RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
+`device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`。
+
+写しで落とした列（内部の記録）: `products` の packing の列、`clock_configs` の一致した EVT 写しの数、
+`operating_conditions` の datasheet 名（`basis` にある）。
 
 ## 各表
 

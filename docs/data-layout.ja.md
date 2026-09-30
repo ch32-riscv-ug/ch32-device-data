@@ -99,7 +99,7 @@ tools/ docs/
 ```
 
 - **正本は GitHub のこの repository**。tag/release はまだ作らない（利用者1人。consumer は commit で固定している）。索引の列を変えたら worklist に記録し、`index/README` の列表を更新する
-- **consumer の契約は `catalog/`＋`index/`＋「安定」印の `evidence/` 表**。証拠の他の表は形を変えてよい。lock は今のまま「commit＋読む表の sha256」で足りる（読むのは正本なので行数は今と同じ）。`index/manifest.csv`（ファイル・sha256・生成元 commit）も生成しておく
+- ~~**consumer の契約は `catalog/`＋`index/`＋「安定」印の `evidence/` 表**。~~ **2026-09-30 に置き換えた: 契約は `index/` の下だけ**（目録と公開する証拠の表は写しを置く。[public-surface.ja.md](public-surface.ja.md)）。当時の文: 証拠の他の表は形を変えてよい。lock は今のまま「commit＋読む表の sha256」で足りる（読むのは正本なので行数は今と同じ）。`index/manifest.csv`（ファイル・sha256・生成元 commit）も生成しておく
 - **`pins.html` は GitHub Pages で配る**（main の root、`.nojekyll` 付き。有効化は要確認）。人が型番・機能で絞って見る入口はここ。索引の CSV を fetch する
 - **mirror README は表示のまま**（各 family repo へ生成。「Edit there, not here」の注も維持）
 - **`candidates/` は commit を止めて `.cache/candidates/`**。証拠の CSV が review 対象の抽出結果になったので、判断過程（`_selector_resolved_by` 等）を型番 JSON で二重に持つ理由が消えた。build_pins 等の入力としては残る（`build_all` が作る）。**注意**: `_unresolved_selector`（F-6）のような「決まらなかった」記録は worklist にあるが、消す前に一度 `candidates/_report.json` の内容が worklist に写っているか確認する
@@ -187,7 +187,7 @@ consumer は commit を固定しているので、途中の状態で壊れるこ
 決めたこと（反対がなければこの通り進める）:
 - 区分は**目録・証拠・索引**の3つ＋表示。A/B/C の呼び名はやめる
 - 証拠は CSV のまま、訂正を入れない。付与識別子は可、語彙導出列は不可
-- 索引は CSV、1表1ファイル。consumer の契約は目録＋索引＋「安定」印の証拠。人向けの絞り込みは viewer
+- 索引は CSV、1表1ファイル。consumer の契約は ~~目録＋索引＋「安定」印の証拠~~ `index/` の下だけ（2026-09-30）。人向けの絞り込みは viewer
 - `tables/` は `catalog/`・`evidence/` に改名（`tables` は3区分になった時点で何も言っていない名前）
 - `candidates/` は commit しない
 - `index/README` は英語も置く

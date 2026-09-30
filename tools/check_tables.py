@@ -1142,12 +1142,54 @@ def index_checks(t: dict) -> list[str]:
     with (paths.INDEX / "manifest.csv").open(encoding="utf-8") as f:
         for r in csv.DictReader(f):
             listed[r["path"]] = r["sha256"]
+    # build_index.manifest_files と同じ範囲（CSV と VERSION）。build_index は pdf 系を import
+    # するので、標準ライブラリだけで動くこの検査は同じ条件を自分で書く。
     actual = {p.relative_to(paths.INDEX).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-              for p in paths.INDEX.rglob("*.csv") if p.name != "manifest.csv"}
+              for p in paths.INDEX.rglob("*")
+              if p.is_file() and (p.suffix == ".csv" or p.name == "VERSION")
+              and p.name != "manifest.csv"}
     if listed != actual:
         changed = sorted(set(listed) ^ set(actual)) or sorted(k for k in listed if listed[k] != actual.get(k))
         bad.append(f"manifest: index/ の内容と一致しない（{len(changed)} ファイル。例 {changed[:3]}）"
                    "——tools/build_index.py を回し直す")
+    return bad
+
+
+def published_surface(tables: Path | None) -> list[str]:
+    """index/ が公開面の全部であること（docs/public-surface.ja.md）。
+
+    - 写した目録・証拠の表（`paths.PUBLISHED`）は、元の表から名指した列を落としただけのもの
+      ——行も並びも同じ。写しを手で直すと、元との差でここが落ちる
+    - index/ に在る CSV は、索引の表か写しのどちらか。名前の無いファイルは公開面に紛れない
+    - `VERSION` は正の整数1つ。consumer を壊す変更（列の削除・改名・書き方・family 名）は
+      これを上げてから入れる。足すだけの変更は上げない
+    """
+    bad = []
+    for name, dropped in paths.PUBLISHED.items():
+        with paths.table(name, tables).open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            source = list(reader)
+            header = [c for c in (reader.fieldnames or []) if c not in dropped]
+        dest = paths.index(name)
+        if not dest.exists():
+            bad.append(f"公開面: index/{name}.csv が無い——tools/build_index.py を回す")
+            continue
+        with dest.open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            copy = list(reader)
+            copy_header = list(reader.fieldnames or [])
+        if copy_header != header:
+            bad.append(f"公開面: index/{name}.csv の列が元の表（落とす列 {list(dropped)} を除く）と違う")
+        elif [[r[c] for c in header] for r in source] != [[r[c] for c in header] for r in copy]:
+            bad.append(f"公開面: index/{name}.csv の行が元の表と違う——tools/build_index.py を回す")
+    known = set(paths.INDEX_TABLES) | set(paths.PUBLISHED) | {"manifest"}
+    for p in sorted(paths.INDEX.glob("*.csv")):
+        if p.stem not in known:
+            bad.append(f"公開面: index/{p.name} は索引の表でも写しでもない（paths.py に無い）")
+    version = paths.INDEX / "VERSION"
+    text = version.read_text(encoding="utf-8").strip() if version.exists() else ""
+    if not re.fullmatch(r"[1-9]\d*", text):
+        bad.append(f"公開面: index/VERSION が正の整数1つでない（{text!r}）")
     return bad
 
 
@@ -1266,6 +1308,7 @@ def main() -> int:
     # 持たない代わりに、その形が壊れていないことをここで見る。
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
+    bad += published_surface(args.tables)
     # 生成器が --full の順序に載っているか。載らない生成器は原本が動いても走らない。
     bad += regeneration_coverage()
     bad += out_option(t)

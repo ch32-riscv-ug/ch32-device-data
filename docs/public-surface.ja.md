@@ -1,14 +1,16 @@
-# 公開面の方針（案）
+# 公開面の方針
 
-文書基準日: 2026-09-30。**案**——ユーザーの判断待ちの項目は末尾の「決めること」に集めた。
-決まったら、この文書を方針として確定し、`index/README`・`evidence/README`・`data-layout.ja.md` を合わせる。
+文書基準日: 2026-09-30。**方針は確定**（同日ユーザーが決めた。末尾「決めたこと」）。**実装も同日**
+（`paths.PUBLISHED`・`build_index.py` の写し・`index/VERSION`・`check_tables.published_surface`・
+`check_docs.check_stable_lists`）。残りは末尾「残り」。consumer 向けの約束の本文は
+[index/README の「Contract for consumers」](../index/README.md#contract-for-consumers)（英語・日本語版あり）。
 
-## 前提: ルールはある。守られていないだけ
+## 前提: ルールはあった。守られていなかった
 
-consumer の契約は2026-08-25から決まっている（`index/README` の「Contract for consumers」:
-`catalog/` の全表＋`index/`＋`evidence/` のうち「安定」印の表）。起きているのは、consumer がその外を
-読んでいること。ルールの穴ではない。正式な経路は **consumer が依頼 → このリポジトリが保証・保守できる
-形に整えて公開 → consumer がそこへ移る**。consumer が evidence を直接読んで先に済ませる道は無い。
+consumer の契約は2026-08-25から決まっていた（`catalog/` の全表＋`index/`＋`evidence/` のうち「安定」印の
+表）。起きていたのは、consumer がその外を読んでいたこと。正式な経路は **consumer が依頼 → この
+リポジトリが保証・保守できる形に整えて公開 → consumer がそこへ移る**。consumer が evidence を直接
+読んで先に済ませる道は無い。
 
 2026-09-30 の実測（読んでいるのは3つ。pytest-cli・dev-oep・wireskein はどの表も読んでいない）:
 
@@ -24,8 +26,8 @@ consumer の契約は2026-08-25から決まっている（`index/README` の「C
 
 ## 原則
 
-1. **公開面は1つのフォルダで、その下は全部が契約**。個別の表を名前で指定しない。consumer は path の
-   接頭辞だけで「契約の内か」を判定できる（lock も検査も1行で書ける）
+1. **公開面は `index/` の下で、その下は全部が契約**。個別の表を名前で指定しない。consumer は path の
+   接頭辞だけで「契約の内か」を判定できる
 2. **公開面に置くのは、このリポジトリが保証でき、保守し続けられる表だけ**。保証するのは次の4つで、
    **行の真偽ではない**（資料が誤っていれば行も誤る。そのかわり、そのことを confidence と basis で正直に言う）
    - 列の名前・意味・書式が固定されている（生成器の定数で決まり、`check_tables` の `column_drift` が見る）
@@ -33,45 +35,42 @@ consumer の契約は2026-08-25から決まっている（`index/README` の「C
    - 不変条件が機械検査に載っている（結合・書式・数）
    - 原本が更新されたら `regenerate.py` で作り直せる（人手の表は `curated/` にあり、検査が見張っている）
 3. **evidence をそのまま契約にしない**。資料の綴りを残す層なので、形が変わってよい層のままにする。
-   公開してよい表は**公開フォルダへ写す**（byte 一致の写し。写しの一致は検査する）。写しの元の形を
-   変えたら、それは公開面の変更になる
+   公開する表は **`index/` へ写す**。行はそのまま、consumer に要らない内部の列だけを落とす
+   （`check_tables.published_surface` が「元の表から名指しした列を落としただけ」を毎回見る）。写しの元の
+   形を変えたら、それは公開面の変更になる
 4. **consumer ごとの専用表は作らない**。欲しい列が既存の表にあればその表を公開し、無ければ抽出（evidence）を
    直してから公開する。専用表は consumer の数だけ保守が増える
 
-## 形: `index/` を公開フォルダにする（推奨）
+## 形
 
-**`index/` の下を全部、公開面にする**。今ある index 表はそのまま置き、`catalog/` の鍵表と、公開してよい
-evidence の表を `index/` へ写す。
-
-- **推奨する理由**: 契約を守っている唯一の consumer（wch-protocols）と `pins.html`、core の `index/` 読みが
-  何も変えずに済む。大きい表（`pinout` 3MB・`registers` 4MB）は既に index にあるので、写すのは小さい表だけ
-  （計約1.4MB）。名前も衝突しない（写す表の名前はどれも index に無い）
-- 次点は新しい `public/` を作って index も写す案。フォルダ名は分かりやすいが、index の 9.4MB が二重になり、
-  wch-protocols・pins.html・core の index 読みも付け替えが要る
-- index の性格は「導出」から「導出＋写し」に変わる。**写しにも事実は足さない**（byte 一致）ので、
-  「索引に事実を足さない」は保てる
-
-### 置くもの
+`index/` を公開フォルダにした。契約を守っている唯一の consumer（wch-protocols）と `pins.html`、core の
+`index/` 読みが何も変えずに済み、大きい表（`pinout` 3MB・`registers` 4MB）は二重にならない。写すのは
+小さい表だけ（計約1.4MB）。index の性格は「導出」から「導出＋写し」に変わるが、**写しにも事実は足さない**
+ので「索引に事実を足さない」は保てる。
 
 | 種類 | 表 | 扱い |
 |---|---|---|
-| 導出（今の index） | `parts`・`pinout`・`routes`・`registers`・`register_map`・`dma`・`timers`・`features`・`capabilities`・`conflicts`・`debug_interfaces` | そのまま |
-| 写し: 目録の鍵 | `families`・`series`・`products`・`packages`・`cores` | `catalog/` から写す |
-| 写し: 今の「安定」evidence 16表 | `interrupts`・`memory_map`・`systick`・`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`・`memory_configs`・`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` | 写す。今の約束を引き継ぐ（core と ch32rv が読んでいる） |
-| 写し: 依頼で新たに公開（下の節） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions` | 写す（ユーザー判断） |
-| 表の説明 | `manifest.csv`（今のまま: path・行数・sha256）・**`columns.csv`（新設: 表・列・意味・書式・空欄の意味）**・**`VERSION`（新設）** | 生成する |
+| 導出（前からの index） | `parts`・`pinout`・`routes`・`registers`・`register_map`・`dma`・`timers`・`features`・`capabilities`・`conflicts`・`register_layouts`・`debug_interfaces` | そのまま |
+| 写し: 目録の鍵 | `families`・`series`・`products`・`packages`・`cores` | `products` の packing の3列を落とす（102行が空。consumer に意味が無い） |
+| 写し: 前の「安定」evidence 15表 | `interrupts`・`memory_map`・`systick`・`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`・`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` | `clock_configs.evt_copies`（一致した EVT 写しの数。生成の記録）を落とす |
+| 写し: 依頼で公開（R-33・R-34） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions` | `operating_conditions.datasheet` を落とす（`basis` にある） |
+| 表の説明 | `manifest.csv`（path・行数・sha256。CSV と `VERSION` を覆う）・`VERSION`（整数1つ。いま `1`） | manifest は生成、VERSION は人が上げる |
 
-### 置かないもの
+写しの一覧と落とす列は `tools/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
 
-- `register_layouts` — 同じ型かどうかを言うハッシュで、header の版で値が変わる。生成の途中の道具なので
-  evidence 側へ移す（読んでいる consumer はいない）
-- `catalog/documents`・`sources`・`toolchains` — mirror の運用と生成の出所。consumer には `manifest.csv` と
-  commit で足りる（mirror は今までどおり `manifests/documents.json` を読む）
-- evidence の他の表 — index に正規化した形がある（下の対応表）か、まだ誰も依頼していない。依頼があれば判定する
+### 置かなかったもの
+
+- `memory_configs` — 前は「安定」だったが外した。全行が `conflict`（EVT ヘッダと RM の `FLASH_OBR` の幅が
+  食い違う）で信頼度 🟡、2026-09-30 にも F-77 で L103 の読みが動いた。読んでいる consumer も無い
+- `device_id_addresses` — `device_ids.id_addr` で足りる
+- `catalog/documents`・`sources`・`toolchains` — mirror の運用と生成の出所。consumer には commit と
+  `manifest.csv` で足りる（mirror は今までどおり `manifests/documents.json` を読む）
+- evidence の他の表 — index に正規化した形がある（下の対応表）か、まだ誰も依頼していない。依頼があれば
+  上の原則で判定する
 
 ## 届いている依頼への答え
 
-### index で足りる → consumer が読み先を移す（新しい公開は無し）
+### index で足りる → consumer が読み先を移す
 
 2026-09-30 に行で突き合わせた。
 
@@ -80,57 +79,55 @@ evidence の表を `index/` へ写す。
 | `evidence/pins`（`pad`・`kind`） | `index/pinout` | pins の (型番, pad, kind) は**全行** pinout にある |
 | `evidence/pin_functions`（`pad`・`signal`・`route`） | `index/pinout` | route の remap・default・af は同数。**違いが2つ**: `main` 行（pad 自身の GPIO 名）は `port`/`gpio` 列になった。`alias` 行（30行）は無く、括弧の別名から `port`/`gpio` を埋めている。core の「機能名で呼ばれる pad → port 名」は `port`/`gpio` で引ける見込みだが、core 側で確かめてもらう |
 | `evidence/register_fields`（`register`・`field`・`kind`・`bits`） | `index/registers` | 同じ行が `(type, register)` に割って入っている（`ADC_CTLR3` → `ADC`＋`CTLR3`、`AFIO_EXTICR1` → `AFIO`＋`EXTICR1`）。`bits` の `hi:lo` も同じ |
-| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。**`controller` 列だけ routes に無い**——core が使うなら routes へ写す（索引の列を足すだけで事実は足さない） |
+| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。**`controller` 列だけ routes に無い**——core が要ると言えば routes へ写す（索引の列を足すだけで事実は足さない。VERSION は上げない） |
 | `evidence/timers`（regcheck） | `index/timers` | index は evidence の上位（`channels`・`complementary` 付き） |
+| `evidence/register_blocks`・`errata`・`operating_conditions`・`device_ids`・`option_bytes`・`option_byte_fields` | `index/` の同名の写し | 公開した（`operating_conditions` は `datasheet` 列が無い） |
+| 前の「安定」evidence 表・`catalog/` の鍵表 | `index/` の同名の写し | 公開した（`products` は packing の列、`clock_configs` は `evt_copies` が無い） |
 
-### index に無い → 公開面に写す候補（R-33・R-34）
-
-| 表 | 依頼 | 信頼度（table-reliability） | 判断案 |
-|---|---|---|---|
-| `device_ids` | ch32rv | ✅ reference 72・型番が products に実在・id_addr の一致を検査 | 写す |
-| `option_bytes` | ch32rv | ✅ confirmed 98・base が OB block と一致 | 写す |
-| `option_byte_fields` | ch32rv | ✅ confirmed 101 / conflict 3 | 写す |
-| `register_blocks` | core（block の base） | ✅ confirmed 548 / ref 128 | 写す（`register_map` から番地−offset で出せるが、consumer に計算させない） |
-| `errata` | core（id の存在確認） | ✅ 人が確認した表（`curated/`）、資料の引用が空振りすると落ちる | 写す。**id は改名しない**ことを約束に入れる |
-| `operating_conditions` | core（`F_HSI`・`F_LSI`・`f_ADC`） | ✅ 3,939行・`symbol` はこのリポジトリが付けた鍵 | 写す（表ごと）。`condition` は資料の文のままで、書式を約束しない列と `columns.csv` に書く |
-
-## core が挙げた論点への答え（案）
+## core が挙げた論点への答え
 
 - **置き場**: `index/` の下が全部。consumer は `TABLE_DIRS` の写しを持たず、`index/<表>.csv` だけを読む。
-  `tools/paths.py` を consumer 向けに出す必要は無くなる
-- **lock**: commit ＋ `index/manifest.csv` の sha256 を1つ（manifest に全表の sha256 がある）。wch-protocols の
-  読み方がこれ。core の regcheck 分も同じ lock に入る
-- **列の書き方**: `index/columns.csv` に表・列ごとに書く（意味・書式・空欄の意味）。対象は
-  `REG:bit;REG:bit`・`hi:lo`・`;` の並び・`route` の語彙・pad の装飾など。**列は名前で読む**——位置では
-  読まない（ch32rv は今いくつかの表を位置で読んでいる）。約束するのは列の名前と意味で、並び順ではない
+  `tools/paths.py` を consumer 向けに出す必要は無い
+- **lock**: commit ＋ `index/manifest.csv` の sha256 を1つ（manifest に全ファイルの sha256 がある）。
+  wch-protocols の読み方がこれ。core の regcheck 分も同じ lock に入る
+- **列の書き方**: 表の README（index の表は `index/README`、写しは元の表の `catalog/README`・`evidence/README`）に
+  ある。**列は名前で読む**——位置では読まない（ch32rv は今いくつかの表を位置で読んでいる）。約束するのは
+  列の名前と意味で、並び順ではない。機械で読める列の説明（`columns.csv`）は「残り」
 - **confidence**: 公開面の行は全部このリポジトリの答え。`conflict` は「資料が食い違い、basis の根拠で片方を
-  採った」という印で、値は採用した値。使うか捨てるかは consumer の安全要求で決める（ch32rv の flash は
-  conflict で止まる。これは正しい使い方）。両論は `conflicts.csv` にある
-- **family 名・schema の版**: `VERSION` を1つ持つ（表ごとではない）。**同じ major の間は、列の削除・改名・
-  書式の変更・family 名と鍵の改名をしない**。列や行を足すのは minor。consumer は major で互換を判定する
+  採った」という印で、値は採用した値。使うか捨てるかは consumer が決める（ch32rv の flash は conflict で
+  止まる。これは正しい使い方）。両論は `conflicts.csv` にある
+- **family 名・schema の版**: `index/VERSION` を1つ持つ（表ごとではない）。**consumer を壊しうる変更**——
+  列の削除・改名、列の書き方の変更、family などの鍵の改名——は先にこれを上げる。表・列・行を足すだけなら
+  上げない。したがって family 名は VERSION 1 の間は凍結
 
 ## 守らせ方
 
-- このリポジトリ: `index/` の写しが元と byte 一致すること、`columns.csv` が全表・全列を覆うこと、
-  `manifest.csv` が `index/` の全ファイルを覆うことを `check_tables` に載せる。`evidence/README` の
-  「consumer はこれらを直接読んでよく」は「`index/` の写しを読む」に直す
+- このリポジトリ（実装済み）: `check_tables.published_surface` が、写しが元と一致すること、`index/` に
+  索引でも写しでもない CSV が無いこと、`VERSION` が正の整数であることを見る。manifest は `index/` の CSV と
+  `VERSION` を全部覆う。`check_docs.check_stable_lists` が README の写しの一覧と `paths.PUBLISHED` の一致を見る。
+  凍結台帳（`pipeline/baseline/tables.csv`）も写しを覆う
 - consumer: 読む path が全部 `index/` で始まることを、consumer 自身の検査に入れてもらう（lock を
   manifest の sha256 にすれば自然にそうなる）。**公開前のデータが要るときは consumer 側に手持ちで置く**
   （ch32rv の `provisional/skus.csv` の形）。evidence を読んで代用しない
 
 ## 移る順
 
-1. ユーザーが「決めること」を決める
-2. このリポジトリ: 写しと `columns.csv`・`VERSION` を生成し、検査を足し、README を直す（1 commit）
-3. consumer へ連絡: 公開の commit と、上の「index で足りる」対応表
-4. consumer が読み先を移す。**猶予期間は evidence の旧 path も残す**（evidence は消さないので自然に残る。
-   ただし契約ではない）
-5. 移り終わったら、`evidence/README` から「安定」印を外す（契約は `index/` だけになる）
+1. ~~ユーザーが決める~~（2026-09-30）
+2. ~~このリポジトリ: 写しと `VERSION` を生成し、検査を足し、README を直す~~（2026-09-30）
+3. consumer へ連絡: 公開の commit と、上の「index で足りる」対応表（commit の後）
+4. consumer が読み先を移す。**猶予期間は evidence の旧 path も残る**（evidence は消さない。ただし契約ではない）
+5. 移り終わったら `paths.STABLE_EVIDENCE` と `evidence/README` の「安定」印を消す
 
-## 決めること（ユーザー）
+## 決めたこと（ユーザー、2026-09-30）
 
-1. 公開フォルダ: **`index/` を公開フォルダにする**（推奨）か、新しい `public/` を作るか
-2. 公開面に写す表: 今の安定16表をそのまま引き継ぐか（推奨）。**依頼6表**（`device_ids`・`option_bytes`・
-   `option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`）を写すか
-3. 版: `VERSION` を1つ持ち、上の規則で major／minor を分けるか。**v1 で family 名を凍結する**か
-4. confidence の扱い: consumer に任せる（推奨）か、このリポジトリが「conflict を除け」と規則にするか
+1. 公開フォルダは `index/`
+2. index の外の表は、**安定して出せるなら公開面に出す**。そのとき不要な列は落としてよい
+   → 前の安定表から `memory_configs` を除いた15表、目録の鍵5表、依頼6表を写した（上の表）
+3. `index/VERSION` を持つ。consumer を壊しうる変更はこれを上げてから
+4. `confidence` の扱いは consumer に任せる
+
+## 残り
+
+- 機械で読める列の説明 `index/columns.csv`（表・列・意味・書式・空欄の意味）。いまは README の文章だけ
+- `routes.controller`（core が要ると言えば）
+- consumer への連絡（commit の後）と、移り終わった後の「安定」印の撤去
