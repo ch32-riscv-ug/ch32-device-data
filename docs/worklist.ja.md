@@ -19,7 +19,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 | 画像 | 2 | 1（**C3 だけ**。C1・C2 は 2026-09-16 に閉じた——C1 は133枚の実測で切れ0・名前の食い違い0、C2 は `evidence/figures.csv` で生成 README がページ直リンクになった） |
 | 検査・運用 | 17 | 1（D7。**再生成のCI化は見送り**——下の D7 に実測と理由） |
 | PDF構造化 | 4 | 0（**D19 も 2026-09-16 に完了**——最後の項目「境界で1字が重なる隣接セル」のツール側が0件になった。残るのは版面がそう刷っている2種だけ。**D18は2026-09-10に完了**——PDFを直接読む生成器が実行経路から居なくなった） |
-| consumerからの依頼 | 10 | 2（**R-28〜R-30を2026-09-01にch32rvから受領、翌日までに3件とも資料から取れるぶん完結**。R-29は完全解決（debug_wiring＋全27 series確定）、R-28は**納品受け入れ済**（実測6台と全一致・gap 7はch32rv曰く未発売＝接続でき次第）、R-30はRMから取れるぶん完結（option 2表＋WRPR粒度。残りは実測照合）。R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
+| consumerからの依頼 | 10 | 4（**R-33・R-34（契約外の表を公開面へ）を2026-09-30にcore・ch32rvから受領、設計はユーザー判断待ち**。**R-28〜R-30を2026-09-01にch32rvから受領、翌日までに3件とも資料から取れるぶん完結**。R-29は完全解決（debug_wiring＋全27 series確定）、R-28は**納品受け入れ済**（実測6台と全一致・gap 7はch32rv曰く未発売＝接続でき次第）、R-30はRMから取れるぶん完結（option 2表＋WRPR粒度。残りは実測照合）。R-27 は H417 の実測待ちが1行。R-20は機械収集ぶんまで、残りはconsumerの要否次第） |
 | 表示（G系） | 13 | 0 |
 | 既知の穴（F系） | 67 | 8（下の F 台帳で ✅ が付いていない行の数。資料側の記録が F-7・F-33・F-43〜46・F-62・F-63。**F-51 は 2026-09-23 に資料側が直って解決**（英語版 RM 1.7→1.8 の格子が値1を PF12/PF13/PE7 に当てた）。**F-76**（`CH32V006K8U6` を datasheet が書いていない）は 2026-09-16 に解決した——資料側の穴は残るが、EVT が名乗る型番を兄弟の規則で目録に入れて出荷品に追いついた。F-4 と F-24 は残りだけが資料側で実害なし。**ツール側の穴は0**——F-74（条件の添字が離れる）は 2026-09-16 に解決した。F-68（格子が言っているのに `basis` が言わない）は 2026-09-16 に残りも解消した（pad の綴り・合成名・`LPT_INn`・ETH の接口名で 193 行）。残った ADC のトリガは資料の食い違いで F-73。F-61（論理積の条件を `(field, value)` で表せない remap 格子）は 2026-09-16 に**案 C**（新しい表 `pin_conditions`）で解決した。F-71（ページ境界で割れた rowspan セル）と G13（折り返しを群と読む）は 2026-09-16 の `CH32X035DS0.en` V2.3 受入で見つけて同日に修理した。同日の**サブエージェント監査が見つけた4つ**のうち F-67・F-69・F-70 は同日に修理。F-66（`basis` が実際に効いた出所を言っていない）は同日に修理した。F-64（signal を先に合わせて食い違いを対にする）と F-65（自動更新に台帳の再記録を足し、`workflow_ledger` で機械化）は 2026-09-15 に修理。F-60 は 2026-09-10 に修理（見出しを読めない表が前の格子を終わらせていなかった）。F-57・F-58 は 2026-08-29、F-59 は 2026-09-04 に解決） |
 
@@ -848,6 +848,53 @@ F-41 で格子の値を採るのと同じ規則。資料側の問題台帳に F-
 | R-31 | flash消去後の読み出し値（wch-protocols・優先度中） | ✅ **実装**（2026-09-06）。`flash_geometry.csv`に5列——RM原文のまま4列（`erased_read_word`/`half`/`byte_even`/`byte_odd`）＋EVT IAPの判定値`blank_check_word`。系統B（V20x/V307/V407/X315/H417）は4値とも明記、系統A（L103/M030/V006/V205/X035）はRMが`字读- 0xFF`とwordしか書かないので**残り3列は空**。zhを一次・M030だけen版（`basis`に`rm-en`）。V003/V103はzh/enとも記述が無く**空欄＋note**（他repoの実測を引用）。EVT側12 familyの判定値は自分で照合（H417は`Common/hardware.c:70`）。**追加**（2026-09-06、consumerのフィードバック）: CH32V103だけRMにもEVT IAPにも根拠が無く、**DBから消去後の値を引けない唯一のfamily**だった。`blank_check_word`を実測の引用で埋め（`basis`に`measured:ch32rv(docs/data-requests/measured/erased-read-2026-09-06.md, CH32V103R8T6)`）、RM側の間接的な裏付け——`FLASH_STATR.PGERR`が「内容が`0xFFFF`でない番地に書こうとすると立つ」＝消去後オール1の前提（CH32xRM.zh p272）——を`rm-pgerr(0xFFFF)`として**機械抽出**で足した。`erased_read_*`（RM原文の列）は空のまま——「RMが言っていないことは書かない」は変えない。幅の不揃い（系統A`0xFF` vs 系統B`0xe339e339`）は原文列なので当然で、**consumerが比較に使うのは正規化済みの`blank_check_word`**——その旨を`evidence/README`に明記 |
 | R-32 | main flashの消去/書き込み**手順**の分類（ch32rv 0004・優先度中） | ✅ **実装**（2026-09-06）。新表`evidence/flash_program_method.csv`（12 family。`flash_geometry`は粒度の表、手順は語彙も出所も違うので別表）——`program_method`/`program_commit`/`erase_method`/`ctlr_bit_names`/`undocumented_note`。RMの**番号付き手順**（zh一次）とEVT driverの突き合わせで confirmed 11・conflict 1。**ch32rvの実機5 familyと一致**（V20x/V307=PgStart、V003/X035/L103=Buffered）。conflictは**H417**——RMは起動bitも`FTPG`と書くがdriverは`CR_PG_STRT`・`register_fields`は`PG_STRT` bit21（RM側の誤記と判断、両論を`basis`に）。**依頼に無かった発見2件**: ①未文書の`0x40022034`書き込みは**M030にも在る**（他10 familyには無く、XORはV103が`0x1000`・M030が`0x100`）、②依頼が挙げた齟齬「V307に`PG_STRT`が無い」は**事実でない**（V20xと同じbit21が在る）。`ctlr_bit_names`は`register_fields`の綴りで出す（RMは`FTPG`、EVT headerは`PAGE_PG`と同じbitを別名で呼ぶため）。**修正**（2026-09-06、consumerのフィードバック）: `program_method`がbuffered系を全部`32-bit buffer writes`と書いていたが、EVT driverの`FLASH_BufLoad`のシグネチャでは**幅が3通り**——32bit（V003/V006/V205/X035/L103）・**64bit（M030）**・**128bit（V103）**。幅より小さい単位で積むと**エラー無しで内容が壊れる**（ch32rvがV103で踏んだ実害そのもの。だから標準half-word＋未文書commitへ退避していた）。列`program_buffer_load_bits`を新設し、方式の文字列もfamily別の幅に直した。RMは幅を書かないので出所は`basis`に`evt-bufload(<N>bit)`。`check_tables`に「列と方式文字列が同じ幅を言うこと」を追加。**ついでに見つけた登録漏れ**: この表の生成器が`pipeline/publish/regenerate.py`の`--full`順序に載っておらず、原本が改版されても再生成されない状態だった（列は合うので`column_drift`にも掛からない）。順序に追加（`ctlr_bit_names`が`register_fields`を要るので`build_registers`の後）し、同じ抜けを機械で捕まえる`check_tables.regeneration_coverage`を新設。**H417のconflictの採用値を反転**（2026-09-06、ユーザー判断）: RMの手順8は起動bitも`FTPG`と書くが、これは手順4で立てた有効化bitと同じで自己矛盾している。driver（`CR_PG_STRT`）・`register_fields`（`PG_STRT` bit21）・同系統のV407/X315の3つが揃うので**RM側の誤記と判断**し、列にはdriverの読み（`fast page, direct writes (PAGE_PG, then PG_STRT)`）を置いてRMの読みを`basis`に`!rm:program_method(...)`で残す形に直した。それまでは「READMEにはRMの誤りと書きながら列にはRMの値を置く」というねじれがあった。V103の`fast_program_bytes`（判断が逆でRMを採用）と同じ扱いに揃えたことになる。`confidence`は`conflict`のままなので、fail-closedのconsumerの挙動は変わらない。旧状態: 受領・未着手（2026-09-06）。
 | R-30 | option bytesの書き込みレイアウトと工場出荷値（ch32rv 0003・優先度中） | 🔶 **表2枚を新設**（2026-09-02、新経路のRM章抽出`pipeline/extract/rm/extract_option_bytes.py`）: [`evidence/option_bytes.csv`](../evidence/option_bytes.csv)（98行——family×バイトの配置・補数位置・書込方式。書込方式は編程手順が名指す制御bitで分類＝V003系`half-word (OBPG)`／L103・M030系`fast page, 32-bit buffer writes (FTPG)`、RMが自動反码を明記すれば`; complement auto-computed`）＋[`evidence/option_byte_fields.csv`](../evidence/option_byte_fields.csv)（106行——bit割当とRM記載の復位値）。依頼の表1に相当。**工場出荷値（依頼の表2）はRMが述べる粒度（バイト/bitの復位値）で提供**——生16バイト列の合成は導出なのでせず、新品実測との突き合わせはch32rv側の測定と依頼書どおり照合する。**WRPRの粒度も抽出済み**（2026-09-02追記）: `option_byte_fields`の`wrpr_bit_protects`列——WRPR群の説明文から「1bitが保護する範囲」（V003=1扇区1KB・V00X/X035=2扇区1KB・V205=4扇区2KB・FV2x/V407=1扇区4KB・L103=2扇区2KB・M030/V103=4KB・H417=DBMODE条件つき8K/4K）。**発見した資料側齟齬は台帳へ**（M030 en版のOB base 0x1FFFF800コピペ、X315のWRPR粒度zh/en差等）。残り: 実測ダンプとの照合（ch32rv側の測定待ち） |
+| R-33 | 契約外で読んでいる表の公開面への整備（ArduinoCore-CH32・2026-09-30受領） | ⏸ **受領のみ・設計はユーザー判断待ち**（ユーザー方針「consumerは公開面からだけ読む」を受けた依頼。[handoff](handoff.ja.md#守ること)）。表と論点は下の「R-33」 |
+| R-34 | 契約外で読んでいる表の公開面への整備（ch32rv・2026-09-30受領） | ⏸ **受領のみ・設計はユーザー判断待ち**（R-33 と同じ方針から）。表と用途は下の「R-34」 |
+
+### R-33 契約外で読んでいる表の公開面への整備（2026-09-30 受領）
+
+arduinocore-ch32-3c から（dev-wch-3e 経由のユーザー方針に沿った依頼）。公開面の設計はユーザーが未決なので、
+ここでは**受けた内容だけ**を記録する。公開面が決まったら core が読み先を移し、`TABLE_DIRS` の写しを消し、lock の範囲を揃える。
+
+**generate.py が契約外で読む表**（表・列・用途）
+
+1. `evidence/pins` — `part_number, pad, kind`。part ごとの pad 一覧（port 幅・pad の種類）
+2. `evidence/pin_functions` — `part_number, pad, signal, route`。UART/I2C/SPI/TIM/ADC の pad と route（`CH32_<inst>_ROUTES`・`Serial` の既定 USART・A<n>・PWM）、route 空／`alias` の行で「機能名で呼ばれる pad → port 名」（H41x の空 route、M007/M103 の `alias`）。core の3箇所で読む中心の表
+3. `evidence/register_blocks` — `family, block, type, base_address`。ADC instance の base（X305/X315 の複数 ADC）
+4. `evidence/register_fields` — `family, register, field, kind, bits`。`ADC_CTLR3.CLK_DIV` の有無 → `CH32_ADC_CLK_CTLR3`（X035/X033）、regcheck の `AFIO_EXTICRn.EXTIk` の `bits`（F1系 4bit×4本／X035 2bit×16本）
+5. `evidence/remap_fields` — `series, selector, controller, bits`（`REG:bit;REG:bit`）。`CH32_SERIALn_REMAP_MASK/VAL`、regcheck の AFIO 照合
+6. `evidence/operating_conditions` — `series, symbol, condition, typ, max, unit`。HSI/LSI の `typ`（V203 の3行の丸め）、`f_ADC` の `max` → `CH32_ADC_MAX_HZ`
+7. `evidence/errata` — `id`。variant/boards が参照する errata id の存在確認
+8. `evidence/clock_prescalers` — `family, field, divider, value`。HPRE の符号化（linear／2^n）、ADCPRE 行の有無（無い＝X035 → `CH32_ADC_CLK_CTLR3`）。**`clock_*` は契約内（安定印）**——core は念のため挙げている
+
+**bench regcheck.py**: 契約外は `evidence/remap_fields`・`evidence/timers`（`family, timer, counter_width_bits`）・`evidence/register_fields`。
+契約内だが path 決め打ち: `index/register_map`・`index/routes`・`evidence/clock_enables`・`index/pinout`・`catalog/families`。
+
+**core が挙げた論点（ユーザー判断）**
+
+- 置き場: core の `TABLE_DIRS` と regcheck の full path が2箇所にある。`tools/paths.py` 相当を consumer が使える形（Python module か manifest）で。timers を generator は index、regcheck は evidence から読んでいる（evidence 側は channels/complementary が消えた）
+- lock: `vendor/ch32-device-data.lock.toml` は generator の表だけ収録（regcheck 分は未収録）。`index/manifest.csv` の sha256 1つで pin する形にしたい。fetch_tools は `commit = "..."` を regex で読む
+- confidence: core も regcheck も `conflict` 行を無視（pin_functions 12・register_fields 38・pinout 12・register_map 12・timers 1・routes 1）。V103 PB4/PB5 TIM3 は evidence remap-1（conflict）対 index remap-2（RM 正）。「index を正とし conflict を除く」でよいか
+- 列の書き方: `remap_fields.bits` の `REG:bit;REG:bit`、`register_fields.bits` の `hi:lo`、`families.series`／`operating_conditions.series` の `;` リスト、`pinout.pad` の装飾、`route` の6値（main/default/remap-N/af-N/alias/空）、空欄の意味。`meta/columns.csv` 等に
+- family 名: `CH32V006`（V002/4/5/7/M007 を含む）・`CH32V20x` が core の `FAMILY` と ch32rv の `--chip` に出る。v1 凍結で一緒に凍結する（ch32rv 側の決定と同じ）ことの確認
+- schema の版: CSV 表に machine-readable な schema／版が無い（`schemas/` は PDF 構造化のみ）
+
+### R-34 ch32rv が契約外で読んでいる表の公開面への整備（2026-09-30 受領）
+
+ch32rv-df から。ch32rv は `cargo xtask db-gen` で DB を作って `crates/target/generated/*.csv` に commit しているので、
+公開面ができるまでは今の生成のまま（build は device-data を読まない）。公開面から読んでいるのは `index/parts`・
+`evidence/flash_geometry`・`evidence/flash_program_method`（安定）・`index/debug_interfaces`（2026-09-30 に `evidence/debug_wiring` から移した。ch32rv d6ea3e3）。
+
+**契約外で読んでいて、公開の表が無いもの**
+
+1. `evidence/device_ids` — `part_number, device_id, id_addr, dont_care_bits`。attach で読む chip id（DMI 0x7F／id_addr、rev bits [7:4] を落とす）→ SKU・family。`target info`、`--chip` の照合、flash の family 決定、OEP probe の target 判定。masked device_id が part 間で重なると ch32rv は生成を止める
+2. `evidence/option_bytes` — `family`、`offset`=0x00 の行の `address`（塊の先頭＝RDPR の番地）、`write_unit`（half-word の OBPG／fast page の FTPG）。`target option`／`target protect`。`index/register_map` の OB に番地はあるが書き方が無い
+3. `evidence/option_byte_fields` — `family`、`byte`=USER の行の `bits, field, default`。`target option get/set`
+
+**あわせて届いた食い違い報告**: V002/V004 は `index/debug_interfaces` で `swio`、`evidence/debug_wiring` で SWCLK=PB3（dual）。
+これは R-29 のときに決めてある（`index/README` の `debug_interfaces.csv` 節: 見出しと pin 表が 1線なので見出しを採り、
+説明書の異論は `basis` の `!WCH-LinkUserManual.PDF(...)` に残す。証拠は資料どおりに残す）。ch32rv の 1線の扱いと同じ。
+覆すなら実機で PB3 の SWCLK を確かめる必要がある（未測）
 
 ### 2026-09-06 セル内下付き復元を converter へ（1.7.1）／凍結台帳のドリフト解消
 
