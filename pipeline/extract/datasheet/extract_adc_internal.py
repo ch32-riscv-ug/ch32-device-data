@@ -54,12 +54,27 @@ sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
 import bundle_pages  # noqa: E402
 import paths  # noqa: E402
+sys.path.insert(0, str(REPO / "pipeline" / "extract" / "rm"))
+import register_fields  # noqa: E402
 
 COLUMNS = ["family", "source", "channel", "sample_time", "sample_time_unit",
            "sample_clock_mhz", "v25_mv", "v25_mv_min", "v25_mv_max",
            "avg_slope_uv_c", "avg_slope_uv_c_min", "avg_slope_uv_c_max",
            "vrefint_mv", "vrefint_mv_min", "vrefint_mv_max",
-           "temp_range_c", "temp_error_c", "#", "confidence", "basis"]
+           "temp_range_c", "temp_error_c",
+           "enable_register", "enable_field", "enable_bit", "enable_confidence",
+           "#", "confidence", "basis"]
+
+# **チャネルを使うのに要る有効化ビット**（R-35。2026-10-01）。RM の ADC 章の field 表で、
+# 説明が「（温度传感器和）内部电压（V_REFINT）通道使能位」/「(Temperature sensor and) internal
+# voltage (V_REFINT) channel enable」と書く field。多くの family は `ADC_CTLR2.TSVREFE`（温度と
+# VREFINT の両方）、X315 は `VREFE`（VREFINT だけ。温度センサを持たない）。X035/V003/V006/M030 の
+# RM はそういう field を持たない（CTLR2 の [31:23] は Reserved）ので空——「RM に有効化ビットが無い」。
+# 「参考电压」「使能」だけで探すと `BUFEN`（説明が TKENABLE に触れる）まで当たるので、説明の
+# **書き出し**で当てる。
+ENABLE_ZH = re.compile(r"^(?P<temp>温度传感器和)?内部电压[^：:]{0,20}通道使能")
+ENABLE_EN = re.compile(r"^(?P<temp>temperature sensor and )?internal voltage.{0,30}channel enable",
+                       re.IGNORECASE)
 
 NUM = r"(-?\d+(?:\.\d+)?)"
 # --- チャネルの散文（zh）。文の途中で改行されるので、ページ内の行を繋いで見る。
@@ -78,7 +93,9 @@ ERROR = re.compile(rf"温度传感器的测量误差\s+±{NUM}\s+℃")
 # 条件欄の `T = -40℃～105℃` に数字が入るので、`[^\d]` では止まれない。数が3つ
 # 空白区切りで並んで V で終わる所まで非貪欲に進む（`-40℃` は直後が ℃ なので
 # `{NUM}\s+` に当たらない）。CH32V20x は条件欄が無く添字の `A` だけが残る。
-VREF = re.compile(rf"内置参考电压[^\n]*?{NUM}\s+{NUM}\s+{NUM}\s+V\b")
+# **典型值の列を持たない表がある**（CH32V103DS0 表3-5 は `最小值 最大值` だけ＝`1.12 1.28 V`）。
+# 真ん中の数は任意にし、無ければ typ は空（min・max だけを採る）。3つ並ぶ表は従来どおり3つ取る。
+VREF = re.compile(rf"内置参考电压[^\n]*?{NUM}\s+(?:{NUM}\s+)?{NUM}\s+V\b")
 T_VREF = re.compile(rf"建议慢速采样\s+{NUM}(?:\s+{NUM})?\s+(us|1/f)")
 # RM の ADC 章。datasheet がチャネル番号を書かない family の逃げ道。
 RM_VREF = re.compile(r"内部参考电压[：:][^。\n]{0,10}?ADC\d?_IN\s*(\d+)")
@@ -88,7 +105,7 @@ EN_SLOPE = re.compile(rf"Avg_Slope[^\d\n]*{NUM}\s+{NUM}\s+{NUM}\s+mV")
 EN_V25 = re.compile(rf"at\s*25\s*(?:°\s*C|℃|C)\s+{NUM}\s+{NUM}\s+{NUM}\s+V\b")
 # 「参考電圧」は ADC の正参考電圧（`-0.3 … +0.3 V`）など別の行にも出るので、
 # 内蔵（internal / built-in）と限定する。
-EN_VREF = re.compile(rf"(?:internal|built-?in)\s+reference\s+voltage[^\n]*?{NUM}\s+{NUM}\s+{NUM}\s+V\b",
+EN_VREF = re.compile(rf"(?:internal|built-?in)\s+reference\s+voltage[^\n]*?{NUM}\s+(?:{NUM}\s+)?{NUM}\s+V\b",
                      re.IGNORECASE)
 
 
@@ -97,8 +114,8 @@ def pages_of(bundle: str) -> list[str]:
     return [text for _number, text in bundle_pages.texts(bundle)]
 
 
-def mv(value: str) -> str:
-    return str(round(float(value) * 1000))
+def mv(value: str | None) -> str:
+    return "" if value is None else str(round(float(value) * 1000))
 
 
 def uv(value: str) -> str:
@@ -139,6 +156,35 @@ def read_en(pages: list[str]) -> dict:
             if m and key not in found:
                 found[key] = m.groups()
     return found
+
+
+def enable_fields(family: str) -> dict[str, tuple[str, str, str, str, str]]:
+    """{source: (register, field, bit, confidence, basis)}。RM の zh と en を両方読み、同じ field を
+    同じ bit で言えば confirmed、片方だけなら reference。"""
+    found: dict[str, dict[str, tuple[str, str, int]]] = {}
+    documents: dict[str, str] = {}
+    for lang, (bundle, document) in bundle_pages.rm_bundles(family).items():
+        fields, _ = register_fields.extract(bundle.name, None)
+        documents[lang] = document
+        pattern = ENABLE_ZH if lang == "zh" else ENABLE_EN
+        for f in fields:
+            m = pattern.match((f.get("description") or "").strip())
+            if not m or not f["register"].upper().startswith("ADC") or f["bit_width"] != 1:
+                continue
+            register = re.sub(r"^ADCx?_", "", f["register"])
+            for source in (("temperature_sensor", "vrefint") if m.group("temp") else ("vrefint",)):
+                found.setdefault(source, {}).setdefault(lang, (register, f["field"], f["bit_offset"]))
+    out = {}
+    for source, by_lang in found.items():
+        said = set(by_lang.values())
+        register, field, bit = by_lang.get("zh") or by_lang["en"]
+        langs = "+".join(f"rm-enable({documents[lang]}:{lang})" for lang in ("zh", "en") if lang in by_lang)
+        if len(said) > 1:
+            out[source] = (register, field, str(bit), "conflict", langs)
+        else:
+            out[source] = (register, field, str(bit),
+                           "confirmed" if len(by_lang) == 2 else "reference", langs)
+    return out
 
 
 def main() -> int:
@@ -241,13 +287,37 @@ def main() -> int:
     unique: dict[tuple[str, str], dict] = {}
     for row in rows:
         unique.setdefault((row["family"], row["source"]), row)
-    rows = sorted(unique.values(), key=lambda r: (r["family"], r["source"]))
+    rows = list(unique.values())
+
+    # **資料に内部参考電圧が無い family も行で言う**（R-35）。行が無いだけだと「読み落とし」と
+    # 「資料に無い」が区別できない（V103 は前者だった）。datasheet と RM のどこにも無いときだけ
+    # `missing` の行を置き、basis に探した資料を並べる。温度センサは従来どおり行を持たない
+    # （持たない family が多く、無いことが仕様）。
+    have_vref = {r["family"] for r in rows if r["source"] == "vrefint"}
+    for family in sorted({f for f in sheets.values()} - have_vref):
+        searched = sorted({d for d, fam in sheets.items() if fam == family}
+                          | {doc for _, doc in bundle_pages.rm_bundles(family).values()})
+        rows.append({"family": family, "source": "vrefint",
+                     **{c: "" for c in COLUMNS if c not in ("family", "source", "#",
+                                                            "confidence", "basis")},
+                     "confidence": "missing",
+                     "basis": "searched(" + "+".join(searched) + ")"})
+
+    for family in sorted({r["family"] for r in rows}):
+        enables = enable_fields(family)
+        for row in rows:
+            if row["family"] == family and row["source"] in enables and row["confidence"] != "missing":
+                register, field, bit, confidence, basis = enables[row["source"]]
+                row.update({"enable_register": register, "enable_field": field,
+                            "enable_bit": bit, "enable_confidence": confidence})
+                row["basis"] += "+" + basis
+    rows = sorted(rows, key=lambda r: (r["family"], r["source"]))
 
     dest = paths.table("adc_internal", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows({**{c: "" for c in COLUMNS}, **row, "#": "#"} for row in rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

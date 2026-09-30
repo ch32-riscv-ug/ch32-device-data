@@ -137,7 +137,12 @@ def main() -> int:
                 continue
             lo = (mask & -mask).bit_length() - 1
             hi = mask.bit_length() - 1
-            bit = f"{lo}" if lo == hi else f"{hi}:{lo}"
+            # **`hi:lo` は連続した範囲のときだけ。** `RCC_AHBPeriph_BLE_CRC`（V20x）は
+            # `0x30040`＝bit 17・16・6 を一度に立てるので範囲ではない。`17:6` と書くと
+            # 間の bit 7〜15 まで含むように読める。連続でなければ空にし、`mask` を正とする
+            # （`registers.bits` と同じ約束）。
+            contiguous = mask == ((1 << (hi + 1)) - 1) ^ ((1 << lo) - 1)
+            bit = f"{lo}" if lo == hi else (f"{hi}:{lo}" if contiguous else "")
             confidence, basis = "reference", [f"evt({rcc_h.name}+{dev_h.name})"]
             stem = name
             for evt_name, rm_name in RM_ALIAS.items():

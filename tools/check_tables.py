@@ -232,6 +232,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "debug_wiring": ("extract_debug_wiring.py", "COLUMNS"),
     "device_id_addresses": ("build_device_ids.py", "ADDRESS_COLUMNS"),
     "device_ids": ("build_device_ids.py", "ID_COLUMNS"),
+    "esig": ("extract_esig.py", "COLUMNS"),
     "dma_requests": ("extract_dma_requests.py", "COLUMNS"),
     "documents": ("build_documents.py", "DOCUMENT_COLUMNS"),
     "errata": ("build_tables.py", "ERRATA_COLUMNS"),
@@ -1044,6 +1045,27 @@ def index_checks(t: dict) -> list[str]:
                     and int(r["complement_address"], 16) != addr + 1):
                 bad.append(f"option_bytes: {family} 0x{addr:08X} の補数が隣でない")
 
+    # esig: **全 family に FLACAP と UNIID1..3 の4行**（R-35）。番地は hex、FLACAP は KiB、
+    # UID の3語は FLACAP の後ろに 4 byte ずつ並ぶ（どの RM もそう書く。崩れたら表の読み違い）。
+    esig: dict[str, dict[str, dict]] = collections.defaultdict(dict)
+    for r in t["esig"]:
+        if r["family"] not in families:
+            bad.append(f"esig: {r['family']} が families.csv に無い")
+        if r["register"] in esig[r["family"]]:
+            bad.append(f"esig: {r['family']} {r['register']} が2行ある")
+        esig[r["family"]][r["register"]] = r
+        if not re.fullmatch(r"0x[0-9a-f]{8}", r["address"]):
+            bad.append(f"esig: {r['family']} {r['register']} の番地 {r['address']!r} が hex でない")
+    for family in sorted(families):
+        got = esig.get(family, {})
+        if set(got) != {"FLACAP", "UNIID1", "UNIID2", "UNIID3"}:
+            bad.append(f"esig: {family} の行が FLACAP/UNIID1..3 でない（{sorted(got)}）")
+            continue
+        if got["FLACAP"]["unit"] != "KiB" or got["FLACAP"]["width_bits"] != "16":
+            bad.append(f"esig: {family} の FLACAP が 16 bit・KiB でない")
+        base = int(got["UNIID1"]["address"], 16)
+        if [int(got[f"UNIID{i}"]["address"], 16) - base for i in (1, 2, 3)] != [0, 4, 8]:
+            bad.append(f"esig: {family} の UNIID1..3 が 4 byte ずつ並んでいない")
     # device_id_addresses: **全familyに1行**（gap familyの読み出し番地こそR-28の
     # 依頼内容）・memory_mapがCHIPID行を持つfamilyとは番地一致（EVTの別ファイル
     # どうしの相互検査）。

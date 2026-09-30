@@ -152,6 +152,7 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("adc_internal", ["pipeline/extract/datasheet/extract_adc_internal.py"]),
             ("device_id_addresses + device_ids",
              ["tools/build_device_ids.py"]),
+            ("esig", ["pipeline/extract/rm/extract_esig.py"]),
         ] + ([
             # 退役 第9号（2026-09-09）。**`--full` のときだけ**走らせる——この5本は
             # 12 family の RM を丸ごと読むので合わせて約20分かかり、「既定は速い

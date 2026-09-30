@@ -97,7 +97,7 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・`clock_configs`・`clock_prescalers`・
 `clock_sources`・`clock_symbols`・`clock_init`・`clock_enables`・`pin_alternate`。
 RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
-`device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`。
+`device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`esig`。
 
 写しで落とした列（内部の記録）: `products` の packing の列、`clock_configs` の一致した EVT 写しの数、
 `operating_conditions` の datasheet 名（`basis` にある）。

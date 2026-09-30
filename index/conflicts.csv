@@ -1,6 +1,6 @@
 table,family,series,part_number,subject,field,kept,dissenting,alternative,#,basis
-adc_internal,CH32V20x,,,family=CH32V20x source=temperature_sensor channel=16,,,CH32V203DS0.PDF:en,,#,CH32V203DS0.PDF:zh(p.48)+!CH32V203DS0.PDF:en
-adc_internal,CH32V307,,,family=CH32V307 source=temperature_sensor channel=16,,,CH32V20x_30xDS0.PDF:en,,#,CH32V20x_30xDS0.PDF:zh(p.80)+!CH32V20x_30xDS0.PDF:en
+adc_internal,CH32V20x,,,family=CH32V20x source=temperature_sensor channel=16,,,CH32V203DS0.PDF:en,,#,CH32V203DS0.PDF:zh(p.48)+!CH32V203DS0.PDF:en+rm-enable(CH32FV2x_V3xRM.PDF:zh)+rm-enable(CH32FV2x_V3xRM.PDF:en)
+adc_internal,CH32V307,,,family=CH32V307 source=temperature_sensor channel=16,,,CH32V20x_30xDS0.PDF:en,,#,CH32V20x_30xDS0.PDF:zh(p.80)+!CH32V20x_30xDS0.PDF:en+rm-enable(CH32FV2x_V3xRM.PDF:zh)+rm-enable(CH32FV2x_V3xRM.PDF:en)
 clock_symbols,CH32V003,,,family=CH32V003 symbol=FLASH_ACTLR_LATENCY role=mask,,,evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0]),,#,evt(device-header+system_ch32*.c)+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])
 clock_symbols,CH32V006,,,family=CH32V006 symbol=FLASH_ACTLR_LATENCY role=mask,,,evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0]),,#,evt(device-header)+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])
 clock_symbols,CH32V103,,,family=CH32V103 symbol=FLASH_ACTLR_LATENCY role=mask,,,evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0]),,#,evt(device-header+system_ch32*.c)+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])

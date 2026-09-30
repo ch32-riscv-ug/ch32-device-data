@@ -3,7 +3,7 @@
 [English](README.md)
 
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
-42 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
+43 表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
 `PA0-WKUP` と装飾ごと持ちます。資料どうしが食い違えば値を直さず `conflict` にして両方を残します。
 **引く**ための表（語彙で揃えた名前・結合済み・型番ごとに割ったもの）は
@@ -225,7 +225,7 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 
 ### `adc_internal.csv`
 
-**`temperatureRead()`相当のAPIの前提**です。温度センサと内部参考電圧が**ADCのどのチャネルか**はfamilyで違い、温度センサを持たないfamilyもあります（V003/V006/M030/X035/X315は`vrefint`行のみ）。
+**`temperatureRead()`相当のAPIの前提**です。温度センサと内部参考電圧が**ADCのどのチャネルか**はfamilyで違い、温度センサを持たないfamilyもあります（V003/V006/X035/X315は`vrefint`行のみ）。**資料が内部参考電圧を書かないfamilyにも`vrefint`行を置く**——値は空、`confidence=missing`、`basis=searched(<探した資料>)`（いまはCH32M030）。「資料に無い」と「読み落とし」を区別するため。
 
 | 列 | 意味 |
 |---|---|
@@ -236,6 +236,12 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 | `avg_slope_uv_c`（min/max） | 平均傾き（負温度係数。datasheetはmV/℃、ここはuV/℃） |
 | `vrefint_mv`（min/max） | 内部参考電圧 |
 | `temp_range_c` / `temp_error_c` | 測定範囲・誤差 |
+| `enable_register` / `enable_field` / `enable_bit` | そのチャネルを読む前に立てるビット。RM の ADC の field 表で、説明が「（温度传感器和）内部电压（V_REFINT）通道使能」で始まる field——多くの family は `CTLR2.TSVREFE` bit 23（温度と VREFINT の両方）、X315 は `CTLR2.VREFE`（VREFINT だけ）。**空＝RM の ADC レジスタにそのビットが無い**（X035/V003/V006 は両版とも `CTLR2[31:23]` が Reserved）。2026-10-01 に追加（R-35） |
+| `enable_confidence` | 有効化ビットだけの確度。RM の両版が同じ field・bit を言えば `confirmed`、片方しか読めなければ `reference`（V103 は en 版の CTLR2 表が読めない）。`basis` に `rm-enable(<RM>:<言語>)` が付く |
+
+`vrefint_mv` が空で `vrefint_mv_min`/`_max` が埋まっている行は、datasheet の表が最小・最大の2列だけのもの（CH32V103）。
+
+**内部参考電圧の工場校正値は、12 family のどの datasheet・RM にも書かれていない**（2026-10-01 に探した）。なのでこの表に校正値の番地の列は無い。
 
 出所はdatasheetの散文（「温度传感器在内部被连接到IN16输入通道上」）と電気的特性の表（`温度传感器特性`・`内置参考电压`）。英語版に同じ表があるので数値が一致すればconfirmed。**V003とX035はdatasheetがチャネル番号を書かず、RMのADC章が書く**（`连接ADC_IN8通道`/`ADC_IN15`）ので、そこはRMから取って`basis`に書いています。
 
@@ -582,6 +588,10 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 （V205/V407/X315は`0x1ffff704`、M030だけ独自の`0x1ffff384`）。`check_tables`が
 `memory_map.csv`のCHIPID領域（ある家系）と、`device_ids.csv`全行の`id_addr`と
 突き合わせる。
+
+### `esig.csv`
+
+**flash 容量と 96 bit の UID を読む番地**（依頼 R-35: `getFlashChipSize()`・チップ ID）。RM の電子署名（ESIG）の章の表から、1行1（family, register）: `FLACAP`（16 bit、flash 容量、単位 KiB）と `UNIID1`〜`UNIID3`（32 bit の語が3つ、`UNIID1` が下位）。工場で書かれる読み出し専用の語で EVT の構造体が無いので `registers`/`register_map` には現れない。幅は `R16_`/`R32_` の接頭辞、単位は field の説明（`以Kbyte为单位` / `in unit of Kbyte`）から。RM の両版を読み、番地と幅が一致すれば `confirmed`（いまは48行すべて）。**CH32M030 だけ `0x1ffff3a0` 起点**、他の family は `0x1ffff7e0`。`check_tables` は全 family に4行、`FLACAP` が 16 bit・KiB、UID の3語が 4 byte 間隔であることを見る。
 
 ### `device_ids.csv`
 
@@ -1036,6 +1046,7 @@ uv run pipeline/extract/manual/extract_debug_data.py  # debug_data（EVTのdebug
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）
+uv run pipeline/extract/rm/extract_esig.py      # esig（RMの電子署名の表を両版、bundleから。数秒）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run pipeline/extract/images/run_extract_images.py  # 各repoのimage/（凍結toolを原本hashゲート経由で。数分かかる）
