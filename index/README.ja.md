@@ -169,7 +169,7 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 ### `registers.csv` — family × 型 × register × field
 
 1行1（register, bit define）。`evidence/registers`（構造体の offset）に `evidence/register_fields`
-（bit define）を並べたもの。field を持たない register も1行（`field` 空）。
+（bit define）を並べたもの。field を持たない register も1行（`field` 空）。`access`/`reset` は RM 中文版の field 表から名前で引いたもの。`access_confidence`/`access_basis` は英語版が同じ語を刷っているかを言う（`conflict` は `conflicts.csv` にも並ぶ）。RM の access の語と、定義に無い語を刷る16 field は証拠の README に。
 
 **`register` はヘッダの綴りのままなので、同じレジスタが family で違う綴りになる。** AFIO の EXTI 設定は
 多くの family で配列 `EXTICR[0]`〜`EXTICR[3]`（X035 は `[0]`/`[1]`）、V003/V006/M030 は1メンバーの
@@ -252,7 +252,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 ### `conflicts.csv` — 資料どうしの食い違い
 
 `tools/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
-（183行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
+（209行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
 「両版で食い違う仕様を全部」に答えるには全表を grep するしかありませんでした。
 
 | 列 | 中身 |
@@ -262,7 +262,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 | `dissenting` | `basis` で `!` が付いている出所 |
 | `alternative` | その出所が言う値（`basis` の `(=…)`） |
 
-**107行に相手の値が入り、76行は空**です。`memory_configs`（67行）と `timers`（1行）は
+**133行に相手の値が入り、76行は空**です。`memory_configs`（67行）と `timers`（1行）は
 食い違いを散文で記録していて DSL に持たないので、空欄は「[evidence/README.ja.md](../evidence/README.ja.md)
 の該当節を読め」の意味になります。
 

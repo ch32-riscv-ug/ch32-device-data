@@ -168,7 +168,10 @@ one member `EXTICR` on V003/V006/M030, and two members `EXTICR1`/`EXTICR2` on H4
 to find "the k-th word" of such a register, order the rows of that `type` by `offset`. `field` is the
 readable name, `define` the EVT spelling (`RCC_APB2PCENR_USART1EN`). Rows with an empty
 `offset` are defines whose banner could not be tied to a struct member (911). `access` /
-`reset` come from the reference manual where the bit position matched (`confirmed`).
+`reset` come from the reference manual's field table (Chinese edition), matched by name.
+`access_confidence`/`access_basis` say whether the English edition prints the same term
+(`conflict` rows are also in `conflicts.csv`); see the evidence README for the manual's access terms
+and the 16 fields that print an undefined one.
 
 **Where the header and the manual put a field at different bits and a bench measurement has
 settled it, this index takes the measured position** (`bits`/`mask`), while the row keeps
@@ -231,7 +234,7 @@ rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree
 
-One row per `conflict` mark anywhere in `catalog/` and `evidence/` (183 today), by
+One row per `conflict` mark anywhere in `catalog/` and `evidence/` (209 today), by
 `tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
 keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
 "show me every spec the two editions disagree on" meant grepping all of them.
@@ -243,7 +246,7 @@ keeps both and marks the row `conflict`. Those marks were spread over eleven tab
 | `dissenting` | the sources marked `!` in `basis` |
 | `alternative` | what those sources state, from `(=...)` in `basis` |
 
-**107 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
+**133 rows carry an alternative and 76 do not.** `memory_configs` (67) and `timers` (1) record
 their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
 table's section of [evidence/README.md](../evidence/README.md)".
 

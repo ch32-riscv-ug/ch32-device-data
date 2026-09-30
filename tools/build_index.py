@@ -63,7 +63,8 @@ ROUTES_COLUMNS = ["series", "selector", "controller", "register", "bits", "value
                   "signal", "pad", "port", "gpio", "#", "confidence", "basis"]
 REGISTERS_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
                      "field", "define", "kind", "of_field", "bits", "mask", "value",
-                     "description", "access", "reset", "#", "confidence", "basis"]
+                     "description", "access", "reset", "#", "confidence", "basis",
+                     "access_confidence", "access_basis"]
 MAP_COLUMNS = ["family", "block", "type", "register", "address", "offset", "width_bits",
                "count", "#", "confidence", "basis"]
 DMA_COLUMNS = ["family", "variant", "dma", "channel", "request_id", "peripheral", "request",
@@ -289,6 +290,8 @@ def registers_rows(registers: list[dict], fields: list[dict]) -> list[dict]:
                      "of_field": f["of_field"], "bits": bits, "mask": mask,
                      "value": f["value"], "description": f["description"],
                      "access": f["rm_access"], "reset": f["rm_reset"],
+                     "access_confidence": f["rm_access_confidence"],
+                     "access_basis": f["rm_access_basis"],
                      "confidence": f["confidence"], "basis": f["basis"]})
     for key, reg in regs.items():
         if key not in used:

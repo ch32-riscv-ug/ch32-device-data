@@ -231,7 +231,7 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 |---|---|
 | `source` | `temperature_sensor` / `vrefint` / `vdd_half` |
 | `channel` | ADC_INの番号 |
-| `sample_time` / `sample_time_unit` | 読むときに必要なサンプル時間。**単位がfamilyで違う**（`us`または`adc_cycles`=ADCクロック周期数）ので揃えず両方持つ。`sample_clock_mhz`は`us`のときの条件 |
+| `sample_time` / `sample_time_unit` | 読むときに必要なサンプル時間。**単位がfamilyで違う**（`us`または`adc_cycles`=ADCクロック周期数）ので揃えず両方持つ。`sample_clock_mhz`は`us`のときの条件。表が値を2つ刷るとき（V006 `3 240`・V003 `3 500`・V103 `0.107 17.1`）は2つ目＝最大（推奨の遅いサンプリング）を採る |
 | `v25_mv`（min/max） | 25℃での温度センサ出力 |
 | `avg_slope_uv_c`（min/max） | 平均傾き（負温度係数。datasheetはmV/℃、ここはuV/℃） |
 | `vrefint_mv`（min/max） | 内部参考電圧 |
@@ -275,6 +275,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
 | `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（548）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
 | `registers` | family × 型 × register 4,936行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
 | `register_fields` | family × register × bit define 33,365行（field 24,792・value 8,573） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。fieldの27.5%（6,829）がRMとbit位置一致、38がconflict |
+**`rm_access` とその確度**（2026-10-01 に追加）。`rm_access` は RM 中文版の「访问」欄を印刷どおりに写したもの。どの RM も冒頭で語を定義する: `RO` 読み出し専用（ハードが変える）、`RZ` 読むと 0 に戻る、`WO` 書き込み専用、`WA` Safe モードで書ける、`WZ` 書くと自動で 0、`RW`、`RWA` Safe モードで読み書き、`RW1` 1 の書き込みが有効、`RW0` 0 の書き込みが有効、`RW1Z` 1 を書くと消える。**定義に無い語を刷っている field が16ある**（`W1` 7・`W0` 4・`RWO` 4・`R0` 1。多くは `0` と `O` の取り違えで、L103 `FWAKE_FLAG` は `RWO` と刷りながら説明は「写0清零」）。印刷どおりに残し、`check_tables.KNOWN_ACCESS_MISPRINTS` が名前で固定する。`rm_access_confidence`/`rm_access_basis` は英語版 RM と照合した結果: `confirmed` 両版一致（6,090）、`conflict` 食い違い（26。`rm_access_basis` に `!<RM>:en(=X)`、`index/conflicts.csv` に `field=rm_access` で並ぶ）、`reference` 英語版の field が読めない（757）。行の `confidence`/`basis` は従来どおり bit 位置の確度。英語版の欄には説明の文字が落ちることがある（`RW t`・`1 0 RW0 o a`）ので、定義の語か既知の誤植がちょうど1つあるときだけ数える。
 
 導出の **layout key**（family × 型 → 構造体の形のハッシュ。同じkeyのfamilyは同じレジスタ定義を共有できる）は索引の[`index/register_layouts.csv`](../index/README.ja.md)にあります。register×fieldを結合して絶対番地を付けた引き口も索引（`index/registers.csv`・`index/register_map.csv`）です。
 

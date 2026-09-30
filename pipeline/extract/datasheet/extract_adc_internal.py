@@ -96,7 +96,12 @@ ERROR = re.compile(rf"温度传感器的测量误差\s+±{NUM}\s+℃")
 # **典型值の列を持たない表がある**（CH32V103DS0 表3-5 は `最小值 最大值` だけ＝`1.12 1.28 V`）。
 # 真ん中の数は任意にし、無ければ typ は空（min・max だけを採る）。3つ並ぶ表は従来どおり3つ取る。
 VREF = re.compile(rf"内置参考电压[^\n]*?{NUM}\s+(?:{NUM}\s+)?{NUM}\s+V\b")
-T_VREF = re.compile(rf"建议慢速采样\s+{NUM}(?:\s+{NUM})?\s+(us|1/f)")
+# **「建议慢速采样」を書かない表がある**（V003 `T 3 500 1/f S_vrefint`、V20x/V307 `T 17.1 us`、
+# V407 `T 8 us`、X315 `T 3.6 us`）。どの版面でも記号の `T` と添字の `S_vrefint` が値と単位を
+# 挟むので、そこで当てる。数が2つ並ぶ表（V006 `3 240`・V003 `3 500`）は2つ目＝最大（推奨の遅い
+# サンプリング）を採る——従来の規則のまま。
+T_VREF = re.compile(rf"(?:建议慢速采样\s+{NUM}(?:\s+{NUM})?\s+(us|1/f)"
+                    rf"|\bT\s+{NUM}(?:\s+{NUM})?\s+(us|1/f)\s+S_vrefint)")
 # RM の ADC 章。datasheet がチャネル番号を書かない family の逃げ道。
 RM_VREF = re.compile(r"内部参考电压[：:][^。\n]{0,10}?ADC\d?_IN\s*(\d+)")
 RM_TEMP = re.compile(r"温度传感器[：:][^。\n]{0,10}?ADC\d?_IN\s*(\d+)")
@@ -258,6 +263,8 @@ def main() -> int:
             confidence, basis = judged("vref")
             basis += rm_basis if "ch_vref" in zh and rm_basis else ""
             vref, t = zh.get("vref"), zh.get("t_vref")
+            if t:
+                t = t[:3] if t[2] else t[3:]  # どちらの形で当たったか
             rows.append({
                 "family": family, "source": "vrefint",
                 "channel": zh.get("ch_vref", ""),
