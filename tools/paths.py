@@ -47,7 +47,7 @@ EVIDENCE_TABLES = (
     "interrupts", "memory_map", "systick", "clock_configs", "clock_prescalers",
     "clock_sources", "clock_symbols", "clock_init", "evt_variants", "debug_data",
     "debug_wiring", "option_bytes", "option_byte_fields",
-    "device_id_addresses", "device_ids", "pin_conditions", "figures",
+    "device_id_addresses", "device_ids", "pin_conditions", "figures", "esig",
 )
 
 # Index tables: one combined file each (all parts / all families). People filter
@@ -72,7 +72,7 @@ PUBLISHED: dict[str, tuple[str, ...]] = {
     "flash_geometry": (), "flash_program_method": (), "adc_internal": (), "debug_data": (),
     # evidence published on request (R-33, R-34)
     "device_ids": (), "option_bytes": (), "option_byte_fields": (), "register_blocks": (),
-    "errata": (), "operating_conditions": ("datasheet",),
+    "errata": (), "operating_conditions": ("datasheet",), "esig": (),
 }
 assert not set(PUBLISHED) & set(INDEX_TABLES)
 

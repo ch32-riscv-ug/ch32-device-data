@@ -68,6 +68,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "option_byte_fields": ("option_byte_fields",),
     "device_id_addresses": ("device_id_addresses",),
     "device_ids": ("device_ids",),
+    "esig": ("esig",),
     "dma_requests": ("dma_requests",),
     "interrupts": ("interrupts",),
     "memory_map": ("memory_map",),

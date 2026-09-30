@@ -107,7 +107,7 @@ Catalog: `families`, `series`, `products`, `packages`, `cores`.
 From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_configs`, `clock_prescalers`,
 `clock_sources`, `clock_symbols`, `clock_init`, `clock_enables`, `pin_alternate`.
 Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
-`device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`.
+`device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`.
 
 Columns left out of the copies (internal bookkeeping): `products` drops its packing columns,
 `clock_configs` drops the count of agreeing EVT copies, `operating_conditions` drops the datasheet name

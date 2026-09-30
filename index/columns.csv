@@ -1,7 +1,7 @@
 table,column,meaning,format,empty
 adc_internal,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty
 adc_internal,source,Internal ADC source the row describes.,enum(temperature_sensor|vdd_half|vrefint),never empty
-adc_internal,channel,ADC input channel number (ADC_IN n) the internal source is connected to.,integer,never empty
+adc_internal,channel,ADC input channel number (ADC_IN n) the internal source is connected to.,integer,the sources state no such source for the family (`confidence` = missing)
 adc_internal,sample_time,"Sample time needed when reading this source, in `sample_time_unit`.",decimal,not stated by the sources
 adc_internal,sample_time_unit,Unit of `sample_time` (`us` or `adc_cycles` = ADC clock cycles); not normalised because it differs per family.,enum(adc_cycles|us),not stated by the sources
 adc_internal,sample_clock_mhz,"ADC clock in MHz that the sample time assumes, when the unit is `us`.",integer,"not stated, or not applicable (unit is not `us`)"
@@ -11,13 +11,17 @@ adc_internal,v25_mv_max,"Temperature sensor output at 25 C, maximum, in mV.",int
 adc_internal,avg_slope_uv_c,"Temperature sensor average slope, typical, in uV per degree C (negative temperature coefficient).",integer,not applicable (not the temperature sensor) or not stated
 adc_internal,avg_slope_uv_c_min,"Temperature sensor average slope, minimum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated
 adc_internal,avg_slope_uv_c_max,"Temperature sensor average slope, maximum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated
-adc_internal,vrefint_mv,"Internal reference voltage, typical, in mV.",integer,not applicable (not vrefint) or not stated
+adc_internal,vrefint_mv,"Internal reference voltage, typical, in mV.",integer,"not applicable (not vrefint), or the datasheet gives only min and max"
 adc_internal,vrefint_mv_min,"Internal reference voltage, minimum, in mV.",integer,not applicable (not vrefint) or not stated
 adc_internal,vrefint_mv_max,"Internal reference voltage, maximum, in mV.",integer,not applicable (not vrefint) or not stated
 adc_internal,temp_range_c,"Temperature sensor measurement range in degrees C, written `lo..hi`.",text,not stated by the sources
 adc_internal,temp_error_c,Temperature sensor measurement error in degrees C.,integer,not stated by the sources
+adc_internal,enable_register,ADC register holding the bit that must be set before this internal channel reads anything (from the reference manual's ADC field table).,name,the reference manual's ADC registers have no enable bit for this channel
+adc_internal,enable_field,Name of that enable bit (`TSVREFE` enables the temperature sensor and VREFINT together; `VREFE` enables VREFINT only).,name,the reference manual's ADC registers have no enable bit for this channel
+adc_internal,enable_bit,Bit position of that enable bit in `enable_register`.,integer,the reference manual's ADC registers have no enable bit for this channel
+adc_internal,enable_confidence,Confidence of the enable bit alone: confirmed = both language editions of the reference manual name the same field and bit; reference = only one edition could be read.,enum(confirmed|reference),no enable bit
 adc_internal,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty
-adc_internal,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty
+adc_internal,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction; missing = no datasheet or reference manual of the family states this source (`basis` lists the documents searched).",enum(confirmed|conflict|missing|reference),never empty
 adc_internal,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty
 capabilities,part_number,Orderable part number; joins products.part_number.,name,never empty
 capabilities,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty
@@ -52,7 +56,7 @@ clock_enables,bus,"Bus name as the family's EVT spells it (AHB/APB1/APB2, HB/PB1
 clock_enables,register,RCC clock-enable register the bus name maps to (`<bus>PCENR`).,enum(AHBPCENR|APB1PCENR|APB2PCENR|HB1PCENR|HB2PCENR|HBPCENR|PB1PCENR|PB2PCENR),never empty
 clock_enables,offset,Offset of the enable register within RCC.,hex,never empty
 clock_enables,address,Absolute address of the enable register.,hex,never empty
-clock_enables,bit,Bit position of the enable bit in the register (one row reads `17:6` where the macro's mask is not a single bit).,bits,never empty
+clock_enables,bit,"Bit position of the enable bit in the register, `hi:lo` for a contiguous multi-bit mask.",bits,the macro sets bits that are not contiguous (read `mask`)
 clock_enables,mask,Mask of the enable bit(s) as the EVT constant defines it.,hex,never empty
 clock_enables,macro,EVT constant passed to `RCC_<bus>PeriphClockCmd()` for this peripheral.,name,never empty
 clock_enables,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty
@@ -161,6 +165,15 @@ errata,description,"What the erratum says (lot-dependent behaviour or hardware c
 errata,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty
 errata,description_confidence,"Confidence of `description`: confirmed when the page is recorded in both language datasheets: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty
 errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty
+esig,family,Family key; joins catalog families.family.,name,never empty
+esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the 96-bit unique ID, `UNIID1` lowest).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty
+esig,address,Absolute address to read the register at (factory-programmed system area; CH32M030 uses a different base).,hex,never empty
+esig,width_bits,"Register width in bits, from the `R16_`/`R32_` prefix.",integer,never empty
+esig,unit,"Unit of the value read: `KiB` for `FLACAP` (flash capacity in Kbytes, per the field description).",enum(KiB),no unit (a raw ID word)
+esig,description,English description from the English edition's register list.,text,the English edition's register list gives none
+esig,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty
+esig,confidence,Confidence of the row: confirmed = both language editions give the same address and width; reference = only one edition; conflict = the editions disagree.,enum(confirmed),never empty
+esig,basis,Reference-manual pages the row was read from (`<document>:<lang>(p.N)`); `unit(...)` gives the pages whose field description states the unit.,text,never empty
 evt_variants,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty
 evt_variants,macro,EVT compile-time variant macro (e.g. `CH32V20x_D8W`).,name,never empty
 evt_variants,part_number,Orderable part number; joins products.part_number.,name,never empty

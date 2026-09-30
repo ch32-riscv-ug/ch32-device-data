@@ -3,7 +3,7 @@
 [日本語](README.ja.md)
 
 **What the documents say**, copied row by row with its basis (`basis`) and confidence (`confidence`)
-attached -- 42 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
+attached -- 43 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
 `pin_functions.signal` varies between `TX1` / `UTX` / `USART1_TX` exactly as the documents do, and `pad` keeps
 decorations such as `PA0-WKUP`. When documents disagree, the value is not corrected; the row is marked `conflict` and both are kept.
 The tables **to look things up in** (names normalised through the vocabulary, joined, split per part number) are in
@@ -226,7 +226,7 @@ Cross-checked against the RM register tables (`USBPDEN` in `RCC_HBPCENR`): **370
 
 ### `adc_internal.csv`
 
-**The premises for a `temperatureRead()`-style API.** **Which ADC channel** the temperature sensor and the internal reference voltage are on differs per family, and some families have no temperature sensor (V003/V006/M030/X035/X315 have a `vrefint` row only).
+**The premises for a `temperatureRead()`-style API.** **Which ADC channel** the temperature sensor and the internal reference voltage are on differs per family, and some families have no temperature sensor (V003/V006/X035/X315 have a `vrefint` row only). **A family whose documents state no internal reference voltage still gets a `vrefint` row**, with empty values, `confidence=missing` and `basis=searched(<documents>)` (CH32M030 today), so "not in the documents" is distinguishable from "not extracted".
 
 | Column | Meaning |
 |---|---|
@@ -237,6 +237,12 @@ Cross-checked against the RM register tables (`USBPDEN` in `RCC_HBPCENR`): **370
 | `avg_slope_uv_c` (min/max) | Average slope (negative temperature coefficient. The datasheet uses mV/℃; here uV/℃) |
 | `vrefint_mv` (min/max) | Internal reference voltage |
 | `temp_range_c` / `temp_error_c` | Measurement range and error |
+| `enable_register` / `enable_field` / `enable_bit` | The bit that must be set before the channel reads anything, from the RM's ADC field table: the field whose description starts "(temperature sensor and) internal voltage (V_REFINT) channel enable" -- `CTLR2.TSVREFE` bit 23 on most families (temperature sensor and VREFINT together), `CTLR2.VREFE` on X315 (VREFINT only). **Empty = the RM's ADC registers have no such bit** (X035/V003/V006: `CTLR2[31:23]` is Reserved in both editions). Added 2026-10-01 (R-35) |
+| `enable_confidence` | The enable bit's own confidence: `confirmed` when both RM editions name the same field and bit, `reference` when only one could be read (V103: the English edition's CTLR2 table is not read). `basis` gains `rm-enable(<RM>:<lang>)` |
+
+A `vrefint_mv` that is empty while `vrefint_mv_min`/`_max` are filled means the datasheet table has only the min and max columns (CH32V103).
+
+**No factory calibration value for the internal reference voltage is stated** in any datasheet or reference manual of the 12 families (searched 2026-10-01), so this table has no calibration-address column.
 
 The sources are the datasheet prose ("温度传感器在内部被连接到IN16输入通道上") and the electrical characteristics tables (`温度传感器特性`, `内置参考电压`). The English edition has the same tables, so matching numbers give confirmed. **For V003 and X035 the datasheet does not give the channel number; the RM ADC chapter does** (`连接ADC_IN8通道` / `ADC_IN15`), so those are taken from the RM and noted in `basis`.
 
@@ -600,6 +606,10 @@ families have a row, **including the ones third-party databases lack** (V205 /
 V407 / X315 at `0x1ffff704`, and M030 at its own `0x1ffff384`). `check_tables`
 cross-checks the address against `memory_map.csv`'s CHIPID region where one
 exists, and against every `device_ids.csv` row's `id_addr`.
+
+### `esig.csv`
+
+**Where to read the flash size and the 96-bit unique ID** (request R-35: `getFlashChipSize()`, chip ID). One row per (family, register) for the reference manual's electronic-signature chapter: `FLACAP` (16-bit, flash capacity in KiB) and `UNIID1`..`UNIID3` (three 32-bit words, `UNIID1` lowest). These are factory-programmed read-only words with no EVT struct, so they are not in `registers`/`register_map`. The width comes from the `R16_`/`R32_` prefix, the unit from the field description (`以Kbyte为单位` / `in unit of Kbyte`). Both RM editions are read: same address and width = `confirmed` (all 48 rows today). **CH32M030's block starts at `0x1ffff3a0`**; every other family at `0x1ffff7e0`. `check_tables` requires the four rows for every family, `FLACAP` at 16 bit in KiB, and the UID words 4 bytes apart.
 
 ### `device_ids.csv`
 
@@ -1074,6 +1084,7 @@ uv run pipeline/extract/manual/extract_debug_data.py  # debug_data (defines in E
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
 uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)
+uv run pipeline/extract/rm/extract_esig.py      # esig (the RM's electronic-signature table, both editions, from the bundles; seconds)
 uv run tools/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
 uv run tools/build_readme.py                    # generated/readme/*.md (README for each family)
 uv run pipeline/extract/images/run_extract_images.py  # image/ in each repo (frozen tool via the source-hash gate; takes a few minutes)
