@@ -242,6 +242,8 @@ Cross-checked against the RM register tables (`USBPDEN` in `RCC_HBPCENR`): **370
 
 A `vrefint_mv` that is empty while `vrefint_mv_min`/`_max` are filled means the datasheet table has only the min and max columns (CH32V103).
 
+**Calibrate before enabling the channel.** The RM of V20x/V30x and H417 notes under `ADC_CTLR1.BUFEN` (both editions): setting `TSVREFE` (or `TKENABLE`) turns the input buffer on and it cannot be turned off, so the ADC calibration (`RSTCAL`/`CAL`) must run before `TSVREFE` is set, with the buffer off. The L103 RM has the same `BUFEN`/`PGA` fields but not the note. Not a column: it is an ordering rule, not a value.
+
 **No factory calibration value for the internal reference voltage is stated** in any datasheet or reference manual of the 12 families (searched 2026-10-01), so this table has no calibration-address column.
 
 The sources are the datasheet prose ("温度传感器在内部被连接到IN16输入通道上") and the electrical characteristics tables (`温度传感器特性`, `内置参考电压`). The English edition has the same tables, so matching numbers give confirmed. **For V003 and X035 the datasheet does not give the channel number; the RM ADC chapter does** (`连接ADC_IN8通道` / `ADC_IN15`), so those are taken from the RM and noted in `basis`.

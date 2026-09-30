@@ -241,6 +241,8 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行
 
 `vrefint_mv` が空で `vrefint_mv_min`/`_max` が埋まっている行は、datasheet の表が最小・最大の2列だけのもの（CH32V103）。
 
+**チャネルを有効にする前に校正する。** V20x/V30x と H417 の RM は `ADC_CTLR1.BUFEN` の注（両版）で、`TSVREFE`（または `TKENABLE`）を立てると入力 buffer が開いて閉じられないので、ADC の校正（`RSTCAL`/`CAL`）は `TSVREFE` を立てる前に buffer を閉じて行う、と書く。L103 の RM は同じ `BUFEN`/`PGA` を持つがこの注は無い。値ではなく順序の規則なので列にはしない。
+
 **内部参考電圧の工場校正値は、12 family のどの datasheet・RM にも書かれていない**（2026-10-01 に探した）。なのでこの表に校正値の番地の列は無い。
 
 出所はdatasheetの散文（「温度传感器在内部被连接到IN16输入通道上」）と電気的特性の表（`温度传感器特性`・`内置参考电压`）。英語版に同じ表があるので数値が一致すればconfirmed。**V003とX035はdatasheetがチャネル番号を書かず、RMのADC章が書く**（`连接ADC_IN8通道`/`ADC_IN15`）ので、そこはRMから取って`basis`に書いています。
