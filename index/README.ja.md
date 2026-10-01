@@ -79,6 +79,12 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
   `decimal`・`hex`・`bits`・`reg-bits`・`list(;)`・`list(,)`・`list(|)`・`url`・`path`・`marker`・`enum(a|b|...)`）、`empty`
   （空欄の意味）。`tools/check_tables.py` が実データと突き合わせる（全列を覆う・enum の値・integer/hex の形・`never empty`）ので、
   黙って古くなりません
+- **`columns.csv` の `spelling` は、その列の綴りを誰が決めるかを言います**: `fixed` はこの repository が決める
+  （目録の鍵、`routes.selector`・`operating_conditions.symbol` のような付けた識別子、`pinout.peripheral`/`role` の
+  ような正規化した語彙）——既存の値を改名するなら `VERSION` を上げるので、照合はこちらで。`as-printed` は
+  datasheet・RM・EVT ヘッダの綴りのまま（`pinout.signal`・`memory_map.region`・`clock_symbols.symbol`・
+  `operating_conditions.condition`）——資料に合わせるので、改版で `VERSION` を上げずに変わりえます。
+  `prose` は人が読む文で照合に使わない。空は値の列（数・番地・印）
 - **[`VERSION`](VERSION) は整数1つ。** consumer を壊しうる変更——列の削除・改名、列の書き方の変更、
   family などの鍵の改名——は先にこれを上げます。表・列・行を足すだけなら上げません。変更は
   [worklist](../docs/worklist.ja.md) とこの README に記録します

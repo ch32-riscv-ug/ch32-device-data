@@ -87,6 +87,13 @@ row.
   (`text`, `name`, `integer`, `decimal`, `hex`, `bits`, `reg-bits`, `list(;)`, `list(,)`, `list(|)`, `url`, `path`,
   `marker`, or `enum(a|b|...)`) and what an `empty` cell means. `tools/check_tables.py` checks it against the
   data (every column covered, enum values, integer/hex shapes, `never empty`), so it cannot silently go stale.
+- **`columns.csv` `spelling` says whose spelling a column carries**: `fixed` = chosen by this repository
+  (catalog keys, assigned identifiers such as `routes.selector` and `operating_conditions.symbol`, normalised
+  vocabulary such as `pinout.peripheral`/`role`); renaming an existing value raises `VERSION`, so match on
+  these. `as-printed` = the datasheet's, reference manual's or EVT header's own spelling (`pinout.signal`,
+  `memory_map.region`, `clock_symbols.symbol`, `operating_conditions.condition`); it follows the documents and
+  can change when one is revised, without a `VERSION` change. `prose` = text for people, not for matching.
+  Empty = a value column (numbers, addresses, markers).
 - **[`VERSION`](VERSION) is one integer.** A change that can break a consumer -- removing or renaming a
   column, changing how a column is written, renaming a family or another key -- raises it first. Adding
   tables, columns or rows does not. Changes are recorded in [docs/worklist.ja.md](../docs/worklist.ja.md)
