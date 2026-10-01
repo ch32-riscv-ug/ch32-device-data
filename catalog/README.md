@@ -105,7 +105,7 @@ either before or after generation, but **do not synchronise in the middle of gen
 
 One row per file that MounRiver currently calls the latest: the IDE (MounRiver Studio), the RISC-V
 toolchain (`MRS_Toolchain_*`) and the vendor chip-support packs -- the tools needed to build
-ArduinoCore-CH32. `.github/workflows/toolchains.yml` refetches it weekly.
+ArduinoCore-CH32RV. `.github/workflows/toolchains.yml` refetches it weekly.
 
 The versions are published only on <https://www.mounriver.com/download>, but that page is a Vue SPA
 whose content comes from a public JSON API (`https://api.mounriver.com/mountriver/api/version/…`).

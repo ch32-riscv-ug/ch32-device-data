@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """MounRiver Studio と MRS ツールチェーンの最新版 → catalog/toolchains.csv
 
-ArduinoCore-CH32 を建てるのに要る上流のツール（IDE・RISC-V ツールチェーン・ベンダの
+ArduinoCore-CH32RV を建てるのに要る上流のツール（IDE・RISC-V ツールチェーン・ベンダの
 チップ対応パック）は WCH/MounRiver 側の都合で更新される。どの版が最新かは
 <https://www.mounriver.com/download> にしか出ないが、あのページは Vue の SPA で、
 中身は公開 JSON API から来ている（ページ HTML の `window._CONFIG['domianURL']`）:

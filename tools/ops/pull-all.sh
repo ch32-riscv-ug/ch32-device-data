@@ -48,7 +48,7 @@ while IFS= read -r -d '' gitpath; do
     fi
     # **branchに乗っていない/upstreamが無いものは対象外**（失敗ではない）。
     # この入れ物にはこのリポジトリ自身の作業用checkout（`tools/ch32-device-data`・
-    # `ArduinoCore-CH32/.tools/ch32-device-data`）がdetached HEADで置かれていて、
+    # `ArduinoCore-CH32RV/.tools/ch32-device-data`）がdetached HEADで置かれていて、
     # pullは必ず失敗する。それをFAILEDに数えると**cronが毎回赤くなり読まれなくなる**。
     if ! git -C "$repo" symbolic-ref -q HEAD >/dev/null; then
         echo "  n/a: detached HEAD"

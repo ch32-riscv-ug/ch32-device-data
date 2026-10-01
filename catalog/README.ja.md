@@ -103,7 +103,7 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 ### `toolchains.csv` — 上流のツールの版
 
-**MounRiver が「いま最新」と言っている配布物**の一覧です。1行1ファイル。ArduinoCore-CH32 を
+**MounRiver が「いま最新」と言っている配布物**の一覧です。1行1ファイル。ArduinoCore-CH32RV を
 建てるのに要る IDE（MounRiver Studio）・RISC-V ツールチェーン（`MRS_Toolchain_*`）・
 ベンダのチップ対応パックが対象で、`.github/workflows/toolchains.yml` が毎週取り直します。
 

@@ -18,7 +18,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 |---|---|---|
 | wch-protocols | `index/` だけ。`index/manifest.csv` の sha256 で照合 | **なし**（手本になる読み方） |
 | ch32rv | 兄弟 path を `cargo xtask db-gen` が読み、生成物を commit。lock なし（生成物の頭に rev だけ） | `evidence/device_ids`・`option_bytes`・`option_byte_fields`（R-34） |
-| ArduinoCore-CH32 | lock（commit＋表ごとの sha256）。ただし bench の `regcheck.py` の分は lock の外 | `evidence/pins`・`pin_functions`・`register_blocks`・`register_fields`・`remap_fields`・`timers`・`errata`・`operating_conditions`（R-33） |
+| ArduinoCore-CH32RV（2026-10-01 に ArduinoCore-CH32 から改名） | lock（commit＋表ごとの sha256）。ただし bench の `regcheck.py` の分は lock の外 | `evidence/pins`・`pin_functions`・`register_blocks`・`register_fields`・`remap_fields`・`timers`・`errata`・`operating_conditions`（R-33） |
 
 外に出た理由は、契約が**表の名前の列挙**だったこと。「安定」印は evidence の中に混ざっていて、path を
 見ても契約の内か外か分からない。列挙も2つの README と `paths.STABLE_EVIDENCE` にあって、実際に
