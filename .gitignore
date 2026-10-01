@@ -19,7 +19,7 @@ build/
 *.out
 a.out
 
-# Locally fetched tools, the way ArduinoCore-CH32/.tools works. Not source:
+# Locally fetched tools, the way ArduinoCore-CH32RV/.tools works. Not source:
 # nothing here is fetched today (the extractors use the environment's cc), but
 # a vendored toolchain belongs here rather than in the tree.
 .tools/

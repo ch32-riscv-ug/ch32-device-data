@@ -51,7 +51,7 @@ MounRiver Studio の `mrs-vscode/out/extension.js` が、更新を促すダイ�
     WCH-LinkE (CH32V305)         82 0d 04 02 0c 12 00 → 2.12、型18 = wcfg 42（2.22）より古い
 
 型番号は `minichlink` の分岐（1=CH549 / 18=LinkE）とも `extension.js` の `g()` とも一致。
-ArduinoCore-CH32 の `docs/todo.ja.md` が記録する「CH549 のファーム 2.11 → 2.12 で
+ArduinoCore-CH32RV（旧 ArduinoCore-CH32）の `docs/todo.ja.md` が記録する「CH549 のファーム 2.11 → 2.12 で
 probe-rs の不具合が解消」も、2.11=31・2.12=32 として同じ式に載ります。
 
 実行:
