@@ -140,10 +140,10 @@ device_ids,part_number,Orderable part number; joins products.part_number.,name,n
 device_ids,device_id,32-bit device ID of the part (package variants differ in bits [19:16]).,hex,never empty,
 device_ids,id_addr,Address the device ID is read from.,hex,never empty,
 device_ids,dont_care_bits,"Bits of the ID to ignore when matching (silicon revision), written `[hi:lo]`.",text,never empty,fixed
-device_ids,id_source,Measurement channel of a real-silicon read (`memory` address read or `attach` probe response).,enum(memory|attach),"value imported from ch32-rs/ch32-data, not measured on silicon",fixed
+device_ids,id_source,Measurement channel of a real-silicon read (`memory` address read or `attach` probe response).,enum(memory|attach),"documented or imported value, not measured on silicon",fixed
 device_ids,note,Remark on the ID format.,text,no remark,prose
 device_ids,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-device_ids,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
+device_ids,confidence,Confidence of the row: confirmed = documented ID corroborated by silicon measurement; reference = documented or imported ID without measurement.,enum(confirmed|reference),never empty,fixed
 device_ids,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
 dma,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
 dma,variant,EVT variant macros whose DMA configuration the row belongs to (CH32V20x/V30x).,list(|),same for every variant of the family,as-printed

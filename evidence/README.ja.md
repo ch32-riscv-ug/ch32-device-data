@@ -598,16 +598,17 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 
 ### `device_ids.csv`
 
-**型番ごとの32bit device_id**（packageの違いはbit[19:16]に出る）。
-**ch32-rs/ch32-data**（`data/chips/*.yaml`。cloneのcommitとfileをbasisに記録）
-から取り込んだ値は`reference`——第三者の機械可読DBは一次資料ではない。
-confirmedへ上がるのは実機読み（WCH-LinkE。basisは`device-id:wch-linke`——
-`debug_data`の`hartinfo:wch-linke`と同じ流儀）と突き合わせた行だけ。
-`id_source`は測定経路（`memory`＝番地読み／`attach`＝probe応答）で、取り込み
-行は空。`dont_care_bits`は`[7:4]`（silicon revision。ch32-dataのbit割り文書と
-probe-rsの照合maskが根拠）。目録に無いch32-dataの型番は**対応付けせずに見える
-形で落とす**——末尾のグレード桁だけ違うニアミスが複数ある
-（ch32-dataの`CH32V006F8P6` vs 目録の`CH32V006F8P7`等）。
+**型番ごとの32bit device_id**。第三者DB ch32-rs/ch32-dataの取り込みに加え、
+公式EVTの`DBGMCU_GetCHIPID`のChipID Listから未登録型番を補完する。
+照合は完全一致か末尾の温度グレード6/7の省略だけ。封装の接尾辞は推測しない。
+`basis`にmirrorのcommit、file、資料の型番表記とIDを残す。既存IDと食い違えば
+生成を止め、複数IDがある曖昧なEVT行は既存の取り込みだけを維持する。
+
+資料による登録は`reference`。`curated/device-ids-measured.json`のmemoryと
+AttachChip実測に一致した行のみ`confirmed`、`id_source=memory`にする。
+ID確認はflash書き込み検証を意味しない。`dont_care_bits`は`[7:4]`。
+ch32-data cloneが無い場合は`--reuse-ch32-data`で既存の取り込み行と出所を明示的に据え置く。
+104型番のうち101型番を収載。未登録はCH32M007K8U7、CH32V203C6U6、CH32X035D8U6。
 
 ### `link_firmware.csv`
 

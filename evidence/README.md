@@ -616,18 +616,20 @@ exists, and against every `device_ids.csv` row's `id_addr`.
 
 ### `device_ids.csv`
 
-**The 32-bit device_id per part number** (package variants differ in bits
-[19:16]). Values imported from **ch32-rs/ch32-data** (`data/chips/*.yaml`; the
-clone's commit and file are in `basis`) are `reference` -- a third-party
-machine-readable database is not a primary source. A row becomes `confirmed`
-only against a real-silicon read (WCH-LinkE; basis `device-id:wch-linke`, the
-same style as `debug_data`'s `hartinfo:wch-linke`); `id_source` records the
-measurement channel (`memory` address read / `attach` probe response) and is
-empty for imported values. `dont_care_bits` is `[7:4]` (silicon revision, per
-ch32-data's bit layout and probe-rs's match mask). ch32-data part numbers that
-are not in `catalog/products.csv` are dropped visibly, not remapped -- several
-differ from WCH's current catalog only in the trailing grade digit
-(`CH32V006F8P6` vs our `CH32V006F8P7`).
+**The 32-bit device_id per part number.** `tools/build_device_ids.py` imports
+ch32-rs/ch32-data and fills missing catalog entries from the official EVT
+`DBGMCU_GetCHIPID` ChipID List. EVT names match exactly or omit only the trailing
+temperature grade (6/7); package suffixes are never guessed. Source commit,
+file, documented name and ID are recorded in `basis`. Disagreeing IDs stop
+generation. Ambiguous multi-ID EVT entries retain only the existing import.
+
+Documented entries are `reference`; matching memory and AttachChip measurements
+from `curated/device-ids-measured.json` make a row `confirmed`, with
+`id_source=memory`. This verifies identity, not flash programming.
+`dont_care_bits` remains `[7:4]`. With no ch32-data clone,
+`--reuse-ch32-data` explicitly retains existing imported rows and provenance.
+The catalog has 101 IDs for 104 parts; the missing parts are CH32M007K8U7,
+CH32V203C6U6 and CH32X035D8U6. No ID is inferred from a sibling package.
 
 ### `link_firmware.csv`
 

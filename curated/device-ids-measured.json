@@ -1,0 +1,18 @@
+{
+  "_comment": "Identity-only measurements supplied by ch32rv requests 0007 and 0008. Mask revision bits [7:4]. Programming support is not implied.",
+  "verified": "2026-10-08",
+  "measured": {
+    "CH32V205RCT6": {
+      "attach_id": "0x20510510",
+      "memory_id": "0x20510510",
+      "id_addr": "0x1ffff704",
+      "evidence": "ch32rv/docs/data-requests/measured/device-id-v205-2026-10-08.md"
+    },
+    "CH32X315MCU6": {
+      "attach_id": "0x31500000",
+      "memory_id": "0x31500000",
+      "id_addr": "0x1ffff704",
+      "evidence": "ch32rv/docs/data-requests/measured/device-id-x315-2026-10-08.md"
+    }
+  }
+}
