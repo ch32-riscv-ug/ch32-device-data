@@ -519,10 +519,12 @@ mailbox 経由の printf が書く番地）。1行1 family。**番地は die で
 |---|---|
 | `evt(<debug.c>)` | 各 EVT の debug.c の `#define DEBUG_DATA0_ADDRESS ((volatile uint32_t*)0x…)`（SDI_Printf の実装）。family 内の全 debug.c で同じ値であることを見る（`+N more`） |
 | `manual:qingke-vN(dataaddr=0x380)` | QingKe プロセッサマニュアル debug 章の hartinfo 表。**V2（`0x0f4`）と V4（`0x380`）は固定値**、V3 と V5 は `0xXXX`＝「以具体读出为准」（実装ごとに hartinfo を読め）なので `dataaddr=read hartinfo` と書き、根拠には数えない |
-| `hartinfo:wch-linke(consumer 2026-08-26)` | consumer が WCH-LinkE で hartinfo.dataaddr を読んだ実測（`curated/debug-data-measured.json`。V003・V103・V203・X035・L103） |
+| `hartinfo:wch-linke(...)` | WCH-LinkE の HARTINFO 実測（`curated/debug-data-measured.json`）。日付・対象は各 basis に保持。従来の V003・V103・V203・X035・L103 と、2026-10-10 の M030・V407・H417 |
 
 CH32H417 は EVT に define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しないので、
-行は残して番地は空・`missing`。埋めるには hartinfo の実測が要る。`dm_data1_addr` は常に `dm_data0_addr + 4`
+両コアの実測による `0xE0000340` / `0xE0000344` を `reference` として収載。
+独立2セッションの hartsel 0/1 が HARTINFO `0x00212340` を返した。M030・V407 は実測と EVT が一致して `confirmed`。
+`dm_data1_addr` は常に `dm_data0_addr + 4`
 （`check_tables` が見る）。生成は `pipeline/extract/manual/extract_debug_data.py`。
 
 ### `debug_wiring.csv`
@@ -608,7 +610,7 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 AttachChip実測に一致した行のみ`confirmed`、`id_source=memory`にする。
 ID確認はflash書き込み検証を意味しない。`dont_care_bits`は`[7:4]`。
 ch32-data cloneが無い場合は`--reuse-ch32-data`で既存の取り込み行と出所を明示的に据え置く。
-104型番のうち101型番を収載。未登録はCH32M007K8U7、CH32V203C6U6、CH32X035D8U6。
+105型番のうち101型番を収載。未登録はCH32M007K8U7、CH32V203C6U6、CH32X035D8U6、新規追加のCH32V407KEU6。
 
 ### `link_firmware.csv`
 

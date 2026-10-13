@@ -13,7 +13,18 @@
     "源电流模块ISOURCE": "Current-source module ISOURCE",
     "电流采样ISP,ISN": "Current sampling ISP/ISN",
     "通信接口": "Communication interfaces",
-    "额定电压": "Rated voltage"
+    "额定电压": "Rated voltage",
+    "定时器": "Timer",
+    "高级（16位）（1）": "Advanced-control (16-bit)(1)",
+    "通用（16位）（1）": "General-purpose (16-bit) (1)",
+    "基本（16位）": "Basic (16-bit)",
+    "看门狗": "Watchdog",
+    "系统时基32位": "SysTick (32-bit)",
+    "ADC单元数": "ADC Unit",
+    "ADC通道数": "ADC channel",
+    "DAC（单元）": "DAC (Unit)",
+    "随机数发生器（RNG）": "RNG",
+    "USBHS（含PHY）": "USBHS (Include PHY)"
   },
   "values": {
     "(CC1R,CC2R)(CC3,CC4)内置Rd(1)": "(CC1R,CC2R)(CC3,CC4), built-in Rd(1)",
@@ -26,6 +37,8 @@
     "带预驱，电机专用": "With pre-driver, motor-dedicated",
     "通用，引脚优化": "General purpose, pin-optimized",
     "通用，引脚兼容": "General purpose, pin-compatible",
-    "通用，电机主控": "General purpose, motor main control"
+    "通用，电机主控": "General purpose, motor main control",
+    "支持": "Support",
+    "2（WWDG+IWDG）": "2 (WWDG + IWDG)"
   }
 }

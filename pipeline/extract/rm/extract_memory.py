@@ -269,6 +269,21 @@ def expand(applies: list[str], parts: list[dict], variants: dict[str, list[str]]
     return sorted(out)
 
 
+def matches_nominal_pair(product: dict, combinations: set[tuple[int, int]]) -> bool:
+    """Require a matching datasheet pair before extending an unqualified RM table.
+
+    A later, smaller die need not implement the older family-wide split table.
+
+    >>> pairs = {(512 * 1024, 200 * 1024), (576 * 1024, 136 * 1024)}
+    >>> matches_nominal_pair({'flash_bytes': '524288', 'sram_bytes': '204800'}, pairs)
+    True
+    >>> matches_nominal_pair({'flash_bytes': '491520', 'sram_bytes': '204800'}, pairs)
+    False
+    """
+    return (int(product['flash_bytes'] or 0),
+            int(product['sram_bytes'] or 0)) in combinations
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=paths.MIRRORS)
@@ -395,15 +410,16 @@ def main() -> int:
             if ld:
                 basis.append("evt(Link.ld)")
 
-            # 適用先を絞る文が無ければ、その manual が扱う family 全体に効く。
-            # CH32V407 の RM はフィールドの説明に適用先を書かないが、それは
-            # 「限定が無い」という意味で、読めなかったという意味ではない。
+            # 適用先を絞る文が無い表は、比較表のFlash/SRAM組が一致するpartへ適用。
+            # 後から追加された小容量die（V407KEU6など）へ旧RMの大容量分割を
+            # family名だけで拡張しない。型番を名指す限定表はその指定を保持する。
             if entry["narrowed"]:
                 targets = expand(sorted(entry["applies"]), parts, variants, notes)
             else:
                 covered = set(owners)
                 targets = sorted(p["part_number"] for p in parts
-                                 if p["family"] in covered)
+                                 if p["family"] in covered
+                                 and matches_nominal_pair(p, combinations))
             if not targets:
                 notes.append(f"{family}: 適用先を決められない組がある "
                              f"({', '.join(sorted(entry['applies'])) or '記載なし'})")

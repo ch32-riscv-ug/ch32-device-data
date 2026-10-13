@@ -31,7 +31,7 @@ Look up the series (the first 8 characters of a part number). The example part n
 | **CH32V305** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 4 | [CH32V305CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305CCT6), [CH32V305FBP6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305FBP6), [CH32V305GBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305GBU6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305) |
 | **CH32V307** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 3 | [CH32V307RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307RCT6), [CH32V307VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307VCT6), [CH32V307WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307WCU6) |
 | **CH32V317** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 2 | [CH32V317VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317VCT6), [CH32V317WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317WCU6) |
-| **CH32V407** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | 3 | [CH32V407RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6), [CH32V407VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6), [CH32V407WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6) |
+| **CH32V407** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | 4 | [CH32V407KEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407KEU6), [CH32V407RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6), [CH32V407VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407) |
 | **CH32V467** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | 3 | [CH32V467RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6), [CH32V467VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6), [CH32V467WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6) |
 | **CH32X033** | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | 1 | [CH32X033F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X033F8P6) |
 | **CH32X035** | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | 7 | [CH32X035C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035C8T6), [CH32X035D8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035D8U6), [CH32X035F7P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035F7P6), [… all 7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035) |
@@ -69,7 +69,8 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 | Feature | Series (repository) |
 |---|---|
 | **DFSDM** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
-| **DAC** | CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)); CH32V407, CH32V467 ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |
+| **HSADC** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
+| **DAC** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)); CH32V407, CH32V467 ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |
 | **CMP** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32L103, CH32M103 ([CH32L103](https://github.com/ch32-riscv-ug/CH32L103)); CH32M030\* ([CH32M030](https://github.com/ch32-riscv-ug/CH32M030)); CH32M007, CH32V007 ([CH32V006](https://github.com/ch32-riscv-ug/CH32V006)); CH32V205 ([CH32V205](https://github.com/ch32-riscv-ug/CH32V205)); CH32V203 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)); CH32X033, CH32X035 ([CH32X035](https://github.com/ch32-riscv-ug/CH32X035)) |
 | **ADC / TKey** | CH32L103, CH32M103 ([CH32L103](https://github.com/ch32-riscv-ug/CH32L103)); CH32V005\*, CH32V006\* ([CH32V006](https://github.com/ch32-riscv-ug/CH32V006)); CH32V103 ([CH32V103](https://github.com/ch32-riscv-ug/CH32V103)); CH32V203, CH32V208 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)); CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)); CH32X033\*, CH32X035\* ([CH32X035](https://github.com/ch32-riscv-ug/CH32X035)) |
 | **OPA** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32L103, CH32M103 ([CH32L103](https://github.com/ch32-riscv-ug/CH32L103)); CH32M030\* ([CH32M030](https://github.com/ch32-riscv-ug/CH32M030)); CH32V003\* ([CH32V003](https://github.com/ch32-riscv-ug/CH32V003)); CH32M007, CH32V005, CH32V006, CH32V007 ([CH32V006](https://github.com/ch32-riscv-ug/CH32V006)); CH32V205 ([CH32V205](https://github.com/ch32-riscv-ug/CH32V205)); CH32V203, CH32V208 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)); CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)); CH32V407, CH32V467 ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)); CH32X033, CH32X035 ([CH32X035](https://github.com/ch32-riscv-ug/CH32X035)) |
@@ -102,8 +103,8 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 | **PSRAM** | CH32V467 ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |
 | **SDMMC** | CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
 | **QSPI** | CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32V205 ([CH32V205](https://github.com/ch32-riscv-ug/CH32V205)); CH32V203 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)) |
-| **SDIO** | CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)) |
 | **FSMC** | CH32V205 ([CH32V205](https://github.com/ch32-riscv-ug/CH32V205)); CH32V303, CH32V307 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)); CH32V407, CH32V467 ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |
+| **SDIO** | CH32H415, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32V303, CH32V305, CH32V307, CH32V317 ([CH32V307](https://github.com/ch32-riscv-ug/CH32V307)) |
 
 ### Timers
 
@@ -175,7 +176,7 @@ Where each document family is mirrored. Repository names follow the document fam
 | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) | CH32V205 | QingKe V3B | 3 | DS×1 RM EVT |
 | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | CH32V203, CH32V208 | QingKe V4B, QingKe V4C | 17 | DS×2 RM EVT |
 | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | CH32V303, CH32V305, CH32V307, CH32V317 | QingKe V4F | 14 | DS×1 RM EVT |
-| [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | CH32V407, CH32V467 | QingKe V3V | 6 | DS×1 RM EVT |
+| [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | CH32V407, CH32V467 | QingKe V3V | 7 | DS×1 RM EVT |
 | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | CH32X033, CH32X035 | QingKe V4C | 8 | DS×1 RM EVT |
 | [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) | CH32X305, CH32X315 | QingKe V3F | 4 | DS×1 RM EVT |
 

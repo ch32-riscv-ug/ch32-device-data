@@ -64,7 +64,10 @@
     ],
     "typecandusbpdcontroller": "USB-PD",
     "usbpdandtypeccontroller": "USB-PD",
-    "_comment": "括弧に略語が無い見出し。キーは小文字化して英数字以外を落としたもの。値が配列なら1つの見出しが2つの機能を指す"
+    "_comment": "括弧に略語が無い見出し。キーは小文字化して英数字以外を落としたもの。値が配列なら1つの見出しが2つの機能を指す",
+    "hsadchighspeedanalogtodigitalconverter": "HSADC",
+    "dacdigitaltoanalogconverter": "DAC",
+    "sdiohostdevicecontroller": "SDIO"
   },
   "excluded": {
     "RISC": "CPU そのもの。core と ISA は cores.csv / series.csv が持つ",

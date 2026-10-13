@@ -205,18 +205,61 @@ def read_edition(bundle: str, document: str) -> tuple[dict, dict, dict]:
     return columns, dict(functions), titles
 
 
-def pair_leftovers(zh: dict, en: dict) -> dict[tuple, tuple]:
-    """A single unpaired column on each side of one table names the same package.
+def unavailable_usarts(text: str) -> dict[str, set[str]]:
+    """Explicit, unconditional USART exclusions for a fully named part.
 
+    Shared pin-mux tables also print signals for peripherals that a part's
+    resource-table notes exclude. Do not infer exclusions from a unit count.
+
+    >>> unavailable_usarts('CH32V407KEU6 芯片不支持 USART4、USART6、USART10。') == {'CH32V407KEU6': {'USART4', 'USART6', 'USART10'}}
+    True
+    >>> unavailable_usarts('CH32V407KEU6 芯片支持 USART4、USART6、USART10。')
+    {}
+    >>> unavailable_usarts('CH32V407 芯片不支持 USART4。')
+    {}
+    """
+    pattern = (r"\b(CH32[A-Z]\d{3}[A-Z][A-Z0-9][A-Z][A-Z0-9])\s*芯片不支持\s*"
+               r"(USART\d+(?:\s*[、,，]\s*USART\d+)*)\s*[。.]")
+    excluded: dict[str, set[str]] = collections.defaultdict(set)
+    for part, peripherals in re.findall(pattern, text):
+        excluded[part].update(re.findall(r"USART\d+", peripherals))
+    return dict(excluded)
+
+
+def pair_leftovers(zh: dict, en: dict) -> dict[tuple, tuple]:
+    """Pair unique full part names across captions, then package leftovers.
+
+    A full part name survives an edition splitting one table by series. A
+    package name does not identify that scope, so it pairs only within a table.
     CH32V208's zh heading says LQFP64M where the en image says LQFP64; with every
     other column already paired, the two leftovers can only be each other.
+
+    >>> zh_key = (("CH32V467", 0), "CH32V467RET6")
+    >>> en_key = (("CH32V407", 0), "CH32V467RET6")
+    >>> pair_leftovers({zh_key: {}}, {en_key: {}}) == {en_key: zh_key}
+    True
+    >>> pair_leftovers({(("A", 0), "QFN32"): {}}, {(("B", 0), "QFN32"): {}})
+    {}
+    >>> pair_leftovers({zh_key: {}, (("OTHER", 0), zh_key[1]): {}}, {en_key: {}})
+    {}
     """
     remap: dict[tuple, tuple] = {}
+    # A revised edition can split a combined pin table by series. A full
+    # part number still identifies its column across that caption change;
+    # package names alone cannot establish the same scope.
+    unpaired_zh, unpaired_en = zh.keys() - en.keys(), en.keys() - zh.keys()
+    for variant in {key[1] for key in unpaired_zh} & {key[1] for key in unpaired_en}:
+        if not re.fullmatch(r"CH32[A-Z]\d{3}[A-Z][A-Z0-9][A-Z][A-Z0-9]", variant):
+            continue
+        left = [key for key in unpaired_zh if key[1] == variant]
+        right = [key for key in unpaired_en if key[1] == variant]
+        if len(left) == len(right) == 1:
+            remap[right[0]] = left[0]
     by_table_zh = collections.defaultdict(list)
     by_table_en = collections.defaultdict(list)
-    for tkey, cvar in zh.keys() - en.keys():
+    for tkey, cvar in (zh.keys() - en.keys()) - set(remap.values()):
         by_table_zh[tkey].append(cvar)
-    for tkey, cvar in en.keys() - zh.keys():
+    for tkey, cvar in (en.keys() - zh.keys()) - set(remap):
         by_table_en[tkey].append(cvar)
     for tkey in by_table_zh.keys() & by_table_en.keys():
         if len(by_table_zh[tkey]) == 1 and len(by_table_en[tkey]) == 1:
@@ -228,7 +271,8 @@ def merge_cells(zh: dict, en: dict, remap: dict | None = None) -> dict:
     """Cross-edition judgement per (tkey, cvar): {(pin, pad): (kind, conf, basis)}."""
     for old, new in (pair_leftovers(zh, en) if remap is None else remap).items():
         en[new] = en.pop(old)
-        en[new]["renamed_from"] = en[new]["variant"]
+        if old[1] != new[1]:
+            en[new]["renamed_from"] = en[new]["variant"]
     merged: dict = {}
     for key in sorted(set(zh) | set(en)):
         zh_cell, en_cell = zh.get(key, {}), en.get(key, {})
@@ -466,6 +510,8 @@ def main() -> int:
     unresolved: list[str] = []
     for (family, datasheet) in sorted(products):
         editions = {}
+        excluded: dict[str, set[str]] = collections.defaultdict(set)
+        scope_basis: dict[str, list[str]] = collections.defaultdict(list)
         for lang in ("zh", "en"):
             bundle = f"{Path(datasheet).stem}.{lang}"
             has = (bundle_pages.BUNDLES / bundle / "manifest.json").exists()
@@ -475,11 +521,17 @@ def main() -> int:
             except Exception as exc:  # noqa: BLE001
                 print(f"{family}/{datasheet} {lang}: 読めません {exc}", file=sys.stderr)
                 editions[lang] = ({}, {}, {})
+            if has:
+                for page, text in bundle_pages.texts(bundle, 10):
+                    for part, peripherals in unavailable_usarts(text).items():
+                        excluded[part].update(peripherals)
+                        names = ",".join(sorted(peripherals, key=lambda unit: int(unit[5:])))
+                        scope_basis[part].append(
+                            f"resource-scope:{datasheet}:{lang}(p.{page};unsupported={names})")
         # 列の対応（zh LQFP64M ↔ en LQFP64）は封装ごとの機能にも同じに効く。
         remap = pair_leftovers(editions["zh"][0], editions["en"][0])
         en_functions = {
-            (key[0], remap.get((key[0], key[1]), (key[0], key[1]))[1], key[2])
-            if (key[0], key[1]) in remap else key: value
+            (*remap.get((key[0], key[1]), (key[0], key[1])), key[2]): value
             for key, value in editions["en"][1].items()}
         cells = merge_cells(editions["zh"][0], editions["en"][0], remap)
         functions = merge_function_sets(editions["zh"][1], en_functions)
@@ -508,10 +560,13 @@ def main() -> int:
             for pad in pads:
                 for (signal, route), (conf, basis) in \
                         functions.get((key[0], key[1], pad), {}).items():
+                    if signal.split("_", 1)[0] in excluded[part]:
+                        continue
                     fn_rows.append({
                         "part_number": part, "pad": pad,
                         "signal": signal, "route": route,
-                        "confidence": conf, "basis": basis,
+                        "confidence": conf,
+                        "basis": "+".join([basis, *scope_basis[part]]),
                         "table": names.get(key[0], ""), "datasheet": datasheet,
                     })
         print(f"{family}/{datasheet}: pins {len(pin_rows)} / functions {len(fn_rows)} 累計",

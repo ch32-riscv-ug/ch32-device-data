@@ -23,8 +23,8 @@ V4 系は 0xE0000380、V3 系の多くは 0xE0000340）。既定値を1つ持つ
                実装ごとに hartinfo を読め、と書く）。core 世代は catalog/families.csv の core 名から
     hartinfo   consumer が WCH-LinkE で hartinfo.dataaddr を読んだ実測（curated/debug-data-measured.json）
 
-CH32H417 の EVT には define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しない
-ので、行は残して番地は空・confidence は missing。
+CH32H417 の EVT には define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しない。
+2026-10-10 の両 hart の実測で番地を補った（単一種類の証拠なので reference）。
 
 実行:
     uv run pipeline/extract/manual/extract_debug_data.py [--mirrors <dir>] [--out <dir>]
@@ -57,6 +57,28 @@ DM_BASE = 0xE0000000
 def hexaddr(value: int) -> str:
     """番地の綴りを1つに（`0xE00000F4`）。出所ごとの大文字小文字の差で食い違いに見せない。"""
     return f"0x{value:08X}"
+
+
+def measured_addresses(entry: dict) -> tuple[str, str]:
+    """Validate the recorded addresses against HARTINFO when it is available.
+
+    >>> entry = {"dm_data0_addr": "0xE0000340", "dm_data1_addr": "0xE0000344", "hartinfo": "0x00212340"}
+    >>> measured_addresses(entry)
+    ('0xE0000340', '0xE0000344')
+    >>> measured_addresses({**entry, "hartinfo": "0x00202340"})
+    Traceback (most recent call last):
+    ...
+    ValueError: HARTINFO does not describe the recorded data0/data1 addresses
+    """
+    data0 = hexaddr(int(entry["dm_data0_addr"], 16))
+    data1 = hexaddr(int(entry["dm_data1_addr"], 16))
+    if "hartinfo" in entry:
+        raw = int(entry["hartinfo"], 16)
+        if (not (raw & (1 << 16)) or ((raw >> 12) & 0xF) < 2
+                or data0 != hexaddr(DM_BASE + (raw & 0xFFF))
+                or int(data1, 16) != int(data0, 16) + 4):
+            raise ValueError("HARTINFO does not describe the recorded data0/data1 addresses")
+    return data0, data1
 
 
 def evt_defines(family_dir: Path) -> tuple[dict[str, str], list[str], list[str]]:
@@ -126,8 +148,10 @@ def main() -> int:
                 basis.append(f"manual:qingke-v{gen}(dataaddr={value})")
                 candidates["manual"].add(addr)
         if family in measured:
-            basis.append("hartinfo:wch-linke(consumer 2026-08-26)")
-            candidates["hartinfo"].add(hexaddr(int(measured[family]["dm_data0_addr"], 16)))
+            entry = measured[family]
+            data0, _data1 = measured_addresses(entry)
+            basis.append(entry.get("basis", "hartinfo:wch-linke(consumer 2026-08-26)"))
+            candidates["hartinfo"].add(data0)
 
         values = {v for vs in candidates.values() for v in vs}
         if not values:

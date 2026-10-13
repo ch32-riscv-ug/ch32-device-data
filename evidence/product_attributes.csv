@@ -1398,149 +1398,176 @@ CH32V317WCU6,18,communication_interfaces_usb_fs_usbhd,1,Communication interfaces
 CH32V317WCU6,19,communication_interfaces_usbhs_include_phy,1,Communication interfaces,Communication interfaces USBHS (include PHY),通信接口 USBHS（含PHY）,Communication interfaces USBHS (include PHY),#,confirmed,products:zh+products:en
 CH32V317WCU6,20,communication_interfaces_ethernet,MAC+10M/100M PHY,Communication interfaces,Communication interfaces Ethernet,通信接口 Ethernet,Communication interfaces Ethernet,#,confirmed,products:zh+products:en
 CH32V317WCU6,21,cpu_main_frequency,Max: 144MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V407RET6,0,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V407RET6,1,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V407RET6,2,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V407RET6,3,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V407RET6,4,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V407RET6,5,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V407RET6,6,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V407RET6,7,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V407RET6,8,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V407RET6,9,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V407RET6,10,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V407RET6,11,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V407RET6,12,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V407RET6,13,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V407RET6,14,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V407RET6,15,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V407RET6,16,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V407RET6,17,usbhs_include_phy,1 (USBHS1),,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V407RET6,18,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V407RET6,19,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V407RET6,20,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V407RET6,21,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V407RET6,22,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V407VET6,0,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V407VET6,1,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V407VET6,2,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V407VET6,3,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V407VET6,4,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V407VET6,5,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V407VET6,6,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V407VET6,7,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V407VET6,8,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V407VET6,9,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V407VET6,10,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V407VET6,11,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V407VET6,12,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V407VET6,13,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V407VET6,14,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V407VET6,15,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V407VET6,16,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V407VET6,17,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V407VET6,18,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V407VET6,19,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V407VET6,20,fsmc,1,,FSMC,FSMC,FSMC,#,confirmed,products:zh+products:en
-CH32V407VET6,21,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V407VET6,22,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V407VET6,23,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V407WEU6,0,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V407WEU6,1,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V407WEU6,2,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V407WEU6,3,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V407WEU6,4,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V407WEU6,5,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V407WEU6,6,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V407WEU6,7,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V407WEU6,8,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V407WEU6,9,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V407WEU6,10,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V407WEU6,11,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V407WEU6,12,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V407WEU6,13,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V407WEU6,14,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V407WEU6,15,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V407WEU6,16,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V407WEU6,17,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V407WEU6,18,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V407WEU6,19,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V407WEU6,20,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V407WEU6,21,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V407WEU6,22,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V467RET6,0,extended_psram_bytes,4M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
-CH32V467RET6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V467RET6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V467RET6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V467RET6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V467RET6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V467RET6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V467RET6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V467RET6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V467RET6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V467RET6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V467RET6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V467RET6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V467RET6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V467RET6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V467RET6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V467RET6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V467RET6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V467RET6,18,usbhs_include_phy,1 (USBHS1),,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V467RET6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V467RET6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V467RET6,21,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V467RET6,22,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V467RET6,23,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V467VET6,0,extended_psram_bytes,8M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
-CH32V467VET6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V467VET6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V467VET6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V467VET6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V467VET6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V467VET6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V467VET6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V467VET6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V467VET6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V467VET6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V467VET6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V467VET6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V467VET6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V467VET6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V467VET6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V467VET6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V467VET6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V467VET6,18,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V467VET6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V467VET6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V467VET6,21,fsmc,1,,FSMC,FSMC,FSMC,#,confirmed,products:zh+products:en
-CH32V467VET6,22,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V467VET6,23,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V467VET6,24,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
-CH32V467WEU6,0,extended_psram_bytes,8M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
-CH32V467WEU6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
-CH32V467WEU6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
-CH32V467WEU6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
-CH32V467WEU6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
-CH32V467WEU6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
-CH32V467WEU6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
-CH32V467WEU6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
-CH32V467WEU6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
-CH32V467WEU6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
-CH32V467WEU6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
-CH32V467WEU6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
-CH32V467WEU6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
-CH32V467WEU6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
-CH32V467WEU6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
-CH32V467WEU6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
-CH32V467WEU6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
-CH32V467WEU6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
-CH32V467WEU6,18,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
-CH32V467WEU6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
-CH32V467WEU6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
-CH32V467WEU6,21,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
-CH32V467WEU6,22,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
-CH32V467WEU6,23,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V407KEU6,0,code_flash_bytes,480K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V407KEU6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,,#,reference,products:zh
+CH32V407KEU6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,,#,reference,products:zh
+CH32V407KEU6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,,#,reference,products:zh
+CH32V407KEU6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,,#,reference,products:zh
+CH32V407KEU6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,,#,reference,products:zh
+CH32V407KEU6,6,rtc,Support,,RTC,RTC,,#,reference,products:zh
+CH32V407KEU6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,,#,reference,products:zh
+CH32V407KEU6,8,adc_channel,8+2,ADC,ADC channel,ADC 通道数,,#,reference,products:zh
+CH32V407KEU6,9,dac_unit,2,,DAC (Unit),DAC（单元）,,#,reference,products:zh
+CH32V407KEU6,10,opa,1,,OPA,OPA,,#,reference,products:zh
+CH32V407KEU6,11,rng,1,,RNG,随机数发生器（RNG）,,#,reference,products:zh
+CH32V407KEU6,12,usart,7(4),,USART,USART,,#,reference,products:zh
+CH32V407KEU6,13,spi_i2s,SPI1 SPI3/I2S3,,SPI/I2S,SPI/I2S,,#,reference,products:zh
+CH32V407KEU6,14,i2c,1,,I2C,I2C,,#,reference,products:zh
+CH32V407KEU6,15,i3c,1,,I3C,I3C,,#,reference,products:zh
+CH32V407KEU6,16,can,1,,CAN,CAN,,#,reference,products:zh
+CH32V407KEU6,17,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,,#,reference,products:zh
+CH32V407KEU6,18,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,,#,reference,products:zh
+CH32V407KEU6,19,argb,1,,ARGB,ARGB,,#,reference,products:zh
+CH32V407KEU6,20,cpu_main_frequency,Max：200MHz,,CPU main frequency,CPU主频,,#,reference,products:zh
+CH32V407RET6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V407RET6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V407RET6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V407RET6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V407RET6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V407RET6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V407RET6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V407RET6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V407RET6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V407RET6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V407RET6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V407RET6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V407RET6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V407RET6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V407RET6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V407RET6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V407RET6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V407RET6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V407RET6,18,usbhs_include_phy,1 (USBHS1),,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V407RET6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V407RET6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V407RET6,21,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V407RET6,22,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V407RET6,23,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V407VET6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V407VET6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V407VET6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V407VET6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V407VET6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V407VET6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V407VET6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V407VET6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V407VET6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V407VET6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V407VET6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V407VET6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V407VET6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V407VET6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V407VET6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V407VET6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V407VET6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V407VET6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V407VET6,18,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V407VET6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V407VET6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V407VET6,21,fsmc,1,,FSMC,FSMC,FSMC,#,confirmed,products:zh+products:en
+CH32V407VET6,22,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V407VET6,23,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V407VET6,24,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V407WEU6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V407WEU6,1,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V407WEU6,2,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V407WEU6,3,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V407WEU6,4,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V407WEU6,5,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V407WEU6,6,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V407WEU6,7,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V407WEU6,8,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V407WEU6,9,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V407WEU6,10,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V407WEU6,11,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V407WEU6,12,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V407WEU6,13,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V407WEU6,14,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V407WEU6,15,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V407WEU6,16,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V407WEU6,17,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V407WEU6,18,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V407WEU6,19,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V407WEU6,20,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V407WEU6,21,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V407WEU6,22,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V407WEU6,23,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V467RET6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V467RET6,1,extended_psram_bytes,4M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
+CH32V467RET6,2,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V467RET6,3,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V467RET6,4,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V467RET6,5,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V467RET6,6,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V467RET6,7,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V467RET6,8,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V467RET6,9,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V467RET6,10,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V467RET6,11,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V467RET6,12,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V467RET6,13,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V467RET6,14,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V467RET6,15,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V467RET6,16,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V467RET6,17,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V467RET6,18,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V467RET6,19,usbhs_include_phy,1 (USBHS1),,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V467RET6,20,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V467RET6,21,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V467RET6,22,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V467RET6,23,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V467RET6,24,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V467VET6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V467VET6,1,extended_psram_bytes,8M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
+CH32V467VET6,2,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V467VET6,3,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V467VET6,4,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V467VET6,5,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V467VET6,6,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V467VET6,7,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V467VET6,8,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V467VET6,9,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V467VET6,10,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V467VET6,11,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V467VET6,12,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V467VET6,13,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V467VET6,14,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V467VET6,15,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V467VET6,16,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V467VET6,17,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V467VET6,18,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V467VET6,19,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V467VET6,20,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V467VET6,21,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V467VET6,22,fsmc,1,,FSMC,FSMC,FSMC,#,confirmed,products:zh+products:en
+CH32V467VET6,23,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V467VET6,24,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V467VET6,25,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
+CH32V467WEU6,0,code_flash_bytes,992K,,Code FLASH (bytes),Code FLASH（字节）,,#,reference,products:zh
+CH32V467WEU6,1,extended_psram_bytes,8M,,Extended PSRAM (Bytes),扩展PSRAM（字节）,Extended PSRAM (Bytes),#,confirmed,products:zh+products:en
+CH32V467WEU6,2,timer_advanced_control_16_bit,2,Timer,Timer Advanced-control (16-bit)(1),定时器 高级（16位）（1）,Timer Advanced-control (16-bit)(1),#,confirmed,products:zh+products:en
+CH32V467WEU6,3,timer_general_purpose_16_bit,4,Timer,Timer General-purpose (16-bit) (1),定时器 通用（16位）（1）,Timer General-purpose (16-bit) (1),#,confirmed,products:zh+products:en
+CH32V467WEU6,4,timer_basic_16_bit,2,Timer,Timer Basic (16-bit),定时器 基本（16位）,Timer Basic (16-bit),#,confirmed,products:zh+products:en
+CH32V467WEU6,5,timer_watchdog,2 (WWDG + IWDG),Timer,Timer Watchdog,定时器 看门狗,Timer Watchdog,#,confirmed,products:zh+products:en
+CH32V467WEU6,6,timer_systick_32_bit,Support,Timer,Timer SysTick (32-bit),定时器 系统时基32位,Timer SysTick (32-bit),#,confirmed,products:zh+products:en
+CH32V467WEU6,7,rtc,Support,,RTC,RTC,RTC,#,confirmed,products:zh+products:en
+CH32V467WEU6,8,adc_unit,2,ADC,ADC Unit,ADC 单元数,ADC Unit,#,confirmed,products:zh+products:en
+CH32V467WEU6,9,adc_channel,16+2,ADC,ADC channel,ADC 通道数,ADC channel,#,confirmed,products:zh+products:en
+CH32V467WEU6,10,dac_unit,2,,DAC (Unit),DAC（单元）,DAC (Unit),#,confirmed,products:zh+products:en
+CH32V467WEU6,11,opa,1,,OPA,OPA,OPA,#,confirmed,products:zh+products:en
+CH32V467WEU6,12,rng,1,,RNG,随机数发生器（RNG）,RNG,#,confirmed,products:zh+products:en
+CH32V467WEU6,13,usart,10,,USART,USART,USART,#,confirmed,products:zh+products:en
+CH32V467WEU6,14,spi_i2s,3/2,,SPI/I2S,SPI/I2S,SPI/I2S,#,confirmed,products:zh+products:en
+CH32V467WEU6,15,i2c,1,,I2C,I2C,I2C,#,confirmed,products:zh+products:en
+CH32V467WEU6,16,i3c,1,,I3C,I3C,I3C,#,confirmed,products:zh+products:en
+CH32V467WEU6,17,can,1,,CAN,CAN,CAN,#,confirmed,products:zh+products:en
+CH32V467WEU6,18,sdio,1,,SDIO,SDIO,SDIO,#,confirmed,products:zh+products:en
+CH32V467WEU6,19,usbhs_include_phy,2,,USBHS (Include PHY),USBHS（含PHY）,USBHS (Include PHY),#,confirmed,products:zh+products:en
+CH32V467WEU6,20,ethernet,MAC+10M/100M PHY,,Ethernet,Ethernet,Ethernet,#,confirmed,products:zh+products:en
+CH32V467WEU6,21,dvp,1,,DVP,DVP,DVP,#,confirmed,products:zh+products:en
+CH32V467WEU6,22,ltdc,1,,LTDC,LTDC,LTDC,#,confirmed,products:zh+products:en
+CH32V467WEU6,23,argb,1,,ARGB,ARGB,ARGB,#,confirmed,products:zh+products:en
+CH32V467WEU6,24,cpu_main_frequency,Max: 200MHz,,CPU main frequency,CPU主频,CPU main frequency,#,confirmed,products:zh+products:en
 CH32X033F8P6,0,advanced_control_timer,2,,Advanced-control timer,高 级 定 时 器,Advanced-control timer,#,confirmed,products:zh+products:en
 CH32X033F8P6,1,general_purpose_timer,1,,General-purpose timer,通 用 定 时 器,General-purpose timer,#,confirmed,products:zh+products:en
 CH32X033F8P6,2,serial_port,4,,Serial port,串 口,Serial port,#,confirmed,products:zh+products:en

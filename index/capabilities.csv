@@ -1391,6 +1391,27 @@ CH32V317WCU6,CH32V317,CH32V307,usart,,count,8,8,communication_interfaces_usart_u
 CH32V317WCU6,CH32V317,CH32V307,usb-fs,usbhd,count,1,1,communication_interfaces_usb_fs_usbhd,#,confirmed,products:zh+products:en
 CH32V317WCU6,CH32V317,CH32V307,usb-hs,include-phy,count,1,1,communication_interfaces_usbhs_include_phy,#,confirmed,products:zh+products:en
 CH32V317WCU6,CH32V317,CH32V307,watchdog,,text,,2 (WWDG + IWDG),timer_watchdog,#,confirmed,products:zh+products:en
+CH32V407KEU6,CH32V407,CH32V407,adc,,count,2,2,adc_unit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,adc-channel,,text,,8+2,adc_channel,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,argb,,count,1,1,argb,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,can,,count,1,1,can,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,clock,,text,,Max：200MHz,cpu_main_frequency,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,dac,,count,2,2,dac_unit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,flash,,text,,480K,code_flash_bytes,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,i2c,,count,1,1,i2c,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,i3c,,count,1,1,i3c,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,opa,,count,1,1,opa,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,rng,,count,1,1,rng,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,rtc,,marker,,Support,rtc,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,spi-i2s,,text,,SPI1 SPI3/I2S3,spi_i2s,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,systick,32bit,marker,,Support,timer_systick_32_bit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,timer-advanced,16bit,count,2,2,timer_advanced_control_16_bit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,timer-basic,16bit,count,2,2,timer_basic_16_bit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,timer-general,16bit,count,4,4,timer_general_purpose_16_bit,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,usart,,text,,7(4),usart,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,usb-hs,include-phy,count,2,2,usbhs_include_phy,#,reference,products:zh
+CH32V407KEU6,CH32V407,CH32V407,watchdog,,text,,2 (WWDG + IWDG),timer_watchdog,#,reference,products:zh
 CH32V407RET6,CH32V407,CH32V407,adc,,count,2,2,adc_unit,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,adc-channel,,text,,16+2,adc_channel,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,argb,,count,1,1,argb,#,confirmed,products:zh+products:en
@@ -1399,6 +1420,7 @@ CH32V407RET6,CH32V407,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V407RET6,CH32V407,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V407RET6,CH32V407,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V407RET6,CH32V407,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32V407RET6,CH32V407,CH32V407,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
@@ -1422,6 +1444,7 @@ CH32V407VET6,CH32V407,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V407VET6,CH32V407,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V407VET6,CH32V407,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V407VET6,CH32V407,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V407VET6,CH32V407,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V407VET6,CH32V407,CH32V407,fsmc,,count,1,1,fsmc,#,confirmed,products:zh+products:en
 CH32V407VET6,CH32V407,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V407VET6,CH32V407,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
@@ -1446,6 +1469,7 @@ CH32V407WEU6,CH32V407,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V407WEU6,CH32V407,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V407WEU6,CH32V407,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V407WEU6,CH32V407,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V407WEU6,CH32V407,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V407WEU6,CH32V407,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V407WEU6,CH32V407,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32V407WEU6,CH32V407,CH32V407,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
@@ -1469,6 +1493,7 @@ CH32V467RET6,CH32V467,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V467RET6,CH32V467,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V467RET6,CH32V467,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V467RET6,CH32V467,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V467RET6,CH32V467,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V467RET6,CH32V467,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V467RET6,CH32V467,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32V467RET6,CH32V467,CH32V407,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en
@@ -1493,6 +1518,7 @@ CH32V467VET6,CH32V467,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V467VET6,CH32V467,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V467VET6,CH32V467,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V467VET6,CH32V467,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V467VET6,CH32V467,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V467VET6,CH32V467,CH32V407,fsmc,,count,1,1,fsmc,#,confirmed,products:zh+products:en
 CH32V467VET6,CH32V467,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V467VET6,CH32V467,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
@@ -1518,6 +1544,7 @@ CH32V467WEU6,CH32V467,CH32V407,clock,,text,,Max: 200MHz,cpu_main_frequency,#,con
 CH32V467WEU6,CH32V467,CH32V407,dac,,count,2,2,dac_unit,#,confirmed,products:zh+products:en
 CH32V467WEU6,CH32V467,CH32V407,dvp,,count,1,1,dvp,#,confirmed,products:zh+products:en
 CH32V467WEU6,CH32V467,CH32V407,ethernet,,text,,MAC+10M/100M PHY,ethernet,#,confirmed,products:zh+products:en
+CH32V467WEU6,CH32V467,CH32V407,flash,,text,,992K,code_flash_bytes,#,reference,products:zh
 CH32V467WEU6,CH32V467,CH32V407,i2c,,count,1,1,i2c,#,confirmed,products:zh+products:en
 CH32V467WEU6,CH32V467,CH32V407,i3c,,count,1,1,i3c,#,confirmed,products:zh+products:en
 CH32V467WEU6,CH32V467,CH32V407,ltdc,,count,1,1,ltdc,#,confirmed,products:zh+products:en

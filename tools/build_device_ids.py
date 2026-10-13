@@ -125,7 +125,9 @@ def confirm_measurements(rows: list[dict]) -> None:
         row["confidence"] = "confirmed"
         row["id_source"] = "memory"
         row["note"] = "AttachChip and memory IDs agree; flash programming not verified"
-        row["basis"] += f"+device-id:wch-linke({measurement['evidence']})"
+        tag = f"device-id:wch-linke({measurement['evidence']})"
+        if tag not in row["basis"].split("+"):
+            row["basis"] += f"+{tag}"
 
 
 def family_addresses() -> list[dict]:

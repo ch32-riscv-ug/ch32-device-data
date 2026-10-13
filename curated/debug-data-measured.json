@@ -1,12 +1,74 @@
 {
-  "_comment": "Debug-module data0/data1 addresses read from the RISC-V DM hartinfo.dataaddr register over WCH-LinkE, reported by the ArduinoCore-CH32 consumer (worklist R-27). Hand-recorded measurements; tools/build_debug_data.py folds them into evidence/debug_data.csv as the basis `hartinfo:wch-linke`.",
-  "verified": "2026-08-26",
-  "method": "hartinfo.dataaddr read through WCH-LinkE while implementing SDI print (DMDATA0/1 mailbox printf) in ArduinoCore-CH32",
+  "_comment": "Hart-side debug data0/data1 addresses measured over WCH-LinkE. pipeline/extract/manual/extract_debug_data.py combines these with EVT and QingKe manuals. Per-entry basis retains measurement date and scope.",
+  "verified": "2026-10-10",
+  "method": "RISC-V DM hartinfo reads over WCH-LinkE; QingKe debug-memory base plus dataaddr. Legacy observations came from ArduinoCore-CH32; October 2026 observations came from ch32rv.",
   "measured": {
-    "CH32V003": {"part_number_hint": "CH32V003", "core": "QingKe V2A", "dm_data0_addr": "0xE00000F4", "dm_data1_addr": "0xE00000F8"},
-    "CH32V103": {"part_number_hint": "CH32V103", "core": "QingKe V3A", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
-    "CH32V20x": {"part_number_hint": "CH32V203", "core": "QingKe V4B", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
-    "CH32X035": {"part_number_hint": "CH32X035", "core": "QingKe V4C", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"},
-    "CH32L103": {"part_number_hint": "CH32L103", "core": "QingKe V4C", "dm_data0_addr": "0xE0000380", "dm_data1_addr": "0xE0000384"}
+    "CH32V003": {
+      "part_number_hint": "CH32V003",
+      "core": "QingKe V2A",
+      "dm_data0_addr": "0xE00000F4",
+      "dm_data1_addr": "0xE00000F8"
+    },
+    "CH32V103": {
+      "part_number_hint": "CH32V103",
+      "core": "QingKe V3A",
+      "dm_data0_addr": "0xE0000380",
+      "dm_data1_addr": "0xE0000384"
+    },
+    "CH32V20x": {
+      "part_number_hint": "CH32V203",
+      "core": "QingKe V4B",
+      "dm_data0_addr": "0xE0000380",
+      "dm_data1_addr": "0xE0000384"
+    },
+    "CH32X035": {
+      "part_number_hint": "CH32X035",
+      "core": "QingKe V4C",
+      "dm_data0_addr": "0xE0000380",
+      "dm_data1_addr": "0xE0000384"
+    },
+    "CH32L103": {
+      "part_number_hint": "CH32L103",
+      "core": "QingKe V4C",
+      "dm_data0_addr": "0xE0000380",
+      "dm_data1_addr": "0xE0000384"
+    },
+    "CH32M030": {
+      "part_number_hint": "CH32M030G8R7",
+      "core": "QingKe V3B",
+      "dm_data0_addr": "0xE0000340",
+      "dm_data1_addr": "0xE0000344",
+      "hartinfo": "0x00212340",
+      "probe_firmware": "2.22",
+      "evidence": "ch32rv/target/hil-m030-2026-10-10/dmi-12-0.ndjson",
+      "evidence_sha256": "0d7618e4a7a14f2b00434cd8611cc43cda1104e4145cc4d14468502f439806fe",
+      "basis": "hartinfo:wch-linke(ch32rv 2026-10-10;default-hart;ch32rv/target/hil-m030-2026-10-10/dmi-12-0.ndjson)"
+    },
+    "CH32V407": {
+      "part_number_hint": "CH32V407WEU6",
+      "core": "QingKe V3V",
+      "dm_data0_addr": "0xE0000340",
+      "dm_data1_addr": "0xE0000344",
+      "hartinfo": "0x00212340",
+      "probe_firmware": "2.22",
+      "evidence": "ch32rv/target/hil-v407-2026-10-10/dmi-12-0.ndjson",
+      "evidence_sha256": "42496e3295740085506a4b4faebeac36c2d623510fd5f2b2b93176be7b3819db",
+      "basis": "hartinfo:wch-linke(ch32rv 2026-10-10;default-hart;ch32rv/target/hil-v407-2026-10-10/dmi-12-0.ndjson)"
+    },
+    "CH32H417": {
+      "part_number_hint": "CH32H417QEU6",
+      "core": "QingKe V5F + QingKe V3F",
+      "dm_data0_addr": "0xE0000340",
+      "dm_data1_addr": "0xE0000344",
+      "hartinfo": "0x00212340",
+      "probe_firmware": "2.22",
+      "evidence": "ch32rv/docs/data-requests/measured/ch32h417-core-select-2026-10-10.json",
+      "evidence_sha256": "22c4082ecf8d0692de13f44f3d98bf496bcc28fecc077b04fc4494aa729abfc4",
+      "basis": "hartinfo:wch-linke(ch32rv 2026-10-10;hartsel=0,1;ch32rv/docs/data-requests/measured/ch32h417-core-select-2026-10-10.json)",
+      "harts": [
+        0,
+        1
+      ]
+    }
   }
 }

@@ -842,7 +842,7 @@ F-41 で格子の値を採るのと同じ規則。資料側の問題台帳に F-
 | R-24追補3 | CH32V103のSTKレジスタほか（E-1〜E-5） | ✅ **全件クローズ**（2026-08-22）。E-1は探されたレジスタが存在せず`systick.csv`で回答、E-2はRMに記述なし、E-3は`memory_configs.csv`新設、E-4/E-5は`clock_symbols`の集め方を直した |
 | R-25 | 表の追加依頼3件（timers・port/pin・preferred印） | ✅ **2件実装・1件は回答**（2026-08-25）。`timers.csv`新設、`pin_roles`に`port`/`pin`。preferred印は「電源投入時の状態」なら資料が既に持つ（`route`の`main`/`default`）ので列を足さず`tables/README`に区別を書いた |
 | R-26 | 追加テーブル4件＋参考1件 | ✅ **全5件実装**（2026-08-25）。`flash_geometry`・`opa_cmp_registers`・`adc_internal`・`usbpd_plumbing`・`clock_enables` |
-| R-27 | debug module の DATA0/DATA1 レジスタの hart 側アドレス（family別） | ✅ **実装**（2026-08-26）。`evidence/debug_data.csv` 12 family（confirmed 7・reference 4・missing 1=H417）。`tools/build_debug_data.py`。下の「R-27」参照 |
+| R-27 | debug module の DATA0/DATA1 レジスタの hart 側アドレス（family別） | ✅ **実装**（2026-08-26）。`evidence/debug_data.csv` 12 family（2026-10-10 更新: confirmed 9・reference 3・missing 0）。`pipeline/extract/manual/extract_debug_data.py`。下の「R-27」参照 |
 | R-28 | chip ID（device_id）のevidence表（ch32rv 0001・0007・0008） | ✅ 2026-10-08に公式EVTのID一覧を生成器へ追加、72→105行（101型番）。H417/M030/V205/V407/X315の全型番、V467/X305/M103も収載。実測V205RCT6/X315MCU6はconfirmed、資料のみはreference。未収載3型番は資料にIDが無いため推測しない。ch32-data clone不在時の明示的据え置きオプションも追加 |
 | R-29 | debug interface種別（1線SWIO/2線RVSWD）の明示列（ch32rv 0002・優先度中） | ✅ **既存データぶんを実装**（2026-09-01。**新しいPDFは読んでいない**）。`index/debug_interfaces.csv`新設（27 series・swio 5／rvswd 11／未記載11）。`tools/build_debug_interfaces.py`が`evidence/features.csv`の**datasheet節見出しの綴り**（`1-wire`/`单线`→swio、`2-wire`/`2线`→rvswd）と`index/pinout.csv`のSWDIO/SWCLK padから作る。**見出しがwire数を言わないseriesは`debug_if`を空にして推測しない**——V005/V006/V205/M030/H41x/V407/V467/X305/X315（gap 7のうちM103以外が該当。**確定にはRM debug章かWCH-Link manualの読取りが要り、それがこの依頼の残り**。両対応系V00X/M030の切替条件も同様）。V208はzh版のみの見出し=reference。V007(+M007)は見出しが1-wireだがpin表はSWDIO+SWCLK両方を持つ（V00X両対応の示唆。見出しの綴りを`wording`に保つ）。見方は[index/README](../index/README.ja.md)。<br>**WCH-Link manual（zh 2.8/en 2.7・WCH-commonにmirror済み）の注記が未記載11 seriesを全て解決する見込み**（2026-09-01に構造化変換で実在を確認。正式な証拠行はD18の新経路で採る——調査メモとしてここに残す）: **1線/2線の両対応と明記**＝M030・V205（と203CC）・H415/416/417・V002/004/005/006/007・M007・V407/467・X305/315（zh/en両版が同じ注記。zhだけCH587_586を追加で挙げる）。対応表のpad（V003=PD1のみ・V00x=PD1+PB3・M030=PA3/PA2・H41x=PB9/PB8・X03x=PC18/PC19・他=PA13/PA14）は**`index/pinout`と全series一致**、V003はSWCLK欄が「-」で1線のみの裏付け。<br>**残りも完全解決**（2026-09-01・D18）: 新経路の抽出器`pipeline/extract/manual/extract_debug_wiring.py`が`evidence/debug_wiring.csv`を新設（26行・全confirmed・両対応15——**新経路による初の新規evidence表**）。`index/debug_interfaces`は2証拠の突き合わせで**全27 seriesが確定**（swio 3・rvswd 11・**both 13**・confirmed 27）。**資料間齟齬2件を発見**: manualはV002/V004を両対応（SWCLK=PB3）と括るが、両者のpin表にSWCLKが無くDS見出しも1-wire——見出しを採りmanualの異議をbasisに記録（下の台帳にも） |
 | R-31 | flash消去後の読み出し値（wch-protocols・優先度中） | ✅ **実装**（2026-09-06）。`flash_geometry.csv`に5列——RM原文のまま4列（`erased_read_word`/`half`/`byte_even`/`byte_odd`）＋EVT IAPの判定値`blank_check_word`。系統B（V20x/V307/V407/X315/H417）は4値とも明記、系統A（L103/M030/V006/V205/X035）はRMが`字读- 0xFF`とwordしか書かないので**残り3列は空**。zhを一次・M030だけen版（`basis`に`rm-en`）。V003/V103はzh/enとも記述が無く**空欄＋note**（他repoの実測を引用）。EVT側12 familyの判定値は自分で照合（H417は`Common/hardware.c:70`）。**追加**（2026-09-06、consumerのフィードバック）: CH32V103だけRMにもEVT IAPにも根拠が無く、**DBから消去後の値を引けない唯一のfamily**だった。`blank_check_word`を実測の引用で埋め（`basis`に`measured:ch32rv(docs/data-requests/measured/erased-read-2026-09-06.md, CH32V103R8T6)`）、RM側の間接的な裏付け——`FLASH_STATR.PGERR`が「内容が`0xFFFF`でない番地に書こうとすると立つ」＝消去後オール1の前提（CH32xRM.zh p272）——を`rm-pgerr(0xFFFF)`として**機械抽出**で足した。`erased_read_*`（RM原文の列）は空のまま——「RMが言っていないことは書かない」は変えない。幅の不揃い（系統A`0xFF` vs 系統B`0xe339e339`）は原文列なので当然で、**consumerが比較に使うのは正規化済みの`blank_check_word`**——その旨を`evidence/README`に明記 |
@@ -1455,7 +1455,7 @@ converter側（1.13.0）を選べたのは、**凍結toolの下を直せば凍�
 
 ### R-27 debug module の DATA0/DATA1 レジスタの hart 側アドレス（2026-08-26 受領・同日実装）
 
-**結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は EVT に define が無く missing**——hartinfo の実測があれば `curated/debug-data-measured.json` に足して埋まる。
+**結果**: `evidence/debug_data.csv`（family × data0/data1。[evidence/README](../evidence/README.ja.md) の節）。値は3群——V2 系 `0xE00000F4`、V4 系 `0xE0000380`、V3 系の多く `0xE0000340`（M030・V205・V407・X315）、**ただし V3A の V103 は `0xE0000380`**。core 世代では決まらないので family 単位。EVT debug.c の define（全 debug.c で一致）× QingKe マニュアル hartinfo 表（V2/V4 は固定値、V3/V5 は「読め」）× 実測5件。**H417 は2026-10-10の両コア HARTINFO 実測で補完**（`reference`）。M030・V407 も同日の実測と EVT が一致して `confirmed`。実測は計8 family。
 
 Arduino コア側で SDI print（DMDATA0/1 mailbox 経由の printf）を実装したところ、**書き込み先
 アドレスが core 世代で違う**ことが実測で分かった。現状は V4 系の `0xE0000380` を既定にして
@@ -1751,7 +1751,7 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 |---|---|---|
 | 0 | ~~**データの区分・形式・置き場所のやり直し**~~ | ✅ **実施**（2026-08-26）→ [data-layout.ja.md](data-layout.ja.md)。`tables/`→`catalog/`（目録7）・`evidence/`（証拠32）・`index/`（索引10表）。`pin_roles`→`index/pinout.csv`、`feature_tags`→`index/features.csv`、証拠の訂正（F-41）を索引側へ、`register_fields.define`・`dma_requests.request`原綴り・`remap_routes`/`timers`の導出列外し、`candidates/`→`.cache/`。**残り: consumer（ArduinoCore-CH32）の lock 付け替え（別 repository）**。確認の記録は [worklist-archive](worklist-archive.ja.md)「表の役割の確認」 |
 | 1 | ~~**R-20 D-7** DMA channel→周辺の対応~~ | ✅ `dma_requests.csv`（2026-08-26）。表の形は5通りあったが1つの読み方で全12 family |
-| 2 | ~~**R-27** debug module の DATA0/DATA1 アドレス~~ | ✅ `evidence/debug_data.csv`（2026-08-26）。H417 だけ実測待ち |
+| 2 | ~~**R-27** debug module の DATA0/DATA1 アドレス~~ | ✅ `evidence/debug_data.csv`（2026-08-26、2026-10-10追補）。H417 は両コア実測で補完済み |
 | 3 | **R-20** 構造体を持たないdefine群の`member`対応 | **1,591 → 911 行**（2026-08-28〜29。680行を解決）。原因は3種類だった:<br>・**banner が型を名乗らない**だけで構造体には居る 343行 → ✅ **解決**。header の banner は `CMP_CTLR` とだけ書き、型は define 側にしかない（`OPA_CMP_CTLR_PSEL_0` の `OPA_`）。register 名そのものをメンバーに持つ構造体が1つに決まるときだけ採る（`member_named`。衝突0件）<br>・**名前では引けないが RM の絶対番地なら引ける** 337行 → ✅ **解決**。CH32H417/V205 の FMC/FSMC は **BCR と BTR が1つの配列に交互**に入っていて（`FMC_Bank1.BTCR[8]`）、RM の `FMC_BCR1`/`FMC_BTR1` はどのメンバー名とも一致しない。V006/X035 の `OPA_KEY` は header が `OPAKEY` と綴る。**RM の各章冒頭の絶対アドレス表**（12 family 全部にある）が番地を書いているので、block の base を引いて offset にすれば実体が決まる（`member_at_address`。0x40025400→`BTCR[0]`、0x40025404→`BTCR[1]` と RM の番地で検算済み）。**スキーマ変更も出所の変更も要らなかった**——アドレス表はもともと base+offset の裏取りに読んであり、それを名前の代わりの鍵に使うだけ<br>・**置き場所がそもそも無い** 911行 → ⬜ 残り。うち62行は RM が番地を書くのに **header に構造体が無い**（V20x の `DVP_*` 0x50050000。F-7 と同じ事実）。残る849行は header にも RM のアドレス表にも無く、`member` は header の概念なので**埋めようがない**。bit 位置と define 名は事実なので offset 無しで載せている |
 | 4 | ~~**D17** PDF構造化の本番移行・事前調査~~ | ✅ **完了**（2026-09-01）。後続はD18 |
 | 5 | **D18** PDF構造化の本実装 | 🔧 **進行中**（2026-09-01〜02）。ingest（converter 1.2.0）・L1結合（3,770表）・人向けMarkdown（差ゼロ検査67文書合格・図caption 100%・添字破損の警告）・一括再生成entry point（`--full`で全CSVをbundle入力で再生成）済み。**凍結PDF tool 19本すべて新経路で従来以上、工程(5)の一括切替も成立**（`--full`初回実行で全正本byte一致・生成手順もbundle入力形へ）。L2 sidecarの実行部（rejected除外＋record CLI）も実装済み——**D16完了条件5点が全部立った**。新経路の新規evidence: debug_wiring・option_bytes/option_byte_fields（R-30）・device_id_addresses/device_ids（R-28受入済）。<br>**converter 1.6.0（人向けMarkdownの忠実度・2026-09-02）**: 2カラム分離・太字/斜体・PUA記号の正規化・図captionの誤検出抑止・ページ境界セルの折り込み・**下付き/上付きの本文行統合**（`V`+`DD`→`VDD`、単語スペース保持。下流のoperating_conditions説明文も`V`→`VDDK`と改善）・**レジスタbit図の組み直し**（番号行→ヘッダ・16等幅・折り返し復旧・TIMの2段保持・罫線無し単一フィールドの合成。bit番号x中心で列マップ＝抽出の列数差に非依存。全67本parity 0、RMカバレッジ94-98%）・**表セル中央寄せ＋長文左寄せ**。検証中に2バグ修正（bit図の誤チェーン→mergedセルbbox欠落でexport中断／隣接セルのbit中心二重主張→グリッド衝突）。**QA監査ツール** `pipeline/review/audit_pages.py`（残る「変な箇所」をスコア化・viewerリンク付き）。残り: L2の実運用（conflict裁定の記録蓄積）・zh/en対応付けreviewの工程化・**QA巡回での100%詰め**（表セル/図中の下付き孤立304・byte境界bit図187・table_issue 1068の目視。bundleセル変更はcanonical byte一致に触れるので要慎重） |
@@ -1826,6 +1826,37 @@ R-20 の機械収集ぶん（4表＋RMアドレス表での裏取り）も同日
 | R-33 | RM の zh/en | **access が両版で食い違う field が26**（`rm_access_confidence=conflict`）。例: H417/V407 `RCC_BDCTLR.LSEON`/`LSEBYP` zh `RW`/en `RO`（LSE の起動は書けるはずで en 側の誤りらしい）、H417 `LPTIM_ICR` の7 flag zh `RW1`/en `W1`（en は定義に無い語）、V407/X315 `FLASH_CTLR.PG_STRT` zh `RW0`/en `WO`、X315 `FLASH_ADDR.FAR` zh `WO`/en `RW`、X315 `SPI_STATR.OVR` zh `RO`/en `RW0` | 片方に寄せず zh を `rm_access`、en を `rm_access_basis` の `!…:en(=X)` に。`index/conflicts.csv` に `field=rm_access` で並ぶ（2026-10-01） |
 
 いずれも**実機では未確認**。「正しい側」はもう一方の資料が複数一致することで決めている。
+
+## 2026-10-10 実測受入と V407 資料更新
+
+consumer の根拠は `ch32rv/docs/data-requests/measured/` と
+`ch32rv/target/hil-{m030,v407,h417}-2026-10-10/`。
+コア選択の追加根拠は `ch32rv/docs/data-requests/0009-h417-core-selection.ja.md` と
+同 `measured/ch32h417-core-select-2026-10-10.json`、独立2セッションの USB capture。
+書き込み・消去等の機能対応を、この識別・読取実測から認定しない。
+
+- **M030G8R7 の容量差は未解決**。ユーザーが刻印 G8R7 を確認。
+  FLACAP `0x1ffff3a0` は繰り返し `0x0010`（RM §18.2.1 の単位では16 KiB）を返すが、
+  資料・DB は64 KiB。保存済み64 KiB dumpの16 KiBブロック0/1は異なり、
+  第1ブロック以降にも非消去データがある。単純な16 KiB周期の繰り返しではないが、
+  読取成功だけで物理64 KiBの確認済みとはしない。DBの容量は変更しない。
+- **V407WEU6 の FLACAP と設定は食い違う**。FLACAP・ChipInfo は576 KiB、
+  USER=`0xBF` の bit6 は0。取得前後の OBR は `0x03fffefe` / `0x03fffefc` で、
+  RM両言語の RAM_CODE_MOD（bit8）は0、EVTヘッダの同名定数（`0x0200`、bit9）は1。
+  RMとUSERでは512 KiB CODE / 200 KiB RAMだが、EVT定数で読むと判定が逆転する。
+  `FLASH_OBR_RAM_CODE_MOD` の既存 evidence は EVT のみの reference。
+  bit位置の資料差とFLACAPの意味を解決するまで、576 KiB CODE / 136 KiB RAMを
+  現在の実機設定として認定しない。総Flash992 KiB、ゼロウェイト領域、SRAM分割を区別する。
+- **H417QEU6 の両コアで DATA 番地の根拠が揃った**。2セッションとも
+  hartsel `1→0→1→0` の readback、mhartid=0/1、marchid/mimpidを確認し、
+  両コアの HARTINFO は `0x00212340`（dataaccess=1、datasize=2、dataaddr=`0x340`）。
+  DATA0/DATA1 は `0xE0000340` / `0xE0000344`。結果JSONとUSB列を照合済み。
+  選択したコアの resume/reset/step は未試験。プロトコル収載は別 repository で扱う。
+- **CH32V407DS0.zh V1.2→V1.3 の取り込み**。原本SHAは
+  `14a0cdebae2a…` → `0c4244ab9359…`、英語版はV1.2。
+  CH32V407KEU6（QFN32、480 KiB Flash、200 KiB SRAM）と対応ピン・周辺機能表を追加。
+  WEU6 の512/200・576/136 KiBの分割条件は新版でも継続。
+  キャッシュ未配置のため全bundleを復元してから全再生成・検査を行う（進行中）。
 
 ## 利用状況（優先順位の根拠）
 

@@ -512,7 +512,7 @@ The sources are `evt(system_ch32*.c)`, `evt(rcc-header+rcc-driver)`, `evt(device
 **Hart-side addresses of the debug module's data0/data1 registers** (consumer request R-27: the
 addresses SDI print -- printf through the DMDATA0/1 mailbox -- writes to). One row per family.
 **The address differs per die**: the V2 families (V003/V00x) use `0xE00000F4`, the V4 families
-(L103/M103, V20x, V30x, X035) `0xE0000380`, most V3 families (M030, V205, V407, X315) `0xE0000340`,
+(L103/M103, V20x, V30x, X035) `0xE0000380`, most V3 families (M030, V205, V407, X315) and both H417 cores `0xE0000340`,
 but V103 (V3A) `0xE0000380`. The core generation does not decide it, hence per family.
 
 Three sources; a row where they agree is `confirmed`:
@@ -521,10 +521,12 @@ Three sources; a row where they agree is `confirmed`:
 |---|---|
 | `evt(<debug.c>)` | `#define DEBUG_DATA0_ADDRESS ((volatile uint32_t*)0x…)` in each EVT's debug.c (the SDI_Printf implementation). All debug.c files of a family must agree (`+N more`) |
 | `manual:qingke-vN(dataaddr=0x380)` | The hartinfo table in the QingKe processor manual's debug chapter. **V2 (`0x0f4`) and V4 (`0x380`) are fixed values**; V3 and V5 print `0xXXX` ("subject to what is actually read out"), recorded as `dataaddr=read hartinfo` and not counted as a source |
-| `hartinfo:wch-linke(consumer 2026-08-26)` | hartinfo.dataaddr read through WCH-LinkE by the consumer (`curated/debug-data-measured.json`: V003, V103, V203, X035, L103) |
+| `hartinfo:wch-linke(...)` | HARTINFO read through WCH-LinkE (`curated/debug-data-measured.json`). The basis retains the date and scope: legacy V003, V103, V203, X035, L103 observations; 2026-10-10 M030, V407 and H417 observations |
 
 CH32H417 has no define in its EVT (no SDI_Printf example) and the V5/V3 manuals do not fix the value,
-so its row stays with empty addresses and `missing`; a hartinfo reading is needed to fill it.
+so its two-core measurement supplies `0xE0000340` / `0xE0000344` as `reference`.
+Both hartsel 0 and 1 returned HARTINFO `0x00212340` in two independent sessions.
+M030 and V407 measurements agree with their EVT defines, making those rows `confirmed`.
 `dm_data1_addr` is always `dm_data0_addr + 4` (checked by `check_tables`). Built by `pipeline/extract/manual/extract_debug_data.py`.
 
 ### `debug_wiring.csv`
@@ -628,8 +630,8 @@ from `curated/device-ids-measured.json` make a row `confirmed`, with
 `id_source=memory`. This verifies identity, not flash programming.
 `dont_care_bits` remains `[7:4]`. With no ch32-data clone,
 `--reuse-ch32-data` explicitly retains existing imported rows and provenance.
-The catalog has 101 IDs for 104 parts; the missing parts are CH32M007K8U7,
-CH32V203C6U6 and CH32X035D8U6. No ID is inferred from a sibling package.
+The catalog has 101 IDs for 105 parts; the missing parts are CH32M007K8U7,
+CH32V203C6U6, CH32X035D8U6 and the newly documented CH32V407KEU6. No ID is inferred from a sibling package.
 
 ### `link_firmware.csv`
 
