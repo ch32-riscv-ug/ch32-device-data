@@ -55,7 +55,7 @@ README自動生成の対象は**データシートとEVTを持つ12リポジト�
 - [x] ✅ **A6 機能フラグ（USB/Ethernet/CAN/PD/DVP…）** — `evidence/features.csv`新設（2026-08-23）。比較表からは作れない（[調査結果はarchive](worklist-archive.ja.md)）ので、**機能説明章の節見出し**を採った。節番号は言語に依らないので中英が厳密に対応する
 - [x] ✅ **A7 メモリマップ** — `evidence/memory_map.csv`新設（2026-08-23）。**DS 1.2章ではなくEVTヘッダーの`*_BASE`から**。相対の連鎖を解く処理は`extract_addresses`が既に持っていた
 - [x] ✅ **A8 書き込み方式** — **A6の副産物**（2026-08-23）。`1-wire Serial Debug Interface (SDI)`／`2-wire SDI Serial Debug Interface`が節見出しとして立っているので、`curated/`への手書きは不要だった
-- [x] ✅ **A10 型番×能力の縦持ち索引** — `index/capabilities.csv`新設（2026-08-29。1,707行）。`evidence/product_attributes.csv`（154種類の綴り・1,714行）**だけ**から作る。`index/parts.csv`は横長なので比較表の属性を13列しか持てず、残りは綴りを知っている人しか引けなかった。属性→能力の対応は**総当たりの辞書**（`tools/build_capabilities.py`の`CAPABILITIES`）で、regex で畳まないのは`adc`（チャネル数）と`adc_unit`（ユニット数）のように**似た綴りで意味が違う**ものが混ざるため。辞書に無い属性が現れたら生成が落ちる。`stated`列が資料の言い方（`count`＝素の整数1,182行／`marker`＝`√`160行／`text`＝`8+2`等365行）を言い、`count`が入るのは`stated=count`のときだけで**数える規則は当てない**。**新しい PDF は読んでいない**（既存の証拠の並べ替え）
+- [x] ✅ **A10 型番×能力の縦持ち索引** — `index/capabilities.csv`新設（2026-08-29。1,734行）。`evidence/product_attributes.csv`（154種類の綴り・1,741行）**だけ**から作る。`index/parts.csv`は横長なので比較表の属性を13列しか持てず、残りは綴りを知っている人しか引けなかった。属性→能力の対応は**総当たりの辞書**（`tools/build_capabilities.py`の`CAPABILITIES`）で、regex で畳まないのは`adc`（チャネル数）と`adc_unit`（ユニット数）のように**似た綴りで意味が違う**ものが混ざるため。辞書に無い属性が現れたら生成が落ちる。`stated`列が資料の言い方（`count`＝素の整数1,182行／`marker`＝`√`160行／`text`＝`8+2`等365行）を言い、`count`が入るのは`stated=count`のときだけで**数える規則は当てない**。**新しい PDF は読んでいない**（既存の証拠の並べ替え）
 - [x] ✅ **A9 割り込みベクタ表** — `evidence/interrupts.csv`新設（2026-08-23）。**RM側と書いたのは材料の見落とし**で、EVTヘッダーの`IRQn_Type`列挙が番号・名前・説明を全部持っている。variantで番号が入れ替わるので`#if`の条件を`condition`列に持つ
 
 ## B. README生成
