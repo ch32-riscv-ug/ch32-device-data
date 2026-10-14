@@ -73,6 +73,14 @@ def main() -> int:
     args = ap.parse_args()
 
     entries, moved, missing, uncovered = drift()
+    # 同じ表が2行あると片方だけ古くても気付けない。マージの衝突を両側残しで
+    # 解いて23表が重複したことがある（2026-10-14）。--record はこれを直さない。
+    tables = [e["table"] for e in entries]
+    duplicated = sorted({t for t in tables if tables.count(t) > 1})
+    for table in duplicated:
+        print(f"{table}: 台帳に {tables.count(table)} 行ある（手で1行にすること）", file=sys.stderr)
+    if duplicated:
+        return 1
     for entry in missing:
         print(f"{entry['table']}: 台帳にあるのに実物が無い", file=sys.stderr)
     for entry, rows, sha in moved:
