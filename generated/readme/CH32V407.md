@@ -28,7 +28,7 @@ Flash and SRAM list every value the series has; more than one means it varies by
 
 ### CH32V407 product comparison
 
-Only the 12 rows that differ between these 4 products; the other 17 are the same for all of them.
+Only the 11 rows that differ between these 4 products; the other 18 are the same for all of them.
 
 | | [CH32V407&#8203;KEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407KEU6)&#8203;(QFN32) | [CH32V407&#8203;RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6)&#8203;(LQFP64) | [CH32V407&#8203;VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6)&#8203;(LQFP100) | [CH32V407&#8203;WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6)&#8203;(QFN68) |
 |---|---|---|---|---|
@@ -40,7 +40,6 @@ Only the 12 rows that differ between these 4 products; the other 17 are the same
 | SPI/I2S | SPI1 SPI3/I2S3 | 3/2 | 3/2 | 3/2 |
 | USBHS (Include PHY) | 2 | 1 (USBHS1) | 2 | 2 |
 | SDIO | - | 1 | 1 | 1 |
-| CPU main frequency | Max：200MHz | Max: 200MHz | Max: 200MHz | Max: 200MHz |
 | DVP | - | 1 | 1 | 1 |
 | LTDC | - | 1 | 1 | 1 |
 | FSMC | - | - | 1 | - |
@@ -57,7 +56,7 @@ Only the 12 rows that differ between these 4 products; the other 17 are the same
 | Advanced-control (16-bit)(1) | 2 | 2 | 2 | 2 |
 | General-purpose (16-bit) (1) | 4 | 4 | 4 | 4 |
 | Basic (16-bit) | 2 | 2 | 2 | 2 |
-| Timer Watchdog | 2 (WWDG + IWDG) | 2 (WWDG + IWDG) | 2 (WWDG + IWDG) | 2 (WWDG + IWDG) |
+| Timer Watchdog | 2(WWDG + IWDG) | 2(WWDG + IWDG) | 2(WWDG + IWDG) | 2(WWDG + IWDG) |
 | SysTick (32-bit) | Support | Support | Support | Support |
 | RTC | Support | Support | Support | Support |
 | ADC Unit | 2 | 2 | 2 | 2 |
@@ -74,7 +73,7 @@ Only the 12 rows that differ between these 4 products; the other 17 are the same
 | SDIO | - | 1 | 1 | 1 |
 | Ethernet | MAC+10M/100M PHY | MAC+10M/100M PHY | MAC+10M/100M PHY | MAC+10M/100M PHY |
 | ARGB | 1 | 1 | 1 | 1 |
-| CPU main frequency | Max：200MHz | Max: 200MHz | Max: 200MHz | Max: 200MHz |
+| CPU main frequency | Max: 200MHz | Max: 200MHz | Max: 200MHz | Max: 200MHz |
 | DVP | - | 1 | 1 | 1 |
 | LTDC | - | 1 | 1 | 1 |
 | FSMC | - | - | 1 | - |
@@ -105,7 +104,7 @@ Only the 4 rows that differ between these 3 products; the other 26 are the same 
 | Advanced-control (16-bit)(1) | 2 | 2 | 2 |
 | General-purpose (16-bit) (1) | 4 | 4 | 4 |
 | Basic (16-bit) | 2 | 2 | 2 |
-| Timer Watchdog | 2 (WWDG + IWDG) | 2 (WWDG + IWDG) | 2 (WWDG + IWDG) |
+| Timer Watchdog | 2(WWDG + IWDG) | 2(WWDG + IWDG) | 2(WWDG + IWDG) |
 | SysTick (32-bit) | Support | Support | Support |
 | RTC | Support | Support | Support |
 | ADC Unit | 2 | 2 | 2 |
@@ -135,13 +134,13 @@ Pinout drawings are in the datasheet (chapter *Pinouts*); each link opens at the
 
 | Package | Products | Datasheet | Outline |
 |---|---|---|---|
-| QFN32 | CH32V407KEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=17) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN32.png) |
-| LQFP64 | CH32V407RET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=21) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=17) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
-| LQFP100 | CH32V407VET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=20) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=16) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
-| QFN68 | CH32V407WEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=20) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=16) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68.png) |
-| LQFP64 | CH32V467RET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=22) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=19) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
-| LQFP100 | CH32V467VET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=21) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=18) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
-| QFN68 | CH32V467WEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=22) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=18) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68.png) |
+| QFN32 | CH32V407KEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=22) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=17) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN32.png) |
+| LQFP64 | CH32V407RET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=22) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=17) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
+| LQFP100 | CH32V407VET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=21) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=16) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
+| QFN68 | CH32V407WEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=21) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=16) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68.png) |
+| LQFP64 | CH32V467RET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=24) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=19) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP64.png) |
+| LQFP100 | CH32V467VET6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=23) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=18) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_LQFP100.png) |
+| QFN68 | CH32V467WEU6 | [en](https://ch32-riscv-ug.github.io/CH32V407/datasheet_en/CH32V407DS0.PDF#page=23) / [zh](https://ch32-riscv-ug.github.io/CH32V407/datasheet_zh/CH32V407DS0.PDF#page=18) | [drawing](https://raw.githubusercontent.com/ch32-riscv-ug/WCH-common/main/image/package_QFN68.png) |
 
 ## Pin maps & alternate functions
 

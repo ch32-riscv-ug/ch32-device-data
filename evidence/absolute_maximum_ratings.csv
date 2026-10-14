@@ -213,18 +213,18 @@ CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on PHY pin of USB and 10M
 CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on other pins,,VSS-0.3,VIO+0.3,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.52)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_IN,Input voltage on the FT (5V tolerance) pin,,VSS-0.3,5.5,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.59),CH32V20x_30xDS0.PDF
 CH32V303;CH32V305;CH32V307;CH32V317,V_IO-V_SS,I/O supply voltage,,-0.3,4.0,V,#,confirmed,CH32V20x_30xDS0.PDF:zh(p.51)+CH32V20x_30xDS0.PDF:en(p.58),CH32V20x_30xDS0.PDF
-CH32V407;CH32V467,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
-CH32V407;CH32V467,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
-CH32V407;CH32V467,I_VDD,Total current of all V_DD main supply pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
-CH32V407;CH32V467,I_VSS,Total current of all V_SS common ground pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.51),CH32V407DS0.PDF
-CH32V407;CH32V467,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_DD,External main supply voltage (including V_DD and V_DDA),,-0.3,4.0,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_DDK,Power decoupling end of core circuit,,-0.2,1.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_IN,Input voltage on FT (tolerant 5V) pin.,,-0.3,5.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_IN,Input voltage on USB 2.0 and Ethernet PHY pins,,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_IN,Input voltage on other pins (supplied by V_DD),,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
-CH32V407;CH32V467,V_REF+,Positive reference voltage of ADC and DAC modules,,-0.3,VDDA+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.50),CH32V407DS0.PDF
+CH32V407;CH32V467,I_IO,Output current on any I/O and control pin,,,-25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
+CH32V407;CH32V467,I_IO,Sink current on any I/O and control pin,,,25,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
+CH32V407;CH32V467,I_VDD,Total current of all V_DD main supply pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
+CH32V407;CH32V467,I_VSS,Total current of all V_SS common ground pins,,,250,mA,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.63),CH32V407DS0.PDF
+CH32V407;CH32V467,T_A,Ambient temperature during operation,,-40,85,℃,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,T_S,Ambient temperature during storage,,-40,125,℃,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_DD,External main supply voltage (including V_DD and V_DDA),,-0.3,4.0,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_DDK,Power decoupling end of core circuit,,-0.2,1.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on FT (tolerant 5V) pin.,,-0.3,5.5,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on USB 2.0 and Ethernet PHY pins,,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_IN,Input voltage on other pins (supplied by V_DD),,-0.3,VDD+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
+CH32V407;CH32V467,V_REF+,Positive reference voltage of ADC and DAC modules,,-0.3,VDDA+0.3,V,#,confirmed,CH32V407DS0.PDF:zh(p.55)+CH32V407DS0.PDF:en(p.62),CH32V407DS0.PDF
 CH32X033;CH32X035,I_GND,Total combined current on all GND common ground pins,,,200,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,I_IO,Sink current on any I/O pins,,,40,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
 CH32X033;CH32X035,I_IO,Source current on any I/O pins,,,30,mA,#,confirmed,CH32X035DS0.PDF:zh(p.23)+CH32X035DS0.PDF:en(p.25),CH32X035DS0.PDF
