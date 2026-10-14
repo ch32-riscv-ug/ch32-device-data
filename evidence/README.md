@@ -618,20 +618,21 @@ exists, and against every `device_ids.csv` row's `id_addr`.
 
 ### `device_ids.csv`
 
-**The 32-bit device_id per part number.** `tools/build_device_ids.py` imports
-ch32-rs/ch32-data and fills missing catalog entries from the official EVT
-`DBGMCU_GetCHIPID` ChipID List. EVT names match exactly or omit only the trailing
-temperature grade (6/7); package suffixes are never guessed. Source commit,
-file, documented name and ID are recorded in `basis`. Disagreeing IDs stop
-generation. Ambiguous multi-ID EVT entries retain only the existing import.
+**The 32-bit device_id per part number.** `tools/build_device_ids.py` reads only
+the official EVT `DBGMCU_GetCHIPID` ChipID List. EVT names match exactly or omit only
+the trailing temperature grade (1/6/7); package suffixes are never guessed. Source
+commit, file, documented name and ID are recorded in `basis`. Disagreeing IDs stop
+generation, and an EVT entry that lists several IDs for one part (CH32V203F6P) is
+not listed. Until 2026-10-14 the third-party ch32-rs/ch32-data was imported as well;
+it was dropped so the data does not depend on an external site (67 of its 72 rows
+match the EVT; three parts without EVT support and four duplicate V003 rows went away).
 
 Documented entries are `reference`; matching memory and AttachChip measurements
 from `curated/device-ids-measured.json` make a row `confirmed`, with
 `id_source=memory`. This verifies identity, not flash programming.
-`dont_care_bits` remains `[7:4]`. With no ch32-data clone,
-`--reuse-ch32-data` explicitly retains existing imported rows and provenance.
-The catalog has 101 IDs for 105 parts; the missing parts are CH32M007K8U7,
-CH32V203C6U6, CH32X035D8U6 and the newly documented CH32V407KEU6. No ID is inferred from a sibling package.
+`dont_care_bits` remains `[7:4]`.
+98 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
+CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6. No ID is inferred from a sibling package.
 
 ### `link_firmware.csv`
 
@@ -1090,7 +1091,7 @@ uv run tools/build_link_firmware.py             # link_firmware (from WCH's dist
 uv run pipeline/extract/manual/extract_debug_data.py  # debug_data (defines in EVT debug.c + the QingKe manuals' hartinfo tables, read from the bundles; seconds)
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
-uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID + ch32-data import)
+uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID and ChipID List)
 uv run pipeline/extract/rm/extract_esig.py      # esig (the RM's electronic-signature table, both editions, from the bundles; seconds)
 uv run tools/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
 uv run tools/build_readme.py                    # generated/readme/*.md (README for each family)

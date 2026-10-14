@@ -600,17 +600,17 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 
 ### `device_ids.csv`
 
-**型番ごとの32bit device_id**。第三者DB ch32-rs/ch32-dataの取り込みに加え、
-公式EVTの`DBGMCU_GetCHIPID`のChipID Listから未登録型番を補完する。
-照合は完全一致か末尾の温度グレード6/7の省略だけ。封装の接尾辞は推測しない。
-`basis`にmirrorのcommit、file、資料の型番表記とIDを残す。既存IDと食い違えば
-生成を止め、複数IDがある曖昧なEVT行は既存の取り込みだけを維持する。
+**型番ごとの32bit device_id**。出所は公式EVTの`DBGMCU_GetCHIPID`のChipID Listだけ。
+照合は完全一致か末尾の温度グレード1/6/7の省略だけ。封装の接尾辞は推測しない。
+`basis`にmirrorのcommit、file、資料の型番表記とIDを残す。EVT内でIDが食い違えば
+生成を止め、1型番に複数IDを書くEVT行（CH32V203F6P）は収載しない。
+2026-10-14 まで第三者DB ch32-rs/ch32-data も取り込んでいたが、外部サイトに依存しないため外した
+（取り込み72行のうち67行はEVTと同値。EVTに根拠が無い3型番と、V003の重複4行が消えた）。
 
 資料による登録は`reference`。`curated/device-ids-measured.json`のmemoryと
 AttachChip実測に一致した行のみ`confirmed`、`id_source=memory`にする。
 ID確認はflash書き込み検証を意味しない。`dont_care_bits`は`[7:4]`。
-ch32-data cloneが無い場合は`--reuse-ch32-data`で既存の取り込み行と出所を明示的に据え置く。
-105型番のうち101型番を収載。未登録はCH32M007K8U7、CH32V203C6U6、CH32X035D8U6、新規追加のCH32V407KEU6。
+105型番のうち98型番を収載。未登録はCH32M007K8U7・CH32V103C6T6・CH32V103C8U6・CH32V203C6U6・CH32V203F6P6・CH32V407KEU6・CH32X035D8U6の7型番（EVTにIDが無いか、複数IDで曖昧）。
 
 ### `link_firmware.csv`
 
@@ -1051,7 +1051,7 @@ uv run tools/build_link_firmware.py             # link_firmware（WCHの配布�
 uv run pipeline/extract/manual/extract_debug_data.py  # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表をbundleから。数秒）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
-uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPID＋ch32-data取込）
+uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPIDとChipID List）
 uv run pipeline/extract/rm/extract_esig.py      # esig（RMの電子署名の表を両版、bundleから。数秒）
 uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
 uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
