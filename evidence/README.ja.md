@@ -611,6 +611,8 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 AttachChip実測に一致した行のみ`confirmed`、`id_source=memory`にする。
 ID確認はflash書き込み検証を意味しない。`dont_care_bits`は`[7:4]`。
 105型番のうち98型番を収載。未登録はCH32M007K8U7・CH32V103C6T6・CH32V103C8U6・CH32V203C6U6・CH32V203F6P6・CH32V407KEU6・CH32X035D8U6の7型番（EVTにIDが無いか、複数IDで曖昧）。
+**1型番1行を保つ**——consumer の ch32rv は型番をキーに読む（2行目が黙って上書きされ、
+もう片方の ID のチップを誤って拒否する）。1型番に複数 ID を載せる形にするときは、先に ch32rv へ知らせる（2026-10-14 合意）。
 
 ### `link_firmware.csv`
 

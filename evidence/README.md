@@ -632,7 +632,10 @@ from `curated/device-ids-measured.json` make a row `confirmed`, with
 `id_source=memory`. This verifies identity, not flash programming.
 `dont_care_bits` remains `[7:4]`.
 98 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
-CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6. No ID is inferred from a sibling package.
+CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6.
+**Keep one row per part.** The consumer ch32rv keys on the part number (a second row
+silently overwrites the first, and a chip reporting the other ID would be rejected);
+tell ch32rv before listing several IDs for one part (agreed 2026-10-14). No ID is inferred from a sibling package.
 
 ### `link_firmware.csv`
 
