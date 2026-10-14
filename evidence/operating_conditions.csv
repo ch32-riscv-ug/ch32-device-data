@@ -2684,7 +2684,6 @@ CH32V203;CH32V205,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,u
 CH32V203;CH32V205,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
-CH32V203;CH32V205,t_SU_(NWAITV_CLKH),FSMC_CLK high before FSMC_NWAIT valid,,6,,,ns,#,reference,CH32V205DS0.PDF:en(p.72),CH32V205DS0.PDF
 CH32V203;CH32V205,t_V(A_NE),FSMC_NE low to FSMC_A active,,0,,5,ns,#,confirmed,CH32V205DS0.PDF:zh(p.60)+CH32V205DS0.PDF:en(p.69),CH32V205DS0.PDF
 CH32V203;CH32V205,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32V205DS0.PDF:zh(p.61)+CH32V205DS0.PDF:en(p.70),CH32V205DS0.PDF
 CH32V203;CH32V205,t_V(BL_NE),FSMC_NE low to FSMC_BL active,,0,,5,ns,#,confirmed,CH32V205DS0.PDF:zh(p.60)+CH32V205DS0.PDF:en(p.69),CH32V205DS0.PDF
@@ -2745,7 +2744,6 @@ CH32V203;CH32V205,t_h(SDA),SDA data hold time,Fast I2C,0,,900,ns,#,confirmed,CH3
 CH32V203;CH32V205,t_h(SDA),SDA data hold time,Standard I2C,0,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_h(STA),Start condition hold time,Fast I2C,0.6,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_h(STA),Start condition hold time,Standard I2C,4.0,,,us,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
-CH32V203;CH32V205,t_h_(CLKH_NWAITV),FSMC_CLK high after FSMC_NWAIT valid,,2,,,ns,#,reference,CH32V205DS0.PDF:en(p.72),CH32V205DS0.PDF
 CH32V203;CH32V205,t_prog_page,Page (256 bytes) programming time,,1.6,2.0,2.5,ms,#,confirmed,CH32V205DS0.PDF:zh(p.47)+CH32V205DS0.PDF:en(p.54),CH32V205DS0.PDF
 CH32V203;CH32V205,t_r(SCL),SDA and SCL rise time,Fast I2C,20,,,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
 CH32V203;CH32V205,t_r(SCL),SDA and SCL rise time,Standard I2C,,,1000,ns,#,confirmed,CH32V205DS0.PDF:zh(p.51)+CH32V205DS0.PDF:en(p.59),CH32V205DS0.PDF
@@ -3507,6 +3505,7 @@ CH32V407;CH32V467,t_RSTTEMPO,Other reset,,2,10,30,ms,#,confirmed,CH32V407DS0.PDF
 CH32V407;CH32V467,t_RSTTEMPO,Power on reset,,16,28,30,ms,#,confirmed,CH32V407DS0.PDF:zh(p.57)+CH32V407DS0.PDF:en(p.64),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(ADV_CLKH),FSMC_CLK high before FSMC_AD[15:0] valid data,,8,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.72)+CH32V407DS0.PDF:en(p.82),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(DATA_NE),Setup time from data to FSMC_NE high,,3*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.71)+CH32V407DS0.PDF:en(p.80),CH32V407DS0.PDF
+CH32V407;CH32V467,t_SU(DATA_NOE),Setup time from data to FSMC_NOE high,,3*tHCLK,,,ns,#,confirmed,CH32V407DS0.PDF:zh(p.71)+CH32V407DS0.PDF:en(p.80),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(HSE),Startup time,"V_DD stable, 25M crystal",,1,,ms,#,confirmed,CH32V407DS0.PDF:zh(p.60)+CH32V407DS0.PDF:en(p.69),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(HSI),HSI oscillator startup stabilization time(1),,,,8,us,#,confirmed,CH32V407DS0.PDF:zh(p.61)+CH32V407DS0.PDF:en(p.70),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(LSE),Startup time,V_DD is stable,,800,,mS,#,confirmed,CH32V407DS0.PDF:zh(p.61)+CH32V407DS0.PDF:en(p.69),CH32V407DS0.PDF
@@ -3518,7 +3517,6 @@ CH32V407;CH32V467,t_SU(STA),Repeated start condition setup time,Fast I2C,0.6,,,u
 CH32V407;CH32V467,t_SU(STA),Repeated start condition setup time,Standard I2C,4.7,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(STO),Stop condition setup time,Fast I2C,0.6,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
 CH32V407;CH32V467,t_SU(STO),Stop condition setup time,Standard I2C,4.0,,,us,#,confirmed,CH32V407DS0.PDF:zh(p.65)+CH32V407DS0.PDF:en(p.74),CH32V407DS0.PDF
-CH32V407;CH32V467,t_SU_(DATA_NOE),Setup time from data to FSMC_NOE high,,3*tHCLK,,,ns,#,reference,CH32V407DS0.PDF:en(p.80),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(A_NE),FSMC_NE low to FSMC_A active,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.71)+CH32V407DS0.PDF:en(p.80),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(A_NE),FSMC_NE low to FSMC_A valid,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.71)+CH32V407DS0.PDF:en(p.81),CH32V407DS0.PDF
 CH32V407;CH32V467,t_V(BL_NE),FSMC_NE low to FSMC_BL active,,0,,5,ns,#,confirmed,CH32V407DS0.PDF:zh(p.71)+CH32V407DS0.PDF:en(p.80),CH32V407DS0.PDF

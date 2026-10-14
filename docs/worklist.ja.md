@@ -1867,7 +1867,7 @@ consumer の根拠は `ch32rv/docs/data-requests/measured/` と
   `I_DDA` の単位の食い違い（en uA / zh mA）が en の mA への訂正で解けて conflict 19→18、
   `V_hys`（FT I/O）が1行増えた。**1行だけ後退**: `t_SU(DATA_NOE)` が英語版の版面で `SU` が
   別断片に割れて `t_SU_(DATA_NOE)` と綴られ、中文版と対にならず confirmed→reference
-  （V205 の `t_SU_(NWAITV_CLKH)` と同じ形）。抽出器の直しとして別commitで扱う。
+  （V205 の `t_SU_(NWAITV_CLKH)` と同じ形）。**同日に別commitで直した**——`operating_rows.norm_symbol` が添字のあとの `_(` を `(` に畳む（`DuCy_(HSE)` のように添字の無い記号は触らない）。V407 の行が confirmed に戻り、V205 の崩れた2行（英語版 p.72 の重複）は既存の confirmed 行に畳まれて 3,928→3,926 行。値は不変。
 
 ## 利用状況（優先順位の根拠）
 

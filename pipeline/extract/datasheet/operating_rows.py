@@ -399,6 +399,13 @@ def split_pin_group(cell):
 
 
 def norm_symbol(cell):
+    """記号セルを表の綴りへ。添字のあとの引数の括弧は下線を挟まない。
+
+    >>> norm_symbol("t\\nSU\\n(DATA_NOE)"), norm_symbol("t\\nh\\n(CLKH_NWAITV)")
+    ('t_SU(DATA_NOE)', 't_h(CLKH_NWAITV)')
+    >>> norm_symbol("DuCy\\n(HSE)")
+    'DuCy_(HSE)'
+    """
     # 添字を挟んで割れた脚注を先に畳む（`V (2⏎OHSAT⏎)` → `V ⏎OHSAT`）。
     cell = FOOTNOTE_SPLIT.sub(lambda m: "\n" + m.group(1), cell or "")
     # **基底が1行目に並び添字が2行目に並ぶ組版**は、行を`_`で繋ぐだけでは読めない
@@ -417,6 +424,11 @@ def norm_symbol(cell):
     # 脚注を落とした跡が空白として残るので（"V (6)\nDD" → "V _DD"）、
     # 連続したアンダースコアは1つに畳む。
     sym = re.sub(r"[\s_]+", "_", sym).strip("_")
+    # **添字のあとの引数の括弧が別の行に落ちる**（`t⏎SU⏎(DATA_NOE)` → `t_SU_(DATA_NOE)`）。
+    # 表の綴りは `t_SU(DATA_NOE)`・`C_in(HSE)` で、括弧の手前に下線は無い。片方の版だけ
+    # こう割れると zh/en が対にならず reference に落ちる（CH32V407DS0.en V1.3。2026-10-14）。
+    # 添字を持たない `DuCy_(HSE)` は両版でこの綴りなので触らない。
+    sym = re.sub(r"^([A-Za-z]+_[A-Za-z0-9]+)_(?=[(（])", r"\1", sym)
     # 添字の括弧は版で全角になる（`C_in（LSE）`）。同じ記号として引けるように揃える。
     sym = sym.translate(WIDE_PARENS)
     # **`I/O` と `IO` は同じ添字**。版で綴りが割れる（zh は `I IO`、en は `I I/O`）ので
