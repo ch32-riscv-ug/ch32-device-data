@@ -527,7 +527,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32V203DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32V203DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_en/CH32V203DS0.PDF) v3.0 | [page](https://www.wch.cn/downloads/CH32V203DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_zh/CH32V203DS0.PDF) v3.0 |
 | CH32V208DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32V208DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_en/CH32V208DS0.PDF) v2.7 | [page](https://www.wch.cn/downloads/CH32V208DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_zh/CH32V208DS0.PDF) v2.7 |
 | CH32FV2x_V3xRM.PDF | reference-manual | [page](https://www.wch-ic.com/downloads/CH32FV2x_V3xRM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_en/CH32FV2x_V3xRM.PDF) v2.5 | [page](https://www.wch.cn/downloads/CH32FV2x_V3xRM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V20x/datasheet_zh/CH32FV2x_V3xRM.PDF) v2.5 |
-| CH32V20xEVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32V20xEVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32V20x/tree/main/EVT) v2.4 |
+| CH32V20xEVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32V20xEVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32V20x/tree/main/EVT) v2.5 |
 
 ### Evaluation boards
 

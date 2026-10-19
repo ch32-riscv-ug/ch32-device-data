@@ -230,7 +230,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32M030DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32M030DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32M030/datasheet_en/CH32M030DS0.PDF) v1.2 | [page](https://www.wch.cn/downloads/CH32M030DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32M030/datasheet_zh/CH32M030DS0.PDF) v1.3 |
 | CH32M030DS2.PDF | datasheet | - | [page](https://www.wch.cn/downloads/CH32M030DS2_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32M030/datasheet_zh/CH32M030DS2.PDF) v1.2 |
 | CH32M030RM.PDF | reference-manual | [page](https://www.wch-ic.com/downloads/CH32M030RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32M030/datasheet_en/CH32M030RM.PDF) v1.2 | [page](https://www.wch.cn/downloads/CH32M030RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32M030/datasheet_zh/CH32M030RM.PDF) v1.2 |
-| CH32M030EVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32M030EVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32M030/tree/main/EVT) v1.5 |
+| CH32M030EVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32M030EVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32M030/tree/main/EVT) v1.6 |
 
 ### Evaluation boards
 
