@@ -9,12 +9,21 @@ CH32H417,ADC,DualADC_FastInterleaved,dual ADC fast interleaved sampling routine,
 CH32H417,ADC,DualADC_InjectionSimul,dual ADC injection simultaneous sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,ADC,DualDAC_Triangle,Dual DAC output triangular wave routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,Internal_Temperature,Internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32H417_List_EN.txt
 CH32H417,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,Betaflight,H41x Betaflight Library,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_QSPI_FLASH,This example demonstrates QSPI operation Winbond W25Qxx SPIFLASH with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_SDIO_SD,This example demonstrates reading and writing all sectors of the SD card through the SDIO interface with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_SDIO_eMMC,This example demonstrates reading and writing all sectors of the eMMC card through the SDIO interface with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_SDMMC_SD,This example demonstrates reading and writing all sectors of the SD card through the SDMMC interface with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_SMDDC_eMMC,This example demonstrates reading and writing all sectors of the eMMC card--KLM8G1GETF-B041 through the SDMMC interface with fatfs,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,FATFS/FATFS_SPI_FLASH,This example demonstrates SPI operation Winbond W25Qxx SPIFLASH with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,FATFS_eMMC,Eight-line operation EMMC card porting file read-write system FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,APPLICATION,JPEG_decode_LTDC,LTDC static display decoded JPEG,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,LTDC_LVGL,use LTDC driver to display some animations on the LCD,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -67,8 +76,12 @@ CH32H417,DVP,DVP_TFTLCD,DVP routine to operate OV2640 and OV5640 camera video mo
 CH32H417,DVP,DVP_UART,DVP routine to operate OV2640 camera JPEG mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ECDC,RAM_Block,ECDC RAM Block Self-encryption and decryption routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ECDC,Single_Time,ECDC Single encryption and decryption routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,ETH,1_Tool_Doc,ETH routine related documents and tools,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ETH,DHCP,DHCP demonstration routine to obtain IP automatically,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ETH,IPRaw_PING,"IP_RAW routine, to demonstrate that the TCP client receives data after connecting to the server and then sends it back",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ETH,IoCHub,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ETH,IoCHub/IoCHub_Demo,"IoCHub basic routines, using AT commands to implement IoCHub's basic function demonstration on MCU",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -112,7 +125,7 @@ CH32H417,I3C,I3C_DMA_Controller,I3C master routine,#,confirmed,evt:tree+evt:list
 CH32H417,I3C,I3C_DMA_Target,I3C slave routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,IAP,USB_UART,USB+UART IAP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,IWDG,IWDG,Independent Watchdog routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,LPTIM,LPTIM_LP_WakeUp,LPTIM sleep，shutdown wakeup routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,LPTIM,LPTIM_LP_WakeUp,"LPTIM sleep,shutdown wakeup routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,LPTIM,PWM_OnePulse_SingleMode,"LPTIM output PWM, single pulse, once set mode waveform routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,LTDC,LTDC_Display,LTDC display routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,OPA,CMP,CMP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -139,6 +152,7 @@ CH32H417,PWR,PVD_VoltageJudger,PVD voltage Judger routine,#,confirmed,evt:tree+e
 CH32H417,PWR,SEL_VIO18,VIO18 software configuration routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PWR,Sleep_Mode,"low power, sleep mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PWR,Stop_Mode,"low power, stop mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PWR,Stop_Mode_RTC_WakeUp,The example demonstrates the use of the RTC timer to periodically wake up from stop mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PWR,VDD12_ExternPower,VDD 1.2V external power supply routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PWR,VDD12_ExternPowerInStopLP,"Routine demonstration of STOPLP mode, VDD 1.2v external power supply, current reduction method",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,QSPI,QSPI_FLASH,QSPI operate Winbond W25Qxx SPI_FLASH routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -161,7 +175,9 @@ CH32H417,SPI,1Lines_half-duplex,"single wire half duplex mode, master/slave mode
 CH32H417,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master/slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master/slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SPI,SPI_DMA,"SPI uses DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,SPI,SPI_SDCARD,SPI SD card FatFs routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SWPMI,SWPMI_MultiBUffering,SWPMI Multi-buffer mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SWPMI,SWPMI_SwpCard,SWP card routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SerDes,AcquireConfig,SerDes obtaints configuration routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -184,8 +200,9 @@ CH32H417,TIM,TIM_INT,Timer interput mode routine,#,confirmed,evt:tree+evt:list-e
 CH32H417,TKey,TKEYLIB,TouchKey Library,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,TKey,TKY_8keys,TouchKey 8Keys detection routine,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,TKey,TKey,TouchKey Detection routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,UHSIF,UHSIF_SLAVE,UHSIF communication routine。,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,UHSIF,UHSIF_SLAVE,UHSIF communication routine.,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USART,USART_DMA_EXT,USART send and receive data through DMA routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_HalfDuplex,"single wire half duplex mode, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_HardwareFlowControl,"hardware flow control mode, master/slave mode, transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_Interrupt,"USART interrupt routine, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -232,7 +249,7 @@ CH32H417,USB,USBSS/DEVICE/UVC,,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List
 CH32H417,USB,USBSS/HOST,,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USB,USBSS/HOST/HOST_SS_ACCESS_SECTOR,USBSS scanning routine,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USB,USBSS/HOST/Host_SS_Hub_Access_Sector,"This routine demonstrates CH32H417 acting as a USB host, accessing and reading/writing U-disk sectors via an external USB HUB.",#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/HOST/Host_SS_Hub_Udisk_Exams,This routine demonstrates how the CH32H417 can act as a USB host to control the udisk under the HUB（Support for file system）.,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/Host_SS_Hub_Udisk_Exams,This routine demonstrates how the CH32H417 can act as a USB host to control the udisk under the HUB (Support for file system).,#,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USBPD,USBPD_SNK,PD SNK routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USBPD,USBPD_SRC,PD SRC routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,WWDG,WWDG,Window Watchdog routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -298,7 +315,9 @@ CH32L103,SPI,2Lines_FullDuplex,"2-wire half-duplex mode, master / slave mode dat
 CH32L103,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master / slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,SPI,SPI_CRC,use CRC error check and master / slave mode transceiver routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,SPI,SPI_DMA,"SPI uses DMA, master / slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,SPI,SPI_SDCARD,SPI SD card FatFs routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,Clock_Select,clock source selection routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,Encode,Timer encoder mode routines,#,reference,evt:list-en,CH32L103_List-EN.txt
@@ -319,6 +338,7 @@ CH32L103,TOUCHKEY,TKey_MulShield,TKey MulShield routine,#,confirmed,evt:tree+evt
 CH32L103,TOUCHKEY,Touch_EX001,Comprehensive demonstration of touch keys,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TOUCHKEY,Touch_EX002,8 Key Touch Routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_DMA,"USART uses DMA, master / slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,USART,USART_DMA_EXT,USART send and receive data through DMA routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_HalfDuplex,"1-wire half duplex mode, master / slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_HardwareFlowControl,"hardware flow control mode, master / slave mode, transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_Idle_Recv,Serial port using DMA for indeterminate length reception routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -495,7 +515,7 @@ CH32V003,INT,VectorInRAM,Vector in RAM routine,#,confirmed,evt:tree+evt:list-en+
 CH32V003,IWDG,IWDG,independent watchdog routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,OPA,OPA,OPA as voltage follower output routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,PWR,PVD_VoltageJudger,PVD voltage Judger Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
-CH32V003,PWR,PVD_Wakeup,STOP mode PVD wakeup MCU Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
+CH32V003,PWR,PVD_Wakeup,Standby mode PVD wakeup MCU Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,PWR,Sleep_Mode,"low power, sleep mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,PWR,Standby_Mode,"low power, standby mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
@@ -636,6 +656,8 @@ CH32V103,I2C,I2C_DMA,"I2C uses DMA, master / slave mode transceiver routine",#,c
 CH32V103,I2C,I2C_EEPROM,I2C interface operation EEPROM peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,I2C,I2C_PEC,use PEC error check and master / slave mode transceiver routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,IAP,UART_USB_IAP,IAP Upgrade Routine - Built-in Hex to Bin Tool and IAP Upgrade Tool,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,INT,Interrupt_VTF,VTF IRQ interrupt routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,INT,VectorInRAM,Vector in RAM routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,IWDG,IWDG,Independent Watchdog routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,PWR,PVD_VoltageJudger,PVD voltage Judger Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,PWR,PVD_Wakeup,STOP mode PVD wakeup MCU Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -1252,6 +1274,12 @@ CH32V407,ADC,Internal_Temperature,internal temperature sensor routine,#,confirme
 CH32V407,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V4x7_List_EN.txt
 CH32V407,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,FATFS,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,FATFS/FATFS_SDIO_SD,This example demonstrates reading and writing all sectors of the SD card through the SDIO interface with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,FATFS/FATFS_SPI_FLASH,This example demonstrates SPI operation Winbond W25Qxx SPIFLASH with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,JPEG_decode_LTDC,LTDC static display decoded JPEG,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,LTDC_LVGL,use LTDC driver to display some animations on the LCD,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,RunInPSRAM,Coremark demo run in PSRAM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1282,11 +1310,13 @@ CH32V407,DAC,DualDAC_Triangle,dual DAC output triangular wave routine,#,confirme
 CH32V407,DMA,DMA_MEM2MEM,memory to memory mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DVP,DVP_TFTLCD,DVP routine to operate OV2640 camera video mode to display image on LCD,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DVP,DVP_UART,DVP routine to operate OV2640 camera JPEG mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ETH,1_Tool_Doc,ETH routine related documents and tools,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,DHCP,DHCP demonstration routine to obtain IP automatically,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,DNS,DHCP demonstration routine to obtain IP automatically and then request domain name resolution,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART",#,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ETH,DualNetPorts,Dual Ethernet Port Example,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with upper computer, to configure WCHNET functions, including configuring various parameters and creating a new communication.",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ETH,ETH_IAP,ETH IAP routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,IPRaw_PING,"IP_RAW routine, to demonstrate that the TCP client receives data after connecting to the server and then sends it back",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,IoCHub,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,IoCHub/IoCHub_Demo,"IoCHub basic routines, using AT commands to implement IoCHub's basic function demonstration on MCU",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1330,11 +1360,12 @@ CH32V407,PWR,Standby_RAM_Application,"When MCU in standby mode, RAM 32k low-powe
 CH32V407,PWR,Standby_RAM_LV_Mode,"when LV is enabled in standby mode, RAM 32k low-power data holding routines",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,PWR,Standby_RAM_Mode,"when LV is not enabled in standby mode, RAM 32k low-power data holding routines",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,PWR,Stop_Mode,"low power, stop mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,PWR,Stop_Mode_RTC_WakeUp,The example demonstrates the use of the RTC timer to periodically wake up from stop mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RCC,HSI_Calibration,HSI calibrate routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RCC,LSI_Calibration,LSI calibrate routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RCC,MCO,MCO pin clock output routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,RNG,RNG,：Random number generator routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,RNG,RNG,Random number generator routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RTC,RTC_Calendar,Calendar Routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RTC,RTC_Calibration,RTC calibrate Routines,#,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SDIO,SDIO_EMMC,SDIO routine to operate eMMC card,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1345,8 +1376,10 @@ CH32V407,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master/slave mode, da
 CH32V407,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master/slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_CRC,CRC error check and master/slave mode transceiver routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_DMA,"SPI uses DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_LCD,SPI interface operation FLASH  and LCD peripheral routines,#,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,SPI,SPI_SDCARD,SPI SD card FatFs routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SYSTICK,SYSTICK_Interrupt,Systick timer routine,#,reference,evt:list-en,CH32V4x7_List_EN.txt
 CH32V407,TIM,Clock_Select,clock source selection routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1365,6 +1398,7 @@ CH32V407,TIM,TIM_Continuous,Timer continuous routines,#,confirmed,evt:tree+evt:l
 CH32V407,TIM,TIM_DMA,timer DMA routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,TIM,TIM_INT,Timer interput mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USART,USART_DMA_EXT,USART send and receive data through DMA routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_HalfDuplex,"single wire half duplex mode, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_HardwareFlowControl,"hardware flow control mode, master/slave mode, transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_Idle_Recv,USART use DMA receiving indeterminate length data routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1503,6 +1537,7 @@ CH32X035,USB,USBFS/HOST_KM,"The host operates the keypad, gets the data of the e
 CH32X035,USB,USBFS/HOST_MTP_FileSystem,"Enumeration process of a USB host to a device that supports MTP and PTP protocols, supports MTP and PTP protocols, and reads its files",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/Host_Udisk,USB host operation USB disk routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/Udisk_Lib,U disk file system library file,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,USBPD,USBPD_CH211,PD + CH211 routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USBPD,USBPD_SNK,PD SNK routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USBPD,USBPD_SRC,PD SRC routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,WWDG,WWDG,Window Watchdog Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1520,6 +1555,12 @@ CH32X315,ADC,DualADC_InjectionSimul,dual ADC injection simultaneous sampling rou
 CH32X315,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32X3x5_List_EN.txt
+CH32X315,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,FATFS,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,FATFS/FATFS_SPI_FLASH,This example demonstrates SPI operation Winbond W25Qxx SPIFLASH with FATFS,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ARGB,Gradient,ARGB routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ARGB,PollingFilling,Poll and interrupt mode drive ARGB,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1551,6 +1592,7 @@ CH32X315,PWR,PVD_VoltageJudger,PVD voltage Judger Routine,#,confirmed,evt:tree+e
 CH32X315,PWR,PVD_Wakeup,STOP mode PVD wakeup MCU Routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,PWR,Sleep_Mode,"low power, sleep mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,PWR,Stop_Mode,"low power, stop mode routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,PWR,Stop_Mode_RTC_WakeUp,The example demonstrates the use of the RTC timer to periodically wake up from stop mode,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,PWR,VDD12_ExternPower,VDD 1.2V external power supply routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,RCC,MCO,MCO pin clock output routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1561,7 +1603,9 @@ CH32X315,SPI,1Lines_half-duplex,"single wire half duplex mode, master/slave mode
 CH32X315,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master/slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master/slave mode, data transceiver",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SPI,SPI_DMA,"SPI uses DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,SPI,SPI_SDCARD,SPI SD card FatFs routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SYSTICK,SYSTICK_Interrupt,Systick timer routine,#,reference,evt:list-en,CH32X3x5_List_EN.txt
 CH32X315,TIM,Clock_Select,clock source selection routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1577,6 +1621,7 @@ CH32X315,TIM,TIM_Continuous,Timer continuous routines,#,confirmed,evt:tree+evt:l
 CH32X315,TIM,TIM_DMA,timer DMA routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,TIM,TIM_INT,Timer interput mode routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USART,USART_DMA_EXT,USART send and receive data through DMA routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_HalfDuplex,"single wire half duplex mode, master/slave mode transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_HardwareFlowControl,"hardware flow control mode, master/slave mode, transceiver routine",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_Idle_Recv,USART use DMA receiving indeterminate length data routines,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt

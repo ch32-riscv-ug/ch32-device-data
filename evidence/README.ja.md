@@ -164,7 +164,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 | `block_erase_bytes` | 快速ブロック消去の単位（32K。V205は64K） |
 | `program_word` | `FLASH_ProgramWord`/`ProgramHalfWord`がdriverにあるか。**空＝快速ページ経由のみ**（L103/M030/V006/V205/X035） |
 | `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | 消去後に読み出される値を**RMの原文のまま**。2系統ある——`0xFFFFFFFF`系（RMは`字读- 0xFF`と8bit幅で書くので列も`0xFF`）と`0xe339e339`系。4つの幅を全部書いているのは`0xe339e339`系だけで、他はwordしか書かないので残り3列は**空**（RMが言っていないので導出しない） |
-| `blank_check_word` | **word読みと突き合わせる32bit値**。通常はWCH自身のEVT IAPサンプルが`*(uint32_t*)FLASH_Base`と比較する値（APPが焼かれているかの判定）。RMとは別の出所なので列を分ける——`0xFF`系のfamilyはここで初めてword幅が確定する。サンプルにblank判定が無いのはCH32V103だけ（GPIOで入る）で、そこは他repoの実測を引用して埋める——出所は`basis` |
+| `blank_check_word` | **word読みと突き合わせる32bit値**。通常はWCH自身のEVT IAPサンプルが`*(uint32_t*)FLASH_Base`と比較する値（APPが焼かれているかの判定）。RMとは別の出所なので列を分ける——`0xFF`系のfamilyはここで初めてword幅が確定する。CH32V103 は長くサンプルにblank判定が無く他repoの実測を引用していたが、2026-10 の EVT 改版で IAP サンプル（`UART_USB_IAP`）が加わり、いまは全familyがEVT由来（実測は`note`に残す） |
 | `zero_wait_note` | `flash_bytes`（零等待領域）と総容量の関係。option byteで動くfamilyは`memory_configs.csv`、総容量は`product_attributes`の`code_flash_bytes`を指す |
 | `note` | モード依存。CH32H417は`FLASH_CFGR0` bit28（dual flash mode）でページ8K・ブロック64Kになる。列の値はsingle mode。RMが消去後の値を書いていないfamilyではその旨と、他repoの実測（あれば）も書く |
 
@@ -172,7 +172,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 出所は**EVTのflash driverの`@brief`**（`page size 4KB`・`1page = 256Byte`）と**RMの闪存章の本文**（`标准页（1K字节）`・`快速编程按页（128字节）`）の2つで、突き合わせて確度を決めます。**実際に食い違いが1件**あります——CH32V103のdriverは`ProgramPage_Fast ... 256Byte`と書きますが、RMは`快速编程按页（128字节）`、同じdriverの消去側も128B、`ROM_ERASE`の引数条件も`StartAddr%128 == 0`。EVTコメントの写し間違いと判断して値は128、`conflict`で両論を`basis`に残しています。
 
-消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、`erased_read_*`は空のままで`note`にその旨を書きます。`blank_check_word`には値が入ります——CH32V003はEVTのIAPサンプルから、CH32V103はch32rvがCH32V103R8T6で読んだ実測の引用で、`basis`に`measured:ch32rv(...)`と出所を書きます。CH32V103のRMも間接的には裏付けていて、`FLASH_STATR.PGERR`の説明が「内容が`0xFFFF`でない番地に書こうとすると立つ」＝消去後がオール1である前提を置いています。これを`basis`に`rm-pgerr(0xFFFF)`として持ちます。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
+消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、`erased_read_*`は空のままで`note`にその旨を書きます。`blank_check_word`には値が入ります——どちらもEVTのIAPサンプルからです（CH32V103 は 2026-10 の EVT 改版で加わったサンプル。それまではch32rvがCH32V103R8T6で読んだ実測を`measured:ch32rv(...)`として引用しており、その実測は`note`に独立の裏付けとして残しています）。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
 
 ### `flash_program_method.csv`
 
@@ -221,7 +221,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 出所はEVTの`ch32*_rcc.h`——`RCC_<bus>PeriphClockCmd()`に渡す定数がperipheralごとのbitで、**busの名前がレジスタを言います**（`RCC_AHBPeriph_USBPD`→`RCC->AHBPCENR`）。busの呼び名はfamilyで違います（AHB/APB1/APB2、HB/PB1/PB2、HB/HB1/HB2）。`RCC_<bus>PeriphClockCmd`が`RCC-><bus>PCENR`へ書くことは8 familyのrcc.cで確かめ、例外はありません。
 
-RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**429行中370行がconfirmed、conflict 0**。referenceの59行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
+RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**428行中370行がconfirmed、conflict 0**。referenceの58行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
 
 ### `adc_internal.csv`
 

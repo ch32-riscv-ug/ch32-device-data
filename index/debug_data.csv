@@ -8,6 +8,6 @@ CH32V103,QingKe V3A,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/deb
 CH32V205,QingKe V3B,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/SRC/Debug/debug.c
 CH32V20x,QingKe V4B + QingKe V4C,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
 CH32V307,QingKe V4F,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380),EVT/EXAM/SRC/Debug/debug.c
-CH32V407,QingKe V3V,0xE0000340,0xE0000344,#,confirmed,evt(EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c)+1 more+manual:qingke-v3(dataaddr=read hartinfo)+hartinfo:wch-linke(ch32rv 2026-10-10;default-hart;ch32rv/target/hil-v407-2026-10-10/dmi-12-0.ndjson),EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c
+CH32V407,QingKe V3V,0xE0000340,0xE0000344,#,confirmed,evt(EVT/EXAM/APPLICATION/JPEG_decode_LTDC/Debug/debug.c)+2 more+manual:qingke-v3(dataaddr=read hartinfo)+hartinfo:wch-linke(ch32rv 2026-10-10;default-hart;ch32rv/target/hil-v407-2026-10-10/dmi-12-0.ndjson),EVT/EXAM/APPLICATION/JPEG_decode_LTDC/Debug/debug.c
 CH32X035,QingKe V4C,0xE0000380,0xE0000384,#,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
 CH32X315,QingKe V3F,0xE0000340,0xE0000344,#,reference,evt(EVT/EXAM/ADC/ADC_ScanOut/Debug/debug.c)+2 more+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/ADC/ADC_ScanOut/Debug/debug.c

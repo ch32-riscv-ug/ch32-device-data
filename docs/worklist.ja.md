@@ -1869,6 +1869,28 @@ consumer の根拠は `ch32rv/docs/data-requests/measured/` と
   別断片に割れて `t_SU_(DATA_NOE)` と綴られ、中文版と対にならず confirmed→reference
   （V205 の `t_SU_(NWAITV_CLKH)` と同じ形）。**同日に別commitで直した**——`operating_rows.norm_symbol` が添字のあとの `_(` を `(` に畳む（`DuCy_(HSE)` のように添字の無い記号は触らない）。V407 の行が confirmed に戻り、V205 の崩れた2行（英語版 p.72 の重複）は既存の confirmed 行に畳まれて 3,928→3,926 行。値は不変。
 
+## 2026-10 EVT 一斉改版の取り込み（2026-10-20）
+
+WCH が全14 EVT パッケージを改版（目録の自動更新 0c662f2・c768d0e・08ec35b。CH32V003 は 1.0→2.2）。
+PDF の原本は不変で、mirror の12 family repo が `catalog/sources.csv` の固定 commit から1〜2 commit 進んでいた。
+`regenerate.py --full --verify` で取り込み。動いたのは EVT 由来の表だけで、**値の後退は無い**。
+
+- **register_fields**（33,365→33,368）: WCH の header 訂正がそのまま入った。H417 `AFIO_EXTICR2` の註
+  （`PA[2]`→`PA[10]` ほか56件）、`OPA_CTLRx_NSELx_2`・`SAI_SR_FLTH_2`・`DFSDM_FLTFCR3_FOSR_9`・M030
+  `ADC_SMP12_1` の値の訂正、V407 `DMA_MADDR8_MA` の誤記→`DMA_MADDR9_MA`、V407 `AFIO_PCFR2_USART7_REMAP_*`
+  （旧版は PARTIALREMAP1/2 が同値 0x400000 だった。新版 0/1/2/3 で remap_fields の RM 値と一致）、
+  追加 `LPTIM_ISR_ARROK`・`SDMMC_SLV_FORCE_ERR`・V407 `EXTI14_PE`。register_blocks/layouts の hash はその追従。
+  **既存の癖**: 値がフィールド全体のマスクと同じ define（`…_FULLREMAP` = 0b11）は `kind=field` に分類される
+  （V003〜V407 に20行。V407 USART7 は今回この形になった）。改版で生まれた問題ではないが、`value` として
+  読めないので別に直す価値がある
+- **clock_enables** 429→428: X035 の rcc.h から `RCC_AHBPeriph_IO2W` が消えた（WCH 側の削除）
+- **flash_geometry**: V103 に IAP サンプル（`UART_USB_IAP`）が加わり、`blank_check_word` に WCH 自身の
+  根拠が付いた（R-31 で「DBから引けない唯一のfamily」だった件。実測は `note` に残る）
+- **evt_examples** 1,608→1,653（例題の追加のみ。V103 に `INT` グループ新設）、**eval_boards** は X035 の
+  ボードフォルダ名の変更（`CH32X035C8T6_R0`→`CH32X035C8T-R0` ほか。型番の対応は不変）
+- **device_ids**: V003/V103 の EVT の型番表記が温度グレード無しに（`CH32V003F4P6`→`CH32V003F4P`）。値は不変
+- **clock_configs**: H417/L103 の `evt_copies`（例題数の分母）だけ。設定値は不変
+
 ## 利用状況（優先順位の根拠）
 
 | # | 誰 | 最初の問い |
