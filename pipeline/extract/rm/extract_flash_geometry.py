@@ -26,6 +26,10 @@ EVT のコメントの写し間違いと判断し、値は 128 を採って conf
                          快速消去を持たず、ブロック消去のみ）
     fast_program_bytes   快速ページ書き込みの単位
     block_erase_bytes    快速ブロック消去の単位
+    flash_mode_bit       消去単位を切り替える flash モードの bit（`FLASH_CFGR0.DBMODE[28]`）。
+                         上の2列は bit=0（single）の値
+    page_erase_bytes_dual  bit=1（dual flash mode）での標準ページ消去の単位
+    block_erase_bytes_dual bit=1 での快速ブロック消去の単位
     program_word         FLASH_ProgramWord / ProgramHalfWord が driver にあるか
                          （1 = word/halfword 単位の直接書き込みができる。
                          空 = 快速ページ経由のみ）
@@ -35,7 +39,11 @@ EVT のコメントの写し間違いと判断し、値は 128 を採って conf
 
 CH32H417 は **flash モードで幾何が変わります**——`FLASH_CFGR0` bit28 が立つ
 （dual flash mode）とページ 8K・ブロック 64K、寝ていると 4K/32K。driver の
-`FLASH_ErasePage` がアドレスマスクを切り替えているのがそれで、`note` に書きます。
+`FLASH_ErasePage` がアドレスマスクを切り替えているのがそれです。single の値を
+`page_erase_bytes`/`block_erase_bytes` に、dual の値を `*_dual` に置き、切り替える bit を
+`flash_mode_bit` に書きます（ch32rv 0010。実機で DBMODE=1 の H417QEU6 に 4 KiB のつもりで
+PER を掛けると 8 KiB 消えた）。dual の値は driver の @brief（`4KB or 8KB`）の大きいほうで、
+RM のレジスタ表の説明（`当DBMODE=1时，执行扇区（8KB）擦除操作`）で裏を取ります。
 
 `tools/build_flash_geometry.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
 外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
@@ -65,7 +73,8 @@ import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
 COLUMNS = ["family", "page_erase_bytes", "fast_erase_bytes", "fast_program_bytes",
-           "block_erase_bytes", "program_word",
+           "block_erase_bytes", "flash_mode_bit", "page_erase_bytes_dual",
+           "block_erase_bytes_dual", "program_word",
            "erased_read_word", "erased_read_half",
            "erased_read_byte_even", "erased_read_byte_odd",
            "blank_check_word", "zero_wait_note", "note",
@@ -138,17 +147,18 @@ def read_driver(family_dir: Path) -> tuple[dict, str] | None:
     briefs = {m.group("name"): m.group("brief") for m in FN_DOC.finditer(text)}
     functions = {m.group(1) for m in FN_DEF.finditer(text)}
 
-    def size(name: str, unit: str) -> int | None:
+    def size(name: str, unit: str, pick=min) -> int | None:
         brief = briefs.get(name, "")
         hits = (KB if unit == "K" else BYTES).findall(brief)
         if not hits:
             return None
         # モードで寸法が変わるもの（CH32H417 の `4KB or 8KB`・block 32KB/64KB）は
-        # **小さいほう＝single flash mode** を列に置き、dual は note で言う。
-        return min(int(h) for h in hits) * (1024 if unit == "K" else 1)
+        # **小さいほう＝single flash mode** を列に置き、大きいほう＝dual は `*_dual` へ。
+        return pick(int(h) for h in hits) * (1024 if unit == "K" else 1)
 
     found = {
         "page_erase_bytes": size("FLASH_ErasePage", "K"),
+        "page_erase_bytes_dual": size("FLASH_ErasePage", "K", max),
         "fast_erase_bytes": size("FLASH_ErasePage_Fast", "B"),
         "fast_program_bytes": size("FLASH_ProgramPage_Fast", "B"),
         "program_word": ("FLASH_ProgramWord" in functions
@@ -168,9 +178,48 @@ def read_driver(family_dir: Path) -> tuple[dict, str] | None:
                 hits = KB.findall(brief)
                 if hits:
                     block = min(int(h) for h in hits) * 1024
+                    found["block_erase_bytes_dual"] = max(int(h) for h in hits) * 1024
                     break
     found["block_erase_bytes"] = block
     return found, paths[0].name
+
+
+# RM のレジスタ表の1行（`28 DBMODE RO 1：双倍FLASH模式；`）と、PER/BER の説明に出る
+# DBMODE=1 のときの寸法（`当DBMODE=1时，执行扇区（8KB）擦除操作`／
+# `When DBMODE=1, perform a sector (8KB)`）。
+DBMODE_ROW = re.compile(r"^\s*(\d+)\s+DBMODE\s+RO\b")
+DBMODE_REGISTER = re.compile(r"R32_(FLASH_CFGR\d)")
+DBMODE_DUAL_KB = re.compile(r"DBMODE\s*=\s*1\D{0,24}?(\d+)\s*KB")
+
+
+def read_flash_mode(family: str) -> tuple[str, set[int], list[str]] | None:
+    """RM が書く flash モードの bit と、DBMODE=1 で名指す寸法（バイト）。
+
+    (`FLASH_CFGR0.DBMODE[28]`, {8192, 65536}, [`文書:言語(p.N)`...])。無ければ None。
+    """
+    bit = ""
+    sizes: set[int] = set()
+    pages: list[str] = []
+    for language, (bundle, document) in sorted(bundle_pages.rm_bundles(family).items()):
+        for number, text in bundle_pages.texts(bundle.name):
+            if "DBMODE" not in text:
+                continue
+            hit = False
+            for line in text.splitlines():
+                m = DBMODE_ROW.match(line)
+                register = DBMODE_REGISTER.search(text)
+                # レジスタ名は見出しが前のページに在ると同じページに無い（zh p.873）。
+                # bit の行だけで当たりとし、名前は名乗っているページから採る。
+                if m:
+                    hit = True
+                    if register and not bit:
+                        bit = f"{register.group(1)}.DBMODE[{m.group(1)}]"
+                for kb in DBMODE_DUAL_KB.findall(line):
+                    sizes.add(int(kb) * 1024)
+                    hit = True
+            if hit:
+                pages.append(f"{document}:{language}(p.{number})")
+    return (bit, sizes, pages) if bit and sizes else None
 
 
 def read_iap(family_dir: Path) -> tuple[str, str] | None:
@@ -328,6 +377,20 @@ def main() -> int:
                     conflicts.append(f"!evt-comment:{column}(={a})")
             else:
                 row[column] = a if a is not None else (b if b is not None else "")
+        # flash モードで寸法が変わる family（CH32H417）。driver の大きいほうの寸法を、
+        # RM が DBMODE=1 の説明で名指す寸法と突き合わせる。一致しなければ列に置かない。
+        row["flash_mode_bit"] = row["page_erase_bytes_dual"] = row["block_erase_bytes_dual"] = ""
+        mode = read_flash_mode(family)
+        dual = {c: evt.get(c) for c in ("page_erase_bytes_dual", "block_erase_bytes_dual")}
+        if mode and any(v and v != row[c.removesuffix("_dual")] for c, v in dual.items()):
+            bit, sizes, mode_pages = mode
+            agreed = {c: v for c, v in dual.items() if v and v in sizes}
+            if len(agreed) == len([v for v in dual.values() if v]):
+                row["flash_mode_bit"] = bit
+                row.update({c: str(v) for c, v in agreed.items()})
+                basis.extend(f"rm-dbmode({p})" for p in mode_pages)
+            else:
+                notes.append(f"{family}: driver の dual 寸法 {dual} が RM の DBMODE=1 {sorted(sizes)} と合わない")
         zero = []
         # H41x は零等待実行を「Code FLASH を RAM_CODE へロードして走らせる」方式で
         # 行う。基準リンカがそう書いている（`zero_wait flah ,and loaded into
@@ -344,8 +407,6 @@ def main() -> int:
         row["zero_wait_note"] = "; ".join(zero)
         # データ列は英語（中文の原文だけが _zh 列に残る規約。check_tables が見る）。
         notes_for_row = []
-        if family == "CH32H417":
-            notes_for_row.append("dual flash mode (FLASH_CFGR0 bit28): page 8K, block 64K")
         if not row["erased_read_word"]:
             # RMが消去後の値を言わないfamily。空欄と「未知」を consumer が区別できるよう
             # 明示し、他repoの実測（引用元を名指し）を添える。RM原文の列には入れない。

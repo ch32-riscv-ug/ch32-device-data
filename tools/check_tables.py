@@ -1598,7 +1598,8 @@ def main() -> int:
     for r in t["flash_geometry"]:
         check("flash_geometry", r["family"], r["family"], families, "families")
         for column in ("page_erase_bytes", "fast_erase_bytes",
-                       "fast_program_bytes", "block_erase_bytes"):
+                       "fast_program_bytes", "block_erase_bytes",
+                       "page_erase_bytes_dual", "block_erase_bytes_dual"):
             value = r[column]
             if value and (not value.isdigit() or int(value) & (int(value) - 1)):
                 bad.append(f"flash_geometry: {r['family']} の {column}={value!r} が"
@@ -1606,6 +1607,18 @@ def main() -> int:
         if (r["page_erase_bytes"] and r["fast_erase_bytes"]
                 and int(r["fast_erase_bytes"]) >= int(r["page_erase_bytes"])):
             bad.append(f"flash_geometry: {r['family']} の fast_erase が標準 page 以上")
+        # flash モードで寸法が変わる family（ch32rv 0010）。`*_dual` は切り替える bit が
+        # 名指されているときだけ在り、bit=0 の値より大きい（同じなら列を分ける意味が無い）。
+        dual = [c for c in ("page_erase_bytes_dual", "block_erase_bytes_dual") if r[c]]
+        if bool(dual) != bool(r["flash_mode_bit"]):
+            bad.append(f"flash_geometry: {r['family']} の flash_mode_bit と *_dual の有無が揃わない")
+        if r["flash_mode_bit"] and not re.fullmatch(r"[A-Z0-9_]+\.[A-Z0-9_]+\[\d+\]", r["flash_mode_bit"]):
+            bad.append(f"flash_geometry: {r['family']} の flash_mode_bit={r['flash_mode_bit']!r} が "
+                       "`REGISTER.FIELD[bit]` でない")
+        for column in dual:
+            single = r[column.removesuffix("_dual")]
+            if r[column].isdigit() and (not single or int(r[column]) <= int(single)):
+                bad.append(f"flash_geometry: {r['family']} の {column} が bit=0 の値より大きくない")
         # 消去後の読み出し値（R-31）。RMの原文のままなので幅は正規化しないが、
         # **16進リテラルであること**と、**幅の広い順に矛盾しないこと**は見る。
         for column in ("erased_read_word", "erased_read_half",

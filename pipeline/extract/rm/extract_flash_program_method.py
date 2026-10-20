@@ -92,6 +92,33 @@ MAGIC = re.compile(r"\*\s*\(\s*__IO\s+uint32_t\s*\*\s*\)\s*(0x4002203[0-9A-Fa-f]
                    r"[^;]*?\^\s*(0x[0-9A-Fa-f]+)")
 
 
+# RM のレジスタ表の1行（`21 PGSTRT WO 0`）。説明は前後の行に割れて出る
+# （zh `开始。置1启动一次页编程`／en `Start. Set to 1 to start a page programming`）。
+REGISTER_ROW = r"^\s*{bit}\s+PG_?STRT\s+(?:WO|RW|RW1|W1)\b"
+STARTS_PROGRAM = re.compile(r"启动一次页编程|start a page programming", re.IGNORECASE)
+
+
+def rm_register_commit(family: str, bit: int) -> list[str]:
+    """RM の FLASH_CTLR 表が bit<n> を「ページ書き込みを起動する PGSTRT」と書いているか。
+
+    手順の文とレジスタ表が食い違う RM がある（CH32H417 V1.8: 手順8は「FTPG を立てて
+    起動」、表は bit21 `PGSTRT` が起動で bit16 `FTPG` は有効化）。表は EVT の driver と
+    bit 単位で一致するので、**第3の根拠**として読む。当たった版の `文書:言語(p.N)` を返す。
+    """
+    row = re.compile(REGISTER_ROW.format(bit=bit))
+    found = []
+    for language, (bundle, document) in sorted(bundle_pages.rm_bundles(family).items()):
+        for number, text in bundle_pages.texts(bundle.name):
+            if "PGSTRT" not in text and "PG_STRT" not in text:
+                continue
+            lines = text.splitlines()
+            for i, line in enumerate(lines):
+                if row.match(line) and STARTS_PROGRAM.search(" ".join(lines[max(0, i - 1):i + 2])):
+                    found.append(f"{document}:{language}(p.{number})")
+                    break
+    return found
+
+
 def rm_steps(family: str, language: str = "zh") -> tuple[dict, str] | None:
     """RMの闪存章から、節ごとの手順のbit列を読む。({節: [bit...]}, 文書名)。"""
     editions = bundle_pages.rm_bundles(family)
@@ -255,9 +282,15 @@ def main() -> int:
                 # 同じ direct writes 系の V407/X315 も PG_STRT。**RM側の誤記と判断して
                 # driver の読みを採用値にし、RM の読みを `!` で残す**——「どちらが正しいか
                 # 判断したら、その値を列に置く」（V103 の fast_program_bytes で RM を
-                # 採ったのと同じ扱い）。confidence は conflict のままなので、
-                # fail-closed で読む consumer の挙動は変わらない。
-                confidence = "conflict"
+                # 採ったのと同じ扱い）。
+                # **RM 自身のレジスタ表が driver の起動 bit を「ページ書き込みを起動」と
+                # 書いていれば confirmed に上げる**（第3の根拠が片方を支持する形。異議は
+                # `!` に残る。ch32rv 0010、2026-10-21）。表で確かめられなければ conflict の
+                # まま——fail-closed で読む consumer の挙動は変わらない。
+                bit = re.search(r"\(bit(\d+)\)", evt_commit or "")
+                table = rm_register_commit(family, int(bit.group(1))) if bit else []
+                confidence = "confirmed" if table else "conflict"
+                basis.extend(f"rm-register({t})" for t in table)
                 basis.append(f"!rm:program_method({method})")
                 method, commit = evt_method, evt_commit
         elif not method:

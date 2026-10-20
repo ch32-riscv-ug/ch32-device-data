@@ -202,10 +202,13 @@ features,#,Separator between the data columns and the provenance columns; every 
 features,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
 features,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
 flash_geometry,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-flash_geometry,page_erase_bytes,"Unit of standard page erase, in bytes.",integer,never empty,
+flash_geometry,page_erase_bytes,"Unit of standard page erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,never empty,
 flash_geometry,fast_erase_bytes,"Unit of fast page erase, in bytes.",integer,no per-page fast erase (block erase only),
 flash_geometry,fast_program_bytes,"Unit of fast page programming, in bytes.",integer,never empty,
-flash_geometry,block_erase_bytes,"Unit of fast block erase, in bytes.",integer,no block erase stated,
+flash_geometry,block_erase_bytes,"Unit of fast block erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,no block erase stated,
+flash_geometry,flash_mode_bit,"Register bit that switches the erase sizes, as `REGISTER.FIELD[bit]` (e.g. `FLASH_CFGR0.DBMODE[28]` on CH32H417); page_erase_bytes/block_erase_bytes are its 0 values.",text,the erase sizes do not depend on a mode bit,fixed
+flash_geometry,page_erase_bytes_dual,"Unit of standard page erase when flash_mode_bit = 1 (dual flash mode), in bytes.",integer,the erase sizes do not depend on a mode bit,
+flash_geometry,block_erase_bytes_dual,"Unit of fast block erase when flash_mode_bit = 1, in bytes.",integer,the erase sizes do not depend on a mode bit,
 flash_geometry,program_word,`1` when `FLASH_ProgramWord`/`ProgramHalfWord` exist in the EVT driver.,enum(1),fast page programming only,
 flash_geometry,erased_read_word,"What a word read returns after erase, exactly as the RM writes it (`0xFF` families print an 8-bit spelling).",hex,the RM does not state it,
 flash_geometry,erased_read_half,"What a half-word read returns after erase, as the RM writes it.",hex,the RM does not state it,
@@ -213,7 +216,7 @@ flash_geometry,erased_read_byte_even,"What an even-address byte read returns aft
 flash_geometry,erased_read_byte_odd,"What an odd-address byte read returns after erase, as the RM writes it.",hex,the RM does not state it,
 flash_geometry,blank_check_word,Full 32-bit value to compare a word read against to detect erased flash.,hex,never empty,
 flash_geometry,zero_wait_note,Relation between products.flash_bytes (zero-wait region) and total capacity.,text,no note,prose
-flash_geometry,note,"Mode dependence and other remarks (e.g. dual flash mode, no RM erased value).",text,no note,prose
+flash_geometry,note,"Other remarks (e.g. no RM erased value).",text,no note,prose
 flash_geometry,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
 flash_geometry,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed).",enum(confirmed|conflict),never empty,fixed
 flash_geometry,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
