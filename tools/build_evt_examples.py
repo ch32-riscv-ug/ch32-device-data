@@ -85,23 +85,24 @@ def parse_list(path):
 
 
 def disk_coverage(evt_dir, keys):
-    """目録のキーが実体として存在するか。併せて目録に無いグループ直下も数える。
+    """目録のキーが実体として存在するか（実体の綴りで返す）。併せて目録に無いグループ直下も数える。
 
     例題の階層はグループ直下とは限らない（USB/USBHS/DEVICE/CH372Device）。
     実体側を機械的に走査すると各プロジェクトの内部フォルダまで拾ってしまう
     ため、**目録を索引の権威**として、その相対パスが実在するかを確認する。
     """
     exam = evt_dir / "EXAM"
-    present = set()
+    present = {}
     if not exam.is_dir():
         return present, []
     # 目録と実体で大小文字が揺れる（目録`TIM_trigger`／実体`TIM_Trigger`）ため
-    # 小文字で引き当てる。
-    actual = {p.relative_to(exam).as_posix().lower()
+    # 小文字で引き当て、実体の綴りを返す。
+    actual = {p.relative_to(exam).as_posix().lower(): p.relative_to(exam).as_posix()
               for p in exam.rglob("*") if p.is_dir()}
     for group, example in keys:
-        if f"{group}/{example}".lower() in actual:
-            present.add((group, example))
+        cased = actual.get(f"{group}/{example}".lower())
+        if cased:
+            present[(group, example)] = tuple(cased.split("/", 1))
     listed_groups = {g for g, _ in keys}
     unlisted = [d.name for d in sorted(exam.iterdir())
                 if d.is_dir() and d.name not in NOT_EXAMPLE
@@ -139,16 +140,28 @@ def main():
         disk, unlisted = disk_coverage(evt, keys)
         if unlisted:
             print(f"{repo.name}: 目録に無いグループ {unlisted}", file=sys.stderr)
-        for group, example in sorted(keys):
+        # **目録2版の綴りは大小文字だけ揺れる**（中文版`TIM_trigger`／英語版と実体
+        # `TIM_Trigger`）。綴りのまま突き合わせると同じ例題が2行になり、片方は
+        # 説明が空のまま並んでいた（7 family。2026-10-20）。小文字で1つに束ね、
+        # 表示は英語版の綴り（目録が索引の権威。既存の鍵を動かさない）、無ければ実体、
+        # 無ければ中文版の綴りを採る。
+        variants = {}
+        for key in keys:
+            variants.setdefault((key[0].lower(), key[1].lower()), []).append(key)
+        en_entries = lists.get("en", ("", {}))[1]
+        for same in variants.values():
+            on_disk = [disk[k] for k in same if k in disk]
+            in_en = [k for k in same if k in en_entries]
+            group, example = (in_en or on_disk or sorted(same))[0]
             evidence = []
-            if (group, example) in disk:
+            if on_disk:
                 evidence.append("evt:tree")
             for lang, (name, entries) in sorted(lists.items()):
-                if (group, example) in entries:
+                if any(k in entries for k in same):
                     evidence.append(f"evt:list-{lang}")
             # 表示は英語のみ。中国語版にしか説明が無い場合は空にし、
             # 中国語の存在自体は basis の evt:list-zh が示す。
-            description = lists.get("en", ("", {}))[1].get((group, example), "")
+            description = next((en_entries[k] for k in in_en if en_entries[k]), "")
             rows.append({
                 "family": repo.name, "group": group, "example": example,
                 "description": description, "#": "#",

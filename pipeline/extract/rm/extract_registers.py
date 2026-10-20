@@ -305,6 +305,45 @@ def bit_span(mask: int) -> tuple[int, int] | None:
     return (lo, hi) if mask == ((1 << (hi + 1)) - 1) ^ ((1 << lo) - 1) else None
 
 
+def full_value_parent(name: str, mask: int, by_name: dict[str, dict]) -> dict | None:
+    """フィールド全体と同じ mask を持つ**値**の親（`…_FULLREMAP` = 0b11）。
+
+    親の探索は「自分より広い mask」を条件にするので、値がフィールドの全bitを立てる
+    ものだと親が見つからず field に化けていた（V003〜V407 の `…_FULLREMAP` 20行）。
+    同じ mask の親を認めるのは、**同じ親の下に、より狭い mask の値が他に在る**とき
+    だけ——そうでなければ単なる別名で、値と決める根拠が無い。末尾が数字だけの名前
+    （`MODE0_1`）は「フィールドの bit n」の慣例で列挙値ではないので対象にしない
+    （CH32V006 の GPIO header は 1bit の `MODE0` に `MODE0_1` = 同じ mask を置いている）。
+
+    >>> defs = {d["name"]: d for d in (
+    ...     {"name": "AFIO_PCFR1_TIM1_REMAP", "mask": 0xC0},
+    ...     {"name": "AFIO_PCFR1_TIM1_REMAP_PARTIALREMAP", "mask": 0x40},
+    ...     {"name": "AFIO_PCFR1_TIM1_REMAP_FULLREMAP", "mask": 0xC0},
+    ...     {"name": "X_EN", "mask": 0x1}, {"name": "X_EN_ALIAS", "mask": 0x1},
+    ...     {"name": "G_MODE0", "mask": 0x1}, {"name": "G_MODE0_0", "mask": 0x0},
+    ...     {"name": "G_MODE0_1", "mask": 0x1})}
+    >>> full_value_parent("AFIO_PCFR1_TIM1_REMAP_FULLREMAP", 0xC0, defs)["name"]
+    'AFIO_PCFR1_TIM1_REMAP'
+    >>> full_value_parent("X_EN_ALIAS", 0x1, defs) is None
+    True
+    >>> full_value_parent("G_MODE0_1", 0x1, defs) is None
+    True
+    """
+    if name.rsplit("_", 1)[-1].isdigit():
+        return None
+    stem = name
+    while "_" in stem:
+        stem = stem.rsplit("_", 1)[0]
+        cand = by_name.get(stem)
+        if cand is None or cand["mask"] != mask:
+            continue
+        siblings = [d for n, d in by_name.items()
+                    if n.startswith(stem + "_") and n != name
+                    and d["mask"] != mask and d["mask"] & mask == d["mask"]]
+        return cand if siblings else None
+    return None
+
+
 def field_name(define: str, register: str, type_name: str) -> str:
     for prefix in (register + "_", type_name + "_"):
         if define.startswith(prefix) and len(define) > len(prefix):
@@ -817,6 +856,8 @@ def main() -> int:
                     if cand and cand["mask"] != mask and cand["mask"] & mask == mask:
                         parent = cand
                         break
+                if parent is None:
+                    parent = full_value_parent(name, mask, by_name)
                 if parent:
                     kind, of_field = "value", field_name(parent["name"], register, type_name)
                     pspan = bit_span(parent["mask"])

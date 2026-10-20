@@ -290,7 +290,9 @@ The derived **layout key** (family × type → hash of the structure's shape; fa
   define groups without a structure (H417's `SERDES_*`/`TKEY_*`, M030's `UART_*`/`CMP_*`) have an empty `member` (911 rows). **Rows are not dropped when it is empty**
   -- the bit position and mask are as the header says
 - **`kind=value` is a value within a field.** `RCC_PLLMULL_3` is a value of `PLLMULL`. `of_field` is the parent, `value` is its value
-  (`mask >> lo`). Counting only `kind=field` gives the number of fields
+  (`mask >> lo`). Counting only `kind=field` gives the number of fields. **A value that sets every bit of its field**
+  (`…_FULLREMAP` = 0b11, `RCC_HPRE_DIV512` = 15) is read as a value too -- its mask equals the parent's, so only when
+  a narrower value of the same parent exists. Names ending in bare digits (`MODE0_1`) follow the bit-number convention and are excluded
 - **A `field` with empty `bits`** is one whose mask is not contiguous (a few). Look at the mask
 - **D-5 (type versions) is `index/register_layouts.layout`.** A breakdown such as "I2C has 4 types" comes out of grouping by
   `layout` per `type`. The key is a hash, so **it carries no meaning; it only says same or different**.

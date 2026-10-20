@@ -289,7 +289,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
   構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（911行）。**空でも行は消していません**
   ——bit位置とmaskはheaderが言っているとおりです
 - **`kind=value`はfieldの中の値**。`RCC_PLLMULL_3`は`PLLMULL`の値。`of_field`が親、`value`がその値
-  （`mask >> lo`）。`kind=field`だけを数えればfieldの数になります
+  （`mask >> lo`）。`kind=field`だけを数えればfieldの数になります。**全bitを立てる値**（`…_FULLREMAP`＝0b11、`RCC_HPRE_DIV512`＝15）も値として読みます——親と mask が同じなので、同じ親の下により狭い値が他に在るときだけ。末尾が数字だけの名前（`MODE0_1`）はbitの番号の慣例なので対象外
 - **`bits`が空の`field`**はmaskが連続していないもの（少数）。maskを見てください
 - **D-5（型のversion）は`index/register_layouts.layout`**。「I2Cは4型」のような分け方は、`type`ごとに
   `layout`でgroup byすれば出ます。keyはハッシュなので**意味は持たず、同じか違うかだけ**を言います。

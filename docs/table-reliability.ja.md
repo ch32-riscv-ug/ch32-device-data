@@ -100,7 +100,7 @@
 | evt_variants | 57 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
 | clock_configs 他 clock_* 5表 | 1,070 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
-| evt_examples | 1,653 | confirmed 1,618 / ref 35 | 結合 | — | ✅ |
+| evt_examples | 1,645 | confirmed 1,610 / ref 35 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 | register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |
 | registers | 4,936 | confirmed 2,763 / ref 2,169 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |

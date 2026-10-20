@@ -1881,12 +1881,13 @@ PDF の原本は不変で、mirror の12 family repo が `catalog/sources.csv` �
   （旧版は PARTIALREMAP1/2 が同値 0x400000 だった。新版 0/1/2/3 で remap_fields の RM 値と一致）、
   追加 `LPTIM_ISR_ARROK`・`SDMMC_SLV_FORCE_ERR`・V407 `EXTI14_PE`。register_blocks/layouts の hash はその追従。
   **既存の癖**: 値がフィールド全体のマスクと同じ define（`…_FULLREMAP` = 0b11）は `kind=field` に分類される
-  （V003〜V407 に20行。V407 USART7 は今回この形になった）。改版で生まれた問題ではないが、`value` として
-  読めないので別に直す価値がある
+  （V003〜V407 に20行。V407 USART7 は今回この形になった）。改版で生まれた問題ではない。**同日に別commitで直した**（`extract_registers.full_value_parent`。同じ形の
+  「全bitを立てる値」161行が `kind=value` に。bit 位置・mask は不変）
 - **clock_enables** 429→428: X035 の rcc.h から `RCC_AHBPeriph_IO2W` が消えた（WCH 側の削除）
 - **flash_geometry**: V103 に IAP サンプル（`UART_USB_IAP`）が加わり、`blank_check_word` に WCH 自身の
   根拠が付いた（R-31 で「DBから引けない唯一のfamily」だった件。実測は `note` に残る）
-- **evt_examples** 1,608→1,653（例題の追加のみ。V103 に `INT` グループ新設）、**eval_boards** は X035 の
+- **evt_examples** 1,608→1,653（例題の追加のみ。V103 に `INT` グループ新設）。中文版の目録が大小文字だけ違う綴り
+  （`TIM_trigger`）で書く例題が2行になる既存の癖も同日別commitで直した（`build_evt_examples` が小文字で束ねる。→1,645）、**eval_boards** は X035 の
   ボードフォルダ名の変更（`CH32X035C8T6_R0`→`CH32X035C8T-R0` ほか。型番の対応は不変）
 - **device_ids**: V003/V103 の EVT の型番表記が温度グレード無しに（`CH32V003F4P6`→`CH32V003F4P`）。値は不変
 - **clock_configs**: H417/L103 の `evt_copies`（例題数の分母）だけ。設定値は不変

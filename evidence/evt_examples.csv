@@ -10,8 +10,7 @@ CH32H417,ADC,DualADC_InjectionSimul,dual ADC injection simultaneous sampling rou
 CH32H417,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,ADC,Internal_Temperature,Internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32H417_List_EN.txt
-CH32H417,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,Betaflight,H41x Betaflight Library,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -494,8 +493,7 @@ CH32V003,ADC,AnalogWatchdog,analog watchdog routine,#,confirmed,evt:tree+evt:lis
 CH32V003,ADC,Auto_Injection,automatic injection mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,ADC,Discontinuous_mode,discontinuous mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
-CH32V003,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V00x_List_EN.txt
-CH32V003,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V00x_List_EN.txt
+CH32V003,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,DMA,DMA_MEM2MEM,Memory to memory mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,DMA,DMA_MEM2PERIP,"Memory to peripheral mode, and peripheral to memory mode routine, see peripheral sub-routines",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
@@ -563,8 +561,7 @@ CH32V006,ADC,TIM_Trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,Motor,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,Motor/BLDC_Motor,Application of sensorless square wave BLDC motor,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,Motor/Electric_Fan,Application of medium and low speed fans based on FOC three-phase brushless motor,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,APPLICATION,Motor/Voilent_Fan,,#,confirmed,evt:tree+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,APPLICATION,Motor/voilent_fan,BLDC-based high-speed fan applications,#,confirmed,evt:tree+evt:list-en,CH32V00X_List_EN.txt
+CH32V006,APPLICATION,Motor/voilent_fan,BLDC-based high-speed fan applications,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,SoftUART,I/O port simulation serial port routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,WUI,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,WUI/wui_demo,gui lcd demo,#,confirmed,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
@@ -635,8 +632,7 @@ CH32V103,ADC,Auto_Injection,automatic injection mode routine,#,confirmed,evt:tre
 CH32V103,ADC,Discontinuous_mode,discontinuous mode routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,ADC,Internal_Temperature,internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V103_List_EN.txt
-CH32V103,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,ADC,Temperature_External_channel,Temperature-External channel Injection alternating inversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,APPLICATION,WS2812_LED,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,#,confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -896,8 +892,7 @@ CH32V20x,ADC,DualADC_RegSimul,"dual ADC regular simultaneous sampling routine, o
 CH32V20x,ADC,DualADC_SlowInterleaved,"dual ADC slow interleaved sampling routine, only applied to CH32V20x_D6",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ADC,Internal_Temperature,internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V20x_List_EN.txt
-CH32V20x,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ADC,Temperature_External_channel,Temperature External channel Injection alternating inversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,CoreMark,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,CoreMark/CoreMark,"CoreMark routine under 168M（12M_HSE） system conditions——only applied to CH32V20x_D6,168M is only suitable for Commercial Grade applications: 0℃ ≤ TA ≤ 70℃ with good heat dissipation",#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1090,8 +1085,7 @@ CH32V307,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,c
 CH32V307,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ADC,Internal_Temperature,internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V30x_List_EN.txt
-CH32V307,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ADC,Temperature_External_channel,Temperature-External channel Injection alternating inversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,APPLICATION,WS2812_LED,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,#,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1271,8 +1265,7 @@ CH32V407,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,c
 CH32V407,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,Internal_Temperature,internal temperature sensor routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32V4x7_List_EN.txt
-CH32V407,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1555,8 +1548,7 @@ CH32X315,ADC,DualADC_InjectionSimul,dual ADC injection simultaneous sampling rou
 CH32X315,ADC,DualADC_RegSimul,dual ADC regular simultaneous sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en,CH32X3x5_List_EN.txt
-CH32X315,ADC,TIM_trigger,,#,confirmed,evt:tree+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,ADC,TIM_Trigger,TIM trigger ADC conversion routine,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,CherryUSB,CherryUSB repository address and introduction,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,FATFS,,#,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
