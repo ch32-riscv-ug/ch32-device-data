@@ -223,7 +223,9 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 出所はEVTの`ch32*_rcc.h`——`RCC_<bus>PeriphClockCmd()`に渡す定数がperipheralごとのbitで、**busの名前がレジスタを言います**（`RCC_AHBPeriph_USBPD`→`RCC->AHBPCENR`）。busの呼び名はfamilyで違います（AHB/APB1/APB2、HB/PB1/PB2、HB/HB1/HB2）。`RCC_<bus>PeriphClockCmd`が`RCC-><bus>PCENR`へ書くことは8 familyのrcc.cで確かめ、例外はありません。
 
-RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**428行中370行がconfirmed、conflict 0**。referenceの58行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
+RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**417行中365行がconfirmed、conflict 0**。referenceの52行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
+
+**rcc.h にはその family に無い周辺の定数も残っています**（他 family のヘッダからの写し）。V20x の`RCC_AHBPeriph_RNG`・`FSMC`・`SDIO`・`USBHS`・`DAC`と、V103 の`FSMC`・`SDIO`・APB1 の`USB`（CH32F103 の USBD）・`CAN1`・`CAN2`・`CEC`の11行です。共有 RM（`CH32FV2x_V3xRM`・`CH32xRM`）の表は bit の適用 family を書かないので EVT と一致して confirmed になっていました——RM の RNG の章は「CH32F20x・CH32V30x・CH32V31x に適用」と書いています。機械では見分けられないので、人の判定を`curated/clock-enables-absent.json`に置いて落とします（2026-10-21、ArduinoCore-CH32RV の依頼。項目が rcc.h から消えるか、device header にその周辺のブロックが現れたら生成が止まる）。device header にブロックが無くても実在するもの——H417 の`BKP`（H417 専用 RM が`BKPEN`を書く）、H417/V205 の`PIOC`と V103 の`USBFS`（EVT に例題と専用ヘッダがある）——は残しています。**V208 の Ethernet のクロックはこの表に無い**のが正しく、RCC ではなく`EXTEN->EXTEN_CTR`の`EXTEN_ETH_10M_EN`（bit2）で入れます（EVT`ETH/NetLib/eth_driver.c`）。
 
 ### `adc_internal.csv`
 

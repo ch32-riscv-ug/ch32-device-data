@@ -1,0 +1,21 @@
+{
+  "_comment": "EVT の rcc.h が定義しているが、その family に周辺が実在しないクロック有効化（他 family のヘッダからの写し残り）。extract_clock_enables.py がこの表の行を落とす。共有 RM（V20x/V30x の CH32FV2x_V3xRM、V103/F103 の CH32xRM）の *PCENR 表は bit の適用 family を書かないので、EVT と RM が一致して confirmed になってしまう——機械では見分けられず、人が判定した。歯止め: 項目は rcc.h に define として実在し、device header にその周辺のブロックが無いこと（無ければ生成が落ちる）。デバイスヘッダにブロックが無くても実在するもの（H417 の BKP は H417 専用 RM が BKPEN を書く、H417/V205 の PIOC と V103 の USBFS は EVT に例題と専用ヘッダがある）はここに入れない。",
+  "decided": "2026-10-21",
+  "absent": {
+    "CH32V20x": {
+      "FSMC": "V203/V208 に FSMC は無い（datasheet・比較表とも。EVT に例題もドライバも無い）",
+      "RNG": "RM 第29章 RNG は『CH32F20x・CH32V30x・CH32V31x に適用』。V20x の EVT に RNG のレジスタ定義・ドライバ・例題が無い",
+      "SDIO": "V203/V208 に SDIO は無い（datasheet・比較表とも。EVT に例題も無い）",
+      "USBHS": "V203/V208 の USB は USBFS（USBD/USBHD）だけ。USBHS は V305/V307 のもの",
+      "DAC": "V203/V208 に DAC は無い（比較表とも。EVT に例題も無い）"
+    },
+    "CH32V103": {
+      "FSMC": "CH32V103 に FSMC は無い（CH32xRM を共有する CH32F103 系のもの）",
+      "SDIO": "CH32V103 に SDIO は無い（同上）",
+      "USB": "APB1 の USBD は CH32F103 のもの。V103 の datasheet と比較表が言う USB は USBHD（RCC_AHBPeriph_USBFS）だけ",
+      "CAN1": "CH32V103 に CAN は無い（datasheet・比較表とも）",
+      "CAN2": "同上",
+      "CEC": "CH32V103 に CEC は無い"
+    }
+  }
+}
