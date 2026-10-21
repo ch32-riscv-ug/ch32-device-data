@@ -1896,7 +1896,8 @@ def main() -> int:
     for r in t["clock_configs"]:
         for cell in (r["pll"], r["outside_rcc"]):
             for entry in (e for e in cell.split(";") if e):
-                symbol = entry.split(" ")[-1]
+                # `RCC_SYSPLL_SEL=0` は「その field を 0 にする」。引くのは field の記号。
+                symbol = entry.split(" ")[-1].removesuffix("=0")
                 if (r["family"], symbol) not in symbols:
                     bad.append(f"clock_configs: {r['family']} {r['config']} が呼ぶ "
                                f"{symbol} が clock_symbols にない")

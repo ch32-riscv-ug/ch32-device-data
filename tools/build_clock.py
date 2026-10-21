@@ -77,7 +77,7 @@ MIRRORS = Path("/home/mt/dev_wch")
 # CH32V203 and CH32V208 and, worse, let a series that two family directories both
 # mention pick up the wrong tree.
 CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
-                  "hpre", "ppre1", "ppre2", "pll",
+                  "hpre", "ppre1", "ppre2", "fpre", "pll",
                   "flash_latency", "flash_sck_div", "outside_rcc",
                   "#", "confidence", "basis", "evt_copies"]
 PRESCALER_COLUMNS = ["family", "field", "divider", "value",
@@ -199,6 +199,7 @@ def main() -> int:
                     "hpre": entry["prescalers"].get("HPRE", "").replace("DIV", ""),
                     "ppre1": entry["prescalers"].get("PPRE1", "").replace("DIV", ""),
                     "ppre2": entry["prescalers"].get("PPRE2", "").replace("DIV", ""),
+                    "fpre": entry["prescalers"].get("FPRE", "").replace("DIV", ""),
                     "pll": ";".join(symbols),
                     "flash_latency": ("" if entry["flash_latency"] is None
                                       else str(entry["flash_latency"])),

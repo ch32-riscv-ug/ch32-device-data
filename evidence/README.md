@@ -458,6 +458,8 @@ Four columns need care when reading.
 
 Watch `ppre1`. CH32V20x/V30x have `ppre1=2` at every HSI-derived frequency, so **`PCLK1 = HCLK/2`**. Writing USART(BRR), I2C(FREQ/CKCFGR) or SPI(BR) under the assumption `PCLK1 = F_CPU` breaks the moment the PLL is used.
 
+**`fpre` is the V3F-side (HCLK) prescaler of CH32H417/X315.** H417's 400M configuration has `fpre=4`, giving V3F 100M (matching `CoreCLK[V3F]` in `domains`). **`SYMBOL=0` in `pll`** means the configuration clears that field alone and writes no value to it -- CH32H417 clears `RCC_SYSPLL_SEL` to put the PLL on SYSPLL and opens it with `RCC_SYSPLL_GATE` (V407 has the gate too). The older families' pattern of clearing several fields together and then writing values is not read as `=0` (2026-10-21, requested by ArduinoCore-CH32RV; H417's multiplier `RCC_PLLMUL16` had been missed because it is not spelled `PLLMULL`).
+
 A row with an empty `flash_latency` means **that configuration does not write latency**. The range written also differs among the families that write it: V003 0 to 1, V006/V103/L103/X035 0 to 2, M030 0 to 3, V205 0 to 4.
 
 **`flash_sck_div` is not wait cycles but the flash clock divider.** The FLASH_ACTLR of CH32X315 and CH32H417 has no `LATENCY[n:0]`; `SCK_CFG[1:0]` selects **how HCLK is divided**. Since the symbol name is `FLASH_ACTLR_LATENCY_HCLK_DIV4`, putting it in `flash_latency` would be read as "4 waits"; the units differ, so the column was split (`check_tables.py` rejects rows that have both). **CH32X315 is HCLK/1, /2, /4, /8; CH32H417 is HCLK/2.** Raising to 240MHz with the default left as is fails, so this is a fact that cannot be left out.

@@ -43,7 +43,8 @@ clock_configs,domains,"Clock domain frequencies the configuration sets, as `name
 clock_configs,hpre,"AHB (HCLK) prescaler divider the configuration writes; joins clock_prescalers (field HPRE, divider).",integer,never empty,
 clock_configs,ppre1,"APB1 (PCLK1) prescaler divider the configuration writes; joins clock_prescalers (field PPRE1, divider).",integer,not written by the configuration (family has no such prescaler),
 clock_configs,ppre2,"APB2 (PCLK2) prescaler divider the configuration writes; joins clock_prescalers (field PPRE2, divider).",integer,not written by the configuration (family has no such prescaler),
-clock_configs,pll,"PLL setting symbols the configuration writes, as EVT symbol names (resolved to values in clock_symbols).",list(;),the configuration does not use the PLL,as-printed
+clock_configs,fpre,"V3F-side HCLK prescaler divider (CH32H417/CH32X315 `RCC_FPRE_DIVn`); joins clock_prescalers (field FPRE, divider).",integer,not written by the configuration (family has no such prescaler),
+clock_configs,pll,"PLL setting symbols the configuration writes, as EVT symbol names (resolved to values in clock_symbols); `SYMBOL=0` when the configuration clears that field alone and writes no value to it (CH32H417 `RCC_SYSPLL_SEL=0` selects the PLL).",list(;),the configuration does not use the PLL,as-printed
 clock_configs,flash_latency,Flash wait-state value (FLASH_ACTLR LATENCY) the configuration writes.,integer,the configuration does not write latency,
 clock_configs,flash_sck_div,"Flash clock divider (HCLK/n, FLASH_ACTLR SCK_CFG) the configuration writes; not wait states (CH32X315/CH32H417 only).",integer,not applicable (family has no SCK_CFG) or not written,
 clock_configs,outside_rcc,"Register written outside RCC and the symbol written to it, as `BLOCK->REGISTER SYMBOL` (e.g. EXTEN PLL HSI prescaler).",text,no register outside RCC is written,as-printed
@@ -75,7 +76,7 @@ clock_init,#,Separator between the data columns and the provenance columns; ever
 clock_init,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
 clock_init,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
 clock_prescalers,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_prescalers,field,RCC prescaler field.,enum(ADCPRE|HPRE|PPRE1|PPRE2),never empty,as-printed
+clock_prescalers,field,RCC prescaler field.,enum(ADCPRE|FPRE|HPRE|PPRE1|PPRE2),never empty,as-printed
 clock_prescalers,divider,Division ratio the value selects.,integer,never empty,
 clock_prescalers,value,"Value that selects the divider, shifted into position, in decimal.",integer,never empty,
 clock_prescalers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,

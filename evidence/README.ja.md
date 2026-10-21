@@ -455,6 +455,8 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 `ppre1`に注意してください。CH32V20x/V30xはHSI由来のどの周波数でも`ppre1=2`で、**`PCLK1 = HCLK/2`**です。USART(BRR)・I2C(FREQ/CKCFGR)・SPI(BR)を`PCLK1 = F_CPU`前提で書くと、PLLを使った瞬間に壊れます。
 
+**`fpre`は CH32H417/X315 の V3F 側（HCLK）の分周**です。H417 の 400M 設定は`fpre=4`で V3F を 100M にします（`domains`の`CoreCLK[V3F]`と一致）。**`pll`の`記号=0`**は、その field だけを消して値を書かない設定です——CH32H417 は`RCC_SYSPLL_SEL`をクリアして PLL を SYSPLL に選び、`RCC_SYSPLL_GATE`で通します（V407 もゲートを持つ）。旧 family のように複数の field を束ねて消してから値を書く形は`=0`と読みません（2026-10-21、ArduinoCore-CH32RV の依頼。H417 の倍率`RCC_PLLMUL16`は綴りが`PLLMULL`と違って取りこぼしていた）。
+
 `flash_latency`が空の行は**その設定がlatencyを書かない**ことを意味します。書くfamilyの範囲も違います: V003は0〜1、V006/V103/L103/X035は0〜2、M030は0〜3、V205は0〜4。
 
 **`flash_sck_div`は待ちサイクルではなくフラッシュクロックの分周比です。** CH32X315とCH32H417のFLASH_ACTLRは`LATENCY[n:0]`を持たず、`SCK_CFG[1:0]`で**HCLKを何分周するか**を選びます。記号名が`FLASH_ACTLR_LATENCY_HCLK_DIV4`なので`flash_latency`に入れると「4待ち」と読まれてしまい、単位が違うので列を分けました（`check_tables.py`が両方を持つ行を弾きます）。**CH32X315はHCLK/1・/2・/4・/8、CH32H417はHCLK/2**です。240MHzへ上げるのに既定のままだと落ちるので、落としたままにはできない事実です。

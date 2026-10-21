@@ -85,9 +85,12 @@ STAGED = re.compile(r"^SetSYSCLK_(?P<stages>.*?)_?(?P<source>HSI|HSE)$")
 
 # What each symbol tells us. A prescaler and a PLL multiplier are both just
 # defines; only the name says which.
-PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBPRE)_"
+# FPRE は CH32H417/X315 の V3F 側（HCLK）の分周。H417 の 400M 設定は FPRE_DIV4 で V3F を 100M にする。
+PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBPRE|FPRE)_"
                        r"(?P<divider>DIV[0-9_]+|Div[0-9_]+)$")
-PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL|PLLXTPRE|PLL_\w+|CFGR2_\w*PLL\w*)\w*$")
+# 倍率の綴りは旧 family の `RCC_PLLMULL18`（CFGR0）と H417 の `RCC_PLLMUL16`（PLLCFGR）の2通り。
+# H417 は PLL の後段に SYSPLL の選択とゲートを持つ（`RCC_SYSPLL_SEL`/`RCC_SYSPLL_GATE`）。
+PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL?|PLLXTPRE|PLL_\w+|SYSPLL_\w+|CFGR2_\w*PLL\w*)\w*$")
 LATENCY = re.compile(r"^FLASH_ACTLR_LATENCY(?:_(?P<wait>\d+))?$")
 SOURCE_SELECT = re.compile(r"^RCC_SW_(?P<source>\w+)$")
 # CH32X315とCH32H417のFLASH_ACTLRは待ちサイクル数ではなく**フラッシュクロックの
@@ -334,6 +337,7 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
             "domains": domains,
             "prescalers": {},
             "pll": [],
+            "pll_cleared": [],
             "flash_latency": None,
             "flash_sck_div": None,
             "system_clock_source": None,
@@ -386,6 +390,7 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
             # skipping the line lost half of what is needed.
             role = ("poll" if op == "poll"
                     else "mask" if (op == "&=" and "~" in value) else "value")
+            named = [x for x in SYMBOL.findall(value) if x in symbols]
             for symbol in SYMBOL.findall(value):
                 if symbol not in symbols:
                     if symbol not in ("uint32_t", "uint8_t", "uint16_t") and role != "poll":
@@ -394,6 +399,11 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                 if CLOCK_SYMBOL.match(symbol):
                     entry["symbols"].setdefault(symbol, set()).add(
                         (f"{block}->{register}", role))
+                # 1つの field だけを名指すクリアに限る。旧 family は
+                # `&= ~(RCC_PLLSRC | RCC_PLLXTPRE | RCC_PLLMULL)` と束ねて消してから値を
+                # 書くので、束の中の field を「0 に設定した」とは読まない。
+                if role == "mask" and len(named) == 1 and PLL.match(symbol):
+                    entry["pll_cleared"].append((symbol, where))
                 if role != "value":
                     continue  # a mask or a polled bit configures nothing by itself
                 m = PRESCALER.match(symbol)
@@ -419,6 +429,15 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                     entry["outside_rcc"].append(f"{block}->{register} {symbol}")
         entry["unresolved_symbols"] = sorted(set(entry["unresolved_symbols"]))
         entry["outside_rcc"] = sorted(set(entry["outside_rcc"]))
+        # **クリアして 0 にすること自体が設定の field**。H417 は `RCC_SYSPLL_SEL` を
+        # クリアして PLL を選び、値の書き込みは続かない。その field だけを消すマスクの後に
+        # 同じ field の値が1つも書かれなければ `<field>=0` として残す（書かれれば値の側が
+        # 言っている）。
+        written = [s.split(" [")[0] for s in entry["pll"]]
+        for symbol, where in entry.pop("pll_cleared"):
+            if not any(w.startswith(symbol) for w in written):
+                zero = f"{symbol}=0"
+                entry["pll"].append(f"{zero} [{where}]" if where else zero)
         entry["pll"] = list(dict.fromkeys(entry["pll"]))
         entry["symbols"] = {k: sorted(v) for k, v in sorted(entry["symbols"].items())}
         configs[name] = entry
