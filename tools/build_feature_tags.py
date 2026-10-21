@@ -33,6 +33,15 @@
                                        （無いことは `-` と書かれ、属性にならない）
     比較表にラベルが無い             → 節見出しに戻る。datasheet 単位
 
+**逆に、比較表にしか無い機能もある。** CH32V208 の datasheet は Ethernet の節見出しを
+持たない（概要文とブロック図にだけ出る）が、比較表は GBU6/RBT6/WBU6 に `10M` と書く。
+**別の datasheet の見出しで既に在るタグ**に限り、比較表がその series に値を持てば
+見出しが無くてもタグを付ける（`features`・`sections` は空、`basis` は `attributes(...)`）。
+新しい語をここで作らないのは、語彙を見出しの綴りから決める方針を崩さないため。
+当てるのは**属性名の最後のトークンがタグのとき**だけ（`communication_interfaces_ethernet`・
+`timer_lptim`）——途中のトークンで当てると `pdusb_usb_pd_type_c`（USB PD）が USB に、
+`adc_tkey_channel`（数え方）が ADC に化ける。
+
 `precision` 列がどちらの読みかを言う。64 タグのうち 46 が比較表側で決まり、
 残る 18 は比較表に行が無い——**そしてそれは CRC・DMA・EXTI・GPIO・PFIC・TIM の
 ような「全 family が持つ」もの**で、比較表が差の無い行を持たないのと整合する。
@@ -123,6 +132,8 @@ def main() -> int:
     tokens_in: dict[str, set[str]] = collections.defaultdict(set)
     # (series, トークン) → その series の型番が実際に値を持つか。
     has: set[tuple[str, str]] = set()
+    # (series, トークン) → 値を持つ属性の (属性名, 確度)。見出しの無いタグの根拠にする。
+    attested: dict[tuple[str, str], set[tuple[str, str]]] = collections.defaultdict(set)
     for row in attributes:
         sheet = sheet_of.get(row["part_number"])
         series = series_of.get(row["part_number"])
@@ -131,6 +142,9 @@ def main() -> int:
                 tokens_in[sheet].add(token)
             if series:
                 has.add((series, token))
+        if series:
+            last = row["attribute"].split("_")[-1]
+            attested[(series, last)].add((row["attribute"], row["confidence"]))
 
     # (tag, series) ごとに、どの見出しから来たかを集める。
     #
@@ -201,6 +215,26 @@ def main() -> int:
             "confidence": entry["confidence"],
             "basis": "+".join(f"features({d})" for d in sorted(entry["datasheets"])),
         })
+    # 見出しの無い series に、比較表だけを根拠にタグを足す（docstring の「逆に」）。
+    covered = {(r["tag"], r["series"]) for r in rows}
+    from_table = 0
+    for tag in sorted({r["tag"] for r in rows}):
+        token = tag.lower().replace("-", "")
+        for series, tok in sorted(attested):
+            if tok != token or (tag, series) in covered:
+                continue
+            evidence = attested[(series, token)]
+            rows.append({
+                "precision": "part", "tag": tag,
+                "parent": curated["parents"].get(tag, ""),
+                "series": series, "family": family_of.get(series, ""),
+                "features": "", "features_zh": "", "sections": "",
+                "confidence": ("confirmed" if all(c == "confirmed" for _, c in evidence)
+                               else "reference"),
+                "basis": "+".join(f"attributes({a})" for a in sorted({a for a, _ in evidence})),
+            })
+            covered.add((tag, series))
+            from_table += 1
     rows.sort(key=lambda r: (r["tag"], r["series"]))
 
     dest = paths.index("features", args.out)
@@ -211,7 +245,8 @@ def main() -> int:
     tags = sorted({r["tag"] for r in rows})
     precise = sum(1 for r in rows if r["precision"] == "part")
     print(f"{dest}: {len(rows)} 行  タグ {len(tags)} 種"
-          f"  比較表で決めた {precise} / 節見出しのみ {len(rows) - precise}",
+          f"  比較表で決めた {precise} / 節見出しのみ {len(rows) - precise}"
+          f"（うち見出しが無く比較表だけで付けた {from_table}）",
           file=sys.stderr)
     if dropped:
         print("  - 節見出しにはあるが比較表が「無い」と書いている（偽陽性を外した）:",

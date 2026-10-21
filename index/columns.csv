@@ -196,9 +196,9 @@ features,parent,Broader tag that also covers this one (e.g. `USBHS` is also unde
 features,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
 features,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
 features,precision,"Which reading decided the row: `part` (the comparison table, per part number) or `datasheet` (a datasheet section heading, per datasheet).",enum(datasheet|part),never empty,fixed
-features,features,Datasheet section heading(s) in English that the tag was read from.,list(;),never empty,as-printed
+features,features,Datasheet section heading(s) in English that the tag was read from.,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed
 features,features_zh,The same heading(s) in the Chinese edition.,list(;),no Chinese heading recorded,as-printed
-features,sections,Datasheet section number(s) of the heading(s).,list(;),never empty,as-printed
+features,sections,Datasheet section number(s) of the heading(s).,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed
 features,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
 features,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
 features,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose

@@ -306,6 +306,9 @@ pin 表に SWCLK が無く見出しも 1-wire なので、**見出しを採り m
 1行1（タグ, series）。`precision`＝`part`（比較表が行を持つ。型番単位）／`datasheet`（節見出しに戻る。
 datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも入る）。節見出しだけだと
 `CH32V20x_30xDS0` の Ethernet が V303 にも付く偽陽性が出るので、比較表がある場合はそちらを採ります。
+逆に**節見出しが無い機能**（CH32V208 の Ethernet は概要文とブロック図にしか出ない）は、別の datasheet の
+見出しで既に在るタグに限り、比較表の属性名の最後のトークンがそのタグなら付けます（`features`・`sections` は空、
+`basis` は `attributes(...)`。2026-10-21、25行）。
 
 ### `register_layouts.csv`
 

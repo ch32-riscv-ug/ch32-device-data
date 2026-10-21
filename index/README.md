@@ -287,6 +287,10 @@ the headings say 1-wire -- the heading wins and the manual's dissent is recorded
 
 `features.csv` (by `tools/build_feature_tags.py`): one row per (tag, series); `precision` says
 whether the comparison table (`part`) or a datasheet section heading (`datasheet`) decided it.
+A feature with no section heading at all (CH32V208's Ethernet appears only in the overview and
+block diagram) is tagged from the comparison table alone when the tag already exists from another
+datasheet's headings and is the last token of the attribute name; `features`/`sections` are then empty
+and `basis` is `attributes(...)` (2026-10-21, 25 rows).
 `register_layouts.csv` (by `pipeline/extract/rm/extract_registers.py`): (family, type) -> layout hash; equal
 hashes share register definitions. `manifest.csv`: path, row count and sha256 of every other CSV
 here.
