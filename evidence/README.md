@@ -639,7 +639,7 @@ match the EVT; three parts without EVT support and four duplicate V003 rows went
 
 Documented entries are `reference`; matching memory and AttachChip measurements
 from `curated/device-ids-measured.json` make a row `confirmed`, with
-`id_source=memory`. This verifies identity, not flash programming.
+`id_source=memory`. This verifies identity, not flash programming -- only rows with a ch32rv record of a matching erase, program and readback on that part (`flash_verified` in `curated/device-ids-measured.json`) say "flash programming verified" in `note` and add `flash:ch32rv(...)` to `basis` (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO; the same record appears in the M030/V407 rows of `flash_program_method` as `measured:ch32rv(...)`).
 `dont_care_bits` remains `[7:4]`.
 98 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
 CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6.

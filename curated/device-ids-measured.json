@@ -1,5 +1,5 @@
 {
-  "_comment": "Identity-only measurements supplied by ch32rv. Mask revision bits [7:4]. Flash capacity and programming support are not established by these ID reads.",
+  "_comment": "Identity measurements supplied by ch32rv. Mask revision bits [7:4]. An ID read alone does not establish flash capacity or programming support; `flash_verified` names the ch32rv record of an erase + program + readback that matched on that part (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO).",
   "verified": "2026-10-10",
   "measured": {
     "CH32V205RCT6": {
@@ -18,13 +18,15 @@
       "attach_id": "0x03bb0810",
       "memory_id": "0x03bb0810",
       "id_addr": "0x1ffff384",
-      "evidence": "ch32rv/docs/data-requests/measured/device-id-m030-2026-10-10.md"
+      "evidence": "ch32rv/docs/data-requests/measured/device-id-m030-2026-10-10.md",
+      "flash_verified": "ch32rv/docs/data-requests/measured/oep-m030-v407-2026-10-22.md"
     },
     "CH32V407WEU6": {
       "attach_id": "0x46710011",
       "memory_id": "0x46710011",
       "id_addr": "0x1ffff704",
-      "evidence": "ch32rv/docs/data-requests/measured/device-id-v407-2026-10-10.md"
+      "evidence": "ch32rv/docs/data-requests/measured/device-id-v407-2026-10-10.md",
+      "flash_verified": "ch32rv/docs/data-requests/measured/oep-m030-v407-2026-10-22.md"
     },
     "CH32H417QEU6": {
       "attach_id": "0x4170053d",

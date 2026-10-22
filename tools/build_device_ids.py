@@ -111,10 +111,17 @@ def confirm_measurements(rows: list[dict]) -> None:
             raise SystemExit(f"{pn}: measurement disagrees with documented ID/address")
         row["confidence"] = "confirmed"
         row["id_source"] = "memory"
-        row["note"] = "AttachChip and memory IDs agree; flash programming not verified"
+        # ID が読めたことは書き込めることを意味しない。ch32rv が erase+program+readback を
+        # その型番で通した記録（`flash_verified`）がある行だけ verified と書く。
+        flashed = measurement.get("flash_verified")
+        row["note"] = ("AttachChip and memory IDs agree; flash programming "
+                       + ("verified (erase, program and readback matched)" if flashed
+                          else "not verified"))
         tag = f"device-id:wch-linke({measurement['evidence']})"
         if tag not in row["basis"].split("+"):
             row["basis"] += f"+{tag}"
+        if flashed and f"flash:ch32rv({flashed})" not in row["basis"].split("+"):
+            row["basis"] += f"+flash:ch32rv({flashed})"
 
 
 def family_addresses() -> list[dict]:

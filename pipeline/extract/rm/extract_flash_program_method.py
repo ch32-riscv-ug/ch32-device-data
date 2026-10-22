@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -230,6 +231,18 @@ def main() -> int:
                                 "BER32", "BER64", "PAGE_BER32", "PAGE_BER64"):
                 ctlr_names.setdefault(row["family"], []).append(row["field"])
 
+    # 実機で erase+program+readback が通った型番（ch32rv。curated/device-ids-measured.json の
+    # `flash_verified`）。手順の確度は資料の突き合わせで決まっているので変えず、basis に
+    # 実機の裏付けとして足す（M030 の buffered 64bit、V407 の direct/PG_STRT。2026-10-22）。
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
+        family_of = {r["part_number"]: r["family"] for r in csv.DictReader(f)}
+    flashed: dict[str, list[str]] = {}
+    measured = json.loads((paths.CURATED / "device-ids-measured.json").read_text(encoding="utf-8"))
+    for part, m in sorted(measured["measured"].items()):
+        if m.get("flash_verified"):
+            flashed.setdefault(family_of[part], []).append(
+                f"measured:ch32rv({m['flash_verified'].removeprefix('ch32rv/')}, {part})")
+
     rows: list[dict] = []
     notes: list[str] = []
     for family in families:
@@ -328,6 +341,7 @@ def main() -> int:
                     f"(`= *(uint32_t*)((addr & ~3) ^ {magic.group(2)})`); the RM does not "
                     "mention it, and ch32rv reports that CH32V103 needs it for erase and "
                     "program to have any effect")
+        basis.extend(flashed.get(family, []))
         rows.append({
             "family": family,
             "program_method": method,
