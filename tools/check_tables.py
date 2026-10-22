@@ -1848,6 +1848,14 @@ def main() -> int:
             if not name or not hz.isdigit():
                 bad.append(f"clock_configs: {where} の domains {domain!r} が "
                            "名前=Hz の形でない")
+        # `SYSCLK=` は本当の SYSCLK。HPRE が分周するなら、その後の周波数を別の名前で
+        # 持つ（`HCLK=`、H417 は `CoreCLK[V5F]=`）。2026-10-22 まで `SetSysClockToN` の
+        # N（HCLK）を SYSCLK と書いていて、consumer が M030 を 144MHz で走らせた。
+        names = {d.partition("=")[0] for d in r["domains"].split(";") if d}
+        if (r["hpre"] not in ("", "1") and "SYSCLK" in names
+                and not any(n == "HCLK" or n.startswith("CoreCLK") for n in names)):
+            bad.append(f"clock_configs: {where} は hpre={r['hpre']} なのに domains が "
+                       "HCLK も CoreCLK も持たない（SYSCLK= に分周後の値が入っている疑い）")
         if r["flash_latency"] and not r["flash_latency"].isdigit():
             bad.append(f"clock_configs: {where} の flash_latency が数でない")
         # A flash clock divider, not a wait count. Keeping it out of
