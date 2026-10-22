@@ -449,6 +449,8 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **`domains`は`名前=Hz`を`;`で並べます**——`SYSCLK=400000000;CoreCLK[V5F]=400000000;CoreCLK[V3F]=100000000`。ほとんどのfamilyは`SYSCLK`だけですが、**CH32V407はSYSCLKとHCLKが別**、**CH32X315はSYSCLK/CoreCLK/HCLKの3段**、**CH32H417は双核なのでCoreCLKがコアごと**です。`SYSCLK = HCLK`という1段のモデルではこの3 familyを表せません。名前が周波数を言っていない設定（`SetSysClockToHSE`＝水晶に直結）は**空**にしてあります。水晶の周波数は基板の属性でchipの属性ではないためです。
 
+**`SYSCLK=`は常に本当のSYSCLK**です。EVTの`SetSysClockToN`のNは**HCLK（HPREの後）**なので、HPREが1でない設定は`SYSCLK=N×hpre;HCLK=N`と書きます——CH32M030の`SetSysClockTo72_HSI`はPLL固定のHSI×18＝144MHzをHPRE/2して`SYSCLK=144000000;HCLK=72000000`、X035の8〜24MHzはHSI 48MHzの分周、V003/V006の8MHzは24MHzの/3です（2026-10-22まで`SYSCLK=72000000`と書いていて、ArduinoCore-CH32RVがM030を144MHzのまま走らせて止まった）。
+
 **`condition`はコンパイル時分岐です**。CH32V307の144MHzは`#ifdef CH32V30x_D8`で`RCC_PLLMULL18`、`#else`で`RCC_PLLMULL18_EXTEN`を書きます。**1つの関数が2つの事実**なので、分岐ごとに行を分け、どちらかを`condition`が言います。
 
 **`outside_rcc`はRCC以外に触るレジスタです**。CH32L103/V103/V205/V20x/V30xはHSIからPLLを回すとき`EXTEN`を触ります（`EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE`）。**CH32V205だけはこのregisterを`CTLR0`と呼びます**。「RCCだけ見ればよい」というモデルでは組めません。

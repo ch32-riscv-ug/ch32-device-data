@@ -429,6 +429,19 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                     entry["outside_rcc"].append(f"{block}->{register} {symbol}")
         entry["unresolved_symbols"] = sorted(set(entry["unresolved_symbols"]))
         entry["outside_rcc"] = sorted(set(entry["outside_rcc"]))
+        # **`SetSysClockToN` の N は HCLK**（分周の後）。HPRE が1でない family では
+        # SYSCLK と違う——M030 の `SetSysClockTo72_HSI` は PLL 固定の HSI×18=144MHz を
+        # HPRE/2 して HCLK 72MHz（EVT の `RCC_GetClocksFreq` も `HCLK = SYSCLK / presc`）。
+        # X035 の 8〜24MHz は HSI 48MHz の分周、V003/V006 の 8MHz は 24MHz の /3。
+        # `SYSCLK=` は常に本当の SYSCLK を言うので、名前の値を HCLK に置き、SYSCLK は
+        # HPRE 倍にする（V407 が名前で `SYSCLK_120MHz_HCLK_60MHz` と書き分けるのと同じ形。
+        # 2026-10-22、ArduinoCore-CH32RV が M030 を 144MHz で走らせて止まった報告）。
+        divider = entry["prescalers"].get("HPRE", "")
+        if PLAIN.match(name) and list(domains) == ["SYSCLK"] and divider[3:].isdigit() \
+                and int(divider[3:]) > 1:
+            n = domains["SYSCLK"]
+            domains = {"SYSCLK": n * int(divider[3:]), "HCLK": n}
+            entry["domains"] = domains
         # **クリアして 0 にすること自体が設定の field**。H417 は `RCC_SYSPLL_SEL` を
         # クリアして PLL を選び、値の書き込みは続かない。その field だけを消すマスクの後に
         # 同じ field の値が1つも書かれなければ `<field>=0` として残す（書かれれば値の側が

@@ -452,6 +452,8 @@ Four columns need care when reading.
 
 **`domains` lists `name=Hz` separated by `;`** -- `SYSCLK=400000000;CoreCLK[V5F]=400000000;CoreCLK[V3F]=100000000`. Most families have only `SYSCLK`, but **CH32V407 has SYSCLK and HCLK separate**, **CH32X315 has the three tiers SYSCLK/CoreCLK/HCLK**, and **CH32H417 is dual-core, so CoreCLK is per core**. A single-tier model `SYSCLK = HCLK` cannot represent these 3 families. Configurations whose name does not state a frequency (`SetSysClockToHSE` = tied directly to the crystal) are left **empty**, because the crystal frequency is a board attribute, not a chip attribute.
 
+**`SYSCLK=` is always the real SYSCLK.** The N in the EVT's `SetSysClockToN` is **HCLK (after HPRE)**, so a configuration whose HPRE is not 1 is written `SYSCLK=N*hpre;HCLK=N` -- CH32M030's `SetSysClockTo72_HSI` takes the fixed HSI x18 = 144 MHz PLL through HPRE/2, giving `SYSCLK=144000000;HCLK=72000000`; X035's 8-24 MHz divide the 48 MHz HSI and V003/V006's 8 MHz is 24 MHz /3 (until 2026-10-22 these read `SYSCLK=72000000`, and ArduinoCore-CH32RV ran an M030 at 144 MHz and it stopped).
+
 **`condition` is a compile-time branch.** CH32V307's 144MHz writes `RCC_PLLMULL18` under `#ifdef CH32V30x_D8` and `RCC_PLLMULL18_EXTEN` under `#else`. **One function, two facts**, so the rows are split per branch and `condition` says which.
 
 **`outside_rcc` is the registers touched outside RCC.** CH32L103/V103/V205/V20x/V30x touch `EXTEN` when running the PLL from HSI (`EXTEN->EXTEN_CTR |= EXTEN_PLL_HSI_PRE`). **Only CH32V205 calls this register `CTLR0`.** It cannot be built under a "just look at RCC" model.

@@ -18,25 +18,25 @@ CH32L103,SetSysClockTo96_HSE,HSE,,SYSCLK=96000000,1,2,1,,RCC_PLLSRC_HSE;RCC_PLLX
 CH32L103,SetSysClockTo96_HSI,HSI,,SYSCLK=96000000,1,2,1,,RCC_PLLSRC_HSI_Div2;RCC_PLLMULL12,2,,EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE,#,reference,evt(system_ch32*.c),120/120
 CH32L103,SetSysClockToHSE,HSE,,,1,1,1,,,0,,,#,reference,evt(system_ch32*.c),120/120
 CH32L103,SetSysClockToHSI_LP,HSI,,,1,1,1,,,,,,#,reference,evt(system_ch32*.c),120/120
-CH32M030,SetSysClockTo24_HSE,HSE,,SYSCLK=24000000,6,,,,RCC_PLLSRC_HSE,1,,,#,reference,evt(system_ch32*.c),97/97
-CH32M030,SetSysClockTo24_HSI,HSI,,SYSCLK=24000000,6,,,,RCC_PLLSRC_HSI,1,,,#,reference,evt(system_ch32*.c),97/97
-CH32M030,SetSysClockTo48_HSE,HSE,,SYSCLK=48000000,3,,,,RCC_PLLSRC_HSE,2,,,#,reference,evt(system_ch32*.c),97/97
-CH32M030,SetSysClockTo48_HSI,HSI,,SYSCLK=48000000,3,,,,RCC_PLLSRC_HSI,2,,,#,reference,evt(system_ch32*.c),97/97
-CH32M030,SetSysClockTo72_HSE,HSE,,SYSCLK=72000000,2,,,,RCC_PLLSRC_HSE,3,,,#,reference,evt(system_ch32*.c),97/97
-CH32M030,SetSysClockTo72_HSI,HSI,,SYSCLK=72000000,2,,,,RCC_PLLSRC_HSI,3,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo24_HSE,HSE,,SYSCLK=144000000;HCLK=24000000,6,,,,RCC_PLLSRC_HSE,1,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo24_HSI,HSI,,SYSCLK=144000000;HCLK=24000000,6,,,,RCC_PLLSRC_HSI,1,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo48_HSE,HSE,,SYSCLK=144000000;HCLK=48000000,3,,,,RCC_PLLSRC_HSE,2,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo48_HSI,HSI,,SYSCLK=144000000;HCLK=48000000,3,,,,RCC_PLLSRC_HSI,2,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo72_HSE,HSE,,SYSCLK=144000000;HCLK=72000000,2,,,,RCC_PLLSRC_HSE,3,,,#,reference,evt(system_ch32*.c),97/97
+CH32M030,SetSysClockTo72_HSI,HSI,,SYSCLK=144000000;HCLK=72000000,2,,,,RCC_PLLSRC_HSI,3,,,#,reference,evt(system_ch32*.c),97/97
 CH32M030,SetSysClockToHSE,HSE,,,1,,,,,0,,,#,reference,evt(system_ch32*.c),97/97
 CH32V003,SetSysClockTo_24MHZ_HSI,HSI,,SYSCLK=24000000,1,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
 CH32V003,SetSysClockTo_24MHz_HSE,HSE,,SYSCLK=24000000,1,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
 CH32V003,SetSysClockTo_48MHZ_HSI,HSI,,SYSCLK=48000000,1,,,,RCC_PLLSRC_HSI_Mul2,1,,,#,reference,evt(system_ch32*.c),62/62
 CH32V003,SetSysClockTo_48MHz_HSE,HSE,,SYSCLK=48000000,1,,,,RCC_PLLSRC_HSE_Mul2,1,,,#,reference,evt(system_ch32*.c),62/62
-CH32V003,SetSysClockTo_8MHz_HSE,HSE,,SYSCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
-CH32V003,SetSysClockTo_8MHz_HSI,HSI,,SYSCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
+CH32V003,SetSysClockTo_8MHz_HSE,HSE,,SYSCLK=24000000;HCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
+CH32V003,SetSysClockTo_8MHz_HSI,HSI,,SYSCLK=24000000;HCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),62/62
 CH32V006,SetSysClockTo_24MHZ_HSI,HSI,,SYSCLK=24000000,1,,,,,1,,,#,reference,evt(system_ch32*.c),73/73
 CH32V006,SetSysClockTo_24MHz_HSE,HSE,,SYSCLK=24000000,1,,,,,1,,,#,reference,evt(system_ch32*.c),73/73
 CH32V006,SetSysClockTo_48MHZ_HSI,HSI,,SYSCLK=48000000,1,,,,RCC_PLLSRC_HSI_Mul2,2,,,#,reference,evt(system_ch32*.c),73/73
 CH32V006,SetSysClockTo_48MHz_HSE,HSE,,SYSCLK=48000000,1,,,,RCC_PLLSRC_HSE_Mul2,2,,,#,reference,evt(system_ch32*.c),73/73
-CH32V006,SetSysClockTo_8MHz_HSE,HSE,,SYSCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),73/73
-CH32V006,SetSysClockTo_8MHz_HSI,HSI,,SYSCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),73/73
+CH32V006,SetSysClockTo_8MHz_HSE,HSE,,SYSCLK=24000000;HCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),73/73
+CH32V006,SetSysClockTo_8MHz_HSI,HSI,,SYSCLK=24000000;HCLK=8000000,3,,,,,0,,,#,reference,evt(system_ch32*.c),73/73
 CH32V103,SetSysClockTo24,,else,SYSCLK=24000000,1,1,1,,RCC_PLLSRC_HSI_Div2;RCC_PLLMULL6,0,,EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE,#,reference,evt(system_ch32*.c),1/89
 CH32V103,SetSysClockTo24,,if (PLL_Source == HSI),SYSCLK=24000000,1,1,1,,RCC_PLLSRC_HSI_Div2;RCC_PLLMULL3,0,,EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE,#,reference,evt(system_ch32*.c),1/89
 CH32V103,SetSysClockTo48,,else,SYSCLK=48000000,1,2,1,,RCC_PLLSRC_HSI_Div2;RCC_PLLMULL12,1,,EXTEN->EXTEN_CTR EXTEN_PLL_HSI_PRE,#,reference,evt(system_ch32*.c),1/89
@@ -137,11 +137,11 @@ CH32V407,SetSYSCLK_480MHz_HCLK_240MHz_HSE,HSE,,SYSCLK=480000000;HCLK=240000000,2
 CH32V407,SetSYSCLK_480MHz_HCLK_240MHz_HSI,HSI,,SYSCLK=480000000;HCLK=240000000,2,1,1,,RCC_PLLSRC_HSI;RCC_PLLMULL24;RCC_SYSPLL_GATE,,,,#,reference,evt(system_ch32*.c),161/161
 CH32V407,SetSYSCLK_HCLK_HSE,HSE,,,1,1,1,,,,,,#,reference,evt(system_ch32*.c),161/161
 CH32V407,SetSYSCLK_HCLK_HSI,HSI,,,1,1,1,,,,,,#,reference,evt(system_ch32*.c),161/161
-CH32X035,SetSysClockTo12_HSI,HSI,,SYSCLK=12000000,4,,,,,0,,,#,reference,evt(system_ch32*.c),94/94
-CH32X035,SetSysClockTo16_HSI,HSI,,SYSCLK=16000000,3,,,,,1,,,#,reference,evt(system_ch32*.c),94/94
-CH32X035,SetSysClockTo24_HSI,HSI,,SYSCLK=24000000,2,,,,,1,,,#,reference,evt(system_ch32*.c),94/94
+CH32X035,SetSysClockTo12_HSI,HSI,,SYSCLK=48000000;HCLK=12000000,4,,,,,0,,,#,reference,evt(system_ch32*.c),94/94
+CH32X035,SetSysClockTo16_HSI,HSI,,SYSCLK=48000000;HCLK=16000000,3,,,,,1,,,#,reference,evt(system_ch32*.c),94/94
+CH32X035,SetSysClockTo24_HSI,HSI,,SYSCLK=48000000;HCLK=24000000,2,,,,,1,,,#,reference,evt(system_ch32*.c),94/94
 CH32X035,SetSysClockTo48_HSI,HSI,,SYSCLK=48000000,1,,,,,2,,,#,reference,evt(system_ch32*.c),94/94
-CH32X035,SetSysClockTo8_HSI,HSI,,SYSCLK=8000000,6,,,,,0,,,#,reference,evt(system_ch32*.c),94/94
+CH32X035,SetSysClockTo8_HSI,HSI,,SYSCLK=48000000;HCLK=8000000,6,,,,,0,,,#,reference,evt(system_ch32*.c),94/94
 CH32X315,SetSYSCLK_240M_CoreCLK_240M_HCLK_120M_HSE,HSE,,SYSCLK=240000000;CoreCLK=240000000;HCLK=120000000,1,,,2,RCC_PLLSRC_USBHSPLL_480M,,2,,#,reference,evt(system_ch32*.c),98/98
 CH32X315,SetSYSCLK_240M_CoreCLK_240M_HCLK_120M_HSI,HSI,,SYSCLK=240000000;CoreCLK=240000000;HCLK=120000000,1,,,2,RCC_PLLSRC_USBHSPLL_480M,,2,,#,reference,evt(system_ch32*.c),98/98
 CH32X315,SetSYSCLK_240M_CoreCLK_240M_HCLK_240M_HSE,HSE,,SYSCLK=240000000;CoreCLK=240000000;HCLK=240000000,1,,,1,RCC_PLLSRC_USBHSPLL_480M,,4,,#,reference,evt(system_ch32*.c),98/98
