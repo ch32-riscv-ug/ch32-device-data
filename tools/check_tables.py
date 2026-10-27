@@ -72,7 +72,16 @@ KNOWN_ROLE_GAPS: dict[str, int] = {}
 #            RM 格子も値1を PC1→PORT3 のようにずらして当てていたので裏づける行が
 #            無かった。**英語版 RM の 1.7→1.8 改版**で格子が値1を PF12/PF13/PE7 に
 #            当てるようになり、`remap_routes` に3行（全部 confirmed）が入って穴が閉じた。
-KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {}
+#   FSMC_NADV / TIM1_CH3N  CH32V407/V467。**2026-10-27 に CH32V407DS0.zh 1.3→1.4 が中文版だけで
+#            remap 欄に書き足した**（英語版は 1.3 のまま。candidate は英語版の pin 表を読むので
+#            経路が付かない）。`TIM1_CH3N` の PE12（remap-3）は RM 表10-15 の TIM1_RM=11 が裏づける
+#            正しい経路で、英語版が追い付けば閉じる見込み。`FSMC_NADV` の PD2（remap-1）は RM 表10-41
+#            と datasheet の脚注が「FSMCEN=1&USBHS2EN=1&RB_UD_RST_SIE=0 で**既定の割り当て**が PD2 へ
+#            移る」と書くもので、remap 値1（PB7）の経路ではない——中文版の欄の置き方の問題
+KNOWN_SELECTOR_GAPS: dict[tuple[str, str], int] = {
+    ("CH32V407", "FSMC_NADV"): 3, ("CH32V407", "TIM1_CH3N"): 2,
+    ("CH32V467", "FSMC_NADV"): 3, ("CH32V467", "TIM1_CH3N"): 2,
+}
 
 # catalog/toolchains.csv の語彙。上流（MounRiver）の綴りではなく、こちらで
 # 正規化した名前（build_toolchains.py の OS_NAME / ARCH_NAME / KIND_ORDER と対）。

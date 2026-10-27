@@ -300,7 +300,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | PC12 | DVP_D9, SDIO_CK, USART4_CK, USART5_TX | - | DVP_D9, I2S3_SD, SDIO_CK, SPI3_MOSI, USART3_CK | - | - |
 | PD0 | FSMC_D2 | - | FSMC_D2 | - | CAN_RX |
 | PD1 | FSMC_D3 | - | FSMC_D3 | - | CAN_TX |
-| PD2 | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR, USART4_RTS, USART5_RX | - | DVP_D11, SDIO_CMD, TIM3_ETR | TIM3_ETR | - |
+| PD2 | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR, USART4_RTS, USART5_RX | - | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR | TIM3_ETR | - |
 | PD3 | FSMC_CLK | - | FSMC_CLK, USART2_CTS | - | - |
 | PD4 | FSMC_NOE | - | FSMC_NOE, USART2_RTS | - | - |
 | PD5 | FSMC_NWE | - | FSMC_NWE, USART2_TX | - | - |
@@ -326,7 +326,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | PE9 | FSMC_D6, LED1, TIM1_CH1_3, USART9_RTS | - | FSMC_D6, USART9_RTS | USART5_RX | USART5_RX |
 | PE10 | FSMC_D7 | - | FSMC_D7, USART8_CTS | USART6_TX | TIM1_CH2N |
 | PE11 | FSMC_D8 | - | FSMC_D8, USART8_RTS | USART6_RX | TIM1_CH2 |
-| PE12 | BOOT0, USART10_CK | - | USART10_CK | USART4_CK | USART4_CK |
+| PE12 | BOOT0, USART10_CK | - | USART10_CK | USART4_CK | TIM1_CH3N, USART4_CK |
 | OSC_IN | - | PD0 | - | - | - |
 | OSC_OUT | - | PD1 | - | - | - |
 | PA0-WKUP | ADC_IN0, TIM2_CH1, TIM2_ETR, TIM5_CH1, TIM8_ETR, USART2_CTS, WKUP | - | TIM8_ETR | TIM2_CH1, TIM2_ETR | - |
@@ -489,7 +489,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | PC12 | DVP_D9, SDIO_CK, USART4_CK, USART5_TX | - | DVP_D9, I2S3_SD, SDIO_CK, SPI3_MOSI, USART3_CK | - | - |
 | PD0 | FSMC_D2 | - | FSMC_D2 | - | CAN_RX |
 | PD1 | FSMC_D3 | - | FSMC_D3 | - | CAN_TX |
-| PD2 | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR, USART4_RTS, USART5_RX | - | DVP_D11, SDIO_CMD, TIM3_ETR | TIM3_ETR | - |
+| PD2 | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR, USART4_RTS, USART5_RX | - | DVP_D11, FSMC_NADV, SDIO_CMD, TIM3_ETR | TIM3_ETR | - |
 | PD3 | FSMC_CLK | - | FSMC_CLK, USART2_CTS | - | - |
 | PD4 | FSMC_NOE | - | FSMC_NOE, USART2_RTS | - | - |
 | PD5 | FSMC_NWE | - | FSMC_NWE, USART2_TX | - | - |
@@ -514,7 +514,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | PE9 | FSMC_D6, LED1, TIM1_CH1_3, USART9_RTS | - | FSMC_D6, USART9_RTS | USART5_RX | USART5_RX |
 | PE10 | FSMC_D7 | - | FSMC_D7, USART8_CTS | USART6_TX | TIM1_CH2N |
 | PE11 | FSMC_D8 | - | FSMC_D8, USART8_RTS | USART6_RX | TIM1_CH2 |
-| PE12 | BOOT0, USART10_CK | - | USART10_CK | USART4_CK | USART4_CK |
+| PE12 | BOOT0, USART10_CK | - | USART10_CK | USART4_CK | TIM1_CH3N, USART4_CK |
 | OSC_IN | - | PD0 | - | - | - |
 | OSC_OUT | - | PD1 | - | - | - |
 | PA0-WKUP | ADC_IN0, TIM2_CH1, TIM2_ETR, TIM5_CH1, TIM8_ETR, USART2_CTS, WKUP | - | TIM8_ETR | TIM2_CH1, TIM2_ETR | - |
@@ -594,6 +594,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 - The non-zero-wait flash area additionally supports RVV instructions and 64-bit DMA access. *(applies: CH32V407, CH32V467; 5th-to-last digit of lot number > 0)*
 - Current consumption is higher than the CH32V407 values in the datasheet tables: about +2~22mA in operating mode and +90uA in stop mode. *(applies: CH32V467; all lots)*
 - PSRAM supports clocks above 200MHz, variable and instruction access, and byte write; in stop mode (voltage regulator in low-power mode) PSRAM data is retained. *(applies: CH32V467; 5th-to-last digit of lot number != 0)*
+- PSRAM maximum clock depends on the lot: 200MHz when the 4th-to-last digit of the lot number is M (the default supply), 300MHz when it is T. Stated by the Chinese datasheet from V1.4 (2026-10); the English V1.3 still gives the older condition of v467-psram-lot (5th-to-last digit != 0, above 200MHz). *(applies: CH32V467; 4th-to-last digit of lot number is T (M is the default supply))*
 - In stop mode with the voltage regulator in low-power mode, bit LDO18_EN in register PWR_CTLR must be configured to 0. *(applies: CH32V467; 5th-to-last digit of lot number = 0)*
 
 ## EVT examples

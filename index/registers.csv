@@ -28404,7 +28404,7 @@ CH32V407,CAN,ERRSR,0x018,32,1,BOFF,CAN_ERRSR_BOFF,field,,2,0x4,,Bus-Off Flag,RO,
 CH32V407,CAN,ERRSR,0x018,32,1,LEC_0,CAN_ERRSR_LEC_0,value,LEC,4,0x10,1,Bit 0,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,CAN,ERRSR,0x018,32,1,LEC_1,CAN_ERRSR_LEC_1,value,LEC,5,0x20,2,Bit 1,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,CAN,ERRSR,0x018,32,1,LEC_2,CAN_ERRSR_LEC_2,value,LEC,6,0x40,4,Bit 2,,,#,reference,evt(ch32v4x7.h),,
-CH32V407,CAN,ERRSR,0x018,32,1,LEC,CAN_ERRSR_LEC,field,,6:4,0x70,,LEC[2:0] bits (Last Error Code),,,#,reference,evt(ch32v4x7.h),,
+CH32V407,CAN,ERRSR,0x018,32,1,LEC,CAN_ERRSR_LEC,field,,6:4,0x70,,LEC[2:0] bits (Last Error Code),RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),reference,CH32V407RM.PDF:zh
 CH32V407,CAN,ERRSR,0x018,32,1,TEC,CAN_ERRSR_TEC,field,,23:16,0xff0000,,Least significant byte of the 9-bit Transmit Error Counter,RO,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,CAN,ERRSR,0x018,32,1,REC,CAN_ERRSR_REC,field,,31:24,0xff000000,,Receive Error Counter,RO,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,CAN,BTIMR,0x01c,32,1,BRP,CAN_BTIMR_BRP,field,,9:0,0x3ff,,,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
@@ -29960,7 +29960,7 @@ CH32V407,ETH,DMACHTDR,0x1048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(ch32v4x7.h
 CH32V407,ETH,DMACHRDR,0x104c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(ch32v4x7.h)+rm-address(CH32V407RM.PDF),,
 CH32V407,ETH,DMACHTBAR,0x1050,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(ch32v4x7.h)+rm-address(CH32V407RM.PDF),,
 CH32V407,ETH,DMACHRBAR,0x1054,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(ch32v4x7.h)+rm-address(CH32V407RM.PDF),,
-CH32V407,EXTEN,EXTEN_CTR,0x000,32,1,,,,,,,,,,0x00000440,#,confirmed,evt(ch32v4x7.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,EXTEN,EXTEN_CTR,0x000,32,1,,,,,,,,,,0x00000240,#,confirmed,evt(ch32v4x7.h)+rm-address(CH32V407RM.PDF),,
 CH32V407,EXTI,INTENR,0x000,32,1,MR0,EXTI_INTENR_MR0,field,,0,0x1,,Interrupt Mask on line 0,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,EXTI,INTENR,0x000,32,1,MR1,EXTI_INTENR_MR1,field,,1,0x2,,Interrupt Mask on line 1,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,EXTI,INTENR,0x000,32,1,MR2,EXTI_INTENR_MR2,field,,2,0x4,,Interrupt Mask on line 2,,,#,reference,evt(ch32v4x7.h),,
@@ -30723,7 +30723,7 @@ CH32V407,PWR,CTLR,0x000,32,1,LDOVDDK,PWR_CTLR_LDOVDDK,field,,26:24,0x7000000,,,R
 CH32V407,PWR,CTLR,0x000,32,1,LDOVDD12A,PWR_CTLR_LDOVDD12A,field,,29:27,0x38000000,,,RW,3,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,PWR,CSR,0x004,32,1,WUF,PWR_CSR_WUF,field,,0,0x1,,Wakeup Flag,RO,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,PWR,CSR,0x004,32,1,SBF,PWR_CSR_SBF,field,,1,0x2,,Standby Flag,RO,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
-CH32V407,PWR,CSR,0x004,32,1,PVDO,PWR_CSR_PVDO,field,,2,0x4,,PVD Output,,,#,reference,evt(ch32v4x7.h),,
+CH32V407,PWR,CSR,0x004,32,1,PVDO,PWR_CSR_PVDO,field,,2,0x4,,PVD Output,RO,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),reference,CH32V407RM.PDF:zh
 CH32V407,PWR,CSR,0x004,32,1,EWUP,PWR_CSR_EWUP,field,,8,0x100,,Enable WKUP pin,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,RCC,CTLR,0x000,32,1,HSION,RCC_HSION,field,,0,0x1,,Internal High Speed clock enable,RW,1,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,RCC,CTLR,0x000,32,1,HSIRDY,RCC_HSIRDY,field,,1,0x2,,Internal High Speed clock ready flag,RO,1,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
@@ -31223,8 +31223,8 @@ CH32V407,SPI,I2SCFGR,0x01c,16,1,I2SMOD,SPI_I2SCFGR_I2SMOD,field,,11,0x800,,I2S m
 CH32V407,SPI,I2SPR,0x020,16,1,I2SDIV,SPI_I2SPR_I2SDIV,field,,7:0,0xff,,I2S Linear prescaler,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,SPI,I2SPR,0x020,16,1,ODD,SPI_I2SPR_ODD,field,,8,0x100,,Odd factor for the prescaler,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,SPI,I2SPR,0x020,16,1,MCKOE,SPI_I2SPR_MCKOE,field,,9,0x200,,Master Clock Output Enable,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
-CH32V407,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),conflict,CH32V407RM.PDF:zh+!CH32V407RM.PDF:en(=W0)
-CH32V407,SPI,HSCR,0x024,16,1,HSRXEN2,SPI_HSCR_HSRXEN2,field,,2,0x4,,,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
+CH32V407,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,,,#,reference,evt(ch32v4x7.h),,
+CH32V407,SPI,HSCR,0x024,16,1,HSRXEN2,SPI_HSCR_HSRXEN2,field,,2,0x4,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,SPI,HSCR,0x024,16,1,I2CWSSYNC,SPI_HSCR_I2CWSSYNC,field,,3,0x8,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
