@@ -165,7 +165,7 @@ errata,series,Series the erratum applies to.,list(;),never empty,fixed
 errata,condition,Lots or part numbers the erratum applies to.,text,applies without a lot or part-number condition,prose
 errata,description,"What the erratum says (lot-dependent behaviour or hardware caution), in English.",text,never empty,prose
 errata,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-errata,description_confidence,"Confidence of `description`: confirmed when the page is recorded in both language datasheets: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
+errata,description_confidence,"Confidence of `description`: confirmed when the page is recorded in both language datasheets (a past edition may be pinned with `@V`), reference when only one edition states it (CH32V467 `v467-psram-lot-mt`, Chinese V1.4 only).",enum(confirmed|reference),never empty,fixed
 errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty,prose
 esig,family,Family key; joins catalog families.family.,name,never empty,fixed
 esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the ID words, `UNIID1` lowest; measured chips differ only in UNIID1|UNIID2, see erratum `esig-uniid3-not-unique`).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty,as-printed
