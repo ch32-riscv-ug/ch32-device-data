@@ -171,7 +171,12 @@ def read_manual(bundle: str) -> list[dict]:
         groups.append(current)
     for group in groups:
         text = " ".join(group.pop("tail", []))
-        group["applies"] = sorted(set(APPLIES.findall(text)))
+        # 型番名を適用先と読むのは**限定の言い回しがあるときだけ**。CH32V407RM.zh V1.3 は
+        # RAM_CODE_MOD の説明に「注：对于CH32V407KEU6芯片，该位建议配置为0」（推奨）を足し、
+        # その型番名を適用先と取って zh の表だけ鍵が {KEU6} になり、en の表と対にならず
+        # 全型番が2行ずつ出た（2026-10-27）。
+        narrowed = any(marker in text for marker in NARROWS)
+        group["applies"] = sorted(set(APPLIES.findall(text))) if narrowed else []
         conditions: dict[str, str] = {}
         for found in CONDITION.finditer(text):
             conditions[found.group("value")] = found.group("text").strip()
