@@ -467,6 +467,10 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **CH32V407 も同じ「FLASH アクセスクロック＝HCLK/n」を持ち、場所が違います**——`FLASH_CTLR`の`SCKMOD[1:0]`（RM: `00`＝HCLK、`01`＝/2、`10`＝/4）。120MHz は 1、240/350/400MHz は 2、480MHz は 4 で、`flash_sck_div`に入ります。V407 は SCKMOD を変える前に`FLASH->KEYR`と`MODEKEYR`へ鍵（`0x45670123`・`0xCDEF89AB`）を2組書き、後で`FLASH->CTLR |= 0x00008080`とします。記号の無い数値の書き込みなので、**`flash_writes`列が書いた順に持ちます**（CH32X315 は同じ手順を`SystemInit`で行うので`clock_init`の step 10〜15 にあります）。V407 の`pll`には CFGR2 の`RCC_SYSPLLSRC_PLL`と`RCC_SYSPLLDIVn`（120MHz は DIV2、他は DIV1）も入ります（2026-10-27、ArduinoCore-CH32RV の依頼。下線の無い綴りを取りこぼしていた）。
 
+**CH32X315 は USBHS/USBSS の PLL を系統クロックの源にします**——`pll`は EVT の書き込み順に、CFGR2 の源と基準（`RCC_USBHSPLLSRCC_HSI`・`RCC_USBHSPLLREFSEL_20MHz`）、CFGR0 の`RCC_PLLSRC_USBHSPLL_480M`と`RCC_PLLDIV2`、切り替え前の`RCC_PLLGATE=0`を持ちます（480M/625M は`RCC_PLLSRC_HS`＋`RCC_PLLHS_SRC_*`）。PLL を起動する`RCC_USBHSPLLON`と準備完了の`RCC_USBHSPLLRDY`は設定ではないので`pll`に入れず、`clock_symbols`に役割つきで載ります（他 family の`RCC_PLLON`と同じ扱い）。`記号=0`の判定は名前ではなく bit の重なりで行います——H417 の 480M は`RCC_SYSPLL_SEL`を消してから同じ field の`RCC_SYSPLL_USBHS`を書くので`=0`ではありません（2026-10-27 まで誤って`RCC_SYSPLL_SEL=0`と出していた）。
+
+**X315 の CPU は CoreCLK（HPRE の後）で、HCLK は FPRE でさらに割ったバスです**（RM のクロックツリー図 p.15: HPRE の出力が「to Core/memory」、その後ろに FPRE /1・/2 → HCLK）。**SysTick の時計は資料で食い違います**——図は「/8 to Core System timer」を FPRE より前（コア側）から出し、STK のレジスタ表（p.84）は STCLK を「1: HCLK、0: HCLK/8」と書きます。CoreCLK = HCLK の設定では同じ値です。
+
 **V407 の CPU は HCLK で動きます。** データシートと RM のクロックツリー図が HB プリスケーラの出力を「to HB bus/core/memory/DMA」と書いています（DS en p.9／zh p.6、RM en p.19／zh p.17）。EVT の設定はどれも`HCLK = SYSCLK/2`で、**480MHz 設定の HCLK 240MHz は比較表の CPU 上限`Max: 200MHz`を超えます**（EVT が用意している設定であって、資料の保証範囲ではない）。
 
 この2 familyは**書き方も違います**——レジスタを直接触らず、ローカル変数へ写して直してから書き戻します（`FLASH_Temp = FLASH->ACTLR; FLASH_Temp &= ~FLASH_ACTLR_SCK_CFG; ...`）。`BLOCK->REGISTER op= value`しか見ていないと中身が丸ごと見えず、これが「X315はlatencyを書かない」という誤りの原因でした。

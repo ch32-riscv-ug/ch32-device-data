@@ -91,7 +91,12 @@ PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBP
 # 倍率の綴りは旧 family の `RCC_PLLMULL18`（CFGR0）と H417 の `RCC_PLLMUL16`（PLLCFGR）の2通り。
 # H417 は PLL の後段に SYSPLL の選択とゲートを持つ（`RCC_SYSPLL_SEL`/`RCC_SYSPLL_GATE`）。
 # V407 は SYSPLL の入力と分周を CFGR2 に `RCC_SYSPLLSRC_PLL`・`RCC_SYSPLLDIVn` と下線なしで書く。
-PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL?|PLLXTPRE|PLL_\w+|SYSPLL\w*|CFGR2_\w*PLL\w*)\w*$")
+# CH32X315 は USBHS/USBSS の PLL を系統クロックの源にし、その源と基準を CFGR2 に
+# `RCC_USBHSPLLSRCC_HSI`・`RCC_USBHSPLLREFSEL_20MHz` と書き、CFGR0 に `RCC_PLLDIV2`、
+# 切り替えの前に `RCC_PLLGATE` を下ろす。起動（`…ON`）と準備完了（`…RDY`）の bit は
+# 設定ではないので入れない——clock_symbols に役割つきで載る（`RCC_PLLON` と同じ扱い）。
+PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL?|PLLXTPRE|PLL_\w+|SYSPLL\w*|PLLDIV\w*|PLLGATE"
+                 r"|PLLHS\w*|USB[HS]SPLL\w*|CFGR2_\w*PLL\w*)\w*(?<!ON)(?<!RDY)$")
 LATENCY = re.compile(r"^FLASH_ACTLR_LATENCY(?:_(?P<wait>\d+))?$")
 SOURCE_SELECT = re.compile(r"^RCC_SW_(?P<source>\w+)$")
 # CH32X315とCH32H417のFLASH_ACTLRは待ちサイクル数ではなく**フラッシュクロックの
@@ -459,9 +464,12 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
         # クリアして PLL を選び、値の書き込みは続かない。その field だけを消すマスクの後に
         # 同じ field の値が1つも書かれなければ `<field>=0` として残す（書かれれば値の側が
         # 言っている）。
+        # 同じ field の値かは**名前ではなく bit で**決める——H417 の 480M は `RCC_SYSPLL_SEL` を
+        # 消してから `RCC_SYSPLL_USBHS`（同じ field の値、名前は SEL で始まらない）を書く。
         written = [s.split(" [")[0] for s in entry["pll"]]
         for symbol, where in entry.pop("pll_cleared"):
-            if not any(w.startswith(symbol) for w in written):
+            mask = symbols.get(symbol, 0)
+            if not any(w.startswith(symbol) or symbols.get(w, 0) & mask for w in written):
                 zero = f"{symbol}=0"
                 entry["pll"].append(f"{zero} [{where}]" if where else zero)
         entry["pll"] = list(dict.fromkeys(entry["pll"]))
