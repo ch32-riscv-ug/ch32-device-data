@@ -65,12 +65,12 @@ clock_enables,#,Separator between the data columns and the provenance columns; e
 clock_enables,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
 clock_enables,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
 clock_init,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_init,function,"EVT function the step belongs to (`SystemInit`, or the configuration function that performs an HSI factory trim).",enum(SetSysClockToHSI_LP|SetSysClockTo_48MHZ_HSI|SystemInit),never empty,as-printed
+clock_init,function,"EVT function the step belongs to: `SystemInit`, or a configuration function (joins clock_configs.config; its steps are the EVT's own order).",name,never empty,as-printed
 clock_init,step,"Order of the step within the function, from 0.",integer,never empty,
 clock_init,action,"What the step does: `set` (`|=`), `clear` (`&=`), `write` (`=`), `poll` (`while`) or `trim` (load the HSI factory trim).",enum(clear|poll|set|trim|write),never empty,fixed
 clock_init,register,"Register written or polled, as `BLOCK->REGISTER`.",name,never empty,as-printed
 clock_init,address,"Absolute address involved: the register's address, or for a trim step the address the factory value is read from.",hex,address not resolved,
-clock_init,value,Value of the step in decimal; for `clear` it is the AND mask as in the original (the bits kept).,integer,never empty,
+clock_init,value,"Value of the step in decimal; for `clear` it is the AND mask (the bits kept): a literal mask as written, or `~X` taken over 32 bits.",integer,never empty,
 clock_init,source,Symbol the trim value is read from (trim steps only).,name,not applicable (not a trim step read from a symbol),as-printed
 clock_init,condition,Condition guarding the step: a value test (e.g. `!= 0xFF`) or a compile-time macro.,text,unconditional,as-printed
 clock_init,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,

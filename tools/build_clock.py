@@ -16,7 +16,9 @@
                           bit the code polls
     clock_init.csv        the ordered steps of SystemInit, which puts the chip
                           into a known state with literal hex rather than
-                          symbols, plus every HSI factory-trim load
+                          symbols, every HSI factory-trim load, and the ordered
+                          steps of each configuration function (step counts
+                          from 0 within each function)
 
 Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
@@ -86,11 +88,12 @@ SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
                   "condition", "#", "confidence", "basis"]
 SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value",
                   "#", "confidence", "basis"]
-# The only table with an order column, because SystemInit is a straight line and
-# the order is transcribed rather than decided: `RCC->CTLR |= 1` has to precede
-# clearing SW or the chip has no clock left to run on. The switching sequence
-# proper stays out -- when to raise the flash latency relative to the switch is a
-# policy, and a policy is not a device fact.
+# The only table with an order column, because the order is transcribed rather
+# than decided: `RCC->CTLR |= 1` has to precede clearing SW or the chip has no
+# clock left to run on. The configuration functions are transcribed the same way
+# since 2026-10-27 (ArduinoCore-CH32RV): CH32X315 has to start and wait for its
+# USBHS PLL before selecting it, and V407 unlocks FLASH before changing SCKMOD.
+# The rows say the order the EVT writes, not an order this repository chose.
 INIT_COLUMNS = ["family", "function", "step", "action", "register", "address",
                 "value", "source", "condition", "#", "confidence", "basis"]
 
@@ -154,7 +157,10 @@ def main() -> int:
                     "divider": divider.replace("DIV", ""), "value": value,
                     "confidence": CONFIDENCE, "basis": PRESCALER_BASIS,
                 })
-        for step, entry in enumerate(data.get("init", [])):
+        steps: collections.Counter = collections.Counter()
+        for entry in data.get("init", []):
+            step = steps[entry["function"]]
+            steps[entry["function"]] += 1
             init_rows.append({
                 "family": family, "function": entry["function"], "step": step,
                 "action": entry["action"], "register": entry["register"],

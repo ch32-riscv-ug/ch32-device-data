@@ -99,7 +99,7 @@
 | systick | 53 | 全行 reference | 結合 | — | 🔵 |
 | evt_variants | 57 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
-| clock_configs 他 clock_* 5表 | 1,079 | reference（symbols に conflict 5） | 相互結合・macro | V003 の trim 未出力（既知）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
+| clock_configs 他 clock_* 5表 | 2,625 | reference（symbols に conflict 5） | 相互結合・macro・clock_init の function が設定に在り step が関数ごとの連番 | V003 の trim 未出力（既知）。clock_init は 2026-10-27 から各クロック設定の関数の手順も EVT の順で写す（103→1,649行。ArduinoCore-CH32RV の依頼）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
 | evt_examples | 1,645 | confirmed 1,610 / ref 35 | 結合 | — | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 | register_blocks | 676 | confirmed 548 / ref 128 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空 | ✅ |

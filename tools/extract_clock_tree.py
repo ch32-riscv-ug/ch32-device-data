@@ -38,8 +38,10 @@ from __future__ import annotations
 
 import argparse
 import collections
+import functools
 import hashlib
 import json
+import operator
 import re
 import sys
 from pathlib import Path
@@ -503,15 +505,58 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
       clear/set の手順として採り、最後の書き戻しは commit なので採らない
     """
     steps: list[dict] = []
-
-    def number(token: str) -> int | None:
-        if NUMBER.match(token):
-            return int(token, 16) if token.lower().startswith("0x") else int(token)
-        return symbols.get(token)
-
     found = INIT_FUNCTION.search(text)
     if found:
+        steps.extend(steps_of(found.group("body"), "SystemInit", symbols))
+    steps.extend(trim_steps(text, symbols))
+    return steps
+
+
+def resolve(token: str, symbols: dict[str, int]) -> int | None:
+    """数・記号・`A | B` の OR を値に。1つでも解決できなければ None。
+
+    `RCC->CFGR0 |= (RCC_PLLSRC_HSI | RCC_PLLMULL24);` のような OR は設定の関数では
+    普通の書き方で、以前は解決できずに手順ごと落としていた。
+    """
+    token = token.strip().strip("()~ ").strip()
+    if "|" in token:
+        parts = [resolve(t, symbols) for t in token.split("|")]
+        return None if any(p is None for p in parts) else functools.reduce(
+            operator.or_, parts, 0)
+    if NUMBER.match(token):
+        return int(token, 16) if token.lower().startswith("0x") else int(token)
+    return symbols.get(token)
+
+
+def kept(expression: str, value: int | None) -> int | None:
+    """`&= ~X` の X を、**残すビット**（`~X` の 32bit）に直す。
+
+    `clear` の value は原典どおりの AND マスク＝残すビット、が表の約束。SystemInit は
+    `&= 0xF8FF0000` と数で書くので X がそのまま残すビットだが、設定の関数は
+    `&= ~RCC_PLLGATE` と書く——`~` を外した X は**落とすビット**で、意味が逆になる。
+    """
+    if value is None or "~" not in CAST.sub("", expression):
+        return value
+    return ~value & 0xFFFFFFFF
+
+
+def steps_of(body: str, function: str, symbols: dict[str, int]) -> list[dict]:
+    """関数の本体の書き込み・待ちを、ソースの順に手順として写す。
+
+    SystemInit と、各クロック設定の関数（`SetSysClockTo*`・`SetSYSCLK*`）の両方に使う。
+    **順序は EVT が書いている事実の写しで、こちらが決めた手順ではない**——consumer が
+    EVT と同じ順で叩けるように持つ（2026-10-27、ArduinoCore-CH32RV の依頼で設定の関数へ
+    広げた。X315 は USBHSPLL の源と基準 → 起動 → 準備完了の待ち → PLLSRC/PLLDIV →
+    Flash の SCK → PLLGATE を下ろす → SW、の順が要る）。
+    """
+    steps: list[dict] = []
+
+    def number(token: str) -> int | None:
+        return resolve(token, symbols)
+
+    if True:
         branch: list[str] = []      # 開いている #if の variant macro
+        index = -1
         seen: list[list[str]] = []  # #else が否定する枝
         alias: dict[str, tuple[str, str]] = {}
 
@@ -519,7 +564,8 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
             parts = [c for c in branch if c] + ([extra] if extra else [])
             return "+".join(parts)
 
-        for line in found.group("body").splitlines():
+        for line in body.splitlines():
+            index += 1
             bare = CAST.sub("", line)
             directive = CPP.match(bare)
             if directive:
@@ -546,12 +592,13 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
             write = WRITE.search(bare)
             if write:
                 operand = write.group("value").strip().strip("()~ ").strip()
-                value = number(operand)
+                value = kept(write.group("value"), number(operand))
                 if value is None:
                     # `RCC->CTLR = tmp;` — RMW の書き戻し。演算は下で採っている。
                     continue
                 steps.append({
-                    "function": "SystemInit",
+                    "line": index,
+                    "function": function,
                     "action": {"|=": "set", "&=": "clear", "=": "write"}[write.group("op")],
                     "register": f"{write.group('block')}->{write.group('register')}",
                     "value": value, "condition": guarded(), "source": "",
@@ -564,11 +611,13 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
                 if value is None and RMW_SHIFT.match(operand):
                     m = RMW_SHIFT.match(operand)
                     value = int(m.group("base")) << int(m.group("by"))
+                value = kept(local.group("value"), value)
                 if value is None:
                     continue
                 block, register = alias[local.group("name")]
                 steps.append({
-                    "function": "SystemInit",
+                    "line": index,
+                    "function": function,
                     "action": {"|=": "set", "&=": "clear"}[local.group("op")],
                     "register": f"{block}->{register}",
                     "value": value, "condition": guarded(), "source": "",
@@ -581,13 +630,23 @@ def read_init(text: str, symbols: dict[str, int]) -> list[dict]:
                 if value is None:
                     continue
                 steps.append({
-                    "function": "SystemInit",
+                    "line": index,
+                    "function": function,
                     "action": "poll",
                     "register": f"{poll.group('block')}->{poll.group('register')}",
                     "value": value,
                     "condition": guarded(" ".join(test.group("compare").split())),
                     "source": "",
                 })
+    return steps
+
+
+def trim_steps(text: str, symbols: dict[str, int]) -> list[dict]:
+    """The HSI trim loads, wherever they sit in the file."""
+    steps: list[dict] = []
+
+    def number(token: str) -> int | None:
+        return resolve(token, symbols)
 
     # The trim loads, wherever they sit. CH32V003 calls the setter twice -- once
     # in SystemInit with a literal default and once from the factory byte, the
@@ -640,12 +699,15 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
     copies: collections.Counter = collections.Counter()
     disagree: list[str] = []
     total = sum(len(paths) for _, paths in variants.values())
+    bodies: dict[str, str] = {}
     for digest, (text, paths) in variants.items():
+        found_bodies = {m.group("name"): m.group("body") for m in FUNCTION.finditer(text)}
         for name, entry in read_variant(text, symbols, family.name, notes).items():
             copies[name] += len(paths)
             known = configs.get(name)
             if known is None:
                 configs[name] = entry
+                bodies[name] = found_bodies.get(name, "")
             elif known != entry:
                 # Say what differs, not just that something does. CH32V407's
                 # 400MHz setting multiplies by 16 in one copy and by 8 in
@@ -714,6 +776,26 @@ def read_family(family: Path) -> tuple[dict, list[str]]:
             step["address"] = "" if found is None else f"{found:#010x}"
     if not init:
         notes.append(f"{family.name}: SystemInit が無い（初期化の場所が別）")
+    # 各クロック設定の手順（採用した版の本体から）。番地は SystemInit と同じ引き方。
+    # 設定の関数の中の HSI トリムの読み込み（L103/V205 の `SetSysClockToHSI_LP`）は、
+    # 上でファイル全体から拾ってあるので、関数の中で呼ばれている位置へ差し込む。
+    for name in sorted(configs):
+        body = bodies.get(name, "")
+        steps = steps_of(body, name, symbols)
+        for step in steps:
+            block, _, register = step["register"].partition("->")
+            found = where.get((block, register))
+            step["address"] = "" if found is None else f"{found:#010x}"
+        trims = [t for t in init if t["action"] == "trim" and t["function"] == name]
+        calls = [i for i, line in enumerate(body.splitlines()) if TRIM_CALL.search(line)]
+        if trims and len(trims) == len(calls):
+            init = [t for t in init if t not in trims]
+            for trim, line in zip(trims, calls):
+                trim["line"] = line
+            steps = sorted(steps + trims, key=lambda t: t["line"])
+        init.extend(steps)
+    for step in init:
+        step.pop("line", None)
 
     sites: dict[str, set[tuple[str, str]]] = collections.defaultdict(set)
     for config in configs.values():

@@ -1923,6 +1923,18 @@ def main() -> int:
     # SystemInit's steps. The order is the fact here, so it has to be a dense
     # run per (family, function) -- a gap means a line the reader dropped.
     init_steps: dict[tuple[str, str], list[int]] = {}
+    # function は SystemInit か、その family の clock_configs の設定（2026-10-27 から設定の
+    # 関数の手順も写す）。step は関数ごとに 0 から連番。
+    configs_of = {(r["family"], r["config"]) for r in t["clock_configs"]}
+    numbered: dict[tuple[str, str], list[int]] = collections.defaultdict(list)
+    for r in t["clock_init"]:
+        if r["function"] != "SystemInit" and (r["family"], r["function"]) not in configs_of:
+            bad.append(f"clock_init: {r['family']} {r['function']} が clock_configs の設定に無い")
+        if r["step"].isdigit():
+            numbered[(r["family"], r["function"])].append(int(r["step"]))
+    for (family, function), found in numbered.items():
+        if sorted(found) != list(range(len(found))):
+            bad.append(f"clock_init: {family} {function} の step が 0 からの連番でない")
     for r in t["clock_init"]:
         check("clock_init", r["function"], r["family"], families, "families")
         if r["action"] not in ("set", "clear", "write", "poll", "trim"):
