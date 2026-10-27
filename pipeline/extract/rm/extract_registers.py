@@ -29,6 +29,23 @@ consumer の R-20（レジスタマップ）の **機械的に集められる部
 3. **値の列挙**は field の部分集合。`RCC_PLLMULL_3` は `RCC_PLLMULL` の中の値。
    同じ banner の中で、名前が親＋`_…` で mask が親に含まれるものを `kind=value` にする
 
+**block は device header の外にもある**（2026-10-27、ArduinoCore の周辺の洗い直し）。
+device header だけを読むと次が落ちる——どれも EVT に例題かドライバがある:
+
+- 周辺の個別 header が構造体と pointer を持つ（`PIOC_SFR.h`・`ch32v205_pioc.h`・
+  `ch32h417_pioc.h`。base の `PIOC_BASE` は device header にある）。同じ `inc/` の
+  header で pointer の define を持つものを足す。型は pointer が指すものだけ採る
+- コア側の周辺は `Core/core_riscv.h` に `PFIC_Type`・`SysTick_Type`（H417 は
+  `HSEM_Type`・`IPC_Type`・`SysTick0/1` も）。綴りが `_Type` で base が数値の直書き
+- **構造体が無く、register を番地のマクロで書く header**（V103 の `ch32v10x_usb.h`:
+  `#define R8_USB_CTRL (*((PUINT8V)(0x40023400)))`）。block 名も型も header に無いので
+  `MACRO_BLOCKS` で名前を決め、base は最小の番地、layout は空。RM の絶対アドレス表が
+  同じ `R8_` の綴りなので、名前と番地の一致で確かめる
+
+**header にあっても family に無い block** は `curated/register-blocks-absent.json` で
+落とす（V103 の header は F103 大容量品の TIM5〜17・UART4/5・DMA2・DAC 等を持ったまま）。
+人が datasheet と RM の章の適用範囲で判定した。項目が header から消えたら生成が落ちる。
+
 **RM との突き合わせ**は2段。(1) レジスタ表: (register, field) の綴りが一致するもの
 （`GPIOx_CFGLR` の `x`・`IDRy` の `y` は数字を落として比べる）で bit 位置が同じなら
 confirmed、違えば conflict（両論を basis に）、RM に無ければ reference。RM の access と
@@ -109,13 +126,21 @@ DEFINE = re.compile(r"^\s*#define\s+(?P<name>\w+)\s+"
                     r"(?:\(\s*\(\s*u?int(?:8|16|32|64)_t\s*\)\s*)?\(?\s*"
                     r"(?P<mask>0[xX][0-9A-Fa-f]+)[uUlL]*\s*\)?\s*\)?"
                     r"\s*(?:/\*+\s*(?P<comment>.*?)\s*\*+/)?\s*$")
-POINTER = re.compile(r"^\s*#define\s+(?P<block>\w+)\s+\(\(\s*(?P<type>\w+)_TypeDef\s*\*\s*\)\s*(?P<base>\w+)\s*\)")
+# 型は `_TypeDef`、`core_riscv.h` だけ `_Type`（`((PFIC_Type *) 0xE000E000 )`）。
+POINTER = re.compile(r"^\s*#define\s+(?P<block>\w+)\s+\(\(\s*(?P<type>\w+?)_Type(?:Def)?\s*\*\s*\)\s*"
+                     r"(?P<base>\w+)\s*\)")
 MEMBER = re.compile(r"^(?:__I?O?\s+|volatile\s+|const\s+)*"
                     r"(?P<type>u?int(?P<width>8|16|32|64)_t|(?P<struct>\w+)_TypeDef)\s+"
-                    r"(?P<name>\w+)(?:\s*\[\s*(?P<count>\d+)\s*\])?\s*;")
+                    r"(?P<name>\w+)(?:\s*\[\s*(?P<count>0[xX][0-9A-Fa-f]+|\d+)\s*\])?\s*;")
 # `typedef struct` / `typedef struct {` / `typedef struct __attribute__((packed))`（USBHSH 等）
 TYPEDEF_START = re.compile(r"^\s*typedef\s+struct\b(?:\s+__attribute__\s*\(\(\w+\)\))?\s*\{?\s*$")
-TYPEDEF_END = re.compile(r"^\s*\}\s*(?P<name>\w+)_TypeDef\s*;")
+TYPEDEF_END = re.compile(r"^\s*\}\s*(?P<name>\w+?)_Type(?:Def)?\s*;")
+# 構造体の無い header の register（`#define R8_USB_CTRL (*((PUINT8V)(0x40023400)))`）。
+ADDRESS_MACRO = re.compile(r"^\s*#define\s+(?P<name>R(?:8|16|32)_\w+)\s+\(\*\(\(PUINT(?:8|16|32)V\)"
+                           r"\(\s*(?P<address>0[xX][0-9A-Fa-f]+)\s*\)\)\)")
+# 番地のマクロだけの header → block 名。header は名前を持たないので EVT の例題のフォルダ名
+# （`EXAM/USB/USBFS`）と割り込みの本名（`USBFS_IRQn`。`USBHD_IRQn` はその別名）から決めた。
+MACRO_BLOCKS = {"ch32v10x_usb.h": "USBFS"}
 TRAILING_DIGITS = re.compile(r"(\D+?)(\d+)$")
 
 
@@ -123,6 +148,24 @@ def find_header(family_dir: Path) -> Path | None:
     found = sorted(family_dir.glob("EVT/**/Peripheral/inc/ch32*.h"))
     plain = [p for p in found if re.fullmatch(r"ch32[a-z0-9]+\.h", p.name, re.IGNORECASE)]
     return plain[0] if plain else (found[0] if found else None)
+
+
+def extra_headers(header: Path) -> list[Path]:
+    """device header の外で block を持つ header（docstring の「block は device header の外にも」）。
+
+    同じ `inc/` の header で pointer の define か番地のマクロを持つものと、`SRC/Core/core_riscv.h`。
+    """
+    found = []
+    for path in sorted(header.parent.glob("*.h")):
+        if path == header:
+            continue
+        lines = path.read_text(errors="ignore").splitlines()
+        if any(POINTER.match(line) or ADDRESS_MACRO.match(line) for line in lines):
+            found.append(path)
+    core = header.parents[2] / "Core" / "core_riscv.h"
+    if core.exists():
+        found.append(core)
+    return found
 
 
 # ---------------------------------------------------------------- 構造体
@@ -213,7 +256,8 @@ def _parse_body(body: list[str], offset: int, st: Struct, structs: dict[str, Str
             continue
         m = MEMBER.match(line)
         if m:
-            count = int(m.group("count") or 1)
+            raw = m.group("count") or "1"
+            count = int(raw, 16) if raw[:2] in ("0x", "0X") else int(raw)
             if m.group("struct"):
                 inner_struct = structs.get(m.group("struct"))
                 width = (inner_struct.size if inner_struct else 4) * 8
@@ -609,8 +653,14 @@ def locate(reg: str, offsets: dict[str, dict], block: str, block_name: str) -> l
         stem, digits = m.groups()
         if stem in offsets:
             member = offsets[stem]
-            if member["count"] > 1 and 1 <= int(digits) <= member["count"]:
-                return [(stem, member["offset"] + (int(digits) - 1) * member["width_bits"] // 8)]
+            # 番号は 1 始まり（`EXTICR1`）とも 0 始まり（core の `HSEM_RX0`・`PFIC_VTFADDRR0`）
+            # とも振られる。両方返し、番地と合う方を採る（(b) と同じ）。
+            step = member["width_bits"] // 8
+            n = int(digits)
+            indexed = [(stem, member["offset"] + i * step) for i in (n - 1, n)
+                       if member["count"] > 1 and 0 <= i < member["count"]]
+            if indexed:
+                return indexed
             if block.endswith(digits):
                 return [(stem, member["offset"])]
     first = FIRST_DIGITS.search(reg)
@@ -686,6 +736,21 @@ def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
 
 # ---------------------------------------------------------------- main
 
+def drop_absent(family: str, blocks: dict[str, tuple[str, int]]) -> dict[str, str]:
+    """`curated/register-blocks-absent.json` の block を blocks から落とす → {block: 型}。
+
+    項目が header の block に無ければ生成を落とす（header が直ったら表から消す合図）。
+    """
+    data = json.loads((paths.CURATED / "register-blocks-absent.json").read_text(encoding="utf-8"))
+    dropped: dict[str, str] = {}
+    for block in data["absent"].get(family, {}):
+        if block not in blocks:
+            raise SystemExit(f"{family}: curated/register-blocks-absent.json の {block} が "
+                             "header の block に無い——表から消す")
+        dropped[block] = blocks.pop(block)[0]
+    return dropped
+
+
 def load_measured() -> dict[tuple[str, str, str], dict]:
     """curated/register-fields-measured.json — 資料どうしが食い違う field の実測（2026-09-25）。
 
@@ -740,6 +805,29 @@ def main() -> int:
         rm_registers = manual.get("__registers__", {})
         evt = f"evt({header.name})"
 
+        # device header の外の block（docstring）。型は pointer が指すものだけ足し、出所を型ごとに持つ。
+        evt_of: dict[str, str] = {}
+        pointers: list[tuple[re.Match, str]] = [(p, evt) for p in map(POINTER.match, lines) if p]
+        macro_blocks: list[tuple[str, int, dict[str, int], str]] = []
+        for extra in extra_headers(header):
+            extra_lines = extra.read_text(errors="ignore").splitlines()
+            source = f"evt({extra.name})"
+            found = [p for p in map(POINTER.match, extra_lines) if p]
+            pointers += [(p, source) for p in found]
+            used = {p.group("type") for p in found}
+            for name, st in read_structs("\n".join(extra_lines)).items():
+                if name in used and name not in structs:
+                    structs[name] = st
+                    evt_of[name] = source
+            macros = {m.group("name"): int(m.group("address"), 16)
+                      for m in map(ADDRESS_MACRO.match, extra_lines) if m}
+            if macros and not found:
+                block = MACRO_BLOCKS.get(extra.name)
+                if block is None:
+                    notes.append(f"{family}: {extra.name} は番地のマクロだけで block 名が無い（MACRO_BLOCKS）")
+                    continue
+                macro_blocks.append((block, min(macros.values()), macros, source))
+
         # define 名の集合を型ごとに（layout key の材料）
         defines_of_type: dict[str, set[str]] = collections.defaultdict(set)
         for register, defs in banners:
@@ -758,20 +846,42 @@ def main() -> int:
                 "family": family, "type": type_name, "layout": layout_of[type_name],
                 "registers": sum(1 for m in st.members if not m["name"].upper().startswith("RESERVED")),
                 "fields": len(defines_of_type.get(type_name, ())),
-                "size_bytes": st.size, "confidence": "reference", "basis": evt,
+                "size_bytes": st.size, "confidence": "reference",
+                "basis": evt_of.get(type_name, evt),
             })
 
         # blocks
         blocks_here: dict[str, tuple[str, int]] = {}
-        for line in lines:
-            p = POINTER.match(line)
-            if not p:
-                continue
-            base = bases.get(p.group("base"))
+        block_source: dict[str, str] = {}
+        for p, source in pointers:
+            raw = p.group("base")
+            base = int(raw, 16) if raw[:2] in ("0x", "0X") else bases.get(raw)
             if base is None:
-                notes.append(f"{family}: {p.group('block')} の base {p.group('base')} を解けない")
+                notes.append(f"{family}: {p.group('block')} の base {raw} を解けない")
                 continue
             blocks_here[p.group("block")] = (p.group("type"), base)
+            block_source[p.group("block")] = source
+        dropped = drop_absent(family, blocks_here)
+        if dropped:
+            notes.append(f"{family}: 実在しない block として落とした"
+                         f"（curated/register-blocks-absent.json）: {', '.join(sorted(dropped))}")
+        # block が全部落ちた型は register・field・layout も幻（V103 の DAC）。
+        gone = set(dropped.values()) - {t for t, _ in blocks_here.values()}
+        layouts_out[:] = [r for r in layouts_out if not (r["family"] == family and r["type"] in gone)]
+        for type_name in gone:
+            structs.pop(type_name, None)
+        # banner は device header にだけある。外の header の型を混ぜると「型を問わず名前が
+        # 1つだけ」の段が誤って結ぶ（H417 の `ECDC_KEY` → `HSEM.KEY`）。
+        banner_structs = {name: st for name, st in structs.items() if name not in evt_of}
+        banners = [(register, defs) for register, defs in banners
+                   if resolve_member(register, banner_structs)[0] not in gone
+                   and register.partition("_")[0] not in gone]
+        for block, base, macros, source in macro_blocks:
+            if block in blocks_here:
+                notes.append(f"{family}: 番地のマクロの block {block} が pointer の block と重なる")
+                continue
+            blocks_here[block] = (block, base)
+            block_source[block] = source
 
         # registers（構造体のメンバー。reserved は出さない）
         regs_here: dict[str, dict[str, dict]] = collections.defaultdict(dict)
@@ -795,6 +905,16 @@ def main() -> int:
                          f"不一致 {bad}・解けない名前 {len(unresolved_addr)}"
                          + (f"（例: {', '.join(sorted(unresolved_addr)[:6])}）" if unresolved_addr else ""))
 
+        # 番地のマクロの block は RM の絶対アドレス表と名前（`R8_USB_CTRL`）と番地で突き合わせる。
+        # RM 側の名前は `R8_` を落としてある（ADDR_NAME）。同じ名前が別の番地で2度出る
+        # （V103 の UEP0_T_LEN は device 0x40023420 と 0x40023430 の2表）ので集合で引く。
+        rm_addresses_of: dict[str, set[int]] = collections.defaultdict(set)
+        for r in ([] if args.no_rm else addr_rows):
+            rm_addresses_of[r["name"]].add(r["address"])
+        for block, _, macros, _ in macro_blocks:
+            if blocks_here.get(block) == (block, min(macros.values())):
+                per_block[block] = sum(1 for name, address in macros.items()
+                                       if address in rm_addresses_of.get(ADDR_NAME.match(name)["name"], ()))
         for block, (type_name, base) in blocks_here.items():
             ok = per_block.get(block, 0)
             blocks_out.append({
@@ -802,14 +922,14 @@ def main() -> int:
                 "layout": layout_of.get(type_name, ""),
                 "base_address": f"{base:#010x}",
                 "confidence": "confirmed" if ok else "reference",
-                "basis": evt + (f"+rm-address({addr_name})" if ok else ""),
+                "basis": block_source[block] + (f"+rm-address({addr_name})" if ok else ""),
             })
 
         for type_name, members in members_here.items():
             for m in members:
                 rm_name = rm_registers.get(rm_key(f"{type_name}_{m['name']}"), "")
                 found = per_register.get((type_name, m["name"]))
-                confidence, basis, check_text, reset = "reference", [evt], "", ""
+                confidence, basis, check_text, reset = "reference", [evt_of.get(type_name, evt)], "", ""
                 if rm_name:
                     confidence = "confirmed"
                     basis.append(f"rm({manual_name})")
@@ -835,7 +955,7 @@ def main() -> int:
         # RM の絶対アドレス表を名前の代わりの鍵に使う（`member_at_address`）。
         addr_of = {r["name"]: r["address"] for r in addr_rows} if not args.no_rm else {}
         for register, defs in banners:
-            type_name, member, why = resolve_member(register, structs)
+            type_name, member, why = resolve_member(register, banner_structs)
             if member is None:
                 placed = member_at_address(addr_of.get(register), blocks_here, members_here)
                 if placed:
@@ -870,7 +990,7 @@ def main() -> int:
                 fname = field_name(name, register, type_name)
                 bits = "" if span is None else (f"{span[0]}" if span[0] == span[1]
                                                 else f"{span[1]}:{span[0]}")
-                confidence, basis = "reference", [evt]
+                confidence, basis = "reference", [evt_of.get(type_name, evt)]
                 rm_access = rm_reset = access_confidence = access_basis = ""
                 said = manual.get((rm_key(register), field_key(fname))) if kind == "field" else None
                 if said:
@@ -914,7 +1034,7 @@ def main() -> int:
         for why, n in unresolved.items():
             notes.append(f"{family}: banner {n} 件を構造体のメンバーに結べない——{why}")
         missing = sorted({register for register, _ in banners
-                          if resolve_member(register, structs)[1] is None})
+                          if resolve_member(register, banner_structs)[1] is None})
         if missing:
             notes.append(f"{family}: 結べない banner: {', '.join(missing[:12])}"
                          + (" …" if len(missing) > 12 else ""))

@@ -1,0 +1,38 @@
+{
+  "_comment": "EVT の device header が pointer を定義しているが、その family に周辺が実在しない block（他の品種のヘッダからの写し残り）。pipeline/extract/rm/extract_registers.py が block の行を落とし、block が全部落ちた型は registers・register_fields・register_layouts からも落とす。CH32V103 の ch32v10x.h は F103 大容量品の定義を持ったまま（CH32xRM は F103 と共用で、F103 だけの章もある）。RM の絶対アドレス表に名前があっても F103 の章なら confirmed になってしまう（DAC）ので、機械では見分けられず人が判定した。歯止め: 項目が header の block に無ければ生成が落ちる。clock_enables の同じ判断は curated/clock-enables-absent.json。",
+  "decided": "2026-10-27",
+  "absent": {
+    "CH32V103": {
+      "TIM5": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM6": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM7": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM8": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM9": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM10": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM11": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM12": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM13": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM14": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM15": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM16": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "TIM17": "V103 のタイマーは高機能 1（TIM1）と汎用 3（TIM2〜4）（datasheet・比較表）。EVT に例題が無い",
+      "UART4": "V103 の USART は 3 まで（比較表）。EVT に例題が無い",
+      "UART5": "V103 の USART は 3 まで（比較表）。EVT に例題が無い",
+      "GPIOE": "V103 の GPIO は PA〜PD（最大 64 ピンの LQFP64M。ピン表）",
+      "GPIOF": "V103 の GPIO は PA〜PD（最大 64 ピンの LQFP64M。ピン表）",
+      "GPIOG": "V103 の GPIO は PA〜PD（最大 64 ピンの LQFP64M。ピン表）",
+      "ADC2": "V103 の ADC は 1 個（datasheet）。EVT に例題が無い",
+      "ADC3": "V103 の ADC は 1 個（datasheet）。EVT に例題が無い",
+      "DAC": "CH32xRM 第16章 DAC は『CH32F103 全系列に適用』（V103 を含まない）。V103 の datasheet に DAC が無い",
+      "DMA2": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い",
+      "DMA2_Channel1": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い",
+      "DMA2_Channel2": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い",
+      "DMA2_Channel3": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い",
+      "DMA2_Channel4": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い",
+      "DMA2_Channel5": "V103 の DMA は 7 チャネルの 1 個（datasheet）。EVT に例題が無い"
+    },
+    "CH32V307": {
+      "ADC3": "datasheet は ADC 2 個（dual ADC）。CH32FV2x_V3xRM に ADC3 のレジスタ番地が無い。EVT に ADC3 を使う例題が無い（datasheet の ADC3 はピンのチャネル名）"
+    }
+  }
+}

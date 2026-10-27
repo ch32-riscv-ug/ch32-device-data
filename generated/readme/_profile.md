@@ -46,6 +46,7 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 
 | Feature | Series (repository) |
 |---|---|
+| **BLE** | CH32V208 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)) |
 | **SERDES** | CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
 | **UHSIF** | CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
 | **SIDO** | CH32V407\*, CH32V467\* ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |

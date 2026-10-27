@@ -85,5 +85,11 @@
     "WWDG": "WDG",
     "TKey": "ADC",
     "_comment": "上位のまとめ。『USB が使えるか』で探す人と 『USBHS が要る』人の両方に答える"
+  },
+  "attribute_tags": {
+    "_comment": "どの datasheet にも節見出しが無い機能に、人が決めたタグを比較表の属性名（product_attributes.attribute）で付ける。属性が消えたら生成が落ちる。",
+    "BLE": [
+      "communication_interfaces_ble_5_3"
+    ]
   }
 }

@@ -5296,6 +5296,16 @@ CH32H417,HSADC,STATR,0x00c,32,1,FIFO_CNT,HSADC_FIFO_CNT,field,,13:11,0x3800,,,,,
 CH32H417,HSADC,DATAR,0x010,32,1,DR,HSADC_DR,field,,9:0,0x3ff,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,HSADC,ADDR0,0x014,32,1,DMA_ADDR0,HSADC_DMA_ADDR0,field,,31:0,0xffffffff,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,HSADC,ADDR1,0x018,32,1,DMA_ADDR1,HSADC_DMA_ADDR1,field,,31:0,0xffffffff,,,,,#,reference,evt(ch32h417.h),,
+CH32H417,HSEM,RX,0x000,32,32,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,RLRX,0x100,32,32,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,LSE,0x200,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,CLR,0x208,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,KEY,0x20c,32,1,,,,,,,,,,0x5AA50003,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,IER,0x300,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,ISR,0x308,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,RESERVE5,0x30c,8,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,HSEM,ISM,0x310,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,HSEM,LSM,0x318,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
 CH32H417,I2C,CTLR1,0x000,16,1,PE,I2C_CTLR1_PE,field,,0,0x1,,Peripheral Enable,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
 CH32H417,I2C,CTLR1,0x000,16,1,SMBUS,I2C_CTLR1_SMBUS,field,,1,0x2,,SMBus Mode,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
 CH32H417,I2C,CTLR1,0x000,16,1,SMBTYPE,I2C_CTLR1_SMBTYPE,field,,3,0x8,,SMBus Type,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
@@ -5567,6 +5577,14 @@ CH32H417,I3C,GETMDSR,0x0d0,32,1,TSCO,I3C_GETMDSR_TSCO,field,,24,0x1000000,,,,,#,
 CH32H417,I3C,EPIDR,0x0d4,32,1,MIPIID,I3C_EPIDR_MIPIID,field,,15:12,0xf000,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,I3C,EPIDR,0x0d4,32,1,IDTSEL,I3C_EPIDR_IDTSEL,field,,16,0x10000,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,I3C,EPIDR,0x0d4,32,1,MIPIMID,I3C_EPIDR_MIPIMID,field,,31:17,0xfffe0000,,,,,#,reference,evt(ch32h417.h),,
+CH32H417,IPC,CTLR,0x000,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,ISR,0x004,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,ISM,0x008,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,ENA,0x010,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,STS,0x014,32,1,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,SET,0x018,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,CLR,0x01c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,IPC,MSG,0x020,32,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
 CH32H417,IWDG,CTLR,0x000,32,1,KEY,IWDG_KEY,field,,15:0,0xffff,,"Key value (write only, read 0000h)",WO,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
 CH32H417,IWDG,PSCR,0x004,32,1,PR_0,IWDG_PR_0,value,PR,0,0x1,1,Bit 0,,,#,reference,evt(ch32h417.h),,
 CH32H417,IWDG,PSCR,0x004,32,1,PR_1,IWDG_PR_1,value,PR,1,0x2,2,Bit 1,,,#,reference,evt(ch32h417.h),,
@@ -5783,6 +5801,83 @@ CH32H417,OPA,CMP_CTLR,0x00c,32,1,CMP_CTLR_FILT_EN,OPA_CMP_CTLR_FILT_EN,field,,13
 CH32H417,OPA,CMP_CTLR,0x00c,32,1,CMP_CTLR_FILT_CFG,OPA_CMP_CTLR_FILT_CFG,field,,24:16,0x1ff0000,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,OPA,CMP_CTLR,0x00c,32,1,CMP_CTLR_FILT_BASE,OPA_CMP_CTLR_FILT_BASE,field,,30:28,0x70000000,,,,,#,reference,evt(ch32h417.h),,
 CH32H417,OPA,CMP_STATR,0x010,32,1,CMP_STATR_OUTFILT,OPA_CMP_STATR_OUTFILT,field,,0,0x1,,,,,#,reference,evt(ch32h417.h),,
+CH32H417,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000032C,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,PFIC,IALLOCR,0x600,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,PFIC,IAUTR,0x700,32,8,,,,,,,,,,0xFFFFFFFF;0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,WAKEIP,0x720,32,2,,,,,,,,,,0x00000000;0x00000001,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,CSTAR,0x780,32,2,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,EENR,0xc80,32,1,,,,,,,,,,0xFFFFFFFF,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,EPR,0xc84,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,EWUPR,0xc88,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32H417RM.PDF)+rm-address(CH32H417RM.PDF),,
+CH32H417,PIOC,D32_PIOC_SFR,0x004,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_INDIR_ADDR,0x004,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_TMR0_COUNT,0x005,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_TMR0_CTRL,0x006,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_TMR0_INIT,0x007,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_PORT_CFG,0x008,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_BIT_CYCLE,0x008,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_INDIR_ADDR2,0x009,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_PORT_DIR,0x00a,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_PORT_IO,0x00b,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_CTRL,0x01c,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_SYS_CFG,0x01c,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_CTRL_RD,0x01d,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_CTRL_WR,0x01e,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_EXCH,0x01f,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D16_DATA_REG0_1,0x020,16,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG0_3,0x020,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG0,0x020,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG1,0x021,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG2,0x022,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG3,0x023,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG4_7,0x024,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG4,0x024,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG5,0x025,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG6,0x026,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG7,0x027,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG8_11,0x028,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG8,0x028,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG9,0x029,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG10,0x02a,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG11,0x02b,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG12_15,0x02c,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG12,0x02c,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG13,0x02d,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG14,0x02e,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG15,0x02f,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG16_19,0x030,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG16,0x030,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG17,0x031,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG18,0x032,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG19,0x033,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG20_23,0x034,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG20,0x034,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG21,0x035,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG22,0x036,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG23,0x037,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG24_27,0x038,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG24,0x038,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG25,0x039,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG26,0x03a,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG27,0x03b,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D32_DATA_REG28_31,0x03c,32,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG28,0x03c,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG29,0x03d,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG30,0x03e,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
+CH32H417,PIOC,D8_DATA_REG31,0x03f,8,1,,,,,,,,,,,#,reference,evt(ch32h417_pioc.h),,
 CH32H417,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,,,,#,reference,evt(ch32h417.h),,
 CH32H417,PWR,CTLR,0x000,32,1,VSEL_VIO18_MODE0,PWR_CTLR_VSEL_VIO18_MODE0,value,VSEL_VIO18,,0x0,0,,,,#,reference,evt(ch32h417.h),,
 CH32H417,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,,,#,reference,evt(ch32h417.h),,
@@ -6996,6 +7091,10 @@ CH32H417,SWPMI,OR,0x024,32,1,SWP_TBYP,SWPMI_SWP_TBYP,field,,0,0x1,,,,,#,referenc
 CH32H417,SWPMI,OR,0x024,32,1,SWP_ISEL_0,SWPMI_SWP_ISEL_0,value,SWP_ISEL,2,0x4,1,,,,#,reference,evt(ch32h417.h),,
 CH32H417,SWPMI,OR,0x024,32,1,SWP_ISEL_1,SWPMI_SWP_ISEL_1,value,SWP_ISEL,3,0x8,2,,,,#,reference,evt(ch32h417.h),,
 CH32H417,SWPMI,OR,0x024,32,1,SWP_ISEL,SWPMI_SWP_ISEL,field,,3:2,0xc,,,,,#,reference,evt(ch32h417.h),,
+CH32H417,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,SysTick,ISR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32H417,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32H417,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
 CH32H417,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
 CH32H417,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32h417.h)+rm(CH32H417RM.PDF),confirmed,CH32H417RM.PDF:zh+CH32H417RM.PDF:en
@@ -9222,6 +9321,20 @@ CH32L103,OPA,CTLR2,0x008,32,1,WKUP_MD_1,OPA_CTLR2_WKUP_MD_1,value,WKUP_MD,25,0x2
 CH32L103,OPA,CTLR2,0x008,32,1,WKUP_MD,OPA_CTLR2_WKUP_MD,field,,25:24,0x3000000,,,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
 CH32L103,OPA,OPCMKEY,0x014,32,1,,,,,,,,,,,#,reference,evt(ch32l103.h),,
 CH32L103,OPCMKEY,OPCMKEY,,,,OPCM_KEY,OPCM_KEY,field,,31:0,0xffffffff,,,,,#,reference,evt(ch32l103.h),,
+CH32L103,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000000C,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32L103RM.PDF)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32L103RM.PDF)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32L103RM.PDF)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32L103RM.PDF)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32L103,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32L103RM.PDF),,
+CH32L103,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32L103,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32L103RM.PDF)+rm-address(CH32L103RM.PDF),,
 CH32L103,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,PVD level 0,,,#,reference,evt(ch32l103.h),,
 CH32L103,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),reference,CH32L103RM.PDF:zh
 CH32L103,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),reference,CH32L103RM.PDF:zh
@@ -9500,6 +9613,10 @@ CH32L103,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32L103,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
 CH32L103,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
 CH32L103,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSRXEN,field,,0,0x1,,,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
+CH32L103,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32L103,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32L103,SysTick,CNT,0x008,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32L103,SysTick,CMP,0x010,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32L103,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
 CH32L103,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
 CH32L103,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32l103.h)+rm(CH32L103RM.PDF),confirmed,CH32L103RM.PDF:zh+CH32L103RM.PDF:en
@@ -11162,6 +11279,19 @@ CH32M030,OPA,CMP_STATR,0x014,32,1,CMP3_CHOUT0,CMP_STATR_CMP3_CHOUT0,field,,18,0x
 CH32M030,OPA,CMP_STATR,0x014,32,1,CMP3_CHOUT1,CMP_STATR_CMP3_CHOUT1,field,,19,0x80000,,,RW1,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
 CH32M030,OPA,CMP_STATR,0x014,32,1,CMP3_CHOUT2,CMP_STATR_CMP3_CHOUT2,field,,20,0x100000,,,RW1,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
 CH32M030,OPA,CMP_STATR,0x014,32,1,CMP3_CHOUT3,CMP_STATR_CMP3_CHOUT3,field,,21,0x200000,,,RW1,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
+CH32M030,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000032C,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32M030RM.PDF)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32M030RM.PDF)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32M030RM.PDF)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32M030,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32M030RM.PDF),,
+CH32M030,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32M030,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32M030RM.PDF)+rm-address(CH32M030RM.PDF),,
 CH32M030,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,,,#,reference,evt(ch32m030.h),,
 CH32M030,PWR,CTLR,0x000,32,1,ISINKEN,PWR_CTLR_ISINKEN,field,,8,0x100,,,,,#,reference,evt(ch32m030.h),,
 CH32M030,PWR,CTLR,0x000,32,1,SEL_IO_VHV_0,PWR_CTLR_SEL_IO_VHV_0,value,SEL_IO_VHV,12,0x1000,1,Bit 0,,,#,reference,evt(ch32m030.h),,
@@ -11333,6 +11463,10 @@ CH32M030,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC R
 CH32M030,SPI,TCRCR,0x018,16,1,HSCR_HSRXEN,SPI_HSCR_HSRXEN,field,,15:0,0xffff,,High Speed mode read Enable,,,#,reference,evt(ch32m030.h),,
 CH32M030,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
 CH32M030,SPI,HSCR,0x024,16,1,,,,,,,,,,0x0000,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF)+rm-address(CH32M030RM.PDF),,
+CH32M030,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32M030,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32M030,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32M030,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32M030,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
 CH32M030,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
 CH32M030,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32m030.h)+rm(CH32M030RM.PDF),confirmed,CH32M030RM.PDF:zh+CH32M030RM.PDF:en
@@ -12627,6 +12761,20 @@ CH32V003,OB,WRPR0,0x008,16,1,WRPR0,FLASH_WRPR0_WRPR0,field,,7:0,0xff,,Flash memo
 CH32V003,OB,WRPR0,0x008,16,1,nWRPR0,FLASH_WRPR0_nWRPR0,field,,15:8,0xff00,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32v00x.h),,
 CH32V003,OB,WRPR1,0x00a,16,1,WRPR1,FLASH_WRPR1_WRPR1,field,,23:16,0xff0000,,Flash memory write protection option bytes,,,#,reference,evt(ch32v00x.h),,
 CH32V003,OB,WRPR1,0x00a,16,1,nWRPR1,FLASH_WRPR1_nWRPR1,field,,31:24,0xff000000,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32v00x.h),,
+CH32V003,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000000C,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V003RM.PDF)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V003RM.PDF)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V003RM.PDF)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V003RM.PDF)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V003,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V003RM.PDF),,
+CH32V003,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V003,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V003RM.PDF)+rm-address(CH32V003RM.PDF),,
 CH32V003,PWR,CTLR,0x000,32,1,PVDLevel_0,PWR_PVDLevel_0,value,,,0x0,0,,,,#,reference,evt(ch32v00x.h),,
 CH32V003,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),reference,CH32V003RM.PDF:zh
 CH32V003,PWR,CTLR,0x000,32,1,PVDE,PWR_CTLR_PVDE,field,,4,0x10,,Power Voltage Detector Enable,RW,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),reference,CH32V003RM.PDF:zh
@@ -12808,6 +12956,10 @@ CH32V003,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32V003,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
 CH32V003,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
 CH32V003,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,W0,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
+CH32V003,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V003,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V003,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V003,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V003,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
 CH32V003,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
 CH32V003,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v00x.h)+rm(CH32V003RM.PDF),confirmed,CH32V003RM.PDF:zh+CH32V003RM.PDF:en
@@ -14003,6 +14155,20 @@ CH32V006,OPA,POLLKEY,0x018,32,1,EXTEN_LOCKUP_EN,EXTEN_LOCKUP_EN,field,,6,0x40,,B
 CH32V006,OPA,POLLKEY,0x018,32,1,EXTEN_LOCKUP_RSTF,EXTEN_LOCKUP_RSTF,field,,7,0x80,,Bit 7,,,#,reference,evt(ch32v00X.h),,
 CH32V006,OPA,POLLKEY,0x018,32,1,EXTEN_TIM2_DMA_REMAP,EXTEN_TIM2_DMA_REMAP,field,,16,0x10000,,DMA multiplexing of TIM2,,,#,reference,evt(ch32v00X.h),,
 CH32V006,OPA,POLLKEY,0x018,32,1,POLL_KEY,POLL_KEY,field,,31:0,0xffffffff,,POLL Upper Lock Key Register,W0,,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
+CH32V006,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V00XRM.PDF)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V00XRM.PDF)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V00XRM.PDF)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V00XRM.PDF)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V006,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V00XRM.PDF),,
+CH32V006,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V006,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V00XRM.PDF)+rm-address(CH32V00XRM.PDF),,
 CH32V006,PWR,CTLR,0x000,32,1,FLASH_LP_0,PWR_CTLR_FLASH_LP_0,value,FLASH_LP,,0x0,0,free time,,,#,reference,evt(ch32v00X.h),,
 CH32V006,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,PVD level 0,,,#,reference,evt(ch32v00X.h),,
 CH32V006,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
@@ -14229,6 +14395,10 @@ CH32V006,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32V006,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
 CH32V006,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
 CH32V006,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,Enable high-speed read mode,RW,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
+CH32V006,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V006,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V006,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V006,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V006,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
 CH32V006,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
 CH32V006,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v00X.h)+rm(CH32V00XRM.PDF),confirmed,CH32V00XRM.PDF:zh+CH32V00XRM.PDF:en
@@ -15066,54 +15236,6 @@ CH32V103,BKP,DATAR42,0x0bc,16,1,D,BKP_DATAR42_D,field,,15:0,0xffff,,Backup data,
 CH32V103,CRC,DATAR,0x000,32,1,DR,CRC_DATAR_DR,field,,31:0,0xffffffff,,Data register bits,RW,4294967295,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,CRC,IDATAR,0x004,8,1,IDR_IDATAR,CRC_IDR_IDATAR,field,,7:0,0xff,,General-purpose 8-bit data register bits,,,#,reference,evt(ch32v10x.h),,
 CH32V103,CRC,CTLR,0x008,32,1,RESET,CRC_CTLR_RESET,field,,0,0x1,,RESET bit,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,EN1,DAC_EN1,field,,0,0x1,,DAC channel1 enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,BOFF1,DAC_BOFF1,field,,1,0x2,,DAC channel1 output buffer disable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,TEN1,DAC_TEN1,field,,2,0x4,,DAC channel1 Trigger enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,TSEL1_0,DAC_TSEL1_0,value,TSEL1,3,0x8,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL1_1,DAC_TSEL1_1,value,TSEL1,4,0x10,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL1_2,DAC_TSEL1_2,value,TSEL1,5,0x20,4,Bit 2,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL1,DAC_TSEL1,field,,5:3,0x38,,TSEL1[2:0] (DAC channel1 Trigger selection),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,WAVE1_0,DAC_WAVE1_0,value,WAVE1,6,0x40,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,WAVE1_1,DAC_WAVE1_1,value,WAVE1,7,0x80,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,WAVE1,DAC_WAVE1,field,,7:6,0xc0,,WAVE1[1:0] (DAC channel1 noise/triangle wave generation enable),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,MAMP1_0,DAC_MAMP1_0,value,MAMP1,8,0x100,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP1_1,DAC_MAMP1_1,value,MAMP1,9,0x200,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP1_2,DAC_MAMP1_2,value,MAMP1,10,0x400,4,Bit 2,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP1_3,DAC_MAMP1_3,value,MAMP1,11,0x800,8,Bit 3,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP1,DAC_MAMP1,field,,11:8,0xf00,,MAMP1[3:0] (DAC channel1 Mask/Amplitude selector),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,DMAEN1,DAC_DMAEN1,field,,12,0x1000,,DAC channel1 DMA enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,EN2,DAC_EN2,field,,16,0x10000,,DAC channel2 enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,BOFF2,DAC_BOFF2,field,,17,0x20000,,DAC channel2 output buffer disable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,TEN2,DAC_TEN2,field,,18,0x40000,,DAC channel2 Trigger enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,TSEL2_0,DAC_TSEL2_0,value,TSEL2,19,0x80000,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL2_1,DAC_TSEL2_1,value,TSEL2,20,0x100000,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL2_2,DAC_TSEL2_2,value,TSEL2,21,0x200000,4,Bit 2,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,TSEL2,DAC_TSEL2,field,,21:19,0x380000,,TSEL2[2:0] (DAC channel2 Trigger selection),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,WAVE2_0,DAC_WAVE2_0,value,WAVE2,22,0x400000,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,WAVE2_1,DAC_WAVE2_1,value,WAVE2,23,0x800000,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,WAVE2,DAC_WAVE2,field,,23:22,0xc00000,,WAVE2[1:0] (DAC channel2 noise/triangle wave generation enable),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,MAMP2_0,DAC_MAMP2_0,value,MAMP2,24,0x1000000,1,Bit 0,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP2_1,DAC_MAMP2_1,value,MAMP2,25,0x2000000,2,Bit 1,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP2_2,DAC_MAMP2_2,value,MAMP2,26,0x4000000,4,Bit 2,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP2_3,DAC_MAMP2_3,value,MAMP2,27,0x8000000,8,Bit 3,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,CTLR,0x000,32,1,MAMP2,DAC_MAMP2,field,,27:24,0xf000000,,MAMP2[3:0] (DAC channel2 Mask/Amplitude selector),RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,CTLR,0x000,32,1,DMAEN2,DAC_DMAEN2,field,,28,0x10000000,,DAC channel2 DMA enabled,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,SWTR,0x004,32,1,SWTRIG1,DAC_SWTRIG1,field,,0,0x1,,DAC channel1 software trigger,WO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,SWTR,0x004,32,1,SWTRIG2,DAC_SWTRIG2,field,,1,0x2,,DAC channel2 software trigger,WO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,R12BDHR1,0x008,32,1,DHR12R1,DAC_DHR12R1,field,,11:0,0xfff,,DAC channel1 12-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,L12BDHR1,0x00c,32,1,DHR12L1,DAC_DHR12L1,field,,15:4,0xfff0,,DAC channel1 12-bit Left aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,R8BDHR1,0x010,32,1,DHR8R1,DAC_DHR8R1,field,,7:0,0xff,,DAC channel1 8-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,R12BDHR2,0x014,32,1,DHR12R2,DAC_DHR12R2,field,,11:0,0xfff,,DAC channel2 12-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,L12BDHR2,0x018,32,1,DHR12L2,DAC_DHR12L2,field,,15:4,0xfff0,,DAC channel2 12-bit Left aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,R8BDHR2,0x01c,32,1,DHR8R2,DAC_DHR8R2,field,,7:0,0xff,,DAC channel2 8-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,RD12BDHR,0x020,32,1,DACC1DHR,DAC_RD12BDHR_DACC1DHR,field,,11:0,0xfff,,DAC channel1 12-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,RD12BDHR,0x020,32,1,DACC2DHR,DAC_RD12BDHR_DACC2DHR,field,,27:16,0xfff0000,,DAC channel2 12-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,LD12BDHR,0x024,32,1,DACC1DHR,DAC_LD12BDHR_DACC1DHR,field,,15:4,0xfff0,,DAC channel1 12-bit Left aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,LD12BDHR,0x024,32,1,DACC2DHR,DAC_LD12BDHR_DACC2DHR,field,,31:20,0xfff00000,,DAC channel2 12-bit Left aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,RD8BDHR,0x028,32,1,DACC1DHR,DAC_RD8BDHR_DACC1DHR,field,,7:0,0xff,,DAC channel1 8-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,RD8BDHR,0x028,32,1,DACC2DHR,DAC_RD8BDHR_DACC2DHR,field,,15:8,0xff00,,DAC channel2 8-bit Right aligned data,,,#,reference,evt(ch32v10x.h),,
-CH32V103,DAC,DOR1,0x02c,32,1,DACC1DOR,DAC_DACC1DOR,field,,11:0,0xfff,,DAC channel1 data output,RO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
-CH32V103,DAC,DOR2,0x030,32,1,DACC2DOR,DAC_DACC2DOR,field,,11:0,0xfff,,DAC channel2 data output,RO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,DBGMCU,CFGR0,0x000,32,1,,,,,,,,,,,#,reference,evt(ch32v10x.h),,
 CH32V103,DBGMCU,CFGR1,0x004,32,1,,,,,,,,,,,#,reference,evt(ch32v10x.h),,
 CH32V103,DMA,INTFR,0x000,32,1,GIF1,DMA_GIF1,field,,0,0x1,,Channel 1 Global interrupt flag,,,#,reference,evt(ch32v10x.h),,
@@ -15766,6 +15888,20 @@ CH32V103,OB,WRPR2,0x00c,16,1,WRPR2,FLASH_WRPR2_WRPR2,field,,7:0,0xff,,Flash memo
 CH32V103,OB,WRPR2,0x00c,16,1,nWRPR2,FLASH_WRPR2_nWRPR2,field,,15:8,0xff00,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32v10x.h),,
 CH32V103,OB,WRPR3,0x00e,16,1,WRPR3,FLASH_WRPR3_WRPR3,field,,23:16,0xff0000,,Flash memory write protection option bytes,,,#,reference,evt(ch32v10x.h),,
 CH32V103,OB,WRPR3,0x00e,16,1,nWRPR3,FLASH_WRPR3_nWRPR3,field,,31:24,0xff000000,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32v10x.h),,
+CH32V103,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000000C,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32xRM.PDF)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,VTFBADDRR,0x044,32,1,,,,,,,,,,0x80000000,#,confirmed,evt(core_riscv.h)+rm(CH32xRM.PDF)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32xRM.PDF)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32xRM.PDF)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,VTFADDRR,0x060,32,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32xRM.PDF),,
+CH32V103,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32xRM.PDF)+rm-address(CH32xRM.PDF),,
 CH32V103,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,,,,#,reference,evt(ch32v10x.h),,
 CH32V103,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),reference,CH32xRM.PDF:zh
 CH32V103,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),reference,CH32xRM.PDF:zh
@@ -16024,6 +16160,23 @@ CH32V103,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32V103,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,WO,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
+CH32V103,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTL0,0x004,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTL1,0x005,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTL2,0x006,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTL3,0x007,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTH0,0x008,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTH1,0x009,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTH2,0x00a,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CNTH3,0x00b,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPLR0,0x00c,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPLR1,0x00d,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPLR2,0x00e,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPLR3,0x00f,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPHR0,0x010,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPHR1,0x011,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPHR2,0x012,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V103,SysTick,CMPHR3,0x013,8,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V103,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
 CH32V103,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v10x.h)+rm(CH32xRM.PDF),confirmed,CH32xRM.PDF:zh+CH32xRM.PDF:en
@@ -19065,6 +19218,75 @@ CH32V205,OPA,OPCM_SR,0x01c,32,1,IF_OUT_POLL_CH1,OPCM_SR_IF_OUT_POLL_CH1,field,,0
 CH32V205,OPA,OPCM_SR,0x01c,32,1,IF_OUT_POLL_CH2,OPCM_SR_IF_OUT_POLL_CH2,field,,1,0x2,,,RW1Z,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,OPA,OPCM_SR,0x01c,32,1,IF_OUT_POLL_CH3,OPCM_SR_IF_OUT_POLL_CH3,field,,2,0x4,,,RW1Z,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,OPA,OPCM_SR,0x01c,32,1,IF_POLL_OPA1,OPCM_SR_IF_POLL_OPA1,field,,4,0x10,,,RW1Z,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
+CH32V205,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000032C,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V205RM.PDF)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V205RM.PDF)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V205RM.PDF)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V205,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V205RM.PDF),,
+CH32V205,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V205,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V205RM.PDF)+rm-address(CH32V205RM.PDF),,
+CH32V205,PIOC,D32_PIOC_SFR,0x004,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_INDIR_ADDR,0x004,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_TMR0_COUNT,0x005,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_TMR0_CTRL,0x006,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_TMR0_INIT,0x007,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_PORT_CFG,0x008,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_BIT_CYCLE,0x008,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_INDIR_ADDR2,0x009,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_PORT_DIR,0x00a,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_PORT_IO,0x00b,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_CTRL,0x01c,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_SYS_CFG,0x01c,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_CTRL_RD,0x01d,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_CTRL_WR,0x01e,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_EXCH,0x01f,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D16_DATA_REG0_1,0x020,16,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG0_3,0x020,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG0,0x020,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG1,0x021,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG2,0x022,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG3,0x023,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG4_7,0x024,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG4,0x024,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG5,0x025,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG6,0x026,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG7,0x027,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG8_11,0x028,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG8,0x028,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG9,0x029,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG10,0x02a,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG11,0x02b,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG12_15,0x02c,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG12,0x02c,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG13,0x02d,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG14,0x02e,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG15,0x02f,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG16_19,0x030,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG16,0x030,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG17,0x031,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG18,0x032,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG19,0x033,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG20_23,0x034,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG20,0x034,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG21,0x035,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG22,0x036,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG23,0x037,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG24_27,0x038,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG24,0x038,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG25,0x039,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG26,0x03a,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG27,0x03b,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D32_DATA_REG28_31,0x03c,32,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG28,0x03c,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG29,0x03d,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG30,0x03e,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
+CH32V205,PIOC,D8_DATA_REG31,0x03f,8,1,,,,,,,,,,,#,reference,evt(ch32v205_pioc.h),,
 CH32V205,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,PVD level 0,,,#,reference,evt(ch32v205.h),,
 CH32V205,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
@@ -19516,6 +19738,10 @@ CH32V205,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32V205,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSRXEN,field,,0,0x1,,,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
+CH32V205,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V205,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V205,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V205,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V205,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
 CH32V205,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v205.h)+rm(CH32V205RM.PDF),confirmed,CH32V205RM.PDF:zh+CH32V205RM.PDF:en
@@ -22560,6 +22786,20 @@ CH32V20x,OSC,Reserve7,0x01e,16,1,,,,,,,,,,,#,reference,evt(ch32v20x.h),,
 CH32V20x,OSC,LSI32K_CAL_STATR,0x020,16,1,,,,,,,,,,,#,reference,evt(ch32v20x.h),,
 CH32V20x,OSC,LSI32K_CAL_OV_CNT,0x022,8,1,,,,,,,,,,,#,reference,evt(ch32v20x.h),,
 CH32V20x,OSC,LSI32K_CAL_CTRL,0x023,8,1,,,,,,,,,,,#,reference,evt(ch32v20x.h),,
+CH32V20x,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V20x,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V20x,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
 CH32V20x,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,,,,#,reference,evt(ch32v20x.h),,
 CH32V20x,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V20x,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
@@ -22839,6 +23079,10 @@ CH32V20x,SPI,I2SPR,0x020,16,1,I2SDIV,SPI_I2SPR_I2SDIV,field,,7:0,0xff,,I2S Linea
 CH32V20x,SPI,I2SPR,0x020,16,1,ODD,SPI_I2SPR_ODD,field,,8,0x100,,Odd factor for the prescaler,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V20x,SPI,I2SPR,0x020,16,1,MCKOE,SPI_I2SPR_MCKOE,field,,9,0x200,,Master Clock Output Enable,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V20x,SPI,HSCR,0x024,16,1,,,,,,,,,,0x0000,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V20x,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V20x,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V20x,SysTick,CNT,0x008,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V20x,SysTick,CMP,0x010,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V20x,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V20x,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V20x,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v20x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
@@ -26692,6 +26936,20 @@ CH32V307,OB,WRPR2,0x00c,16,1,nWRPR2,FLASH_WRPR2_nWRPR2,field,,15:8,0xff00,,Flash
 CH32V307,OB,WRPR3,0x00e,16,1,WRPR3,FLASH_WRPR3_WRPR3,field,,23:16,0xff0000,,Flash memory write protection option bytes,,,#,reference,evt(ch32v30x.h),,
 CH32V307,OB,WRPR3,0x00e,16,1,nWRPR3,FLASH_WRPR3_nWRPR3,field,,31:24,0xff000000,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32v30x.h),,
 CH32V307,OPA,CR,0x000,32,1,,,,,,,,,,,#,reference,evt(ch32v30x.h),,
+CH32V307,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V307,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32FV2x_V3xRM.PDF),,
+CH32V307,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V307,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32FV2x_V3xRM.PDF)+rm-address(CH32FV2x_V3xRM.PDF),,
 CH32V307,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,,,,#,reference,evt(ch32v30x.h),,
 CH32V307,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V307,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
@@ -27142,6 +27400,10 @@ CH32V307,SPI,I2SPR,0x020,16,1,ODD,SPI_I2SPR_ODD,field,,8,0x100,,Odd factor for t
 CH32V307,SPI,I2SPR,0x020,16,1,MCKOE,SPI_I2SPR_MCKOE,field,,9,0x200,,Master Clock Output Enable,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V307,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,WO,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),conflict,CH32FV2x_V3xRM.PDF:zh+!CH32FV2x_V3xRM.PDF:en(=W0)
 CH32V307,SPI,HSCR,0x024,16,1,HSRXEN2,SPI_HSCR_HSRXEN2,field,,2,0x4,,,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
+CH32V307,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V307,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V307,SysTick,CNT,0x008,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V307,SysTick,CMP,0x010,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V307,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V307,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
 CH32V307,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v30x.h)+rm(CH32FV2x_V3xRM.PDF),confirmed,CH32FV2x_V3xRM.PDF:zh+CH32FV2x_V3xRM.PDF:en
@@ -30622,6 +30884,25 @@ CH32V407,OPA,CR,0x000,32,1,PSEL,OPA_PSEL,field,,5,0x20,,,,,#,reference,evt(ch32v
 CH32V407,OPA,CR,0x000,32,1,PGADIF,OPA_PGADIF,field,,6,0x40,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,OPA,CR,0x000,32,1,FB_EN,OPA_FB_EN,field,,7,0x80,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,OPA,CR,0x000,32,1,HS,OPA_HS,field,,8,0x100,,,,,#,reference,evt(ch32v4x7.h),,
+CH32V407,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000032C,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V407,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V407,PFIC,WAKEIP0,0x720,32,1,,,,,,,,,,0x00000001,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,CSTAR0,0x780,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,EENR,0xc80,32,1,,,,,,,,,,0xFFFFFFFF,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,EPR,0xc84,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,EWUPR,0xc88,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
+CH32V407,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32V407RM.PDF)+rm-address(CH32V407RM.PDF),,
 CH32V407,PSRAM,CTLR,0x000,32,1,CFIFO,PSRAM_CFIFO,field,,4,0x10,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,PSRAM,CTLR,0x000,32,1,DFIFO,PSRAM_DFIFO,field,,5,0x20,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,PSRAM,CTLR,0x000,32,1,CAPCFG_0,PSRAM_CAPCFG_0,value,CAPCFG,8,0x100,1,,,,#,reference,evt(ch32v4x7.h),,
@@ -31226,6 +31507,10 @@ CH32V407,SPI,I2SPR,0x020,16,1,MCKOE,SPI_I2SPR_MCKOE,field,,9,0x200,,Master Clock
 CH32V407,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,SPI,HSCR,0x024,16,1,HSRXEN2,SPI_HSCR_HSRXEN2,field,,2,0x4,,,,,#,reference,evt(ch32v4x7.h),,
 CH32V407,SPI,HSCR,0x024,16,1,I2CWSSYNC,SPI_HSCR_I2CWSSYNC,field,,3,0x8,,,,,#,reference,evt(ch32v4x7.h),,
+CH32V407,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V407,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V407,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32V407,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32V407,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
 CH32V407,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32v4x7.h)+rm(CH32V407RM.PDF),confirmed,CH32V407RM.PDF:zh+CH32V407RM.PDF:en
@@ -32963,6 +33248,76 @@ CH32X035,OPA,CTLR2,0x008,32,1,PSEL3,OPA_CTLR2_PSEL3,field,,13,0x2000,,,RW,0,#,co
 CH32X035,OPA,OPAKEY,0x00c,32,1,KEY,OPA_KEY,field,,31:0,0xffffffff,,,,,#,reference,evt(ch32x035.h),,
 CH32X035,OPA,CMPKEY,0x010,32,1,CMP_KEY,CMP_KEY,field,,31:0,0xffffffff,,,RW,,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,OPA,POLLKEY,0x014,32,1,POLL_KEY,POLL_KEY,field,,31:0,0xffffffff,,,RW,,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
+CH32X035,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000000C,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X035RM.PDF)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X035RM.PDF)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X035RM.PDF)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X035RM.PDF)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X035,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X035RM.PDF),,
+CH32X035,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X035,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X035RM.PDF)+rm-address(CH32X035RM.PDF),,
+CH32X035,PIOC,D32_PIOC_SFR,0x004,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_INDIR_ADDR,0x004,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_TMR0_COUNT,0x005,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_TMR0_CTRL,0x006,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_TMR0_INIT,0x007,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_PORT_CFG,0x008,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_BIT_CYCLE,0x008,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_INDIR_ADDR2,0x009,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_PORT_DIR,0x00a,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_PORT_IO,0x00b,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_CTRL,0x01c,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_SYS_CFG,0x01c,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_CTRL_RD,0x01d,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_CTRL_WR,0x01e,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_EXCH,0x01f,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D16_DATA_REG0_1,0x020,16,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG0_3,0x020,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG0,0x020,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG1,0x021,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG2,0x022,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG3,0x023,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG4_7,0x024,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG4,0x024,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG5,0x025,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG6,0x026,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG7,0x027,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG8_11,0x028,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG8,0x028,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG9,0x029,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG10,0x02a,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG11,0x02b,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG12_15,0x02c,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG12,0x02c,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG13,0x02d,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG14,0x02e,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG15,0x02f,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG16_19,0x030,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG16,0x030,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG17,0x031,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG18,0x032,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG19,0x033,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG20_23,0x034,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG20,0x034,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG21,0x035,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG22,0x036,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG23,0x037,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG24_27,0x038,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG24,0x038,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG25,0x039,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG26,0x03a,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG27,0x03b,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D32_DATA_REG28_31,0x03c,32,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG28,0x03c,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG29,0x03d,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG30,0x03e,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
+CH32X035,PIOC,D8_DATA_REG31,0x03f,8,1,,,,,,,,,,,#,reference,evt(PIOC_SFR.h),,
 CH32X035,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,PVD level 0,,,#,reference,evt(ch32x035.h),,
 CH32X035,PWR,CTLR,0x000,32,1,PDDS,PWR_CTLR_PDDS,field,,1,0x2,,Power Down Deepsleep,RW,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,PWR,CTLR,0x000,32,1,PLS_0,PWR_CTLR_PLS_0,value,PLS,5,0x20,1,Bit 0,,,#,reference,evt(ch32x035.h),,
@@ -33090,6 +33445,10 @@ CH32X035,SPI,CRCR,0x010,16,1,CRCPOLY,SPI_CRCR_CRCPOLY,field,,15:0,0xffff,,CRC po
 CH32X035,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC Register,RO,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,Read Enable under SPI High speed mode,WO,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
+CH32X035,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X035,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X035,SysTick,CNT,0x008,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X035,SysTick,CMP,0x010,64,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32X035,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
 CH32X035,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32x035.h)+rm(CH32X035RM.PDF),confirmed,CH32X035RM.PDF:zh+CH32X035RM.PDF:en
@@ -34769,6 +35128,25 @@ CH32X315,OB,WRPR2,0x00c,16,1,WRPR2,FLASH_WRPR2_WRPR2,field,,7:0,0xff,,Flash memo
 CH32X315,OB,WRPR2,0x00c,16,1,nWRPR2,FLASH_WRPR2_nWRPR2,field,,15:8,0xff00,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32x3x5.h),,
 CH32X315,OB,WRPR3,0x00e,16,1,WRPR3,FLASH_WRPR3_WRPR3,field,,23:16,0xff0000,,Flash memory write protection option bytes,,,#,reference,evt(ch32x3x5.h),,
 CH32X315,OB,WRPR3,0x00e,16,1,nWRPR3,FLASH_WRPR3_nWRPR3,field,,31:24,0xff000000,,Flash memory write protection complemented option bytes,,,#,reference,evt(ch32x3x5.h),,
+CH32X315,PFIC,ISR,0x000,32,8,,,,,,,,,,0x00000000;0x0000032C,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IPR,0x020,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,ITHRESDR,0x040,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,CFGR,0x048,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,GISR,0x04c,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,VTFIDR,0x050,8,4,,,,,,,,,,0xXXXXXXXX,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,VTFADDR,0x060,32,4,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X315,PFIC,IENR,0x100,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IRER,0x180,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IPSR,0x200,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IPRR,0x280,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IACTR,0x300,32,8,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,IPRIOR,0x400,8,256,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X315,PFIC,WAKEIP0,0x720,32,1,,,,,,,,,,0x00000001,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,CSTAR0,0x780,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,EENR,0xc80,32,1,,,,,,,,,,0xFFFFFFFF,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,EPR,0xc84,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,EWUPR,0xc88,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
+CH32X315,PFIC,SCTLR,0xd10,32,1,,,,,,,,,,0x00000000,#,confirmed,evt(core_riscv.h)+rm(CH32X315RM.PDF)+rm-address(CH32X315RM.PDF),,
 CH32X315,PWR,CTLR,0x000,32,1,PLS_MODE0,PWR_CTLR_PLS_MODE0,value,PLS,,0x0,0,,,,#,reference,evt(ch32x3x5.h),,
 CH32X315,PWR,CTLR,0x000,32,1,LPDS,PWR_CTLR_LPDS,field,,0,0x1,,Low-Power Deepsleep,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
 CH32X315,PWR,CTLR,0x000,32,1,PVDE,PWR_CTLR_PVDE,field,,4,0x10,,Power Voltage Detector Enable,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
@@ -35119,6 +35497,10 @@ CH32X315,SPI,RCRCR,0x014,16,1,RXCRC,SPI_RCRCR_RXCRC,field,,15:0,0xffff,,Rx CRC R
 CH32X315,SPI,TCRCR,0x018,16,1,TXCRC,SPI_TCRCR_TXCRC,field,,15:0,0xffff,,Tx CRC Register,RO,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
 CH32X315,SPI,HSCR,0x024,16,1,HSRXEN,SPI_HSCR_HSRXEN,field,,0,0x1,,,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
 CH32X315,SPI,HSCR,0x024,16,1,HSRXEN2,SPI_HSCR_HSRXEN2,field,,2,0x4,,,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
+CH32X315,SysTick,CTLR,0x000,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X315,SysTick,SR,0x004,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X315,SysTick,CNT,0x008,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
+CH32X315,SysTick,CMP,0x010,32,1,,,,,,,,,,,#,reference,evt(core_riscv.h),,
 CH32X315,TIM,CTLR1,0x000,16,1,CEN,TIM_CEN,field,,0,0x1,,Counter enable,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
 CH32X315,TIM,CTLR1,0x000,16,1,UDIS,TIM_UDIS,field,,1,0x2,,Update disable,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en
 CH32X315,TIM,CTLR1,0x000,16,1,URS,TIM_URS,field,,2,0x4,,Update request source,RW,0,#,confirmed,evt(ch32x3x5.h)+rm(CH32X315RM.PDF),confirmed,CH32X315RM.PDF:zh+CH32X315RM.PDF:en

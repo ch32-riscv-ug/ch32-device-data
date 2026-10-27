@@ -377,9 +377,9 @@ products,sram_bytes_basis,Sources that support `sram_bytes`.,text,never empty,pr
 products,gpio_count_basis,Sources that support `gpio_count`.,text,never empty,prose
 products,temperature_basis,Sources that support `temperature`.,text,no source states the value,prose
 register_blocks,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-register_blocks,block,Peripheral instance name (e.g. `USART1`).,name,never empty,as-printed
-register_blocks,type,EVT `*_TypeDef` stem the block uses (e.g. `USART`).,name,never empty,as-printed
-register_blocks,layout,Layout key (8-hex-digit hash of the type's structure); equal keys share register definitions; carries no other meaning.,name,the device header has no type structure for the block,
+register_blocks,block,"Peripheral instance name (e.g. `USART1`). Collected from the EVT device header, the per-peripheral headers that define a block pointer (`PIOC`), and `core_riscv.h` (`PFIC`, `SysTick`, CH32H417 `HSEM`/`IPC`); blocks a header defines but the family does not have are removed by human judgment (`curated/register-blocks-absent.json`).",name,never empty,as-printed
+register_blocks,type,"EVT `*_TypeDef` stem the block uses (e.g. `USART`); `*_Type` for the core blocks of `core_riscv.h` (`PFIC`, `SysTick`); the block name itself when the header defines the registers only as address macros (CH32V103 `USBFS`).",name,never empty,as-printed
+register_blocks,layout,Layout key (8-hex-digit hash of the type's structure); equal keys share register definitions; carries no other meaning.,name,the EVT headers have no type structure for the block (CH32H417 `UHSIF`; CH32V103 `USBFS` is address macros only),
 register_blocks,base_address,Base address of the block.,hex,never empty,
 register_blocks,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
 register_blocks,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed

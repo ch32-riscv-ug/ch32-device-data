@@ -38,6 +38,9 @@
 **別の datasheet の見出しで既に在るタグ**に限り、比較表がその series に値を持てば
 見出しが無くてもタグを付ける（`features`・`sections` は空、`basis` は `attributes(...)`）。
 新しい語をここで作らないのは、語彙を見出しの綴りから決める方針を崩さないため。
+**どの datasheet にも見出しが無い機能**だけは、人が語を決めて
+`curated/feature-tags.json` の `attribute_tags`（タグ → 比較表の属性名）に置く
+（CH32V208 の BLE。概要文と比較表の `BLE 5.3` 行にしか出ない。2026-10-27）。
 当てるのは**属性名の最後のトークンがタグのとき**だけ（`communication_interfaces_ethernet`・
 `timer_lptim`）——途中のトークンで当てると `pdusb_usb_pd_type_c`（USB PD）が USB に、
 `adc_tkey_channel`（数え方）が ADC に化ける。
@@ -113,7 +116,7 @@ def main() -> int:
     args = ap.parse_args()
 
     curated = json.loads(CURATED.read_text(encoding="utf-8"))
-    for key in ("aliases", "titles", "excluded", "parents"):
+    for key in ("aliases", "titles", "excluded", "parents", "attribute_tags"):
         curated[key] = {k: v for k, v in curated[key].items() if k != "_comment"}
 
     with paths.table("features").open(newline="", encoding="utf-8") as f:
@@ -235,6 +238,29 @@ def main() -> int:
             })
             covered.add((tag, series))
             from_table += 1
+    # どの datasheet にも見出しの無い機能は、人が決めた語と比較表の属性名で付ける
+    # （`attribute_tags`。V208 の BLE は概要文と比較表の `BLE 5.3` 行にしか出ない）。
+    for tag, names in curated["attribute_tags"].items():
+        for name in names:
+            found = {(series_of.get(r["part_number"]), r["confidence"]) for r in attributes
+                     if r["attribute"] == name and series_of.get(r["part_number"])}
+            if not found:
+                raise SystemExit(f"curated/feature-tags.json の attribute_tags {tag}: "
+                                 f"属性 {name} が product_attributes に無い")
+            for series in sorted({s for s, _ in found}):
+                if (tag, series) in covered:
+                    continue
+                rows.append({
+                    "precision": "part", "tag": tag,
+                    "parent": curated["parents"].get(tag, ""),
+                    "series": series, "family": family_of.get(series, ""),
+                    "features": "", "features_zh": "", "sections": "",
+                    "confidence": ("confirmed" if all(c == "confirmed" for s, c in found if s == series)
+                                   else "reference"),
+                    "basis": f"attributes({name})",
+                })
+                covered.add((tag, series))
+                from_table += 1
     rows.sort(key=lambda r: (r["tag"], r["series"]))
 
     dest = paths.index("features", args.out)

@@ -951,7 +951,7 @@ ORG_STATIC = """## Toolchain mirror
 # ここに無いタグが現れたら生成を落とす（分類の穴を黙って作らないため）。
 FEATURE_CATEGORIES = (
     ("Connectivity", ("USB", "USBD", "USBFS", "USBHS", "USBSS", "USB-PD",
-                      "CAN", "ETHERNET", "USART", "UART", "I2C", "I3C", "SPI",
+                      "CAN", "ETHERNET", "BLE", "USART", "UART", "I2C", "I3C", "SPI",
                       "I2S", "SWPMI", "SIDO", "SERDES", "UHSIF", "PIOC")),
     ("Analog", ("ADC", "TKey", "HSADC", "DAC", "OPA", "CMP", "DFSDM")),
     ("Motor and power drive", ("GATE-DRIVER", "ISP", "ISINK", "ISOURCE", "QII")),
