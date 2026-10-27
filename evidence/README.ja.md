@@ -340,6 +340,7 @@ reference manualのDMA章の「DMAx各通道外设映射表」だけが持つ情
 ページ跨ぎ／DMAMUX番号表）のを1つの読み方で読んでいます。セル内の折り返し（`USART2_T`⏎`X_1`）は1語に繋ぎ、その折り返しの**間にページ境界が来た**もの（前ページ最終行の`USART1_T`＋続き表先頭行の`X_0`）も、続き側の断片から前の行へ書き戻して繋ぎます。読み方の規則と資料側の癖は
 `pipeline/extract/rm/extract_dma_requests.py`の冒頭に書きました（凍結tool `tools/build_dma_requests.py` を
 bundle入力でbyte一致を確認して置き換えた新経路の生成器。2026-09-09）。
+**`通道8〜`から始まる表は新しい DMA の始まりではなく、直前の格子の続き**として読みます——CH32V407RM は表題を表の下に置くので、DMA1 の ch8〜13 の表の直後に`Figure 11-3 DMA2 …`が来て、ADC1(ch12)・ADC2(ch13)・USART9/10・I3C・ARGB の8行が DMA2 に化けていました（2026-10-27 に直した。header の DMA1 は ch13 まで、DMA2 は ch11 まで。ArduinoCore-CH32RV が ADC1 を DMA1 ch12 で実機確認）。`check_tables`は (DMA, channel) が header の`DMAx_ChannelN`に実在することを見ます。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 

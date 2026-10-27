@@ -343,6 +343,7 @@ The tables come in 5 shapes (a one-page grid / continued on the next page withou
 spanning pages / DMAMUX number table), all read with one reading method. A request wrapped inside a cell (`USART2_T`⏎`X_1`) is joined into one name, and one whose wrap is **cut by the page break** (`USART1_T` on the last row of one page, `X_0` on the first row of the uncaptioned continuation) is joined too, by writing the continuation's fragment back onto the row above. The reading rules and the documents' quirks are written
 at the top of `pipeline/extract/rm/extract_dma_requests.py` (the bundle-reading extractor that
 replaced the frozen `tools/build_dma_requests.py` on 2026-09-09 after a byte-identical run).
+**A table starting at `Channel 8` is not the start of a new DMA but the continuation of the grid before it** -- CH32V407RM places table titles below the tables, so `Figure 11-3 DMA2 ...` followed DMA1's ch8-13 table and eight rows (ADC1 ch12, ADC2 ch13, USART9/10, I3C, ARGB) were read as DMA2 (fixed 2026-10-27; the header has DMA1 up to ch13 and DMA2 up to ch11; ArduinoCore-CH32RV ran ADC1 on DMA1 ch12 on hardware). `check_tables` checks that each (DMA, channel) exists as `DMAx_ChannelN` in the header.
 
 ### `pin_functions.csv` is **per pinout**, not a per-part-number function list
 

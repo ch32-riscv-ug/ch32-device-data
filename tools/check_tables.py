@@ -1564,6 +1564,16 @@ def main() -> int:
     # dma_requests: 格子（dma+channel）か DMAMUX（request_id）のどちらか一方を持つこと。
     # variant は evt_variants の macro（`|` 区切り）にあること。remap の値。
     macros = {r["macro"] for r in t["evt_variants"]} if t.get("evt_variants") else set()
+    # (DMA, channel) は EVT header に `DMAx_ChannelN` のブロックが実在すること。CH32V407 の
+    # DMA1 ch8〜13 が DMA2 として載っていた（header の DMA2 は ch11 まで。2026-10-27）。
+    dma_channels = {(r["family"], r["block"]) for r in t["register_blocks"]
+                    if re.fullmatch(r"DMA\d_Channel\d+", r["block"])}
+    dma_families = {f for f, _ in dma_channels}
+    for r in t["dma_requests"]:
+        if (r["family"] in dma_families and r["dma"] and r["channel"].isdigit()
+                and (r["family"], f"{r['dma']}_Channel{r['channel']}") not in dma_channels):
+            bad.append(f"dma_requests: {r['family']} {r['request']} の {r['dma']} ch{r['channel']} が "
+                       "register_blocks に無い（header にそのチャネルが無い）")
     for r in t["dma_requests"]:
         check("dma_requests", r["request"], r["family"], families, "families")
         has_channel = bool(r["dma"]) and r["channel"].isdigit()

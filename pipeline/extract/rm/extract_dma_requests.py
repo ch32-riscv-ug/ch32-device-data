@@ -253,7 +253,24 @@ def read_bundle(bundle: str, family: str) -> list[dict]:
                     current = int(m.group(1)) if m else current
                     col_channel.append(current)
                 number, dma = "", "DMA1"
-                if used_captions < len(captions):
+                first = next((c for c in col_channel if c is not None), 1)
+                if first > 1 and grid and not grid.get("skip") and not grid.get("mux"):
+                    # **`通道8〜` から始まる表は新しい DMA の始まりではない**——直前の格子の
+                    # 続き。表題を消費しない。CH32V407RM は表題を表の**下**に置くので、DMA1 の
+                    # ch8〜13 の表の直後に `Figure 11-3 DMA2 …` が来て、出てきた順に割り当てると
+                    # ADC1(ch12)・ADC2(ch13) ほかが DMA2 に化けていた（zh/en とも。EVT と
+                    # ch32v4x7.h は DMA1 が ch13 まで、DMA2 が ch11 まで。ArduinoCore-CH32RV が
+                    # V407 の ADC1 を DMA1 ch12 で実機確認。2026-10-27）。
+                    # ただし**自分の表題を持つ続きの表**もある（CH32FV2x_V3xRM.en の
+                    # `Table 11-4 … DMA2 channel (Ⅱ)`）。次の表題が同じ DMA を名乗るならそれは
+                    # この表のもので、消費しないと後ろの表題が1つずつずれる。
+                    number, dma = grid["table"], grid["dma"]
+                    if used_captions < len(captions) and \
+                            (captions[used_captions][2] if captions[used_captions][2] != "DMA"
+                             else "DMA1") == dma:
+                        number = captions[used_captions][1]
+                        used_captions += 1
+                elif used_captions < len(captions):
                     _, number, dma = captions[used_captions]
                     used_captions += 1
                 elif grid:
