@@ -465,6 +465,10 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **`flash_sck_div`は待ちサイクルではなくフラッシュクロックの分周比です。** CH32X315とCH32H417のFLASH_ACTLRは`LATENCY[n:0]`を持たず、`SCK_CFG[1:0]`で**HCLKを何分周するか**を選びます。記号名が`FLASH_ACTLR_LATENCY_HCLK_DIV4`なので`flash_latency`に入れると「4待ち」と読まれてしまい、単位が違うので列を分けました（`check_tables.py`が両方を持つ行を弾きます）。**CH32X315はHCLK/1・/2・/4・/8、CH32H417はHCLK/2**です。240MHzへ上げるのに既定のままだと落ちるので、落としたままにはできない事実です。
 
+**CH32V407 も同じ「FLASH アクセスクロック＝HCLK/n」を持ち、場所が違います**——`FLASH_CTLR`の`SCKMOD[1:0]`（RM: `00`＝HCLK、`01`＝/2、`10`＝/4）。120MHz は 1、240/350/400MHz は 2、480MHz は 4 で、`flash_sck_div`に入ります。V407 は SCKMOD を変える前に`FLASH->KEYR`と`MODEKEYR`へ鍵（`0x45670123`・`0xCDEF89AB`）を2組書き、後で`FLASH->CTLR |= 0x00008080`とします。記号の無い数値の書き込みなので、**`flash_writes`列が書いた順に持ちます**（CH32X315 は同じ手順を`SystemInit`で行うので`clock_init`の step 10〜15 にあります）。V407 の`pll`には CFGR2 の`RCC_SYSPLLSRC_PLL`と`RCC_SYSPLLDIVn`（120MHz は DIV2、他は DIV1）も入ります（2026-10-27、ArduinoCore-CH32RV の依頼。下線の無い綴りを取りこぼしていた）。
+
+**V407 の CPU は HCLK で動きます。** データシートと RM のクロックツリー図が HB プリスケーラの出力を「to HB bus/core/memory/DMA」と書いています（DS en p.9／zh p.6、RM en p.19／zh p.17）。EVT の設定はどれも`HCLK = SYSCLK/2`で、**480MHz 設定の HCLK 240MHz は比較表の CPU 上限`Max: 200MHz`を超えます**（EVT が用意している設定であって、資料の保証範囲ではない）。
+
 この2 familyは**書き方も違います**——レジスタを直接触らず、ローカル変数へ写して直してから書き戻します（`FLASH_Temp = FLASH->ACTLR; FLASH_Temp &= ~FLASH_ACTLR_SCK_CFG; ...`）。`BLOCK->REGISTER op= value`しか見ていないと中身が丸ごと見えず、これが「X315はlatencyを書かない」という誤りの原因でした。
 
 **この3表だけはseriesではなくfamilyで引きます。** クロックツリーはsiliconの性質で、EVTのcloneは1 silicon分だからです（`families.csv`がどのseriesを覆うかを持っています）。seriesで引くとCH32V20xの19設定がV203とV208へ複製されるうえ、2つのfamily dirが同じseriesに触れている場合（V203はCH32V20xとCH32V205の両方から作られたSKUがある）に**別のsiliconのツリーを拾います**。
@@ -488,11 +492,11 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **macroを設定しないプロジェクトは既定のvariantで黙って通ります。** CH32V203RBT6にD6のまま組めば、HSE_VALUEが24MHzのまま（正しくは32MHz）、周辺の集合も違う、という形で表に出ません。
 
-**`clock_symbols.csv`の`role`列は、その記号が何なのかを言います。** 観測から決めています——`&= ~X`なら`mask`、`|= X`なら`value`、`while(REG & X)`なら`poll`。434行の内訳は value 223 / mask 176 / poll 35 です。
+**`clock_symbols.csv`の`role`列は、その記号が何なのかを言います。** 観測から決めています——`&= ~X`なら`mask`、`|= X`なら`value`、`while(REG & X)`なら`poll`。438行の内訳は value 226 / mask 177 / poll 35 です。
 
 マスクが要るのは**setterが全部read-modify-writeだから**です。値だけでは書けません。ところが**ベンダのコード自身がフィールドをクリアせずにORしている**ことがあり（CH32V20xは`RCC->CFGR0 |= RCC_HPRE_DIV1`をリセット値に依存して書く）、ソースの観測だけではマスクが揃いません。足りない分はヘッダの形から認定しています——「名前が`_`境界で他の2つ以上の記号の接頭辞になっていて、値が連続した1本のビット列である」。これがちょうど`RCC_HPRE`（対`RCC_HPRE_DIV1..DIV512`）・`RCC_SW`（対`RCC_SW_HSI/HSE/PLL`）・`FLASH_ACTLR_LATENCY`に当たり、`RCC_HSEON`のような単一ビットには当たりません。レジスタの位置はヘッダのbannerコメント（`/*** Bit definition for RCC_CFGR0 register ***/`）から引きます——名前は`RCC_ADCPRE`がCFGR0のものだと言わないので。
 
-出所は`basis`で分かれます: **`evt(device-header+system_ch32*.c)`は設定コードが実際に書いたもの（305行）、`evt(device-header)`はヘッダに定義があるだけ（129行）**です。
+出所は`basis`で分かれます: **`evt(device-header+system_ch32*.c)`は設定コードが実際に書いたもの（309行）、`evt(device-header)`はヘッダに定義があるだけ（129行）**です。
 
 **`confidence=conflict`はヘッダが1行の中で自分と食い違っている記号です。** 5件あります。代表は`FLASH_ACTLR_LATENCY`で、CH32V003/V006/V103/X035が値`0x03`（2bit幅）に対しコメントは`LATENCY[2:0]`（3bit幅）と書きます。名前を信じるか数を信じるかで書けるマスクが変わり、狭い方ではlatency 4が書けません。`basis`に両方の読みを残しています（`+!evt(device-header-comment:FLASH_ACTLR_LATENCY[2:0])`）。**マスクの幅自体もfamilyで違います**: V003/V006/V103/L103/X035が`0x03`、V20x/V307/M030が`0x07`、V205が`0x0F`。
 

@@ -90,17 +90,24 @@ PRESCALER = re.compile(r"^RCC_(?P<field>HPRE|PPRE1|PPRE2|ADCPRE|CoreHCLK_PRE|HBP
                        r"(?P<divider>DIV[0-9_]+|Div[0-9_]+)$")
 # 倍率の綴りは旧 family の `RCC_PLLMULL18`（CFGR0）と H417 の `RCC_PLLMUL16`（PLLCFGR）の2通り。
 # H417 は PLL の後段に SYSPLL の選択とゲートを持つ（`RCC_SYSPLL_SEL`/`RCC_SYSPLL_GATE`）。
-PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL?|PLLXTPRE|PLL_\w+|SYSPLL_\w+|CFGR2_\w*PLL\w*)\w*$")
+# V407 は SYSPLL の入力と分周を CFGR2 に `RCC_SYSPLLSRC_PLL`・`RCC_SYSPLLDIVn` と下線なしで書く。
+PLL = re.compile(r"^RCC_(?:PLLSRC|PLLMULL?|PLLXTPRE|PLL_\w+|SYSPLL\w*|CFGR2_\w*PLL\w*)\w*$")
 LATENCY = re.compile(r"^FLASH_ACTLR_LATENCY(?:_(?P<wait>\d+))?$")
 SOURCE_SELECT = re.compile(r"^RCC_SW_(?P<source>\w+)$")
 # CH32X315とCH32H417のFLASH_ACTLRは待ちサイクル数ではなく**フラッシュクロックの
 # 分周比**を持つ（SCK_CFG[1:0]）。名前が LATENCY_HCLK_DIVn なので LATENCY と
 # 同じ列に入れると「n待ち」と読まれる。単位が違うので列を分ける。
-FLASH_SCK = re.compile(r"^FLASH_ACTLR_LATENCY_HCLK_DIV(?P<divider>\d+)$")
+# CH32V407 は同じ「FLASH アクセスクロック＝HCLK/n」を FLASH_CTLR の SCKMOD[1:0] に持つ
+# （RM: `00: FLASH access clock frequency = HCLK; 01: = (HCLK/2); 10: = (HCLK/4)`）。
+FLASH_SCK = re.compile(r"^FLASH_(?:ACTLR_LATENCY_HCLK_DIV|CTLR_SCKMOD_Div)(?P<divider>\d+)$")
 # 設定を「適用する」ために触るもの。enable/ready ビットと、read-modify-write の
 # ために要る field マスクがここに入る。値だけでは書けないので、名前が出てくる
 # 記号は分類できたものも含めて全部 clock_symbols.csv に落とす。
-CLOCK_SYMBOL = re.compile(r"^(?:RCC_\w+|FLASH_ACTLR\w*|EXTEN_\w+)$")
+CLOCK_SYMBOL = re.compile(r"^(?:RCC_\w+|FLASH_ACTLR\w*|FLASH_CTLR_SCKMOD\w*|EXTEN_\w+)$")
+# FLASH のレジスタへ**数値そのまま**を書く行（V407/X315 の SCKMOD を変える前の
+# `FLASH->KEYR = 0x45670123` ×2・`MODEKEYR` ×2 と、後の `FLASH->CTLR |= 0x00008080`）。
+# 記号が無いので clock_symbols には落ちない。順番に意味があるので書いた順に残す。
+LITERAL = re.compile(r"^\s*\(*\s*(0x[0-9A-Fa-f]+)\s*\)*\s*$")
 # Anything the configuration writes that is not RCC or FLASH. This is the fact
 # R-24 calls C-4: CH32V20x cannot run its PLL from HSI without EXTEN_CTR.
 NON_RCC_BLOCKS = ("RCC", "FLASH")
@@ -340,6 +347,7 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
             "pll_cleared": [],
             "flash_latency": None,
             "flash_sck_div": None,
+            "flash_writes": [],
             "system_clock_source": None,
             "outside_rcc": [],
             "unresolved_symbols": [],
@@ -385,6 +393,11 @@ def read_variant(text: str, symbols: dict[str, int], family_name: str,
                 else:
                     continue
             value = CAST.sub("", value)
+            literal = LITERAL.match(value) if op in ("=", "|=") else None
+            if block == "FLASH" and literal:
+                entry["flash_writes"].append(f"FLASH->{register}{op}{literal.group(1)}"
+                                             + (f" [{where}]" if where else ""))
+                continue
             # `&= ~FIELD` names the mask, not a value. Setters are all
             # read-modify-write, so the mask is as necessary as the value and
             # skipping the line lost half of what is needed.

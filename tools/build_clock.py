@@ -78,7 +78,7 @@ MIRRORS = Path("/home/mt/dev_wch")
 # mention pick up the wrong tree.
 CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
                   "hpre", "ppre1", "ppre2", "fpre", "pll",
-                  "flash_latency", "flash_sck_div", "outside_rcc",
+                  "flash_latency", "flash_sck_div", "flash_writes", "outside_rcc",
                   "#", "confidence", "basis", "evt_copies"]
 PRESCALER_COLUMNS = ["family", "field", "divider", "value",
                      "#", "confidence", "basis"]
@@ -205,6 +205,7 @@ def main() -> int:
                                       else str(entry["flash_latency"])),
                     "flash_sck_div": ("" if entry["flash_sck_div"] is None
                                       else str(entry["flash_sck_div"])),
+                    "flash_writes": ";".join(entry["flash_writes"]),
                     "outside_rcc": ";".join(entry["outside_rcc"]),
                     "confidence": CONFIDENCE, "basis": BASIS,
                     "evt_copies": entry["copies"],
