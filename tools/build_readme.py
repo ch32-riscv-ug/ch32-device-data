@@ -952,7 +952,7 @@ ORG_STATIC = """## Toolchain mirror
 FEATURE_CATEGORIES = (
     ("Connectivity", ("USB", "USBD", "USBFS", "USBHS", "USBSS", "USB-PD",
                       "CAN", "ETHERNET", "BLE", "USART", "UART", "I2C", "I3C", "SPI",
-                      "I2S", "SWPMI", "SIDO", "SERDES", "UHSIF", "PIOC")),
+                      "I2S", "SWPMI", "SERDES", "UHSIF", "PIOC")),
     ("Analog", ("ADC", "TKey", "HSADC", "DAC", "OPA", "CMP", "DFSDM")),
     ("Motor and power drive", ("GATE-DRIVER", "ISP", "ISINK", "ISOURCE", "QII")),
     ("Display, audio and camera", ("LTDC", "DVP", "ARGB", "GPHA", "SAI")),

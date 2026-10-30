@@ -49,7 +49,6 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 | **BLE** | CH32V208 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)) |
 | **SERDES** | CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
 | **UHSIF** | CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
-| **SIDO** | CH32V407\*, CH32V467\* ([CH32V407](https://github.com/ch32-riscv-ug/CH32V407)) |
 | **USB / USBD** | CH32V203, CH32V208 ([CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)) |
 | **SWPMI** | CH32H415, CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)) |
 | **USB / USBSS** | CH32H416, CH32H417 ([CH32H417](https://github.com/ch32-riscv-ug/CH32H417)); CH32X315 ([CH32X315](https://github.com/ch32-riscv-ug/CH32X315)) |
