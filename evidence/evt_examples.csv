@@ -728,6 +728,7 @@ CH32V205,ADC,Discontinuous_mode,discontinuous mode routine,confirmed,evt:tree+ev
 CH32V205,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,CoreMark,CoreMark routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,WUI,WCHGUI routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -810,7 +811,9 @@ CH32V205,SPI,1Lines_half-duplex,"1-wire half-duplex mode, master / slave mode da
 CH32V205,SPI,2Lines_FullDuplex,"2-wire half-duplex mode, master / slave mode data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,SPI,SPI_CRC,use CRC error check and master / slave mode transceiver routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,SPI,SPI_DMA,"SPI uses DMA, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,SPI,SPI_SDCARD,SPI SD card FatFs routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,SYSTICK,SYSTICK_Interrupt,,confirmed,evt:tree+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TIM,Clock_Select,clock source selection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -832,6 +835,7 @@ CH32V205,TOUCHKEY,TKEY_205_CT_EX002,Charge transfer 8-key touch routine,confirme
 CH32V205,TOUCHKEY,TKey,TouchKey Detection Routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TencentOS,TencentOS,TencentOS migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USART,USART_DMA_EXT,USART send and receive data through DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_HalfDuplex,"single wire half duplex mode, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_HardwareFlowControl,"hardware flow control mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_Idle_Recv,USART use DMA receiving indeterminate length data routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
