@@ -4,7 +4,7 @@
 The bottom of the hierarchy families -> series -> products -> pins. Rows are
 keyed by part_number, so they join products.csv (and through it series and
 families) relationally -- the datasheet and table a row came from are kept only
-as provenance, to the right of the "#" separator.
+as provenance, after the data columns.
 
     pins.csv           part_number, pin, pad: which pad sits on which lead
     pin_functions.csv  part_number, pad, signal, route: what the pad carries
@@ -64,11 +64,8 @@ def curated_columns() -> dict:
         return {}
     return json.loads(CURATED_COLUMNS.read_text(encoding="utf-8"))
 
-# The "#" column separates data from metadata; see tables/README.ja.md.
-PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type",
-               "#", "confidence", "basis", "table", "datasheet"]
-FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route",
-                    "#", "confidence", "basis", "table", "datasheet"]
+PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type", "confidence", "basis", "table", "datasheet"]
+FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route", "confidence", "basis", "table", "datasheet"]
 
 SERIES_TOKEN = re.compile(r"CH32[A-Z0-9x]+")
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
@@ -295,7 +292,7 @@ def merge_cells(zh: dict, en: dict, remap: dict | None = None) -> dict:
                 conf, basis = "confirmed", f"pin-table:zh+{en_tag}"
             elif in_zh and pin in en_by_pin and not (en_by_pin[pin] & zh_by_pin[pin]):
                 other = ",".join(sorted(en_by_pin[pin]))
-                conf, basis = "conflict", f"pin-table:zh+!pin-table:en(={other})"
+                conf, basis = "conflict", f"pin-table:zh+!pin-table:en(pad={other})"
             elif in_en and pin in zh_by_pin and not (zh_by_pin[pin] & en_by_pin[pin]):
                 continue  # the zh side of this contradiction carries the row
             elif in_zh:
@@ -359,9 +356,8 @@ def merge_function_sets(zh: dict, en: dict) -> dict:
         paired_en = set()
         for fn, other, field in pair_dissent(only_zh, only_en):
             said = other[0] if field == "signal" else other[1]
-            named = ":signal" if field == "signal" else ""
             entry[fn] = ("conflict",
-                         f"pin-table:zh+!pin-table:en{named}(={said})")
+                         f"pin-table:zh+!pin-table:en({field}={said})")
             only_zh = only_zh - {fn}
             paired_en.add(other)
         for fn in only_zh:
@@ -445,16 +441,14 @@ def write_csv(path: Path, rows: list[dict], columns: list[str]) -> None:
     with path.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=columns)
         writer.writeheader()
-        # The separator carries "#" in every row, so the boundary is visible
-        # wherever one lands in the file.
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
 
 
 def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
     """RM の格子が pin 表の remap 値と食い違う行に、格子の値を basis で並べる。
 
     **値は書き換えない。** この表は証拠（資料が何と書いているか）なので、pin 表の
-    値を残し、`conflict` にして basis に `!rm-remap-grid(=remap-N)` を並べる。
+    値を残し、`conflict` にして basis に `!rm-remap-grid(route=remap-N)` を並べる。
     格子を採るのは索引の側（`index/pinout.csv`。pipeline/build/build_index.py）。
 
     CH32V103 の pin 表は `TIM3_CH1_1` を PB4 と PC6 の**両方**に書くが、RM の
@@ -490,7 +484,7 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
             (row["pad"], row["signal"], row["route"]))
         if route:
             row["confidence"] = "conflict"
-            row["basis"] = f"{row['basis']}+!rm-remap-grid(={route})"
+            row["basis"] = f"{row['basis']}+!rm-remap-grid(route={route})"
             flagged += 1
     if flagged:
         print(f"RMの格子と remap 値が食い違う行（値は pin 表のまま）: {flagged} 行", file=sys.stderr)

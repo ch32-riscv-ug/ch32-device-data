@@ -10,7 +10,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 |---|---|---|
 | [`index/`](index/README.ja.md) 公開面 | 鍵の表（family・series・型番・package・core）、資料の事実をそのまま公開する表、証拠から語彙で揃えて組み直した**引くための表**。型番や機能で絞って見るのは viewer（`pins.html`）で | 利用者・generator |
 | [`evidence/`](evidence/README.ja.md) 証拠 15表 | 索引の材料。資料は何と書いているか。**綴りは原典のまま**、行ごとに出所（`basis`）と確度（`confidence`） | 正しさを確かめる人 |
-| [`catalog/`](catalog/README.ja.md) 目録 3表 | 表を作る元の文書・mirror の commit・上流ツールの版 | 保守する人 |
+| [`catalog/`](catalog/README.ja.md) 目録 4表 | 型番の目録（`index/parts.csv` として公開）と、表を作る元の文書・mirror の commit・上流ツールの版 | 保守する人 |
 
 > [!IMPORTANT]
 > このリポジトリはArduinoコアの対応宣言ではありません。表に載っている型番＝対応、ではありません。
@@ -21,7 +21,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 
 ## 構成
 
-- `catalog/`・`evidence/`・`index/`: 上の3区分の表。`#`列より左がデータ、右が出所と確度のメタ。`pipeline/common/paths.py` が置き場所を1箇所で決める
+- `catalog/`・`evidence/`・`index/`: 上の3区分の表。データの列が先、そのあとに確度と根拠の列。`pipeline/common/paths.py` が置き場所を1箇所で決める
 - `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`build_pins`/`build_remap`/`build_tables` の入力）
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
@@ -74,10 +74,8 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   辞書に無い属性が現れたら生成が落ちる（`adc`はチャネル数、`adc_unit`はユニット数、
   というように似た綴りで意味が違うため規則では畳めない）
 - `pipeline/build/build_conflicts.py`: 全表の`conflict`の印を`index/conflicts.csv`に集める。
-  証拠は食い違いを片方に寄せず両論を残す規則だが、その記録が11の表に散っていて
-  「両版で食い違う仕様を全部」に答えられなかった。`basis`のDSLから「どの出所が
-  異を唱えるか」と「その出所は何と言うか」を取り出すので、**102行は表が採った値と
-  相手の値が横に並ぶ**
+  `basis`の`!`の項から、食い違う列（`field`）・表が採った値（`kept`）・異論の値
+  （`alternative`）を取り出す
 - `pipeline/build/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`index/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく

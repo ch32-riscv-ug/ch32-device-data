@@ -92,7 +92,7 @@ TOOLCHAIN_ARCHES = {"", "x86", "x64", "arm64"}
 TOOLCHAIN_API = "https://api.mounriver.com/mountriver/api/version/"
 
 GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
-GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+)\)")
 
 
 def build_index_grid(basis: str) -> str | None:
@@ -979,8 +979,9 @@ def index_checks(t: dict) -> list[str]:
     for r in t["index:conflicts"]:
         if r["table"] not in paths.SOURCE_TABLES:
             bad.append(f"conflicts: 知らない表 {r['table']!r}")
-        elif r["field"] and r["field"] not in (t[r["table"]][0] if t[r["table"]] else {}):
-            bad.append(f"conflicts: {r['table']} に列 {r['field']!r} が無い")
+        elif r["field"] and (missing := [c for c in r["field"].split(";")
+                                         if c not in (t[r["table"]][0] if t[r["table"]] else {})]):
+            bad.append(f"conflicts: {r['table']} に列 {missing} が無い")
     # capabilities ⊆ product_attributes。値は綴りのまま写すので値まで戻して見る。
     # **`count` は資料が素の整数を書いたときだけ**入る（読みを足していないこと）。
     attributes = {(r["part_number"], r["attribute"], r["value"].strip()) for r in t["product_attributes"]}
@@ -1183,15 +1184,14 @@ def index_checks(t: dict) -> list[str]:
 
 # `index/columns.csv` の `format` の語彙。値を検査できるものは実データで確かめる。
 COLUMN_FORMATS = re.compile(
-    r"^(text|name|integer|decimal|hex|bits|reg-bits|list\(;\)|list\(,\)|list\(\|\)|url|path|marker|enum\(.+\))$")
+    r"^(text|name|integer|decimal|hex|bits|reg-bits|list\(;\)|list\(,\)|list\(\|\)|url|path|enum\(.+\))$")
 # 綴りではなく値を持つ列（`spelling` が空）。書式で決まるものと、書式が text/name でも値のもの。
-SPELLING_FREE = {"integer", "decimal", "hex", "bits", "reg-bits", "marker", "url", "path"}
+SPELLING_FREE = {"integer", "decimal", "hex", "bits", "reg-bits", "url", "path"}
 VALUE_COLUMNS = {"min", "typ", "max", "layout", "temp_range_c", "reset", "sha256", "program_word",
                  "complementary"}
 FORMAT_CHECKS = {
     "integer": re.compile(r"^-?\d+$"),
     "hex": re.compile(r"^0x[0-9a-fA-F]+$"),
-    "marker": re.compile(r"^#$"),
 }
 
 
@@ -1208,7 +1208,7 @@ def column_dictionary() -> list[str]:
         return ["公開面: index/columns.csv が無い"]
     with path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        if reader.fieldnames != ["table", "column", "meaning", "format", "empty", "spelling"]:
+        if reader.fieldnames != ["table", "column", "meaning", "format", "empty", "spelling", "role"]:
             return [f"columns.csv: ヘッダが違う（{reader.fieldnames}）"]
         described = list(reader)
     bad = []
@@ -1219,6 +1219,11 @@ def column_dictionary() -> list[str]:
         with p.open(newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             actual[p.stem] = [list(reader.fieldnames or []), list(reader)]
+    roles = {(r["table"], r["column"]): r["role"] for r in described}
+    for name, (header, _) in actual.items():
+        kinds = [roles.get((name, c)) for c in header]
+        if "provenance" in kinds and "data" in kinds[kinds.index("provenance"):]:
+            bad.append(f"columns.csv: {name} の provenance の列のあとにデータの列がある（出所の列は右端に置く）")
     seen = collections.Counter((r["table"], r["column"]) for r in described)
     want = {(name, c) for name, (header, _) in actual.items() for c in header}
     if dup := sorted(k for k, n in seen.items() if n > 1):
@@ -1241,6 +1246,9 @@ def column_dictionary() -> list[str]:
             bad.append(f"{where} の spelling {r['spelling']!r} が語彙に無い")
         if (r["spelling"] == "") != (r["format"] in SPELLING_FREE or r["column"] in VALUE_COLUMNS):
             bad.append(f"{where}: spelling が空なのは値の列（数・番地・印・URL・path・min/typ/max ほか）だけ")
+        # `role`: data はデータの列、provenance は確度と出所の列。provenance は表の右端に並ぶ。
+        if r["role"] not in ("data", "provenance"):
+            bad.append(f"{where} の role {r['role']!r} が語彙に無い")
         if not COLUMN_FORMATS.match(r["format"]):
             bad.append(f"{where} の format {r['format']!r} が語彙に無い")
             continue
@@ -1311,6 +1319,23 @@ def access_vocabulary(t: dict) -> list[str]:
             bad.append(f"register_fields: {r['family']}/{r['register']}/{r['field']} の access と"
                        " その確度の片方だけが埋まっている")
     return bad
+
+
+def basis_syntax(t: dict, documents: set[str]) -> list[str]:
+    """全表の `basis` 列（`*_basis` も）が文法どおりであること（pipeline/common/basis_grammar.py）。
+
+    文法は公開面の約束。`!` の項は食い違う列を `(列=値)` で名指し、文書は `[kind:]<文書>[:言語][(p.N)]`
+    で書く（preview のページに対応する）。知らない kind や目録に無い文書も落とす。
+    """
+    import basis_grammar  # noqa: PLC0415
+    bad = []
+    for name, rows in t.items():
+        for r in rows:
+            for column, value in r.items():
+                if column and (column == "basis" or column.endswith("_basis")) and value:
+                    for problem in basis_grammar.problems(value, documents):
+                        bad.append(f"{name}.{column}: {problem}")
+    return bad[:20] + ([f"…ほか {len(bad) - 20} 件"] if len(bad) > 20 else [])
 
 
 def published_surface(tables: Path | None) -> list[str]:
@@ -1386,6 +1411,10 @@ def main() -> int:
     for r in t["families"]:
         for column in ("datasheets", "reference_manuals", "evt"):
             check("families", r["family"], r[column], documents, "documents", ";")
+        # family の定義: WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る。
+        if r["evt"] != f"{r['family']}EVT.ZIP":
+            bad.append(f"families: {r['family']} の evt が {r['family']}EVT.ZIP でない（{r['evt']!r}）"
+                       "——family は EVT パッケージの名前から取る")
         for token in r["cores"].split(";"):
             check("families", r["family"], token, cores, "cores", " + ")
     for r in t["cores"]:
@@ -1466,6 +1495,7 @@ def main() -> int:
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
     bad += published_surface(args.tables)
+    bad += basis_syntax(t, {r["document"] for r in t["documents"]})
     bad += access_vocabulary(t)
     # 生成器が --full の順序に載っているか。載らない生成器は原本が動いても走らない。
     bad += regeneration_coverage()
@@ -1483,7 +1513,7 @@ def main() -> int:
 
     # 索引 pinout は pins × pin_functions を語彙で言い換えたもので、**新しい事実は
     # 足さない**。行が pin_functions に戻せること（route だけは RM 格子の値を採る
-    # 行があり、その場合 basis に `!rm-remap-grid(=その値)` があること）、lead が
+    # 行があり、その場合 basis に `!rm-remap-grid(route=その値)` があること）、lead が
     # pins にあること、覆えなかった数が増えていないことを見る。
     lead_of = {(r["part_number"], r["pad"], r["pin"]) for r in t["pins"]}
     grid_route = {}
@@ -1591,12 +1621,12 @@ def main() -> int:
                 bad.append(f"dma_requests: {r['family']} の variant {macro!r} が evt_variants にない")
 
     # debug_data は family ごと1行。data1 は data0 の次の word、番地は DM の 0xE0000000 台。
-    # 番地が空なのは missing の行だけ（H417: EVT に define が無く、V5/V3 のマニュアルは固定しない）。
+    # 番地が空なのは確度も空の行だけ（どの出所も番地を言わない family）。
     for r in t["debug_data"]:
         check("debug_data", r["family"], r["family"], families, "families")
-        if r["confidence"] == "missing":
+        if not r["confidence"]:
             if r["dm_data0_addr"] or r["dm_data1_addr"]:
-                bad.append(f"debug_data: {r['family']} は missing なのに番地がある")
+                bad.append(f"debug_data: {r['family']} は確度が空なのに番地がある")
             continue
         for column in ("dm_data0_addr", "dm_data1_addr"):
             if not re.fullmatch(r"0xE000[0-9A-F]{4}", r[column]):
@@ -2236,7 +2266,7 @@ def main() -> int:
     for name, rows in t.items():
         if not rows:
             continue
-        columns = [c for c in rows[0] if c != "#" and not c.endswith("_zh") and c not in LITERAL]
+        columns = [c for c in rows[0] if not c.endswith("_zh") and c not in LITERAL]
         for r in rows:
             for column in columns:
                 value = r.get(column, "")

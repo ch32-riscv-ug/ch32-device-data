@@ -61,7 +61,7 @@ import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "bus", "register", "offset", "address", "bit",
-           "mask", "macro", "#", "confidence", "basis"]
+           "mask", "macro", "confidence", "basis"]
 
 PERIPH = re.compile(r"^\s*#define\s+(?P<macro>RCC_(?P<bus>[A-Z0-9]+)Periph_(?P<name>\w+))\s+"
                     r"\(\s*\(\s*u?int\d+_t\s*\)\s*(?P<mask>0[xX][0-9A-Fa-f]+)\s*\)", re.M)
@@ -175,10 +175,10 @@ def main() -> int:
             if said is not None and lo == hi:
                 if said == lo:
                     confidence = "confirmed"
-                    basis.append(f"rm({manual_name})")
+                    basis.append(f"rm:{manual_name}")
                 else:
                     confidence = "conflict"
-                    basis.append(f"!rm({manual_name})(=bit{said})")
+                    basis.append(f"!rm:{manual_name}(bit={said})")
             rows.append({
                 "family": family,
                 "peripheral": name,
@@ -198,7 +198,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

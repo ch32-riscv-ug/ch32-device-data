@@ -38,8 +38,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
-COLUMNS = ["family", "register", "address", "width_bits", "unit", "description",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "register", "address", "width_bits", "unit", "description", "confidence", "basis"]
 
 # 表の1行: 名前・番地・（en なら）説明・復位値。説明は復位値の `0xX…` の手前まで。
 ROW = re.compile(r"R(?P<width>8|16|32)_ESIG_(?P<name>[A-Z0-9]+)\s+(?P<address>0x[0-9A-Fa-f]{8})"
@@ -88,7 +87,7 @@ def main() -> int:
             if len({(s["address"], s["width"]) for s in said.values()}) > 1:
                 confidence = "conflict"
                 other = said["en"]
-                basis += f"+!{editions['en'][1]}:en(={other['address']}/{other['width']})"
+                basis += f"+!{editions['en'][1]}:en(address={other['address']},width_bits={other['width']})"
             else:
                 confidence = "confirmed" if len(said) == 2 else "reference"
             unit = ""
@@ -97,7 +96,7 @@ def main() -> int:
                          for lang, ((_, unit_page), _) in editions.items() if unit_page]
                 if pages:
                     unit = "KiB"
-                    basis += "+unit(" + "+".join(pages) + ")"
+                    basis += "".join(f"+unit:{p}" for p in pages)
                 else:
                     notes.append(f"{family}: FLACAP の単位を言う説明が見つからない")
             rows.append({"family": family, "register": name, "address": first["address"],

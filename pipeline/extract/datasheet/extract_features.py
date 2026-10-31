@@ -61,8 +61,7 @@ import paths  # noqa: E402
 # 機能説明の章は必ず前の方にある。ここまで見れば足りる。
 MAX_PAGES = 40
 
-COLUMNS = ["series", "family", "section", "feature", "feature_zh", "granularity",
-           "#", "confidence", "basis", "datasheet"]
+COLUMNS = ["series", "family", "section", "feature", "feature_zh", "granularity", "confidence", "basis", "datasheet"]
 
 #   1.4.19 Controller Area Network (CAN)
 # 表の中の数字の並び（"1.8 3.6"）を拾わないよう、題に文字を要求する。
@@ -174,7 +173,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     seen = sorted({r["series"] for r in rows})
     print(f"{dest}: {len(rows)} 行  series 群 {len(seen)}  "
           f"{dict(Counter(r['confidence'] for r in rows))}", file=sys.stderr)

@@ -20,7 +20,7 @@
 | 資料の綴り・値 | `signal`・`pad`・`parameter`・`request`・`define` | そのまま。型だけ揃える（数・hex・単位） |
 | **付与識別子** | `remap_fields.selector`・`operating_conditions.symbol`・`product_attributes.attribute`・`pins.kind`・`clock_symbols.role`・`opa_cmp_registers.unit` | 資料が名前を付けていないものに repository が付けた鍵。資料の綴り（`field`・`parameter`・`label_zh/en`・`type`）が同じ行に残る |
 | 目録の鍵 | `part_number`・`series`・`family`・`document` | 正規化した名前（結合のため） |
-| 出所 | `#` より右の `confidence`・`basis`（`products` は列ごと） | 全行に付く |
+| 出所 | データの列のあとの `confidence`・`basis`（`products` は列ごと） | 全行に付く |
 
 語彙で導出した列（`peripheral`・`role`・`port`・`gpio`、pin から数えた `channels`）は
 ここには**無く**、索引にあります。
@@ -91,7 +91,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 両言語照合で吸収している表記ずれ: 表番号のずれ（X315はzh`表2-1-1`=en`Table 2-1`。表題中のシリーズ名で照合）、列見出しの綴り（`QFN48×7`、`QFN28(6)`、zh`LQFP64M`=en画像`LQFP64`は表内の消去法でペアリング）、1列が複数packageを兼ねる見出し（`LQFP48/QFN48X7`は成分ごとに登録）。
 
-**pin表とRMのremap格子が食い違う行**（CH32V103のTIM3。pin表は`TIM3_CH1_1`をPB4とPC6の両方に書くが、RM格子はPB4=2・PC6=3で値1は定義されていない。F-41）は、**値はpin表のまま**`conflict`にし、basisに`!rm-remap-grid(=remap-2)`と格子の値を並べています。格子の値を採るのは索引`index/pinout.csv`の側です。
+**pin表とRMのremap格子が食い違う行**（CH32V103のTIM3。pin表は`TIM3_CH1_1`をPB4とPC6の両方に書くが、RM格子はPB4=2・PC6=3で値1は定義されていない。F-41）は、**値はpin表のまま**`conflict`にし、basisに`!rm-remap-grid(route=remap-2)`と格子の値を並べています。格子の値を採るのは索引`index/pinout.csv`の側です。
 
 ### `product_attributes.csv`
 
@@ -150,7 +150,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 > 注：32位的TIM5_CNT仅适用于型号为CH32F20x_D8W、CH32V20x_D8、CH32V20x_D8W系列的产品，其他系列芯片的TIM5_CNT为16位。
 
-と書きます。名指しされたmacroを`condition`に置き（`interrupts.csv`と同じ持ち方）、`confidence`は`varies-by-package`。**同じRMを共有する別familyがそのvariantを持たない場合は`conflict`**にします——CH32V307はCH32V20xとRMを共有しますが注のvariantを持たないので、32bitと言い切れません。
+と書きます。名指しされたmacroを`condition`に置き（`interrupts.csv`と同じ持ち方）、`confidence`は`reference`。**同じRMを共有する別familyがそのvariantを持たない場合は`conflict`**にします——CH32V307はCH32V20xとRMを共有しますが注のvariantを持たないので、32bitと言い切れません。
 
 ### `flash_geometry.csv`
 
@@ -299,7 +299,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
   `layout`でgroup byすれば出ます。keyはハッシュなので**意味は持たず、同じか違うかだけ**を言います。
   header側の定義が1つでも変われば変わる（版が上がると同じsiliconでも変わり得る）
 - **RMとの突き合わせは綴りが一致したものだけ**。RMの`GPIOx_CFGLR`・`IDRy`の`x`/`y`は数字を落として
-  比べます。一致してbit位置が同じ→`confirmed`、違う→`conflict`（`basis`に`!rm(...)(=hi:lo)`）、
+  比べます。一致してbit位置が同じ→`confirmed`、違う→`conflict`（`basis`に`!rm:<manual>(bits=hi:lo)`）、
   RMに同名が無い→`reference`。**`reference`は誤りではなく裏取り待ち**で、`value`行は照合対象外
   なので常に`reference`です
 - `conflict`は本物の食い違いです（例: CH32V003の`GPIO_LCKR.LCKK`はEVT bit8 / RM bit16、
@@ -976,17 +976,16 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 
 ## 確定の基準は「根拠の総合判断」
 
-各CSVには名前も値もすべて `#` の区切り列があり、**そこから右はデータ本体ではなくメタデータ**（confidence/basis）です。全行のそのセルに`#`が入るので、ファイルのどこを見ていても「ここまでがデータ」の境界が分かります。読むときは`#`以降の列を落とせば素のデータ表になります。別ファイルに分けないのは、データとメタが構造的にずれないようにするためです。
+どの表でも、確度と根拠の列はデータの列のあとに並びます（`index/columns.csv` の `role` が `provenance`）。別ファイルに分けないのは、データとメタが構造的にずれないようにするためです。
 
 | `*_confidence` | 判定 |
 |---|---|
 | `confirmed` | 独立した根拠が2つ以上一致、**または人が内容を確認して根拠を記録した** |
 | `reference` | 根拠が1つだけで裏取りも矛盾もない。参考値 |
 | `conflict` | 根拠同士が矛盾。**人の判断が要る** |
-| `missing` | どの根拠にも記載がない |
-| `partial` / `varies-by-package` | （series.csvのみ）配下の確度不揃い / package依存 |
+| （空） | 値が空なので確度も無い（理由は `index/columns.csv` のその列の `empty`） |
 
-**`conflict`は行に付きますが、どの列が争点かは`basis`の`!`が言います。** `flash_geometry.csv`のCH32V103行にある`!evt-comment:fast_program_bytes(=256)`は、食い違っているのが`fast_program_bytes`**だけ**だという意味で、同じ行の他の列は争点ではありません。`conflict`をfail-closedで落とすconsumerは、行ごと捨てる前に`!`を読んでください。
+**`conflict`は行に付きますが、どの列が争点かは`basis`の`!`が言います。** `flash_geometry.csv`のCH32V103行にある`!evt-comment(fast_program_bytes=256)`は、食い違っているのが`fast_program_bytes`**だけ**だという意味で、同じ行の他の列は争点ではありません。`conflict`をfail-closedで落とすconsumerは、行ごと捨てる前に`!`を読んでください。
 
 **確定は自動化に限りません。** 使い捨てスクリプトで該当箇所を提示させ、人が両言語を突き合わせて確認できたら確定とし、根拠を`curated/`に記録します。core・ISAはこの方式です（`curated/series-facts.json`、2026-08-18確認）。
 
@@ -1021,8 +1020,8 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 再生成や途中挿入でdiffが局所に収まるよう、規則を固定しています。
 
 - **行順**: 各表とも行の識別子の単純昇順。families=`family`、series=`series`、products=`(part_number, family, datasheet)`。productsのpart_numberだけでは一意保証がない（同じ型番が複数datasheetに載りうる）ため、識別子の組で並べます
-- **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に区切りの `#` 列（全行`#`）、その右に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
-- **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして`#`の右（メタ側）にあります
+- **列順**: 左から重要な値（識別子 → スペック → package詳細 → 出典）。次に`*_confidence`ブロック、`*_basis`ブロックを同じ順で並べます
+- **pins系**: 行の識別子は（part_number, pin, pad）/（part_number, pad, signal, route）で、その昇順。出典の`table`・`datasheet`は確認用データとして確度と根拠の列のあと（メタ側）にあります
 
 ## 画像（現在は未使用）
 

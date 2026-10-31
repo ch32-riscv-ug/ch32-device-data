@@ -274,7 +274,7 @@ TEXT_REPAIRS = [
 ]
 
 COLUMNS = ["series", "symbol", "parameter", "condition",
-           "min", "typ", "max", "unit", "#", "confidence", "basis"]
+           "min", "typ", "max", "unit", "confidence", "basis"]
 
 # データシート1ページ目の特徴リストが宣言する「系統主頻」。電気的特性表の
 # F_HCLK（AHBの上限値）とは別の事実で、こちらが製品として謳われる周波数
@@ -1404,7 +1404,7 @@ def main():
                 confidence = "reference"
                 basis = f"{datasheet}:en(p.{en_page})"
             row.pop("_group", None)
-            out.append({**row, "series": series, "#": "#",
+            out.append({**row, "series": series,
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
 
@@ -1454,7 +1454,7 @@ def main():
             out.append({"symbol": zh["symbol"], "parameter": name,
                         "condition": zh["condition"], "min": zh["min"],
                         "typ": zh["typ"], "max": zh["max"], "unit": zh["unit"],
-                        "series": series, "#": "#", "confidence": "reference",
+                        "series": series, "confidence": "reference",
                         "basis": f"{datasheet}:zh(p.{zh['_page']})",
                         "datasheet": datasheet})
         if skipped:
@@ -1484,7 +1484,7 @@ def main():
                 basis = f"{datasheet}:{lang}(p.{page_no})"
             out.append({"series": series, "symbol": "F_MAIN",
                         "parameter": "System main frequency", "condition": "",
-                        "min": "", "typ": "", "max": value, "unit": "MHz", "#": "#",
+                        "min": "", "typ": "", "max": value, "unit": "MHz",
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
 
@@ -1519,7 +1519,7 @@ def main():
             elif len(readings) == 2:
                 confidence = "conflict"
                 basis = (f"{paper}:en(p.{readings['en'][0]})"
-                         f"+!{paper}:zh(={readings['zh'][1]})")
+                         f"+!{paper}:zh(max={readings['zh'][1]})")
             else:
                 lang = next(iter(readings))
                 confidence = "reference"
@@ -1531,7 +1531,7 @@ def main():
                             "min": one if symbol == "F_USBCLK" else "",
                             "typ": one,
                             "max": one if symbol == "F_USBCLK" else "",
-                            "unit": "MHz", "#": "#", "confidence": confidence,
+                            "unit": "MHz", "confidence": confidence,
                             "basis": basis, "datasheet": paper})
 
     # **同じ事実を2度書かない。** 1ページに PLL の表が変種ごとに複数あり
@@ -1554,7 +1554,7 @@ def main():
     # **確度は鍵に入れない。** 入れると「同じ主張で確度が違う2行」が残る
     # （`CH32H417DS0` の `V_DD33A 1.8/3.3/3.6` は OPA 表で confirmed・CMP 表で reference）。
     # 出典のデータシートは列に出さないが、鍵には入れる（別のデータシートの同じ主張は別の行）。
-    claim = [c for c in COLUMNS if c not in ("basis", "#", "confidence")] + ["datasheet"]
+    claim = [c for c in COLUMNS if c not in ("basis", "confidence")] + ["datasheet"]
     best: dict[tuple, dict] = {}
     order: list[tuple] = []
     for r in out:

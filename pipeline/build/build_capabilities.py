@@ -40,7 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 
 CAPABILITY_COLUMNS = ["part_number", "series", "family", "capability", "qualifier",
-                      "stated", "count", "value", "attribute", "#", "confidence", "basis"]
+                      "stated", "count", "value", "attribute", "confidence", "basis"]
 
 # `evidence/product_attributes.attribute` → `capability` または `capability:qualifier`。
 #

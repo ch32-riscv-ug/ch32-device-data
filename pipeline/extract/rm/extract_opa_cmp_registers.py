@@ -58,7 +58,7 @@ import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "block", "register", "unit", "offset", "address", "field", "bits",
-           "mask", "purpose", "#", "confidence", "basis"]
+           "mask", "purpose", "confidence", "basis"]
 # RM のレジスタ見出し。`12.4.2 比较器控制寄存器（OPA_CTLR2）` の題が**どの周辺の
 # レジスタか**を言う——CH32X035 は OPA block の CTLR1 が OPA、CTLR2 が CMP で、
 # 名前からは分からない。
@@ -272,12 +272,12 @@ def main() -> int:
                 lo, width = said
                 if (lo, lo + width - 1) == span:
                     confidence = "confirmed"
-                    basis.append(f"rm({manual_name})")
+                    basis.append(f"rm:{manual_name}")
                 else:
                     confidence = "conflict"
                     hi = lo + width - 1
-                    basis.append(f"!rm({manual_name})(={hi}:{lo})" if hi != lo
-                                 else f"!rm({manual_name})(={lo})")
+                    basis.append(f"!rm:{manual_name}(bits={hi}:{lo})" if hi != lo
+                                 else f"!rm:{manual_name}(bits={lo})")
             # 持ち主: RM の見出し。無ければレジスタ名の綴り（M030 の CMP_CTLR、
             # V205 の OPA_CFGR1）、それも無ければ空——推測しない。
             unit = next((units[r] for r in candidates if r in units), "")
@@ -310,12 +310,12 @@ def main() -> int:
         # 1 family だけ回したときは他 family の行を残す（全 RM を読み直すと長い）。
         with dest.open(newline="", encoding="utf-8") as f:
             kept = [r for r in csv.DictReader(f) if r["family"] != args.family]
-        rows = [{k: r.get(k, "") for k in COLUMNS if k != "#"} for r in kept] + rows
+        rows = [{k: r.get(k, "") for k in COLUMNS} for r in kept] + rows
         rows.sort(key=lambda r: (r["family"], r["block"], r["register"], r["field"]))
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

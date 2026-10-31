@@ -73,7 +73,7 @@ import paths  # noqa: E402
 
 COLUMNS = ["part_number", "value", "code_bytes", "sram_bytes",
            "datasheet_value", "option_byte_bits", "obr_bits",
-           "condition", "#", "confidence", "basis"]
+           "condition", "confidence", "basis"]
 
 # "00x：CODE-192KB + RAM-128KB" / "1：CODE-576KB + RAM-136KB"。CH32V407 は
 # 1bit なので値が1文字になる。区切りは全角コロンで、English 版も全角のまま。
@@ -395,24 +395,27 @@ def main() -> int:
                 obr_bits = (f"[{option[0] + user_shift}:"
                             f"{option[1] + user_shift}]")
             confidence = "confirmed" if len(entry["langs"]) > 1 else "reference"
-            basis = [f"rm({document}:{lang}(p.{page}))"
+            basis = [f"rm:{document}:{lang}(p.{page})"
                      for lang, page in sorted(entry["page"].items())]
             if field_span:
                 stated = field_span[0] - field_span[1] + 1
+                header_bits = f"[{field_span[0]}:{field_span[1]}]"
+                dissent = False
                 if stated != width:
-                    confidence = "conflict"
+                    confidence, dissent = "conflict", True
                     notes.append(
                         f"{family}: EVT header の FLASH_OBR フィールドは "
                         f"[{field_span[0]}:{field_span[1]}]（{stated}bit）だが、"
                         f"RM の符号は {width}bit 要る（{width}bit 無いと "
                         + " と ".join(sorted(v for v in entry["values"] if "x" not in v))
                         + " が区別できない）")
-                elif obr_bits and obr_bits != f"[{field_span[0]}:{field_span[1]}]":
-                    confidence = "conflict"
+                elif obr_bits and obr_bits != header_bits:
+                    confidence, dissent = "conflict", True
                     notes.append(
                         f"{family}: EVT header の FLASH_OBR フィールドは "
                         f"[{field_span[0]}:{field_span[1]}] だが、RM は {obr_bits} と書く")
-                basis.append(f"evt({family})")
+                # EVT header が FLASH_OBR の幅を違って書くときは、その幅を異論として名指す。
+                basis.append(f"!evt({family})(obr_bits={header_bits})" if dissent else f"evt({family})")
             if ld:
                 basis.append("evt(Link.ld)")
 
@@ -467,7 +470,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行  "
           f"part {len({r['part_number'] for r in rows})}", file=sys.stderr)
     for note in dict.fromkeys(notes):

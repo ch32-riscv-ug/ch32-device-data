@@ -44,8 +44,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "number", "name", "kind", "description", "condition",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "number", "name", "kind", "description", "condition", "confidence", "basis"]
 # EVT のヘッダーだけが言う。RM の表が second reading になる。
 CONFIDENCE = "reference"
 
@@ -195,7 +194,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     seen_families = sorted({r["family"] for r in rows})
     conditional = sum(1 for r in rows if r["condition"])
     print(f"{dest}: {len(rows)} 行  family {len(seen_families)}"

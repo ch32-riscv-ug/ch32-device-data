@@ -79,14 +79,11 @@ MIRRORS = Path("/home/mt/dev_wch")
 # mention pick up the wrong tree.
 CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
                   "hpre", "ppre1", "ppre2", "fpre", "pll",
-                  "flash_latency", "flash_sck_div", "flash_writes", "outside_rcc",
-                  "#", "confidence", "basis"]
-PRESCALER_COLUMNS = ["family", "field", "divider", "value",
-                     "#", "confidence", "basis"]
+                  "flash_latency", "flash_sck_div", "flash_writes", "outside_rcc", "confidence", "basis"]
+PRESCALER_COLUMNS = ["family", "field", "divider", "value", "confidence", "basis"]
 SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
-                  "condition", "#", "confidence", "basis"]
-SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value",
-                  "#", "confidence", "basis"]
+                  "condition", "confidence", "basis"]
+SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value", "confidence", "basis"]
 # The only table with an order column, because the order is transcribed rather
 # than decided: `RCC->CTLR |= 1` has to precede clearing SW or the chip has no
 # clock left to run on. The configuration functions are transcribed the same way
@@ -94,7 +91,7 @@ SYMBOL_COLUMNS = ["family", "symbol", "role", "register", "address", "value",
 # USBHS PLL before selecting it, and V407 unlocks FLASH before changing SCKMOD.
 # The rows say the order the EVT writes, not an order this repository chose.
 INIT_COLUMNS = ["family", "function", "step", "action", "register", "address",
-                "value", "source", "condition", "#", "confidence", "basis"]
+                "value", "source", "condition", "confidence", "basis"]
 
 BASIS = "evt(system_ch32*.c)"
 PRESCALER_BASIS = "evt(device-header)"
@@ -175,7 +172,7 @@ def main() -> int:
                 # consumer believes decides whether the widest value fits, so
                 # both readings are carried rather than one being chosen.
                 confidence = "conflict"
-                basis = f"{basis}+!evt(device-header-comment:{entry['disagreement']})"
+                basis = f"{basis}+!evt:device-header-comment(value={entry['disagreement']})"
             symbol_rows.append({
                 "family": family, "symbol": entry["symbol"],
                 "role": entry["role"],
@@ -231,7 +228,7 @@ def main() -> int:
         with dest.open("w", encoding="utf-8", newline="") as out:
             writer = csv.DictWriter(out, fieldnames=columns)
             writer.writeheader()
-            writer.writerows({**row, "#": "#"} for row in rows)
+            writer.writerows(rows)
         print(f"{dest}: {len(rows)} 行", file=sys.stderr)
 
     staged = [r for r in config_rows if r["domains"].count("=") > 1]

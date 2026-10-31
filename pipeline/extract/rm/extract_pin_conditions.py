@@ -91,7 +91,7 @@ import bundle_pages  # noqa: E402
 import extract_remap  # noqa: E402
 import paths  # noqa: E402
 
-COLUMNS = ["series", "signal", "condition", "pad", "errata", "#", "confidence", "basis"]
+COLUMNS = ["series", "signal", "condition", "pad", "errata", "confidence", "basis"]
 
 MIRRORS = Path("/home/mt/dev_wch")
 # datasheet の注記。「…の既定の映射が自動で…へ変わる」。
@@ -393,7 +393,7 @@ def main() -> int:
                 key = (row["signal"], row["condition"])
                 entry = seen.setdefault(key, {**row, "said": {}})
                 entry["said"][lang] = (row["pad"],
-                                       f"rm:{lang}({document} p.{row['page']})")
+                                       f"rm:{document}:{lang}(p.{row['page']})")
         settled: dict[str, list[dict]] = collections.defaultdict(list)
         for (signal, condition), entry in seen.items():
             said = entry["said"]
@@ -426,7 +426,7 @@ def main() -> int:
                         if (note["signal"] != row["signal"] or note["pad"] != row["pad"]
                                 or note["terms"] != terms):
                             continue
-                        row["basis"] += f"+ds:{lang}({note['document']} p.{note['page']})"
+                        row["basis"] += f"+ds:{note['document']}:{lang}(p.{note['page']})"
                         if note["errata"]:
                             row.setdefault("errata_ids", set()).add(note["errata"])
                         corroborated += 1
@@ -461,7 +461,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**{c: r.get(c, "") for c in COLUMNS}, "#": "#"} for r in out_rows)
+        writer.writerows({c: r.get(c, "") for c in COLUMNS} for r in out_rows)
     tally = collections.Counter(r["confidence"] for r in out_rows)
     linked = sum(1 for r in out_rows if r["errata"])
     # **注記が裏付けたのに errata に繋がらない行**は黙って流さない。理由は2つあって、

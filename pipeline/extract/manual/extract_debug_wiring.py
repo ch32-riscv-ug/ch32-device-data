@@ -41,8 +41,7 @@ import review_sidecar  # noqa: E402
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
-COLUMNS = ["series", "swdio_pad", "swclk_pad", "dual_support",
-           "#", "confidence", "basis"]
+COLUMNS = ["series", "swdio_pad", "swclk_pad", "dual_support", "confidence", "basis"]
 
 # chip群のtoken → このrepositoryのseries。**辞書に無いCH32 tokenは生成が落ちる**。
 OURS: dict[str, tuple[str, ...]] = {
@@ -211,7 +210,7 @@ def main() -> int:
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS)
         w.writeheader()
-        w.writerows({**{c: r.get(c, "") for c in COLUMNS}, "#": "#"} for r in rows)
+        w.writerows({c: r.get(c, "") for c in COLUMNS} for r in rows)
     from collections import Counter  # noqa: PLC0415
     print(f"{dest}: {len(rows)} 行 "
           f"{dict(Counter(r['confidence'] for r in rows))} "

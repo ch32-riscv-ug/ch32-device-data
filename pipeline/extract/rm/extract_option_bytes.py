@@ -49,10 +49,9 @@ import review_sidecar  # noqa: E402
 BUNDLES = REPO / ".cache" / "structured-bundles"
 
 BYTE_COLUMNS = ["family", "address", "offset", "byte", "complement_address",
-                "write_unit", "#", "confidence", "basis"]
+                "write_unit", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "byte", "bits", "field", "default",
-                 "wrpr_bit_protects", "option", "evt_argument", "evt_values",
-                 "#", "confidence", "basis"]
+                 "wrpr_bit_protects", "option", "evt_argument", "evt_values", "confidence", "basis"]
 
 STRUCTURE_CAPTION = re.compile(r"用户选择字信息结构|User option bytes? information structure")
 FIELDS_HEADER = re.compile(r"^(?:名称/字节|Name/Byte)$", re.IGNORECASE)
@@ -573,7 +572,7 @@ def main() -> int:
         with dest.open("w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=columns)
             w.writeheader()
-            w.writerows({**{c: r.get(c, "") for c in columns}, "#": "#"}
+            w.writerows({c: r.get(c, "") for c in columns}
                         for r in rows)
         print(f"{dest}: {len(rows)} 行 "
               f"{dict(Counter(r['confidence'] for r in rows))}", file=sys.stderr)

@@ -64,7 +64,7 @@ ARCH_IN_NAME = re.compile(r"[_-](X64|X86|X32|ARM64)[._-]", re.IGNORECASE)
 KIND_ORDER = ("toolchain", "ide", "ide-community", "components")
 
 COLUMNS = ["kind", "edition", "os", "arch", "version", "file", "size_bytes",
-           "released", "download_api", "#", "confidence", "basis"]
+           "released", "download_api", "confidence", "basis"]
 
 
 class ToolchainError(RuntimeError):
@@ -248,7 +248,7 @@ def differences(old: list[dict], new: list[dict]) -> list[str]:
         lines.append(f"- 増えた: {file} ({after[file]['kind']} {after[file]['version']})")
     for file in sorted(set(before) & set(after)):
         changed = [f"{c}: {before[file].get(c, '')!r} → {after[file][c]!r}"
-                   for c in COLUMNS if c != "#" and before[file].get(c, "") != after[file][c]]
+                   for c in COLUMNS if before[file].get(c, "") != after[file][c]]
         if changed:
             lines.append(f"- 変わった: {file} — " + " / ".join(changed))
     return lines

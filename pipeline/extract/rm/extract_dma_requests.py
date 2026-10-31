@@ -71,7 +71,7 @@ import signal_vocabulary  # noqa: E402
 # 残す）。en 版の綴りが違えば `request_en`。印の読み（selectable / default / remap）
 # と peripheral 名は索引 `index/dma.csv` が付ける（pipeline/build/build_index.py）。
 COLUMNS = ["family", "variant", "dma", "channel", "request_id", "request", "request_en",
-           "note", "#", "confidence", "basis"]
+           "note", "confidence", "basis"]
 
 HEAD_FIRST = re.compile(r"^(外设|Peripheral)s?$", re.IGNORECASE)
 HEAD_CHANNEL = re.compile(r"^(?:通道|Channel)\s*(\d+)$", re.IGNORECASE)
@@ -385,7 +385,7 @@ def main() -> int:
             for r in rows:
                 k = key(r)
                 entry = seen.setdefault(k, {**r, "langs": {}, "spelled": {}})
-                entry["langs"][lang] = f"rm:{lang}({document} p.{r['page']})"
+                entry["langs"][lang] = f"rm:{document}:{lang}(p.{r['page']})"
                 entry["spelled"][lang] = r["verbatim"]
                 if r["note"] and not entry["note"]:
                     entry["note"] = r["note"]
@@ -426,7 +426,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         w = csv.DictWriter(out, fieldnames=COLUMNS)
         w.writeheader()
-        w.writerows({**{c: r.get(c, "") for c in COLUMNS}, "#": "#"} for r in out_rows)
+        w.writerows({c: r.get(c, "") for c in COLUMNS} for r in out_rows)
     tally = collections.Counter(r["confidence"] for r in out_rows)
     print(f"{dest}: {len(out_rows)} 行  family {len({r['family'] for r in out_rows})}  {dict(tally)}",
           file=sys.stderr)

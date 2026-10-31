@@ -35,8 +35,7 @@ FILE_LIKE = re.compile(r"\.[A-Za-z0-9]{1,4}(?:-[A-Za-z]{2})?$")
 # 表示値に中国語は載せられないので落とし、件数だけ報告する。
 CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 
-COLUMNS = ["family", "group", "example", "description",
-           "#", "confidence", "basis", "source"]
+COLUMNS = ["family", "group", "example", "description", "confidence", "basis", "source"]
 
 
 def parse_list(path):
@@ -165,7 +164,7 @@ def main():
             description = next((en_entries[k] for k in in_en if en_entries[k]), "")
             rows.append({
                 "family": repo.name, "group": group, "example": example,
-                "description": description, "#": "#",
+                "description": description,
                 "confidence": "confirmed" if len(evidence) >= 2 else "reference",
                 "basis": "+".join(evidence),
                 "source": lists.get("en", lists.get("zh", ("", {})))[0],

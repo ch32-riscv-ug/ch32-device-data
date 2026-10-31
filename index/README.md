@@ -6,12 +6,12 @@
 [Contract for consumers](#contract-for-consumers)). It holds two kinds of table:
 
 - **Facts published as read** ([Published as read](#published-as-read)): the key tables (families,
-  series, parts, packages, cores) and facts read from the documents and the EVT headers, written here
+  series, packages, cores) and facts read from the documents and the EVT headers, written here
   directly by their generators.
 - **Lookup tables** ([Tables](#tables)): derived by `pipeline/build/build_index.py` from the
-  [evidence](../evidence/README.md) (what the documents say, spelled as they spell it) and the tables
-  above, with names normalised -- and from nothing else: `tools/check_tables.py` verifies on every run
-  that each lookup row can be traced back to evidence rows.
+  [evidence](../evidence/README.md) (what the documents say, spelled as they spell it), the catalog and
+  the tables above, with names normalised -- and from nothing else: `tools/check_tables.py` verifies on
+  every run that each lookup row can be traced back to evidence rows.
 
 The split between `index/`, `evidence/` and `catalog/` is defined in
 [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese).
@@ -20,25 +20,25 @@ The split between `index/`, `evidence/` and `catalog/` is defined in
 
 | Question | Table |
 |---|---|
-| Which part meets my requirements? | [`parts.csv`](parts.csv) |
+| Which part meets my requirements? Its name, package, memory, clock, supply and peripheral counts | [`parts.csv`](parts.csv) |
 | Which parts have capability X, and how many of it? | [`capabilities.csv`](capabilities.csv) |
 | Where do the sources disagree with each other? | [`conflicts.csv`](conflicts.csv) |
 | Which series have feature X? | [`features.csv`](features.csv) |
 | What is this lead of this part? Which lead carries USART1 TX? | [`pinout.csv`](pinout.csv) |
 | Is the debug wiring 1-wire (SWIO) or 2-wire (SWDIO+SWCLK)? | [`debug_interfaces.csv`](debug_interfaces.csv) |
 | Which remap value routes the signal where I want it? | [`routes.csv`](routes.csv) |
+| Pads that move with which peripherals are enabled (not an AFIO remap) | [`pin_conditions.csv`](pin_conditions.csv) |
 | Registers and bit fields (header generation) | [`registers.csv`](registers.csv) |
 | Absolute register addresses | [`register_map.csv`](register_map.csv) |
 | DMA request -> channel | [`dma.csv`](dma.csv) |
 | Timers, with the channels that reach pins | [`timers.csv`](timers.csv) |
 | Which families share a register layout | [`register_layouts.csv`](register_layouts.csv) |
-| Part names, series, families, packages, cores | [`products.csv`](products.csv), [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) |
+| Series, families, packages, cores | [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) |
 | Chip ID, option bytes, flash geometry and programming | [`device_ids.csv`](device_ids.csv), [`option_bytes.csv`](option_bytes.csv), [`option_byte_fields.csv`](option_byte_fields.csv), [`flash_geometry.csv`](flash_geometry.csv), [`flash_program_method.csv`](flash_program_method.csv) |
 | Absolute maximum ratings | [`absolute_maximum_ratings.csv`](absolute_maximum_ratings.csv) |
-| Pads that move with which peripherals are enabled (not an AFIO remap) | [`pin_conditions.csv`](pin_conditions.csv) |
 | OPA/CMP and USB-PD register fields | [`opa_cmp_registers.csv`](opa_cmp_registers.csv), [`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
 | FLASH/SRAM split set by the option bytes | [`memory_configs.csv`](memory_configs.csv) |
-| WCH-Link firmware versions, and the versions measured to fail | [`link_firmware.csv`](link_firmware.csv), [`link_firmware_issues.csv`](link_firmware_issues.csv) |
+| WCH-Link firmware files, and the versions measured to fail | [`link_firmware.csv`](link_firmware.csv), [`link_firmware_issues.csv`](link_firmware_issues.csv) |
 | Clock tree, interrupts, memory map, operating conditions, errata | see [Published as read](#published-as-read) |
 | What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
@@ -46,14 +46,13 @@ The split between `index/`, `evidence/` and `catalog/` is defined in
 
 Every table is **one combined file** (every part, every family) and generators read it as is.
 CSV is for programs; people filter by part or feature in the viewer ([`pins.html`](../pins.html),
-served from GitHub Pages). There are no per-part copies -- they would only duplicate the file.
+served from GitHub Pages).
 
 ## The viewer
 
-`pins.html` reads `index/products`, `index/pinout`, `index/capabilities` and two evidence
-tables (`product_attributes`, `remap_fields`) -- 3.5 MB, 218 KB over the wire, parsed in about
-a quarter of a second. It has no per-series build output on purpose: a display cache would be a
-second copy of the index to keep in step.
+`pins.html` reads `index/parts`, `index/pinout`, `index/capabilities` and two evidence tables
+(`product_attributes`, `remap_fields`). It has no per-series build output: a display cache would be
+a second copy of the index to keep in step.
 
 | Parameter | Meaning |
 |---|---|
@@ -69,54 +68,89 @@ confidence: `~` one source only, `!` the two editions disagree, `?` after a rema
 no selector field could be tied to it. Clicking a remap value jumps to the selector's register
 row.
 
-## Rules
-
-- Names are normalised through `pipeline/common/signal_vocabulary.py` (`peripheral`, `role`, `port`, `gpio`).
-  **The original spelling sits in the next column** (`signal`, `spelled`, `define`), so every row
-  leads back to the evidence.
-- `confidence` is the confidence of the evidence rows used (the weakest, where several were
-  folded). `basis` is copied when the row maps 1:1 to an evidence row; wide tables such as
-  `parts.csv` say per column which evidence table to consult instead.
-- Data columns are English; everything right of `#` is provenance.
-- The index disagrees with the evidence in exactly one place: where a datasheet's pin table
-  states a remap value that the reference manual's remap grid contradicts, `pinout.route`
-  takes the grid's value (12 rows, CH32V103 TIM3). The evidence keeps the pin table's value as
-  `conflict` with `!rm-remap-grid(=remap-N)` in `basis`; the grid *defines* the value, the pin
-  table only quotes it.
-
 ## Contract for consumers
 
 - **Read only files under `index/`.** `catalog/` and `evidence/` are this repository's working layers and
-  may change shape at any time; what consumers need from them is copied here. If something you need is
-  not here, ask for it to be published (a data request) rather than reading around the surface.
-- **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (CSV and
+  may change shape at any time. If something you need is not here, ask for it to be published (a data
+  request) rather than reading around the surface.
+- **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (every CSV and
   `VERSION`) with its row count and sha256.
 - **Releases.** A tag `v<VERSION>.<n>` publishes a GitHub release carrying this directory as one zip
   (`ch32-device-data-index-<tag>.zip`: every CSV, `VERSION` and the two READMEs). The tag's first number
   always equals `VERSION`. Take the zip to build without the network, and check it against its own
   `manifest.csv`.
-- **Read columns by name, not by position.** Column order is not part of the contract.
+- **Read columns by name, not by position.** Column order is not part of the contract, and tables and
+  columns are added without notice.
 - **[`columns.csv`](columns.csv) describes every column** of every table here: `meaning`, `format`
   (`text`, `name`, `integer`, `decimal`, `hex`, `bits`, `reg-bits`, `list(;)`, `list(,)`, `list(|)`, `url`, `path`,
-  `marker`, or `enum(a|b|...)`) and what an `empty` cell means. `tools/check_tables.py` checks it against the
-  data (every column covered, enum values, integer/hex shapes, `never empty`), so it cannot silently go stale.
+  or `enum(a|b|...)`), what an `empty` cell means, and its `role`: `data`, or `provenance` for the
+  confidence and basis columns, which always come after the data columns. `tools/check_tables.py` checks it
+  against the data (every column covered, enum values, integer/hex shapes, `never empty`, provenance last).
 - **`columns.csv` `spelling` says whose spelling a column carries**: `fixed` = chosen by this repository
-  (catalog keys, assigned identifiers such as `routes.selector` and `operating_conditions.symbol`, normalised
+  (keys, assigned identifiers such as `routes.selector` and `operating_conditions.symbol`, normalised
   vocabulary such as `pinout.peripheral`/`role`); renaming an existing value raises `VERSION`, so match on
   these. `as-printed` = the datasheet's, reference manual's or EVT header's own spelling (`pinout.signal`,
   `memory_map.region`, `clock_symbols.symbol`, `operating_conditions.condition`); it follows the documents and
   can change when one is revised, without a `VERSION` change. `prose` = text for people, not for matching.
-  Empty = a value column (numbers, addresses, markers).
+  Empty = a value column (numbers, addresses).
 - **[`VERSION`](VERSION) is one integer.** A change that can break a consumer -- removing or renaming a
-  column, changing how a column is written, renaming a family or another key -- raises it first. Adding
-  tables, columns or rows does not. Changes are recorded in [docs/worklist.ja.md](../docs/worklist.ja.md)
-  and in this README.
-- **`confidence` is for you to act on.** Every row is this repository's answer; `conflict` means the sources
-  disagree and `basis` says which one was kept (both sides are in [`conflicts.csv`](conflicts.csv)).
-  Whether to use or drop such rows is the consumer's decision.
+  column, changing how a column is written, renaming a key or a `fixed` value -- raises it, and the
+  repositories that read this surface move with it. Adding tables, columns or rows does not.
+- **`family` is a unit of WCH's EVT packages**, named after its archive `<family>EVT.ZIP`. It is not a
+  product line and not a datasheet or reference-manual unit (`CH32V20x_30xDS0` spans CH32V20x and CH32V307;
+  CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow
+  and `VERSION` is raised.
+- **`confidence` is one of `confirmed`, `reference`, `conflict`**, and empty exactly when the value it
+  describes is empty (the column's `empty` says why). `confirmed` = two or more independent bases agree, or a
+  person checked the content and recorded the basis; `reference` = one basis, neither corroborated nor
+  contradicted; `conflict` = the bases disagree, the table kept one value, and `basis` names the other side.
+  A value made of several rows takes the weakest of them. What to do with each level is the consumer's
+  decision.
+- **`basis` follows one grammar** ([below](#basis)), so a program can read which document, edition and page
+  states a value, and which source disagrees with it.
 - What is guaranteed is the shape (columns, their meaning and spelling rules), provenance on every row,
   the invariants `tools/check_tables.py` checks, and regeneration when the sources change -- **not** that
   every row is true: where a document is wrong, the row is wrong and says so through `confidence`/`basis`.
+
+## basis
+
+A `basis` cell (and every `<column>_basis` cell) lists the sources of the value it sits next to.
+
+```
+basis    := term ("+" term)*                     terms are split on "+" outside parentheses
+term     := [mark] source [dissent]
+mark     := "!"   a source that states something else (always followed by a dissent)
+          | "?"   a check that could not be applied cleanly (not a disagreement)
+source   := [kind ":"] document [":" lang] ["(" locator ")"]
+          | kind [":" label] ["(" detail ")"]
+document := a document name from the catalog (ends in .PDF), with "@V<version>" for a past edition
+lang     := "zh" | "en"
+locator  := "p." <PDF page number> [";" detail]  |  detail
+dissent  := "(" column "=" value ("," column "=" value)* ")"
+```
+
+- `CH32V407DS0.PDF:zh(p.59)` = the Chinese edition of that datasheet, PDF page 59. The page number is the
+  PDF's own page index, the same number the structured preview uses
+  (`https://ch32-riscv-ug.github.io/ch32-device-data-preview/<document stem>.<lang>/pages/<NNNN>.md`).
+- `!CH32V007DS0.PDF:zh(max=115)` = that source states `max` as 115; the table kept the other value.
+  [`conflicts.csv`](conflicts.csv) collects every such term: `field` is the column, `kept` the table's value,
+  `alternative` the dissenting value.
+- `kind` names how the source was read: `pin-table:zh`, `products:en` (comparison table), `rm:<manual>`,
+  `rm-address:<manual>` (the chapter's absolute-address table), `rm-remap-grid`, `evt(<file>)`,
+  `evt-api(<file>)`, `measured:<date>(<record>)`, `rule:<name>`, and so on. The full list with a line each is
+  `KINDS` in `pipeline/common/basis_grammar.py`; `tools/check_tables.py` rejects a kind not in it.
+- Parentheses always pair; a `detail` or `value` may contain balanced parentheses, commas and `+`.
+
+## Rules
+
+- Names are normalised through `pipeline/common/signal_vocabulary.py` (`peripheral`, `role`, `port`, `gpio`).
+  **The original spelling sits in the next column** (`signal`, `spelled`, `define`), so every row
+  leads back to the evidence.
+- Data columns are English.
+- The index disagrees with the evidence in exactly one place: where a datasheet's pin table states a
+  remap value that the reference manual's remap grid contradicts, `pinout.route` takes the grid's value.
+  The evidence keeps the pin table's value as `conflict` with `!rm-remap-grid(route=remap-N)` in `basis`;
+  the grid *defines* the value, the pin table only quotes it.
 
 ## Published as read
 
@@ -124,7 +158,7 @@ Each generator writes these tables here directly (`paths.PUBLISHED`), one row pe
 `confidence` and `basis`. Every column is described in [`columns.csv`](columns.csv); how each table is
 read from the sources is in the [catalog README](../catalog/README.md) and the
 [evidence README](../evidence/README.md) under the same table name.
-Keys: `families`, `series`, `products`, `packages`, `cores`.
+Keys: `families`, `series`, `packages`, `cores`.
 From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_configs`, `clock_prescalers`,
 `clock_sources`, `clock_symbols`, `clock_init`, `clock_enables`, `pin_alternate`.
 Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
@@ -134,16 +168,22 @@ WCH-LinkUtility: `link_firmware`; measured failures: `link_firmware_issues`.
 
 ## Tables
 
-### `parts.csv` -- product comparison
+### `parts.csv` -- one row per part
 
-One row per part. Identity and headline specs from `index/products.csv` (`flash_bytes`,
-`sram_bytes`, `gpio_count`, `temperature`; per-column provenance lives there), `pins` from
-`index/packages`, `clock_max` / `vdd_min` / `vdd_max` from `index/operating_conditions`
-(`F_MAIN`, else `F_HCLK` -> `F_SYSCLK` -> `F_CORE`; `V_DD` envelope), and the comparison-table
-counts (`usart`, `spi`, `i2c`, `can`, `usb`, `adc`, `dac`, `opa`, `cmp`, `timers_advanced`,
-`timers_general`, `rtc`, `ethernet`) **verbatim** from `evidence/product_attributes` (`4`,
-`1/10`, `√`; two attributes landing in one column are joined with `;`). No counting rules are
-applied here -- `tools/check_counts.py` does the reconciliation.
+The part table. **Every value column has its own `<column>_confidence` and `<column>_basis`**:
+
+- identity and headline specs from the catalog (`part_number`, `series`, `family`, `package`,
+  `flash_bytes`, `sram_bytes`, `gpio_count`, `temperature`, `packing`, `listed_as`, `datasheet`), checked
+  between the comparison table and the ordering table;
+- `pins` from `packages.pin_count`;
+- `clock_max` / `vdd_min` / `vdd_max` from `operating_conditions` (`F_MAIN`, else `F_HCLK` -> `F_SYSCLK`
+  -> `F_CORE`; the `V_DD` envelope), with the confidence and basis of the rows used;
+- the comparison-table counts (`usart`, `spi`, `i2c`, `can`, `usb`, `adc`, `dac`, `opa`, `cmp`,
+  `timers_advanced`, `timers_general`, `rtc`, `ethernet`) **verbatim** from `evidence/product_attributes`
+  (`4`, `1/10`, `√`; two attributes landing in one column are joined with `;`). No counting rules are
+  applied here -- `tools/check_counts.py` does the reconciliation.
+
+`family`, `listed_as` and `datasheet` are names the catalog assigns, so they carry no confidence.
 
 ### `pinout.csv` -- part x lead x function
 
@@ -160,7 +200,7 @@ one row**, so `port`+`gpio` -> lead is a single lookup.
 | `signal` | the datasheet's spelling (`USART1_TX` / `TX1` / `UTX`) |
 | `route` | `main` (primary function, live at reset) / `default` (default alternate function: reachable without remap once in AF mode) / `remap-N` / `af-N`. **`main` and `default` are different things** and which column a datasheet uses varies by family |
 | `selector`, `value` | the AFIO selector that picks this route (`afio-tim2-remap`) and its value; key into `routes.csv`; `0` for `default`/`main`; empty when no selector applies |
-| `af` | N of `af-N` (AF-number families: V205, X315, H41x); the register lives in `index/pin_alternate` |
+| `af` | N of `af-N` (AF-number families: V205, X315, H41x); the register lives in `pin_alternate` |
 
 Not listed: a pad's own GPIO name as its primary function (`PA9` -> `PA9`) and power pads. Pads
 whose name *is* the function (`NRST`, `OSC_IN`, `BOOT0`) are listed. Spellings the vocabulary
@@ -171,39 +211,39 @@ cannot read are not listed; their count is pinned to 0 in `tools/check_tables.py
 One row per (series, selector, value, signal): `evidence/remap_fields` (register and bits of the
 selector) joined with `evidence/remap_routes` (signal and pad per value), plus `peripheral`,
 `role`, `port`, `gpio`. `controller` is the block that owns the selector's register (`afio`, or
-`extend` for the EXTEN block; from `remap_fields`, added 2026-09-30 for R-33). `register` reads
-`PCFR1|PCFR2` when a field spans two registers.
+`extend` for the EXTEN block). `register` reads `PCFR1|PCFR2` when a field spans two registers. A route
+that holds only when certain peripherals are enabled is completed by `pin_conditions.csv`.
 
 ### `registers.csv` -- family x type x register x field
 
-One row per (register, bit define): `evidence/registers` (struct offsets) joined with
-`evidence/register_fields`. Registers without defines get one row with `field` empty. `type` is
-the EVT `*_TypeDef` stem; `register` the struct member, arrays per element (`EXTICR[1]`, offset =
+One row per bit define, plus one row per register the header gives no bit defines for. `kind` says which:
+`field` (a bit field), `value` (an enumerated value within a field, `of_field` names the field), or
+`register` (the register alone). A register with bit defines appears only on its field and value rows,
+each repeating the register's `offset`, `width_bits` and `count`.
+
+`type` is the EVT `*_TypeDef` stem; `register` the struct member, arrays per element (`EXTICR[1]`, offset =
 first + index x width) and nested structs flattened (`sTxMailBox[0].TXMIR`). **`register` is the
 header's own spelling, so the same register can be spelled differently across families**: AFIO's
 EXTI configuration is an array `EXTICR[0]`..`EXTICR[3]` in most families (`EXTICR[0]`/`[1]` on X035),
-one member `EXTICR` on V003/V006/M030, and two members `EXTICR1`/`EXTICR2` on H417 (offsets
-0x03c/0x040). The names are not normalised (that would invent names the header does not have);
-to find "the k-th word" of such a register, order the rows of that `type` by `offset`. `field` is the
-readable name, `define` the EVT spelling (`RCC_APB2PCENR_USART1EN`). Rows with an empty
-`offset` are defines whose banner could not be tied to a struct member (911). `access` /
-`reset` come from the reference manual's field table (Chinese edition), matched by name.
-`access_confidence`/`access_basis` say whether the English edition prints the same term
-(`conflict` rows are also in `conflicts.csv`); see the evidence README for the manual's access terms
-and the 16 fields that print an undefined one.
+one member `EXTICR` on V003/V006/M030, and two members `EXTICR1`/`EXTICR2` on H417. The names are not
+normalised (that would invent names the header does not have); to find "the k-th word" of such a
+register, order the rows of that `type` by `offset`. `field` is the readable name, `define` the EVT
+spelling (`RCC_APB2PCENR_USART1EN`). Rows with an empty `offset` are defines whose banner could not be
+tied to a struct member. `access` / `reset` come from the reference manual's field table (Chinese
+edition), matched by name; `access_confidence`/`access_basis` say whether the English edition prints the
+same term.
 
 **Where the header and the manual put a field at different bits and a bench measurement has
 settled it, this index takes the measured position** (`bits`/`mask`), while the row keeps
 `confidence=conflict` and a `basis` that shows both documents and the measurement -- the same
-rule as `pinout.csv` taking the RM remap grid's value. Today that is CH32L103 `FLASH_OBR`
-`DATA0`/`DATA1`: the header says `[17:10]`/`[25:18]`, the manual `[19:12]`/`[27:20]`, and
-writing data bytes 0x5a/0xc3 then reading `FLASH_OBR` over WCH-LinkE showed the manual is right
-(`basis` ends `obr-readback:wch-linke(=19:12)`). `evidence/register_fields.csv` keeps the header's
-bits, because it records what the documents say.
+rule as `pinout.csv` taking the RM remap grid's value. CH32L103 `FLASH_OBR` `DATA0`/`DATA1` is such a
+case: the header says `[17:10]`/`[25:18]`, the manual `[19:12]`/`[27:20]`, and reading `FLASH_OBR` back
+over WCH-LinkE showed the manual is right (`basis` ends `obr-readback:wch-linke(bits=19:12)`).
+`evidence/register_fields.csv` keeps the header's bits, because it records what the documents say.
 
 ### `register_map.csv` -- absolute addresses
 
-One row per (family, block, register): `index/register_blocks` base addresses x `registers`,
+One row per (family, block, register): `register_blocks` base addresses x `registers`,
 `address = base + offset`. Blocks whose struct is not in the header (`USBHSH` on V407/X315) get
 one row with `register` empty.
 
@@ -218,16 +258,16 @@ one row with `register` empty.
 
 `evidence/timers` (kind, counter width, update vector from the RM) plus `channels` (highest
 channel number reaching a pin, counted from `pinout.csv` -- not the silicon's limit) and
-`complementary` (`1` if any `CHxN` reaches a pin).
+`complementary` (`1` if any `CHxN` reaches a pin). A timer that exists only in some variants names them
+in `condition`.
 
 ### `capabilities.csv` -- part x capability, long format
 
 One row per (part, capability, qualifier, source attribute), from
-`evidence/product_attributes` alone (by `pipeline/build/build_capabilities.py`). `parts.csv` is the
-comparison table laid out wide and can hold 13 of the 158 attribute spellings as columns; this
-table holds all of them as rows, under a normalised capability name, so a query does not have to
-know that "how many SPI" is spelled `spi` in one family and `communication_interfaces_spi` in
-another.
+`evidence/product_attributes` alone (by `pipeline/build/build_capabilities.py`). `parts.csv` lays the
+comparison table out wide in 13 columns; this table holds every attribute as a row, under a normalised
+capability name, so a query does not have to know that "how many SPI" is spelled `spi` in one family and
+`communication_interfaces_spi` in another.
 
 | Column | Meaning |
 |---|---|
@@ -247,53 +287,39 @@ comparison table has no such row", and the table cannot tell the two apart. Do n
 `adc` is the **unit** count and `adc-channel` the **channel** count; the source spells both "ADC"
 in places (`adc` = `8+2` channels, `adc_unit` = `2` units), which is why the attribute-to-capability
 map is an exhaustive dictionary rather than a set of patterns. Clock, voltage, flash, SRAM and GPIO
-rows are carried too, so the comparison table is fully represented -- but for those,
-`parts.csv` has the better-sourced value (`index/operating_conditions`, `index/products`)
-rather than the comparison table's prose (`Max: 144MHz`).
+rows are carried too, so the comparison table is fully represented -- but for those, `parts.csv` has the
+better-sourced value rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree
 
-One row per `conflict` mark anywhere in `catalog/` and `evidence/` (200 today), by
-`pipeline/build/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
-keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
-"show me every spec the two editions disagree on" meant grepping all of them.
+One row per `conflict` mark in any table, by `pipeline/build/build_conflicts.py`. The tables never
+resolve a disagreement by picking a side silently; they keep one value, mark the row `conflict`, and name
+the other side in `basis`. This table collects those marks.
 
 | Column | Meaning |
 |---|---|
 | `table`, `subject` | where the row lives, and its key columns as `col=value` |
-| `field`, `kept` | the column in dispute and the value the table kept -- filled when the mark is per-column, when the basis names a real column of that table, or when the table asserts one value per row (`pin_functions.route`, `product_attributes.value`, `register_fields.bits`). Empty where a row asserts several values and the basis says which one differs |
+| `field` | the column in dispute: the column of a per-column confidence, else the column the dissent names. Several columns are joined with `;` |
+| `kept` | the table's value of `field` |
 | `dissenting` | the sources marked `!` in `basis` |
-| `alternative` | what those sources state, from `(=...)` in `basis` |
+| `alternative` | what those sources state for `field` |
 
-**125 rows carry an alternative and 75 do not.** `memory_configs` (67) and `timers` (1) record
-their disagreement in prose rather than in the basis DSL, so the empty cell means "read that
-table's section of [evidence/README.md](../evidence/README.md)".
-
-**A `conflict` mark is not always a disagreement about the fact.** The 24 `product_attributes`
-rows mix real differences (`2 (OPA1/3)` against `1 (OPA1)`) with wording (`Typical: 72MHz`
-against `Typ. 72MHz`). ~~Eight `operating_conditions` rows were spelling only~~ -- those were
-taken out of the comparison on 2026-09-09 (units `mS`/`ms` and values `0.8VDD`/`0.8*VDD`,
-`VI/O`/`VIO` are normalized before matching), so the 16 that remain are document
-disagreements adjudicated against the original. For a Chinese dissent, `alternative` is the
-translated reading the basis carries, not the original spelling.
-
-`operating_conditions` states four values per row (`min`/`typ`/`max`/`unit`) and which one is
-disputed varies, so those rows leave `field` empty and name the columns inside `alternative`
-(`min=60,typ=82,max=110`).
+**A `conflict` mark is not always a disagreement about the fact.** Some `product_attributes` rows differ in
+wording only (`Typical: 72MHz` against `Typ. 72MHz`), and `option_byte_fields` rows whose `field` is `field`
+differ in the spelling of the field's name, not in its bits or default. Read `field` to tell them apart.
+For a Chinese dissent, `alternative` is the translated reading the basis carries, not the original spelling.
 
 ### `debug_interfaces.csv` -- is the debug wiring 1-wire or 2-wire?
 
-By `pipeline/build/build_debug_interfaces.py` (for flashing tools; request R-29). One row per series.
-`debug_if` comes from crossing two pieces of evidence: **the datasheet's debug section
-heading** (`evidence/features.csv`: `1-wire` -> `swio`, `2-wire` -> `rvswd`) and **the
-WCH-Link manual's wiring table plus its dual-support note** (`evidence/debug_wiring.csv`);
-`both` means the manual lists the series as supporting 1-wire and 2-wire. A stated heading
-must not contradict the manual (`swio` is consistent with `both` as a subset). **All 27
-series are decided** (swio 3, rvswd 11, both 13). Two exceptions: the manual lumps
-V002/V004 into the dual-support group (SWCLK=PB3), but their pin tables carry no SWCLK and
-the headings say 1-wire -- the heading wins and the manual's dissent is recorded in basis
-(`!WCH-LinkUserManual.PDF(...)`). `swdio_pads`/`swclk_pads` copy the normalised pads from
-`index/pinout.csv`; the build also verifies the manual's pads exist there.
+By `pipeline/build/build_debug_interfaces.py`. One row per series. `debug_if` comes from crossing two pieces
+of evidence: **the datasheet's debug section heading** (`evidence/features.csv`: `1-wire` -> `swio`,
+`2-wire` -> `rvswd`) and **the WCH-Link manual's wiring table plus its dual-support note**
+(`evidence/debug_wiring.csv`); `both` means the manual lists the series as supporting 1-wire and 2-wire. A
+stated heading must not contradict the manual (`swio` is consistent with `both` as a subset). Where the
+manual lumps V002/V004 into the dual-support group (SWCLK=PB3) but their pin tables carry no SWCLK and the
+headings say 1-wire, the heading wins and the manual's dissent is recorded in basis
+(`!WCH-LinkUserManual.PDF(swclk=PB3,dual=yes)`). `swdio_pads`/`swclk_pads` copy the normalised pads from
+`pinout.csv`; the build also verifies the manual's pads exist there.
 
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 
@@ -302,14 +328,14 @@ whether the comparison table (`part`) or a datasheet section heading (`datasheet
 A feature with no section heading at all (CH32V208's Ethernet appears only in the overview and
 block diagram) is tagged from the comparison table alone when the tag already exists from another
 datasheet's headings and is the last token of the attribute name; `features`/`sections` are then empty
-and `basis` is `attributes(...)` (2026-10-21, 25 rows).
+and `basis` is `attributes(...)`.
 `register_layouts.csv` (by `pipeline/extract/rm/extract_registers.py`): (family, type) -> layout hash; equal
-hashes share register definitions. `manifest.csv`: path, row count and sha256 of every other CSV
-here.
+hashes share register definitions. `manifest.csv`: path, row count and sha256 of every CSV here and of
+`VERSION`.
 
 ```sh
 uv run pipeline/build/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)
 uv run pipeline/build/build_conflicts.py      # conflicts.csv (likewise)
-uv run pipeline/build/build_index.py          # rebuild everything (seconds; evidence must be current)
-uv run tools/check_tables.py         # index ⊆ evidence, manifest matches
+uv run pipeline/build/build_index.py          # the lookup tables and the manifest (seconds; evidence must be current)
+uv run tools/check_tables.py                  # index ⊆ evidence, manifest matches, basis grammar
 ```

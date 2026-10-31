@@ -43,8 +43,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "common"))
 import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "repository", "commit", "committed_at", "dirty",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "repository", "commit", "committed_at", "dirty", "confidence", "basis"]
 
 
 def git(repo: Path, *args: str) -> str | None:
@@ -121,7 +120,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     stale = sum(1 for r in rows if r["dirty"])
     print(f"{dest}: {len(rows)} 行"
           + (f"  うち未コミットの変更あり {stale}" if stale else ""), file=sys.stderr)

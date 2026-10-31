@@ -12,7 +12,7 @@ each family repository from it. The tables come in three kinds
 |---|---|---|
 | [`index/`](index/README.md) | **the public surface**: the key tables (families, series, parts, packages, cores), the facts published as read, and lookup tables derived from the evidence with normalised names; filter by part or feature in the viewer (`pins.html`) | users and generators |
 | [`evidence/`](evidence/README.md) (15 tables) | the material the index is derived from: what the documents say, **spelled as they spell it**, every row with its provenance (`basis`) and confidence (`confidence`) | anyone checking correctness |
-| [`catalog/`](catalog/README.md) (3 tables) | the documents, the mirror commits and the upstream tool versions the tables are built from | maintainers |
+| [`catalog/`](catalog/README.md) (4 tables) | the part catalogue (published through `index/parts.csv`), and the documents, mirror commits and upstream tool versions the tables are built from | maintainers |
 
 This repository does not declare Arduino core support for any part.
 
@@ -26,7 +26,7 @@ gains a PDF, the rules, and the working conventions for the structured-PDF pipel
 
 ## Layout
 
-- `catalog/`, `evidence/`, `index/`: the three kinds of table above. Data columns left of `#`, provenance to the right. `pipeline/common/paths.py` is the one place that knows where each table lives
+- `catalog/`, `evidence/`, `index/`: the three kinds of table above. Data columns first, then the confidence and basis columns. `pipeline/common/paths.py` is the one place that knows where each table lives
 - `.cache/candidates/*.json`: per-SKU machine extraction written by `build_all.py` (not committed; input to `build_pins`, `build_remap`, `build_tables`)
 - `curated/`: the few hand-verified overrides (pin-table column headers, errata, series facts)
 - `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it ([manifests/README.md](manifests/README.md))

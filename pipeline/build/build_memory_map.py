@@ -43,8 +43,7 @@ REPO = Path(__file__).resolve().parents[2]
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "region", "base_address", "kind", "condition",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "region", "base_address", "kind", "condition", "confidence", "basis"]
 # EVT だけが言う。reference manual のメモリマップ図が second reading になる。
 CONFIDENCE = "reference"
 
@@ -212,7 +211,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     seen = sorted({r["family"] for r in rows})
     tally = collections.Counter(r["kind"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len(seen)}  {dict(tally)}", file=sys.stderr)

@@ -2,19 +2,16 @@
 """資料どうしが食い違っている箇所を1表に集める → index/conflicts.csv
 
 **証拠は食い違いを片方に寄せず `conflict` として両論を残します**（`docs/handoff.ja.md`
-の規則）。ただしその記録は33の表に散っていて、「両版で食い違う仕様を全部見せて」
-に答えるには全表を grep するしかありませんでした（2026-08-29 の監査の指摘。
-`basis` が1セル内の DSL なので横断で引けない、というのがその内容）。
+の規則）。その記録は多くの表に散っているので、ここで1表に集めます。
 
-この索引はその一番安い切り出しです。**新しい事実は足しません**——`confidence` が
-`conflict` の行を集め、`basis` の DSL から「どの出所が異を唱えているか」
-（`!<source>`）と「その出所は何と言っているか」（`(=<value>)`）を取り出すだけ。
+新しい事実は足しません——`confidence` が `conflict` の行を集め、`basis`（文法は
+`pipeline/common/basis_grammar.py`）の `!` の項から「どの出所が異を唱えているか」と「その出所は何と
+言っているか」を、食い違う列の名前つきで取り出すだけです。
 
-    どの表の・何について・どの出所が・何と言っているか
+    どの表の・何について（field）・どの出所が（dissenting）・何と言っているか（alternative）
 
-`basis` が異論を DSL で書いていない表もあります（`memory_configs` の67行と
-`timers` の1行）。**そこは空欄になり、それ自体が「食い違いは散文で記録されている」
-という情報**です——`evidence/README` の当該節を読むしかない、と分かります。
+`basis` に `!` の項が無い conflict の行（食い違いを散文で記録している行）は、表ごとの主張の列
+（`ASSERTS`）があればそれを `field` にし、`dissenting` と `alternative` は空になります。
 
 実行:
     uv run pipeline/build/build_conflicts.py [--out <dir>]
@@ -30,10 +27,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
+import basis_grammar  # noqa: E402
 import paths  # noqa: E402
 
 COLUMNS = ["table", "family", "series", "part_number", "subject", "field",
-           "kept", "dissenting", "alternative", "#", "basis"]
+           "kept", "dissenting", "alternative", "basis"]
 
 # その表の行を名指すのに要る列。**総当たりで持つ**——表を足したら、その行を
 # どう名指すかを決めないと生成が落ちる。値の列は入れない（行を指す鍵だけ）。
@@ -92,41 +90,9 @@ KEYS: dict[str, tuple[str, ...]] = {
     "esig": ("family", "register"),
 }
 
-# `basis` の DSL。異を唱える出所は `!` で始まり、その出所が言う値は `(=…)`。
-#   `pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)`
-#   `evt(ch32l103.h)+!rm(CH32L103RM.PDF)(=29:24)`
-#   `evt(ch32v10x_flash.c)+rm(CH32xRM.PDF)+!evt-comment:fast_program_bytes(=256)`
-# **括弧は入れ子になる**（`!products:zh(=1（OPA1）)`）ので、`(=` からは対応する
-# 閉じ括弧まで数えて取る。正規表現の最短一致だと値を途中で切る。
-def dissenting_tokens(basis: str) -> list[str]:
-    """`basis` の `!` で始まる項。**`+` は括弧の外だけが区切り**。
-
-    値そのものに `+` が入る（`!…:zh(typ=V+VCC12VS)`）ので、素朴に `+` で
-    割ると値が途中で切れる。
-
-    >>> dissenting_tokens("a(p.1)+!b:zh(typ=V+VCC12VS)+c")
-    ['b:zh(typ=V+VCC12VS)']
-    >>> dissenting_tokens("pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)")
-    ['rm-remap-grid(=remap-2)']
-    """
-    out, depth, token = [], 0, []
-    for ch in basis:
-        if ch == "(":
-            depth += 1
-        elif ch == ")":
-            depth -= 1
-        if ch == "+" and depth == 0:
-            out.append("".join(token))
-            token = []
-        else:
-            token.append(ch)
-    out.append("".join(token))
-    return [t[1:].strip() for t in out if t.startswith("!") and t[1:].strip()]
-# 異を唱える出所が列名を名乗ることがある（`!evt-comment:fast_program_bytes(=256)`）。
-# **その表に本当にある列のときだけ採る**——`!products:zh(=…)` の `zh` や
-# `!rm-remap-grid(=…)` の `grid` は出所の名前であって列ではないので、
-# 綴りの形だけで決めると列名でないものを列名として書いてしまう。
-NAMES_FIELD = re.compile(r"[:\-]([a-z][a-z0-9_]*)\(=")
+# `basis` の文法は `pipeline/common/basis_grammar.py`。異を唱える出所は `!` で始まり、その出所が言う値を
+# 食い違う列の名前つきで持つ（`!CH32V007DS0.PDF:zh(max=115)`・`!rm-remap-grid(route=remap-2)`）。
+# 列の名前が `field` に、その出所の値が `alternative` に、採った値が `kept` に入る。
 
 # **その表が1行につき主張している列。** 行ごと `conflict` と印が付く表では、
 # 食い違っているのはこの列の値。鍵（KEYS）と同じで表の形についての静的な事実で、
@@ -148,44 +114,6 @@ ASSERTS: dict[str, str] = {
 # 違うのが当たり前**（版面の割り付けが違う）——この表は構造上 `conflict` を持たない。
 
 
-# 相手の値の書き方は表で3通りある。1つの値を争う表は `(=<値>)`、欄ごとに
-# 争う表（`operating_conditions`）は `(min=…,typ=…,max=…,unit=…)`、
-# 新経路の抽出器は列名を名指す `(address=…)`・`(field=…)`・`(default=…)`。
-# どの `<列名>=` でも「相手の値」として中身ごと写す（`(p.614)` のような
-# ページ参照は `=` を含まないので巻き込まれない）。
-STATED = re.compile(r"\((?==|[a-z_][a-z0-9_]*=)")
-
-
-def stated_value(token: str) -> str:
-    """相手の出所が言う値。**括弧は入れ子になる**ので深さを数えて閉じを探す。
-
-    >>> stated_value("evt-comment:fast_program_bytes(=256)")
-    '256'
-    >>> stated_value("products:zh(=1（OPA1）)")
-    '1（OPA1）'
-    >>> stated_value("CH32V203DS0.PDF:zh(min=60,typ=82,max=110,unit=)")
-    'min=60,typ=82,max=110,unit='
-    >>> stated_value("CH32V203DS0.PDF:en")
-    ''
-    """
-    m = STATED.search(token)
-    at = m.start() if m else -1
-    if at == -1:
-        return ""
-    depth, out = 0, []
-    for ch in token[at:]:
-        if ch == "(":
-            depth += 1
-            if depth == 1:
-                continue
-        elif ch == ")":
-            depth -= 1
-            if depth == 0:
-                break
-        out.append(ch)
-    return "".join(out).lstrip("=").strip()
-
-
 def conflicts_in(name: str, rows: list[dict]) -> list[dict]:
     if not rows:
         return []
@@ -197,21 +125,20 @@ def conflicts_in(name: str, rows: list[dict]) -> list[dict]:
                 continue
             field = "" if column == "confidence" else column[:-len("_confidence")]
             basis = row.get("basis" if not field else f"{field}_basis", "") or ""
-            tokens = dissenting_tokens(basis)
-            named = [m.group(1) for t in tokens if (m := NAMES_FIELD.search("!" + t))
-                     and m.group(1) in row]
-            about = field or (named[0] if named else ASSERTS.get(name, ""))
+            dissents = [t for t in basis_grammar.parse(basis) if t["mark"] == "!" and t["dissent"]]
+            columns = list(dict.fromkeys(c for t in dissents for c in t["dissent"]))
+            about = [field] if field else (columns or ([ASSERTS[name]] if name in ASSERTS else []))
             out.append({
                 "table": name,
                 "family": row.get("family", ""),
                 "series": row.get("series", ""),
                 "part_number": row.get("part_number", ""),
                 "subject": " ".join(f"{k}={row.get(k, '')}" for k in key if row.get(k)),
-                "field": about,
-                "kept": row.get(about, ""),
-                "dissenting": ";".join(
-                    t[:m.start()] if (m := STATED.search(t)) else t for t in tokens),
-                "alternative": ";".join(v for t in tokens if (v := stated_value(t))),
+                "field": ";".join(about),
+                "kept": ";".join(row.get(c, "") for c in about),
+                "dissenting": ";".join(t["term"][1:t["term"].rfind("(")] for t in dissents),
+                "alternative": ";".join(t["dissent"].get(c, "") for t in dissents for c in about
+                                        if c in t["dissent"]),
                 "basis": basis,
             })
     return out
@@ -239,7 +166,7 @@ def main() -> int:
     tally = collections.Counter(r["table"] for r in rows)
     silent = sum(1 for r in rows if not r["dissenting"])
     print(f"{dest}: {len(rows)} 行  {dict(tally.most_common())}", file=sys.stderr)
-    print(f"  - 異論を basis の DSL に持たない行（食い違いは散文で記録）: {silent}",
+    print(f"  - basis に ! の項を持たない conflict の行（食い違いは散文で記録）: {silent}",
           file=sys.stderr)
     return 0
 

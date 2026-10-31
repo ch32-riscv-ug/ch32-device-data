@@ -54,8 +54,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "board", "parts", "revision", "kind", "path",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "board", "parts", "revision", "kind", "path", "confidence", "basis"]
 # EVT に入っているファイルそのもの。数え違いはあっても解釈の余地は無い。
 CONFIDENCE = "confirmed"
 
@@ -152,7 +151,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["kind"] for r in rows)
     unresolved = sum(1 for r in rows if r["kind"] == "board" and not r["parts"])
     print(f"{dest}: {len(rows)} 行  {dict(tally)}"

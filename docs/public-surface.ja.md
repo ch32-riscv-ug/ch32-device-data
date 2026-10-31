@@ -54,7 +54,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | 写し: 目録の鍵 | `families`・`series`・`products`・`packages`・`cores` | `products` の packing の3列を落とす（102行が空。consumer に意味が無い） |
 | 写し: 前の「安定」evidence 15表 | `interrupts`・`memory_map`・`systick`・`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`・`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` | `clock_configs.evt_copies`（一致した EVT 写しの数。生成の記録）を落とす |
 | 写し: 依頼で公開（R-33・R-34） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions` | `operating_conditions.datasheet` を落とす（`basis` にある） |
-| 表の説明 | `manifest.csv`（path・行数・sha256。CSV と `VERSION` を覆う）・`VERSION`（整数1つ。いま `1`） | manifest は生成、VERSION は人が上げる |
+| 表の説明 | `manifest.csv`（path・行数・sha256。CSV と `VERSION` を覆う）・`VERSION`（整数1つ） | manifest は生成、VERSION は人が上げる |
 
 写しの一覧と落とす列は `pipeline/common/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
 
@@ -96,7 +96,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
   止まる。これは正しい使い方）。両論は `conflicts.csv` にある
 - **family 名・schema の版**: `index/VERSION` を1つ持つ（表ごとではない）。**consumer を壊しうる変更**——
   列の削除・改名、列の書き方の変更、family などの鍵の改名——は先にこれを上げる。表・列・行を足すだけなら
-  上げない。したがって family 名は VERSION 1 の間は凍結
+  上げない。family は WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る
 
 ## 守らせ方
 

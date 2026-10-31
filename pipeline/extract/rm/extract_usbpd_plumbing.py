@@ -54,8 +54,7 @@ import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
-           "phy_block", "phy_register", "phy_field", "phy_bits", "phy_mask", "phy_address",
-           "#", "confidence", "basis"]
+           "phy_block", "phy_register", "phy_field", "phy_bits", "phy_mask", "phy_address", "confidence", "basis"]
 
 # PD の field だけ。`UDP_*`/`UDM_*`（USB の D+/D- pad 制御。X035 の AFIO_CTLR や
 # M030 の EXTEN_CTLR1 にある）は USB の配管で PD ではないので入れない——入れると
@@ -209,10 +208,10 @@ def main() -> int:
                     lo, width = said
                     if (lo, lo + width - 1) == span:
                         confidence = "confirmed"
-                        basis.append(f"rm({manual_name})")
+                        basis.append(f"rm:{manual_name}")
                     else:
                         confidence = "conflict"
-                        basis.append(f"!rm({manual_name})(={lo + width - 1}:{lo})")
+                        basis.append(f"!rm:{manual_name}(phy_bits={lo + width - 1}:{lo})")
                 base = bases.get(f"{block}_BASE")
                 offset = structs[block][register]
                 rows.append({**rcc, "phy_block": block, "phy_register": register,
@@ -224,7 +223,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

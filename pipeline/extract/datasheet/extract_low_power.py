@@ -604,7 +604,7 @@ def merge_editions(datasheet: str, series: str, en_rows: list[dict],
             basis = f"{datasheet}:en(p.{en_page})+!{datasheet}:zh({diff})"
         else:
             basis = f"{datasheet}:en(p.{en_page})"
-        out.append({**row, "series": series, "#": "#",
+        out.append({**row, "series": series,
                     "confidence": verdict, "basis": basis,
                     "datasheet": datasheet})
     return out
@@ -686,7 +686,7 @@ def main() -> int:
         with (args.out / name).open("w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=operating.COLUMNS)
             w.writeheader()
-            w.writerows({**{c: r.get(c, "") for c in operating.COLUMNS}, "#": "#"}
+            w.writerows({c: r.get(c, "") for c in operating.COLUMNS}
                         for r in rows)
 
     kinds = Counter(r["confidence"] for r in new_rows)

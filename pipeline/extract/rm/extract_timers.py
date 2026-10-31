@@ -58,8 +58,7 @@ import paths  # noqa: E402
 
 # `channels`/`complementary`（pin に出ているチャネルから数える導出）は索引
 # `index/timers.csv` が持つ（pipeline/build/build_index.py）。ここは RM と EVT の記述だけ。
-COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition", "confidence", "basis"]
 
 # `15.4.10 通用定时器的计数器（TIMx_CNT）（x=2/3/4）` と、単体の
 # `14.4.9 定时器的计数器（TIM1_CNT）`。前者は対象を x= で並べ、後者は名前が名乗る。
@@ -79,6 +78,8 @@ HEAD_ONE = re.compile(
 WIDTH = re.compile(r"\[(?P<hi>\d+):\d+\]\s*CNT|CNT\[(?P<hi2>\d+):\d+\]")
 # 幅が variant で変わるという注。`32位的TIM5_CNT仅适用于型号为…系列的产品`
 VARIES = re.compile(r"(?P<bits>\d+)位的TIM(?P<n>\d+)_CNT")
+# 同じ注の後半「其他系列芯片的TIM5_CNT为16位」——名指した variant 以外の幅。
+OTHERS = re.compile(r"其他[^。]*?TIM\d+_CNT为(?P<bits>\d+)位")
 MACRO = re.compile(r"CH32[A-Za-z0-9_]+")
 # 見出しの種類。資料の言い方をそのまま英語の呼び名へ。
 # 見出しの種類。資料の言い方をそのまま英語の呼び名へ。比較表も
@@ -141,13 +142,16 @@ def read_timers(bundle: str) -> tuple[list[dict], list[str]]:
                                  "page": stream[i][0]})
 
     # variant で幅が変わる注。
-    for line in lines:
+    for i, line in enumerate(lines):
         varies = VARIES.search(line)
         if varies:
             n = int(varies.group("n"))
             if n in found:
+                # 注は版面で折り返す（「其\n他系列」）ので次の行とつないで読む。
+                others = OTHERS.search(line + (lines[i + 1] if i + 1 < len(lines) else ""))
                 found[n]["_varies"] = (int(varies.group("bits")),
-                                       MACRO.findall(line))
+                                       MACRO.findall(line),
+                                       int(others.group("bits")) if others else None)
     return [found[n] for n in sorted(found)], notes
 
 
@@ -209,16 +213,20 @@ def main() -> int:
                 "update_vector": irq_of.get((family, timer["timer"]), ""),
                 # 幅が variant で変わるなら、その variant を条件に置く。
                 "condition": ";".join(applies),
-                "confidence": ("varies-by-package" if applies else
+                # variant で変わる幅は condition 列が言う。確度は RM の1つの根拠なので reference。
+                "confidence": ("reference" if applies else
                                "conflict" if varies else "reference"),
-                "basis": f"rm({document}:p{timer['page']})",
+                # 名指しされない family では、注の後半が言う幅を異論として名指す。
+                "basis": f"rm:{document}(p.{timer['page']})" + (
+                    f"+!rm:{document}(p.{timer['page']};note)(counter_width_bits={varies[2]})"
+                    if varies and not applies and varies[2] else ""),
             })
 
     dest = paths.table("timers", args.out)
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     wide = sum(1 for r in rows if r["counter_width_bits"] == 32)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}"
           f"  32bit {wide}", file=sys.stderr)

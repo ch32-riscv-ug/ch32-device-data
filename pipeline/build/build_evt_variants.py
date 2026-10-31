@@ -48,8 +48,7 @@ REPO = Path(__file__).resolve().parents[2]
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "macro", "part_number", "default",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "macro", "part_number", "default", "confidence", "basis"]
 BASIS = "evt(device-header-comment)"
 # One source, and prose at that. The reference manual does not use these names.
 CONFIDENCE = "reference"
@@ -134,7 +133,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行", file=sys.stderr)
     per_family = collections.Counter(r["family"] for r in rows)
     for family, n in sorted(per_family.items()):

@@ -20,7 +20,7 @@ The tables **to look things up in** (names normalised through the vocabulary, jo
 | Document spelling / value | `signal`, `pad`, `parameter`, `request`, `define` | As is. Only the type is normalised (number, hex, unit) |
 | **Assigned identifier** | `remap_fields.selector`, `operating_conditions.symbol`, `product_attributes.attribute`, `pins.kind`, `clock_symbols.role`, `opa_cmp_registers.unit` | A key the repository assigns to something the documents do not name. The document's spelling (`field`, `parameter`, `label_zh/en`, `type`) stays in the same row |
 | Catalog key | `part_number`, `series`, `family`, `document` | Normalised names (for joins) |
-| Provenance | `confidence` and `basis` to the right of `#` (per column for `products`) | On every row |
+| Provenance | `confidence` and `basis` after the data columns (per column for `products`) | On every row |
 
 Columns derived through the vocabulary (`peripheral`, `role`, `port`, `gpio`, and `channels` counted from pins) are
 **not** here; they are in the index.
@@ -92,7 +92,7 @@ Because the policy is that `route` preserves the document's column (spelling and
 
 Notation differences absorbed by cross-checking both language editions: shifted table numbers (X315: zh `表2-1-1` = en `Table 2-1`; matched by the series name in the caption), column-heading spelling (`QFN48×7`, `QFN28(6)`; zh `LQFP64M` = en image `LQFP64`, paired by elimination within the table), one column standing for several packages (`LQFP48/QFN48X7` is registered per component).
 
-**Rows where the pin table and the RM remap grid disagree** (TIM3 of CH32V103: the pin table writes `TIM3_CH1_1` on both PB4 and PC6, but the RM grid has PB4=2, PC6=3 and value 1 is not defined. F-41) are marked `conflict` **with the value as in the pin table**, and the basis lists `!rm-remap-grid(=remap-2)` alongside the grid's value. It is the index `index/pinout.csv` that adopts the grid's value.
+**Rows where the pin table and the RM remap grid disagree** (TIM3 of CH32V103: the pin table writes `TIM3_CH1_1` on both PB4 and PC6, but the RM grid has PB4=2, PC6=3 and value 1 is not defined. F-41) are marked `conflict` **with the value as in the pin table**, and the basis lists `!rm-remap-grid(route=remap-2)` alongside the grid's value. It is the index `index/pinout.csv` that adopts the grid's value.
 
 ### `product_attributes.csv`
 
@@ -151,7 +151,7 @@ Channel counts (`channels`, `complementary`) are not in this table; the index's 
 
 > 注：32位的TIM5_CNT仅适用于型号为CH32F20x_D8W、CH32V20x_D8、CH32V20x_D8W系列的产品，其他系列芯片的TIM5_CNT为16位。
 
-The named macros go in `condition` (held the same way as in `interrupts.csv`) and `confidence` is `varies-by-package`. **When another family sharing the same RM does not have that variant, it becomes `conflict`** -- CH32V307 shares its RM with CH32V20x but has none of the variants in the note, so it cannot be declared 32-bit.
+The named macros go in `condition` (held the same way as in `interrupts.csv`) and `confidence` is `reference`. **When another family sharing the same RM does not have that variant, it becomes `conflict`** -- CH32V307 shares its RM with CH32V20x but has none of the variants in the note, so it cannot be declared 32-bit.
 
 ### `flash_geometry.csv`
 
@@ -302,7 +302,7 @@ The derived **layout key** (family × type → hash of the structure's shape; fa
   `layout` per `type`. The key is a hash, so **it carries no meaning; it only says same or different**.
   It changes if even one definition on the header side changes (an edition bump can change it for the same silicon)
 - **Cross-checking against the RM covers only names whose spelling matched.** The `x`/`y` in the RM's `GPIOx_CFGLR`, `IDRy` are compared with the digits dropped.
-  Matched and same bit position → `confirmed`; different → `conflict` (`!rm(...)(=hi:lo)` in `basis`);
+  Matched and same bit position → `confirmed`; different → `conflict` (`!rm:<manual>(bits=hi:lo)` in `basis`);
   no same name in the RM → `reference`. **`reference` is not an error; it is awaiting corroboration**, and `value` rows are outside the check,
   so they are always `reference`
 - `conflict` is a genuine disagreement (e.g. CH32V003's `GPIO_LCKR.LCKK` is EVT bit8 / RM bit16;
@@ -1018,17 +1018,16 @@ reference is a disagreement between catalog and tree, a fact on the document sid
 
 ## Confirmation is "an overall judgement of the bases"
 
-Every CSV has a separator column whose name and every value are `#`; **everything to its right is metadata (confidence/basis), not the data proper**. Because that cell is `#` on every row, wherever you look in the file you can see the boundary "data ends here". When reading, dropping the columns from `#` onwards gives a plain data table. They are not split into a separate file so that data and metadata cannot drift apart structurally.
+The confidence and basis columns follow the data columns in every table (in `index/columns.csv` their `role` is `provenance`). They are not split into a separate file so that data and metadata cannot drift apart structurally.
 
 | `*_confidence` | Judgement |
 |---|---|
 | `confirmed` | Two or more independent bases agree, **or a person checked the content and recorded the basis** |
 | `reference` | Only one basis, with neither corroboration nor contradiction. A reference value |
 | `conflict` | Bases contradict each other. **Needs human judgement** |
-| `missing` | Not stated in any basis |
-| `partial` / `varies-by-package` | (series.csv only) uneven confidence among the members / package dependent |
+| (empty) | The value is empty, so there is nothing to be confident about (the column's `empty` in `index/columns.csv` says why) |
 
-**`conflict` is recorded per row, but the `!` marker in `basis` says which column is disputed.** `!evt-comment:fast_program_bytes(=256)` on the CH32V103 row of `flash_geometry.csv` means the disagreement is about `fast_program_bytes` alone -- the other columns of that row are not in dispute. A consumer that fails closed on `conflict` should read the `!` marker before dropping a whole row.
+**`conflict` is recorded per row, but the `!` marker in `basis` says which column is disputed.** `!evt-comment(fast_program_bytes=256)` on the CH32V103 row of `flash_geometry.csv` means the disagreement is about `fast_program_bytes` alone -- the other columns of that row are not in dispute. A consumer that fails closed on `conflict` should read the `!` marker before dropping a whole row.
 
 **Confirmation is not limited to automation.** A throwaway script presents the relevant passages, a person cross-checks both language editions, and if confirmed, the basis is recorded in `curated/`. Core and ISA are done this way (`curated/series-facts.json`, checked 2026-08-18).
 
@@ -1063,8 +1062,8 @@ Unit words (`8-channel`↔`8路`), full-width symbols, temperature → two numbe
 The rules are fixed so that regeneration or mid-file insertion keeps diffs local.
 
 - **Row order**: in every table, simple ascending order of the row's identifier. families = `family`, series = `series`, products = `(part_number, family, datasheet)`. Since part_number alone does not guarantee uniqueness in products (the same part number may appear in several datasheets), rows are ordered by the identifier tuple
-- **Column order**: important values from the left (identifier → specs → package details → source). Then the separator `#` column (`#` on every row), and to its right the `*_confidence` block and the `*_basis` block in the same order
-- **pins tables**: the row identifier is (part_number, pin, pad) / (part_number, pad, signal, route), in ascending order. The source `table` and `datasheet` are to the right of `#` (meta side) as data for verification
+- **Column order**: important values from the left (identifier → specs → package details → source). Then the `*_confidence` block and the `*_basis` block in the same order
+- **pins tables**: the row identifier is (part_number, pin, pad) / (part_number, pad, signal, route), in ascending order. The source `table` and `datasheet` are after the confidence and basis columns (meta side) as data for verification
 
 ## Images (currently unused)
 
