@@ -54,8 +54,7 @@ import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
-           "phy_block", "phy_register", "phy_field", "phy_bits", "phy_mask", "phy_address",
-           "#", "confidence", "basis"]
+           "phy_block", "phy_register", "phy_field", "phy_bits", "phy_mask", "phy_address", "confidence", "basis"]
 
 # PD の field だけ。`UDP_*`/`UDM_*`（USB の D+/D- pad 制御。X035 の AFIO_CTLR や
 # M030 の EXTEN_CTLR1 にある）は USB の配管で PD ではないので入れない——入れると
@@ -224,7 +223,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

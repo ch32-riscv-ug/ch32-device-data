@@ -63,8 +63,7 @@ COLUMNS = ["family", "source", "channel", "sample_time", "sample_time_unit",
            "avg_slope_uv_c", "avg_slope_uv_c_min", "avg_slope_uv_c_max",
            "vrefint_mv", "vrefint_mv_min", "vrefint_mv_max",
            "temp_range_c", "temp_error_c",
-           "enable_register", "enable_field", "enable_bit", "enable_confidence",
-           "#", "confidence", "basis"]
+           "enable_register", "enable_field", "enable_bit", "enable_confidence", "confidence", "basis"]
 
 # **チャネルを使うのに要る有効化ビット**（R-35。2026-10-01）。RM の ADC 章の field 表で、
 # 説明が「（温度传感器和）内部电压（V_REFINT）通道使能位」/「(Temperature sensor and) internal
@@ -285,7 +284,7 @@ def main() -> int:
         if "ch_half" in zh:
             rows.append({
                 "family": family, "source": "vdd_half", "channel": zh["ch_half"],
-                **{c: "" for c in COLUMNS if c not in ("family", "source", "channel", "#",
+                **{c: "" for c in COLUMNS if c not in ("family", "source", "channel",
                                                         "confidence", "basis")},
                 "confidence": "reference",
                 "basis": f"{datasheet}:zh(p.{where['ch_half']})",
@@ -299,22 +298,22 @@ def main() -> int:
 
     # **資料に内部参考電圧が無い family も行で言う**（R-35）。行が無いだけだと「読み落とし」と
     # 「資料に無い」が区別できない（V103 は前者だった）。datasheet と RM のどこにも無いときだけ
-    # `missing` の行を置き、basis に探した資料を並べる。温度センサは従来どおり行を持たない
+    # 「資料に無い」と言う行を置き（値の列は空、確度は探した1つの根拠なので reference）、basis に探した資料を並べる。温度センサは従来どおり行を持たない
     # （持たない family が多く、無いことが仕様）。
     have_vref = {r["family"] for r in rows if r["source"] == "vrefint"}
     for family in sorted({f for f in sheets.values()} - have_vref):
         searched = sorted({d for d, fam in sheets.items() if fam == family}
                           | {doc for _, doc in bundle_pages.rm_bundles(family).values()})
         rows.append({"family": family, "source": "vrefint",
-                     **{c: "" for c in COLUMNS if c not in ("family", "source", "#",
+                     **{c: "" for c in COLUMNS if c not in ("family", "source",
                                                             "confidence", "basis")},
-                     "confidence": "missing",
+                     "confidence": "reference",
                      "basis": "searched(" + "+".join(searched) + ")"})
 
     for family in sorted({r["family"] for r in rows}):
         enables = enable_fields(family)
         for row in rows:
-            if row["family"] == family and row["source"] in enables and row["confidence"] != "missing":
+            if row["family"] == family and row["source"] in enables and not row["basis"].startswith("searched("):
                 register, field, bit, confidence, basis = enables[row["source"]]
                 row.update({"enable_register": register, "enable_field": field,
                             "enable_bit": bit, "enable_confidence": confidence})
@@ -325,7 +324,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**{c: "" for c in COLUMNS}, **row, "#": "#"} for row in rows)
+        writer.writerows({**{c: "" for c in COLUMNS}, **row} for row in rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)

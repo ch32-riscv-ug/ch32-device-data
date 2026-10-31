@@ -73,7 +73,7 @@ import paths  # noqa: E402
 
 COLUMNS = ["part_number", "value", "code_bytes", "sram_bytes",
            "datasheet_value", "option_byte_bits", "obr_bits",
-           "condition", "#", "confidence", "basis"]
+           "condition", "confidence", "basis"]
 
 # "00x：CODE-192KB + RAM-128KB" / "1：CODE-576KB + RAM-136KB"。CH32V407 は
 # 1bit なので値が1文字になる。区切りは全角コロンで、English 版も全角のまま。
@@ -467,7 +467,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行  "
           f"part {len({r['part_number'] for r in rows})}", file=sys.stderr)
     for note in dict.fromkeys(notes):

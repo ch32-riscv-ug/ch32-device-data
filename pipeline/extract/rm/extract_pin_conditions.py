@@ -91,7 +91,7 @@ import bundle_pages  # noqa: E402
 import extract_remap  # noqa: E402
 import paths  # noqa: E402
 
-COLUMNS = ["series", "signal", "condition", "pad", "errata", "#", "confidence", "basis"]
+COLUMNS = ["series", "signal", "condition", "pad", "errata", "confidence", "basis"]
 
 MIRRORS = Path("/home/mt/dev_wch")
 # datasheet の注記。「…の既定の映射が自動で…へ変わる」。
@@ -461,7 +461,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**{c: r.get(c, "") for c in COLUMNS}, "#": "#"} for r in out_rows)
+        writer.writerows({c: r.get(c, "") for c in COLUMNS} for r in out_rows)
     tally = collections.Counter(r["confidence"] for r in out_rows)
     linked = sum(1 for r in out_rows if r["errata"])
     # **注記が裏付けたのに errata に繋がらない行**は黙って流さない。理由は2つあって、

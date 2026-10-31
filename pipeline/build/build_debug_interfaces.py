@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 
 COLUMNS = ["series", "family", "debug_if", "wording", "section",
-           "swdio_pads", "swclk_pads", "#", "confidence", "basis"]
+           "swdio_pads", "swclk_pads", "confidence", "basis"]
 
 # 節見出しが debug 接続のものか（SWPMI「Single-wire Protocol Master Interface」と
 # SDIO はここで落ちる: en に debug も zh に 调试 も無い）。

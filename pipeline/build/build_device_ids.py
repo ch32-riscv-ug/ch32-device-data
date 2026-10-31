@@ -38,9 +38,9 @@ import paths  # noqa: E402
 
 MIRRORS = paths.MIRRORS
 
-ADDRESS_COLUMNS = ["family", "address", "#", "confidence", "basis"]
+ADDRESS_COLUMNS = ["family", "address", "confidence", "basis"]
 ID_COLUMNS = ["part_number", "device_id", "id_addr", "dont_care_bits",
-              "id_source", "note", "#", "confidence", "basis"]
+              "id_source", "note", "confidence", "basis"]
 
 CHIPID_LITERAL = re.compile(
     r"uint32_t\s+DBGMCU_GetCHIPID\s*\(\s*void\s*\)\s*\{[^}]*?(0x1[Ff]{3}[0-9A-Fa-f]{4})",
@@ -176,14 +176,14 @@ def main() -> int:
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=ADDRESS_COLUMNS)
         w.writeheader()
-        w.writerows({**r, "#": "#", "confidence": "reference"} for r in addresses)
+        w.writerows({**r, "confidence": "reference"} for r in addresses)
     print(f"{dest}: {len(addresses)} 行（EVTのDBGMCU_GetCHIPIDから）", file=sys.stderr)
 
     dest = paths.table("device_ids", args.out)
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=ID_COLUMNS)
         w.writeheader()
-        w.writerows({**{c: r.get(c, "") for c in ID_COLUMNS}, "#": "#"}
+        w.writerows({c: r.get(c, "") for c in ID_COLUMNS}
                     for r in id_rows)
     print(f"{dest}: {len(id_rows)} 行（EVT + 実測）", file=sys.stderr)
     missing = sorted(set(family_of) - {r["part_number"] for r in id_rows})

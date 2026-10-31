@@ -37,8 +37,7 @@ import bundle_pages  # noqa: E402
 import operating_rows as operating  # noqa: E402  記号・値・文章の読み方は共通
 import paths  # noqa: E402
 
-COLUMNS = ["series", "symbol", "parameter", "condition", "min", "max", "unit",
-           "#", "confidence", "basis", "datasheet"]
+COLUMNS = ["series", "symbol", "parameter", "condition", "min", "max", "unit", "confidence", "basis", "datasheet"]
 
 # 表題の4綴り（全corpus実測）。章番号は文書で 3-1 と 4-1 に分かれる。
 CAPTION = re.compile(
@@ -202,7 +201,7 @@ def build() -> list[dict]:
                 confidence = "reference"
                 basis = f"{datasheet}:en(p.{page})"
             row.pop("typ", None)
-            out.append({**row, "series": series, "#": "#",
+            out.append({**row, "series": series,
                         "confidence": confidence, "basis": basis,
                         "datasheet": datasheet})
         if remaining:

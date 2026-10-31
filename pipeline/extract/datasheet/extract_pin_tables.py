@@ -4,7 +4,7 @@
 The bottom of the hierarchy families -> series -> products -> pins. Rows are
 keyed by part_number, so they join products.csv (and through it series and
 families) relationally -- the datasheet and table a row came from are kept only
-as provenance, to the right of the "#" separator.
+as provenance, after the data columns.
 
     pins.csv           part_number, pin, pad: which pad sits on which lead
     pin_functions.csv  part_number, pad, signal, route: what the pad carries
@@ -64,11 +64,8 @@ def curated_columns() -> dict:
         return {}
     return json.loads(CURATED_COLUMNS.read_text(encoding="utf-8"))
 
-# The "#" column separates data from metadata; see tables/README.ja.md.
-PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type",
-               "#", "confidence", "basis", "table", "datasheet"]
-FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route",
-                    "#", "confidence", "basis", "table", "datasheet"]
+PIN_COLUMNS = ["part_number", "pin", "pad", "kind", "type", "confidence", "basis", "table", "datasheet"]
+FUNCTION_COLUMNS = ["part_number", "pad", "signal", "route", "confidence", "basis", "table", "datasheet"]
 
 SERIES_TOKEN = re.compile(r"CH32[A-Z0-9x]+")
 FOOTNOTE = re.compile(r"[（(]\d+[)）]")
@@ -445,9 +442,7 @@ def write_csv(path: Path, rows: list[dict], columns: list[str]) -> None:
     with path.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=columns)
         writer.writeheader()
-        # The separator carries "#" in every row, so the boundary is visible
-        # wherever one lands in the file.
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
 
 
 def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:

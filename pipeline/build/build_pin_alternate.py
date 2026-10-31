@@ -50,7 +50,7 @@ import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "pad", "port", "pin", "block", "register", "address",
-           "bits", "width_bits", "#", "confidence", "basis"]
+           "bits", "width_bits", "confidence", "basis"]
 # EVT だけが言う。reference manual の GPIO 章が second reading になる。
 CONFIDENCE = "reference"
 
@@ -137,7 +137,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     seen = sorted({r["family"] for r in rows})
     print(f"{dest}: {len(rows)} 行  family {len(seen)} ({', '.join(seen)})",
           file=sys.stderr)

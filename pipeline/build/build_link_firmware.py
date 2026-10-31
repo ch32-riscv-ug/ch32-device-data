@@ -79,12 +79,11 @@ SOURCE = "https://file.wch.cn/download/file?id=418"
 PAGE = "https://www.wch.cn/downloads/wch-linkutility_zip.html"
 
 COLUMNS = ["device", "mcu", "mode", "role", "file", "size", "sha256",
-           "wcfg_version", "reported_version", "measured_version", "set_version",
-           "#", "confidence", "basis"]
+           "wcfg_version", "reported_version", "measured_version", "set_version", "confidence", "basis"]
 # 実測で壊れていると分かっている版（`curated/link-firmware-issues.json`）。配布物の表（上）は「いま配って
 # いるファイル」なので、古い版はそこに行が無い——別の表にして、版と機材と症状を出所つきで持つ。
 ISSUE_COLUMNS = ["device", "mcu", "mode", "version", "wcfg_version", "tool", "target", "symptom",
-                 "works_in", "#", "confidence", "basis"]
+                 "works_in", "confidence", "basis"]
 ISSUES = paths.CURATED / "link-firmware-issues.json"
 
 
@@ -276,7 +275,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行  取得元 {origin}", file=sys.stderr)
     write_issues(args.out)
     print(f"  配布パッケージ版: {set_version}", file=sys.stderr)
@@ -291,7 +290,7 @@ def main() -> int:
 def write_issues(out_dir: Path | None) -> None:
     """`link_firmware_issues`: 実測した記録のある不良だけ。1つの測定は1つの根拠なので reference。"""
     issues = json.loads(ISSUES.read_text(encoding="utf-8"))["issues"]
-    rows = [{**{c: issue.get(c, "") for c in ISSUE_COLUMNS if c not in ("#", "confidence", "basis")},
+    rows = [{**{c: issue.get(c, "") for c in ISSUE_COLUMNS if c not in ("confidence", "basis")},
              "confidence": "reference",
              "basis": f"measured:{issue['measured']}({issue['evidence']})"}
             for issue in issues]
@@ -300,7 +299,7 @@ def write_issues(out_dir: Path | None) -> None:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=ISSUE_COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行", file=sys.stderr)
 
 

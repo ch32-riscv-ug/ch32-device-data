@@ -88,7 +88,7 @@ def series_bytes(data: "Data", series: dict, column: str) -> str:
     """Series 行の Flash/SRAM。**型番で違う series は実値を全部並べる**（`128K/256K`）。
 
     `index/series.csv` は「その series の全型番で同じ値」だけを持ち、型番で変わる
-    ものは空にして `confidence` に `varies-by-package` と書く（値は products 側）。
+    ものは値も確度も空にする（値は型番ごとの表の側）。
     表示までそれに従うと空欄になり、**資料に無い**のか**1つに決まらない**のかが
     読む側から区別できない。決まらない理由は型番差なので、その差そのものを出す。
     条件で複数値になる Clock 列（`200/240`）と同じ `/` 区切り。

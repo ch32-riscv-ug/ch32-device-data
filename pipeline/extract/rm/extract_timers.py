@@ -58,8 +58,7 @@ import paths  # noqa: E402
 
 # `channels`/`complementary`（pin に出ているチャネルから数える導出）は索引
 # `index/timers.csv` が持つ（pipeline/build/build_index.py）。ここは RM と EVT の記述だけ。
-COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition", "confidence", "basis"]
 
 # `15.4.10 通用定时器的计数器（TIMx_CNT）（x=2/3/4）` と、単体の
 # `14.4.9 定时器的计数器（TIM1_CNT）`。前者は対象を x= で並べ、後者は名前が名乗る。
@@ -209,7 +208,8 @@ def main() -> int:
                 "update_vector": irq_of.get((family, timer["timer"]), ""),
                 # 幅が variant で変わるなら、その variant を条件に置く。
                 "condition": ";".join(applies),
-                "confidence": ("varies-by-package" if applies else
+                # variant で変わる幅は condition 列が言う。確度は RM の1つの根拠なので reference。
+                "confidence": ("reference" if applies else
                                "conflict" if varies else "reference"),
                 "basis": f"rm({document}:p{timer['page']})",
             })
@@ -218,7 +218,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     wide = sum(1 for r in rows if r["counter_width_bits"] == 32)
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}"
           f"  32bit {wide}", file=sys.stderr)

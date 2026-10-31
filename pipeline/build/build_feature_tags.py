@@ -74,7 +74,7 @@ import paths  # noqa: E402
 CURATED = REPO / "curated" / "feature-tags.json"
 
 COLUMNS = ["tag", "parent", "series", "family", "precision", "features",
-           "features_zh", "sections", "#", "confidence", "basis"]
+           "features_zh", "sections", "confidence", "basis"]
 
 # 括弧の中の略語。`(USBFS/OTG_FS)` や `(MAC+PHY)` も1つとして採る。
 PAREN = re.compile(r"[（(]([A-Z][A-Za-z0-9+/_. ]{1,16})[)）]")
@@ -268,7 +268,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tags = sorted({r["tag"] for r in rows})
     precise = sum(1 for r in rows if r["precision"] == "part")
     print(f"{dest}: {len(rows)} 行  タグ {len(tags)} 種"

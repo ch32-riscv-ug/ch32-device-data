@@ -253,7 +253,7 @@ def main() -> int:
     with dest.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=operating.COLUMNS)
         w.writeheader()
-        w.writerows({**{c: r.get(c, "") for c in operating.COLUMNS}, "#": "#"}
+        w.writerows({c: r.get(c, "") for c in operating.COLUMNS}
                     for r in rows)
     from collections import Counter  # noqa: PLC0415
     print(f"{dest}: {len(rows)} 行 "

@@ -1183,15 +1183,14 @@ def index_checks(t: dict) -> list[str]:
 
 # `index/columns.csv` の `format` の語彙。値を検査できるものは実データで確かめる。
 COLUMN_FORMATS = re.compile(
-    r"^(text|name|integer|decimal|hex|bits|reg-bits|list\(;\)|list\(,\)|list\(\|\)|url|path|marker|enum\(.+\))$")
+    r"^(text|name|integer|decimal|hex|bits|reg-bits|list\(;\)|list\(,\)|list\(\|\)|url|path|enum\(.+\))$")
 # 綴りではなく値を持つ列（`spelling` が空）。書式で決まるものと、書式が text/name でも値のもの。
-SPELLING_FREE = {"integer", "decimal", "hex", "bits", "reg-bits", "marker", "url", "path"}
+SPELLING_FREE = {"integer", "decimal", "hex", "bits", "reg-bits", "url", "path"}
 VALUE_COLUMNS = {"min", "typ", "max", "layout", "temp_range_c", "reset", "sha256", "program_word",
                  "complementary"}
 FORMAT_CHECKS = {
     "integer": re.compile(r"^-?\d+$"),
     "hex": re.compile(r"^0x[0-9a-fA-F]+$"),
-    "marker": re.compile(r"^#$"),
 }
 
 
@@ -1208,7 +1207,7 @@ def column_dictionary() -> list[str]:
         return ["公開面: index/columns.csv が無い"]
     with path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        if reader.fieldnames != ["table", "column", "meaning", "format", "empty", "spelling"]:
+        if reader.fieldnames != ["table", "column", "meaning", "format", "empty", "spelling", "role"]:
             return [f"columns.csv: ヘッダが違う（{reader.fieldnames}）"]
         described = list(reader)
     bad = []
@@ -1219,6 +1218,11 @@ def column_dictionary() -> list[str]:
         with p.open(newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             actual[p.stem] = [list(reader.fieldnames or []), list(reader)]
+    roles = {(r["table"], r["column"]): r["role"] for r in described}
+    for name, (header, _) in actual.items():
+        kinds = [roles.get((name, c)) for c in header]
+        if "provenance" in kinds and "data" in kinds[kinds.index("provenance"):]:
+            bad.append(f"columns.csv: {name} の provenance の列のあとにデータの列がある（出所の列は右端に置く）")
     seen = collections.Counter((r["table"], r["column"]) for r in described)
     want = {(name, c) for name, (header, _) in actual.items() for c in header}
     if dup := sorted(k for k, n in seen.items() if n > 1):
@@ -1241,6 +1245,9 @@ def column_dictionary() -> list[str]:
             bad.append(f"{where} の spelling {r['spelling']!r} が語彙に無い")
         if (r["spelling"] == "") != (r["format"] in SPELLING_FREE or r["column"] in VALUE_COLUMNS):
             bad.append(f"{where}: spelling が空なのは値の列（数・番地・印・URL・path・min/typ/max ほか）だけ")
+        # `role`: data はデータの列、provenance は確度と出所の列。provenance は表の右端に並ぶ。
+        if r["role"] not in ("data", "provenance"):
+            bad.append(f"{where} の role {r['role']!r} が語彙に無い")
         if not COLUMN_FORMATS.match(r["format"]):
             bad.append(f"{where} の format {r['format']!r} が語彙に無い")
             continue
@@ -1386,6 +1393,10 @@ def main() -> int:
     for r in t["families"]:
         for column in ("datasheets", "reference_manuals", "evt"):
             check("families", r["family"], r[column], documents, "documents", ";")
+        # family の定義: WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る。
+        if r["evt"] != f"{r['family']}EVT.ZIP":
+            bad.append(f"families: {r['family']} の evt が {r['family']}EVT.ZIP でない（{r['evt']!r}）"
+                       "——family は EVT パッケージの名前から取る")
         for token in r["cores"].split(";"):
             check("families", r["family"], token, cores, "cores", " + ")
     for r in t["cores"]:
@@ -1591,12 +1602,12 @@ def main() -> int:
                 bad.append(f"dma_requests: {r['family']} の variant {macro!r} が evt_variants にない")
 
     # debug_data は family ごと1行。data1 は data0 の次の word、番地は DM の 0xE0000000 台。
-    # 番地が空なのは missing の行だけ（H417: EVT に define が無く、V5/V3 のマニュアルは固定しない）。
+    # 番地が空なのは確度も空の行だけ（どの出所も番地を言わない family）。
     for r in t["debug_data"]:
         check("debug_data", r["family"], r["family"], families, "families")
-        if r["confidence"] == "missing":
+        if not r["confidence"]:
             if r["dm_data0_addr"] or r["dm_data1_addr"]:
-                bad.append(f"debug_data: {r['family']} は missing なのに番地がある")
+                bad.append(f"debug_data: {r['family']} は確度が空なのに番地がある")
             continue
         for column in ("dm_data0_addr", "dm_data1_addr"):
             if not re.fullmatch(r"0xE000[0-9A-F]{4}", r[column]):
@@ -2236,7 +2247,7 @@ def main() -> int:
     for name, rows in t.items():
         if not rows:
             continue
-        columns = [c for c in rows[0] if c != "#" and not c.endswith("_zh") and c not in LITERAL]
+        columns = [c for c in rows[0] if not c.endswith("_zh") and c not in LITERAL]
         for r in rows:
             for column in columns:
                 value = r.get(column, "")

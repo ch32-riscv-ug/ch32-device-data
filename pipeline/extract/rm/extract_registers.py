@@ -91,12 +91,11 @@ import paths  # noqa: E402
 import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-BLOCK_COLUMNS = ["family", "block", "type", "layout", "base_address", "#", "confidence", "basis"]
+BLOCK_COLUMNS = ["family", "block", "type", "layout", "base_address", "confidence", "basis"]
 REGISTER_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
-                    "rm_register", "rm_reset", "rm_address_check", "#", "confidence", "basis"]
+                    "rm_register", "rm_reset", "rm_address_check", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "register", "type", "member", "field", "define", "kind", "of_field",
-                 "bits", "mask", "value", "description", "rm_access", "rm_reset",
-                 "#", "confidence", "basis", "rm_access_confidence", "rm_access_basis"]
+                 "bits", "mask", "value", "description", "rm_access", "rm_reset", "confidence", "basis", "rm_access_confidence", "rm_access_basis"]
 
 # **RM の access の語彙。** どの RM も冒頭の表で定義する（CH32H417RM.en p.2: `RO` Read-only,
 # changed by hardware / `RZ` read clears / `WO` write only / `WA` write in Safe mode / `WZ` write, auto
@@ -118,8 +117,7 @@ def access_term(cell: str) -> str:
     """
     found = ACCESS_TOKEN.findall(cell or "")
     return found[0] if len(found) == 1 else ""
-LAYOUT_COLUMNS = ["family", "type", "layout", "registers", "fields", "size_bytes",
-                  "#", "confidence", "basis"]
+LAYOUT_COLUMNS = ["family", "type", "layout", "registers", "fields", "size_bytes", "confidence", "basis"]
 
 BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+)\s+register", re.IGNORECASE)
 # `((uint32_t)0x0001)` / `(0x0001)` / `0x0001` / `(0x1U)`。ほかの形（`(1 << 3)`・別名）は採らない。
@@ -1055,7 +1053,7 @@ def main() -> int:
         with dest.open("w", encoding="utf-8", newline="") as out:
             w = csv.DictWriter(out, fieldnames=columns)
             w.writeheader()
-            w.writerows({**{c: r.get(c, "") for c in columns}, "#": "#"} for r in rows)
+            w.writerows({c: r.get(c, "") for c in columns} for r in rows)
         tally = collections.Counter(r["confidence"] for r in rows)
         print(f"{dest}: {len(rows)} 行  {dict(tally)}", file=sys.stderr)
 

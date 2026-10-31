@@ -49,7 +49,7 @@ import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
 COLUMNS = ["series", "part_number", "kind", "document",
-           "page_zh", "page_en", "#", "confidence", "basis"]
+           "page_zh", "page_en", "confidence", "basis"]
 
 # 章の見出し。`引脚分布`・`引脚图` は凍結tool `pipeline/extract/images/extract_images.py` から引き継いだ
 # 綴りで、**中文版の実際の綴りは `引脚排列`**（英語版しか読まない凍結tool では出番が
@@ -214,7 +214,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     tally = collections.Counter(r["confidence"] for r in rows)
     print(f"{dest}: {len(rows)} 行  文書 {len({r['document'] for r in rows})}"
           f"  {dict(tally)}", file=sys.stderr)

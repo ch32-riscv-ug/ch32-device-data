@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 
 COLUMNS = ["table", "family", "series", "part_number", "subject", "field",
-           "kept", "dissenting", "alternative", "#", "basis"]
+           "kept", "dissenting", "alternative", "basis"]
 
 # その表の行を名指すのに要る列。**総当たりで持つ**——表を足したら、その行を
 # どう名指すかを決めないと生成が落ちる。値の列は入れない（行を指す鍵だけ）。

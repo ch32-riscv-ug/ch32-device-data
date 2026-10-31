@@ -1,576 +1,556 @@
-table,column,meaning,format,empty,spelling
-absolute_maximum_ratings,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed
-absolute_maximum_ratings,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `I_INJ(PIN)`).",name,never empty,fixed
-absolute_maximum_ratings,parameter,"Parameter description in English, as the datasheet writes it.",text,never empty,as-printed
-absolute_maximum_ratings,condition,"Condition or part the limit is stated for, from the table's unnamed column.",text,no condition stated,as-printed
-absolute_maximum_ratings,min,Lowest value the part survives (a number or a formula).,text,not stated by the sources,
-absolute_maximum_ratings,max,"Highest value the part survives (a number, a formula, or `+/-n`).",text,not stated by the sources,
-absolute_maximum_ratings,unit,Unit of min/max as the datasheet writes it.,name,never empty,fixed
-absolute_maximum_ratings,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-absolute_maximum_ratings,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-absolute_maximum_ratings,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-absolute_maximum_ratings,datasheet,Datasheet the row is read from; joins products.datasheet.,name,never empty,fixed
-adc_internal,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-adc_internal,source,Internal ADC source the row describes.,enum(temperature_sensor|vdd_half|vrefint),never empty,fixed
-adc_internal,channel,ADC input channel number (ADC_IN n) the internal source is connected to.,integer,the sources state no such source for the family (`confidence` = missing),
-adc_internal,sample_time,"Sample time needed when reading this source, in `sample_time_unit`.",decimal,not stated by the sources,
-adc_internal,sample_time_unit,Unit of `sample_time` (`us` or `adc_cycles` = ADC clock cycles); not normalised because it differs per family.,enum(adc_cycles|us),not stated by the sources,fixed
-adc_internal,sample_clock_mhz,"ADC clock in MHz that the sample time assumes, when the unit is `us`.",integer,"not stated, or not applicable (unit is not `us`)",
-adc_internal,v25_mv,"Temperature sensor output at 25 C, typical, in mV.",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,v25_mv_min,"Temperature sensor output at 25 C, minimum, in mV.",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,v25_mv_max,"Temperature sensor output at 25 C, maximum, in mV.",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,avg_slope_uv_c,"Temperature sensor average slope, typical, in uV per degree C (negative temperature coefficient).",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,avg_slope_uv_c_min,"Temperature sensor average slope, minimum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,avg_slope_uv_c_max,"Temperature sensor average slope, maximum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated,
-adc_internal,vrefint_mv,"Internal reference voltage, typical, in mV.",integer,"not applicable (not vrefint), or the datasheet gives only min and max",
-adc_internal,vrefint_mv_min,"Internal reference voltage, minimum, in mV.",integer,not applicable (not vrefint) or not stated,
-adc_internal,vrefint_mv_max,"Internal reference voltage, maximum, in mV.",integer,not applicable (not vrefint) or not stated,
-adc_internal,temp_range_c,"Temperature sensor measurement range in degrees C, written `lo..hi`.",text,not stated by the sources,
-adc_internal,temp_error_c,Temperature sensor measurement error in degrees C.,integer,not stated by the sources,
-adc_internal,enable_register,ADC register holding the bit that must be set before this internal channel reads anything (from the reference manual's ADC field table).,name,the reference manual's ADC registers have no enable bit for this channel,as-printed
-adc_internal,enable_field,Name of that enable bit (`TSVREFE` enables the temperature sensor and VREFINT together; `VREFE` enables VREFINT only).,name,the reference manual's ADC registers have no enable bit for this channel,as-printed
-adc_internal,enable_bit,Bit position of that enable bit in `enable_register`.,integer,the reference manual's ADC registers have no enable bit for this channel,
-adc_internal,enable_confidence,Confidence of the enable bit alone: confirmed = both language editions of the reference manual name the same field and bit; reference = only one edition could be read.,enum(confirmed|reference),no enable bit,fixed
-adc_internal,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-adc_internal,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction; missing = no datasheet or reference manual of the family states this source (`basis` lists the documents searched).",enum(confirmed|conflict|missing|reference),never empty,fixed
-adc_internal,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-capabilities,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed
-capabilities,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-capabilities,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-capabilities,capability,"Normalised capability name (e.g. `usart`, `can-fd`, `timer-general`, `adc` = unit count, `adc-channel` = channel count).",name,never empty,fixed
-capabilities,qualifier,"Distinction the document itself draws inside the capability (e.g. `32bit`, `tim1`, `include-phy`, `adc1`); spelling differences are not qualifiers.",name,no distinction drawn within the capability,fixed
-capabilities,stated,"How the document states the value: `count` (a bare integer), `marker` (claims presence without a number) or `text` (anything else).",enum(count|marker|text),never empty,fixed
-capabilities,count,"The integer value, only when `stated` is `count`; no counting rule is applied.",integer,not applicable (`stated` is `marker` or `text`),
-capabilities,value,The document's value verbatim.,text,never empty,as-printed
-capabilities,attribute,The evidence product_attributes key the row came from (the way back to the evidence).,name,never empty,fixed
-capabilities,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-capabilities,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-capabilities,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_configs,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_configs,config,Name of the EVT `system_ch32*.c` clock configuration function (one function = one configuration).,name,never empty,as-printed
-clock_configs,source,"Oscillator the configuration runs from, as named in the function name.",enum(HSE|HSI),the function name names no oscillator,fixed
-clock_configs,condition,Compile-time branch (`#if`/`#ifdef` expression or `else`) under which this row's writes apply.,text,unconditional (no compile-time branch),as-printed
-clock_configs,domains,"Clock domain frequencies the configuration sets, as `name=Hz` pairs (e.g. `SYSCLK=48000000;CoreCLK[V5F]=...`).",list(;),the configuration name states no frequency (e.g. running straight off HSE),fixed
-clock_configs,hpre,"AHB (HCLK) prescaler divider the configuration writes; joins clock_prescalers (field HPRE, divider).",integer,never empty,
-clock_configs,ppre1,"APB1 (PCLK1) prescaler divider the configuration writes; joins clock_prescalers (field PPRE1, divider).",integer,not written by the configuration (family has no such prescaler),
-clock_configs,ppre2,"APB2 (PCLK2) prescaler divider the configuration writes; joins clock_prescalers (field PPRE2, divider).",integer,not written by the configuration (family has no such prescaler),
-clock_configs,fpre,"V3F-side HCLK prescaler divider (CH32H417/CH32X315 `RCC_FPRE_DIVn`); joins clock_prescalers (field FPRE, divider).",integer,not written by the configuration (family has no such prescaler),
-clock_configs,pll,"PLL setting symbols the configuration writes, as EVT symbol names (resolved to values in clock_symbols); `SYMBOL=0` when the configuration clears that field alone and writes no value to it (CH32H417 `RCC_SYSPLL_SEL=0` selects the PLL).",list(;),the configuration does not use the PLL,as-printed
-clock_configs,flash_latency,Flash wait-state value (FLASH_ACTLR LATENCY) the configuration writes.,integer,the configuration does not write latency,
-clock_configs,flash_sck_div,"Flash access clock divider (HCLK/n) the configuration writes: FLASH_ACTLR SCK_CFG on CH32X315/CH32H417, FLASH_CTLR SCKMOD on CH32V407; not wait states.",integer,not applicable (family has no such divider) or not written,
-clock_configs,flash_writes,"Literal writes to FLASH registers inside the configuration, in order, as `FLASH->REGISTER=0x...` or `|=` (CH32V407: the KEYR/MODEKEYR unlock pairs before changing SCKMOD and `CTLR|=0x00008080` after; CH32X315 does the same in SystemInit, see clock_init).",list(;),the configuration writes no literal value to FLASH,as-printed
-clock_configs,outside_rcc,"Register written outside RCC and the symbol written to it, as `BLOCK->REGISTER SYMBOL` (e.g. EXTEN PLL HSI prescaler).",text,no register outside RCC is written,as-printed
-clock_configs,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_configs,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-clock_configs,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_enables,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_enables,peripheral,Peripheral name as the EVT RCC constant spells it (`RCC_<bus>Periph_<name>`).,name,never empty,fixed
-clock_enables,bus,"Bus name as the family's EVT spells it (AHB/APB1/APB2, HB/PB1/PB2, HB/HB1/HB2).",enum(AHB|APB1|APB2|HB|HB1|HB2|PB1|PB2),never empty,as-printed
-clock_enables,register,RCC clock-enable register the bus name maps to (`<bus>PCENR`).,enum(AHBPCENR|APB1PCENR|APB2PCENR|HB1PCENR|HB2PCENR|HBPCENR|PB1PCENR|PB2PCENR),never empty,as-printed
-clock_enables,offset,Offset of the enable register within RCC.,hex,never empty,
-clock_enables,address,Absolute address of the enable register.,hex,never empty,
-clock_enables,bit,"Bit position of the enable bit in the register, `hi:lo` for a contiguous multi-bit mask.",bits,the macro sets bits that are not contiguous (read `mask`),
-clock_enables,mask,Mask of the enable bit(s) as the EVT constant defines it.,hex,never empty,
-clock_enables,macro,EVT constant passed to `RCC_<bus>PeriphClockCmd()` for this peripheral.,name,never empty,as-printed
-clock_enables,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_enables,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-clock_enables,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_init,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_init,function,"EVT function the step belongs to: `SystemInit`, or a configuration function (joins clock_configs.config; its steps are the EVT's own order).",name,never empty,as-printed
-clock_init,step,"Order of the step within the function, from 0.",integer,never empty,
-clock_init,action,"What the step does: `set` (`|=`), `clear` (`&=`), `write` (`=`), `poll` (`while`) or `trim` (load the HSI factory trim).",enum(clear|poll|set|trim|write),never empty,fixed
-clock_init,register,"Register written or polled, as `BLOCK->REGISTER`.",name,never empty,as-printed
-clock_init,address,"Absolute address involved: the register's address, or for a trim step the address the factory value is read from.",hex,address not resolved,
-clock_init,value,"Value of the step in decimal; for `clear` it is the AND mask (the bits kept): a literal mask as written, or `~X` taken over 32 bits.",integer,never empty,
-clock_init,source,Symbol the trim value is read from (trim steps only).,name,not applicable (not a trim step read from a symbol),as-printed
-clock_init,condition,Condition guarding the step: a value test (e.g. `!= 0xFF`) or a compile-time macro.,text,unconditional,as-printed
-clock_init,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_init,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-clock_init,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_prescalers,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_prescalers,field,RCC prescaler field.,enum(ADCPRE|FPRE|HPRE|PPRE1|PPRE2),never empty,as-printed
-clock_prescalers,divider,Division ratio the value selects.,integer,never empty,
-clock_prescalers,value,"Value that selects the divider, shifted into position, in decimal.",integer,never empty,
-clock_prescalers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_prescalers,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-clock_prescalers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_sources,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_sources,consumer,"Clock consumer that can select a source (USB, RTC, ADC, I2S, RNG, ETH, SYS, ...).",name,never empty,as-printed
-clock_sources,option,"Selectable source, from the `RCC_*CLKSource_*` constant name.",name,never empty,as-printed
-clock_sources,value,Value of the constant (decimal) that selects the option.,integer,never empty,
-clock_sources,register,RCC register holding the selector field.,enum(BDCTLR|CFGR0|CFGR2),the EVT RCC header and driver name no register for this selector,as-printed
-clock_sources,shift,Bit shift of the selector field in the register.,integer,never empty,
-clock_sources,condition,Compile-time branch under which this value means this option.,text,unconditional,as-printed
-clock_sources,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_sources,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-clock_sources,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-clock_symbols,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-clock_symbols,symbol,EVT header symbol used in clock_configs `pll`/`outside_rcc` or observed in the configuration code.,name,never empty,as-printed
-clock_symbols,role,"What the symbol is, from how the code uses it: `value` (`|=`), `mask` (`&= ~`) or `poll` (`while`).",enum(mask|poll|value),never empty,fixed
-clock_symbols,register,Destination register as `BLOCK->REGISTER`.,name,never empty,as-printed
-clock_symbols,address,Absolute address of that register.,hex,address not resolved,
-clock_symbols,value,"Numeric value of the symbol, shifted into position, in decimal.",integer,never empty,
-clock_symbols,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-clock_symbols,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(conflict|reference),never empty,fixed
-clock_symbols,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-conflicts,table,Catalog or evidence table where the conflicted row lives.,name,never empty,fixed
-conflicts,family,"Family of the conflicted row, when that table has a family column.",name,the source table has no family column,fixed
-conflicts,series,"Series of the conflicted row, when that table has a series column.",list(;),the source table has no series column,fixed
-conflicts,part_number,"Part number of the conflicted row, when that table has a part_number column.",name,the source table has no part_number column,fixed
-conflicts,subject,"Key columns of the conflicted row, as space-separated `col=value` pairs.",text,never empty,prose
-conflicts,field,Column in dispute.,name,the row asserts several values and the basis does not name one column,fixed
-conflicts,kept,Value the source table kept in the disputed column.,text,no single disputed column (`field` is empty),as-printed
-conflicts,dissenting,Sources marked `!` in the basis.,text,the dissent is not recorded as a `!` source in the basis,prose
-conflicts,alternative,"What the dissenting sources state, from `(=...)` in the basis (translated reading for a Chinese dissent).",text,the disagreement is recorded in prose (see that table's section of evidence/README.md),prose
-conflicts,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-conflicts,basis,"Basis of the conflicted row, including its `!` dissenting sources and `(=...)` alternatives.",text,never empty,prose
-cores,core,QingKe core name.,name,never empty,fixed
-cores,isa,Core ISA as the core manual's overview table states it (brackets mark optional extensions).,text,never empty,as-printed
-cores,manual,QingKe processor manual the core is described in.,name,never empty,fixed
-cores,note,Remark on the core.,text,no remark,prose
-cores,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-cores,isa_confidence,"Confidence of `isa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-cores,isa_basis,Sources that support `isa`.,text,never empty,prose
-debug_data,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-debug_data,core,Core(s) of the family.,text,never empty,as-printed
-debug_data,dm_data0_addr,"Hart-side address of the debug module data0 register (DMDATA0, used by SDI printf).",hex,not stated by any source (CH32H417),
-debug_data,dm_data1_addr,Hart-side address of the debug module data1 register; always `dm_data0_addr + 4`.,hex,not stated by any source (CH32H417),
-debug_data,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-debug_data,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|missing|reference),never empty,fixed
-debug_data,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-debug_data,evt_file,EVT debug.c file whose DEBUG_DATA0_ADDRESS define was read.,path,the family's EVT has no such define,
-debug_interfaces,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-debug_interfaces,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-debug_interfaces,debug_if,"Debug wiring: `swio` (1-wire SWIO), `rvswd` (2-wire SWDIO+SWCLK) or `both` (the WCH-Link manual lists the series as supporting both).",enum(both|rvswd|swio),never empty,fixed
-debug_interfaces,wording,English datasheet section heading the debug interface was read from.,text,the heading used has no English edition,as-printed
-debug_interfaces,section,Datasheet section number of that heading.,text,never empty,as-printed
-debug_interfaces,swdio_pads,"Pads carrying SWDIO for the series, from index/pinout.",list(;),never empty,as-printed
-debug_interfaces,swclk_pads,"Pads carrying SWCLK for the series, from index/pinout.",list(;),no SWCLK pad (1-wire series),as-printed
-debug_interfaces,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-debug_interfaces,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-debug_interfaces,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-device_ids,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed
-device_ids,device_id,32-bit device ID of the part (package variants differ in bits [19:16]).,hex,never empty,
-device_ids,id_addr,Address the device ID is read from.,hex,never empty,
-device_ids,dont_care_bits,"Bits of the ID to ignore when matching (silicon revision), written `[hi:lo]`.",text,never empty,fixed
-device_ids,id_source,Measurement channel of a real-silicon read (`memory` address read or `attach` probe response).,enum(memory|attach),"documented or imported value, not measured on silicon",fixed
-device_ids,note,Remark on the ID format.,text,no remark,prose
-device_ids,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-device_ids,confidence,Confidence of the row: confirmed = documented ID corroborated by silicon measurement; reference = documented or imported ID without measurement.,enum(confirmed|reference),never empty,fixed
-device_ids,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-dma,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-dma,variant,EVT variant macros whose DMA configuration the row belongs to (CH32V20x/V30x).,list(|),same for every variant of the family,as-printed
-dma,dma,DMA controller.,enum(DMA1|DMA2),not applicable (CH32H417 DMAMUX: request is not tied to a channel),as-printed
-dma,channel,1-based DMA channel number.,integer,not applicable (CH32H417 DMAMUX: request is not tied to a channel),
-dma,request_id,DMAMUX request input number (CH32H417 only; the value written to CHANNELx_MUX is this minus 1).,integer,not applicable (fixed-channel DMA),
-dma,peripheral,Normalised peripheral owning the request (e.g. `SPI/I2S2_RX` -> `SPI2`).,name,never empty,fixed
-dma,request,Request name with the remap marker stripped.,name,never empty,as-printed
-dma,remap,"Reading of the remap marker: `selectable` (`*`), or `default`/`remap` for CH32X315's `_0`/`_1`.",enum(default|remap|selectable),no remap marker,fixed
-dma,spelled,"Request as the reference manual spells it, marker included.",name,never empty,as-printed
-dma,note,"Footnote marks and remarks carried from the manual, plus a DMAMUX note for request-number rows.",text,no note,prose
-dma,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-dma,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-dma,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-errata,id,Identifier assigned to the erratum by this repository.,name,never empty,fixed
-errata,series,Series the erratum applies to.,list(;),never empty,fixed
-errata,condition,Lots or part numbers the erratum applies to.,text,applies without a lot or part-number condition,prose
-errata,description,"What the erratum says (lot-dependent behaviour or hardware caution), in English.",text,never empty,prose
-errata,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-errata,description_confidence,"Confidence of `description`: confirmed when the page is recorded in both language datasheets (a past edition may be pinned with `@V`), reference when only one language edition states it.",enum(confirmed|reference),never empty,fixed
-errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty,prose
-esig,family,Family key; joins catalog families.family.,name,never empty,fixed
-esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the ID words, `UNIID1` lowest; measured chips differ only in UNIID1|UNIID2, see erratum `esig-uniid3-not-unique`).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty,as-printed
-esig,address,Absolute address to read the register at (factory-programmed system area; CH32M030 uses a different base).,hex,never empty,
-esig,width_bits,"Register width in bits, from the `R16_`/`R32_` prefix.",integer,never empty,
-esig,unit,"Unit of the value read: `KiB` for `FLACAP` (flash capacity in Kbytes, per the field description).",enum(KiB),no unit (a raw ID word),fixed
-esig,description,English description from the English edition's register list.,text,the English edition's register list gives none,prose
-esig,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-esig,confidence,Confidence of the row: confirmed = both language editions give the same address and width; reference = only one edition; conflict = the editions disagree.,enum(confirmed),never empty,fixed
-esig,basis,Reference-manual pages the row was read from (`<document>:<lang>(p.N)`); `unit(...)` gives the pages whose field description states the unit.,text,never empty,prose
-evt_variants,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-evt_variants,macro,EVT compile-time variant macro (e.g. `CH32V20x_D8W`).,name,never empty,as-printed
-evt_variants,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed
-evt_variants,default,`yes` when this macro is the one the EVT device header enables by default.,enum(yes),not the default variant,fixed
-evt_variants,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-evt_variants,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-evt_variants,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-families,family,Family key.,name,never empty,fixed
-families,repository,GitHub mirror repository the family's documents are read from (`owner/name`).,name,never empty,fixed
-families,series,Series in the family.,list(;),never empty,fixed
-families,series_count,Number of series in the family.,integer,never empty,
-families,part_number_count,Number of part numbers in the family.,integer,never empty,
-families,cores,Cores used in the family (a dual-core part is written `A + B`).,list(;),never empty,fixed
-families,datasheets,Datasheets that apply to the family.,list(;),never empty,fixed
-families,reference_manuals,Reference manuals that apply to the family.,list(;),never empty,fixed
-families,evt,EVT archive that applies to the family.,name,never empty,fixed
-features,tag,"Normalised feature tag (e.g. `DMA`, `USBHS`).",name,never empty,fixed
-features,parent,Broader tag that also covers this one (e.g. `USBHS` is also under `USB`).,enum(ADC|USB|WDG),no parent tag,fixed
-features,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-features,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-features,precision,"Which reading decided the row: `part` (the comparison table, per part number) or `datasheet` (a datasheet section heading, per datasheet).",enum(datasheet|part),never empty,fixed
-features,features,Datasheet section heading(s) in English that the tag was read from.,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed
-features,features_zh,The same heading(s) in the Chinese edition.,list(;),no Chinese heading recorded,as-printed
-features,sections,Datasheet section number(s) of the heading(s).,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed
-features,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-features,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-features,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-flash_geometry,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-flash_geometry,page_erase_bytes,"Unit of standard page erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,never empty,
-flash_geometry,fast_erase_bytes,"Unit of fast page erase, in bytes.",integer,no per-page fast erase (block erase only),
-flash_geometry,fast_program_bytes,"Unit of fast page programming, in bytes.",integer,never empty,
-flash_geometry,block_erase_bytes,"Unit of fast block erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,no block erase stated,
-flash_geometry,flash_mode_bit,"Register bit that switches the erase sizes, as `REGISTER.FIELD[bit]` (e.g. `FLASH_CFGR0.DBMODE[28]` on CH32H417); page_erase_bytes/block_erase_bytes are its 0 values.",text,the erase sizes do not depend on a mode bit,fixed
-flash_geometry,page_erase_bytes_dual,"Unit of standard page erase when flash_mode_bit = 1 (dual flash mode), in bytes.",integer,the erase sizes do not depend on a mode bit,
-flash_geometry,block_erase_bytes_dual,"Unit of fast block erase when flash_mode_bit = 1, in bytes.",integer,the erase sizes do not depend on a mode bit,
-flash_geometry,program_word,`1` when `FLASH_ProgramWord`/`ProgramHalfWord` exist in the EVT driver.,enum(1),fast page programming only,
-flash_geometry,erased_read_word,"What a word read returns after erase, exactly as the RM writes it (`0xFF` families print an 8-bit spelling).",hex,the RM does not state it,
-flash_geometry,erased_read_half,"What a half-word read returns after erase, as the RM writes it.",hex,the RM does not state it,
-flash_geometry,erased_read_byte_even,"What an even-address byte read returns after erase, as the RM writes it.",hex,the RM does not state it,
-flash_geometry,erased_read_byte_odd,"What an odd-address byte read returns after erase, as the RM writes it.",hex,the RM does not state it,
-flash_geometry,blank_check_word,Full 32-bit value to compare a word read against to detect erased flash.,hex,never empty,
-flash_geometry,zero_wait_note,Relation between products.flash_bytes (zero-wait region) and total capacity.,text,no note,prose
-flash_geometry,note,Other remarks (e.g. no RM erased value).,text,no note,prose
-flash_geometry,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-flash_geometry,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed).",enum(confirmed|conflict),never empty,fixed
-flash_geometry,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-flash_program_method,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-flash_program_method,program_method,"Fast-page programming procedure, named by the control bits the RM names.",text,never empty,prose
-flash_program_method,program_buffer_load_bits,"Width of one buffer load in bits, for buffered families.",integer,"not applicable (direct-writes family, no buffer)",
-flash_program_method,program_commit,Control bit that starts the write.,enum(PG_STRT (bit21)|STRT (bit6)),never empty,as-printed
-flash_program_method,erase_method,Fast erase procedure (or the block-erase bit for families without per-page fast erase).,text,never empty,prose
-flash_program_method,ctlr_bit_names,FLASH_CTLR field names as the family's EVT header spells them.,list(;),never empty,as-printed
-flash_program_method,undocumented_note,A step the driver performs that the RM never mentions.,text,none known,prose
-flash_program_method,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-flash_program_method,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed).",enum(confirmed|conflict),never empty,fixed
-flash_program_method,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-interrupts,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-interrupts,number,Interrupt/exception number from the EVT `IRQn_Type` enumeration.,integer,never empty,
-interrupts,name,Enumerator name without the `_IRQn` suffix.,name,never empty,as-printed
-interrupts,kind,`exception` (RISC-V processor exception) or `irq` (PFIC peripheral interrupt).,enum(exception|irq),never empty,fixed
-interrupts,description,One-line description from the EVT header.,text,never empty,prose
-interrupts,condition,EVT variant macros under which this number has this name.,list(|),unconditional,as-printed
-interrupts,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-interrupts,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-interrupts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-link_firmware,device,WCH debugger product the firmware is for (e.g. `WCH-LinkE`).,name,never empty,fixed
-link_firmware,mcu,"MCU of the debugger that runs the firmware, derived from its first instruction.",name,never empty,fixed
-link_firmware,mode,Target architecture mode the firmware serves (`RISC-V` or `ARM`).,enum(ARM|RISC-V),the firmware has one mode only,fixed
-link_firmware,role,"`offline` = the application image, which WCH's tools send in IAP mode; `iap` = the same application with the IAP bootloader prepended (its tail is the `offline` file byte for byte), written whole by an external programmer.",enum(iap|offline),never empty,fixed
-link_firmware,file,File name in WCH-LinkUtility.,name,never empty,as-printed
-link_firmware,size,File size in bytes.,integer,never empty,
-link_firmware,sha256,sha256 of the file; tells whether a local file is the one being distributed now.,name,never empty,
-link_firmware,wcfg_version,WCH's own version number from `wchlink.wcfg`.,integer,never empty,
-link_firmware,reported_version,"The version the device reports over USB, decoded from `wcfg_version` as `major.minor` (wcfg = major*10 + minor).",text,never empty,fixed
-link_firmware,measured_version,The version read from a real device with `tools/read_link_version.py`.,text,not measured,fixed
-link_firmware,set_version,Version of the WCH-LinkUtility set the files come from.,name,never empty,as-printed
-link_firmware,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-link_firmware,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-link_firmware,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-link_firmware_issues,device,WCH debugger product (e.g. `WCH-Link`); joins link_firmware.device.,name,never empty,fixed
-link_firmware_issues,mcu,MCU of the debugger that runs the firmware.,name,never empty,fixed
-link_firmware_issues,mode,Target architecture mode the firmware was running in.,enum(RISC-V),never empty,fixed
-link_firmware_issues,version,"Firmware version the device reports (`major.minor`), as measured.",text,never empty,fixed
-link_firmware_issues,wcfg_version,The same version in WCH's `wchlink.wcfg` numbering (major*10 + minor).,integer,never empty,
-link_firmware_issues,tool,Host tool the failure was seen with.,name,never empty,as-printed
-link_firmware_issues,target,Target part the failure was seen on; joins products part numbers.,name,never empty,fixed
-link_firmware_issues,symptom,"What fails, as recorded.",text,never empty,prose
-link_firmware_issues,works_in,Firmware version measured to work on the same hardware.,text,no working version measured,fixed
-link_firmware_issues,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-link_firmware_issues,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-link_firmware_issues,basis,The measurement record: `measured:<date>(<where it is recorded>)`.,text,never empty,prose
-manifest,path,"File name under index/ (every CSV and `VERSION`, except manifest.csv itself).",path,never empty,
-manifest,rows,Row count of the file (lines minus the header; 0 for `VERSION`).,integer,never empty,
-manifest,sha256,"SHA-256 of the file's bytes, lower-case hex without prefix.",name,never empty,
-memory_configs,part_number,Part whose FLASH/SRAM boundary moves with the user option bytes; joins products.part_number.,name,never empty,fixed
-memory_configs,value,Code of the `RAM_CODE_MOD` field (bits; `x` = either value).,text,never empty,as-printed
-memory_configs,code_bytes,Zero-wait code area in bytes for this code.,integer,never empty,
-memory_configs,sram_bytes,SRAM in bytes for this code.,integer,never empty,
-memory_configs,datasheet_value,`1` on the pair the datasheet comparison table lists (the row matching products.sram_bytes); not a shipped default.,enum(1),not the pair the datasheet lists,fixed
-memory_configs,option_byte_bits,Position of the field within the USER option byte at `0x1FFFF800` (write side).,text,never empty,as-printed
-memory_configs,obr_bits,Position of the field within `FLASH_OBR` (read side).,text,never empty,as-printed
-memory_configs,condition,Constraint attached to this code only.,text,no constraint,prose
-memory_configs,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-memory_configs,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed). Every row is conflict: the Chinese manual gives a 3-bit field, the English manual and the EVT header 2 bits.",enum(conflict),never empty,fixed
-memory_configs,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-memory_map,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-memory_map,region,Region name from the EVT `*_BASE` constant (or the linker-script region for `link-origin`).,name,never empty,as-printed
-memory_map,base_address,Start address of the region.,hex,never empty,
-memory_map,kind,"`memory`, `bus`, `peripheral` or `link-origin` (the start address the EVT linker script uses, most common value).",enum(bus|link-origin|memory|peripheral),never empty,fixed
-memory_map,condition,Variant macros or core the address applies to.,list(|),unconditional,as-printed
-memory_map,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-memory_map,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-memory_map,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-opa_cmp_registers,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins families.family.",name,never empty,fixed
-opa_cmp_registers,block,"Register block that holds the field (`OPA`, or `EXTEN` on CH32V003).",name,never empty,as-printed
-opa_cmp_registers,register,"Register name within the block, as the header spells it.",name,never empty,as-printed
-opa_cmp_registers,unit,Whether the register belongs to the op-amp or the comparator.,enum(CMP|OPA),never empty,fixed
-opa_cmp_registers,offset,Offset of the register within the block.,hex,never empty,
-opa_cmp_registers,address,Absolute address of the register.,hex,never empty,
-opa_cmp_registers,field,Field name with the block and register prefix dropped.,name,never empty,as-printed
-opa_cmp_registers,bits,Bit position `hi:lo` or a single bit.,bits,the mask is zero,
-opa_cmp_registers,mask,Mask of the define.,hex,never empty,
-opa_cmp_registers,purpose,"Role assigned from the field name (`enable`, `positive input select`, `gain` ...).",text,the field name declares no role,fixed
-opa_cmp_registers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-opa_cmp_registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-opa_cmp_registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-operating_conditions,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed
-operating_conditions,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `F_HCLK`, `f_ADC`).",name,never empty,fixed
-operating_conditions,parameter,"Parameter description in English, as the datasheet writes it.",text,not stated by the sources,as-printed
-operating_conditions,condition,Test or operating condition of the row.,text,no condition stated,as-printed
-operating_conditions,min,"Minimum value (a number, a formula against another symbol, or another symbol).",text,not stated by the sources,
-operating_conditions,typ,Typical or nominal value.,text,not stated by the sources,
-operating_conditions,max,"Maximum value (a number, a formula, or another symbol).",text,not stated by the sources,
-operating_conditions,unit,Unit of min/typ/max as the datasheet writes it.,name,not stated by the sources,fixed
-operating_conditions,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-operating_conditions,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-operating_conditions,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-option_byte_fields,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-option_byte_fields,byte,Option byte or byte group the field lives in.,enum(Data0-Data1|RDPR|USER|WRPR0-WRPR1|WRPR0-WRPR3),never empty,as-printed
-option_byte_fields,bits,Bit position within the byte: a single bit or `[hi:lo]`.,text,the row describes the whole byte or group,as-printed
-option_byte_fields,field,Field name as the RM prints it.,name,the row describes the whole byte or group,as-printed
-option_byte_fields,default,"Reset value at the granularity the RM states, source spelling kept.",text,never empty,as-printed
-option_byte_fields,wrpr_bit_protects,What one WRPR bit write-protects (WRPR group rows only).,text,not a WRPR group row,prose
-option_byte_fields,option,"Name of the option the field sets, from WCH EVT's write API: `iwdg`, `stop-reset`, `standby-reset`, `reset-pin`, `reset-pin-select`, `over-voltage`, `start-mode`, `can-bus-off`, `ram-split`, `usbfs-download`, `usbhs-download`, `usart-download`; `write-protect` on the WRPR rows.",enum(can-bus-off|iwdg|over-voltage|ram-split|reset-pin|reset-pin-select|standby-reset|start-mode|stop-reset|usart-download|usbfs-download|usbhs-download|write-protect),EVT's write API does not set the field,fixed
-option_byte_fields,evt_argument,"The EVT argument that writes the field: a parameter of `FLASH_UserOptionByteConfig` (`Peripheral/src/*_flash.c`; the function's own parameter list, not the header's declaration), or `FLASH_EnableWriteProtection` on the WRPR rows.",name,EVT's write API does not set the field,as-printed
-option_byte_fields,evt_values,"Each value of the field and the EVT constant that writes it, `value=CONSTANT` joined by `;` (e.g. `1=OB_STDBY_NoRST;0=OB_STDBY_RST`); the value is the field's own bits, so `1=` names what a set bit means. On the WRPR rows `1=protected` is the polarity of `FLASH_EnableWriteProtection`'s argument: EVT writes the complement into the WRPR bytes, so in the stored byte a 0 bit is protected.",list(;),EVT's write API does not set the field,as-printed
-option_byte_fields,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-option_byte_fields,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-option_byte_fields,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-option_bytes,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-option_bytes,address,Absolute address of the option byte.,hex,never empty,
-option_bytes,offset,Distance from the option-byte base (the region's lowest address).,hex,never empty,
-option_bytes,byte,"Byte name as printed (RDPR, USER, Data0, WRPR0, Reserved, ...).",enum(Data0|Data1|RDPR|Reserved|USER|WRPR0|WRPR1|WRPR2|WRPR3),never empty,as-printed
-option_bytes,complement_address,Address of the inverse-code byte paired with it.,hex,the table leaves the byte unpaired (Reserved),
-option_bytes,write_unit,"How the region is programmed, classified from the control bit the RM programming procedure names.","enum(fast page, 32-bit buffer writes (FTPG)|fast page, 32-bit buffer writes (FTPG); complement auto-computed|half-word (OBPG); complement auto-computed)",never empty,prose
-option_bytes,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-option_bytes,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-option_bytes,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-packages,package,Package name key.,name,never empty,fixed
-packages,pin_count,Lead count.,integer,never empty,
-packages,body_size,Body size as `W*Lmm`.,text,never empty,as-printed
-packages,pin_pitch,Lead pitch with unit (e.g. `0.5mm`).,text,never empty,as-printed
-packages,product_count,Number of part numbers in this package.,integer,never empty,
-packages,families,Families that use the package.,list(;),never empty,fixed
-packages,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-packages,pin_count_confidence,"Confidence of `pin_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-packages,body_size_confidence,"Confidence of `body_size`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-packages,pin_pitch_confidence,"Confidence of `pin_pitch`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-packages,pin_count_basis,Sources that support `pin_count`.,text,never empty,prose
-packages,body_size_basis,Sources that support `body_size`.,text,never empty,prose
-packages,pin_pitch_basis,Sources that support `pin_pitch`.,text,never empty,prose
-parts,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed
-parts,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-parts,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-parts,package,Package name; joins packages.package.,name,never empty,fixed
-parts,pins,"Lead count of the package, from catalog packages.",integer,never empty,
-parts,flash_bytes,"Zero-wait flash size in bytes, from catalog products.",integer,never empty,
-parts,sram_bytes,"SRAM size in bytes, from catalog products.",integer,never empty,
-parts,gpio_count,"GPIO count, from catalog products.",integer,never empty,
-parts,clock_max,"Maximum clock from operating_conditions (F_MAIN, else F_HCLK, F_SYSCLK, F_CORE), with unit; several values joined with `/`.",text,never empty,prose
-parts,vdd_min,"Lowest V_DD minimum across the series' operating_conditions rows, in V.",decimal,not stated by the sources,
-parts,vdd_max,"Highest V_DD maximum across the series' operating_conditions rows, in V.",decimal,not stated by the sources,
-parts,temperature,"Operating temperature range from catalog products, written `lo..hiC`.",text,not stated by the sources,as-printed
-parts,usart,"USART/UART comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,spi,"SPI comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,i2c,"I2C comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,can,"CAN comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,usb,"USB comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,adc,"ADC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,dac,"DAC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,opa,"OPA comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,cmp,"Comparator comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,timers_advanced,"Advanced-control timer comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,timers_general,"General-purpose timer comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,rtc,"RTC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,ethernet,"Ethernet comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed
-parts,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-parts,confidence,"Weakest confidence among the products columns the row uses (flash_bytes, sram_bytes, gpio_count, temperature): confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-pin_alternate,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-pin_alternate,pad,GPIO pad name.,name,never empty,as-printed
-pin_alternate,port,GPIO port letter.,enum(A|B|C|D|E|F),never empty,fixed
-pin_alternate,pin,GPIO pin number within the port.,integer,never empty,
-pin_alternate,block,Peripheral block holding the AF register.,enum(AFIO),never empty,as-printed
-pin_alternate,register,"AF register for the pad (`GPIOx_AFLR` for pins 0-7, `GPIOx_AFHR` for pins 8-15).",name,never empty,as-printed
-pin_alternate,address,Absolute address of that register.,hex,never empty,
-pin_alternate,bits,"Register bits that hold the pad's AF number, LSB first.",reg-bits,never empty,
-pin_alternate,width_bits,Width of the AF number field in bits.,integer,never empty,
-pin_alternate,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-pin_alternate,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-pin_alternate,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-pin_conditions,series,Series key; joins series.series.,name,never empty,fixed
-pin_conditions,signal,Signal whose pad depends on which peripherals are enabled.,name,never empty,as-printed
-pin_conditions,condition,"The manual's conjunction, `&`-separated terms `NAME=0` or `NAME=1`; a row applies when every term holds, and the row with the most terms wins.",text,never empty,as-printed
-pin_conditions,pad,Pad the signal is on under the condition.,name,the documents say the signal is unavailable under that condition,as-printed
-pin_conditions,errata,Erratum that qualifies the row; joins errata.id.,name,no erratum applies,fixed
-pin_conditions,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-pin_conditions,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-pin_conditions,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-pinout,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed
-pinout,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-pinout,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-pinout,pin,Lead number; an exposed pad is `EP`.,text,never empty,as-printed
-pinout,pad,"Pad name as the datasheet spells it (e.g. `PA0-WKUP`, `LO1`).",name,never empty,as-printed
-pinout,port,"GPIO port letter of the pad read as a GPIO, decorations dropped (also from a parenthesised alias or a GPIO name listed on a function-named pad).",name,not a GPIO pad,fixed
-pinout,gpio,GPIO pin number of the pad read as a GPIO.,integer,not a GPIO pad,
-pinout,kind,"Lead kind: `gpio`, `power`, `analog`, `other` or `nc` (marked not connected by the datasheet).",enum(analog|gpio|nc|other|power),never empty,fixed
-pinout,peripheral,Normalised peripheral of the function (e.g. `USART1`).,name,lead listed without a function,fixed
-pinout,role,Normalised role of the function within the peripheral (e.g. `TX`).,name,lead listed without a function,fixed
-pinout,signal,"Function as the datasheet spells it (e.g. `USART1_TX`, `TX1`, `UTX`).",name,lead listed without a function,as-printed
-pinout,route,"How the function is reached: `main` (live at reset), `default` (default alternate function, no remap), `remap-N` or `af-N`.",name,"no function, or the pin table gives no route",fixed
-pinout,selector,AFIO selector that picks this route; key into routes.,name,not applicable (no selector),fixed
-pinout,value,Selector value for this route (`0` for `default`/`main`).,integer,not applicable (no selector),
-pinout,af,N of `af-N` (AF-number families); the register is in pin_alternate.,integer,not applicable (route is not `af-N`),
-pinout,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-pinout,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-pinout,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-products,part_number,Orderable part number key.,name,never empty,fixed
-products,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-products,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-products,package,Package name; joins packages.package.,name,never empty,fixed
-products,flash_bytes,"Flash that executes with zero wait, in bytes (the amount for FLASH in the linker script).",integer,never empty,
-products,sram_bytes,SRAM size in bytes.,integer,never empty,
-products,gpio_count,GPIO count.,integer,never empty,
-products,temperature,"Operating temperature range, written `lo..hiC`.",text,not stated by the sources,as-printed
-products,packing,"Packing type from the ordering-information table (e.g. `Tray`), spelled as printed.",text,the ordering-information table gives no packing type,as-printed
-products,listed_as,"Abbreviation the comparison table uses for the part (e.g. `CH32V208CB`, wildcard `C6x6`).",name,the comparison table lists the full part number,as-printed
-products,datasheet,Datasheet the part is listed in.,name,never empty,fixed
-products,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-products,part_number_confidence,"Confidence of `part_number`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-products,series_confidence,"Confidence of `series`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-products,package_confidence,"Confidence of `package`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed
-products,flash_bytes_confidence,"Confidence of `flash_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-products,sram_bytes_confidence,"Confidence of `sram_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-products,gpio_count_confidence,"Confidence of `gpio_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-products,temperature_confidence,"Confidence of `temperature`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|missing|reference),never empty,fixed
-products,packing_confidence,"Confidence of `packing`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|missing|reference),never empty,fixed
-products,part_number_basis,Sources that support `part_number`.,text,never empty,prose
-products,series_basis,Sources that support `series`.,text,never empty,prose
-products,package_basis,Sources that support `package`.,text,never empty,prose
-products,flash_bytes_basis,Sources that support `flash_bytes`.,text,never empty,prose
-products,sram_bytes_basis,Sources that support `sram_bytes`.,text,never empty,prose
-products,gpio_count_basis,Sources that support `gpio_count`.,text,never empty,prose
-products,temperature_basis,Sources that support `temperature`.,text,no source states the value,prose
-products,packing_basis,Sources that support `packing`.,text,no source states the value,prose
-register_blocks,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-register_blocks,block,"Peripheral instance name (e.g. `USART1`). Collected from the EVT device header, the per-peripheral headers that define a block pointer (`PIOC`), and `core_riscv.h` (`PFIC`, `SysTick`, CH32H417 `HSEM`/`IPC`); blocks a header defines but the family does not have are removed by human judgment (`curated/register-blocks-absent.json`).",name,never empty,as-printed
-register_blocks,type,"EVT `*_TypeDef` stem the block uses (e.g. `USART`); `*_Type` for the core blocks of `core_riscv.h` (`PFIC`, `SysTick`); the block name itself when the header defines the registers only as address macros (CH32V103 `USBFS`).",name,never empty,as-printed
-register_blocks,layout,Layout key (8-hex-digit hash of the type's structure); equal keys share register definitions; carries no other meaning.,name,the EVT headers have no type structure for the block (CH32H417 `UHSIF`; CH32V103 `USBFS` is address macros only),
-register_blocks,base_address,Base address of the block.,hex,never empty,
-register_blocks,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-register_blocks,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-register_blocks,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-register_layouts,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-register_layouts,type,EVT `*_TypeDef` stem.,name,never empty,as-printed
-register_layouts,layout,Layout key: 8-hex-digit hash of the structure and its define names; equal keys share register definitions.,name,never empty,
-register_layouts,registers,Number of non-reserved structure members.,integer,never empty,
-register_layouts,fields,Number of bit defines for the type.,integer,never empty,
-register_layouts,size_bytes,Size of the structure in bytes.,integer,never empty,
-register_layouts,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-register_layouts,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-register_layouts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-register_map,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-register_map,block,Peripheral instance name.,name,never empty,as-printed
-register_map,type,EVT `*_TypeDef` stem of the block.,name,never empty,as-printed
-register_map,register,Structure member (register) name as the header spells it.,name,the block's struct is not in the header,as-printed
-register_map,address,Absolute address: block base + register offset.,hex,never empty,
-register_map,offset,Offset of the register within the block.,hex,the block's struct is not in the header,
-register_map,width_bits,Register width in bits.,integer,the block's struct is not in the header,
-register_map,count,Array element count of the member (1 for a plain register).,integer,the block's struct is not in the header,
-register_map,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-register_map,confidence,"Weakest confidence of the block and register rows joined: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-register_map,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-registers,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-registers,type,EVT `*_TypeDef` stem.,name,never empty,as-printed
-registers,register,"Struct member as the header spells it; arrays per element (`EXTICR[1]`), nested structs flattened (`sTxMailBox[0].TXMIR`).",name,never empty,as-printed
-registers,offset,Offset of the register within the struct (array element = first + index x width).,hex,the define's banner could not be tied to a struct member,
-registers,width_bits,Register width in bits.,integer,the define's banner could not be tied to a struct member,
-registers,count,Array element count of the struct member.,integer,the define's banner could not be tied to a struct member,
-registers,field,Readable field name (type and register prefix dropped).,name,register has no bit defines,as-printed
-registers,define,EVT define spelling (e.g. `RCC_APB2PCENR_USART1EN`).,name,register has no bit defines,as-printed
-registers,kind,`field` (a bit field) or `value` (an enumerated value within a field).,enum(field|value),register has no bit defines,fixed
-registers,of_field,Parent field of a `value` row.,name,"not a `value` row, or no parent field",as-printed
-registers,bits,Bit position `hi:lo` or a single bit; a bench-measured position overrides the header where the documents disagree.,bits,"no bit defines, or the mask is zero or not contiguous",
-registers,mask,Mask of the define.,hex,register has no bit defines,
-registers,value,"Value within the parent field (`mask >> lo`), for `value` rows.",integer,not a `value` row,
-registers,description,EVT one-line description of the define.,text,the header gives no description,prose
-registers,access,"Access type from the Chinese edition of the reference manual, spelled as printed; the manual defines RO, RZ, WO, WA, WZ, RW, RWA, RW1, RW0, RW1Z, and a few fields print other spellings (W1, W0, RWO, R0) that are misprints kept as printed.",enum(R0|RO|RW|RW0|RW1|RW1Z|RWO|W0|W1|WO|WZ),not matched against the reference manual,as-printed
-registers,reset,Reset value from the reference manual (a register-level value on rows without a field; may contain `X`).,text,not stated or not matched against the reference manual,
-registers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-registers,access_confidence,"Confidence of `access` alone, checked against the English edition: confirmed = both editions print the same term; reference = the English edition's field could not be read; conflict = the editions print different terms (both are in `access_basis` and in conflicts.csv).",enum(confirmed|conflict|reference),no access stated (no reference manual row for the field),fixed
-registers,access_basis,"Editions that state `access`, joined by `+`; `!<document>:en(=X)` gives the English edition's differing term.",text,no access stated,prose
-routes,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed
-routes,selector,Remap selector identifier assigned by this repository (e.g. `afio-tim2-remap`).,name,never empty,fixed
-routes,controller,"Block that owns the selector's register: `afio`, or `extend` for the EXTEN block.",enum(afio|extend),never empty,fixed
-routes,register,Register(s) holding the selector; `PCFR1|PCFR2` when the field spans two registers.,name,never empty,as-printed
-routes,bits,"Register and bit of each selector bit, LSB of the value first.",reg-bits,never empty,
-routes,value,Selector value.,integer,never empty,
-routes,peripheral,Normalised peripheral of the signal.,name,the signal is not a peripheral function (a GPIO name),fixed
-routes,role,Normalised role of the signal.,name,the signal is not a peripheral function (a GPIO name),fixed
-routes,signal,Signal as the document spells it.,name,never empty,as-printed
-routes,pad,Pad the signal goes to with this value.,name,never empty,as-printed
-routes,port,GPIO port letter of the pad.,name,not a GPIO pad,fixed
-routes,gpio,GPIO pin number of the pad.,integer,not a GPIO pad,
-routes,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-routes,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed
-routes,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-series,series,Series key.,name,never empty,fixed
-series,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-series,core,Core as the chip datasheet states it.,name,never empty,fixed
-series,isa,ISA as the chip datasheet states it (how the chip chose the core's optional parts).,text,never empty,as-printed
-series,flash_bytes,Zero-wait flash size in bytes shared by every part of the series.,integer,not a single value for the series (varies by package; see products),
-series,sram_bytes,SRAM size in bytes shared by every part of the series.,integer,not a single value for the series (varies by package; see products),
-series,gpio_count,GPIO count shared by every part of the series.,integer,not a single value for the series (varies by package; see products),
-series,temperature,"Operating temperature range shared by every part, written `lo..hiC`.",text,not a single value for the series (varies by package; see products) or not stated,as-printed
-series,packages,Packages the series comes in.,"list(,)",never empty,fixed
-series,part_number_count,Number of part numbers in the series.,integer,never empty,
-series,datasheets,Datasheets the series is listed in.,list(;),never empty,fixed
-series,product_url_zh,WCH product page (Chinese site).,url,never empty,
-series,product_url_en,WCH product page (English site).,url,never empty,
-series,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-series,core_confidence,"Confidence of `core`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-series,isa_confidence,"Confidence of `isa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-series,flash_bytes_confidence,"Confidence of `flash_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; partial = uneven confidence among the member parts; varies-by-package = the value depends on the package or variant.",enum(confirmed|partial|varies-by-package),never empty,fixed
-series,sram_bytes_confidence,"Confidence of `sram_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; partial = uneven confidence among the member parts; varies-by-package = the value depends on the package or variant.",enum(confirmed|partial|varies-by-package),never empty,fixed
-series,gpio_count_confidence,"Confidence of `gpio_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; varies-by-package = the value depends on the package or variant.",enum(confirmed|varies-by-package),never empty,fixed
-series,temperature_confidence,"Confidence of `temperature`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; partial = uneven confidence among the member parts; varies-by-package = the value depends on the package or variant.",enum(confirmed|missing|partial|varies-by-package),never empty,fixed
-series,core_basis,Sources that support `core`.,text,never empty,prose
-series,isa_basis,Sources that support `isa`.,text,never empty,prose
-systick,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-systick,block,"SysTick instance (`SysTick`, or `SysTick0`/`SysTick1` per core on dual-core CH32H417).",enum(SysTick|SysTick0|SysTick1),never empty,as-printed
-systick,register,Register name from `SysTick_Type` in core_riscv.h.,enum(CMP|CMPHR|CMPLR|CNT|CNTH|CNTL|CTLR|ISR|SR),never empty,as-printed
-systick,offset,Offset within the SysTick block.,hex,never empty,
-systick,address,Absolute address of the register.,hex,never empty,
-systick,width_bits,Register width in bits.,integer,never empty,
-systick,write_bits,"Access width the register accepts for writes, in bits.",integer,never empty,
-systick,purpose,What the register is for.,enum(compare|compare_high|compare_low|control|counter|counter_high|counter_low|status),never empty,fixed
-systick,note,Remark on the register.,text,no remark,prose
-systick,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-systick,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
-systick,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-timers,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
-timers,timer,Timer instance.,name,never empty,as-printed
-timers,kind,Timer kind from the RM register heading.,enum(advanced|general-purpose|streamlined),the RM heading does not state the kind,fixed
-timers,counter_width_bits,"Counter width in bits, from the RM CNT field table.",integer,never empty,
-timers,channels,"Highest channel number reaching a pin, counted from index/pinout (not the silicon's limit).",integer,no channel of the timer reaches a pin,
-timers,complementary,`1` if any complementary output (`CHxN`) reaches a pin.,enum(1),no complementary output reaches a pin,
-timers,update_vector,"Interrupt vector name of the timer's update interrupt, from interrupts.",name,no vector found for the timer,as-printed
-timers,condition,Variant macros the counter width applies to.,list(;),unconditional,as-printed
-timers,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-timers,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction; varies-by-package = the value depends on the package or variant.",enum(conflict|reference|varies-by-package),never empty,fixed
-timers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
-usbpd_plumbing,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins families.family.",name,never empty,fixed
-usbpd_plumbing,peripheral,"USB-PD instance (`USBPD`, or `USBPD0`/`USBPD1` on CH32M030).",name,never empty,as-printed
-usbpd_plumbing,rcc_register,RCC register that holds the clock-enable bit.,name,never empty,as-printed
-usbpd_plumbing,rcc_bit,Bit number of the clock enable.,integer,never empty,
-usbpd_plumbing,rcc_address,Absolute address of the RCC register.,hex,never empty,
-usbpd_plumbing,phy_block,Register block that holds the PD PHY configuration field.,name,never empty,as-printed
-usbpd_plumbing,phy_register,Register within that block.,name,never empty,as-printed
-usbpd_plumbing,phy_field,"PD PHY configuration field, as the header spells it.",name,never empty,as-printed
-usbpd_plumbing,phy_bits,"Bit position of the field, `hi:lo` or a single bit.",bits,never empty,
-usbpd_plumbing,phy_mask,Mask of the field.,hex,never empty,
-usbpd_plumbing,phy_address,Absolute address of the PHY register.,hex,never empty,
-usbpd_plumbing,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
-usbpd_plumbing,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
-usbpd_plumbing,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
+table,column,meaning,format,empty,spelling,role
+absolute_maximum_ratings,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed,data
+absolute_maximum_ratings,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `I_INJ(PIN)`).",name,never empty,fixed,data
+absolute_maximum_ratings,parameter,"Parameter description in English, as the datasheet writes it.",text,never empty,as-printed,data
+absolute_maximum_ratings,condition,"Condition or part the limit is stated for, from the table's unnamed column.",text,no condition stated,as-printed,data
+absolute_maximum_ratings,min,Lowest value the part survives (a number or a formula).,text,not stated by the sources,,data
+absolute_maximum_ratings,max,"Highest value the part survives (a number, a formula, or `+/-n`).",text,not stated by the sources,,data
+absolute_maximum_ratings,unit,Unit of min/max as the datasheet writes it.,name,never empty,fixed,data
+absolute_maximum_ratings,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+absolute_maximum_ratings,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+absolute_maximum_ratings,datasheet,Datasheet the row is read from; joins products.datasheet.,name,never empty,fixed,provenance
+adc_internal,family,Family key; joins families.family.,name,never empty,fixed,data
+adc_internal,source,Internal ADC source the row describes.,enum(temperature_sensor|vdd_half|vrefint),never empty,fixed,data
+adc_internal,channel,ADC input channel number (ADC_IN n) the internal source is connected to.,integer,the sources state no such source for the family (`confidence` = missing),,data
+adc_internal,sample_time,"Sample time needed when reading this source, in `sample_time_unit`.",decimal,not stated by the sources,,data
+adc_internal,sample_time_unit,Unit of `sample_time` (`us` or `adc_cycles` = ADC clock cycles); not normalised because it differs per family.,enum(adc_cycles|us),not stated by the sources,fixed,data
+adc_internal,sample_clock_mhz,"ADC clock in MHz that the sample time assumes, when the unit is `us`.",integer,"not stated, or not applicable (unit is not `us`)",,data
+adc_internal,v25_mv,"Temperature sensor output at 25 C, typical, in mV.",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,v25_mv_min,"Temperature sensor output at 25 C, minimum, in mV.",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,v25_mv_max,"Temperature sensor output at 25 C, maximum, in mV.",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,avg_slope_uv_c,"Temperature sensor average slope, typical, in uV per degree C (negative temperature coefficient).",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,avg_slope_uv_c_min,"Temperature sensor average slope, minimum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,avg_slope_uv_c_max,"Temperature sensor average slope, maximum, in uV per degree C.",integer,not applicable (not the temperature sensor) or not stated,,data
+adc_internal,vrefint_mv,"Internal reference voltage, typical, in mV.",integer,"not applicable (not vrefint), or the datasheet gives only min and max",,data
+adc_internal,vrefint_mv_min,"Internal reference voltage, minimum, in mV.",integer,not applicable (not vrefint) or not stated,,data
+adc_internal,vrefint_mv_max,"Internal reference voltage, maximum, in mV.",integer,not applicable (not vrefint) or not stated,,data
+adc_internal,temp_range_c,"Temperature sensor measurement range in degrees C, written `lo..hi`.",text,not stated by the sources,,data
+adc_internal,temp_error_c,Temperature sensor measurement error in degrees C.,integer,not stated by the sources,,data
+adc_internal,enable_register,ADC register holding the bit that must be set before this internal channel reads anything (from the reference manual's ADC field table).,name,the reference manual's ADC registers have no enable bit for this channel,as-printed,data
+adc_internal,enable_field,Name of that enable bit (`TSVREFE` enables the temperature sensor and VREFINT together; `VREFE` enables VREFINT only).,name,the reference manual's ADC registers have no enable bit for this channel,as-printed,data
+adc_internal,enable_bit,Bit position of that enable bit in `enable_register`.,integer,the reference manual's ADC registers have no enable bit for this channel,,data
+adc_internal,enable_confidence,"Confidence of `enable`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`enable` is empty,fixed,provenance
+adc_internal,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+adc_internal,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+capabilities,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
+capabilities,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+capabilities,family,Family key; joins families.family.,name,never empty,fixed,data
+capabilities,capability,"Normalised capability name (e.g. `usart`, `can-fd`, `timer-general`, `adc` = unit count, `adc-channel` = channel count).",name,never empty,fixed,data
+capabilities,qualifier,"Distinction the document itself draws inside the capability (e.g. `32bit`, `tim1`, `include-phy`, `adc1`); spelling differences are not qualifiers.",name,no distinction drawn within the capability,fixed,data
+capabilities,stated,"How the document states the value: `count` (a bare integer), `marker` (claims presence without a number) or `text` (anything else).",enum(count|marker|text),never empty,fixed,data
+capabilities,count,"The integer value, only when `stated` is `count`; no counting rule is applied.",integer,not applicable (`stated` is `marker` or `text`),,data
+capabilities,value,The document's value verbatim.,text,never empty,as-printed,data
+capabilities,attribute,The evidence product_attributes key the row came from (the way back to the evidence).,name,never empty,fixed,data
+capabilities,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+capabilities,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_configs,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_configs,config,Name of the EVT `system_ch32*.c` clock configuration function (one function = one configuration).,name,never empty,as-printed,data
+clock_configs,source,"Oscillator the configuration runs from, as named in the function name.",enum(HSE|HSI),the function name names no oscillator,fixed,data
+clock_configs,condition,Compile-time branch (`#if`/`#ifdef` expression or `else`) under which this row's writes apply.,text,unconditional (no compile-time branch),as-printed,data
+clock_configs,domains,"Clock domain frequencies the configuration sets, as `name=Hz` pairs (e.g. `SYSCLK=48000000;CoreCLK[V5F]=...`).",list(;),the configuration name states no frequency (e.g. running straight off HSE),fixed,data
+clock_configs,hpre,"AHB (HCLK) prescaler divider the configuration writes; joins clock_prescalers (field HPRE, divider).",integer,never empty,,data
+clock_configs,ppre1,"APB1 (PCLK1) prescaler divider the configuration writes; joins clock_prescalers (field PPRE1, divider).",integer,not written by the configuration (family has no such prescaler),,data
+clock_configs,ppre2,"APB2 (PCLK2) prescaler divider the configuration writes; joins clock_prescalers (field PPRE2, divider).",integer,not written by the configuration (family has no such prescaler),,data
+clock_configs,fpre,"V3F-side HCLK prescaler divider (CH32H417/CH32X315 `RCC_FPRE_DIVn`); joins clock_prescalers (field FPRE, divider).",integer,not written by the configuration (family has no such prescaler),,data
+clock_configs,pll,"PLL setting symbols the configuration writes, as EVT symbol names (resolved to values in clock_symbols); `SYMBOL=0` when the configuration clears that field alone and writes no value to it (CH32H417 `RCC_SYSPLL_SEL=0` selects the PLL).",list(;),the configuration does not use the PLL,as-printed,data
+clock_configs,flash_latency,Flash wait-state value (FLASH_ACTLR LATENCY) the configuration writes.,integer,the configuration does not write latency,,data
+clock_configs,flash_sck_div,"Flash access clock divider (HCLK/n) the configuration writes: FLASH_ACTLR SCK_CFG on CH32X315/CH32H417, FLASH_CTLR SCKMOD on CH32V407; not wait states.",integer,not applicable (family has no such divider) or not written,,data
+clock_configs,flash_writes,"Literal writes to FLASH registers inside the configuration, in order, as `FLASH->REGISTER=0x...` or `|=` (CH32V407: the KEYR/MODEKEYR unlock pairs before changing SCKMOD and `CTLR|=0x00008080` after; CH32X315 does the same in SystemInit, see clock_init).",list(;),the configuration writes no literal value to FLASH,as-printed,data
+clock_configs,outside_rcc,"Register written outside RCC and the symbol written to it, as `BLOCK->REGISTER SYMBOL` (e.g. EXTEN PLL HSI prescaler).",text,no register outside RCC is written,as-printed,data
+clock_configs,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+clock_configs,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_enables,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_enables,peripheral,Peripheral name as the EVT RCC constant spells it (`RCC_<bus>Periph_<name>`).,name,never empty,fixed,data
+clock_enables,bus,"Bus name as the family's EVT spells it (AHB/APB1/APB2, HB/PB1/PB2, HB/HB1/HB2).",enum(AHB|APB1|APB2|HB|HB1|HB2|PB1|PB2),never empty,as-printed,data
+clock_enables,register,RCC clock-enable register the bus name maps to (`<bus>PCENR`).,enum(AHBPCENR|APB1PCENR|APB2PCENR|HB1PCENR|HB2PCENR|HBPCENR|PB1PCENR|PB2PCENR),never empty,as-printed,data
+clock_enables,offset,Offset of the enable register within RCC.,hex,never empty,,data
+clock_enables,address,Absolute address of the enable register.,hex,never empty,,data
+clock_enables,bit,"Bit position of the enable bit in the register, `hi:lo` for a contiguous multi-bit mask.",bits,the macro sets bits that are not contiguous (read `mask`),,data
+clock_enables,mask,Mask of the enable bit(s) as the EVT constant defines it.,hex,never empty,,data
+clock_enables,macro,EVT constant passed to `RCC_<bus>PeriphClockCmd()` for this peripheral.,name,never empty,as-printed,data
+clock_enables,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+clock_enables,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_init,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_init,function,"EVT function the step belongs to: `SystemInit`, or a configuration function (joins clock_configs.config; its steps are the EVT's own order).",name,never empty,as-printed,data
+clock_init,step,"Order of the step within the function, from 0.",integer,never empty,,data
+clock_init,action,"What the step does: `set` (`|=`), `clear` (`&=`), `write` (`=`), `poll` (`while`) or `trim` (load the HSI factory trim).",enum(clear|poll|set|trim|write),never empty,fixed,data
+clock_init,register,"Register written or polled, as `BLOCK->REGISTER`.",name,never empty,as-printed,data
+clock_init,address,"Absolute address involved: the register's address, or for a trim step the address the factory value is read from.",hex,address not resolved,,data
+clock_init,value,"Value of the step in decimal; for `clear` it is the AND mask (the bits kept): a literal mask as written, or `~X` taken over 32 bits.",integer,never empty,,data
+clock_init,source,Symbol the trim value is read from (trim steps only).,name,not applicable (not a trim step read from a symbol),as-printed,data
+clock_init,condition,Condition guarding the step: a value test (e.g. `!= 0xFF`) or a compile-time macro.,text,unconditional,as-printed,data
+clock_init,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+clock_init,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_prescalers,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_prescalers,field,RCC prescaler field.,enum(ADCPRE|FPRE|HPRE|PPRE1|PPRE2),never empty,as-printed,data
+clock_prescalers,divider,Division ratio the value selects.,integer,never empty,,data
+clock_prescalers,value,"Value that selects the divider, shifted into position, in decimal.",integer,never empty,,data
+clock_prescalers,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+clock_prescalers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_sources,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_sources,consumer,"Clock consumer that can select a source (USB, RTC, ADC, I2S, RNG, ETH, SYS, ...).",name,never empty,as-printed,data
+clock_sources,option,"Selectable source, from the `RCC_*CLKSource_*` constant name.",name,never empty,as-printed,data
+clock_sources,value,Value of the constant (decimal) that selects the option.,integer,never empty,,data
+clock_sources,register,RCC register holding the selector field.,enum(BDCTLR|CFGR0|CFGR2),the EVT RCC header and driver name no register for this selector,as-printed,data
+clock_sources,shift,Bit shift of the selector field in the register.,integer,never empty,,data
+clock_sources,condition,Compile-time branch under which this value means this option.,text,unconditional,as-printed,data
+clock_sources,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+clock_sources,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+clock_symbols,family,Family key; joins families.family.,name,never empty,fixed,data
+clock_symbols,symbol,EVT header symbol used in clock_configs `pll`/`outside_rcc` or observed in the configuration code.,name,never empty,as-printed,data
+clock_symbols,role,"What the symbol is, from how the code uses it: `value` (`|=`), `mask` (`&= ~`) or `poll` (`while`).",enum(mask|poll|value),never empty,fixed,data
+clock_symbols,register,Destination register as `BLOCK->REGISTER`.,name,never empty,as-printed,data
+clock_symbols,address,Absolute address of that register.,hex,address not resolved,,data
+clock_symbols,value,"Numeric value of the symbol, shifted into position, in decimal.",integer,never empty,,data
+clock_symbols,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(conflict|reference),never empty,fixed,provenance
+clock_symbols,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+conflicts,table,Catalog or evidence table where the conflicted row lives.,name,never empty,fixed,data
+conflicts,family,"Family of the conflicted row, when that table has a family column.",name,the source table has no family column,fixed,data
+conflicts,series,"Series of the conflicted row, when that table has a series column.",list(;),the source table has no series column,fixed,data
+conflicts,part_number,"Part number of the conflicted row, when that table has a part_number column.",name,the source table has no part_number column,fixed,data
+conflicts,subject,"Key columns of the conflicted row, as space-separated `col=value` pairs.",text,never empty,prose,data
+conflicts,field,Column in dispute.,name,the row asserts several values and the basis does not name one column,fixed,data
+conflicts,kept,Value the source table kept in the disputed column.,text,no single disputed column (`field` is empty),as-printed,data
+conflicts,dissenting,Sources marked `!` in the basis.,text,the dissent is not recorded as a `!` source in the basis,prose,data
+conflicts,alternative,"What the dissenting sources state, from `(=...)` in the basis (translated reading for a Chinese dissent).",text,the disagreement is recorded in prose (see that table's section of evidence/README.md),prose,data
+conflicts,basis,"Basis of the conflicted row, including its `!` dissenting sources and `(=...)` alternatives.",text,never empty,prose,provenance
+cores,core,QingKe core name.,name,never empty,fixed,data
+cores,isa,Core ISA as the core manual's overview table states it (brackets mark optional extensions).,text,never empty,as-printed,data
+cores,manual,QingKe processor manual the core is described in.,name,never empty,fixed,data
+cores,note,Remark on the core.,text,no remark,prose,data
+cores,isa_confidence,"Confidence of `isa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+cores,isa_basis,Sources that support `isa`.,text,never empty,prose,provenance
+debug_data,family,Family key; joins families.family.,name,never empty,fixed,data
+debug_data,core,Core(s) of the family.,text,never empty,as-printed,data
+debug_data,dm_data0_addr,"Hart-side address of the debug module data0 register (DMDATA0, used by SDI printf).",hex,not stated by any source (CH32H417),,data
+debug_data,dm_data1_addr,Hart-side address of the debug module data1 register; always `dm_data0_addr + 4`.,hex,not stated by any source (CH32H417),,data
+debug_data,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+debug_data,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+debug_data,evt_file,EVT debug.c file whose DEBUG_DATA0_ADDRESS define was read.,path,the family's EVT has no such define,,provenance
+debug_interfaces,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+debug_interfaces,family,Family key; joins families.family.,name,never empty,fixed,data
+debug_interfaces,debug_if,"Debug wiring: `swio` (1-wire SWIO), `rvswd` (2-wire SWDIO+SWCLK) or `both` (the WCH-Link manual lists the series as supporting both).",enum(both|rvswd|swio),never empty,fixed,data
+debug_interfaces,wording,English datasheet section heading the debug interface was read from.,text,the heading used has no English edition,as-printed,data
+debug_interfaces,section,Datasheet section number of that heading.,text,never empty,as-printed,data
+debug_interfaces,swdio_pads,"Pads carrying SWDIO for the series, from index/pinout.",list(;),never empty,as-printed,data
+debug_interfaces,swclk_pads,"Pads carrying SWCLK for the series, from index/pinout.",list(;),no SWCLK pad (1-wire series),as-printed,data
+debug_interfaces,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+debug_interfaces,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+device_ids,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
+device_ids,device_id,32-bit device ID of the part (package variants differ in bits [19:16]).,hex,never empty,,data
+device_ids,id_addr,Address the device ID is read from.,hex,never empty,,data
+device_ids,dont_care_bits,"Bits of the ID to ignore when matching (silicon revision), written `[hi:lo]`.",text,never empty,fixed,data
+device_ids,id_source,Measurement channel of a real-silicon read (`memory` address read or `attach` probe response).,enum(memory|attach),"documented or imported value, not measured on silicon",fixed,data
+device_ids,note,Remark on the ID format.,text,no remark,prose,data
+device_ids,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+device_ids,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+dma,family,Family key; joins families.family.,name,never empty,fixed,data
+dma,variant,EVT variant macros whose DMA configuration the row belongs to (CH32V20x/V30x).,list(|),same for every variant of the family,as-printed,data
+dma,dma,DMA controller.,enum(DMA1|DMA2),not applicable (CH32H417 DMAMUX: request is not tied to a channel),as-printed,data
+dma,channel,1-based DMA channel number.,integer,not applicable (CH32H417 DMAMUX: request is not tied to a channel),,data
+dma,request_id,DMAMUX request input number (CH32H417 only; the value written to CHANNELx_MUX is this minus 1).,integer,not applicable (fixed-channel DMA),,data
+dma,peripheral,Normalised peripheral owning the request (e.g. `SPI/I2S2_RX` -> `SPI2`).,name,never empty,fixed,data
+dma,request,Request name with the remap marker stripped.,name,never empty,as-printed,data
+dma,remap,"Reading of the remap marker: `selectable` (`*`), or `default`/`remap` for CH32X315's `_0`/`_1`.",enum(default|remap|selectable),no remap marker,fixed,data
+dma,spelled,"Request as the reference manual spells it, marker included.",name,never empty,as-printed,data
+dma,note,"Footnote marks and remarks carried from the manual, plus a DMAMUX note for request-number rows.",text,no note,prose,data
+dma,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+dma,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+errata,id,Identifier assigned to the erratum by this repository.,name,never empty,fixed,data
+errata,series,Series the erratum applies to.,list(;),never empty,fixed,data
+errata,condition,Lots or part numbers the erratum applies to.,text,applies without a lot or part-number condition,prose,data
+errata,description,"What the erratum says (lot-dependent behaviour or hardware caution), in English.",text,never empty,prose,data
+errata,description_confidence,"Confidence of `description`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty,prose,provenance
+esig,family,Family key; joins families.family.,name,never empty,fixed,data
+esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the ID words, `UNIID1` lowest; measured chips differ only in UNIID1|UNIID2, see erratum `esig-uniid3-not-unique`).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty,as-printed,data
+esig,address,Absolute address to read the register at (factory-programmed system area; CH32M030 uses a different base).,hex,never empty,,data
+esig,width_bits,"Register width in bits, from the `R16_`/`R32_` prefix.",integer,never empty,,data
+esig,unit,"Unit of the value read: `KiB` for `FLACAP` (flash capacity in Kbytes, per the field description).",enum(KiB),no unit (a raw ID word),fixed,data
+esig,description,English description from the English edition's register list.,text,the English edition's register list gives none,prose,data
+esig,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+esig,basis,Reference-manual pages the row was read from (`<document>:<lang>(p.N)`); `unit(...)` gives the pages whose field description states the unit.,text,never empty,prose,provenance
+evt_variants,family,Family key; joins families.family.,name,never empty,fixed,data
+evt_variants,macro,EVT compile-time variant macro (e.g. `CH32V20x_D8W`).,name,never empty,as-printed,data
+evt_variants,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
+evt_variants,default,`yes` when this macro is the one the EVT device header enables by default.,enum(yes),not the default variant,fixed,data
+evt_variants,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+evt_variants,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+families,family,"Family key. A unit of WCH's EVT packages, named after its archive `<family>EVT.ZIP` without `EVT.ZIP`. Not a product line and not a datasheet or reference-manual unit (CH32V20x_30xDS0 spans CH32V20x and CH32V307; CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow and VERSION is raised.",name,never empty,fixed,data
+families,repository,GitHub mirror repository the family's documents are read from (`owner/name`).,name,never empty,fixed,data
+families,series,Series in the family.,list(;),never empty,fixed,data
+families,series_count,Number of series in the family.,integer,never empty,,data
+families,part_number_count,Number of part numbers in the family.,integer,never empty,,data
+families,cores,Cores used in the family (a dual-core part is written `A + B`).,list(;),never empty,fixed,data
+families,datasheets,Datasheets that apply to the family.,list(;),never empty,fixed,data
+families,reference_manuals,Reference manuals that apply to the family.,list(;),never empty,fixed,data
+families,evt,EVT archive of the family; always `<family>EVT.ZIP`.,name,never empty,fixed,data
+features,tag,"Normalised feature tag (e.g. `DMA`, `USBHS`).",name,never empty,fixed,data
+features,parent,Broader tag that also covers this one (e.g. `USBHS` is also under `USB`).,enum(ADC|USB|WDG),no parent tag,fixed,data
+features,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+features,family,Family key; joins families.family.,name,never empty,fixed,data
+features,precision,"Which reading decided the row: `part` (the comparison table, per part number) or `datasheet` (a datasheet section heading, per datasheet).",enum(datasheet|part),never empty,fixed,data
+features,features,Datasheet section heading(s) in English that the tag was read from.,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed,data
+features,features_zh,The same heading(s) in the Chinese edition.,list(;),no Chinese heading recorded,as-printed,data
+features,sections,Datasheet section number(s) of the heading(s).,list(;),the datasheet has no heading for it and the comparison table alone gives the tag (basis `attributes(...)`),as-printed,data
+features,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+features,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+flash_geometry,family,Family key; joins families.family.,name,never empty,fixed,data
+flash_geometry,page_erase_bytes,"Unit of standard page erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,never empty,,data
+flash_geometry,fast_erase_bytes,"Unit of fast page erase, in bytes.",integer,no per-page fast erase (block erase only),,data
+flash_geometry,fast_program_bytes,"Unit of fast page programming, in bytes.",integer,never empty,,data
+flash_geometry,block_erase_bytes,"Unit of fast block erase, in bytes (with flash_mode_bit = 0 where the size depends on it).",integer,no block erase stated,,data
+flash_geometry,flash_mode_bit,"Register bit that switches the erase sizes, as `REGISTER.FIELD[bit]` (e.g. `FLASH_CFGR0.DBMODE[28]` on CH32H417); page_erase_bytes/block_erase_bytes are its 0 values.",text,the erase sizes do not depend on a mode bit,fixed,data
+flash_geometry,page_erase_bytes_dual,"Unit of standard page erase when flash_mode_bit = 1 (dual flash mode), in bytes.",integer,the erase sizes do not depend on a mode bit,,data
+flash_geometry,block_erase_bytes_dual,"Unit of fast block erase when flash_mode_bit = 1, in bytes.",integer,the erase sizes do not depend on a mode bit,,data
+flash_geometry,program_word,`1` when `FLASH_ProgramWord`/`ProgramHalfWord` exist in the EVT driver.,enum(1),fast page programming only,,data
+flash_geometry,erased_read_word,"What a word read returns after erase, exactly as the RM writes it (`0xFF` families print an 8-bit spelling).",hex,the RM does not state it,,data
+flash_geometry,erased_read_half,"What a half-word read returns after erase, as the RM writes it.",hex,the RM does not state it,,data
+flash_geometry,erased_read_byte_even,"What an even-address byte read returns after erase, as the RM writes it.",hex,the RM does not state it,,data
+flash_geometry,erased_read_byte_odd,"What an odd-address byte read returns after erase, as the RM writes it.",hex,the RM does not state it,,data
+flash_geometry,blank_check_word,Full 32-bit value to compare a word read against to detect erased flash.,hex,never empty,,data
+flash_geometry,zero_wait_note,Relation between products.flash_bytes (zero-wait region) and total capacity.,text,no note,prose,data
+flash_geometry,note,Other remarks (e.g. no RM erased value).,text,no note,prose,data
+flash_geometry,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed).",enum(confirmed|conflict),never empty,fixed,provenance
+flash_geometry,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+flash_program_method,family,Family key; joins families.family.,name,never empty,fixed,data
+flash_program_method,program_method,"Fast-page programming procedure, named by the control bits the RM names.",text,never empty,prose,data
+flash_program_method,program_buffer_load_bits,"Width of one buffer load in bits, for buffered families.",integer,"not applicable (direct-writes family, no buffer)",,data
+flash_program_method,program_commit,Control bit that starts the write.,enum(PG_STRT (bit21)|STRT (bit6)),never empty,as-printed,data
+flash_program_method,erase_method,Fast erase procedure (or the block-erase bit for families without per-page fast erase).,text,never empty,prose,data
+flash_program_method,ctlr_bit_names,FLASH_CTLR field names as the family's EVT header spells them.,list(;),never empty,as-printed,data
+flash_program_method,undocumented_note,A step the driver performs that the RM never mentions.,text,none known,prose,data
+flash_program_method,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+flash_program_method,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+interrupts,family,Family key; joins families.family.,name,never empty,fixed,data
+interrupts,number,Interrupt/exception number from the EVT `IRQn_Type` enumeration.,integer,never empty,,data
+interrupts,name,Enumerator name without the `_IRQn` suffix.,name,never empty,as-printed,data
+interrupts,kind,`exception` (RISC-V processor exception) or `irq` (PFIC peripheral interrupt).,enum(exception|irq),never empty,fixed,data
+interrupts,description,One-line description from the EVT header.,text,never empty,prose,data
+interrupts,condition,EVT variant macros under which this number has this name.,list(|),unconditional,as-printed,data
+interrupts,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+interrupts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+link_firmware,device,WCH debugger product the firmware is for (e.g. `WCH-LinkE`).,name,never empty,fixed,data
+link_firmware,mcu,"MCU of the debugger that runs the firmware, derived from its first instruction.",name,never empty,fixed,data
+link_firmware,mode,Target architecture mode the firmware serves (`RISC-V` or `ARM`).,enum(ARM|RISC-V),the firmware has one mode only,fixed,data
+link_firmware,role,"`offline` = the application image, which WCH's tools send in IAP mode; `iap` = the same application with the IAP bootloader prepended (its tail is the `offline` file byte for byte), written whole by an external programmer.",enum(iap|offline),never empty,fixed,data
+link_firmware,file,File name in WCH-LinkUtility.,name,never empty,as-printed,data
+link_firmware,size,File size in bytes.,integer,never empty,,data
+link_firmware,sha256,sha256 of the file; tells whether a local file is the one being distributed now.,name,never empty,,data
+link_firmware,wcfg_version,WCH's own version number from `wchlink.wcfg`.,integer,never empty,,data
+link_firmware,reported_version,"The version the device reports over USB, decoded from `wcfg_version` as `major.minor` (wcfg = major*10 + minor).",text,never empty,fixed,data
+link_firmware,measured_version,The version read from a real device with `tools/read_link_version.py`.,text,not measured,fixed,data
+link_firmware,set_version,Version of the WCH-LinkUtility set the files come from.,name,never empty,as-printed,data
+link_firmware,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+link_firmware,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+link_firmware_issues,device,WCH debugger product (e.g. `WCH-Link`); joins link_firmware.device.,name,never empty,fixed,data
+link_firmware_issues,mcu,MCU of the debugger that runs the firmware.,name,never empty,fixed,data
+link_firmware_issues,mode,Target architecture mode the firmware was running in.,enum(RISC-V),never empty,fixed,data
+link_firmware_issues,version,"Firmware version the device reports (`major.minor`), as measured.",text,never empty,fixed,data
+link_firmware_issues,wcfg_version,The same version in WCH's `wchlink.wcfg` numbering (major*10 + minor).,integer,never empty,,data
+link_firmware_issues,tool,Host tool the failure was seen with.,name,never empty,as-printed,data
+link_firmware_issues,target,Target part the failure was seen on; joins parts.part_number.,name,never empty,fixed,data
+link_firmware_issues,symptom,"What fails, as recorded.",text,never empty,prose,data
+link_firmware_issues,works_in,Firmware version measured to work on the same hardware.,text,no working version measured,fixed,data
+link_firmware_issues,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+link_firmware_issues,basis,The measurement record: `measured:<date>(<where it is recorded>)`.,text,never empty,prose,provenance
+manifest,path,"File name under index/ (every CSV and `VERSION`, except manifest.csv itself).",path,never empty,,data
+manifest,rows,Row count of the file (lines minus the header; 0 for `VERSION`).,integer,never empty,,data
+manifest,sha256,"SHA-256 of the file's bytes, lower-case hex without prefix.",name,never empty,,data
+memory_configs,part_number,Part whose FLASH/SRAM boundary moves with the user option bytes; joins products.part_number.,name,never empty,fixed,data
+memory_configs,value,Code of the `RAM_CODE_MOD` field (bits; `x` = either value).,text,never empty,as-printed,data
+memory_configs,code_bytes,Zero-wait code area in bytes for this code.,integer,never empty,,data
+memory_configs,sram_bytes,SRAM in bytes for this code.,integer,never empty,,data
+memory_configs,datasheet_value,`1` on the pair the datasheet comparison table lists (the row matching products.sram_bytes); not a shipped default.,enum(1),not the pair the datasheet lists,fixed,data
+memory_configs,option_byte_bits,Position of the field within the USER option byte at `0x1FFFF800` (write side).,text,never empty,as-printed,data
+memory_configs,obr_bits,Position of the field within `FLASH_OBR` (read side).,text,never empty,as-printed,data
+memory_configs,condition,Constraint attached to this code only.,text,no constraint,prose,data
+memory_configs,confidence,Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed).,enum(conflict),never empty,fixed,provenance
+memory_configs,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+memory_map,family,Family key; joins families.family.,name,never empty,fixed,data
+memory_map,region,Region name from the EVT `*_BASE` constant (or the linker-script region for `link-origin`).,name,never empty,as-printed,data
+memory_map,base_address,Start address of the region.,hex,never empty,,data
+memory_map,kind,"`memory`, `bus`, `peripheral` or `link-origin` (the start address the EVT linker script uses, most common value).",enum(bus|link-origin|memory|peripheral),never empty,fixed,data
+memory_map,condition,Variant macros or core the address applies to.,list(|),unconditional,as-printed,data
+memory_map,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+memory_map,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+opa_cmp_registers,family,Family key; joins families.family.,name,never empty,fixed,data
+opa_cmp_registers,block,"Register block that holds the field (`OPA`, or `EXTEN` on CH32V003).",name,never empty,as-printed,data
+opa_cmp_registers,register,"Register name within the block, as the header spells it.",name,never empty,as-printed,data
+opa_cmp_registers,unit,Whether the register belongs to the op-amp or the comparator.,enum(CMP|OPA),never empty,fixed,data
+opa_cmp_registers,offset,Offset of the register within the block.,hex,never empty,,data
+opa_cmp_registers,address,Absolute address of the register.,hex,never empty,,data
+opa_cmp_registers,field,Field name with the block and register prefix dropped.,name,never empty,as-printed,data
+opa_cmp_registers,bits,Bit position `hi:lo` or a single bit.,bits,the mask is zero,,data
+opa_cmp_registers,mask,Mask of the define.,hex,never empty,,data
+opa_cmp_registers,purpose,"Role assigned from the field name (`enable`, `positive input select`, `gain` ...).",text,the field name declares no role,fixed,data
+opa_cmp_registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+opa_cmp_registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+operating_conditions,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed,data
+operating_conditions,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `F_HCLK`, `f_ADC`).",name,never empty,fixed,data
+operating_conditions,parameter,"Parameter description in English, as the datasheet writes it.",text,not stated by the sources,as-printed,data
+operating_conditions,condition,Test or operating condition of the row.,text,no condition stated,as-printed,data
+operating_conditions,min,"Minimum value (a number, a formula against another symbol, or another symbol).",text,not stated by the sources,,data
+operating_conditions,typ,Typical or nominal value.,text,not stated by the sources,,data
+operating_conditions,max,"Maximum value (a number, a formula, or another symbol).",text,not stated by the sources,,data
+operating_conditions,unit,Unit of min/typ/max as the datasheet writes it.,name,not stated by the sources,fixed,data
+operating_conditions,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+operating_conditions,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+option_byte_fields,family,Family key; joins families.family.,name,never empty,fixed,data
+option_byte_fields,byte,Option byte or byte group the field lives in.,enum(Data0-Data1|RDPR|USER|WRPR0-WRPR1|WRPR0-WRPR3),never empty,as-printed,data
+option_byte_fields,bits,Bit position within the byte: a single bit or `[hi:lo]`.,text,the row describes the whole byte or group,as-printed,data
+option_byte_fields,field,Field name as the RM prints it.,name,the row describes the whole byte or group,as-printed,data
+option_byte_fields,default,"Reset value at the granularity the RM states, source spelling kept.",text,never empty,as-printed,data
+option_byte_fields,wrpr_bit_protects,What one WRPR bit write-protects (WRPR group rows only).,text,not a WRPR group row,prose,data
+option_byte_fields,option,"Name of the option the field sets, from WCH EVT's write API: `iwdg`, `stop-reset`, `standby-reset`, `reset-pin`, `reset-pin-select`, `over-voltage`, `start-mode`, `can-bus-off`, `ram-split`, `usbfs-download`, `usbhs-download`, `usart-download`; `write-protect` on the WRPR rows.",enum(can-bus-off|iwdg|over-voltage|ram-split|reset-pin|reset-pin-select|standby-reset|start-mode|stop-reset|usart-download|usbfs-download|usbhs-download|write-protect),EVT's write API does not set the field,fixed,data
+option_byte_fields,evt_argument,"The EVT argument that writes the field: a parameter of `FLASH_UserOptionByteConfig` (`Peripheral/src/*_flash.c`; the function's own parameter list, not the header's declaration), or `FLASH_EnableWriteProtection` on the WRPR rows.",name,EVT's write API does not set the field,as-printed,data
+option_byte_fields,evt_values,"Each value of the field and the EVT constant that writes it, `value=CONSTANT` joined by `;` (e.g. `1=OB_STDBY_NoRST;0=OB_STDBY_RST`); the value is the field's own bits, so `1=` names what a set bit means. On the WRPR rows `1=protected` is the polarity of `FLASH_EnableWriteProtection`'s argument: EVT writes the complement into the WRPR bytes, so in the stored byte a 0 bit is protected.",list(;),EVT's write API does not set the field,as-printed,data
+option_byte_fields,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+option_byte_fields,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+option_bytes,family,Family key; joins families.family.,name,never empty,fixed,data
+option_bytes,address,Absolute address of the option byte.,hex,never empty,,data
+option_bytes,offset,Distance from the option-byte base (the region's lowest address).,hex,never empty,,data
+option_bytes,byte,"Byte name as printed (RDPR, USER, Data0, WRPR0, Reserved, ...).",enum(Data0|Data1|RDPR|Reserved|USER|WRPR0|WRPR1|WRPR2|WRPR3),never empty,as-printed,data
+option_bytes,complement_address,Address of the inverse-code byte paired with it.,hex,the table leaves the byte unpaired (Reserved),,data
+option_bytes,write_unit,"How the region is programmed, classified from the control bit the RM programming procedure names.","enum(fast page, 32-bit buffer writes (FTPG)|fast page, 32-bit buffer writes (FTPG); complement auto-computed|half-word (OBPG); complement auto-computed)",never empty,prose,data
+option_bytes,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+option_bytes,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+packages,package,Package name key.,name,never empty,fixed,data
+packages,pin_count,Lead count.,integer,never empty,,data
+packages,body_size,Body size as `W*Lmm`.,text,never empty,as-printed,data
+packages,pin_pitch,Lead pitch with unit (e.g. `0.5mm`).,text,never empty,as-printed,data
+packages,product_count,Number of part numbers in this package.,integer,never empty,,data
+packages,families,Families that use the package.,list(;),never empty,fixed,data
+packages,pin_count_confidence,"Confidence of `pin_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+packages,body_size_confidence,"Confidence of `body_size`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+packages,pin_pitch_confidence,"Confidence of `pin_pitch`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+packages,pin_count_basis,Sources that support `pin_count`.,text,never empty,prose,provenance
+packages,body_size_basis,Sources that support `body_size`.,text,never empty,prose,provenance
+packages,pin_pitch_basis,Sources that support `pin_pitch`.,text,never empty,prose,provenance
+parts,part_number,Orderable part number key.,name,never empty,fixed,data
+parts,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+parts,family,Family key; joins families.family.,name,never empty,fixed,data
+parts,package,Package name; joins packages.package.,name,never empty,fixed,data
+parts,pins,"Lead count of the package, from catalog packages.",integer,never empty,,data
+parts,flash_bytes,Zero-wait flash size in bytes.,integer,never empty,,data
+parts,sram_bytes,SRAM size in bytes.,integer,never empty,,data
+parts,gpio_count,GPIO count.,integer,never empty,,data
+parts,clock_max,"Maximum clock from operating_conditions (F_MAIN, else F_HCLK, F_SYSCLK, F_CORE), with unit; several values joined with `/`.",text,never empty,prose,data
+parts,vdd_min,"Lowest V_DD minimum across the series' operating_conditions rows, in V.",decimal,not stated by the sources,,data
+parts,vdd_max,"Highest V_DD maximum across the series' operating_conditions rows, in V.",decimal,not stated by the sources,,data
+parts,temperature,"Operating temperature range, written `lo..hiC`.",text,not stated by the sources,as-printed,data
+parts,usart,"USART/UART comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,spi,"SPI comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,i2c,"I2C comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,can,"CAN comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,usb,"USB comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,adc,"ADC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,dac,"DAC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,opa,"OPA comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,cmp,"Comparator comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,timers_advanced,"Advanced-control timer comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,timers_general,"General-purpose timer comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,rtc,"RTC comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,ethernet,"Ethernet comparison-table count from evidence/product_attributes, verbatim (several attributes joined with `;`).",text,the part's comparison table has no such entry (or states `-`),as-printed,data
+parts,packing,"Packing type from the ordering-information table (e.g. `Tray`), spelled as printed.",text,the ordering-information table gives no packing type,as-printed,data
+parts,listed_as,"Abbreviation the comparison table uses for the part (e.g. `CH32V208CB`, wildcard `C6x6`).",name,the comparison table lists the full part number,as-printed,data
+parts,datasheet,Datasheet the part is listed in.,name,never empty,fixed,data
+parts,part_number_confidence,"Confidence of `part_number`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+parts,series_confidence,"Confidence of `series`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+parts,package_confidence,"Confidence of `package`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+parts,pins_confidence,"Confidence of `pins`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+parts,flash_bytes_confidence,"Confidence of `flash_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+parts,sram_bytes_confidence,"Confidence of `sram_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+parts,gpio_count_confidence,"Confidence of `gpio_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+parts,clock_max_confidence,"Confidence of `clock_max`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+parts,vdd_min_confidence,"Confidence of `vdd_min`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`vdd_min` is empty,fixed,provenance
+parts,vdd_max_confidence,"Confidence of `vdd_max`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`vdd_max` is empty,fixed,provenance
+parts,temperature_confidence,"Confidence of `temperature`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`temperature` is empty,fixed,provenance
+parts,usart_confidence,"Confidence of `usart`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`usart` is empty,fixed,provenance
+parts,spi_confidence,"Confidence of `spi`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`spi` is empty,fixed,provenance
+parts,i2c_confidence,"Confidence of `i2c`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`i2c` is empty,fixed,provenance
+parts,can_confidence,"Confidence of `can`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`can` is empty,fixed,provenance
+parts,usb_confidence,"Confidence of `usb`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`usb` is empty,fixed,provenance
+parts,adc_confidence,"Confidence of `adc`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`adc` is empty,fixed,provenance
+parts,dac_confidence,"Confidence of `dac`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`dac` is empty,fixed,provenance
+parts,opa_confidence,"Confidence of `opa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`opa` is empty,fixed,provenance
+parts,cmp_confidence,"Confidence of `cmp`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`cmp` is empty,fixed,provenance
+parts,timers_advanced_confidence,"Confidence of `timers_advanced`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`timers_advanced` is empty,fixed,provenance
+parts,timers_general_confidence,"Confidence of `timers_general`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`timers_general` is empty,fixed,provenance
+parts,rtc_confidence,"Confidence of `rtc`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`rtc` is empty,fixed,provenance
+parts,ethernet_confidence,"Confidence of `ethernet`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`ethernet` is empty,fixed,provenance
+parts,packing_confidence,"Confidence of `packing`: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),`packing` is empty,fixed,provenance
+parts,part_number_basis,"Sources that support `part_number`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,series_basis,"Sources that support `series`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,package_basis,"Sources that support `package`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,pins_basis,"Sources that support `pins`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,flash_bytes_basis,"Sources that support `flash_bytes`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,sram_bytes_basis,"Sources that support `sram_bytes`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,gpio_count_basis,"Sources that support `gpio_count`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,clock_max_basis,"Sources that support `clock_max`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+parts,vdd_min_basis,"Sources that support `vdd_min`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`vdd_min` is empty,prose,provenance
+parts,vdd_max_basis,"Sources that support `vdd_max`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`vdd_max` is empty,prose,provenance
+parts,temperature_basis,"Sources that support `temperature`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`temperature` is empty,prose,provenance
+parts,usart_basis,"Sources that support `usart`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`usart` is empty,prose,provenance
+parts,spi_basis,"Sources that support `spi`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`spi` is empty,prose,provenance
+parts,i2c_basis,"Sources that support `i2c`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`i2c` is empty,prose,provenance
+parts,can_basis,"Sources that support `can`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`can` is empty,prose,provenance
+parts,usb_basis,"Sources that support `usb`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`usb` is empty,prose,provenance
+parts,adc_basis,"Sources that support `adc`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`adc` is empty,prose,provenance
+parts,dac_basis,"Sources that support `dac`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`dac` is empty,prose,provenance
+parts,opa_basis,"Sources that support `opa`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`opa` is empty,prose,provenance
+parts,cmp_basis,"Sources that support `cmp`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`cmp` is empty,prose,provenance
+parts,timers_advanced_basis,"Sources that support `timers_advanced`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`timers_advanced` is empty,prose,provenance
+parts,timers_general_basis,"Sources that support `timers_general`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`timers_general` is empty,prose,provenance
+parts,rtc_basis,"Sources that support `rtc`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`rtc` is empty,prose,provenance
+parts,ethernet_basis,"Sources that support `ethernet`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`ethernet` is empty,prose,provenance
+parts,packing_basis,"Sources that support `packing`, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,`packing` is empty,prose,provenance
+pin_alternate,family,Family key; joins families.family.,name,never empty,fixed,data
+pin_alternate,pad,GPIO pad name.,name,never empty,as-printed,data
+pin_alternate,port,GPIO port letter.,enum(A|B|C|D|E|F),never empty,fixed,data
+pin_alternate,pin,GPIO pin number within the port.,integer,never empty,,data
+pin_alternate,block,Peripheral block holding the AF register.,enum(AFIO),never empty,as-printed,data
+pin_alternate,register,"AF register for the pad (`GPIOx_AFLR` for pins 0-7, `GPIOx_AFHR` for pins 8-15).",name,never empty,as-printed,data
+pin_alternate,address,Absolute address of that register.,hex,never empty,,data
+pin_alternate,bits,"Register bits that hold the pad's AF number, LSB first.",reg-bits,never empty,,data
+pin_alternate,width_bits,Width of the AF number field in bits.,integer,never empty,,data
+pin_alternate,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+pin_alternate,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+pin_conditions,series,Series key; joins series.series.,name,never empty,fixed,data
+pin_conditions,signal,Signal whose pad depends on which peripherals are enabled.,name,never empty,as-printed,data
+pin_conditions,condition,"The manual's conjunction, `&`-separated terms `NAME=0` or `NAME=1`; a row applies when every term holds, and the row with the most terms wins.",text,never empty,as-printed,data
+pin_conditions,pad,Pad the signal is on under the condition.,name,the documents say the signal is unavailable under that condition,as-printed,data
+pin_conditions,errata,Erratum that qualifies the row; joins errata.id.,name,no erratum applies,fixed,data
+pin_conditions,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+pin_conditions,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+pinout,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
+pinout,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+pinout,family,Family key; joins families.family.,name,never empty,fixed,data
+pinout,pin,Lead number; an exposed pad is `EP`.,text,never empty,as-printed,data
+pinout,pad,"Pad name as the datasheet spells it (e.g. `PA0-WKUP`, `LO1`).",name,never empty,as-printed,data
+pinout,port,"GPIO port letter of the pad read as a GPIO, decorations dropped (also from a parenthesised alias or a GPIO name listed on a function-named pad).",name,not a GPIO pad,fixed,data
+pinout,gpio,GPIO pin number of the pad read as a GPIO.,integer,not a GPIO pad,,data
+pinout,kind,"Lead kind: `gpio`, `power`, `analog`, `other` or `nc` (marked not connected by the datasheet).",enum(analog|gpio|nc|other|power),never empty,fixed,data
+pinout,peripheral,Normalised peripheral of the function (e.g. `USART1`).,name,lead listed without a function,fixed,data
+pinout,role,Normalised role of the function within the peripheral (e.g. `TX`).,name,lead listed without a function,fixed,data
+pinout,signal,"Function as the datasheet spells it (e.g. `USART1_TX`, `TX1`, `UTX`).",name,lead listed without a function,as-printed,data
+pinout,route,"How the function is reached: `main` (live at reset), `default` (default alternate function, no remap), `remap-N` or `af-N`.",name,"no function, or the pin table gives no route",fixed,data
+pinout,selector,AFIO selector that picks this route; key into routes.,name,not applicable (no selector),fixed,data
+pinout,value,Selector value for this route (`0` for `default`/`main`).,integer,not applicable (no selector),,data
+pinout,af,N of `af-N` (AF-number families); the register is in pin_alternate.,integer,not applicable (route is not `af-N`),,data
+pinout,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+pinout,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+register_blocks,family,Family key; joins families.family.,name,never empty,fixed,data
+register_blocks,block,"Peripheral instance name (e.g. `USART1`). Collected from the EVT device header, the per-peripheral headers that define a block pointer (`PIOC`), and `core_riscv.h` (`PFIC`, `SysTick`, CH32H417 `HSEM`/`IPC`); blocks a header defines but the family does not have are removed by human judgment (`curated/register-blocks-absent.json`).",name,never empty,as-printed,data
+register_blocks,type,"EVT `*_TypeDef` stem the block uses (e.g. `USART`); `*_Type` for the core blocks of `core_riscv.h` (`PFIC`, `SysTick`); the block name itself when the header defines the registers only as address macros (CH32V103 `USBFS`).",name,never empty,as-printed,data
+register_blocks,layout,Layout key (8-hex-digit hash of the type's structure); equal keys share register definitions; carries no other meaning.,name,the EVT headers have no type structure for the block (CH32H417 `UHSIF`; CH32V103 `USBFS` is address macros only),,data
+register_blocks,base_address,Base address of the block.,hex,never empty,,data
+register_blocks,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+register_blocks,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+register_layouts,family,Family key; joins families.family.,name,never empty,fixed,data
+register_layouts,type,EVT `*_TypeDef` stem.,name,never empty,as-printed,data
+register_layouts,layout,Layout key: 8-hex-digit hash of the structure and its define names; equal keys share register definitions.,name,never empty,,data
+register_layouts,registers,Number of non-reserved structure members.,integer,never empty,,data
+register_layouts,fields,Number of bit defines for the type.,integer,never empty,,data
+register_layouts,size_bytes,Size of the structure in bytes.,integer,never empty,,data
+register_layouts,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+register_layouts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+register_map,family,Family key; joins families.family.,name,never empty,fixed,data
+register_map,block,Peripheral instance name.,name,never empty,as-printed,data
+register_map,type,EVT `*_TypeDef` stem of the block.,name,never empty,as-printed,data
+register_map,register,Structure member (register) name as the header spells it.,name,the block's struct is not in the header,as-printed,data
+register_map,address,Absolute address: block base + register offset.,hex,never empty,,data
+register_map,offset,Offset of the register within the block.,hex,the block's struct is not in the header,,data
+register_map,width_bits,Register width in bits.,integer,the block's struct is not in the header,,data
+register_map,count,Array element count of the member (1 for a plain register).,integer,the block's struct is not in the header,,data
+register_map,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+register_map,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+registers,family,Family key; joins families.family.,name,never empty,fixed,data
+registers,type,EVT `*_TypeDef` stem.,name,never empty,as-printed,data
+registers,register,"Struct member as the header spells it; arrays per element (`EXTICR[1]`), nested structs flattened (`sTxMailBox[0].TXMIR`).",name,never empty,as-printed,data
+registers,offset,Offset of the register within the struct (array element = first + index x width).,hex,the define's banner could not be tied to a struct member,,data
+registers,width_bits,Register width in bits.,integer,the define's banner could not be tied to a struct member,,data
+registers,count,Array element count of the struct member.,integer,the define's banner could not be tied to a struct member,,data
+registers,field,Readable field name (type and register prefix dropped).,name,a `register` row,as-printed,data
+registers,define,EVT define spelling (e.g. `RCC_APB2PCENR_USART1EN`).,name,a `register` row,as-printed,data
+registers,kind,"`field` (a bit field), `value` (an enumerated value within a field), or `register` (a register the header gives no bit defines for: one row with the register alone; a register with bit defines appears only on its field and value rows).",enum(field|register|value),never empty,fixed,data
+registers,of_field,Parent field of a `value` row.,name,"not a `value` row, or no parent field",as-printed,data
+registers,bits,Bit position `hi:lo` or a single bit; a bench-measured position overrides the header where the documents disagree.,bits,"no bit defines, or the mask is zero or not contiguous",,data
+registers,mask,Mask of the define.,hex,register has no bit defines,,data
+registers,value,"Value within the parent field (`mask >> lo`), for `value` rows.",integer,not a `value` row,,data
+registers,description,EVT one-line description of the define.,text,the header gives no description,prose,data
+registers,access,"Access type from the Chinese edition of the reference manual, spelled as printed; the manual defines RO, RZ, WO, WA, WZ, RW, RWA, RW1, RW0, RW1Z, and a few fields print other spellings (W1, W0, RWO, R0) that are misprints kept as printed.",enum(R0|RO|RW|RW0|RW1|RW1Z|RWO|W0|W1|WO|WZ),not matched against the reference manual,as-printed,data
+registers,reset,Reset value from the reference manual (a register-level value on rows without a field; may contain `X`).,text,not stated or not matched against the reference manual,,data
+registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+registers,access_confidence,"Confidence of `access`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),`access` is empty,fixed,provenance
+registers,access_basis,"Editions that state `access`, joined by `+`; `!<document>:en(=X)` gives the English edition's differing term.",text,no access stated,prose,provenance
+routes,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
+routes,selector,Remap selector identifier assigned by this repository (e.g. `afio-tim2-remap`).,name,never empty,fixed,data
+routes,controller,"Block that owns the selector's register: `afio`, or `extend` for the EXTEN block.",enum(afio|extend),never empty,fixed,data
+routes,register,Register(s) holding the selector; `PCFR1|PCFR2` when the field spans two registers.,name,never empty,as-printed,data
+routes,bits,"Register and bit of each selector bit, LSB of the value first.",reg-bits,never empty,,data
+routes,value,Selector value.,integer,never empty,,data
+routes,peripheral,Normalised peripheral of the signal.,name,the signal is not a peripheral function (a GPIO name),fixed,data
+routes,role,Normalised role of the signal.,name,the signal is not a peripheral function (a GPIO name),fixed,data
+routes,signal,Signal as the document spells it.,name,never empty,as-printed,data
+routes,pad,Pad the signal goes to with this value.,name,never empty,as-printed,data
+routes,port,GPIO port letter of the pad.,name,not a GPIO pad,fixed,data
+routes,gpio,GPIO pin number of the pad.,integer,not a GPIO pad,,data
+routes,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+routes,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+series,series,Series key.,name,never empty,fixed,data
+series,family,Family key; joins families.family.,name,never empty,fixed,data
+series,core,Core as the chip datasheet states it.,name,never empty,fixed,data
+series,isa,ISA as the chip datasheet states it (how the chip chose the core's optional parts).,text,never empty,as-printed,data
+series,flash_bytes,Zero-wait flash size in bytes shared by every part of the series.,integer,not a single value for the series (varies by package; see products),,data
+series,sram_bytes,SRAM size in bytes shared by every part of the series.,integer,not a single value for the series (varies by package; see products),,data
+series,gpio_count,GPIO count shared by every part of the series.,integer,not a single value for the series (varies by package; see products),,data
+series,temperature,"Operating temperature range shared by every part, written `lo..hiC`.",text,not a single value for the series (varies by package; see products) or not stated,as-printed,data
+series,packages,Packages the series comes in.,"list(,)",never empty,fixed,data
+series,part_number_count,Number of part numbers in the series.,integer,never empty,,data
+series,datasheets,Datasheets the series is listed in.,list(;),never empty,fixed,data
+series,product_url_zh,WCH product page (Chinese site).,url,never empty,,data
+series,product_url_en,WCH product page (English site).,url,never empty,,data
+series,core_confidence,"Confidence of `core`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+series,isa_confidence,"Confidence of `isa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+series,flash_bytes_confidence,"Confidence of `flash_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`flash_bytes` is empty,fixed,provenance
+series,sram_bytes_confidence,"Confidence of `sram_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`sram_bytes` is empty,fixed,provenance
+series,gpio_count_confidence,"Confidence of `gpio_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),`gpio_count` is empty,fixed,provenance
+series,temperature_confidence,"Confidence of `temperature`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`temperature` is empty,fixed,provenance
+series,core_basis,Sources that support `core`.,text,never empty,prose,provenance
+series,isa_basis,Sources that support `isa`.,text,never empty,prose,provenance
+systick,family,Family key; joins families.family.,name,never empty,fixed,data
+systick,block,"SysTick instance (`SysTick`, or `SysTick0`/`SysTick1` per core on dual-core CH32H417).",enum(SysTick|SysTick0|SysTick1),never empty,as-printed,data
+systick,register,Register name from `SysTick_Type` in core_riscv.h.,enum(CMP|CMPHR|CMPLR|CNT|CNTH|CNTL|CTLR|ISR|SR),never empty,as-printed,data
+systick,offset,Offset within the SysTick block.,hex,never empty,,data
+systick,address,Absolute address of the register.,hex,never empty,,data
+systick,width_bits,Register width in bits.,integer,never empty,,data
+systick,write_bits,"Access width the register accepts for writes, in bits.",integer,never empty,,data
+systick,purpose,What the register is for.,enum(compare|compare_high|compare_low|control|counter|counter_high|counter_low|status),never empty,fixed,data
+systick,note,Remark on the register.,text,no remark,prose,data
+systick,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+systick,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+timers,family,Family key; joins families.family.,name,never empty,fixed,data
+timers,timer,Timer instance.,name,never empty,as-printed,data
+timers,kind,Timer kind from the RM register heading.,enum(advanced|general-purpose|streamlined),the RM heading does not state the kind,fixed,data
+timers,counter_width_bits,"Counter width in bits, from the RM CNT field table.",integer,never empty,,data
+timers,channels,"Highest channel number reaching a pin, counted from index/pinout (not the silicon's limit).",integer,no channel of the timer reaches a pin,,data
+timers,complementary,`1` if any complementary output (`CHxN`) reaches a pin.,enum(1),no complementary output reaches a pin,,data
+timers,update_vector,"Interrupt vector name of the timer's update interrupt, from interrupts.",name,no vector found for the timer,as-printed,data
+timers,condition,Variant macros the counter width applies to.,list(;),unconditional,as-printed,data
+timers,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(conflict|reference),never empty,fixed,provenance
+timers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+usbpd_plumbing,family,Family key; joins families.family.,name,never empty,fixed,data
+usbpd_plumbing,peripheral,"USB-PD instance (`USBPD`, or `USBPD0`/`USBPD1` on CH32M030).",name,never empty,as-printed,data
+usbpd_plumbing,rcc_register,RCC register that holds the clock-enable bit.,name,never empty,as-printed,data
+usbpd_plumbing,rcc_bit,Bit number of the clock enable.,integer,never empty,,data
+usbpd_plumbing,rcc_address,Absolute address of the RCC register.,hex,never empty,,data
+usbpd_plumbing,phy_block,Register block that holds the PD PHY configuration field.,name,never empty,as-printed,data
+usbpd_plumbing,phy_register,Register within that block.,name,never empty,as-printed,data
+usbpd_plumbing,phy_field,"PD PHY configuration field, as the header spells it.",name,never empty,as-printed,data
+usbpd_plumbing,phy_bits,"Bit position of the field, `hi:lo` or a single bit.",bits,never empty,,data
+usbpd_plumbing,phy_mask,Mask of the field.,hex,never empty,,data
+usbpd_plumbing,phy_address,Absolute address of the PHY register.,hex,never empty,,data
+usbpd_plumbing,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+usbpd_plumbing,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance

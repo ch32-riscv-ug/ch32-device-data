@@ -378,7 +378,8 @@ class Judgement:
             + [r if ok else ("?" if soft else "!") + r for r, ok, soft in self.checks]
         )
         if not self.readings:
-            return "", "missing", basis
+            # 値が無ければ確度も空（confidence は値について言う。空の意味は columns.csv の `empty`）
+            return "", "", basis
         distinct = {canon(v) for _, v in self.readings}
         value = self.readings[0][1]
         if len(distinct) > 1 or any(not ok and not soft for _, ok, soft in self.checks):
@@ -819,22 +820,18 @@ def write_csv(path: Path, rows: list[dict], priority: list[str]) -> None:
              if not k.endswith(("_confidence", "_basis")) and k not in ("confidence", "basis")]
     values = [k for k in priority if k in keys]
     values += sorted(k for k in plain if k not in values)  # safety net for new fields
-    # An empty column named "#" separates the data from its metadata: everything
-    # to its right is confidence/basis, not the data itself. One file, so the two
-    # can never drift apart, and a reader can simply drop the columns from "#" on.
-    # Row-level confidence/basis (product_attributes) sit right of "#" as well.
+    # Confidence/basis columns follow the data columns, so the two stay in one file
+    # and cannot drift apart. Row-level confidence/basis (product_attributes) come last.
     meta = (
         [f"{k}_confidence" for k in values if f"{k}_confidence" in keys]
         + [f"{k}_basis" for k in values if f"{k}_basis" in keys]
         + [k for k in ("confidence", "basis") if k in keys]
     )
-    columns = values + ["#"] + meta if meta else values
+    columns = values + meta
     with path.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=columns)
         writer.writeheader()
-        # The separator carries "#" in every row too, so the boundary is visible
-        # wherever one lands in the file, not only next to the header.
-        writer.writerows(({**row, "#": "#"} for row in rows) if meta else rows)
+        writer.writerows(rows)
 
 
 def tally(path: Path, rows: list[dict]) -> None:
@@ -905,23 +902,22 @@ def series_rows(rows: list[dict]) -> list[dict]:
         for key in ("core", "isa"):
             entry[key] = fact.get(key, "")
             entry[f"{key}_confidence"] = fact.get(f"{key}_confidence",
-                                                  "missing" if not fact.get(key) else "reference")
+                                                  "" if not fact.get(key) else "reference")
             entry[f"{key}_basis"] = fact.get(f"{key}_basis", "")
         for field in fields:
             values = {m[field] for m in members if m.get(field)}
             states = {m.get(f"{field}_confidence") for m in members if m.get(field)}
-            if not values:
-                entry[field] = ""
-                entry[f"{field}_confidence"] = "missing"
-            elif len(values) == 1:
+            if len(values) == 1:
+                # The series value is as strong as its weakest member.
                 entry[field] = values.pop()
                 entry[f"{field}_confidence"] = (
-                    "confirmed" if states == {"confirmed"} else "partial"
+                    "confirmed" if states == {"confirmed"} else "reference"
                 )
             else:
-                # Differs between packages, so it is not a property of the series.
+                # Not stated, or differs between packages: not a property of the series
+                # (the parts table has each part's value). No value, no confidence.
                 entry[field] = ""
-                entry[f"{field}_confidence"] = "varies-by-package"
+                entry[f"{field}_confidence"] = ""
         entry["packages"] = ",".join(
             sorted({m["package"] for m in members if m.get("package")})
         )

@@ -78,8 +78,7 @@ COLUMNS = ["family", "page_erase_bytes", "fast_erase_bytes", "fast_program_bytes
            "block_erase_bytes_dual", "program_word",
            "erased_read_word", "erased_read_half",
            "erased_read_byte_even", "erased_read_byte_odd",
-           "blank_check_word", "zero_wait_note", "note",
-           "#", "confidence", "basis"]
+           "blank_check_word", "zero_wait_note", "note", "confidence", "basis"]
 
 # --- EVT driver 側 -----------------------------------------------------------
 # @brief から次のタグまでを丸ごと。CH32H417 の EraseBlock_Fast は寸法を
@@ -437,7 +436,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     from collections import Counter
     print(f"{dest}: {len(rows)} 行  {dict(Counter(r['confidence'] for r in rows))}",
           file=sys.stderr)

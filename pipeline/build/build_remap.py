@@ -55,12 +55,10 @@ CANDIDATES = paths.CANDIDATES
 SERIES = re.compile(r"^(CH32[A-Z]\d{3})")
 
 FIELD_COLUMNS = ["series", "selector", "controller", "register", "field",
-                 "bits", "valid_values", "reset_value",
-                 "#", "confidence", "basis"]
+                 "bits", "valid_values", "reset_value", "confidence", "basis"]
 # `peripheral`/`role`（語彙で揃えた読み）は索引 `index/routes.csv` が付ける
 # （pipeline/build/build_index.py）。ここは資料の綴り（signal・pad）だけ。
-ROUTE_COLUMNS = ["series", "selector", "value", "signal", "pad",
-                 "#", "confidence", "basis"]
+ROUTE_COLUMNS = ["series", "selector", "value", "signal", "pad", "confidence", "basis"]
 
 FIELD_BASIS = "candidates(evt-header+rm-register-table+rm-remap-grid:en)"
 # The EVT header does not define this field at all, so nothing cross-checks the
@@ -270,7 +268,7 @@ def main() -> int:
         with dest.open("w", encoding="utf-8", newline="") as out:
             writer = csv.DictWriter(out, fieldnames=columns)
             writer.writeheader()
-            writer.writerows({**row, "#": "#"} for row in rows)
+            writer.writerows(rows)
         print(f"{dest}: {len(rows)} 行", file=sys.stderr)
     defaults = sum(1 for r in route_rows if r["value"] == 0)
     print(f"  うち既定経路(value=0): {defaults} 行", file=sys.stderr)

@@ -31,7 +31,7 @@ CACHE = REPO / ".cache"
 CANDIDATES = CACHE / "candidates"
 MIRRORS = Path("/home/mt/dev_wch")
 
-CATALOG_TABLES = ("documents", "sources", "toolchains")
+CATALOG_TABLES = ("products", "documents", "sources", "toolchains")
 
 EVIDENCE_TABLES = (
     "pins", "pin_functions", "product_attributes", "features",
@@ -50,8 +50,8 @@ INDEX_TABLES = ("parts", "pinout", "routes", "registers", "register_map", "dma",
 # Catalog and evidence tables that live in index/ itself: their generators write
 # them there directly, so the public surface holds the one and only copy.
 PUBLISHED = (
-    # catalog keys
-    "families", "series", "cores", "packages", "products",
+    # catalog keys (products is published through index/parts.csv)
+    "families", "series", "cores", "packages",
     # facts read from EVT headers
     "interrupts", "memory_map", "systick", "evt_variants",
     "clock_configs", "clock_prescalers", "clock_sources", "clock_symbols", "clock_init",
@@ -104,9 +104,9 @@ def load_index(name: str) -> list[dict]:
 
 
 def write(path: Path, rows: list[dict], columns: list[str]) -> None:
-    """Write rows with the ``#`` separator column filled in every row."""
+    """Write rows with the given columns (missing values are empty)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as out:
         w = csv.DictWriter(out, fieldnames=columns)
         w.writeheader()
-        w.writerows({**{c: r.get(c, "") for c in columns}, "#": "#"} for r in rows)
+        w.writerows({c: r.get(c, "") for c in columns} for r in rows)

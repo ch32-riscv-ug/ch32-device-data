@@ -38,8 +38,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
-COLUMNS = ["family", "register", "address", "width_bits", "unit", "description",
-           "#", "confidence", "basis"]
+COLUMNS = ["family", "register", "address", "width_bits", "unit", "description", "confidence", "basis"]
 
 # 表の1行: 名前・番地・（en なら）説明・復位値。説明は復位値の `0xX…` の手前まで。
 ROW = re.compile(r"R(?P<width>8|16|32)_ESIG_(?P<name>[A-Z0-9]+)\s+(?P<address>0x[0-9A-Fa-f]{8})"

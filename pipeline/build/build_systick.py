@@ -49,8 +49,7 @@ import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "block", "register", "offset", "address",
-           "width_bits", "write_bits", "purpose", "note",
-           "#", "confidence", "basis"]
+           "width_bits", "write_bits", "purpose", "note", "confidence", "basis"]
 BASIS = "evt(core_riscv.h)"
 # 1資料のみ。reference manual の STK 章が second reading になる。
 CONFIDENCE = "reference"
@@ -184,7 +183,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     print(f"{dest}: {len(rows)} 行", file=sys.stderr)
 
     shapes: dict[tuple, list[str]] = {}

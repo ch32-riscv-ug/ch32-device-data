@@ -56,28 +56,21 @@ GPIO_NAME = re.compile(r"P[A-H]\d{1,2}")
 GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
 
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
-                  "peripheral", "role", "signal", "route", "selector", "value", "af",
-                  "#", "confidence", "basis"]
+                  "peripheral", "role", "signal", "route", "selector", "value", "af", "confidence", "basis"]
 ROUTES_COLUMNS = ["series", "selector", "controller", "register", "bits", "value", "peripheral", "role",
-                  "signal", "pad", "port", "gpio", "#", "confidence", "basis"]
+                  "signal", "pad", "port", "gpio", "confidence", "basis"]
 REGISTERS_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
                      "field", "define", "kind", "of_field", "bits", "mask", "value",
-                     "description", "access", "reset", "#", "confidence", "basis",
+                     "description", "access", "reset", "confidence", "basis",
                      "access_confidence", "access_basis"]
 MAP_COLUMNS = ["family", "block", "type", "register", "address", "offset", "width_bits",
-               "count", "#", "confidence", "basis"]
+               "count", "confidence", "basis"]
 DMA_COLUMNS = ["family", "variant", "dma", "channel", "request_id", "peripheral", "request",
-               "remap", "spelled", "note", "#", "confidence", "basis"]
+               "remap", "spelled", "note", "confidence", "basis"]
 TIMERS_COLUMNS = ["family", "timer", "kind", "counter_width_bits", "channels", "complementary",
-                  "update_vector", "condition", "#", "confidence", "basis"]
-PARTS_COLUMNS = ["part_number", "series", "family", "package", "pins", "flash_bytes",
-                 "sram_bytes", "gpio_count", "clock_max", "vdd_min", "vdd_max", "temperature",
-                 "usart", "spi", "i2c", "can", "usb", "adc", "dac", "opa", "cmp",
-                 "timers_advanced", "timers_general", "rtc", "ethernet",
-                 "#", "confidence"]
+                  "update_vector", "condition", "confidence", "basis"]
 
-CONFIDENCE_ORDER = {"confirmed": 0, "reference": 1, "varies-by-package": 2, "conflict": 3,
-                    "missing": 4, "": 5}
+CONFIDENCE_ORDER = {"confirmed": 0, "reference": 1, "conflict": 2, "": 3}
 
 
 def weakest(*values: str) -> str:
@@ -296,7 +289,7 @@ def registers_rows(registers: list[dict], fields: list[dict]) -> list[dict]:
         if key not in used:
             rows.append({"family": reg["family"], "type": reg["type"], "register": reg["register"],
                          "offset": reg["offset"], "width_bits": reg["width_bits"],
-                         "count": reg["count"], "field": "", "define": "", "kind": "",
+                         "count": reg["count"], "field": "", "define": "", "kind": "register",
                          "of_field": "", "bits": "", "mask": "", "value": "", "description": "",
                          "access": "", "reset": reg["rm_reset"],
                          "confidence": reg["confidence"], "basis": reg["basis"]})
@@ -402,43 +395,86 @@ ATTRIBUTE_COLUMNS: dict[str, re.Pattern] = {
 }
 
 
-def operating_summary(operating: list[dict], series: str) -> tuple[str, str, str]:
-    """(clock_max, vdd_min, vdd_max)。pipeline/build/build_readme.py と同じ読み方。"""
+# 型番の表。目録の型番の列（識別・主要仕様・ordering・掲載 datasheet）に、ピン数・最大クロック・電源電圧・
+# 比較表の周辺の数を並べる。**値の列ごとに確度と根拠**を持つ（目録の鍵の表の形）。family・listed_as・
+# datasheet は series と目録が決める名前なので確度を持たない。
+PARTS_COLUMNS = ["part_number", "series", "family", "package", "pins", "flash_bytes", "sram_bytes",
+                 "gpio_count", "clock_max", "vdd_min", "vdd_max", "temperature", "usart", "spi", "i2c",
+                 "can", "usb", "adc", "dac", "opa", "cmp", "timers_advanced", "timers_general", "rtc",
+                 "ethernet", "packing", "listed_as", "datasheet", "part_number_confidence",
+                 "series_confidence", "package_confidence", "pins_confidence", "flash_bytes_confidence",
+                 "sram_bytes_confidence", "gpio_count_confidence", "clock_max_confidence",
+                 "vdd_min_confidence", "vdd_max_confidence", "temperature_confidence",
+                 "usart_confidence", "spi_confidence", "i2c_confidence", "can_confidence",
+                 "usb_confidence", "adc_confidence", "dac_confidence", "opa_confidence",
+                 "cmp_confidence", "timers_advanced_confidence", "timers_general_confidence",
+                 "rtc_confidence", "ethernet_confidence", "packing_confidence", "part_number_basis",
+                 "series_basis", "package_basis", "pins_basis", "flash_bytes_basis", "sram_bytes_basis",
+                 "gpio_count_basis", "clock_max_basis", "vdd_min_basis", "vdd_max_basis",
+                 "temperature_basis", "usart_basis", "spi_basis", "i2c_basis", "can_basis", "usb_basis",
+                 "adc_basis", "dac_basis", "opa_basis", "cmp_basis", "timers_advanced_basis",
+                 "timers_general_basis", "rtc_basis", "ethernet_basis", "packing_basis"]
+PARTS_VALUES = [c for c in PARTS_COLUMNS if not c.endswith(("_confidence", "_basis"))]
+PARTS_STATED = [c[:-len("_confidence")] for c in PARTS_COLUMNS if c.endswith("_confidence")]
+assert [c for c in PARTS_VALUES if c in ATTRIBUTE_COLUMNS] == list(ATTRIBUTE_COLUMNS)
+
+
+def joined_basis(rows: list[dict], column: str = "basis") -> str:
+    """複数の証拠行の basis を、項を重ねずに `+` で繋ぐ。"""
+    terms: dict[str, None] = {}
+    for r in rows:
+        for term in re.split(r"\+(?![^()]*\))", r.get(column, "")):
+            if term:
+                terms[term] = None
+    return "+".join(terms)
+
+
+def operating_summary(operating: list[dict], series: str) -> dict[str, tuple[str, str, str]]:
+    """{clock_max|vdd_min|vdd_max: (値, 確度, 根拠)}。pipeline/build/build_readme.py と同じ読み方。"""
     rows = [r for r in operating if series in r["series"].split(";")]
-    clock = ""
+    out = {"clock_max": ("", "", ""), "vdd_min": ("", "", ""), "vdd_max": ("", "", "")}
     for prefix in ("F_MAIN", "F_HCLK", "F_SYSCLK", "F_CORE"):
         hits = [r for r in rows if r["symbol"].startswith(prefix)
                 and r["max"] and r["max"][0].isdigit()]
         if hits:
-            clock = "/".join(dict.fromkeys(r["max"] for r in hits)) + " " + hits[0]["unit"]
+            out["clock_max"] = ("/".join(dict.fromkeys(r["max"] for r in hits)) + " " + hits[0]["unit"],
+                                weakest(*(r["confidence"] for r in hits)), joined_basis(hits))
             break
     vdd = [r for r in rows if r["symbol"] == "V_DD" and r["min"] and r["max"]]
-    lo = min((r["min"] for r in vdd), key=float, default="")
-    hi = max((r["max"] for r in vdd), key=float, default="")
-    return clock, lo, hi
+    if vdd:
+        lo = min((r["min"] for r in vdd), key=float)
+        hi = max((r["max"] for r in vdd), key=float)
+        for column, value, side in (("vdd_min", lo, "min"), ("vdd_max", hi, "max")):
+            chosen = [r for r in vdd if r[side] == value]
+            out[column] = (value, weakest(*(r["confidence"] for r in chosen)), joined_basis(chosen))
+    return out
 
 
 def parts_rows(products: list[dict], packages: list[dict], attributes: list[dict],
                operating: list[dict]) -> list[dict]:
-    pin_count = {p["package"]: p["pin_count"] for p in packages}
-    attrs: dict[str, dict[str, list[str]]] = collections.defaultdict(lambda: collections.defaultdict(list))
+    package_of = {p["package"]: p for p in packages}
+    attrs: dict[str, dict[str, list[dict]]] = collections.defaultdict(lambda: collections.defaultdict(list))
     for a in attributes:
         for column, pattern in ATTRIBUTE_COLUMNS.items():
             if pattern.search(a["attribute"]):
-                attrs[a["part_number"]][column].append(a["value"])
+                attrs[a["part_number"]][column].append(a)
     rows = []
     for p in products:
-        clock, lo, hi = operating_summary(operating, p["series"])
-        row = {"part_number": p["part_number"], "series": p["series"], "family": p["family"],
-               "package": p["package"], "pins": pin_count.get(p["package"], ""),
-               "flash_bytes": p["flash_bytes"], "sram_bytes": p["sram_bytes"],
-               "gpio_count": p["gpio_count"], "clock_max": clock, "vdd_min": lo, "vdd_max": hi,
-               "temperature": p["temperature"]}
+        row = {c: p.get(c, "") for c in PARTS_VALUES}
+        for c in PARTS_STATED:
+            row[f"{c}_confidence"] = p.get(f"{c}_confidence", "")
+            row[f"{c}_basis"] = p.get(f"{c}_basis", "")
+        package = package_of.get(p["package"], {})
+        row.update(pins=package.get("pin_count", ""),
+                   pins_confidence=package.get("pin_count_confidence", ""),
+                   pins_basis=package.get("pin_count_basis", ""))
+        for column, (value, confidence, basis) in operating_summary(operating, p["series"]).items():
+            row.update({column: value, f"{column}_confidence": confidence, f"{column}_basis": basis})
         for column in ATTRIBUTE_COLUMNS:
-            row[column] = ";".join(dict.fromkeys(attrs[p["part_number"]].get(column, [])))
-        row["confidence"] = weakest(*(p.get(f"{c}_confidence", "") for c in
-                                      ("flash_bytes", "sram_bytes", "gpio_count", "temperature")
-                                      if p.get(c)))
+            stated = attrs[p["part_number"]].get(column, [])
+            row[column] = ";".join(dict.fromkeys(a["value"] for a in stated))
+            row[f"{column}_confidence"] = weakest(*(a["confidence"] for a in stated))
+            row[f"{column}_basis"] = joined_basis(stated)
         rows.append(row)
     rows.sort(key=lambda r: r["part_number"])
     return rows

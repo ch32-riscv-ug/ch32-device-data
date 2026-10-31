@@ -48,7 +48,7 @@ sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
-COLUMNS = ["family", "core", "dm_data0_addr", "dm_data1_addr", "#", "confidence", "basis", "evt_file"]
+COLUMNS = ["family", "core", "dm_data0_addr", "dm_data1_addr", "confidence", "basis", "evt_file"]
 DEFINE = re.compile(r"#define\s+DEBUG_DATA(?P<n>[01])_ADDRESS\s+\(\(volatile\s+uint32_t\s*\*\)\s*(?P<addr>0x[0-9A-Fa-f]{8})\)")
 GENERATION = re.compile(r"QingKe V(?P<gen>\d)")
 DATAADDR = re.compile(r"\[11:0\]\s+dataaddr\s+RO\s+(?P<value>0x[0-9A-Fa-fX]{3})")
@@ -156,7 +156,7 @@ def main() -> int:
 
         values = {v for vs in candidates.values() for v in vs}
         if not values:
-            confidence, data0, data1 = "missing", "", ""
+            confidence, data0, data1 = "", "", ""
         elif len(values) > 1:
             # 出所どうしが食い違う。EVT の値を採り（実装が書いている番地）、違う出所は
             # `!source(=値)` で並べる

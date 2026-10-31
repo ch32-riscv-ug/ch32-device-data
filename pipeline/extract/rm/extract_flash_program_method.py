@@ -59,7 +59,7 @@ import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
 COLUMNS = ["family", "program_method", "program_buffer_load_bits", "program_commit",
-           "erase_method", "ctlr_bit_names", "undocumented_note", "#", "confidence", "basis"]
+           "erase_method", "ctlr_bit_names", "undocumented_note", "confidence", "basis"]
 
 # --- RM 側 --------------------------------------------------------------------
 # 闪存章の節見出し。手順はこの見出しの下に番号付きで並ぶ。
@@ -360,7 +360,7 @@ def main() -> int:
     with dest.open("w", encoding="utf-8", newline="") as out:
         writer = csv.DictWriter(out, fieldnames=COLUMNS)
         writer.writeheader()
-        writer.writerows({**row, "#": "#"} for row in rows)
+        writer.writerows(rows)
     from collections import Counter
     print(f"{dest}: {len(rows)} 行  {dict(Counter(r['confidence'] for r in rows))}",
           file=sys.stderr)
