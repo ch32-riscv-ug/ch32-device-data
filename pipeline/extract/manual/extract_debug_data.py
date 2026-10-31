@@ -136,7 +136,7 @@ def main() -> int:
         basis: list[str] = []
         candidates: dict[str, set[str]] = collections.defaultdict(set)  # source → {data0}
         if defines.get("0") and defines.get("1"):
-            basis.append(f"evt({files[0]})" + (f"+{len(files) - 1} more" if len(files) > 1 else ""))
+            basis.append(f"evt({files[0]}" + (f"; {len(files) - 1} more files" if len(files) > 1 else "") + ")")
             candidates["evt"].add(defines["0"])
         for gen in gens:
             value = fixed.get(gen)
@@ -159,14 +159,14 @@ def main() -> int:
             confidence, data0, data1 = "", "", ""
         elif len(values) > 1:
             # 出所どうしが食い違う。EVT の値を採り（実装が書いている番地）、違う出所は
-            # `!source(=値)` で並べる
+            # `!source(dm_data0_addr=値)` で並べる
             confidence = "conflict"
             data0 = defines.get("0") or sorted(values)[0]
             data1 = defines.get("1", "")
             for source in ("manual", "hartinfo"):
                 other = candidates.get(source, set()) - {data0}
                 if other:
-                    basis = [f"!{b}(={next(iter(other))})" if b.startswith(source) and "read hartinfo" not in b else b
+                    basis = [f"!{b}(dm_data0_addr={next(iter(other))})" if b.startswith(source) and "read hartinfo" not in b else b
                              for b in basis]
         else:
             data0 = next(iter(values))

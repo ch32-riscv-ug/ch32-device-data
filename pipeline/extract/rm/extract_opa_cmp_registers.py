@@ -272,12 +272,12 @@ def main() -> int:
                 lo, width = said
                 if (lo, lo + width - 1) == span:
                     confidence = "confirmed"
-                    basis.append(f"rm({manual_name})")
+                    basis.append(f"rm:{manual_name}")
                 else:
                     confidence = "conflict"
                     hi = lo + width - 1
-                    basis.append(f"!rm({manual_name})(={hi}:{lo})" if hi != lo
-                                 else f"!rm({manual_name})(={lo})")
+                    basis.append(f"!rm:{manual_name}(bits={hi}:{lo})" if hi != lo
+                                 else f"!rm:{manual_name}(bits={lo})")
             # 持ち主: RM の見出し。無ければレジスタ名の綴り（M030 の CMP_CTLR、
             # V205 の OPA_CFGR1）、それも無ければ空——推測しない。
             unit = next((units[r] for r in candidates if r in units), "")

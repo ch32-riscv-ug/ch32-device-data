@@ -87,7 +87,7 @@ def main() -> int:
             if len({(s["address"], s["width"]) for s in said.values()}) > 1:
                 confidence = "conflict"
                 other = said["en"]
-                basis += f"+!{editions['en'][1]}:en(={other['address']}/{other['width']})"
+                basis += f"+!{editions['en'][1]}:en(address={other['address']},width_bits={other['width']})"
             else:
                 confidence = "confirmed" if len(said) == 2 else "reference"
             unit = ""
@@ -96,7 +96,7 @@ def main() -> int:
                          for lang, ((_, unit_page), _) in editions.items() if unit_page]
                 if pages:
                     unit = "KiB"
-                    basis += "+unit(" + "+".join(pages) + ")"
+                    basis += "".join(f"+unit:{p}" for p in pages)
                 else:
                     notes.append(f"{family}: FLACAP の単位を言う説明が見つからない")
             rows.append({"family": family, "register": name, "address": first["address"],

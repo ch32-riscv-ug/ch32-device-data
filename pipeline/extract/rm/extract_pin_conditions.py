@@ -393,7 +393,7 @@ def main() -> int:
                 key = (row["signal"], row["condition"])
                 entry = seen.setdefault(key, {**row, "said": {}})
                 entry["said"][lang] = (row["pad"],
-                                       f"rm:{lang}({document} p.{row['page']})")
+                                       f"rm:{document}:{lang}(p.{row['page']})")
         settled: dict[str, list[dict]] = collections.defaultdict(list)
         for (signal, condition), entry in seen.items():
             said = entry["said"]
@@ -426,7 +426,7 @@ def main() -> int:
                         if (note["signal"] != row["signal"] or note["pad"] != row["pad"]
                                 or note["terms"] != terms):
                             continue
-                        row["basis"] += f"+ds:{lang}({note['document']} p.{note['page']})"
+                        row["basis"] += f"+ds:{note['document']}:{lang}(p.{note['page']})"
                         if note["errata"]:
                             row.setdefault("errata_ids", set()).add(note["errata"])
                         corroborated += 1

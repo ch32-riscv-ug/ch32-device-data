@@ -217,7 +217,7 @@ def main() -> int:
             "sections": ";".join(sorted(entry["sections"],
                                         key=lambda s: [int(n) for n in s.split(".")])),
             "confidence": entry["confidence"],
-            "basis": "+".join(f"features({d})" for d in sorted(entry["datasheets"])),
+            "basis": "+".join(f"features:{d}" for d in sorted(entry["datasheets"])),
         })
     # 見出しの無い series に、比較表だけを根拠にタグを足す（docstring の「逆に」）。
     covered = {(r["tag"], r["series"]) for r in rows}

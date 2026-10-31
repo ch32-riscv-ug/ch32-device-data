@@ -395,24 +395,27 @@ def main() -> int:
                 obr_bits = (f"[{option[0] + user_shift}:"
                             f"{option[1] + user_shift}]")
             confidence = "confirmed" if len(entry["langs"]) > 1 else "reference"
-            basis = [f"rm({document}:{lang}(p.{page}))"
+            basis = [f"rm:{document}:{lang}(p.{page})"
                      for lang, page in sorted(entry["page"].items())]
             if field_span:
                 stated = field_span[0] - field_span[1] + 1
+                header_bits = f"[{field_span[0]}:{field_span[1]}]"
+                dissent = False
                 if stated != width:
-                    confidence = "conflict"
+                    confidence, dissent = "conflict", True
                     notes.append(
                         f"{family}: EVT header の FLASH_OBR フィールドは "
                         f"[{field_span[0]}:{field_span[1]}]（{stated}bit）だが、"
                         f"RM の符号は {width}bit 要る（{width}bit 無いと "
                         + " と ".join(sorted(v for v in entry["values"] if "x" not in v))
                         + " が区別できない）")
-                elif obr_bits and obr_bits != f"[{field_span[0]}:{field_span[1]}]":
-                    confidence = "conflict"
+                elif obr_bits and obr_bits != header_bits:
+                    confidence, dissent = "conflict", True
                     notes.append(
                         f"{family}: EVT header の FLASH_OBR フィールドは "
                         f"[{field_span[0]}:{field_span[1]}] だが、RM は {obr_bits} と書く")
-                basis.append(f"evt({family})")
+                # EVT header が FLASH_OBR の幅を違って書くときは、その幅を異論として名指す。
+                basis.append(f"!evt({family})(obr_bits={header_bits})" if dissent else f"evt({family})")
             if ld:
                 basis.append("evt(Link.ld)")
 

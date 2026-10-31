@@ -211,7 +211,7 @@ def main() -> int:
                 # variant で変わる幅は condition 列が言う。確度は RM の1つの根拠なので reference。
                 "confidence": ("reference" if applies else
                                "conflict" if varies else "reference"),
-                "basis": f"rm({document}:p{timer['page']})",
+                "basis": f"rm:{document}(p.{timer['page']})",
             })
 
     dest = paths.table("timers", args.out)

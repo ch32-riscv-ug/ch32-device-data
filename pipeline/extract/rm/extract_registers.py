@@ -713,6 +713,7 @@ def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
                 if not located:
                     continue
                 hit = True
+                hit_base = base
                 key = (type_name, located[0][0])
                 for use, offset in located:
                     if base + offset == r["address"]:
@@ -725,7 +726,8 @@ def check_addresses(rows: list[dict], blocks: dict[str, tuple[str, int]],
                 if matched:
                     break
             if hit and not matched:
-                per_register[key]["bad"].append(r["address"])
+                # 食い違いは offset で持つ（行の列）。RM の絶対番地 − その block の base。
+                per_register[key]["bad"].append(r["address"] - hit_base)
             if hit:
                 break
         if not hit:
@@ -754,7 +756,7 @@ def load_measured() -> dict[tuple[str, str, str], dict]:
     """curated/register-fields-measured.json — 資料どうしが食い違う field の実測（2026-09-25）。
 
     **行は作らない。** 資料が既に述べている field の位置を決めるためだけに効き、
-    証拠の行は `conflict` のまま `basis` に `<method>:<probe>(=<bits>)` が加わる。
+    証拠の行は `conflict` のまま `basis` に `<method>:<probe>(bits=<bits>)` が加わる。
     索引（`pipeline/build/build_index.py`）がその位置を採る。
     """
     path = REPO / "curated" / "register-fields-measured.json"
@@ -921,7 +923,7 @@ def main() -> int:
                 "layout": layout_of.get(type_name, ""),
                 "base_address": f"{base:#010x}",
                 "confidence": "confirmed" if ok else "reference",
-                "basis": block_source[block] + (f"+rm-address({addr_name})" if ok else ""),
+                "basis": block_source[block] + (f"+rm-address:{addr_name}" if ok else ""),
             })
 
         for type_name, members in members_here.items():
@@ -931,16 +933,16 @@ def main() -> int:
                 confidence, basis, check_text, reset = "reference", [evt_of.get(type_name, evt)], "", ""
                 if rm_name:
                     confidence = "confirmed"
-                    basis.append(f"rm({manual_name})")
+                    basis.append(f"rm:{manual_name}")
                 if found and found["ok"]:
                     confidence = "confirmed"
                     check_text = f"ok:{found['ok']}"
-                    basis.append(f"rm-address({addr_name})")
+                    basis.append(f"rm-address:{addr_name}")
                     reset = ";".join(sorted(found["reset"]))
                 if found and found["bad"]:
                     confidence = "conflict"
                     check_text = (check_text + ";" if check_text else "") + f"mismatch:{len(found['bad'])}"
-                    basis.append(f"!rm-address({addr_name})(={found['bad'][0]:#010x})")
+                    basis.append(f"!rm-address:{addr_name}(offset={found['bad'][0]:#05x})")
                 regs_out.append({
                     "family": family, "type": type_name, "register": m["name"],
                     "offset": f"{m['offset']:#05x}", "width_bits": m["width_bits"],
@@ -1005,18 +1007,18 @@ def main() -> int:
                             access_basis = f"{zh_basis}+{manual_en_name}:en"
                         else:
                             access_confidence = "conflict"
-                            access_basis = f"{zh_basis}+!{manual_en_name}:en(={en_access})"
+                            access_basis = f"{zh_basis}+!{manual_en_name}:en(rm_access={en_access})"
                     rm_reset = "" if said.get("reset_value") is None else str(said["reset_value"])
                     lo, width = said["bit_offset"], said["bit_width"]
                     if span and (lo, lo + width - 1) == span:
                         confidence = "confirmed"
-                        basis.append(f"rm({manual_name})")
+                        basis.append(f"rm:{manual_name}")
                     elif span:
                         confidence = "conflict"
-                        basis.append(f"!rm({manual_name})(={lo + width - 1}:{lo})")
+                        basis.append(f"!rm:{manual_name}(bits={lo + width - 1}:{lo})")
                 fact = measured.get((family, register, fname)) if kind == "field" else None
                 if fact:
-                    basis.append(f"{fact['method']}:{fact['probe']}(={fact['bits']})")
+                    basis.append(f"{fact['method']}:{fact['probe']}(bits={fact['bits']})")
                 fields_out.append({
                     "family": family, "register": register, "type": type_name,
                     "member": (f"{member['struct']}.{member['name']}"

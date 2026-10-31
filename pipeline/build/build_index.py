@@ -24,7 +24,7 @@
 pipeline/build/build_feature_tags.py と pipeline/extract/rm/extract_registers.py が書く。
 
 証拠と違う値を索引が持つのは1箇所だけ: pin 表の remap 値が RM の格子と
-食い違う行（`pin_functions` の basis に `!rm-remap-grid(=remap-N)`）は格子の
+食い違う行（`pin_functions` の basis に `!rm-remap-grid(route=remap-N)`）は格子の
 値を採る（worklist F-41。格子はその値の定義そのもので、pin 表は写し）。
 
 実行:
@@ -53,7 +53,7 @@ from extract_dma_requests import REMAPPED, TYPO, peripheral_of  # noqa: E402  �
 # GPIO としての読み（port と番号）はその装飾を落として取る。
 GPIO_PAD = re.compile(r"^P(?P<port>[A-H])(?P<gpio>\d{1,2})(?:[-_]|$)")
 GPIO_NAME = re.compile(r"P[A-H]\d{1,2}")
-GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+)\)")
 
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
                   "peripheral", "role", "signal", "route", "selector", "value", "af", "confidence", "basis"]
@@ -213,17 +213,17 @@ def routes_rows(remap_fields: list[dict], remap_routes: list[dict]) -> tuple[lis
 # ---------------------------------------------------------------- registers
 
 # 資料どうしが食い違う field を実機で測った位置（`register_fields` の basis に
-# `obr-readback:wch-linke(=19:12)` の形で載る）。索引はこれを採る——F-41 で格子の値を
+# `obr-readback:wch-linke(bits=19:12)` の形で載る）。索引はこれを採る——F-41 で格子の値を
 # 採るのと同じ規則で、証拠の行は `conflict` のまま両論と実測を持ち続ける。
-MEASURED_BITS = re.compile(r"(?:^|\+)[a-z][a-z0-9-]*:[a-z][a-z0-9-]*\(=(?P<bits>\d+(?::\d+)?)\)")
+MEASURED_BITS = re.compile(r"(?:^|\+)[a-z][a-z0-9-]*:[a-z][a-z0-9-]*\(bits=(?P<bits>\d+(?::\d+)?)\)")
 
 
 def measured_bits(basis: str) -> str | None:
     """basis が実測の位置を持っていればその bits。
 
-    >>> measured_bits("evt(ch32l103.h)+!rm(CH32L103RM.PDF)(=19:12)+obr-readback:wch-linke(=19:12)")
+    >>> measured_bits("evt(ch32l103.h)+!rm:CH32L103RM.PDF(bits=19:12)+obr-readback:wch-linke(bits=19:12)")
     '19:12'
-    >>> measured_bits("evt(ch32l103.h)+!rm(CH32L103RM.PDF)(=19:12)") is None
+    >>> measured_bits("evt(ch32l103.h)+!rm:CH32L103RM.PDF(bits=19:12)") is None
     True
     """
     m = MEASURED_BITS.search(basis)
@@ -283,7 +283,8 @@ def registers_rows(registers: list[dict], fields: list[dict]) -> list[dict]:
                      "value": f["value"], "description": f["description"],
                      "access": f["rm_access"], "reset": f["rm_reset"],
                      "access_confidence": f["rm_access_confidence"],
-                     "access_basis": f["rm_access_basis"],
+                     # 証拠の列名 `rm_access` を、索引の列名 `access` に読み替える。
+                     "access_basis": f["rm_access_basis"].replace("(rm_access=", "(access="),
                      "confidence": f["confidence"], "basis": f["basis"]})
     for key, reg in regs.items():
         if key not in used:

@@ -69,7 +69,7 @@ CH32H416RDU6,31,swpmi,1,,SWPMI,SWPMI,SWPMI,confirmed,products:zh+products:en
 CH32H416RDU6,32,pdusb_usbfs_otg_fs,1,PDUSB,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,PDUSB USBFS/OTG_FS,confirmed,products:zh+products:en
 CH32H416RDU6,33,pdusb_usbhs_usb2_0,1,PDUSB,PDUSB USBHS (USB2.0),PDUSB USBHS（USB 2.0）,PDUSB USBHS (USB2.0),confirmed,products:zh+products:en
 CH32H416RDU6,34,pdusb_usbss_usb3_0,1,PDUSB,PDUSB USBSS (USB3.0),PDUSB USBSS（USB 3.0）,PDUSB USBSS (USB3.0),confirmed,products:zh+products:en
-CH32H416RDU6,35,pdusb_usbpd_type_c,1 Built-in Rd(4),PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,conflict,products:en+!products:zh(=1 built-in Rd(4))
+CH32H416RDU6,35,pdusb_usbpd_type_c,1 Built-in Rd(4),PDUSB,PDUSB USBPD Type-C,PDUSB USBPD Type-C,PDUSB USBPD Type-C,conflict,products:en+!products:zh(value=1 built-in Rd(4))
 CH32H416RDU6,36,pioc,1,,PIOC,PIOC,PIOC,confirmed,products:zh+products:en
 CH32H417MEU6,0,sram_core_1_hs_itcm,128KB,SRAM,SRAM Core 1 HS ITCM,SRAM 内核1高速ITCM,SRAM Core 1 HS ITCM,confirmed,products:zh+products:en
 CH32H417MEU6,1,sram_core_1_hs_dtcm,256KB,SRAM,SRAM Core 1 HS DTCM,SRAM 内核1高速DTCM,SRAM Core 1 HS DTCM,confirmed,products:zh+products:en
@@ -215,7 +215,7 @@ CH32L103C8T6,16,communication_interface_pdusb_usb_host_device,Host Device,Commun
 CH32L103C8T6,17,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink,Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,confirmed,products:zh+products:en
 CH32L103C8T6,18,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103C8T6,19,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103C8T6,20,main_applications_and_features,"General-purpose, Pin compatible",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, pin-compatible)"
+CH32L103C8T6,20,main_applications_and_features,"General-purpose, Pin compatible",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, pin-compatible)"
 CH32L103F8P6,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32L103F8P6,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32L103F8P6,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -235,7 +235,7 @@ CH32L103F8P6,15,communication_interface_pdusb_usb_host_device,Device,Communicati
 CH32L103F8P6,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink,Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,confirmed,products:zh+products:en
 CH32L103F8P6,17,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103F8P6,18,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103F8P6,19,main_applications_and_features,"General-purpose, Pin compatible",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, pin-compatible)"
+CH32L103F8P6,19,main_applications_and_features,"General-purpose, Pin compatible",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, pin-compatible)"
 CH32L103F8U6,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32L103F8U6,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32L103F8U6,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -252,10 +252,10 @@ CH32L103F8U6,12,communication_interface_spi,2,Communication interface,Communicat
 CH32L103F8U6,13,communication_interface_i2c,2,Communication interface,Communication interface I2C,通信接口 I2C,Communication interface I2C,confirmed,products:zh+products:en
 CH32L103F8U6,14,communication_interface_can,1,Communication interface,Communication interface CAN,通信接口 CAN,Communication interface CAN,confirmed,products:zh+products:en
 CH32L103F8U6,15,communication_interface_pdusb_usb_host_device,Host Device,Communication interface PDUSB,Communication interface PDUSB USB Host Device,通信接口 PDUSB USB Host Device,Communication interface PDUSB USB Host Device,confirmed,products:zh+products:en
-CH32L103F8U6,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103F8U6,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103F8U6,17,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103F8U6,18,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103F8U6,19,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, pin-optimized)"
+CH32L103F8U6,19,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, pin-optimized)"
 CH32L103G8R6,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32L103G8R6,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32L103G8R6,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -275,7 +275,7 @@ CH32L103G8R6,15,communication_interface_pdusb_usb_host_device,Host Device,Commun
 CH32L103G8R6,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink,Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,confirmed,products:zh+products:en
 CH32L103G8R6,17,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103G8R6,18,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103G8R6,19,main_applications_and_features,"General-purpose, motor master",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, motor main control)"
+CH32L103G8R6,19,main_applications_and_features,"General-purpose, motor master",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, motor main control)"
 CH32L103K8U6,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32L103K8U6,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32L103K8U6,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -293,10 +293,10 @@ CH32L103K8U6,13,communication_interface_i2c,I2C1,Communication interface,Communi
 CH32L103K8U6,14,communication_interface_can,1,Communication interface,Communication interface CAN,通信接口 CAN,Communication interface CAN,confirmed,products:zh+products:en
 CH32L103K8U6,15,communication_interface_can_fd,√,Communication interface,Communication interface CAN FD,通信接口 CAN FD,Communication interface CAN FD,confirmed,products:zh+products:en
 CH32L103K8U6,16,communication_interface_pdusb_usb_host_device,Host Device,Communication interface PDUSB,Communication interface PDUSB USB Host Device,通信接口 PDUSB USB Host Device,Communication interface PDUSB USB Host Device,confirmed,products:zh+products:en
-CH32L103K8U6,17,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103K8U6,17,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103K8U6,18,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103K8U6,19,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103K8U6,20,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, pin-optimized)"
+CH32L103K8U6,20,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, pin-optimized)"
 CH32L103K8U7,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32L103K8U7,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32L103K8U7,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -313,10 +313,10 @@ CH32L103K8U7,12,communication_interface_spi,SPI1,Communication interface,Communi
 CH32L103K8U7,13,communication_interface_i2c,I2C1,Communication interface,Communication interface I2C,通信接口 I2C,Communication interface I2C,confirmed,products:zh+products:en
 CH32L103K8U7,14,communication_interface_can,1,Communication interface,Communication interface CAN,通信接口 CAN,Communication interface CAN,confirmed,products:zh+products:en
 CH32L103K8U7,15,communication_interface_pdusb_usb_host_device,Host Device,Communication interface PDUSB,Communication interface PDUSB USB Host Device,通信接口 PDUSB USB Host Device,Communication interface PDUSB USB Host Device,confirmed,products:zh+products:en
-CH32L103K8U7,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103K8U7,16,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink Built-in Rd(1),Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103K8U7,17,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32L103K8U7,18,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32L103K8U7,19,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=General purpose, pin-optimized)"
+CH32L103K8U7,19,main_applications_and_features,"General-purpose, pin optimized",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=General purpose, pin-optimized)"
 CH32M007E8R6,0,adtm,1,,ADTM,高 级 定 时 器,ADTM,confirmed,products:zh+products:en
 CH32M007E8R6,1,gptm,1,,GPTM,通 用 定 时 器,GPTM,confirmed,products:zh+products:en
 CH32M007E8R6,2,streamlined_timer,1,,Streamlined timer,精 简 定 时 器,Streamlined timer,confirmed,products:zh+products:en
@@ -388,7 +388,7 @@ CH32M030C8T7,11,opa4,1,,OPA4,OPA4,OPA4,confirmed,products:zh+products:en
 CH32M030C8T7,12,cmp1,1,,CMP1,CMP1,CMP1,confirmed,products:zh+products:en
 CH32M030C8T7,13,cmp2,1,,CMP2,CMP2,CMP2,confirmed,products:zh+products:en
 CH32M030C8T7,14,cmp3,1,,CMP3,CMP3,CMP3,confirmed,products:zh+products:en
-CH32M030C8T7,15,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(=2 differential)
+CH32M030C8T7,15,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8T7,16,signal_decoding_qii,2,,Signal decoding QII,信号解码QII,Signal decoding QII,confirmed,products:zh+products:en
 CH32M030C8T7,17,programmable_current_injection_module_isink,2,,Programmable current injection module ISINK,可编程灌电流模块ISINK,Programmable current injection module ISINK,confirmed,products:zh+products:en
 CH32M030C8T7,18,source_current_module_isource,2,,Source current module ISOURCE,源电流模块ISOURCE,Source current module ISOURCE,confirmed,products:zh+products:en
@@ -413,7 +413,7 @@ CH32M030C8U3,12,opa4,1,,OPA4,OPA4,OPA4,confirmed,products:zh+products:en
 CH32M030C8U3,13,cmp1,1,,CMP1,CMP1,CMP1,confirmed,products:zh+products:en
 CH32M030C8U3,14,cmp2,1,,CMP2,CMP2,CMP2,confirmed,products:zh+products:en
 CH32M030C8U3,15,cmp3,1,,CMP3,CMP3,CMP3,confirmed,products:zh+products:en
-CH32M030C8U3,16,current_sampling_isp_isn,Differential*2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(=2 differential)
+CH32M030C8U3,16,current_sampling_isp_isn,Differential*2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8U3,17,signal_decoding_qii,2,,Signal decoding QII,信号解码QII,Signal decoding QII,confirmed,products:zh+products:en
 CH32M030C8U3,18,programmable_current_injection_module_isink,2,,Programmable current injection module ISINK,可编程灌电流模块ISINK,Programmable current injection module ISINK,confirmed,products:zh+products:en
 CH32M030C8U3,19,source_current_module_isource,2,,Source current module ISOURCE,源电流模块ISOURCE,Source current module ISOURCE,confirmed,products:zh+products:en
@@ -421,7 +421,7 @@ CH32M030C8U3,20,communication_interface_uart,1,Communication interface,Communica
 CH32M030C8U3,21,communication_interface_spi,1,Communication interface,Communication interface SPI,通信接口 SPI,Communication interface SPI,confirmed,products:zh+products:en
 CH32M030C8U3,22,communication_interface_i2c,1,Communication interface,Communication interface I2C,通信接口 I2C,Communication interface I2C,confirmed,products:zh+products:en
 CH32M030C8U3,23,communication_interface_pdusb_usbfs,Host Device,Communication interface PDUSB,Communication interface PDUSB USBFS,通信接口 PDUSB USBFS,Communication interface PDUSB USBFS,confirmed,products:zh+products:en
-CH32M030C8U3,24,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030C8U3,24,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M030C8U7,0,half_bridge_gate_driver,4,,Half-bridge gate driver,半桥栅极驱动器,Half-bridge gate driver,confirmed,products:zh+products:en
 CH32M030C8U7,1,pre_drive_i_o_mv_i_0,8,,Pre-drive I/O (MV I/0),预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),confirmed,products:zh+products:en
 CH32M030C8U7,2,high_voltage_i_o_hv_i_0,1,,High voltage I/O（HV I/0）,高压I/O（HV I/0）,High voltage I/O（HV I/0）,confirmed,products:zh+products:en
@@ -438,7 +438,7 @@ CH32M030C8U7,12,opa4,1,,OPA4,OPA4,OPA4,confirmed,products:zh+products:en
 CH32M030C8U7,13,cmp1,1,,CMP1,CMP1,CMP1,confirmed,products:zh+products:en
 CH32M030C8U7,14,cmp2,1,,CMP2,CMP2,CMP2,confirmed,products:zh+products:en
 CH32M030C8U7,15,cmp3,1,,CMP3,CMP3,CMP3,confirmed,products:zh+products:en
-CH32M030C8U7,16,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(=2 differential)
+CH32M030C8U7,16,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8U7,17,signal_decoding_qii,2,,Signal decoding QII,信号解码QII,Signal decoding QII,confirmed,products:zh+products:en
 CH32M030C8U7,18,programmable_current_injection_module_isink,2,,Programmable current injection module ISINK,可编程灌电流模块ISINK,Programmable current injection module ISINK,confirmed,products:zh+products:en
 CH32M030C8U7,19,source_current_module_isource,2,,Source current module ISOURCE,源电流模块ISOURCE,Source current module ISOURCE,confirmed,products:zh+products:en
@@ -446,7 +446,7 @@ CH32M030C8U7,20,communication_interface_uart,1,Communication interface,Communica
 CH32M030C8U7,21,communication_interface_spi,1,Communication interface,Communication interface SPI,通信接口 SPI,Communication interface SPI,confirmed,products:zh+products:en
 CH32M030C8U7,22,communication_interface_i2c,1,Communication interface,Communication interface I2C,通信接口 I2C,Communication interface I2C,confirmed,products:zh+products:en
 CH32M030C8U7,23,communication_interface_pdusb_usbfs,Host Device,Communication interface PDUSB,Communication interface PDUSB USBFS,通信接口 PDUSB USBFS,Communication interface PDUSB USBFS,confirmed,products:zh+products:en
-CH32M030C8U7,24,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030C8U7,24,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M030G8R7,0,half_bridge_gate_driver,3,,Half-bridge gate driver,半桥栅极驱动器,Half-bridge gate driver,confirmed,products:zh+products:en
 CH32M030G8R7,1,pre_drive_i_o_mv_i_0,6,,Pre-drive I/O (MV I/0),预驱动I/O（MV I/0）,Pre-drive I/O (MV I/0),confirmed,products:zh+products:en
 CH32M030G8R7,2,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
@@ -460,7 +460,7 @@ CH32M030G8R7,9,opa3,1,,OPA3,OPA3,OPA3,confirmed,products:zh+products:en
 CH32M030G8R7,10,opa4,1,,OPA4,OPA4,OPA4,confirmed,products:zh+products:en
 CH32M030G8R7,11,cmp2,1,,CMP2,CMP2,CMP2,confirmed,products:zh+products:en
 CH32M030G8R7,12,cmp3,1,,CMP3,CMP3,CMP3,confirmed,products:zh+products:en
-CH32M030G8R7,13,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(=2 differential)
+CH32M030G8R7,13,current_sampling_isp_isn,Differential *2,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(value=2 differential)
 CH32M030G8R7,14,signal_decoding_qii,1,,Signal decoding QII,信号解码QII,Signal decoding QII,confirmed,products:zh+products:en
 CH32M030G8R7,15,programmable_current_injection_module_isink,1,,Programmable current injection module ISINK,可编程灌电流模块ISINK,Programmable current injection module ISINK,confirmed,products:zh+products:en
 CH32M030G8R7,16,communication_interface_uart,1,Communication interface,Communication interface UART,通信接口 UART,Communication interface UART,confirmed,products:zh+products:en
@@ -481,7 +481,7 @@ CH32M030K8U7,10,opa3,1,,OPA3,OPA3,OPA3,confirmed,products:zh+products:en
 CH32M030K8U7,11,opa4,1,,OPA4,OPA4,OPA4,confirmed,products:zh+products:en
 CH32M030K8U7,12,cmp2,1,,CMP2,CMP2,CMP2,confirmed,products:zh+products:en
 CH32M030K8U7,13,cmp3,1,,CMP3,CMP3,CMP3,confirmed,products:zh+products:en
-CH32M030K8U7,14,current_sampling_isp_isn,Differential *1 Single end*1,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(=1 differential + 1 single-ended)
+CH32M030K8U7,14,current_sampling_isp_isn,Differential *1 Single end*1,,"Current sampling ISP, ISN","电流采样ISP,ISN","Current sampling ISP, ISN",conflict,products:en+!products:zh(value=1 differential + 1 single-ended)
 CH32M030K8U7,15,signal_decoding_qii,1,,Signal decoding QII,信号解码QII,Signal decoding QII,confirmed,products:zh+products:en
 CH32M030K8U7,16,programmable_current_injection_module_isink,2,,Programmable current injection module ISINK,可编程灌电流模块ISINK,Programmable current injection module ISINK,confirmed,products:zh+products:en
 CH32M030K8U7,17,source_current_module_isource,1,,Source current module ISOURCE,源电流模块ISOURCE,Source current module ISOURCE,confirmed,products:zh+products:en
@@ -489,7 +489,7 @@ CH32M030K8U7,18,communication_interface_uart,1,Communication interface,Communica
 CH32M030K8U7,19,communication_interface_spi,1,Communication interface,Communication interface SPI,通信接口 SPI,Communication interface SPI,confirmed,products:zh+products:en
 CH32M030K8U7,20,communication_interface_i2c,1,Communication interface,Communication interface I2C,通信接口 I2C,Communication interface I2C,confirmed,products:zh+products:en
 CH32M030K8U7,21,communication_interface_pdusb_usbfs,Host Device,Communication interface PDUSB,Communication interface PDUSB USBFS,通信接口 PDUSB USBFS,Communication interface PDUSB USBFS,confirmed,products:zh+products:en
-CH32M030K8U7,22,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030K8U7,22,communication_interface_pdusb_usb_pd_type_c,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M103G8R6,0,timer_advanced_control_tim1_16_bit,1,Timer,Timer Advanced-control TIM1 (16-bit),定时器 高级TIM1（16位）,Timer Advanced-control TIM1 (16-bit),confirmed,products:zh+products:en
 CH32M103G8R6,1,timer_general_purpose_tim2_3_16_bit,2,Timer,Timer General-purpose TIM2/3 (16-bit),定时器 通用TIM2/3（16位）,Timer General-purpose TIM2/3 (16-bit),confirmed,products:zh+products:en
 CH32M103G8R6,2,timer_general_purpose_tim4_32_bit,1,Timer,Timer General-purpose TIM4 (32-bit),定时器 通用TIM4（32位）,Timer General-purpose TIM4 (32-bit),confirmed,products:zh+products:en
@@ -511,7 +511,7 @@ CH32M103G8R6,17,communication_interface_pdusb_usb_host_device,Host Device,Commun
 CH32M103G8R6,18,communication_interface_pdusb_usb_pd_type_c,DRP Source Sink,Communication interface PDUSB,Communication interface PDUSB USB PD Type-C,通信接口 PDUSB USB PD Type-C,Communication interface PDUSB USB PD Type-C,confirmed,products:zh+products:en
 CH32M103G8R6,19,cpu_main_frequency,Max: 96MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32M103G8R6,20,rated_voltage,3.3V,,Rated voltage,额定电压,Rated voltage,confirmed,products:zh+products:en
-CH32M103G8R6,21,main_applications_and_features,"With gate drive, dedicated for motor",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(=With pre-driver, motor-dedicated)"
+CH32M103G8R6,21,main_applications_and_features,"With gate drive, dedicated for motor",,Main applications and features,主要应用及特点,Main applications and features,conflict,"products:en+!products:zh(value=With pre-driver, motor-dedicated)"
 CH32V002A4M6,0,adtm,1,,ADTM,高级 定时 器,ADTM,confirmed,products:zh+products:en
 CH32V002A4M6,1,gptm,1,,GPTM,通用 定时 器,GPTM,confirmed,products:zh+products:en
 CH32V002A4M6,2,watchdog,2,,Watchdog,看 门 狗,Watchdog,confirmed,products:zh+products:en
@@ -751,7 +751,7 @@ CH32V103C6T6,5,communication_interface_spi,1,Communication Interface,Communicati
 CH32V103C6T6,6,communication_interface_i2c,1,Communication Interface,Communication Interface I2C,通信接口 I2C,Communication Interface I2C,confirmed,products:zh+products:en
 CH32V103C6T6,7,communication_interface_usart,2,Communication Interface,Communication Interface USART,通信接口 USART,Communication Interface USART,confirmed,products:zh+products:en
 CH32V103C6T6,8,communication_interface_usbhd_2_0fs,1,Communication Interface,Communication Interface USBHD 2.0FS,通信接口 USBHD 2.0FS,Communication Interface USBHD 2.0FS,confirmed,products:zh+products:en
-CH32V103C6T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C6T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C6T6,10,operating_voltage,2.7V~5.5V,,Operating voltage,工作电压,Operating voltage,confirmed,products:zh+products:en
 CH32V103C8T6,0,timer_general_purpose,3,Timer,Timer General-purpose,定时器 通用,Timer General-purpose,confirmed,products:zh+products:en
 CH32V103C8T6,1,timer_advanced,1,Timer,Timer Advanced,定时器 高级,Timer Advanced,confirmed,products:zh+products:en
@@ -762,7 +762,7 @@ CH32V103C8T6,5,communication_interface_spi,2,Communication Interface,Communicati
 CH32V103C8T6,6,communication_interface_i2c,2,Communication Interface,Communication Interface I2C,通信接口 I2C,Communication Interface I2C,confirmed,products:zh+products:en
 CH32V103C8T6,7,communication_interface_usart,3,Communication Interface,Communication Interface USART,通信接口 USART,Communication Interface USART,confirmed,products:zh+products:en
 CH32V103C8T6,8,communication_interface_usbhd_2_0fs,1,Communication Interface,Communication Interface USBHD 2.0FS,通信接口 USBHD 2.0FS,Communication Interface USBHD 2.0FS,confirmed,products:zh+products:en
-CH32V103C8T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C8T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C8T6,10,operating_voltage,2.7V~5.5V,,Operating voltage,工作电压,Operating voltage,confirmed,products:zh+products:en
 CH32V103C8U6,0,timer_general_purpose,3,Timer,Timer General-purpose,定时器 通用,Timer General-purpose,confirmed,products:zh+products:en
 CH32V103C8U6,1,timer_advanced,1,Timer,Timer Advanced,定时器 高级,Timer Advanced,confirmed,products:zh+products:en
@@ -773,7 +773,7 @@ CH32V103C8U6,5,communication_interface_spi,2,Communication Interface,Communicati
 CH32V103C8U6,6,communication_interface_i2c,2,Communication Interface,Communication Interface I2C,通信接口 I2C,Communication Interface I2C,confirmed,products:zh+products:en
 CH32V103C8U6,7,communication_interface_usart,3,Communication Interface,Communication Interface USART,通信接口 USART,Communication Interface USART,confirmed,products:zh+products:en
 CH32V103C8U6,8,communication_interface_usbhd_2_0fs,1,Communication Interface,Communication Interface USBHD 2.0FS,通信接口 USBHD 2.0FS,Communication Interface USBHD 2.0FS,confirmed,products:zh+products:en
-CH32V103C8U6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C8U6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C8U6,10,operating_voltage,2.7V~5.5V,,Operating voltage,工作电压,Operating voltage,confirmed,products:zh+products:en
 CH32V103R8T6,0,timer_general_purpose,3,Timer,Timer General-purpose,定时器 通用,Timer General-purpose,confirmed,products:zh+products:en
 CH32V103R8T6,1,timer_advanced,1,Timer,Timer Advanced,定时器 高级,Timer Advanced,confirmed,products:zh+products:en
@@ -784,7 +784,7 @@ CH32V103R8T6,5,communication_interface_spi,2,Communication Interface,Communicati
 CH32V103R8T6,6,communication_interface_i2c,2,Communication Interface,Communication Interface I2C,通信接口 I2C,Communication Interface I2C,confirmed,products:zh+products:en
 CH32V103R8T6,7,communication_interface_usart,3,Communication Interface,Communication Interface USART,通信接口 USART,Communication Interface USART,confirmed,products:zh+products:en
 CH32V103R8T6,8,communication_interface_usbhd_2_0fs,1,Communication Interface,Communication Interface USBHD 2.0FS,通信接口 USBHD 2.0FS,Communication Interface USBHD 2.0FS,confirmed,products:zh+products:en
-CH32V103R8T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103R8T6,9,cpu_clock_frequency,Typical: 72MHz,,CPU clock frequency,CPU主频,CPU clock frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103R8T6,10,operating_voltage,2.7V~5.5V,,Operating voltage,工作电压,Operating voltage,confirmed,products:zh+products:en
 CH32V203C6T6,0,timer_advanced_control_16_bit,1,Timer,Timer Advanced-control (16-bit),定时器 高级（16位）,Timer Advanced-control (16-bit),confirmed,products:zh+products:en
 CH32V203C6T6,1,timer_general_purpose_16_bit,3,Timer,Timer General-purpose (16-bit),定时器 通用（16位）,Timer General-purpose (16-bit),confirmed,products:zh+products:en
@@ -1718,7 +1718,7 @@ CH32X315MCU6,12,spi,3,,SPI,SPI,SPI,confirmed,products:zh+products:en
 CH32X315MCU6,13,i2c,2,,I2C,I2C,I2C,confirmed,products:zh+products:en
 CH32X315MCU6,14,pdusb_usbhs_usb2_0,Host/Device,PDUSB,PDUSB USBHS(USB2.0),PDUSB USBHS(USB 2.0),PDUSB USBHS(USB2.0),confirmed,products:zh+products:en
 CH32X315MCU6,15,pdusb_usbss_usb3_0,Device,PDUSB,PDUSB USBSS(USB3.0),PDUSB USBSS(USB 3.0),PDUSB USBSS(USB3.0),confirmed,products:zh+products:en
-CH32X315MCU6,16,pdusb_usbpd,1 Built-in Rd(2),PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,conflict,products:en+!products:zh(=1 built-in Rd(2))
+CH32X315MCU6,16,pdusb_usbpd,1 Built-in Rd(2),PDUSB,PDUSB USBPD,PDUSB USBPD,PDUSB USBPD,conflict,products:en+!products:zh(value=1 built-in Rd(2))
 CH32X315MCU6,17,argb,1,,ARGB,ARGB,ARGB,confirmed,products:zh+products:en
 CH32X315MCU6,18,cpu_main_frequency,Max: 480MHz,,CPU main frequency,CPU主频,CPU main frequency,confirmed,products:zh+products:en
 CH32X315WCU6,0,code_flash_bytes,480K(1),,Code FLASH (Bytes),Code FLASH（字节）,Code FLASH (Bytes),confirmed,products:zh+products:en

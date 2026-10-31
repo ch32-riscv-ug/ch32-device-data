@@ -385,7 +385,7 @@ def main() -> int:
             for r in rows:
                 k = key(r)
                 entry = seen.setdefault(k, {**r, "langs": {}, "spelled": {}})
-                entry["langs"][lang] = f"rm:{lang}({document} p.{r['page']})"
+                entry["langs"][lang] = f"rm:{document}:{lang}(p.{r['page']})"
                 entry["spelled"][lang] = r["verbatim"]
                 if r["note"] and not entry["note"]:
                     entry["note"] = r["note"]

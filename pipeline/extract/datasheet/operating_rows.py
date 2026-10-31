@@ -1519,7 +1519,7 @@ def main():
             elif len(readings) == 2:
                 confidence = "conflict"
                 basis = (f"{paper}:en(p.{readings['en'][0]})"
-                         f"+!{paper}:zh(={readings['zh'][1]})")
+                         f"+!{paper}:zh(max={readings['zh'][1]})")
             else:
                 lang = next(iter(readings))
                 confidence = "reference"

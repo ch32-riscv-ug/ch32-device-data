@@ -172,7 +172,7 @@ def main() -> int:
                 # consumer believes decides whether the widest value fits, so
                 # both readings are carried rather than one being chosen.
                 confidence = "conflict"
-                basis = f"{basis}+!evt(device-header-comment:{entry['disagreement']})"
+                basis = f"{basis}+!evt:device-header-comment(value={entry['disagreement']})"
             symbol_rows.append({
                 "family": family, "symbol": entry["symbol"],
                 "role": entry["role"],

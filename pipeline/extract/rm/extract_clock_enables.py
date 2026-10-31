@@ -175,10 +175,10 @@ def main() -> int:
             if said is not None and lo == hi:
                 if said == lo:
                     confidence = "confirmed"
-                    basis.append(f"rm({manual_name})")
+                    basis.append(f"rm:{manual_name}")
                 else:
                     confidence = "conflict"
-                    basis.append(f"!rm({manual_name})(=bit{said})")
+                    basis.append(f"!rm:{manual_name}(bit={said})")
             rows.append({
                 "family": family,
                 "peripheral": name,

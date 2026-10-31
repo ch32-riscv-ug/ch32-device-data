@@ -92,7 +92,7 @@ TOOLCHAIN_ARCHES = {"", "x86", "x64", "arm64"}
 TOOLCHAIN_API = "https://api.mounriver.com/mountriver/api/version/"
 
 GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
-GRID_VALUE = re.compile(r"!rm-remap-grid\(=(?P<route>remap-\d+)\)")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+)\)")
 
 
 def build_index_grid(basis: str) -> str | None:
@@ -979,8 +979,9 @@ def index_checks(t: dict) -> list[str]:
     for r in t["index:conflicts"]:
         if r["table"] not in paths.SOURCE_TABLES:
             bad.append(f"conflicts: 知らない表 {r['table']!r}")
-        elif r["field"] and r["field"] not in (t[r["table"]][0] if t[r["table"]] else {}):
-            bad.append(f"conflicts: {r['table']} に列 {r['field']!r} が無い")
+        elif r["field"] and (missing := [c for c in r["field"].split(";")
+                                         if c not in (t[r["table"]][0] if t[r["table"]] else {})]):
+            bad.append(f"conflicts: {r['table']} に列 {missing} が無い")
     # capabilities ⊆ product_attributes。値は綴りのまま写すので値まで戻して見る。
     # **`count` は資料が素の整数を書いたときだけ**入る（読みを足していないこと）。
     attributes = {(r["part_number"], r["attribute"], r["value"].strip()) for r in t["product_attributes"]}
@@ -1320,6 +1321,23 @@ def access_vocabulary(t: dict) -> list[str]:
     return bad
 
 
+def basis_syntax(t: dict, documents: set[str]) -> list[str]:
+    """全表の `basis` 列（`*_basis` も）が文法どおりであること（pipeline/common/basis_grammar.py）。
+
+    文法は公開面の約束。`!` の項は食い違う列を `(列=値)` で名指し、文書は `[kind:]<文書>[:言語][(p.N)]`
+    で書く（preview のページに対応する）。知らない kind や目録に無い文書も落とす。
+    """
+    import basis_grammar  # noqa: PLC0415
+    bad = []
+    for name, rows in t.items():
+        for r in rows:
+            for column, value in r.items():
+                if column and (column == "basis" or column.endswith("_basis")) and value:
+                    for problem in basis_grammar.problems(value, documents):
+                        bad.append(f"{name}.{column}: {problem}")
+    return bad[:20] + ([f"…ほか {len(bad) - 20} 件"] if len(bad) > 20 else [])
+
+
 def published_surface(tables: Path | None) -> list[str]:
     """index/ が公開面の全部であること（docs/public-surface.ja.md）。
 
@@ -1477,6 +1495,7 @@ def main() -> int:
     # 表のヘッダと生成器の列定義。中身の鮮度は見られないが、列のずれは分かる。
     bad += column_drift(t)
     bad += published_surface(args.tables)
+    bad += basis_syntax(t, {r["document"] for r in t["documents"]})
     bad += access_vocabulary(t)
     # 生成器が --full の順序に載っているか。載らない生成器は原本が動いても走らない。
     bad += regeneration_coverage()
@@ -1494,7 +1513,7 @@ def main() -> int:
 
     # 索引 pinout は pins × pin_functions を語彙で言い換えたもので、**新しい事実は
     # 足さない**。行が pin_functions に戻せること（route だけは RM 格子の値を採る
-    # 行があり、その場合 basis に `!rm-remap-grid(=その値)` があること）、lead が
+    # 行があり、その場合 basis に `!rm-remap-grid(route=その値)` があること）、lead が
     # pins にあること、覆えなかった数が増えていないことを見る。
     lead_of = {(r["part_number"], r["pad"], r["pin"]) for r in t["pins"]}
     grid_route = {}

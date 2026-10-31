@@ -281,7 +281,7 @@ def main() -> int:
         confidence = "reference"
         basis: list[str] = []
         if manual:
-            basis.append(f"rm{'-en' if language == 'en' else ''}({manual_name})")
+            basis.append(f"rm{'-en' if language == 'en' else ''}:{manual_name}")
         if driver:
             basis.append(f"evt({driver_name})")
         if bits:
@@ -304,8 +304,8 @@ def main() -> int:
                 bit = re.search(r"\(bit(\d+)\)", evt_commit or "")
                 table = rm_register_commit(family, int(bit.group(1))) if bit else []
                 confidence = "confirmed" if table else "conflict"
-                basis.extend(f"rm-register({t})" for t in table)
-                basis.append(f"!rm:program_method({method})")
+                basis.extend(f"rm-register:{t}" for t in table)
+                basis.append(f"!rm(program_method={method})")
                 method, commit = evt_method, evt_commit
         elif not method:
             method, commit = evt_method, evt_commit

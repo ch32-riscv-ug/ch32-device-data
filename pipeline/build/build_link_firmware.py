@@ -252,7 +252,7 @@ def main() -> int:
             # **その読み替えのほうが実態と合っていない**疑いが濃い。
             "confidence": "conflict" if seen and decoded and seen != decoded else CONFIDENCE,
             "basis": (f"wch({origin})" if not (seen and decoded and seen != decoded)
-                      else f"wch({origin})+!device(={seen})"),
+                      else f"wch({origin})+!silicon:read-link-version(reported_version={seen})"),
         })
 
     # `with-bootloader` の image の後ろは、同じ device・mode の `application` の image そのもの。

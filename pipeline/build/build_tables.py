@@ -1102,7 +1102,7 @@ def attribute_rows(rows: list[dict]) -> list[dict]:
                 # basis も `#` より左のデータ列なので中国語は残せない。
                 basis = "products:zh+products:en" if agree \
                     else ("products:en+!products:zh("
-                          f"={translated(value_zh, translations['values'])})")
+                          f"value={translated(value_zh, translations['values'])})")
             elif zh_i is not None:
                 confidence, basis = "reference", "products:zh"
             else:

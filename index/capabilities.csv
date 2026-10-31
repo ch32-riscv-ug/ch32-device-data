@@ -68,7 +68,7 @@ CH32H416RDU6,CH32H416,CH32H417,timer-lptim,,count,2,2,timer_lptim,confirmed,prod
 CH32H416RDU6,CH32H416,CH32H417,usart,,count,7,7,usart,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,usb-fs,otg,count,1,1,pdusb_usbfs_otg_fs,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,usb-hs,,count,1,1,pdusb_usbhs_usb2_0,confirmed,products:zh+products:en
-CH32H416RDU6,CH32H416,CH32H417,usb-pd,,text,,1 Built-in Rd(4),pdusb_usbpd_type_c,conflict,products:en+!products:zh(=1 built-in Rd(4))
+CH32H416RDU6,CH32H416,CH32H417,usb-pd,,text,,1 Built-in Rd(4),pdusb_usbpd_type_c,conflict,products:en+!products:zh(value=1 built-in Rd(4))
 CH32H416RDU6,CH32H416,CH32H417,usb-ss,,count,1,1,pdusb_usbss_usb3_0,confirmed,products:zh+products:en
 CH32H416RDU6,CH32H416,CH32H417,watchdog,,text,,WWDG+IWDG,timer_watchdog,confirmed,products:zh+products:en
 CH32H417MEU6,CH32H417,CH32H417,adc,with-tkey,count,2,2,adc_tkey_units,confirmed,products:zh+products:en
@@ -250,7 +250,7 @@ CH32L103F8U6,CH32L103,CH32L103,timer-lptim,,marker,,√,timer_low_power_timer_lp
 CH32L103F8U6,CH32L103,CH32L103,tkey-channel,,count,10,10,tkey,confirmed,products:zh+products:en
 CH32L103F8U6,CH32L103,CH32L103,usart,,count,4,4,communication_interface_usart,confirmed,products:zh+products:en
 CH32L103F8U6,CH32L103,CH32L103,usb,host-device,text,,Host Device,communication_interface_pdusb_usb_host_device,confirmed,products:zh+products:en
-CH32L103F8U6,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103F8U6,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103F8U6,CH32L103,CH32L103,voltage,,text,,3.3V,rated_voltage,confirmed,products:zh+products:en
 CH32L103F8U6,CH32L103,CH32L103,watchdog,,text,,2 ( WWDG + IWDG ),timer_watchdog,confirmed,products:zh+products:en
 CH32L103G8R6,CH32L103,CH32L103,adc-channel,,text,,10+3,adc,confirmed,products:zh+products:en
@@ -289,7 +289,7 @@ CH32L103K8U6,CH32L103,CH32L103,timer-lptim,,marker,,√,timer_low_power_timer_lp
 CH32L103K8U6,CH32L103,CH32L103,tkey-channel,,count,10,10,tkey,confirmed,products:zh+products:en
 CH32L103K8U6,CH32L103,CH32L103,usart,,count,4,4,communication_interface_usart,confirmed,products:zh+products:en
 CH32L103K8U6,CH32L103,CH32L103,usb,host-device,text,,Host Device,communication_interface_pdusb_usb_host_device,confirmed,products:zh+products:en
-CH32L103K8U6,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103K8U6,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103K8U6,CH32L103,CH32L103,voltage,,text,,3.3V,rated_voltage,confirmed,products:zh+products:en
 CH32L103K8U6,CH32L103,CH32L103,watchdog,,text,,2 ( WWDG + IWDG ),timer_watchdog,confirmed,products:zh+products:en
 CH32L103K8U7,CH32L103,CH32L103,adc-channel,,text,,10+3,adc,confirmed,products:zh+products:en
@@ -308,7 +308,7 @@ CH32L103K8U7,CH32L103,CH32L103,timer-lptim,,marker,,√,timer_low_power_timer_lp
 CH32L103K8U7,CH32L103,CH32L103,tkey-channel,,count,10,10,tkey,confirmed,products:zh+products:en
 CH32L103K8U7,CH32L103,CH32L103,usart,,count,4,4,communication_interface_usart,confirmed,products:zh+products:en
 CH32L103K8U7,CH32L103,CH32L103,usb,host-device,text,,Host Device,communication_interface_pdusb_usb_host_device,confirmed,products:zh+products:en
-CH32L103K8U7,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=DRP/Source/Sink, built-in Rd(1))"
+CH32L103K8U7,CH32L103,CH32L103,usb-pd,,text,,DRP Source Sink Built-in Rd(1),communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=DRP/Source/Sink, built-in Rd(1))"
 CH32L103K8U7,CH32L103,CH32L103,voltage,,text,,3.3V,rated_voltage,confirmed,products:zh+products:en
 CH32L103K8U7,CH32L103,CH32L103,watchdog,,text,,2 ( WWDG + IWDG ),timer_watchdog,confirmed,products:zh+products:en
 CH32M007E8R6,CH32M007,CH32V006,adc-channel,,text,,7+2,adc,confirmed,products:zh+products:en
@@ -371,7 +371,7 @@ CH32M030C8T7,CH32M030,CH32M030,adc-channel,,count,20,20,adc,confirmed,products:z
 CH32M030C8T7,CH32M030,CH32M030,cmp,cmp1,count,1,1,cmp1,confirmed,products:zh+products:en
 CH32M030C8T7,CH32M030,CH32M030,cmp,cmp2,count,1,1,cmp2,confirmed,products:zh+products:en
 CH32M030C8T7,CH32M030,CH32M030,cmp,cmp3,count,1,1,cmp3,confirmed,products:zh+products:en
-CH32M030C8T7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(=2 differential)
+CH32M030C8T7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8T7,CH32M030,CH32M030,gate-driver,half-bridge,count,4,4,half_bridge_gate_driver,confirmed,products:zh+products:en
 CH32M030C8T7,CH32M030,CH32M030,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
 CH32M030C8T7,CH32M030,CH32M030,isink,,count,2,2,programmable_current_injection_module_isink,confirmed,products:zh+products:en
@@ -395,7 +395,7 @@ CH32M030C8U3,CH32M030,CH32M030,adc-channel,,count,20,20,adc,confirmed,products:z
 CH32M030C8U3,CH32M030,CH32M030,cmp,cmp1,count,1,1,cmp1,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,cmp,cmp2,count,1,1,cmp2,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,cmp,cmp3,count,1,1,cmp3,confirmed,products:zh+products:en
-CH32M030C8U3,CH32M030,CH32M030,current-sense,,text,,Differential*2,current_sampling_isp_isn,conflict,products:en+!products:zh(=2 differential)
+CH32M030C8U3,CH32M030,CH32M030,current-sense,,text,,Differential*2,current_sampling_isp_isn,conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8U3,CH32M030,CH32M030,gate-driver,half-bridge,count,4,4,half_bridge_gate_driver,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,hv-io,,count,2,2,high_voltage_i_o_hv_i_0,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
@@ -414,13 +414,13 @@ CH32M030C8U3,CH32M030,CH32M030,timer-general,tim2-16bit,count,1,1,timer_general_
 CH32M030C8U3,CH32M030,CH32M030,timer-streamlined,tim3-16bit,count,1,1,timer_streamlined_tim3_16_bit,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,usart,uart,count,1,1,communication_interface_uart,confirmed,products:zh+products:en
 CH32M030C8U3,CH32M030,CH32M030,usb-fs,,text,,Host Device,communication_interface_pdusb_usbfs,confirmed,products:zh+products:en
-CH32M030C8U3,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030C8U3,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M030C8U3,CH32M030,CH32M030,watchdog,wwdg,count,1,1,timer_wwdg,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,adc-channel,,count,20,20,adc,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,cmp,cmp1,count,1,1,cmp1,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,cmp,cmp2,count,1,1,cmp2,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,cmp,cmp3,count,1,1,cmp3,confirmed,products:zh+products:en
-CH32M030C8U7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(=2 differential)
+CH32M030C8U7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(value=2 differential)
 CH32M030C8U7,CH32M030,CH32M030,gate-driver,half-bridge,count,4,4,half_bridge_gate_driver,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,hv-io,,count,1,1,high_voltage_i_o_hv_i_0,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
@@ -439,12 +439,12 @@ CH32M030C8U7,CH32M030,CH32M030,timer-general,tim2-16bit,count,1,1,timer_general_
 CH32M030C8U7,CH32M030,CH32M030,timer-streamlined,tim3-16bit,count,1,1,timer_streamlined_tim3_16_bit,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,usart,uart,count,1,1,communication_interface_uart,confirmed,products:zh+products:en
 CH32M030C8U7,CH32M030,CH32M030,usb-fs,,text,,Host Device,communication_interface_pdusb_usbfs,confirmed,products:zh+products:en
-CH32M030C8U7,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030C8U7,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M030C8U7,CH32M030,CH32M030,watchdog,wwdg,count,1,1,timer_wwdg,confirmed,products:zh+products:en
 CH32M030G8R7,CH32M030,CH32M030,adc-channel,,count,11,11,adc,confirmed,products:zh+products:en
 CH32M030G8R7,CH32M030,CH32M030,cmp,cmp2,count,1,1,cmp2,confirmed,products:zh+products:en
 CH32M030G8R7,CH32M030,CH32M030,cmp,cmp3,count,1,1,cmp3,confirmed,products:zh+products:en
-CH32M030G8R7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(=2 differential)
+CH32M030G8R7,CH32M030,CH32M030,current-sense,,text,,Differential *2,current_sampling_isp_isn,conflict,products:en+!products:zh(value=2 differential)
 CH32M030G8R7,CH32M030,CH32M030,gate-driver,half-bridge,count,3,3,half_bridge_gate_driver,confirmed,products:zh+products:en
 CH32M030G8R7,CH32M030,CH32M030,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
 CH32M030G8R7,CH32M030,CH32M030,isink,,count,1,1,programmable_current_injection_module_isink,confirmed,products:zh+products:en
@@ -464,7 +464,7 @@ CH32M030G8R7,CH32M030,CH32M030,watchdog,wwdg,count,1,1,timer_wwdg,confirmed,prod
 CH32M030K8U7,CH32M030,CH32M030,adc-channel,,count,16,16,adc,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,cmp,cmp2,count,1,1,cmp2,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,cmp,cmp3,count,1,1,cmp3,confirmed,products:zh+products:en
-CH32M030K8U7,CH32M030,CH32M030,current-sense,,text,,Differential *1 Single end*1,current_sampling_isp_isn,conflict,products:en+!products:zh(=1 differential + 1 single-ended)
+CH32M030K8U7,CH32M030,CH32M030,current-sense,,text,,Differential *1 Single end*1,current_sampling_isp_isn,conflict,products:en+!products:zh(value=1 differential + 1 single-ended)
 CH32M030K8U7,CH32M030,CH32M030,gate-driver,half-bridge,count,2,2,half_bridge_gate_driver,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,hv-io,,count,1,1,high_voltage_i_o_hv_i_0,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
@@ -482,7 +482,7 @@ CH32M030K8U7,CH32M030,CH32M030,timer-general,tim2-16bit,count,1,1,timer_general_
 CH32M030K8U7,CH32M030,CH32M030,timer-streamlined,tim3-16bit,count,1,1,timer_streamlined_tim3_16_bit,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,usart,uart,count,1,1,communication_interface_uart,confirmed,products:zh+products:en
 CH32M030K8U7,CH32M030,CH32M030,usb-fs,,text,,Host Device,communication_interface_pdusb_usbfs,confirmed,products:zh+products:en
-CH32M030K8U7,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
+CH32M030K8U7,CH32M030,CH32M030,usb-pd,,text,,"(CC1R, CC2R) (CC3, CC4) Built-in Rd(1)",communication_interface_pdusb_usb_pd_type_c,conflict,"products:en+!products:zh(value=(CC1R,CC2R)(CC3,CC4), built-in Rd(1))"
 CH32M030K8U7,CH32M030,CH32M030,watchdog,wwdg,count,1,1,timer_wwdg,confirmed,products:zh+products:en
 CH32M103G8R6,CH32M103,CH32L103,adc-channel,,text,,10+3,adc,confirmed,products:zh+products:en
 CH32M103G8R6,CH32M103,CH32L103,can,,count,1,1,communication_interface_can,confirmed,products:zh+products:en
@@ -736,7 +736,7 @@ CH32V007K8U7,CH32V007,CH32V006,tkey-channel,,count,8,8,touch_key_button,confirme
 CH32V007K8U7,CH32V007,CH32V006,usart,,count,2,2,serial_port,confirmed,products:zh+products:en
 CH32V007K8U7,CH32V007,CH32V006,watchdog,,count,2,2,watchdog,confirmed,products:zh+products:en
 CH32V103C6T6,CH32V103,CH32V103,adc-channel,with-tkey,count,10,10,adc_tkey_number_of_channels,confirmed,products:zh+products:en
-CH32V103C6T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C6T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C6T6,CH32V103,CH32V103,i2c,,count,1,1,communication_interface_i2c,confirmed,products:zh+products:en
 CH32V103C6T6,CH32V103,CH32V103,spi,,count,1,1,communication_interface_spi,confirmed,products:zh+products:en
 CH32V103C6T6,CH32V103,CH32V103,systick,,count,1,1,timer_systick,confirmed,products:zh+products:en
@@ -747,7 +747,7 @@ CH32V103C6T6,CH32V103,CH32V103,usb-fs,usbhd,count,1,1,communication_interface_us
 CH32V103C6T6,CH32V103,CH32V103,voltage,,text,,2.7V~5.5V,operating_voltage,confirmed,products:zh+products:en
 CH32V103C6T6,CH32V103,CH32V103,watchdog,,count,2,2,timer_watchdog_wdt,confirmed,products:zh+products:en
 CH32V103C8T6,CH32V103,CH32V103,adc-channel,with-tkey,count,10,10,adc_tkey_number_of_channels,confirmed,products:zh+products:en
-CH32V103C8T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C8T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C8T6,CH32V103,CH32V103,i2c,,count,2,2,communication_interface_i2c,confirmed,products:zh+products:en
 CH32V103C8T6,CH32V103,CH32V103,spi,,count,2,2,communication_interface_spi,confirmed,products:zh+products:en
 CH32V103C8T6,CH32V103,CH32V103,systick,,count,1,1,timer_systick,confirmed,products:zh+products:en
@@ -758,7 +758,7 @@ CH32V103C8T6,CH32V103,CH32V103,usb-fs,usbhd,count,1,1,communication_interface_us
 CH32V103C8T6,CH32V103,CH32V103,voltage,,text,,2.7V~5.5V,operating_voltage,confirmed,products:zh+products:en
 CH32V103C8T6,CH32V103,CH32V103,watchdog,,count,2,2,timer_watchdog_wdt,confirmed,products:zh+products:en
 CH32V103C8U6,CH32V103,CH32V103,adc-channel,with-tkey,count,10,10,adc_tkey_number_of_channels,confirmed,products:zh+products:en
-CH32V103C8U6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103C8U6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103C8U6,CH32V103,CH32V103,i2c,,count,2,2,communication_interface_i2c,confirmed,products:zh+products:en
 CH32V103C8U6,CH32V103,CH32V103,spi,,count,2,2,communication_interface_spi,confirmed,products:zh+products:en
 CH32V103C8U6,CH32V103,CH32V103,systick,,count,1,1,timer_systick,confirmed,products:zh+products:en
@@ -769,7 +769,7 @@ CH32V103C8U6,CH32V103,CH32V103,usb-fs,usbhd,count,1,1,communication_interface_us
 CH32V103C8U6,CH32V103,CH32V103,voltage,,text,,2.7V~5.5V,operating_voltage,confirmed,products:zh+products:en
 CH32V103C8U6,CH32V103,CH32V103,watchdog,,count,2,2,timer_watchdog_wdt,confirmed,products:zh+products:en
 CH32V103R8T6,CH32V103,CH32V103,adc-channel,with-tkey,count,16,16,adc_tkey_number_of_channels,confirmed,products:zh+products:en
-CH32V103R8T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(=Typ. 72MHz)
+CH32V103R8T6,CH32V103,CH32V103,clock,,text,,Typical: 72MHz,cpu_clock_frequency,conflict,products:en+!products:zh(value=Typ. 72MHz)
 CH32V103R8T6,CH32V103,CH32V103,i2c,,count,2,2,communication_interface_i2c,confirmed,products:zh+products:en
 CH32V103R8T6,CH32V103,CH32V103,spi,,count,2,2,communication_interface_spi,confirmed,products:zh+products:en
 CH32V103R8T6,CH32V103,CH32V103,systick,,count,1,1,timer_systick,confirmed,products:zh+products:en
@@ -1711,7 +1711,7 @@ CH32X315MCU6,CH32X315,CH32X315,timer-general,16bit,count,2,2,timer_general_purpo
 CH32X315MCU6,CH32X315,CH32X315,timer-general,32bit,count,1,1,timer_general_purpose_32_bit,confirmed,products:zh+products:en
 CH32X315MCU6,CH32X315,CH32X315,usart,,count,4,4,usart,confirmed,products:zh+products:en
 CH32X315MCU6,CH32X315,CH32X315,usb-hs,,text,,Host/Device,pdusb_usbhs_usb2_0,confirmed,products:zh+products:en
-CH32X315MCU6,CH32X315,CH32X315,usb-pd,,text,,1 Built-in Rd(2),pdusb_usbpd,conflict,products:en+!products:zh(=1 built-in Rd(2))
+CH32X315MCU6,CH32X315,CH32X315,usb-pd,,text,,1 Built-in Rd(2),pdusb_usbpd,conflict,products:en+!products:zh(value=1 built-in Rd(2))
 CH32X315MCU6,CH32X315,CH32X315,usb-ss,,text,,Device,pdusb_usbss_usb3_0,confirmed,products:zh+products:en
 CH32X315MCU6,CH32X315,CH32X315,watchdog,,text,,WWDG+IWDG,timer_watchdog,confirmed,products:zh+products:en
 CH32X315WCU6,CH32X315,CH32X315,adc-channel,adc1,text,,12+1,adc_adc1_channel,confirmed,products:zh+products:en

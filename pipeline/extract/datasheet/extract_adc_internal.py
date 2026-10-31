@@ -127,6 +127,14 @@ def uv(value: str) -> str:
     return str(round(float(value) * 1000))
 
 
+# 中英が食い違ったとき、英語版の値を名指す列（`!<datasheet>:en(<列>=<値>)`）。値の並びは (min, typ, max)。
+DISSENT_COLUMNS = {
+    "slope": (("avg_slope_uv_c_min", "avg_slope_uv_c", "avg_slope_uv_c_max"), uv),
+    "v25": (("v25_mv_min", "v25_mv", "v25_mv_max"), mv),
+    "vref": (("vrefint_mv_min", "vrefint_mv", "vrefint_mv_max"), mv),
+}
+
+
 def read_zh(pages: list[str]) -> tuple[dict, dict[str, int]]:
     """{項目: 値} と {項目: ページ}。"""
     found: dict = {}
@@ -183,7 +191,7 @@ def enable_fields(family: str) -> dict[str, tuple[str, str, str, str, str]]:
     for source, by_lang in found.items():
         said = set(by_lang.values())
         register, field, bit = by_lang.get("zh") or by_lang["en"]
-        langs = "+".join(f"rm-enable({documents[lang]}:{lang})" for lang in ("zh", "en") if lang in by_lang)
+        langs = "+".join(f"rm-enable:{documents[lang]}:{lang}" for lang in ("zh", "en") if lang in by_lang)
         if len(said) > 1:
             out[source] = (register, field, str(bit), "conflict", langs)
         else:
@@ -224,7 +232,7 @@ def main() -> int:
                         if m and key not in zh:
                             zh[key] = int(m.group(1))
                             where[key] = pno
-                            rm_basis = f"+rm({manual_document}:p.{pno})"
+                            rm_basis = f"+rm:{manual_document}:zh(p.{pno})"
 
         def judged(*keys: str) -> tuple[str, str]:
             """zh の値が en にもあるか。keys のどれかで比べる。"""
@@ -232,7 +240,10 @@ def main() -> int:
             disagree = [k for k in keys if k in zh and k in en and tuple(zh[k][:3]) != tuple(en[k][:3])]
             pages = "+".join(dict.fromkeys(f"{datasheet}:zh(p.{where[k]})" for k in keys if k in where))
             if disagree:
-                return "conflict", pages + "+!" + datasheet + ":en"
+                said = ",".join(f"{column}={DISSENT_COLUMNS[k][1](en[k][i])}" for k in disagree
+                                for i, column in enumerate(DISSENT_COLUMNS[k][0])
+                                if zh[k][i] != en[k][i] and en[k][i] is not None)
+                return "conflict", pages + f"+!{datasheet}:en({said})"
             if agree:
                 return "confirmed", pages + f"+{datasheet}:en"
             return "reference", pages

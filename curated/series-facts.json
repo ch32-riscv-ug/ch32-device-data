@@ -5,218 +5,218 @@
     "CH32V002": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V002DS0)-features:zh",
+      "core_basis": "features:CH32V002DS0.PDF:zh",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V002DS0.PDF:zh+features:CH32V002DS0.PDF:en"
     },
     "CH32V003": {
       "core": "QingKe V2A",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V003DS0)-features:zh+en",
+      "core_basis": "features:CH32V003DS0.PDF:zh+features:CH32V003DS0.PDF:en",
       "isa": "RV32EC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V003DS0.PDF:zh+features:CH32V003DS0.PDF:en"
     },
     "CH32V004": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V004DS0)-features:zh",
+      "core_basis": "features:CH32V004DS0.PDF:zh",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V004DS0.PDF:zh+features:CH32V004DS0.PDF:en"
     },
     "CH32V005": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V006DS0)-features:zh (V005 shares the V006 datasheet)",
+      "core_basis": "features:CH32V006DS0.PDF:zh(V005 shares the V006 datasheet)",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V006DS0.PDF:zh+features:CH32V006DS0.PDF:en"
     },
     "CH32V006": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V006DS0)-features:zh+memorymap:zh",
+      "core_basis": "features:CH32V006DS0.PDF:zh+memorymap:zh",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V006DS0.PDF:zh+features:CH32V006DS0.PDF:en"
     },
     "CH32V007": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V007DS0)-features:zh",
+      "core_basis": "features:CH32V007DS0.PDF:zh",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V007DS0.PDF:zh+features:CH32V007DS0.PDF:en"
     },
     "CH32M007": {
       "core": "QingKe V2C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V007DS0)-features:zh (M007 shares the V007 datasheet)",
+      "core_basis": "features:CH32V007DS0.PDF:zh(M007 shares the V007 datasheet)",
       "isa": "RV32EmC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en"
+      "isa_basis": "features:CH32V007DS0.PDF:zh+features:CH32V007DS0.PDF:en"
     },
     "CH32V103": {
       "core": "QingKe V3A",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V103DS0)-intro:zh+en",
+      "core_basis": "ds:CH32V103DS0.PDF:zh(intro)+ds:CH32V103DS0.PDF:en(intro)",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v3-manual:zh+en (V3 summary table); V3A=RV32IMAC"
+      "isa_basis": "features:CH32V103DS0.PDF:zh+features:CH32V103DS0.PDF:en+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3A=RV32IMAC)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3A=RV32IMAC)"
     },
     "CH32L103": {
       "core": "QingKe V4C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(L103DS0)-features:zh+en",
+      "core_basis": "features:CH32L103DS0.PDF:zh+features:CH32L103DS0.PDF:en",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v4-manual:zh+en (V4 summary table); V4C=RV32IMAC"
+      "isa_basis": "features:CH32L103DS0.PDF:zh+features:CH32L103DS0.PDF:en+manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4C=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4C=RV32IMAC)"
     },
     "CH32M103": {
       "core": "QingKe V4C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(L103DS0)-features:zh (M103 shares the L103 datasheet)",
+      "core_basis": "features:CH32L103DS0.PDF:zh(M103 shares the L103 datasheet)",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v4-manual:zh+en (V4 summary table); V4C=RV32IMAC"
+      "isa_basis": "features:CH32L103DS0.PDF:zh+features:CH32L103DS0.PDF:en+manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4C=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4C=RV32IMAC)"
     },
     "CH32M030": {
       "core": "QingKe V3B",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(M030DS0)-features:zh+en",
+      "core_basis": "features:CH32M030DS0.PDF:zh+features:CH32M030DS0.PDF:en",
       "isa": "RV32IMCB",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v3-manual:zh+en (V3 summary table); V3B=RV32I[M]C[B]"
+      "isa_basis": "features:CH32M030DS0.PDF:zh+features:CH32M030DS0.PDF:en+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3B=RV32I[M]C[B])+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3B=RV32I[M]C[B])"
     },
     "CH32V203": {
       "core": "QingKe V4B",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V203DS0)-intro:zh (fitted with a QingKe V4B core). Exception: CH32V203CCT6 is the 256K part listed in CH32V205DS0, sharing the V205 (QingKe V3B) datasheet and comparison table with no core statement of its own",
+      "core_basis": "ds:CH32V203DS0.PDF:zh(intro; fitted with a QingKe V4B core. Exception: CH32V203CCT6 is the 256K part listed in CH32V205DS0, sharing the V205 (QingKe V3B) datasheet and comparison table with no core statement of its own)",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4B=RV32IMAC"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4B=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4B=RV32IMAC)"
     },
     "CH32V205": {
       "core": "QingKe V3B",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V205DS0)-features:zh+section-1.4.1",
+      "core_basis": "features:CH32V205DS0.PDF:zh+ds:CH32V205DS0.PDF:zh(section 1.4.1)",
       "isa": "RV32ICBM-X",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+manual:qingke-v3-manual:zh+en (V3 summary table); V3B=RV32I[M]C[B] (letter order differs between documents)"
+      "isa_basis": "features:CH32V205DS0.PDF:zh+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3B=RV32I[M]C[B] (letter order differs between documents))+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3B=RV32I[M]C[B] (letter order differs between documents))"
     },
     "CH32V208": {
       "core": "QingKe V4C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V208DS0)-intro:zh (states that CH32V208 has a V4C core)",
+      "core_basis": "ds:CH32V208DS0.PDF:zh(intro; states that CH32V208 has a V4C core)",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4C=RV32IMAC"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4C=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4C=RV32IMAC)"
     },
     "CH32V303": {
       "core": "QingKe V4F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en (CH32V30x and CH32V31x are based on QingKe V4F)",
+      "core_basis": "features:CH32V20x_30xDS0.PDF:zh+features:CH32V20x_30xDS0.PDF:en(CH32V30x and CH32V31x are based on QingKe V4F)",
       "isa": "RV32IMACF",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4F=RV32IMACF"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4F=RV32IMACF)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4F=RV32IMACF)"
     },
     "CH32V305": {
       "core": "QingKe V4F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en",
+      "core_basis": "features:CH32V20x_30xDS0.PDF:zh+features:CH32V20x_30xDS0.PDF:en",
       "isa": "RV32IMACF",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4F=RV32IMACF"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4F=RV32IMACF)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4F=RV32IMACF)"
     },
     "CH32V307": {
       "core": "QingKe V4F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en",
+      "core_basis": "features:CH32V20x_30xDS0.PDF:zh+features:CH32V20x_30xDS0.PDF:en",
       "isa": "RV32IMACF",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4F=RV32IMACF"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4F=RV32IMACF)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4F=RV32IMACF)"
     },
     "CH32V317": {
       "core": "QingKe V4F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V20x_30xDS0)-features:zh+en (explicitly including V31x)",
+      "core_basis": "features:CH32V20x_30xDS0.PDF:zh+features:CH32V20x_30xDS0.PDF:en(explicitly including V31x)",
       "isa": "RV32IMACF",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v4-manual:zh+en (V4 summary table); V4F=RV32IMACF"
+      "isa_basis": "manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4F=RV32IMACF)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4F=RV32IMACF)"
     },
     "CH32V407": {
       "core": "QingKe V3V",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V407DS0)-features:zh+en",
+      "core_basis": "features:CH32V407DS0.PDF:zh+features:CH32V407DS0.PDF:en",
       "isa": "RV32IMABCV-X",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-architecture:zh+manual:qingke-v3-manual:zh+en (V3 summary table); V3V=RV32IMACB+Zve64x"
+      "isa_basis": "ds:CH32V407DS0.PDF:zh(architecture)+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3V=RV32IMACB+Zve64x)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3V=RV32IMACB+Zve64x)"
     },
     "CH32V467": {
       "core": "QingKe V3V",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(V407DS0)-features:zh+en (V467 shares the V407 datasheet)",
+      "core_basis": "features:CH32V407DS0.PDF:zh+features:CH32V407DS0.PDF:en(V467 shares the V407 datasheet)",
       "isa": "RV32IMABCV-X",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-architecture:zh+manual:qingke-v3-manual:zh+en (V3 summary table); V3V=RV32IMACB+Zve64x"
+      "isa_basis": "ds:CH32V407DS0.PDF:zh(architecture)+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3V=RV32IMACB+Zve64x)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3V=RV32IMACB+Zve64x)"
     },
     "CH32X033": {
       "core": "QingKe V4C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(X035DS0)-features:zh+en (X033 shares the X035 datasheet)",
+      "core_basis": "features:CH32X035DS0.PDF:zh+features:CH32X035DS0.PDF:en(X033 shares the X035 datasheet)",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v4-manual:zh+en (V4 summary table); V4C=RV32IMAC"
+      "isa_basis": "features:CH32X035DS0.PDF:zh+features:CH32X035DS0.PDF:en+manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4C=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4C=RV32IMAC)"
     },
     "CH32X035": {
       "core": "QingKe V4C",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(X035DS0)-features:zh+en",
+      "core_basis": "features:CH32X035DS0.PDF:zh+features:CH32X035DS0.PDF:en",
       "isa": "RV32IMAC",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-features:zh+en+manual:qingke-v4-manual:zh+en (V4 summary table); V4C=RV32IMAC"
+      "isa_basis": "features:CH32X035DS0.PDF:zh+features:CH32X035DS0.PDF:en+manual:QingKeV4_Processor_Manual.PDF:zh(V4 summary table; V4C=RV32IMAC)+manual:QingKeV4_Processor_Manual.PDF:en(V4 summary table; V4C=RV32IMAC)"
     },
     "CH32X305": {
       "core": "QingKe V3F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(X315DS0)-features:zh+en (X305 shares the X315 datasheet)",
+      "core_basis": "features:CH32X315DS0.PDF:zh+features:CH32X315DS0.PDF:en(X305 shares the X315 datasheet)",
       "isa": "RV32IMAFBC-X",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-architecture:zh+manual:qingke-v3-manual:zh+en (V3 summary table); V3F=RV32IMAFCB"
+      "isa_basis": "ds:CH32X315DS0.PDF:zh(architecture)+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3F=RV32IMAFCB)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3F=RV32IMAFCB)"
     },
     "CH32X315": {
       "core": "QingKe V3F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(X315DS0)-features:zh+en",
+      "core_basis": "features:CH32X315DS0.PDF:zh+features:CH32X315DS0.PDF:en",
       "isa": "RV32IMAFBC-X",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:ds-architecture:zh+manual:qingke-v3-manual:zh+en (V3 summary table); V3F=RV32IMAFCB"
+      "isa_basis": "ds:CH32X315DS0.PDF:zh(architecture)+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3F=RV32IMAFCB)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3F=RV32IMAFCB)"
     },
     "CH32H415": {
       "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "reference",
-      "core_basis": "manual:ds(H417DS0)-intro:zh+en states dual-core for CH32H417 only; H415 shares the datasheet and ITCM layout but has no statement of its own",
+      "core_basis": "ds:CH32H417DS0.PDF:zh(intro)+ds:CH32H417DS0.PDF:en(intro; states dual-core for CH32H417 only; H415 shares the datasheet and ITCM layout but has no statement of its own)",
       "isa": "RV32IMABCF + RV32IMAFCB",
       "isa_confidence": "reference",
-      "isa_basis": "inferred from the same dual-core structure as H417 (the core itself is reference)"
+      "isa_basis": "inferred(the same dual-core structure as H417; the core itself is reference)"
     },
     "CH32H416": {
       "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "reference",
-      "core_basis": "manual:ds(H417DS0)-intro:zh+en states dual-core for CH32H417 only; H416 shares the datasheet and ITCM layout but has no statement of its own",
+      "core_basis": "ds:CH32H417DS0.PDF:zh(intro)+ds:CH32H417DS0.PDF:en(intro; states dual-core for CH32H417 only; H416 shares the datasheet and ITCM layout but has no statement of its own)",
       "isa": "RV32IMABCF + RV32IMAFCB",
       "isa_confidence": "reference",
-      "isa_basis": "inferred from the same dual-core structure as H417 (the core itself is reference)"
+      "isa_basis": "inferred(the same dual-core structure as H417; the core itself is reference)"
     },
     "CH32H417": {
       "core": "QingKe V5F + QingKe V3F",
       "core_confidence": "confirmed",
-      "core_basis": "manual:ds(H417DS0)-intro+features:zh+en (dual-core structure: QingKe RISC-V5F and RISC-V3F)",
+      "core_basis": "ds:CH32H417DS0.PDF:zh(intro)+features:CH32H417DS0.PDF:zh+ds:CH32H417DS0.PDF:en(intro)+features:CH32H417DS0.PDF:en(dual-core structure: QingKe RISC-V5F and RISC-V3F)",
       "isa": "RV32IMABCF + RV32IMAFCB",
       "isa_confidence": "confirmed",
-      "isa_basis": "manual:qingke-v5-manual:zh+en (V5F=RV32IMABCF)+manual:qingke-v3-manual:zh+en (V3 summary table) (V3F=RV32IMAFCB); dual-core"
+      "isa_basis": "manual:QingKeV5_Processor_Manual.PDF:zh(V5F=RV32IMABCF)+manual:QingKeV5_Processor_Manual.PDF:en(V5F=RV32IMABCF)+manual:QingKeV3_Processor_Manual.PDF:zh(V3 summary table; V3F=RV32IMAFCB; dual-core)+manual:QingKeV3_Processor_Manual.PDF:en(V3 summary table; V3F=RV32IMAFCB; dual-core)"
     }
   }
 }

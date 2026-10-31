@@ -208,10 +208,10 @@ def main() -> int:
                     lo, width = said
                     if (lo, lo + width - 1) == span:
                         confidence = "confirmed"
-                        basis.append(f"rm({manual_name})")
+                        basis.append(f"rm:{manual_name}")
                     else:
                         confidence = "conflict"
-                        basis.append(f"!rm({manual_name})(={lo + width - 1}:{lo})")
+                        basis.append(f"!rm:{manual_name}(phy_bits={lo + width - 1}:{lo})")
                 base = bases.get(f"{block}_BASE")
                 offset = structs[block][register]
                 rows.append({**rcc, "phy_block": block, "phy_register": register,
