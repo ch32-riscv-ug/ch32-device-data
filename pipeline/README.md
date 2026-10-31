@@ -70,8 +70,6 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            wrapped in the source-hash gate**. Pixel crops need the original PDF and
            pdfcompat cannot stand in, so the gate just checks the hash on open --
            the last direct-PDF read now meets the execution-path requirement too)
-reconcile/ compare_csv.py (frozen-vs-candidate multiset diff: unchanged/added/changed/missing);
-           zh/en pairing comes later
 common/    review_sidecar.py (**L2: the reader of human decisions**. The committed
            record is structured/<stem>.<lang>/review.json -- approved/rejected per
            block ID, pinned to the original's SHA-256. The new-path extractors

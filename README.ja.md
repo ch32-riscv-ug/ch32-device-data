@@ -81,9 +81,6 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
-- `tools/crosscheck_ch32data.py`: [ch32-rs/ch32-data](https://github.com/ch32-rs/ch32-data)と
-  AFIO remap fieldを突き合わせる。**上流ではなく検算相手**——向こうは
-  CH32V205/V407/V467/X305/X315/M030/M103のレジスタ定義を持たないため
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
 - `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）
 - `docs/handoff.ja.md`: **人もAIエージェントも最初に読む作業引継ぎ。** 正本の所在、再開手順、原本（mirror）更新時の手順、守ること、判断の指針、PDF構造化の作業規約
@@ -115,7 +112,6 @@ node tools/check_viewer.js      # pins.html の表示（DOM 無しで関数を�
 
 ```sh
 uv run tools/extract_remap_fields.py --mirrors <EVT cloneの親> --compare evidence
-uv run tools/crosscheck_ch32data.py --ch32-data <ch32-dataのclone>
 ```
 
 reference manualは**両言語版を読んで和を取ります**。中国語版のほうが新しく、
