@@ -474,9 +474,9 @@ def check_holes(open_or_not: dict[str, bool]) -> list[str]:
 # consumer に「直接読んでよい」と約束している証拠の表の一覧。README ごとに段落の書き出しを持ち、
 # そこから空行までを一覧とみなす。
 STABLE_LISTS = (
-    # 公開面へ写した表の一覧（`paths.PUBLISHED`）。落とした列は次の段落に書く（一覧に混ぜない）。
-    ("index/README.md", "## Copied from catalog and evidence", "published"),
-    ("index/README.ja.md", "## 目録・証拠からの写し", "published"),
+    # そのまま公開する表の一覧（`paths.PUBLISHED`）。
+    ("index/README.md", "## Published as read", "published"),
+    ("index/README.ja.md", "## そのまま公開する表", "published"),
 )
 TABLE_NAME = re.compile(r"`([a-z][a-z0-9_]*\*?)`")
 

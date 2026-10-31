@@ -11,7 +11,7 @@ each family repository from it. The tables come in three kinds
 | | What | For whom |
 |---|---|---|
 | [`index/`](index/README.md) | **the public surface**: the key tables (families, series, parts, packages, cores), the facts published as read, and lookup tables derived from the evidence with normalised names; filter by part or feature in the viewer (`pins.html`) | users and generators |
-| [`evidence/`](evidence/README.md) (21 tables) | the material the index is derived from: what the documents say, **spelled as they spell it**, every row with its provenance (`basis`) and confidence (`confidence`) | anyone checking correctness |
+| [`evidence/`](evidence/README.md) (15 tables) | the material the index is derived from: what the documents say, **spelled as they spell it**, every row with its provenance (`basis`) and confidence (`confidence`) | anyone checking correctness |
 | [`catalog/`](catalog/README.md) (3 tables) | the documents, the mirror commits and the upstream tool versions the tables are built from | maintainers |
 
 This repository does not declare Arduino core support for any part.

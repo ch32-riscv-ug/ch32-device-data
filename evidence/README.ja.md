@@ -3,7 +3,7 @@
 [English](README.md)
 
 **資料は何と書いているか**を、行ごとに出所（`basis`）と確度（`confidence`）を付けて写した
-21 表で、索引（[`index/`](../index/README.ja.md)）の材料です。資料の事実のうち、そのまま公開する表は `index/` に置いています（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
+15 表で、索引（[`index/`](../index/README.ja.md)）の材料です。資料の事実のうち、そのまま公開する表は `index/` に置いています（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。綴りは原典のまま——
 `pin_functions.signal` は `TX1` / `UTX` / `USART1_TX` と資料どおりに揺れ、`pad` は
 `PA0-WKUP` と装飾ごと持ちます。資料どうしが食い違えば値を直さず `conflict` にして両方を残します。
 **引く**ための表（語彙で揃えた名前・結合済み・型番ごとに割ったもの）は

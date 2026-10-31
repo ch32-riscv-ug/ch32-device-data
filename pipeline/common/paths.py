@@ -34,11 +34,10 @@ MIRRORS = Path("/home/mt/dev_wch")
 CATALOG_TABLES = ("documents", "sources", "toolchains")
 
 EVIDENCE_TABLES = (
-    "pins", "pin_functions", "product_attributes", "features", "memory_configs",
-    "eval_boards", "evt_examples", "link_firmware", "absolute_maximum_ratings",
+    "pins", "pin_functions", "product_attributes", "features",
+    "eval_boards", "evt_examples",
     "remap_fields", "remap_routes", "timers", "registers", "register_fields",
-    "dma_requests", "opa_cmp_registers", "usbpd_plumbing", "debug_wiring",
-    "device_id_addresses", "pin_conditions", "figures",
+    "dma_requests", "debug_wiring", "device_id_addresses", "figures",
 )
 
 # Index tables: one combined file each (all parts / all families). People filter
@@ -60,7 +59,9 @@ PUBLISHED = (
     "adc_internal", "debug_data",
     # facts read from datasheets and reference manuals
     "device_ids", "option_bytes", "option_byte_fields", "register_blocks",
-    "errata", "operating_conditions", "esig",
+    "errata", "operating_conditions", "esig", "absolute_maximum_ratings",
+    "opa_cmp_registers", "usbpd_plumbing", "pin_conditions", "memory_configs",
+    "link_firmware",
 )
 assert not set(PUBLISHED) & set(INDEX_TABLES)
 assert not set(PUBLISHED) & (set(CATALOG_TABLES) | set(EVIDENCE_TABLES))

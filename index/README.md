@@ -2,15 +2,19 @@
 
 [日本語](README.ja.md)
 
-The tables **to look things up in**. `pipeline/build/build_index.py` derives them from the
-[evidence](../evidence/README.ja.md) (what the documents say, spelled as they spell it) and the
-[catalog](../catalog/README.ja.md) (the names) -- and from nothing else: `tools/check_tables.py`
-verifies on every run that each index row can be traced back to evidence rows. The three-way
-split is defined in [docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese).
-
 **Everything under `index/` is the public surface, and nothing outside it is** (see
-[Contract for consumers](#contract-for-consumers)). Catalog and evidence tables that consumers need are
-therefore copied in here (see [Copied from catalog and evidence](#copied-from-catalog-and-evidence)).
+[Contract for consumers](#contract-for-consumers)). It holds two kinds of table:
+
+- **Facts published as read** ([Published as read](#published-as-read)): the key tables (families,
+  series, parts, packages, cores) and facts read from the documents and the EVT headers, written here
+  directly by their generators.
+- **Lookup tables** ([Tables](#tables)): derived by `pipeline/build/build_index.py` from the
+  [evidence](../evidence/README.md) (what the documents say, spelled as they spell it) and the tables
+  above, with names normalised -- and from nothing else: `tools/check_tables.py` verifies on every run
+  that each lookup row can be traced back to evidence rows.
+
+The split between `index/`, `evidence/` and `catalog/` is defined in
+[docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese).
 
 ## Where to look
 
@@ -28,9 +32,14 @@ therefore copied in here (see [Copied from catalog and evidence](#copied-from-ca
 | DMA request -> channel | [`dma.csv`](dma.csv) |
 | Timers, with the channels that reach pins | [`timers.csv`](timers.csv) |
 | Which families share a register layout | [`register_layouts.csv`](register_layouts.csv) |
-| Part names, series, families, packages, cores | [`products.csv`](products.csv), [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) (copies) |
-| Chip ID, option bytes, flash geometry and programming | [`device_ids.csv`](device_ids.csv), [`option_bytes.csv`](option_bytes.csv), [`option_byte_fields.csv`](option_byte_fields.csv), [`flash_geometry.csv`](flash_geometry.csv), [`flash_program_method.csv`](flash_program_method.csv) (copies) |
-| Clock tree, interrupts, memory map, operating conditions, errata | see [Copied from catalog and evidence](#copied-from-catalog-and-evidence) |
+| Part names, series, families, packages, cores | [`products.csv`](products.csv), [`series.csv`](series.csv), [`families.csv`](families.csv), [`packages.csv`](packages.csv), [`cores.csv`](cores.csv) |
+| Chip ID, option bytes, flash geometry and programming | [`device_ids.csv`](device_ids.csv), [`option_bytes.csv`](option_bytes.csv), [`option_byte_fields.csv`](option_byte_fields.csv), [`flash_geometry.csv`](flash_geometry.csv), [`flash_program_method.csv`](flash_program_method.csv) |
+| Absolute maximum ratings | [`absolute_maximum_ratings.csv`](absolute_maximum_ratings.csv) |
+| Pads that move with which peripherals are enabled (not an AFIO remap) | [`pin_conditions.csv`](pin_conditions.csv) |
+| OPA/CMP and USB-PD register fields | [`opa_cmp_registers.csv`](opa_cmp_registers.csv), [`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
+| FLASH/SRAM split set by the option bytes | [`memory_configs.csv`](memory_configs.csv) |
+| WCH-Link firmware versions | [`link_firmware.csv`](link_firmware.csv) |
+| Clock tree, interrupts, memory map, operating conditions, errata | see [Published as read](#published-as-read) |
 | What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
 | Version of the public surface | [`VERSION`](VERSION) |
@@ -109,20 +118,19 @@ row.
   the invariants `tools/check_tables.py` checks, and regeneration when the sources change -- **not** that
   every row is true: where a document is wrong, the row is wrong and says so through `confidence`/`basis`.
 
-## Copied from catalog and evidence
+## Published as read
 
-`pipeline/build/build_index.py` copies these tables row for row (`paths.PUBLISHED`); `tools/check_tables.py`
-checks that each copy equals its source. Column meanings are in the [catalog README](../catalog/README.md)
-and the [evidence README](../evidence/README.md) under the same table name.
-Catalog: `families`, `series`, `products`, `packages`, `cores`.
+Each generator writes these tables here directly (`paths.PUBLISHED`), one row per fact with its
+`confidence` and `basis`. Every column is described in [`columns.csv`](columns.csv); how each table is
+read from the sources is in the [catalog README](../catalog/README.md) and the
+[evidence README](../evidence/README.md) under the same table name.
+Keys: `families`, `series`, `products`, `packages`, `cores`.
 From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_configs`, `clock_prescalers`,
 `clock_sources`, `clock_symbols`, `clock_init`, `clock_enables`, `pin_alternate`.
 Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
-`device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`.
-
-Columns left out of the copies (internal bookkeeping): `products` drops its packing columns,
-`clock_configs` drops the count of agreeing EVT copies, `operating_conditions` drops the datasheet name
-(it is in `basis`).
+`device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`,
+`absolute_maximum_ratings`, `opa_cmp_registers`, `usbpd_plumbing`, `pin_conditions`, `memory_configs`.
+WCH-LinkUtility: `link_firmware`.
 
 ## Tables
 

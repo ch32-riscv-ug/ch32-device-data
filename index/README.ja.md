@@ -2,13 +2,16 @@
 
 [English](README.md)
 
-**利用者が引くための表**です。[証拠 `evidence/`](../evidence/README.ja.md)（資料の綴りのまま）と
-[目録 `catalog/`](../catalog/README.ja.md)（名前）**だけ**から `pipeline/build/build_index.py` が組み直したもので、
-新しい事実は足していません——`tools/check_tables.py` が「索引の行は証拠に戻せる」ことを毎回見ます。
-区分の定義は [docs/data-layout.ja.md](../docs/data-layout.ja.md)。
-
 **`index/` の下が公開面の全部で、その外は公開面ではありません**（[consumer の契約](#consumer-の契約)）。
-consumer が要る目録・証拠の表はここへ写してあります（[目録・証拠からの写し](#目録証拠からの写し)）。
+表は2種類あります。
+
+- **資料の事実をそのまま公開する表**（[そのまま公開する表](#そのまま公開する表)）: 鍵の表（family・series・
+  型番・パッケージ・コア）と、資料や EVT ヘッダから読んだ事実。それぞれの生成器がここに直接書きます。
+- **引くための表**（[各表](#各表)）: [証拠 `evidence/`](../evidence/README.ja.md)（資料の綴りのまま）と上の表
+  **だけ**から `pipeline/build/build_index.py` が名前を揃えて組み直したもの。新しい事実は足していません——
+  `tools/check_tables.py` が「索引の行は証拠に戻せる」ことを毎回見ます。
+
+`index/`・`evidence/`・`catalog/` の区分の定義は [docs/data-layout.ja.md](../docs/data-layout.ja.md)。
 
 ## 何がどこにあるか
 
@@ -26,9 +29,14 @@ consumer が要る目録・証拠の表はここへ写してあります（[目�
 | DMA 要求 → channel | [`dma.csv`](dma.csv) |
 | タイマの素性（チャネル数つき） | [`timers.csv`](timers.csv) |
 | family をまたいで同じレジスタ配置か | [`register_layouts.csv`](register_layouts.csv) |
-| 型番・series・family・パッケージ・コアの名前 | [`products.csv`](products.csv)・[`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv)（写し） |
-| chip ID・option bytes・flash の形と書き方 | [`device_ids.csv`](device_ids.csv)・[`option_bytes.csv`](option_bytes.csv)・[`option_byte_fields.csv`](option_byte_fields.csv)・[`flash_geometry.csv`](flash_geometry.csv)・[`flash_program_method.csv`](flash_program_method.csv)（写し） |
-| クロック・割り込み・メモリマップ・動作条件・エラッタ | [目録・証拠からの写し](#目録証拠からの写し) |
+| 型番・series・family・パッケージ・コアの名前 | [`products.csv`](products.csv)・[`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv) |
+| chip ID・option bytes・flash の形と書き方 | [`device_ids.csv`](device_ids.csv)・[`option_bytes.csv`](option_bytes.csv)・[`option_byte_fields.csv`](option_byte_fields.csv)・[`flash_geometry.csv`](flash_geometry.csv)・[`flash_program_method.csv`](flash_program_method.csv) |
+| 絶対最大定格 | [`absolute_maximum_ratings.csv`](absolute_maximum_ratings.csv) |
+| 有効にした周辺で pad が動く信号（AFIO の remap ではないもの） | [`pin_conditions.csv`](pin_conditions.csv) |
+| OPA/CMP と USB-PD のレジスタの field | [`opa_cmp_registers.csv`](opa_cmp_registers.csv)・[`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
+| option bytes で決まる FLASH/SRAM の配分 | [`memory_configs.csv`](memory_configs.csv) |
+| WCH-Link のファームの版 | [`link_firmware.csv`](link_firmware.csv) |
+| クロック・割り込み・メモリマップ・動作条件・エラッタ | [そのまま公開する表](#そのまま公開する表) |
 | ここの全列の意味・書き方・空欄の意味 | [`columns.csv`](columns.csv) |
 | 全ファイルの sha256 | [`manifest.csv`](manifest.csv) |
 | 公開面の版 | [`VERSION`](VERSION) |
@@ -98,19 +106,18 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
   変わったときの再生成です。**全行が正しいことは保証しません**——資料が誤っていれば行も誤り、その
   ことを `confidence`/`basis` で言います
 
-## 目録・証拠からの写し
+## そのまま公開する表
 
-`pipeline/build/build_index.py` がこれらを行ごとそのまま写します（`paths.PUBLISHED`）。写しが元と等しいことは
-`tools/check_tables.py` が見ます。列の意味は同じ名前の表を [目録の README](../catalog/README.ja.md) と
-[証拠の README](../evidence/README.ja.md) で引いてください。
-目録: `families`・`series`・`products`・`packages`・`cores`。
+それぞれの生成器がここに直接書きます（`paths.PUBLISHED`）。1行1事実で、`confidence` と `basis` が付きます。
+全列の意味は [`columns.csv`](columns.csv) に、資料からの読み方は同じ名前の表を
+[目録の README](../catalog/README.ja.md) と [証拠の README](../evidence/README.ja.md) で引いてください。
+鍵: `families`・`series`・`products`・`packages`・`cores`。
 EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・`clock_configs`・`clock_prescalers`・
 `clock_sources`・`clock_symbols`・`clock_init`・`clock_enables`・`pin_alternate`。
 RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
-`device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`esig`。
-
-写しで落とした列（内部の記録）: `products` の packing の列、`clock_configs` の一致した EVT 写しの数、
-`operating_conditions` の datasheet 名（`basis` にある）。
+`device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`esig`・
+`absolute_maximum_ratings`・`opa_cmp_registers`・`usbpd_plumbing`・`pin_conditions`・`memory_configs`。
+WCH-LinkUtility 由来: `link_firmware`。
 
 ## 各表
 

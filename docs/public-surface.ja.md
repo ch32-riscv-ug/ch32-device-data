@@ -60,8 +60,6 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 
 ### 置かなかったもの
 
-- `memory_configs` — 前は「安定」だったが外した。全行が `conflict`（EVT ヘッダと RM の `FLASH_OBR` の幅が
-  食い違う）で信頼度 🟡、2026-09-30 にも F-77 で L103 の読みが動いた。読んでいる consumer も無い
 - `device_id_addresses` — `device_ids.id_addr` で足りる
 - `catalog/documents`・`sources`・`toolchains` — mirror の運用と生成の出所。consumer には commit と
   `manifest.csv` で足りる（mirror は今までどおり `manifests/documents.json` を読む）
