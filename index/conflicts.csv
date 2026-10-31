@@ -95,9 +95,9 @@ operating_conditions,,CH32V203;CH32V205,,series=CH32V203;CH32V205 symbol=f_ADC p
 operating_conditions,,CH32V203;CH32V205,,series=CH32V203;CH32V205 symbol=f_S parameter=Sampling rate,,,CH32V205DS0.PDF:zh,max=5.3,#,CH32V205DS0.PDF:en(p.63)+!CH32V205DS0.PDF:zh(max=5.3)
 operating_conditions,,CH32V208,,series=CH32V208 symbol=F_LSI parameter=Frequency,,,CH32V208DS0.PDF:zh,"typ=32,max=45",#,"CH32V208DS0.PDF:en(p.34)+!CH32V208DS0.PDF:zh(typ=32,max=45)"
 operating_conditions,,CH32V303;CH32V305;CH32V307;CH32V317,,series=CH32V303;CH32V305;CH32V307;CH32V317 symbol=R_ADC parameter=Sampling switch resistance,,,CH32V20x_30xDS0.PDF:zh,max=1.5,#,CH32V20x_30xDS0.PDF:en(p.87)+!CH32V20x_30xDS0.PDF:zh(max=1.5)
-option_byte_fields,CH32M030,,,family=CH32M030 byte=USER bits=[4:3],,,CH32M030RM.PDF:zh,field=RST_MODE[1:0],#,CH32M030RM.PDF:en(p.261)+!CH32M030RM.PDF:zh(field=RST_MODE[1:0])
-option_byte_fields,CH32V003,,,family=CH32V003 byte=USER bits=0,,,CH32V003RM.PDF:zh,field=IWDG_SW,#,CH32V003RM.PDF:en(p.183)+!CH32V003RM.PDF:zh(field=IWDG_SW)
-option_byte_fields,CH32V205,,,family=CH32V205 byte=USER bits=0,,,CH32V205RM.PDF:zh,field=IWDGSW,#,CH32V205RM.PDF:en(p.451)+!CH32V205RM.PDF:zh(field=IWDGSW)
+option_byte_fields,CH32M030,,,family=CH32M030 byte=USER bits=[4:3],,,CH32M030RM.PDF:zh,field=RST_MODE[1:0],#,CH32M030RM.PDF:en(p.261)+!CH32M030RM.PDF:zh(field=RST_MODE[1:0])+evt-api(ch32m030_flash.c)
+option_byte_fields,CH32V003,,,family=CH32V003 byte=USER bits=0,,,CH32V003RM.PDF:zh,field=IWDG_SW,#,CH32V003RM.PDF:en(p.183)+!CH32V003RM.PDF:zh(field=IWDG_SW)+evt-api(ch32v00x_flash.c)
+option_byte_fields,CH32V205,,,family=CH32V205 byte=USER bits=0,,,CH32V205RM.PDF:zh,field=IWDGSW,#,CH32V205RM.PDF:en(p.451)+!CH32V205RM.PDF:zh(field=IWDGSW)+evt-api(ch32v205_flash.c)
 pin_functions,,,CH32V103C6T6,part_number=CH32V103C6T6 pad=PB4 signal=TIM3_CH1 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)
 pin_functions,,,CH32V103C6T6,part_number=CH32V103C6T6 pad=PB5 signal=TIM3_CH2 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)
 pin_functions,,,CH32V103C8T6,part_number=CH32V103C8T6 pad=PB4 signal=TIM3_CH1 route=remap-1,route,remap-1,rm-remap-grid,remap-2,#,pin-table:zh+pin-table:en+!rm-remap-grid(=remap-2)

@@ -30,8 +30,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import functools
 import hashlib
 import json
+import operator
 import re
 import sys
 from pathlib import Path
@@ -49,7 +51,8 @@ BUNDLES = REPO / ".cache" / "structured-bundles"
 BYTE_COLUMNS = ["family", "address", "offset", "byte", "complement_address",
                 "write_unit", "#", "confidence", "basis"]
 FIELD_COLUMNS = ["family", "byte", "bits", "field", "default",
-                 "wrpr_bit_protects", "#", "confidence", "basis"]
+                 "wrpr_bit_protects", "option", "evt_argument", "evt_values",
+                 "#", "confidence", "basis"]
 
 STRUCTURE_CAPTION = re.compile(r"用户选择字信息结构|User option bytes? information structure")
 FIELDS_HEADER = re.compile(r"^(?:名称/字节|Name/Byte)$", re.IGNORECASE)
@@ -140,6 +143,138 @@ FIELD_VERDICTS: dict[tuple[str, str, str], tuple[str, str, str]] = {
     ("CH32FV2x_V3xRM.PDF", "USER", "[7:5]"): ("zh", "confirmed", "evt(ch32v30x.h)"),
     ("CH32X035RM.PDF", "USER", "[7:5]"): ("zh", "confirmed", "rule:bit-width"),
 }
+
+
+# EVT の書き込み API（`Peripheral/src/*_flash.c`）。ch32rv の依頼（ch32rv 1ff6457）: USER の各 field を
+# **EVT の `FLASH_UserOptionByteConfig` のどの引数が書くか**と、値ごとの定数名で引けるようにする。
+# 引数の並びは関数の定義、定数の割り当ては関数の説明のコメント（`@param OB_STOP` の下に並ぶ定数）、
+# 定数の値は `inc/*_flash.h` の define。コメントが定数を並べない引数（H417 の `OB_USBFSDL`・
+# `OB_USARTDL`）は、引数名で始まる define を割り当てる。
+#
+# **header の宣言は読まない。** CH32M030 の header は `FLASH_UserOptionByteConfig(uint16_t OB_IWDG,
+# uint16_t OB_STOP, ...)` と宣言するが、違うのは引数の名前だけで（数と型は同じ）、header に
+# `OB_IWDG_*` の定数は無く、動くのは .c の本体（STOP・STDBY・RST・RST_PIN・OV_CFG。RM の USER bit0 は
+# Reserved で一致する）。C では宣言の引数名に意味が無いので、資料の食い違いとは扱わない。
+#
+# `option` は引数につける名前。iwdg・stop-reset・standby-reset・reset-pin は ch32rv の名前。知らない
+# 引数が EVT に現れたら落ちる（名前は人が決める）。
+EVT_OPTION_NAMES = {
+    "OB_IWDG": "iwdg", "OB_STOP": "stop-reset", "OB_STDBY": "standby-reset",
+    "OB_RST": "reset-pin", "OB_RST_PIN": "reset-pin-select", "OB_OV_CFG": "over-voltage",
+    "OB_PowerON_Start_Mode": "start-mode", "OB_CAN": "can-bus-off", "OB_RAM_MODE": "ram-split",
+    "OB_USBFSDL": "usbfs-download", "OB_USBHSDL": "usbhs-download", "OB_USARTDL": "usart-download",
+}
+CONFIG_SIGNATURE = re.compile(r"FLASH_Status\s+FLASH_UserOptionByteConfig\s*\(([^)]*)\)\s*\{")
+OB_DEFINE = re.compile(r"^\s*#define\s+(OB_\w+)\s+\(\(uint\d+_t\)\s*(0x[0-9A-Fa-f]+)\)", re.M)
+DOC_PARAM = re.compile(r"^\s*\*\s+(?:@param\s+)?(OB_\w+)\s+-", re.M)
+WRITE_PROTECT = re.compile(r"FLASH_Status\s+FLASH_EnableWriteProtection\s*\(")
+
+
+def evt_flash_sources(family: str) -> tuple[Path, Path] | None:
+    """(`*_flash.c`, `*_flash.h`)。EVT が無い family は None。"""
+    peripheral = paths.MIRRORS / family / "EVT" / "EXAM" / "SRC" / "Peripheral"
+    sources = sorted((peripheral / "src").glob("*_flash.c"))
+    headers = sorted((peripheral / "inc").glob("*_flash.h"))
+    if not sources or not headers:
+        return None
+    if len(sources) != 1 or len(headers) != 1:
+        raise SystemExit(f"{family}: EVT の flash の .c/.h が1つに決まらない {sources} {headers}")
+    return sources[0], headers[0]
+
+
+def evt_option_api(family: str) -> tuple[dict[str, dict[int, str]], bool, str]:
+    """({引数: {USER バイト内の値: 定数}}, FLASH_EnableWriteProtection があるか, .c の名前)。"""
+    found = evt_flash_sources(family)
+    if found is None:
+        return {}, False, ""
+    source, header = found
+    text = source.read_text(encoding="utf-8", errors="replace")
+    m = CONFIG_SIGNATURE.search(text)
+    if not m:
+        raise SystemExit(f"{source.name}: FLASH_UserOptionByteConfig の定義が無い")
+    params = [p.split()[-1] for p in m.group(1).split(",")]
+    values = {name: int(value, 16) for name, value in
+              OB_DEFINE.findall(header.read_text(encoding="utf-8", errors="replace"))}
+    # 関数定義の直前の説明コメント: 引数名の行のあとに、その引数の定数が並ぶ。
+    doc = text[text.rfind("/*", 0, m.start()):m.start()]
+    listed: dict[str, list[str]] = {}
+    current = None
+    for name in DOC_PARAM.findall(doc):
+        if name in params:
+            current = name
+            listed[current] = []
+        elif current is not None:
+            listed[current].append(name)
+    def owner(constant: str) -> str | None:
+        """定数名が引数名で始まるなら、その引数（いちばん長い名前）。"""
+        named = [p for p in params if constant.startswith(p + "_")]
+        return max(named, key=len) if named else None
+
+    # コメントは引数の見出しを落とすことがある（H417 は `OB_USBFSDL_*` を `OB_IWDG` の下に並べる）。
+    # 別の引数名で始まる定数はその引数のもの。V407 の `OB_RAM_MODE` の下の `OB_RAM_CODE_MOD*` の
+    # ように、どの引数名でも始まらない定数はコメントの並びに従う。
+    for param in list(listed):
+        listed[param] = [c for c in listed[param] if owner(c) in (None, param)]
+    out: dict[str, dict[int, str]] = {}
+    for param in params:
+        if param not in EVT_OPTION_NAMES:
+            raise SystemExit(f"{source.name}: 引数 {param} に option の名前が無い——EVT_OPTION_NAMES に足すこと")
+        constants = listed.get(param) or [c for c in values if owner(c) == param]
+        if missing := [c for c in constants if c not in values]:
+            raise SystemExit(f"{header.name}: {param} の定数 {missing} の define が無い")
+        if not constants:
+            raise SystemExit(f"{source.name}: {param} の定数が決まらない")
+        out[param] = {values[c]: c for c in constants}
+    return out, bool(WRITE_PROTECT.search(text)), source.name
+
+
+def field_mask(bits: str) -> tuple[int, int] | None:
+    """USER バイト内の (mask, 最下位 bit)。`5` または `[4:3]`。"""
+    if bits.isdigit():
+        return 1 << int(bits), int(bits)
+    m = BIT_RANGE.match(bits)
+    if not m:
+        return None
+    hi, lo = int(m.group(1)), int(m.group(2))
+    return ((1 << (hi - lo + 1)) - 1) << lo, lo
+
+
+def attach_evt_options(family: str, rows: list[dict]) -> None:
+    """option_byte_fields の1 family 分に `option`・`evt_argument`・`evt_values` を足す。
+
+    USER の field ごとに、bit が重なる引数を探す。見るのは**定数どうしで値が変わる bit**だけ——
+    V407 の `OB_RAM_CODE_MOD0/1`（0x80/0xC0）は Reserved の bit7 を両方とも立て（RM の既定値 1）、
+    選ぶのは bit6 だけ。1つの引数の変わる bit が2つの field に跨ったり、どの field にも当たらない
+    引数が残ったりしたら落ちる（EVT と RM の bit 割当の食い違い）。
+    """
+    api, write_protect, source = evt_option_api(family)
+    varying = {p: (functools.reduce(operator.or_, consts) & ~functools.reduce(operator.and_, consts))
+               for p, consts in api.items()}
+    used = set()
+    for r in rows:
+        if r["byte"].startswith("WRPR") and write_protect:
+            r.update(option="write-protect", evt_argument="FLASH_EnableWriteProtection",
+                     evt_values="1=protected")
+            r["basis"] += f"+evt-api({source})"
+            continue
+        if r["byte"] != "USER" or not (shape := field_mask(r["bits"])):
+            continue
+        mask, lo = shape
+        hits = [p for p in api if varying[p] & mask]
+        if not hits:
+            continue
+        if len(hits) > 1:
+            raise SystemExit(f"{family} USER {r['bits']}: EVT の引数 {hits} が同じ field に重なる")
+        param = hits[0]
+        if varying[param] & ~mask:
+            raise SystemExit(f"{family} USER {r['bits']}: {param} の定数が field の外の bit で変わる")
+        used.add(param)
+        r.update(option=EVT_OPTION_NAMES[param], evt_argument=param,
+                 evt_values=";".join(f"{(v & mask) >> lo}={c}" for v, c in
+                                     sorted(api[param].items(), reverse=True)))
+        r["basis"] += f"+evt-api({source})"
+    if unused := sorted(set(api) - used):
+        raise SystemExit(f"{family}: EVT の引数 {unused} がどの USER field にも当たらない")
 
 
 def load_pages(name: str) -> list[dict]:
@@ -413,8 +548,9 @@ def main() -> int:
                                            if e["complement_address"] else ""),
                     "write_unit": write_unit,
                     "confidence": e["confidence"], "basis": e["basis"]})
+            family_fields = []
             for e in merged_fields:
-                field_rows.append({
+                family_fields.append({
                     "family": family, "byte": e["byte"], "bits": e["bits"],
                     "field": e["field"],
                     # 散文の復位値（zh単独版）は値トークン列に畳む——公開列に
@@ -423,6 +559,8 @@ def main() -> int:
                                 else default_key(e["default"])),
                     "wrpr_bit_protects": e["wrpr_bit_protects"],
                     "confidence": e["confidence"], "basis": e["basis"]})
+            attach_evt_options(family, family_fields)
+            field_rows += family_fields
 
     byte_rows.sort(key=lambda r: (r["family"], r["address"]))
     field_rows.sort(key=lambda r: (r["family"],))  # 表の並びはRMの記載順を保つ

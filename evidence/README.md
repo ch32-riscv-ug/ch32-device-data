@@ -620,6 +620,21 @@ each confirmed with the other edition's dissent kept in basis. Discrepancies
 without third evidence stay `conflict` (the IWDG_SW/IWDGSW spelling, which
 flips per document, and X315's WRPR granularity).
 
+**How WCH's EVT writes each field** -- `option`, `evt_argument`, `evt_values`. A writer that wants to
+say "turn the IWDG to software mode" needs the field and the polarity, and EVT's
+`FLASH_UserOptionByteConfig` (`Peripheral/src/*_flash.c`) is the API that states both: its
+parameter list names the options the family takes, its doc comment lists the constants per
+parameter, and `inc/*_flash.h` gives each constant's value. A parameter is tied to the USER field
+its constants **vary** in -- CH32V407's `OB_RAM_CODE_MOD0/1` (0x80/0xC0) both set the reserved
+bit7 to its reset value 1 and choose with bit6 alone. A parameter whose varying bits straddle two
+fields, or match none, stops the build. The header's declaration is not read: CH32M030's header
+declares `FLASH_UserOptionByteConfig(uint16_t OB_IWDG, uint16_t OB_STOP, ...)` while the .c that runs
+takes STOP, STDBY, RST, RST_PIN, OV_CFG -- only the parameter names differ (same count and types),
+the header has no `OB_IWDG_*` constant, and the reference manual's USER bit0 is reserved, so it is
+not a disagreement about the chip. On the WRPR rows `1=protected` follows
+`FLASH_EnableWriteProtection`, which writes the complement of its argument: in the stored byte a 0
+bit is protected.
+
 ### `device_id_addresses.csv`
 
 **Where the 32-bit chip identifier is read from, per family** (consumer request

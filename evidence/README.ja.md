@@ -601,6 +601,19 @@ en版は無名のまま）、X035の復位値は`xxxb`（`rule:bit-width`——[
 いずれもconfirmedで、もう片方の版の異議はbasisに残る。証拠の無い齟齬は
 conflictのまま（文書ごとに逆転するIWDG_SW/IWDGSWの綴り、X315のWRPR粒度）。
 
+**WCH の EVT が各 field をどう書くか**——`option`・`evt_argument`・`evt_values`。「IWDG をソフト
+モードに」と書き込むには field と極性が要り、それを両方言っている API が EVT の
+`FLASH_UserOptionByteConfig`（`Peripheral/src/*_flash.c`）です。引数の並びがその family の取る
+option、説明コメントが引数ごとの定数、`inc/*_flash.h` が定数の値を言います。引数は、その定数が
+**変わる bit** の USER field に結びます——CH32V407 の `OB_RAM_CODE_MOD0/1`（0x80/0xC0）は Reserved の
+bit7 を両方とも既定値 1 で立て、bit6 だけで選びます。変わる bit が2つの field に跨る、またはどの
+field にも当たらない引数があれば生成が落ちます。header の宣言は読みません。CH32M030 の header は
+`FLASH_UserOptionByteConfig(uint16_t OB_IWDG, uint16_t OB_STOP, ...)` と宣言しますが、動く .c は
+STOP・STDBY・RST・RST_PIN・OV_CFG を取ります。違うのは引数の名前だけで（数と型は同じ）、header に
+`OB_IWDG_*` の定数は無く、RM の USER bit0 は Reserved なので、chip についての食い違いではありません。
+WRPR の行の `1=protected` は `FLASH_EnableWriteProtection` の引数の向きで、この関数は引数の補数を
+書くので、書かれたバイトの中では 0 の bit が保護です。
+
 ### `device_id_addresses.csv`
 
 **32bit chip識別子（device_id）の読み出し番地をfamilyごとに**（consumer依頼
