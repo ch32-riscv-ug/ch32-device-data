@@ -304,9 +304,6 @@ the other side in `basis`. This table collects those marks.
 | `dissenting` | the sources marked `!` in `basis` |
 | `alternative` | what those sources state for `field` |
 
-A row whose table records the disagreement in prose rather than in `basis` (a variant-dependent timer)
-has `dissenting` and `alternative` empty.
-
 **A `conflict` mark is not always a disagreement about the fact.** Some `product_attributes` rows differ in
 wording only (`Typical: 72MHz` against `Typ. 72MHz`), and `option_byte_fields` rows whose `field` is `field`
 differ in the spelling of the field's name, not in its bits or default. Read `field` to tell them apart.

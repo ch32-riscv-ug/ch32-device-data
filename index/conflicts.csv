@@ -198,4 +198,4 @@ registers,CH32H417,,,family=CH32H417 type=CAN register=FMCFGR,offset,0x204,rm-ad
 registers,CH32H417,,,family=CH32H417 type=CAN register=FSCFGR,offset,0x20c,rm-address:CH32H417RM.PDF,0x210,evt(ch32h417.h)+rm:CH32H417RM.PDF+rm-address:CH32H417RM.PDF+!rm-address:CH32H417RM.PDF(offset=0x210)
 registers,CH32H417,,,family=CH32H417 type=CAN register=FWR,offset,0x21c,rm-address:CH32H417RM.PDF,0x220,evt(ch32h417.h)+rm:CH32H417RM.PDF+rm-address:CH32H417RM.PDF+!rm-address:CH32H417RM.PDF(offset=0x220)
 remap_routes,,CH32M030,,series=CH32M030 selector=afio-adc-etrgin-remap value=1 signal=ADC_ETR,value,1,rm-remap-grid,0,candidates(datasheet-pin-table)+!rm-remap-grid(value=0)
-timers,CH32V307,,,family=CH32V307 timer=TIM5,,,,,rm:CH32FV2x_V3xRM.PDF(p.242)
+timers,CH32V307,,,family=CH32V307 timer=TIM5,counter_width_bits,32,rm:CH32FV2x_V3xRM.PDF(p.242;note),16,rm:CH32FV2x_V3xRM.PDF(p.242)+!rm:CH32FV2x_V3xRM.PDF(p.242;note)(counter_width_bits=16)

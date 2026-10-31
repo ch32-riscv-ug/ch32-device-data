@@ -312,9 +312,6 @@ family をまたいで「X を持たない型番」を数えないこと。
 | `dissenting` | `basis` で `!` が付いている出所 |
 | `alternative` | その出所が言う `field` の値 |
 
-食い違いを `basis` ではなく散文で記録している行（variant で変わるタイマ）は、`dissenting` と
-`alternative` が空です。
-
 **`conflict` の印は「事実が食い違っている」と同義ではありません。** `product_attributes` には言い回しの差
 だけの行（`Typical: 72MHz` と `Typ. 72MHz`）があり、`option_byte_fields` で `field` が `field` の行は、
 bit の位置や既定値ではなく field の名前の綴りが違うだけです。見分けるには `field` を読んでください。
