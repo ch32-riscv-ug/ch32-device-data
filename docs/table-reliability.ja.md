@@ -125,6 +125,7 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | link_firmware | 10 | 全行 reference | 結合を持たない（配布物の写し）・`reported_version` が `wcfg_version` の復号と一致すること | **版番号は解決済み**（F-11。2026-08-29）。`wcfg_version` は `major*10 + minor`（major は観測した全個体で 2）で、`reported_version` が復号値、`measured_version` が実機の申告値。LinkE と CH549 の2機種は実測で一致（`tools/read_link_version.py`）。残る8行は実機を持っていないぶんで `measured_version` が空 | 🟡 |
+| link_firmware_issues | 1 | 全行 reference | 結合（device が link_firmware に在ること）・`basis` が `measured:<日付>(<記録の所在>)` | 実測の記録がある不良だけ。版を試していない device には付けない（WCH-Link CH549 の 2.11 は LinkE では試していない） | ✅ |
 
 この表だけは**資料ではなく配布物と実機**を出所にするので、他の表の「両言語照合」に
 あたる裏取りが `measured_version`（実機が USB で申告する版）になる。

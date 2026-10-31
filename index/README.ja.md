@@ -35,7 +35,7 @@
 | 有効にした周辺で pad が動く信号（AFIO の remap ではないもの） | [`pin_conditions.csv`](pin_conditions.csv) |
 | OPA/CMP と USB-PD のレジスタの field | [`opa_cmp_registers.csv`](opa_cmp_registers.csv)・[`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
 | option bytes で決まる FLASH/SRAM の配分 | [`memory_configs.csv`](memory_configs.csv) |
-| WCH-Link のファームの版 | [`link_firmware.csv`](link_firmware.csv) |
+| WCH-Link のファームの版と、実測で不良と分かった版 | [`link_firmware.csv`](link_firmware.csv)・[`link_firmware_issues.csv`](link_firmware_issues.csv) |
 | クロック・割り込み・メモリマップ・動作条件・エラッタ | [そのまま公開する表](#そのまま公開する表) |
 | ここの全列の意味・書き方・空欄の意味 | [`columns.csv`](columns.csv) |
 | 全ファイルの sha256 | [`manifest.csv`](manifest.csv) |
@@ -117,7 +117,7 @@ EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・
 RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
 `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`esig`・
 `absolute_maximum_ratings`・`opa_cmp_registers`・`usbpd_plumbing`・`pin_conditions`・`memory_configs`。
-WCH-LinkUtility 由来: `link_firmware`。
+WCH-LinkUtility 由来: `link_firmware`。実測した不良: `link_firmware_issues`。
 
 ## 各表
 

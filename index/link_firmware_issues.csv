@@ -1,0 +1,2 @@
+device,mcu,mode,version,wcfg_version,tool,target,symptom,works_in,#,confidence,basis
+WCH-Link,CH549,RISC-V,2.11,31,probe-rs,CH32V103R8T6,"download --reset writes the flash and reports success, but the core stays halted (disable_debug_module: could not clear sw-breakpoint state: DtmOperationFailed); a wlink reset starts it",2.12,#,reference,measured:2026-08-22(ArduinoCore-CH32RV e6e9dfa6 docs/upload-and-fixture.ja.md)

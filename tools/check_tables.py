@@ -256,6 +256,7 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "flash_program_method": ("extract_flash_program_method.py", "COLUMNS"),
     "interrupts": ("build_interrupts.py", "COLUMNS"),
     "link_firmware": ("build_link_firmware.py", "COLUMNS"),
+    "link_firmware_issues": ("build_link_firmware.py", "ISSUE_COLUMNS"),
     "memory_configs": ("extract_memory.py", "COLUMNS"),
     "memory_map": ("build_memory_map.py", "COLUMNS"),
     "opa_cmp_registers": ("extract_opa_cmp_registers.py", "COLUMNS"),
@@ -1421,6 +1422,14 @@ def main() -> int:
     # 上流の仕様変更は「空の表」として現れる。**使う側が当てにする形**を数で固定する。
     if kinds["toolchain"] < 1 or kinds["ide"] < 3:
         bad.append(f"toolchains: 行が足りない（上流の取得が壊れた？）: {dict(kinds)}")
+    # 実測した不良の版は、配布物の表にある device と mcu のもの。target は目録の型番。
+    devices = {(r["device"], r["mcu"]) for r in t["link_firmware"]}
+    for r in t["link_firmware_issues"]:
+        if (r["device"], r["mcu"]) not in devices:
+            bad.append(f"link_firmware_issues: {r['device']}/{r['mcu']} が link_firmware に無い")
+        check("link_firmware_issues", r["version"], r["target"], products, "products")
+        if not re.fullmatch(r"measured:\d{4}-\d{2}-\d{2}\(.+\)", r["basis"]):
+            bad.append(f"link_firmware_issues: {r['device']} {r['version']} の basis が measured:<日付>(<記録>) でない")
     for r in t["errata"]:
         check("errata", r["id"], r["series"], series, "series", ";")
     for r in t["evt_examples"]:

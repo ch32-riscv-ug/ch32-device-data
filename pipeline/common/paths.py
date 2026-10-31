@@ -61,7 +61,7 @@ PUBLISHED = (
     "device_ids", "option_bytes", "option_byte_fields", "register_blocks",
     "errata", "operating_conditions", "esig", "absolute_maximum_ratings",
     "opa_cmp_registers", "usbpd_plumbing", "pin_conditions", "memory_configs",
-    "link_firmware",
+    "link_firmware", "link_firmware_issues",
 )
 assert not set(PUBLISHED) & set(INDEX_TABLES)
 assert not set(PUBLISHED) & (set(CATALOG_TABLES) | set(EVIDENCE_TABLES))

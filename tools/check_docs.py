@@ -96,6 +96,7 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "series / families / cores / documents": ("series", "families", "cores", "documents"),
     "toolchains": ("toolchains",),
     "link_firmware": ("link_firmware",),
+    "link_firmware_issues": ("link_firmware_issues",),
 }
 
 # 文章の中の数。(ファイル, 正規表現, 量の名前)。正規表現は数を `n` で取る。

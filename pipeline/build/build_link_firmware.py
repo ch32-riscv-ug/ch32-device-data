@@ -64,6 +64,7 @@ import argparse
 import csv
 import hashlib
 import io
+import json
 import re
 import sys
 import urllib.request
@@ -80,6 +81,11 @@ PAGE = "https://www.wch.cn/downloads/wch-linkutility_zip.html"
 COLUMNS = ["device", "mcu", "mode", "role", "file", "size", "sha256",
            "wcfg_version", "reported_version", "measured_version", "set_version",
            "#", "confidence", "basis"]
+# 実測で壊れていると分かっている版（`curated/link-firmware-issues.json`）。配布物の表（上）は「いま配って
+# いるファイル」なので、古い版はそこに行が無い——別の表にして、版と機材と症状を出所つきで持つ。
+ISSUE_COLUMNS = ["device", "mcu", "mode", "version", "wcfg_version", "tool", "target", "symptom",
+                 "works_in", "#", "confidence", "basis"]
+ISSUES = paths.CURATED / "link-firmware-issues.json"
 
 
 # 実機で読んだ申告版（`tools/read_link_version.py`）。**表に載せる前に、
@@ -145,8 +151,11 @@ CONFIDENCE = "reference"
 # ファイル名 → (デバイス, MCU, モード, 役割)。
 #
 # MCUは推測ではなくバイナリの先頭命令で判る——8051は`02`(LJMP)、RISC-Vは`6f`(jal)。
-# 役割はWCH-Link User Manual第6章の対応で、p.20が①〜⑩として同じ10本を挙げている:
-# `*APP_IAP*`がIAPモード経由の更新用、`FIRMWARE_*`がBOOTモード（オフライン）用。
+# 役割はファイルの実体で決まる: `*APP_IAP*` は IAP の bootloader を先頭に付けた image で、後ろは同じ
+# device・mode の `FIRMWARE_*` とバイト単位で同じ（LinkE・LinkW・DAPLink は先頭 8KiB、CH549 は 3KiB が
+# bootloader）。外部の書込機で丸ごと書くもの。`FIRMWARE_*` が application で、WCH のツールが IAP モードで
+# 流すのはこちら（ch32rv が LinkE 2.22⇄2.13 の往復で実測）。値の綴り `iap`/`offline` は名前から付けた
+# 当初のもので、実体とは逆に読める——次の VERSION で `with-bootloader`/`application` に改める。
 CATALOG = {
     "FIRMWARE_CH549.bin":        ("WCH-Link", "CH549", "RISC-V", "offline"),
     "WCH-Link_APP_IAP_RV.bin":   ("WCH-Link", "CH549", "RISC-V", "iap"),
@@ -248,6 +257,14 @@ def main() -> int:
                       else f"wch({origin})+!device(={seen})"),
         })
 
+    # `iap` の image の後ろは、同じ device・mode の `offline` の image そのもの（先頭が bootloader）。
+    by_role = {(r["device"], r["mode"], r["role"]): blobs[r["file"]] for r in rows}
+    for (device, mode, role), image in by_role.items():
+        if role != "iap":
+            continue
+        application = by_role.get((device, mode, "offline"))
+        if application is None or not image.endswith(application) or len(image) == len(application):
+            raise SystemExit(f"{device} {mode}: iap の image が bootloader ＋ offline の image になっていない")
     missing = sorted(set(CATALOG) - {r["file"] for r in rows})
     for name in missing:
         notes.append(f"配布物に無い: {name}")
@@ -261,6 +278,7 @@ def main() -> int:
         writer.writeheader()
         writer.writerows({**row, "#": "#"} for row in rows)
     print(f"{dest}: {len(rows)} 行  取得元 {origin}", file=sys.stderr)
+    write_issues(args.out)
     print(f"  配布パッケージ版: {set_version}", file=sys.stderr)
     for (device, mode), key in sorted(WCFG_KEY.items()):
         label = f"{device}{'/' + mode if mode else ''}"
@@ -268,6 +286,22 @@ def main() -> int:
     for note in notes:
         print(f"  - {note}", file=sys.stderr)
     return 0
+
+
+def write_issues(out_dir: Path | None) -> None:
+    """`link_firmware_issues`: 実測した記録のある不良だけ。1つの測定は1つの根拠なので reference。"""
+    issues = json.loads(ISSUES.read_text(encoding="utf-8"))["issues"]
+    rows = [{**{c: issue.get(c, "") for c in ISSUE_COLUMNS if c not in ("#", "confidence", "basis")},
+             "confidence": "reference",
+             "basis": f"measured:{issue['measured']}({issue['evidence']})"}
+            for issue in issues]
+    rows.sort(key=lambda r: (r["device"], r["mode"], r["version"]))
+    dest = paths.table("link_firmware_issues", out_dir)
+    with dest.open("w", encoding="utf-8", newline="") as out:
+        writer = csv.DictWriter(out, fieldnames=ISSUE_COLUMNS)
+        writer.writeheader()
+        writer.writerows({**row, "#": "#"} for row in rows)
+    print(f"{dest}: {len(rows)} 行", file=sys.stderr)
 
 
 if __name__ == "__main__":

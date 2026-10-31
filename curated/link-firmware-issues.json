@@ -1,0 +1,18 @@
+{
+  "_comment": "WCH-Link firmware versions that fail in a measured way. One entry per (device, mcu, mode, version). Only measurements with a dated record go here; a version is not marked bad for a device it was not tried on. Read by pipeline/build/build_link_firmware.py into index/link_firmware_issues.csv.",
+  "issues": [
+    {
+      "device": "WCH-Link",
+      "mcu": "CH549",
+      "mode": "RISC-V",
+      "version": "2.11",
+      "wcfg_version": "31",
+      "tool": "probe-rs",
+      "target": "CH32V103R8T6",
+      "symptom": "download --reset writes the flash and reports success, but the core stays halted (disable_debug_module: could not clear sw-breakpoint state: DtmOperationFailed); a wlink reset starts it",
+      "works_in": "2.12",
+      "measured": "2026-08-22",
+      "evidence": "ArduinoCore-CH32RV e6e9dfa6 docs/upload-and-fixture.ja.md"
+    }
+  ]
+}

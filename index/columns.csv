@@ -255,7 +255,7 @@ interrupts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:z
 link_firmware,device,WCH debugger product the firmware is for (e.g. `WCH-LinkE`).,name,never empty,fixed
 link_firmware,mcu,"MCU of the debugger that runs the firmware, derived from its first instruction.",name,never empty,fixed
 link_firmware,mode,Target architecture mode the firmware serves (`RISC-V` or `ARM`).,enum(ARM|RISC-V),the firmware has one mode only,fixed
-link_firmware,role,`iap` = the debugger's own firmware; `offline` = the offline-download firmware.,enum(iap|offline),never empty,fixed
+link_firmware,role,"`offline` = the application image, which WCH's tools send in IAP mode; `iap` = the same application with the IAP bootloader prepended (its tail is the `offline` file byte for byte), written whole by an external programmer.",enum(iap|offline),never empty,fixed
 link_firmware,file,File name in WCH-LinkUtility.,name,never empty,as-printed
 link_firmware,size,File size in bytes.,integer,never empty,
 link_firmware,sha256,sha256 of the file; tells whether a local file is the one being distributed now.,name,never empty,
@@ -266,6 +266,18 @@ link_firmware,set_version,Version of the WCH-LinkUtility set the files come from
 link_firmware,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
 link_firmware,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
 link_firmware,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose
+link_firmware_issues,device,WCH debugger product (e.g. `WCH-Link`); joins link_firmware.device.,name,never empty,fixed
+link_firmware_issues,mcu,MCU of the debugger that runs the firmware.,name,never empty,fixed
+link_firmware_issues,mode,Target architecture mode the firmware was running in.,enum(RISC-V),never empty,fixed
+link_firmware_issues,version,"Firmware version the device reports (`major.minor`), as measured.",text,never empty,fixed
+link_firmware_issues,wcfg_version,The same version in WCH's `wchlink.wcfg` numbering (major*10 + minor).,integer,never empty,
+link_firmware_issues,tool,Host tool the failure was seen with.,name,never empty,as-printed
+link_firmware_issues,target,Target part the failure was seen on; joins products part numbers.,name,never empty,fixed
+link_firmware_issues,symptom,"What fails, as recorded.",text,never empty,prose
+link_firmware_issues,works_in,Firmware version measured to work on the same hardware.,text,no working version measured,fixed
+link_firmware_issues,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
+link_firmware_issues,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed
+link_firmware_issues,basis,The measurement record: `measured:<date>(<where it is recorded>)`.,text,never empty,prose
 manifest,path,"File name under index/ (every CSV and `VERSION`, except manifest.csv itself).",path,never empty,
 manifest,rows,Row count of the file (lines minus the header; 0 for `VERSION`).,integer,never empty,
 manifest,sha256,"SHA-256 of the file's bytes, lower-case hex without prefix.",name,never empty,

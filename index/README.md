@@ -38,7 +38,7 @@ The split between `index/`, `evidence/` and `catalog/` is defined in
 | Pads that move with which peripherals are enabled (not an AFIO remap) | [`pin_conditions.csv`](pin_conditions.csv) |
 | OPA/CMP and USB-PD register fields | [`opa_cmp_registers.csv`](opa_cmp_registers.csv), [`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
 | FLASH/SRAM split set by the option bytes | [`memory_configs.csv`](memory_configs.csv) |
-| WCH-Link firmware versions | [`link_firmware.csv`](link_firmware.csv) |
+| WCH-Link firmware versions, and the versions measured to fail | [`link_firmware.csv`](link_firmware.csv), [`link_firmware_issues.csv`](link_firmware_issues.csv) |
 | Clock tree, interrupts, memory map, operating conditions, errata | see [Published as read](#published-as-read) |
 | What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
@@ -130,7 +130,7 @@ From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_
 Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
 `device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`,
 `absolute_maximum_ratings`, `opa_cmp_registers`, `usbpd_plumbing`, `pin_conditions`, `memory_configs`.
-WCH-LinkUtility: `link_firmware`.
+WCH-LinkUtility: `link_firmware`; measured failures: `link_firmware_issues`.
 
 ## Tables
 
