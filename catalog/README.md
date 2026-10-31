@@ -3,15 +3,16 @@
 [日本語](README.ja.md)
 
 The tables that decide **what exists and what it is called** ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)).
-The five key tables (`families`, `series`, `products`, `packages`, `cores`) are public, so they live in `index/`; the three
-tables of documents, mirrors and upstream tools (`documents`, `sources`, `toolchains`) live here in `catalog/`.
+The four key tables (`families`, `series`, `packages`, `cores`) are public, so they live in `index/`. `products` lives here and
+is published as part of `index/parts.csv`; the tables of documents, mirrors and upstream tools (`documents`, `sources`,
+`toolchains`) live here too.
 Every other table joins on the names defined here -- family, series, part number, package, core, document, and mirror version. Adding or renaming a name propagates to every table, so it is done by
 recording it in the [worklist](../docs/worklist.ja.md) (Japanese).
 
 `products.csv` holds, in addition to identification (part number, series, family, package, the datasheet it is listed in),
 the main specifications (flash, SRAM, GPIO count, temperature) obtained by cross-checking the comparison table against the
-ordering table, **with per-column confidence and basis**. The reader-friendly comparison table for users is the index's
-[`index/parts.csv`](../index/README.md).
+ordering table, **with per-column confidence and basis**. Consumers read it through [`index/parts.csv`](../index/README.md),
+which carries every column of it.
 
 `toolchains.csv` alone is not a key for the other tables: it records **the versions of the upstream tools** and joins nothing.
 
@@ -25,7 +26,7 @@ One row per family. Which series it contains, and which datasheets, reference ma
 
 ### `series.csv`
 
-One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty as `varies-by-package` and go down to products.csv (**empty here does not mean unknown**: the Series table of the generated README lists every value the parts have instead, as `128K/256K`). **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
+One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty, with an empty confidence, and go down to products.csv (**empty here does not mean unknown**: the Series table of the generated README lists every value the parts have instead, as `128K/256K`). **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
 
 ### `products.csv`
 

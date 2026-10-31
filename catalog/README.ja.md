@@ -3,14 +3,14 @@
 [English](README.md)
 
 **何が存在し、何と呼ぶか**を決める表の説明です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
-鍵の5表（`families`・`series`・`products`・`packages`・`cores`）は公開面なので `index/` に置き、
-文書・mirror・上流ツールの3表（`documents`・`sources`・`toolchains`）はこの `catalog/` に置きます。
+鍵の4表（`families`・`series`・`packages`・`cores`）は公開面なので `index/` に置きます。`products` はここに置き、
+`index/parts.csv` の一部として公開します。文書・mirror・上流ツールの3表（`documents`・`sources`・`toolchains`）もここに置きます。
 ほかの全部の表はここの名前——family・series・型番・package・core・文書・mirror の版——を鍵にして結合します。名前の追加や改名は全表に波及するので、
 [worklist](../docs/worklist.ja.md) に記録して行います。
 
 `products.csv` は識別（型番・series・family・package・掲載 datasheet）に加えて、比較表と
 ordering 表を突き合わせた主要仕様（flash・SRAM・GPIO 数・温度）を**列ごとの確度と根拠つき**で
-持ちます。利用者向けの見やすい比較表は索引の [`index/parts.csv`](../index/README.ja.md) です。
+持ちます。利用者はこれを、全列を持つ [`index/parts.csv`](../index/README.ja.md) として読みます。
 
 `toolchains.csv` だけは他の表の鍵ではなく、**上流のツールの版**を写した一覧です（結合先を持ちません）。
 
@@ -25,7 +25,7 @@ toolchains を生成します。確度・根拠の読み方は
 
 ### `series.csv`
 
-1行1シリーズ（CH32V006, CH32V203, …）。core・ISAと、配下の全packageが共有する値だけを持ちます。packageで変わる値は`varies-by-package`として空になり、products.csvへ降ります（**表では空でも「不明」ではありません**。生成READMEのSeries表はこの場合、型番側の実値を全部並べます——`128K/256K`。2026-08-27）。**シリーズとdatasheetは1対1ではありません**（CH32V203CCT6はCH32V205DS0に掲載）。
+1行1シリーズ（CH32V006, CH32V203, …）。core・ISAと、配下の全packageが共有する値だけを持ちます。packageで変わる値は値も確度も空になり、products.csvへ降ります（**表では空でも「不明」ではありません**。生成READMEのSeries表はこの場合、型番側の実値を全部並べます——`128K/256K`。2026-08-27）。**シリーズとdatasheetは1対1ではありません**（CH32V203CCT6はCH32V205DS0に掲載）。
 
 ### `products.csv`
 

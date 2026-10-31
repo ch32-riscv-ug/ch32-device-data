@@ -6,8 +6,8 @@
 表は2種類あります。
 
 - **資料の事実をそのまま公開する表**（[そのまま公開する表](#そのまま公開する表)）: 鍵の表（family・series・
-  型番・パッケージ・コア）と、資料や EVT ヘッダから読んだ事実。それぞれの生成器がここに直接書きます。
-- **引くための表**（[各表](#各表)）: [証拠 `evidence/`](../evidence/README.ja.md)（資料の綴りのまま）と上の表
+  パッケージ・コア）と、資料や EVT ヘッダから読んだ事実。それぞれの生成器がここに直接書きます。
+- **引くための表**（[各表](#各表)）: [証拠 `evidence/`](../evidence/README.ja.md)（資料の綴りのまま）・目録・上の表
   **だけ**から `pipeline/build/build_index.py` が名前を揃えて組み直したもの。新しい事実は足していません——
   `tools/check_tables.py` が「索引の行は証拠に戻せる」ことを毎回見ます。
 
@@ -17,25 +17,25 @@
 
 | 知りたいこと | 表 |
 |---|---|
-| 要求を満たす型番は（U2） | [`parts.csv`](parts.csv) |
+| 要求を満たす型番は。その名前・パッケージ・メモリ・クロック・電源・周辺の数 | [`parts.csv`](parts.csv) |
 | 能力（と、その数）から型番を絞る | [`capabilities.csv`](capabilities.csv) |
 | 資料どうしが食い違っている箇所を全部見る | [`conflicts.csv`](conflicts.csv) |
 | 機能から series を探す | [`features.csv`](features.csv) |
-| この型番のこの足は何か・この機能はどの足に出るか（U1/U3） | [`pinout.csv`](pinout.csv) |
+| この型番のこの足は何か・この機能はどの足に出るか | [`pinout.csv`](pinout.csv) |
 | debug 配線は1線（SWIO）か2線（SWDIO+SWCLK）か | [`debug_interfaces.csv`](debug_interfaces.csv) |
-| remap の値をどれにするか（U3） | [`routes.csv`](routes.csv) |
-| レジスタとビット（ヘッダ生成。U4） | [`registers.csv`](registers.csv) |
+| remap の値をどれにするか | [`routes.csv`](routes.csv) |
+| 有効にした周辺で pad が動く信号（AFIO の remap ではないもの） | [`pin_conditions.csv`](pin_conditions.csv) |
+| レジスタとビット（ヘッダ生成） | [`registers.csv`](registers.csv) |
 | レジスタの絶対番地 | [`register_map.csv`](register_map.csv) |
 | DMA 要求 → channel | [`dma.csv`](dma.csv) |
 | タイマの素性（チャネル数つき） | [`timers.csv`](timers.csv) |
 | family をまたいで同じレジスタ配置か | [`register_layouts.csv`](register_layouts.csv) |
-| 型番・series・family・パッケージ・コアの名前 | [`products.csv`](products.csv)・[`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv) |
+| series・family・パッケージ・コア | [`series.csv`](series.csv)・[`families.csv`](families.csv)・[`packages.csv`](packages.csv)・[`cores.csv`](cores.csv) |
 | chip ID・option bytes・flash の形と書き方 | [`device_ids.csv`](device_ids.csv)・[`option_bytes.csv`](option_bytes.csv)・[`option_byte_fields.csv`](option_byte_fields.csv)・[`flash_geometry.csv`](flash_geometry.csv)・[`flash_program_method.csv`](flash_program_method.csv) |
 | 絶対最大定格 | [`absolute_maximum_ratings.csv`](absolute_maximum_ratings.csv) |
-| 有効にした周辺で pad が動く信号（AFIO の remap ではないもの） | [`pin_conditions.csv`](pin_conditions.csv) |
 | OPA/CMP と USB-PD のレジスタの field | [`opa_cmp_registers.csv`](opa_cmp_registers.csv)・[`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
 | option bytes で決まる FLASH/SRAM の配分 | [`memory_configs.csv`](memory_configs.csv) |
-| WCH-Link のファームの版と、実測で不良と分かった版 | [`link_firmware.csv`](link_firmware.csv)・[`link_firmware_issues.csv`](link_firmware_issues.csv) |
+| WCH-Link のファームのファイルと、実測で不良と分かった版 | [`link_firmware.csv`](link_firmware.csv)・[`link_firmware_issues.csv`](link_firmware_issues.csv) |
 | クロック・割り込み・メモリマップ・動作条件・エラッタ | [そのまま公開する表](#そのまま公開する表) |
 | ここの全列の意味・書き方・空欄の意味 | [`columns.csv`](columns.csv) |
 | 全ファイルの sha256 | [`manifest.csv`](manifest.csv) |
@@ -43,13 +43,13 @@
 
 どの表も**結合した1ファイル**（全型番・全family）で、generator はこれを読みます。
 CSV は機械が読むもので、人が型番や機能で絞り込んで見るのは viewer（[`pins.html`](../pins.html)。
-GitHub Pages で配る）の仕事です。型番ごとに切ったコピーは持ちません（正本と重複するだけなので）。
+GitHub Pages で配る）の仕事です。
 
 ## viewer
 
-`pins.html` が読むのは `index/products`・`index/pinout`・`index/capabilities` と、証拠2表
-（`product_attributes`・`remap_fields`）です。raw 3.5MB・転送 218KB・解析 0.25秒ほど。
-**series 別の表示用キャッシュは意図的に置きません**——索引の複製をもう1つ抱えることになるためです。
+`pins.html` が読むのは `index/parts`・`index/pinout`・`index/capabilities` と、証拠2表
+（`product_attributes`・`remap_fields`）です。series 別の表示用キャッシュは置きません——索引の複製を
+もう1つ抱えることになるためです。
 
 | パラメータ | 中身 |
 |---|---|
@@ -64,54 +64,90 @@ GitHub Pages で配る）の仕事です。型番ごとに切ったコピーは�
 `~` は単一出所、`!` は両版の食い違い、remap 値のあとの `?` は selector を決められないもの。
 remap 値をクリックするとその selector のレジスタ行へ飛びます。
 
-## 共通の規則
-
-- 名前は `pipeline/common/signal_vocabulary.py` の語彙で揃えてあります（`peripheral`・`role`・`port`・`gpio`）。
-  **元の綴りは隣の列**（`signal`・`spelled`・`define`）に残るので、証拠へ戻れます
-- `confidence` は使った証拠行の確度（複数行を畳んだ表はいちばん弱いもの）。`basis` は証拠行と
-  1対1のときに写します。`parts.csv` のような横長の表は `basis` を持たず、下に「この列はどの証拠から」を書きます
-- data 列は英語。`#` 列より右が出所
-- 証拠と違う値を持つのは1箇所だけ: **pin 表の remap 値が RM の格子と食い違う行**は格子の値を採ります
-  （`pinout.route`。CH32V103 の TIM3 12行。証拠 `pin_functions` は pin 表の値のまま `conflict` で、
-  basis に `!rm-remap-grid(=remap-N)` があります。格子はその値の定義そのもので、pin 表は写しだからです）
-
 ## consumer の契約
 
 - **読むのは `index/` の下だけ。** `catalog/` と `evidence/` はこのリポジトリの作業の層で、形はいつでも
-  変わります。consumer が要るものはここへ写してあります。ここに無いものが要るときは、外を読まずに
-  公開を依頼してください（データの依頼）
-- **固定は commit と `manifest.csv` の sha256。** manifest がここの全ファイル（CSV と `VERSION`）の行数と
+  変わります。ここに無いものが要るときは、外を読まずに公開を依頼してください（データの依頼）
+- **固定は commit と `manifest.csv` の sha256。** manifest がここの全ファイル（全 CSV と `VERSION`）の行数と
   sha256 を持ちます
 - **リリース。** tag `v<VERSION>.<n>` を打つと、このディレクトリを1つの zip
   （`ch32-device-data-index-<tag>.zip`。全 CSV・`VERSION`・README 2つ）にした GitHub の release が出ます。
   tag の先頭の数はいつも `VERSION` と同じです。ネットワークなしでビルドするときは zip を取り、
   中の `manifest.csv` で照合してください
-- **列は名前で読む。** 列の並び順は契約に入りません
+- **列は名前で読む。** 列の並び順は契約に入らず、表と列は断りなく足されます
 - **[`columns.csv`](columns.csv) がここの全表・全列を説明します**: `meaning`（意味）、`format`（`text`・`name`・`integer`・
-  `decimal`・`hex`・`bits`・`reg-bits`・`list(;)`・`list(,)`・`list(|)`・`url`・`path`・`marker`・`enum(a|b|...)`）、`empty`
-  （空欄の意味）。`tools/check_tables.py` が実データと突き合わせる（全列を覆う・enum の値・integer/hex の形・`never empty`）ので、
-  黙って古くなりません
+  `decimal`・`hex`・`bits`・`reg-bits`・`list(;)`・`list(,)`・`list(|)`・`url`・`path`・`enum(a|b|...)`）、`empty`
+  （空欄の意味）、`role`（`data`＝データの列／`provenance`＝確度と根拠の列。provenance はいつもデータの列のあと）。
+  `tools/check_tables.py` が実データと突き合わせます（全列を覆う・enum の値・integer/hex の形・`never empty`・
+  provenance が右端）
 - **`columns.csv` の `spelling` は、その列の綴りを誰が決めるかを言います**: `fixed` はこの repository が決める
-  （目録の鍵、`routes.selector`・`operating_conditions.symbol` のような付けた識別子、`pinout.peripheral`/`role` の
+  （鍵、`routes.selector`・`operating_conditions.symbol` のような付けた識別子、`pinout.peripheral`/`role` の
   ような正規化した語彙）——既存の値を改名するなら `VERSION` を上げるので、照合はこちらで。`as-printed` は
   datasheet・RM・EVT ヘッダの綴りのまま（`pinout.signal`・`memory_map.region`・`clock_symbols.symbol`・
   `operating_conditions.condition`）——資料に合わせるので、改版で `VERSION` を上げずに変わりえます。
-  `prose` は人が読む文で照合に使わない。空は値の列（数・番地・印）
+  `prose` は人が読む文で照合に使わない。空は値の列（数・番地）
 - **[`VERSION`](VERSION) は整数1つ。** consumer を壊しうる変更——列の削除・改名、列の書き方の変更、
-  family などの鍵の改名——は先にこれを上げます。表・列・行を足すだけなら上げません。変更は
-  [worklist](../docs/worklist.ja.md) とこの README に記録します
-- **`confidence` の扱いは consumer が決める。** どの行もこのリポジトリの答えで、`conflict` は資料が
-  食い違ったこと、`basis` はどちらを採ったかを言います（両論は [`conflicts.csv`](conflicts.csv)）
+  鍵や `fixed` の値の改名——で上げ、この公開面を読むリポジトリも一緒に版を上げます。表・列・行を
+  足すだけなら上げません
+- **`family` は WCH の EVT パッケージの単位**で、名前は `<family>EVT.ZIP` から取ります。製品の系列でも、
+  datasheet や RM の単位でもありません（`CH32V20x_30xDS0` は CH32V20x と CH32V307 にまたがり、CH32V006 は
+  CH32V002〜CH32V007 と CH32M007 を含む）。WCH が EVT を組み替えたら family もそれに従い、そのとき
+  `VERSION` を上げます
+- **`confidence` は `confirmed`・`reference`・`conflict` のどれか**で、空になるのは、それが言う値が空のときだけ
+  です（理由はその列の `empty`）。`confirmed`＝独立した根拠が2つ以上一致、または人が中身を確かめて根拠を
+  記録した／`reference`＝根拠が1つで、裏付けも食い違いも無い／`conflict`＝根拠が食い違い、表は片方を採って、
+  `basis` にもう片方を名指した。複数の行からできた値は、いちばん弱いものを採ります。どの確度をどう扱うかは
+  consumer が決めます
+- **`basis` は1つの文法に従います**（[下](#basis)）。どの資料のどの版・どのページが値を言っているか、
+  どの出所が異を唱えているかを、プログラムが読めます
 - 保証するのは形（列・意味・綴りの規則）、全行の出所、`tools/check_tables.py` が見る不変条件、原本が
   変わったときの再生成です。**全行が正しいことは保証しません**——資料が誤っていれば行も誤り、その
   ことを `confidence`/`basis` で言います
+
+## basis
+
+`basis` 列（と `<列>_basis` 列）は、隣の値の出所を並べます。
+
+```
+basis    := term ("+" term)*                     項は括弧の外の "+" で区切る
+term     := [mark] source [dissent]
+mark     := "!"   別のことを言う出所（必ず dissent が付く）
+          | "?"   当てはめきれなかった照合（食い違いではない）
+source   := [kind ":"] document [":" lang] ["(" locator ")"]
+          | kind [":" label] ["(" detail ")"]
+document := 目録の文書名（.PDF で終わる）。過去の版を指すなら "@V<版>"
+lang     := "zh" | "en"
+locator  := "p." <PDF の通しページ番号> [";" detail]  |  detail
+dissent  := "(" 列 "=" 値 ("," 列 "=" 値)* ")"
+```
+
+- `CH32V407DS0.PDF:zh(p.59)` は、その datasheet の中文版の PDF 59 ページ。ページ番号は PDF 自身の通し番号で、
+  構造化 preview のページと同じ数です
+  （`https://ch32-riscv-ug.github.io/ch32-device-data-preview/<文書名>.<言語>/pages/<NNNN>.md`）
+- `!CH32V007DS0.PDF:zh(max=115)` は、その出所が `max` を 115 と言い、表はもう一方の値を採ったこと。
+  このような項は全部 [`conflicts.csv`](conflicts.csv) に集まります（`field` が列、`kept` が表の値、`alternative` が
+  異論の値）
+- `kind` はその出所の読み方です: `pin-table:zh`、`products:en`（比較表）、`rm:<manual>`、`rm-address:<manual>`
+  （章の冒頭の絶対番地表）、`rm-remap-grid`、`evt(<file>)`、`evt-api(<file>)`、`measured:<日付>(<記録>)`、
+  `rule:<名前>` など。全部の一覧と1行の説明は `pipeline/common/basis_grammar.py` の `KINDS` にあり、
+  `tools/check_tables.py` は一覧に無い kind で落ちます
+- 括弧はいつも対になります。`detail` と値は、対になった括弧・`,`・`+` を含めてかまいません
+
+## 共通の規則
+
+- 名前は `pipeline/common/signal_vocabulary.py` の語彙で揃えてあります（`peripheral`・`role`・`port`・`gpio`）。
+  **元の綴りは隣の列**（`signal`・`spelled`・`define`）に残るので、証拠へ戻れます
+- data 列は英語
+- 証拠と違う値を持つのは1箇所だけ: **pin 表の remap 値が RM の格子と食い違う行**は格子の値を採ります
+  （`pinout.route`）。証拠 `pin_functions` は pin 表の値のまま `conflict` で、basis に
+  `!rm-remap-grid(route=remap-N)` があります。格子はその値の定義そのもので、pin 表は写しだからです
 
 ## そのまま公開する表
 
 それぞれの生成器がここに直接書きます（`paths.PUBLISHED`）。1行1事実で、`confidence` と `basis` が付きます。
 全列の意味は [`columns.csv`](columns.csv) に、資料からの読み方は同じ名前の表を
 [目録の README](../catalog/README.ja.md) と [証拠の README](../evidence/README.ja.md) で引いてください。
-鍵: `families`・`series`・`products`・`packages`・`cores`。
+鍵: `families`・`series`・`packages`・`cores`。
 EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・`clock_configs`・`clock_prescalers`・
 `clock_sources`・`clock_symbols`・`clock_init`・`clock_enables`・`pin_alternate`。
 RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
@@ -121,23 +157,20 @@ WCH-LinkUtility 由来: `link_firmware`。実測した不良: `link_firmware_iss
 
 ## 各表
 
-### `parts.csv` — 型番の比較表
+### `parts.csv` — 1行1型番
 
-1行1型番。`index/products.csv` の仕様列と、`evidence/product_attributes.csv` の比較表の値、
-`index/operating_conditions.csv` のクロック上限・電圧範囲を横に並べたもの。
+型番の表です。**値の列ごとに `<列>_confidence` と `<列>_basis` を持ちます。**
 
-| 列 | 中身 | どの証拠から |
+| 列 | 中身 | どこから |
 |---|---|---|
-| `part_number` `series` `family` `package` | 識別 | `index/products` |
-| `pins` | lead 数 | `index/packages.pin_count` |
-| `flash_bytes` `sram_bytes` `gpio_count` `temperature` | 主要仕様（バイト数・個数・温度範囲） | `index/products`（列ごとの根拠はそちらに） |
-| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記 | `index/operating_conditions` |
+| `part_number` `series` `family` `package` `flash_bytes` `sram_bytes` `gpio_count` `temperature` `packing` `listed_as` `datasheet` | 識別と主要仕様。比較表と ordering 表を突き合わせたもの | 目録 |
+| `pins` | lead 数 | `packages.pin_count` |
+| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記 | `operating_conditions`（使った行の確度と根拠） |
 | `vdd_min` `vdd_max` | `V_DD` の包絡（V） | 同上 |
-| `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | 比較表の値**そのまま**（`4`・`1/10`・`√`）。属性の綴りが family で違うので `build_index.py` の `ATTRIBUTE_COLUMNS` で列に寄せる。同じ列に2属性が当たれば `;` | `evidence/product_attributes`（`label_zh/en` に資料の見出し） |
-| `confidence` | 仕様列の確度のうちいちばん弱いもの | — |
+| `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | 比較表の値**そのまま**（`4`・`1/10`・`√`）。属性の綴りが family で違うので `build_index.py` の `ATTRIBUTE_COLUMNS` で列に寄せる。同じ列に2属性が当たれば `;` | `evidence/product_attributes` |
 
-数え方の規則は持ちません（`OPA/CMP = 4` を OPA 4 と読まない）。数を突き合わせるのは
-`tools/check_counts.py` の仕事です。
+`family`・`listed_as`・`datasheet` は目録が付ける名前なので確度を持ちません。数え方の規則は持ちません
+（`OPA/CMP = 4` を OPA 4 と読まない）。数を突き合わせるのは `tools/check_counts.py` の仕事です。
 
 ### `pinout.csv` — 型番 × lead × 機能
 
@@ -149,17 +182,17 @@ WCH-LinkUtility 由来: `link_firmware`。実測した不良: `link_firmware_iss
 | `pin` | lead 番号。露出パッドは `EP` |
 | `pad` | 資料の綴り（`PA0-WKUP`・`LO1`・`VDD_VIO_1`） |
 | `port` `gpio` | GPIO としての読み（`A`・`0`）。装飾を落とし、括弧の別名（`LO1 (PA0)`）と、機能名の pad に pin 表が route 無しで書く GPIO 名（`OSC_IN` → `PD0`）からも埋める。後者は同じ型番の別の lead がその GPIO を持つとき（100ピン封装で `PD0` が独立した lead）は埋めない。GPIO でなければ空 |
-| `kind` | `gpio` / `power` / `analog` / `other` / `nc`（`evidence/pins` の付与列）。`nc` は資料が「使わない」と書いた足で、番号だけがあり pad 名も型も機能も無い |
+| `kind` | `gpio` / `power` / `analog` / `other` / `nc`。`nc` は資料が「使わない」と書いた足で、番号だけがあり pad 名も型も機能も無い |
 | `peripheral` `role` | 語彙で揃えた機能（`USART1`・`TX`）。周辺名の特殊な綴りは下の表 |
 | `signal` | 資料の綴り（`USART1_TX` / `TX1` / `UTX`） |
 | `route` | `main`（主功能。リセット直後に生きている）／`default`（默认复用功能。AF モードにすれば remap 無しで届く）／`remap-N`／`af-N`。**`main` と `default` は別のこと**で、どちらに書くかは family で違う（[evidence/README](../evidence/README.ja.md) の「`route` の値の意味」） |
 | `selector` `value` | その経路を選ぶ AFIO selector（`afio-tim2-remap`）と値。`routes.csv` の鍵。`default`/`main` は値 `0`。selector を持たない経路は空 |
-| `af` | `af-N` の N（AF 方式の family: V205・X315・H41x）。書き込み先は `index/pin_alternate` |
+| `af` | `af-N` の N（AF 方式の family: V205・X315・H41x）。書き込み先は `pin_alternate` |
 
 載せないもの: pad 自身の GPIO 名（`PA9` の主機能が `PA9`）と電源の主機能（`VSS` の `VSS`）。
 ただし **`NRST`・`OSC_IN`・`BOOT0` のように自分の名前が機能そのもの**である pad は載せます
 （設定しなくても動く機能として引くため）。語彙で覆えない綴りは載せず、その数は
-`tools/check_tables.py` の `KNOWN_ROLE_GAPS`（いま 0）で固定してあります。
+`tools/check_tables.py` の `KNOWN_ROLE_GAPS` で 0 に固定してあります。
 
 **語彙の周辺名のうち、資料の見出しと同じ綴りでないもの**（`pipeline/common/signal_vocabulary.py` の `SYSTEM` に根拠）:
 
@@ -179,43 +212,46 @@ WCH-LinkUtility 由来: `link_firmware`。実測した不良: `link_firmware_iss
 
 1行1（series, selector, 値, 信号）。`evidence/remap_fields`（selector の register・bit）と
 `evidence/remap_routes`（値ごとの信号と pad）を結び、`peripheral`/`role`/`port`/`gpio` を付けたもの。
-`controller` は selector の register を持つ block（`afio`、EXTEN block なら `extend`。`remap_fields` から。
-2026-09-30 に R-33 で追加）。`register` が `PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき）。
-`peripheral`/`role` が空の行は語彙で読めない綴り（GPIO 名を信号に書く X315 の `PD0` 1行）。
+`controller` は selector の register を持つ block（`afio`、EXTEN block なら `extend`）。`register` が
+`PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき）。
+`peripheral`/`role` が空の行は語彙で読めない綴り（GPIO 名を信号に書く X315 の `PD0`）。周辺を有効に
+したときだけ成り立つ経路は `pin_conditions.csv` が補います。
 
 ### `registers.csv` — family × 型 × register × field
 
-1行1（register, bit define）。`evidence/registers`（構造体の offset）に `evidence/register_fields`
-（bit define）を並べたもの。field を持たない register も1行（`field` 空）。`access`/`reset` は RM 中文版の field 表から名前で引いたもの。`access_confidence`/`access_basis` は英語版が同じ語を刷っているかを言う（`conflict` は `conflicts.csv` にも並ぶ）。RM の access の語と、定義に無い語を刷る16 field は証拠の README に。
+bit define ごとに1行と、bit define の無い register ごとに1行。どちらかは `kind` が言います:
+`field`（ビット領域）、`value`（領域の列挙値。`of_field` がどの領域か）、`register`（register だけの行）。
+bit define のある register は field と value の行にだけ現れ、各行が register の `offset`・`width_bits`・
+`count` を持ちます。
 
 **`register` はヘッダの綴りのままなので、同じレジスタが family で違う綴りになる。** AFIO の EXTI 設定は
 多くの family で配列 `EXTICR[0]`〜`EXTICR[3]`（X035 は `[0]`/`[1]`）、V003/V006/M030 は1メンバーの
-`EXTICR`、H417 は2メンバーの `EXTICR1`/`EXTICR2`（offset 0x03c/0x040）。名前は揃えない（ヘッダに無い名前を
-作ることになる）。「その register の k 番目の語」は、同じ `type` の行を `offset` で並べて引く。
+`EXTICR`、H417 は2メンバーの `EXTICR1`/`EXTICR2`。名前は揃えない（ヘッダに無い名前を作ることになる）。
+「その register の k 番目の語」は、同じ `type` の行を `offset` で並べて引く。
 
 **header と manual が field の位置を違えて書き、実機の測定で決着したものは、この索引が
 測った位置を採ります**（`bits`/`mask`）。行は `confidence=conflict` のままで、`basis` に両方の資料と
-実測が並びます——`pinout.csv` が RM の remap 格子の値を採るのと同じ規則です。いまは CH32L103 の
-`FLASH_OBR` の `DATA0`/`DATA1` だけで、header は `[17:10]`/`[25:18]`、manual は `[19:12]`/`[27:20]`。
-データバイトに 0x5a/0xc3 を書いて WCH-LinkE で `FLASH_OBR` を読むと manual が正しかった
-（`basis` の末尾が `obr-readback:wch-linke(=19:12)`）。`evidence/register_fields.csv` は資料の言い分を
-記録する表なので header の bits のまま残します。
+実測が並びます——`pinout.csv` が RM の remap 格子の値を採るのと同じ規則です。CH32L103 の
+`FLASH_OBR` の `DATA0`/`DATA1` がそれで、header は `[17:10]`/`[25:18]`、manual は `[19:12]`/`[27:20]`。
+WCH-LinkE で `FLASH_OBR` を読み返すと manual が正しかった（`basis` の末尾が
+`obr-readback:wch-linke(bits=19:12)`）。`evidence/register_fields.csv` は資料の言い分を記録する表なので
+header の bits のまま残します。
 
 | 列 | 中身 |
 |---|---|
 | `type` | EVT の `*_TypeDef` の名前（`USART`・`DMA_Channel`）。同じ型は family で共有できる（`register_layouts.csv`） |
 | `register` | 構造体メンバー。配列は要素ごと（`EXTICR[1]`。offset は先頭＋添字×幅）、入れ子は `sTxMailBox[0].TXMIR` |
-| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**offset が空の行**は banner の register 名を構造体のメンバーに結べなかった define（911 行。bit 位置と define 名は事実なので落とさない） |
+| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**offset が空の行**は banner の register 名を構造体のメンバーに結べなかった define（bit 位置と define 名は事実なので落とさない） |
 | `field` | 読むための名前（型・register の接頭辞を落とした） |
 | `define` | EVT の綴りそのまま（`RCC_APB2PCENR_USART1EN`）。証拠へ戻る鍵 |
-| `kind` `of_field` `value` | `field`＝ビット領域、`value`＝その領域の列挙値（`of_field` がどの領域か、`value` がその値） |
+| `kind` `of_field` `value` | 上の3種と、`value` の行の親の領域と値 |
 | `bits` `mask` | ビット位置（`7:0`）と mask |
 | `description` | EVT のコメント |
-| `access` `reset` | RM のレジスタ表から（bit 位置が一致した行は `confirmed`） |
+| `access` `reset` | RM 中文版のレジスタ表から名前で引いたもの。`access_confidence`/`access_basis` は英語版が同じ語を刷っているか |
 
 ### `register_map.csv` — 絶対番地
 
-1行1（family, block, register）。`index/register_blocks`（`USART1` の base address）×
+1行1（family, block, register）。`register_blocks`（`USART1` の base address）×
 `registers` で `address = base + offset`。型の構造体が無い block（V407/X315 の `USBHSH`）は
 register 空・address＝base の1行。
 
@@ -230,16 +266,16 @@ channel 固定でなく、`note` にそう書く。variant・channel の意味�
 
 `evidence/timers`（RM の種類・カウンタ幅・更新割り込み）に、`pinout.csv` から数えた
 `channels`（pin に出ている最大チャネル番号。silicon の上限ではない）と
-`complementary`（`CHxN` が pin に出ていれば `1`）を足したもの。
+`complementary`（`CHxN` が pin に出ていれば `1`）を足したもの。一部の variant にだけあるタイマは
+`condition` にその variant を書きます。
 
 ### `capabilities.csv` — 型番 × 能力（縦持ち）
 
 `pipeline/build/build_capabilities.py` が `evidence/product_attributes` **だけ**から作ります。
 1行1（型番, 能力, qualifier, 元の属性）。
 
-`parts.csv` は比較表を横に並べたもので、158種類ある属性の綴りのうち列に持てるのは13種類だけです。
-この表は残りも含めて全部を行に落とし、**能力の名前を揃えて**あるので、
-「SPI が何本か」を family ごとに `spi`・`communication_interfaces_spi` と綴り分けている事情を
+`parts.csv` は比較表を13列に横に並べたものです。この表は全部の属性を行に落とし、**能力の名前を揃えて**
+あるので、「SPI が何本か」を family ごとに `spi`・`communication_interfaces_spi` と綴り分けている事情を
 引く側が知らなくて済みます。
 
 | 列 | 中身 |
@@ -259,57 +295,46 @@ family をまたいで「X を持たない型番」を数えないこと。
 
 `adc` は**ユニット数**、`adc-channel` は**チャネル数**です。資料はどちらも「ADC」と書くことがあり
 （`adc`＝`8+2` はチャネル、`adc_unit`＝`2` はユニット）、規則で畳むと静かに間違えるので、
-属性→能力の対応は**総当たりの辞書**にしてあります（`pipeline/build/build_capabilities.py`。
-辞書に無い属性が現れたら生成が落ちます）。
-
-クロック・電圧・Flash・SRAM・GPIO の行も比較表にあるぶんは載せますが、
-**数として引くなら `parts.csv` のほうが出所が良い**です（`index/operating_conditions` と
-`index/products` から来た数で、比較表の自由文 `Max: 144MHz` ではありません）。
+属性→能力の対応は**総当たりの辞書**にしてあります（辞書に無い属性が現れたら生成が落ちます）。
+クロック・電圧・Flash・SRAM・GPIO の行も比較表にあるぶんは載せますが、**数として引くなら
+`parts.csv` のほうが出所が良い**です（比較表の自由文 `Max: 144MHz` ではありません）。
 
 ### `conflicts.csv` — 資料どうしの食い違い
 
-`pipeline/build/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
-（200行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
-「両版で食い違う仕様を全部」に答えるには全表を grep するしかありませんでした。
+`pipeline/build/build_conflicts.py` が全表から `conflict` の印を集めたもの。表は食い違いを黙って片方に
+寄せず、片方の値を採って行を `conflict` にし、`basis` にもう片方を名指します。この表はその印を集めます。
 
 | 列 | 中身 |
 |---|---|
 | `table`・`subject` | どの表のどの行か（鍵の列を `col=value` で並べたもの） |
-| `field`・`kept` | 争っている列と、表が採った値。列ごとの印のとき／`basis` がその表に実在する列名を名乗るとき／その表が1行につき1つの値を主張するとき（`pin_functions.route`・`product_attributes.value`・`register_fields.bits`）に埋まる。1行で複数の値を主張する表は空で、`basis` の側が欄を名指しする |
+| `field` | 争っている列。列ごとの確度ならその列、ほかは異論の項が名指す列。複数なら `;` で並べる |
+| `kept` | 表が採った `field` の値 |
 | `dissenting` | `basis` で `!` が付いている出所 |
-| `alternative` | その出所が言う値（`basis` の `(=…)`） |
+| `alternative` | その出所が言う `field` の値 |
 
-**125行に相手の値が入り、75行は空**です。`memory_configs`（67行）と `timers`（1行）は
-食い違いを散文で記録していて DSL に持たないので、空欄は「[evidence/README.ja.md](../evidence/README.ja.md)
-の該当節を読め」の意味になります。
+食い違いを `basis` ではなく散文で記録している行（variant で変わるタイマ）は、`dissenting` と
+`alternative` が空です。
 
-**`conflict` の印は「事実が食い違っている」と同義ではありません。** `product_attributes` の24行は
-**仕様の差**（`2 (OPA1/3)` と `1（OPA1）`）と**言い回しの差**（`Typical: 72MHz` と `Typ. 72MHz`）が
-混ざります。~~`operating_conditions` の8行は綴りの差だけ~~ → **2026-09-09に対応付けの側で外しました**
-（単位の `mS`/`ms`、値の `0.8VDD`/`0.8*VDD`・`VI/O`/`VIO` を揃えてから突き合わせる）ので、
-いま残る16行は**原文で裁定した資料側の齟齬**です。中文版が異を唱えている行の `alternative` は、
-`basis` が持つ**訳した読み**であって原文の綴りではありません。
-
-`operating_conditions` は1行で min/typ/max/unit の4つを主張していて、争っているのがどれかは
-行ごとに違うので、`field` は空にして `alternative` の側が欄を名指しします（`min=60,typ=82,max=110`）。
+**`conflict` の印は「事実が食い違っている」と同義ではありません。** `product_attributes` には言い回しの差
+だけの行（`Typical: 72MHz` と `Typ. 72MHz`）があり、`option_byte_fields` で `field` が `field` の行は、
+bit の位置や既定値ではなく field の名前の綴りが違うだけです。見分けるには `field` を読んでください。
+中文版が異を唱えている行の `alternative` は、`basis` が持つ**訳した読み**であって原文の綴りではありません。
 
 ### `debug_interfaces.csv` — debug 配線は1線か2線か
 
-`pipeline/build/build_debug_interfaces.py` が作ります（書き込みツール向け。R-29）。1行1 series。
-2つの証拠の突き合わせで `debug_if` を決めます——**datasheet の debug 節見出しの綴り**
-（`evidence/features.csv`。`1-wire`／`单线`→`swio`、`2-wire`／`2线`→`rvswd`）と、
-**WCH-Link manual の配線表＋両対応の注記**（`evidence/debug_wiring.csv`）。manual が
-両対応と言えば `both`、見出しが wire 数を言う場合は manual と矛盾しないことを確かめます
-（`swio` は `both` の部分集合として整合）。**全27 series が確定**（swio 3・rvswd 11・
-both 13）。例外が2つ——manual は V002/V004 を両対応（SWCLK=PB3）と括りますが、両者の
-pin 表に SWCLK が無く見出しも 1-wire なので、**見出しを採り manual の異議を basis に
-記録**しています（`!WCH-LinkUserManual.PDF(...)`）。
+`pipeline/build/build_debug_interfaces.py` が作ります。1行1 series。2つの証拠の突き合わせで `debug_if` を
+決めます——**datasheet の debug 節見出しの綴り**（`evidence/features.csv`。`1-wire`／`单线`→`swio`、
+`2-wire`／`2线`→`rvswd`）と、**WCH-Link manual の配線表＋両対応の注記**（`evidence/debug_wiring.csv`）。
+manual が両対応と言えば `both`、見出しが wire 数を言う場合は manual と矛盾しないことを確かめます
+（`swio` は `both` の部分集合として整合）。manual は V002/V004 を両対応（SWCLK=PB3）と括りますが、両者の
+pin 表に SWCLK が無く見出しも 1-wire なので、**見出しを採り manual の異議を basis に記録**しています
+（`!WCH-LinkUserManual.PDF(swclk=PB3,dual=yes)`）。
 
 | 列 | 中身 |
 |---|---|
 | `debug_if` | `swio`（1線）／`rvswd`（2線）／`both`（両対応。manual の注記） |
 | `wording` `section` | datasheet 側の節見出しの英語の綴りと節番号（CH32V208 は英語版に見出しが無く空） |
-| `swdio_pads` `swclk_pads` | `index/pinout.csv` の正規化 role（SWDIO/SWCLK）の pad（`;`区切り。manual の pad が実在することも生成が確かめる） |
+| `swdio_pads` `swclk_pads` | `pinout.csv` の正規化 role（SWDIO/SWCLK）の pad（`;`区切り。manual の pad が実在することも生成が確かめる） |
 
 ### `features.csv` — 機能から series を探す
 
@@ -319,16 +344,16 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 `CH32V20x_30xDS0` の Ethernet が V303 にも付く偽陽性が出るので、比較表がある場合はそちらを採ります。
 逆に**節見出しが無い機能**（CH32V208 の Ethernet は概要文とブロック図にしか出ない）は、別の datasheet の
 見出しで既に在るタグに限り、比較表の属性名の最後のトークンがそのタグなら付けます（`features`・`sections` は空、
-`basis` は `attributes(...)`。2026-10-21、25行）。
+`basis` は `attributes(...)`）。
 
 ### `register_layouts.csv`
 
 `pipeline/extract/rm/extract_registers.py` が作ります。(family, 型) → 構造体の形のハッシュ `layout`。同じ `layout`
-の family はレジスタ定義を共有できます（D-5）。
+の family はレジスタ定義を共有できます。
 
 ### `manifest.csv`
 
-`index/` の全 CSV（自分以外）の path・行数・sha256。`build_index.py` の最後に作り、
+`index/` の全 CSV（自分以外）と `VERSION` の path・行数・sha256。`build_index.py` の最後に作り、
 `check_tables.py` が中身と一致することを見ます。
 
 ## 生成と検査
@@ -336,9 +361,9 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 ```sh
 uv run pipeline/build/build_capabilities.py     # capabilities.csv（manifest に入るので build_index より前）
 uv run pipeline/build/build_conflicts.py        # conflicts.csv（同上）
-uv run pipeline/build/build_index.py            # 全部（1〜2秒。証拠の表が揃っていること）
+uv run pipeline/build/build_index.py            # 引くための表と manifest（1〜2秒。証拠の表が揃っていること）
 uv run pipeline/build/build_index.py --only pinout,timers
-uv run tools/check_tables.py           # 索引 ⊆ 証拠、manifest 一致
+uv run tools/check_tables.py           # 索引 ⊆ 証拠、manifest 一致、basis の文法
 ```
 
 証拠の表を作り直したら索引も作り直します（順番は [evidence/README](../evidence/README.ja.md) の「生成」）。

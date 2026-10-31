@@ -12,7 +12,7 @@
 |---|---|---|---|
 | **ファミリー family** | mirror repository = 文書の単位。**分離規則はEVT単位（1 repository = 1 EVT archive）**。WCHが専用EVTを出す製品群は専用repositoryになる（CH32V205はV20xから分離）。このプロジェクトがrepository構成に合わせて定めた単位で、WCH公式の分類名ではない | `CH32V20x` | `index/families.csv`（1行1ファミリー） |
 | **シリーズ series** | 型番の先頭8文字（`CH32`+英字1+数字3）が表す製品系列。die・coreの単位に最も近い | `CH32V203` | `index/series.csv`（1行1シリーズ） |
-| **注文型番 part number** | 実際に注文できる完全型番。SKUと同義に使う | `CH32V006K8U7` | `index/products.csv`（1行1型番） |
+| **注文型番 part number** | 実際に注文できる完全型番。SKUと同義に使う | `CH32V006K8U7` | `index/parts.csv`（1行1型番） |
 | **package** | 物理パッケージ。同一型番＝単一package。寸法・pitch・lead数はpackageの属性としてマスタ表に正規化し、productsは名前で参照する | `LQFP48` | `index/packages.csv`（1行1package） |
 | ~~silicon~~ | 旧称。**series** に改称した（`silicon.csv`→`series.csv`） | — | — |
 
@@ -44,11 +44,9 @@
 | **confirmed（確定）** | 独立した根拠が2つ以上一致、**または人が内容確認して根拠を記録した**値。2言語一致だけが条件ではない |
 | **reference（参考）** | 根拠が1つだけで、裏取りも矛盾もない値 |
 | **conflict** | 根拠同士が矛盾。人の判断待ち |
-| **missing** | どの根拠にも記載がない |
-| **partial** / **varies-by-package** | （series.csvのみ）配下の確度不揃い / package依存の値でシリーズの属性ではない |
-| **basis（根拠）** | 値の出所一覧（`*_basis`列、`+`区切り）。`!規則`=矛盾（conflict化）、`?規則`=soft照合の不一致 |
+| **basis（根拠）** | 値の出所一覧（`*_basis`列、括弧の外の`+`区切り）。`!出所(列=値)`=その出所が列の値を別に言う（conflict化）、`?規則`=soft照合の不一致。文法は `pipeline/common/basis_grammar.py` と index/README の「basis」 |
 | **soft照合** | 一致すれば確度を押し上げるが、不一致でもconflictにしない照合。抽出欠落がありうる根拠（pin-table）に使う |
-| **`manual:`** | 人が確認して記録した根拠。記録は`curated/`にあるものだけが名乗れる |
+| **`manual:`** | QingKe のプロセッサマニュアル、または名指した節を人が確認して記録した根拠。記録は`curated/`にあるものだけが名乗れる |
 
 ## 一次資料
 
