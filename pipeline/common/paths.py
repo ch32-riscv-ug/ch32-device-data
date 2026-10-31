@@ -1,19 +1,18 @@
 """Where every table lives, in one place.
 
-The repository keeps three kinds of table (docs/data-layout.ja.md):
-
-    catalog/   目録  the names everything else keys on (families, series, products …)
-    evidence/  証拠  what the documents say, spelled as they spell it, with provenance
-    index/     索引  lookup tables derived from evidence -- vocabulary-normalised,
-                     one combined file per table
+    catalog/   目録  documents, mirror commits and upstream tool versions (not published)
+    evidence/  証拠  what the documents say, spelled as they spell it, with provenance --
+                     the material the index is derived from (not published)
+    index/     公開面 everything consumers read: the derived lookup tables, and the
+                     catalog and evidence tables published as they are (``PUBLISHED``)
 
 Tools ask this module for a path instead of spelling directories themselves, so
-moving a table means editing one dictionary. ``table(name)`` covers catalog and
-evidence (their names are unique across the two); ``index(name)`` covers the
-index, whose ``registers`` / ``timers`` share a file name with evidence tables
-on purpose (same subject, different layer).
+moving a table means editing one tuple. ``table(name)`` covers the catalog,
+evidence and published tables (their names are unique across the three);
+``index(name)`` covers the index, whose derived ``registers`` / ``timers`` share a
+file name with evidence tables on purpose (same subject, different layer).
 
-    uv run python3 -c "import tools.paths as p; print(p.table('pins'))"
+    uv run python3 -c "import paths as p; print(p.table('pins'))"
 """
 
 from __future__ import annotations
@@ -32,22 +31,14 @@ CACHE = REPO / ".cache"
 CANDIDATES = CACHE / "candidates"
 MIRRORS = Path("/home/mt/dev_wch")
 
-CATALOG_TABLES = ("families", "series", "products", "packages", "cores",
-                  "documents", "sources", "toolchains")
+CATALOG_TABLES = ("documents", "sources", "toolchains")
 
 EVIDENCE_TABLES = (
-    "pins", "pin_functions", "pin_alternate", "product_attributes",
-    "features", "errata", "memory_configs", "adc_internal", "flash_geometry",
-    "flash_program_method",
-    "eval_boards", "evt_examples", "link_firmware", "operating_conditions",
-    "absolute_maximum_ratings",
-    "remap_fields", "remap_routes", "timers",
-    "register_blocks", "registers", "register_fields", "dma_requests",
-    "opa_cmp_registers", "clock_enables", "usbpd_plumbing",
-    "interrupts", "memory_map", "systick", "clock_configs", "clock_prescalers",
-    "clock_sources", "clock_symbols", "clock_init", "evt_variants", "debug_data",
-    "debug_wiring", "option_bytes", "option_byte_fields",
-    "device_id_addresses", "device_ids", "pin_conditions", "figures", "esig",
+    "pins", "pin_functions", "product_attributes", "features", "memory_configs",
+    "eval_boards", "evt_examples", "link_firmware", "absolute_maximum_ratings",
+    "remap_fields", "remap_routes", "timers", "registers", "register_fields",
+    "dma_requests", "opa_cmp_registers", "usbpd_plumbing", "debug_wiring",
+    "device_id_addresses", "pin_conditions", "figures",
 )
 
 # Index tables: one combined file each (all parts / all families). People filter
@@ -57,28 +48,32 @@ INDEX_TABLES = ("parts", "pinout", "routes", "registers", "register_map", "dma",
                 "timers", "features", "capabilities", "conflicts", "register_layouts",
                 "debug_interfaces")
 
-# index/ is the whole public surface (docs/public-surface.ja.md): consumers read
-# nothing outside it. Catalog and evidence tables it publishes are copied in by
-# build_index.py, row for row, minus the columns named here (internal bookkeeping
-# a consumer has no use for). The copy keeps the source's name.
-PUBLISHED: dict[str, tuple[str, ...]] = {
+# Catalog and evidence tables that live in index/ itself: their generators write
+# them there directly, so the public surface holds the one and only copy.
+PUBLISHED = (
     # catalog keys
-    "families": (), "series": (), "cores": (), "packages": (),
-    "products": ("packing", "packing_confidence", "packing_basis"),
-    # evidence copied from EVT headers (the former "stable" set)
-    "interrupts": (), "memory_map": (), "systick": (), "evt_variants": (),
-    "clock_configs": ("evt_copies",), "clock_prescalers": (), "clock_sources": (),
-    "clock_symbols": (), "clock_init": (), "clock_enables": (), "pin_alternate": (),
-    "flash_geometry": (), "flash_program_method": (), "adc_internal": (), "debug_data": (),
-    # evidence published on request (R-33, R-34)
-    "device_ids": (), "option_bytes": (), "option_byte_fields": (), "register_blocks": (),
-    "errata": (), "operating_conditions": ("datasheet",), "esig": (),
-}
+    "families", "series", "cores", "packages", "products",
+    # facts read from EVT headers
+    "interrupts", "memory_map", "systick", "evt_variants",
+    "clock_configs", "clock_prescalers", "clock_sources", "clock_symbols", "clock_init",
+    "clock_enables", "pin_alternate", "flash_geometry", "flash_program_method",
+    "adc_internal", "debug_data",
+    # facts read from datasheets and reference manuals
+    "device_ids", "option_bytes", "option_byte_fields", "register_blocks",
+    "errata", "operating_conditions", "esig",
+)
 assert not set(PUBLISHED) & set(INDEX_TABLES)
+assert not set(PUBLISHED) & (set(CATALOG_TABLES) | set(EVIDENCE_TABLES))
+
+# Every table a generator writes row by row with its own provenance (as opposed to
+# the derived index tables): what conflicts, baselines and counts walk.
+SOURCE_TABLES = CATALOG_TABLES + EVIDENCE_TABLES + PUBLISHED
 
 
 def where(name: str) -> Path:
-    """Directory of a catalog or evidence table."""
+    """Directory of a catalog, evidence or published table."""
+    if name in PUBLISHED:
+        return INDEX
     if name in CATALOG_TABLES:
         return CATALOG
     if name in EVIDENCE_TABLES:
@@ -87,7 +82,7 @@ def where(name: str) -> Path:
 
 
 def table(name: str, out: Path | None = None) -> Path:
-    """Path of a catalog/evidence table. ``out`` overrides the directory (tests)."""
+    """Path of a catalog, evidence or published table. ``out`` overrides the directory (tests)."""
     return (out if out is not None else where(name)) / f"{name}.csv"
 
 

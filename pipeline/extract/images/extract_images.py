@@ -29,10 +29,9 @@ from pathlib import Path
 import pdfplumber
 
 MIRRORS = Path("/home/mt/dev_wch")
-REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent / "tools"))
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "tools"))
 import paths  # noqa: E402
 RESOLUTION = 200
 
@@ -692,9 +691,6 @@ def main():
         series_of_datasheet[(p["family"], p["datasheet"])].add(p["series"])
 
     # 型番 → 必要なpinoutファイル名（配置が同じ型番は1枚を共有する）
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent / "tools"))
     import check_images
     need = {f: set(names) for f, names in
             check_images.required().items()}

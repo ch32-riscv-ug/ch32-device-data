@@ -61,10 +61,10 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
-sys.path.insert(0, str(REPO / "pipeline" / "common"))
 # 単体で走らせても`operating_rows`（同じディレクトリ）を引けるように。
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import paths  # noqa: E402
 import operating_rows as operating  # noqa: E402  記号/値の正規化（規則は凍結時のまま）
 import held_sources  # noqa: E402  据え置き文書の名簿（regenerate --hold-sources）
 import review_sidecar  # noqa: E402
@@ -612,7 +612,7 @@ def merge_editions(datasheet: str, series: str, en_rows: list[dict],
 
 def collect_rows() -> list[dict]:
     """全datasheetからA11の行を集める（正本生成器も使う入口）。"""
-    with (REPO / "catalog" / "products.csv").open(newline="", encoding="utf-8") as f:
+    with paths.table("products").open(newline="", encoding="utf-8") as f:
         products = list(csv.DictReader(f))
     ds_series: dict[str, set] = {}
     for p in products:
@@ -666,7 +666,7 @@ def main() -> int:
     new_rows = collect_rows()
 
     # 凍結CSVに新しい行を足した candidate を作る（正本には書かない）。
-    frozen_path = REPO / "evidence" / "operating_conditions.csv"
+    frozen_path = paths.table("operating_conditions")
     with frozen_path.open(newline="", encoding="utf-8") as f:
         frozen = list(csv.DictReader(f))
     combined = frozen + new_rows

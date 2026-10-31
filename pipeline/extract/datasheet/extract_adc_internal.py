@@ -31,7 +31,7 @@ RM を読み、basis にそう書く。
 外した移植（D18 の退役手順: bundle 入力で凍結tool と **byte 一致**を確認 → `regenerate.py` を
 こちらへ切替 → 凍結tool を削除。2026-09-09。退役の第5号）。読む欄は bundle の `text`
 （ページ本文）だけで、読みの規則は変えていない。ページの読み手は
-`pipeline/extract/bundle_pages.py`（sha 照合つき）。datasheet は `catalog/products.csv` の
+`pipeline/extract/bundle_pages.py`（sha 照合つき）。datasheet は `index/products.csv` の
 `datasheet` 列と言語、RM は目録の `repositories` で引く。ここでは PDF を開かない。
 
 実行:

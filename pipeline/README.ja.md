@@ -31,7 +31,7 @@ extract/   pdfcompat.py（bundle互換層＋原本hashの入口ゲート。PDF�
            pdfplumber依存だけを外した移植で、抽出の規則は1行も同じ。`build_operating_conditions.py`が
            ライブラリとして呼ぶ。退役の第8号——これで`operating_conditions`経路のPDF直読みは無くなった）
            datasheet/run_operating.py（削除済み。凍結ロジックをbundle入力で走らせる
-           evidence/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
+           index/operating_conditions.csv の1,588行を**byte一致**で再現——2026-09-01実測）
            datasheet/extract_low_power.py（A11: 消費電流・ウェイクアップ時間。
            caption選定＋断片結合＋表番号スコープの2段階zh/en照合。偽conflict 0）
            datasheet/build_operating_conditions.py（**operating_conditions.csvの正本生成器**。
@@ -268,7 +268,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    **壊れた分割は情報を持っているので、そちらも残す。** pdfplumberが残す改行は
    下付きの境界で、`operating_rows.norm_symbol`はそれを正規化記号に変える
    （`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）。1.7.0で繋いだ形だけを残したら、
-   `evidence/operating_conditions.csv`の**`I_DD`系1,207行がエラーも出さずに消えた**。
+   `index/operating_conditions.csv`の**`I_DD`系1,207行がエラーも出さずに消えた**。
    1.7.1からはセルが2つの面を持つ——表が`cells`と`extracted_rows`を両方持つのと
    同じ考え方で、`text`が復元後の読み順、`text_split`が版面の割り方。
    `logical_tables.text_grid(merged, "text_split")`で引け、`merge_cells`が結合セルにも

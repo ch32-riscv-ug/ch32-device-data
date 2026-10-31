@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""RMのoption bytes章 → evidence/option_bytes.csv・option_byte_fields.csv（R-30）。
+"""RMのoption bytes章 → index/option_bytes.csv・option_byte_fields.csv（R-30）。
 
 ch32rvの依頼0003（`target option get/set`・`recover unbrick`）が要るのは
 **書き込みレイアウト**（各バイトの意味・補数バイトの配置・書込単位）と
@@ -39,7 +39,6 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 sys.path.insert(0, str(REPO / "pipeline" / "build"))
-sys.path.insert(0, str(REPO / "pipeline" / "common"))
 
 import logical_tables  # noqa: E402
 import paths  # noqa: E402

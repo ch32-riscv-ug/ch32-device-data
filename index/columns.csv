@@ -359,6 +359,7 @@ products,flash_bytes,"Flash that executes with zero wait, in bytes (the amount f
 products,sram_bytes,SRAM size in bytes.,integer,never empty,
 products,gpio_count,GPIO count.,integer,never empty,
 products,temperature,"Operating temperature range, written `lo..hiC`.",text,not stated by the sources,as-printed
+products,packing,"Packing type from the ordering-information table (e.g. `Tray`), spelled as printed.",text,the ordering-information table gives no packing type,as-printed
 products,listed_as,"Abbreviation the comparison table uses for the part (e.g. `CH32V208CB`, wildcard `C6x6`).",name,the comparison table lists the full part number,as-printed
 products,datasheet,Datasheet the part is listed in.,name,never empty,fixed
 products,#,Separator between the data columns and the provenance columns; every value is `#`.,marker,never empty,
@@ -369,6 +370,7 @@ products,flash_bytes_confidence,"Confidence of `flash_bytes`: confirmed = two or
 products,sram_bytes_confidence,"Confidence of `sram_bytes`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
 products,gpio_count_confidence,"Confidence of `gpio_count`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed
 products,temperature_confidence,"Confidence of `temperature`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|missing|reference),never empty,fixed
+products,packing_confidence,"Confidence of `packing`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; missing = not stated in any basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|missing|reference),never empty,fixed
 products,part_number_basis,Sources that support `part_number`.,text,never empty,prose
 products,series_basis,Sources that support `series`.,text,never empty,prose
 products,package_basis,Sources that support `package`.,text,never empty,prose
@@ -376,6 +378,7 @@ products,flash_bytes_basis,Sources that support `flash_bytes`.,text,never empty,
 products,sram_bytes_basis,Sources that support `sram_bytes`.,text,never empty,prose
 products,gpio_count_basis,Sources that support `gpio_count`.,text,never empty,prose
 products,temperature_basis,Sources that support `temperature`.,text,no source states the value,prose
+products,packing_basis,Sources that support `packing`.,text,no source states the value,prose
 register_blocks,family,"Family key (one EVT/document set, e.g. `CH32V20x`); joins catalog families.family.",name,never empty,fixed
 register_blocks,block,"Peripheral instance name (e.g. `USART1`). Collected from the EVT device header, the per-peripheral headers that define a block pointer (`PIOC`), and `core_riscv.h` (`PFIC`, `SysTick`, CH32H417 `HSEM`/`IPC`); blocks a header defines but the family does not have are removed by human judgment (`curated/register-blocks-absent.json`).",name,never empty,as-printed
 register_blocks,type,"EVT `*_TypeDef` stem the block uses (e.g. `USART`); `*_Type` for the core blocks of `core_riscv.h` (`PFIC`, `SysTick`); the block name itself when the header defines the registers only as address macros (CH32V103 `USBFS`).",name,never empty,as-printed

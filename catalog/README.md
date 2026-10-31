@@ -2,9 +2,10 @@
 
 [日本語](README.ja.md)
 
-The eight tables that decide **what exists and what it is called** ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)).
-Every other table (evidence `evidence/`, index `index/`) joins on the names defined here -- family, series, part number,
-package, core, document, and mirror version. Adding or renaming a name propagates to every table, so it is done by
+The tables that decide **what exists and what it is called** ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)).
+The five key tables (`families`, `series`, `products`, `packages`, `cores`) are public, so they live in `index/`; the three
+tables of documents, mirrors and upstream tools (`documents`, `sources`, `toolchains`) live here in `catalog/`.
+Every other table joins on the names defined here -- family, series, part number, package, core, document, and mirror version. Adding or renaming a name propagates to every table, so it is done by
 recording it in the [worklist](../docs/worklist.ja.md) (Japanese).
 
 `products.csv` holds, in addition to identification (part number, series, family, package, the datasheet it is listed in),

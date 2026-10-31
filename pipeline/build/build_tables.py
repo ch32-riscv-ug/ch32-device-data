@@ -50,8 +50,6 @@ from crosscheck_languages import canonical_value  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 CANDIDATES = paths.CANDIDATES
 SERIES_FACTS = REPO / "curated" / "series-facts.json"

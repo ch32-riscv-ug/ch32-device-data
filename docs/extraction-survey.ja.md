@@ -840,8 +840,8 @@ I2C1・SPI1・USART2のselectorへ付いていました。**TIM1の経路が3つ
 
 ### 収集済みにしたもの
 
-- **一般動作条件（General operating conditions / 通用工作条件）表** → `evidence/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
-- **ロット依存注記（エラッタ）** → `evidence/errata.csv` 21行（`pipeline/extract/scan_errata.py`で走査、`curated/errata.csv`で管理）
+- **一般動作条件（General operating conditions / 通用工作条件）表** → `index/operating_conditions.csv`（`tools/build_operating.py`）。クロック上限（F_HCLK等のF_系）と動作電圧範囲（V_DD、ADC/USB使用条件別）。62行中61行が両言語一致でconfirmed。family READMEの「## Series」表にMax clock・VDD列として反映
+- **ロット依存注記（エラッタ）** → `index/errata.csv` 21行（`pipeline/extract/scan_errata.py`で走査、`curated/errata.csv`で管理）
 
 抽出上の注意（build_operating.pyが吸収済み）: zh版の表題は「通用工作条件」（「一般」ではない）、絶対最大定格表が同一ページにあり`条件`列の有無で区別する、記号セルの折返しで`F_HCLK or F_SYS`が壊れる、脚注は全角括弧`（2）`、rowspanの単位セルはzh版で空になる。
 

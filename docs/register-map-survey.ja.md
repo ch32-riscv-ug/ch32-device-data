@@ -268,7 +268,7 @@ operating_conditions / product_attributes。**registerの表は1つもありま�
 ## 先出し1: SysTick（R-24追補3のE-1）
 
 **`millis()`/`micros()`/`delay()`がCH32V103で動かない**という報告を受けて、
-1周辺だけ先に出した。`evidence/systick.csv`（53行）が配置を持ち、bit定義は
+1周辺だけ先に出した。`index/systick.csv`（53行）が配置を持ち、bit定義は
 reference manualにしか無いのでここに記録する。
 
 ### 配置は4種類ある（`core_riscv.h`から機械抽出）

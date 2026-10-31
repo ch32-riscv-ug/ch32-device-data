@@ -49,8 +49,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import signal_vocabulary  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 CANDIDATES = paths.CANDIDATES
 

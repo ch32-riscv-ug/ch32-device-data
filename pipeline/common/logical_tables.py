@@ -449,7 +449,7 @@ def snap_ghost_columns(merged: dict) -> int:
 
     **人向け出力専用**（exporterとparity検査だけが呼ぶ）——`merge_cells`の列番号を
     動かすと正規CSVに効く。`merge_cells`側で寄せた版を試したところ
-    `evidence/operating_conditions.csv`にX315の偽行（`typ=enabled`）が1行増え、
+    `index/operating_conditions.csv`にX315の偽行（`typ=enabled`）が1行増え、
     zhの異論がStop mode行から奪われた（`check_baseline`が捕捉。2026-09-08に撤退して
     この形に組み替えた）。canonicalは和集合の列番号のまま、人向けだけ寄せる。
 

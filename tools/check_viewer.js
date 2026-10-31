@@ -63,7 +63,7 @@ function csv(file) {
 }
 
 Object.assign(api.state, {
-  products: csv("catalog/products.csv"),
+  products: csv("index/products.csv"),
   roles: csv("index/pinout.csv"),
   caps: csv("index/capabilities.csv"),
   attrs: csv("evidence/product_attributes.csv"),

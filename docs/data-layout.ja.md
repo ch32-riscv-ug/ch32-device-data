@@ -110,7 +110,7 @@ tools/ docs/
 | いまの表 | 行き先 | 変えること |
 |---|---|---|
 | `families` `series` `packages` `cores` `documents` `sources` | `catalog/` | そのまま |
-| `products` | `catalog/products.csv`（`part_number` `series` `family` `package` `datasheet` `listed_as`＋その basis）と `index/parts.csv`（下記） | 列ごとの `*_confidence/*_basis` 28列をやめる。仕様の列は索引へ |
+| `products` | `index/products.csv`（`part_number` `series` `family` `package` `datasheet` `listed_as`＋その basis）と `index/parts.csv`（下記） | 列ごとの `*_confidence/*_basis` 28列をやめる。仕様の列は索引へ |
 | `pins` | `evidence/` | `EP`（露出パッドの lead）と `kind` は「付与」と README に印。`pad` は資料のまま |
 | `pin_functions` | `evidence/` | F-41 の12行を資料の値に戻す（`conflict`）。`alias` 行はそのまま（資料の括弧書き） |
 | `pin_roles` | **置き換え** → `index/pinout.csv` | `pins` の lead と `remap_routes` の selector/値を結び、機能の無い lead も行に持つ。consumer は `pin_roles.csv` の代わりに `pinout.csv` を読む |
@@ -215,7 +215,7 @@ consumer は commit を固定しているので、途中の状態で壊れるこ
   の `STARTS_REQUEST`・`GLUED`）
 - `dma_requests.request_en`（en 版の綴りが zh 版と違うときだけ入る列）は、再生成の結果**全行空**
   だった——`*` 印も `_0`/`_1` も両版が同じ綴りで書いている。列は規則どおり残す（違いが出たら入る）
-- **公開する情報に日本語を入れない**（2026-08-26 指摘）。`catalog/cores.csv`・`series.csv` の `basis`
+- **公開する情報に日本語を入れない**（2026-08-26 指摘）。`index/cores.csv`・`series.csv` の `basis`
   に curated/*.json 由来の日本語が残っていたので英語にし、`check_tables` の CJK 検査を `#` の右の列
   （`basis`）まで広げた（`*_zh` と `path` だけ例外）。README は各ディレクトリに英語版 `README.md` を
   置き、日本語版 `README.ja.md` を併記する。`docs/` の作業文書だけ日本語

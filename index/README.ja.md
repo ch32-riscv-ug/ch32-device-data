@@ -112,8 +112,8 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 
 ### `parts.csv` — 型番の比較表
 
-1行1型番。`catalog/products.csv` の仕様列と、`evidence/product_attributes.csv` の比較表の値、
-`evidence/operating_conditions.csv` のクロック上限・電圧範囲を横に並べたもの。
+1行1型番。`index/products.csv` の仕様列と、`evidence/product_attributes.csv` の比較表の値、
+`index/operating_conditions.csv` のクロック上限・電圧範囲を横に並べたもの。
 
 | 列 | 中身 | どの証拠から |
 |---|---|---|

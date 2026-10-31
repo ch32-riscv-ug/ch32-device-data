@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Debug module の data0/data1 レジスタの hart 側アドレス → evidence/debug_data.csv。
+"""Debug module の data0/data1 レジスタの hart 側アドレス → index/debug_data.csv。
 **マニュアルは bundle を直接読む**。
 
 `tools/build_debug_data.py`（凍結tool。PDF を pdfplumber で直読み）から pdfplumber 依存だけを
@@ -20,7 +20,7 @@ V4 系は 0xE0000380、V3 系の多くは 0xE0000340）。既定値を1つ持つ
                （SDI_Printf の実装。family 内の全 debug.c で同じ値であることを見る）
     manual     QingKe プロセッサマニュアル（V2/V3/V4/V5）debug 章の hartinfo 表の `dataaddr`。
                V2 と V4 は固定値（0x0f4 / 0x380）、V3 と V5 は `0xXXX`（「以具体读出为准」——
-               実装ごとに hartinfo を読め、と書く）。core 世代は catalog/families.csv の core 名から
+               実装ごとに hartinfo を読め、と書く）。core 世代は index/families.csv の core 名から
     hartinfo   consumer が WCH-LinkE で hartinfo.dataaddr を読んだ実測（curated/debug-data-measured.json）
 
 CH32H417 の EVT には define が無く（SDI_Printf 例が無い）、V5/V3 のマニュアルは値を固定しない。

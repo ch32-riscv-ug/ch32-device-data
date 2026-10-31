@@ -274,7 +274,7 @@ TEXT_REPAIRS = [
 ]
 
 COLUMNS = ["series", "symbol", "parameter", "condition",
-           "min", "typ", "max", "unit", "#", "confidence", "basis", "datasheet"]
+           "min", "typ", "max", "unit", "#", "confidence", "basis"]
 
 # データシート1ページ目の特徴リストが宣言する「系統主頻」。電気的特性表の
 # F_HCLK（AHBの上限値）とは別の事実で、こちらが製品として謳われる周波数
@@ -1553,7 +1553,8 @@ def main():
     RANK = {"confirmed": 0, "conflict": 1, "reference": 2}
     # **確度は鍵に入れない。** 入れると「同じ主張で確度が違う2行」が残る
     # （`CH32H417DS0` の `V_DD33A 1.8/3.3/3.6` は OPA 表で confirmed・CMP 表で reference）。
-    claim = [c for c in COLUMNS if c not in ("basis", "#", "confidence")]
+    # 出典のデータシートは列に出さないが、鍵には入れる（別のデータシートの同じ主張は別の行）。
+    claim = [c for c in COLUMNS if c not in ("basis", "#", "confidence")] + ["datasheet"]
     best: dict[tuple, dict] = {}
     order: list[tuple] = []
     for r in out:
@@ -1572,7 +1573,7 @@ def main():
     dest = paths.table("operating_conditions", args.out)
     dest.parent.mkdir(parents=True, exist_ok=True)
     with dest.open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS)
+        w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
         w.writeheader()
         w.writerows(out)
     from collections import Counter

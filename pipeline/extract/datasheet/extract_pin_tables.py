@@ -23,7 +23,7 @@ reference, and the same lead carrying different pads is a conflict.
 
 読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。凍結 `tools/build_pins.py` の
 移植＝退役 第10号）。表の解析は `pipeline/extract/datasheet/extract_pins.py`
-（凍結 `tools/extract_pins.py` の移植）。datasheet は目録（`catalog/products.csv` の
+（凍結 `tools/extract_pins.py` の移植）。datasheet は目録（`index/products.csv` の
 `datasheet` 欄）で引き、bundle 名は `<stem>.<lang>`。
 
 列の手当て（`curated/pin-table-columns.json`）は凍結 `build_all.curated_columns()` が

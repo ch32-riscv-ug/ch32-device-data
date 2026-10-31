@@ -382,7 +382,7 @@ def conflict_keys(t: dict) -> list[str]:
     check_tables で即死させる。
     """
     import build_conflicts  # noqa: PLC0415  importだけ（生成はしない）
-    canonical = paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+    canonical = paths.SOURCE_TABLES
     out = []
     for name in canonical:
         if name not in build_conflicts.KEYS:
@@ -818,7 +818,7 @@ def figures_sane(t: dict) -> list[str]:
     - `confidence` はページの数と一致する（両版なら `confirmed`、片版なら `reference`）
     - `basis` の `p.N` が列と同じ番号を言っている（列と DSL の二重持ちが離れない）
 
-    そして**被覆**——`catalog/products.csv` の全型番に `pinout` の行が在ること。
+    そして**被覆**——`index/products.csv` の全型番に `pinout` の行が在ること。
     ピン配置図を持たない型番はいま0件なので、例外はここに名前で置く決まりにする
     （資料が図を描かない型番が出てきたら、人が見てからここへ足す）。
     """
@@ -968,7 +968,7 @@ def index_checks(t: dict) -> list[str]:
                    f"{len(missing)} 件（例 {missing[:3]}）——viewer は索引だけを読む")
     # conflicts は「confidence が conflict の行」を集めたものなので、数が合うこと。
     # **索引が古いと食い違いを見落とす**——増えたのに索引に無いのがいちばん困る。
-    marked = sum(1 for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+    marked = sum(1 for name in paths.SOURCE_TABLES
                  for r in t[name]
                  for c, v in r.items()
                  if c and "confidence" in c and (v or "").strip() == "conflict")
@@ -976,7 +976,7 @@ def index_checks(t: dict) -> list[str]:
         bad.append(f"conflicts: 索引が {len(t['index:conflicts'])} 行だが、"
                    f"証拠に conflict は {marked} 行——pipeline/build/build_conflicts.py を回し直す")
     for r in t["index:conflicts"]:
-        if r["table"] not in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+        if r["table"] not in paths.SOURCE_TABLES:
             bad.append(f"conflicts: 知らない表 {r['table']!r}")
         elif r["field"] and r["field"] not in (t[r["table"]][0] if t[r["table"]] else {}):
             bad.append(f"conflicts: {r['table']} に列 {r['field']!r} が無い")
@@ -1315,34 +1315,23 @@ def access_vocabulary(t: dict) -> list[str]:
 def published_surface(tables: Path | None) -> list[str]:
     """index/ が公開面の全部であること（docs/public-surface.ja.md）。
 
-    - 写した目録・証拠の表（`paths.PUBLISHED`）は、元の表から名指した列を落としただけのもの
-      ——行も並びも同じ。写しを手で直すと、元との差でここが落ちる
-    - index/ に在る CSV は、索引の表か写しのどちらか。名前の無いファイルは公開面に紛れない
+    - そのまま公開する目録・証拠の表（`paths.PUBLISHED`）は index/ に在り、catalog/・evidence/ に
+      同じ名前の表が残っていない（公開面の表は1つだけ）
+    - index/ に在る CSV は、索引の表か公開する表のどちらか。名前の無いファイルは公開面に紛れない
     - `VERSION` は正の整数1つ。consumer を壊す変更（列の削除・改名・書き方・family 名）は
       これを上げてから入れる。足すだけの変更は上げない
     """
     bad = []
-    for name, dropped in paths.PUBLISHED.items():
-        with paths.table(name, tables).open(newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            source = list(reader)
-            header = [c for c in (reader.fieldnames or []) if c not in dropped]
-        dest = paths.index(name)
-        if not dest.exists():
-            bad.append(f"公開面: index/{name}.csv が無い——pipeline/build/build_index.py を回す")
-            continue
-        with dest.open(newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            copy = list(reader)
-            copy_header = list(reader.fieldnames or [])
-        if copy_header != header:
-            bad.append(f"公開面: index/{name}.csv の列が元の表（落とす列 {list(dropped)} を除く）と違う")
-        elif [[r[c] for c in header] for r in source] != [[r[c] for c in header] for r in copy]:
-            bad.append(f"公開面: index/{name}.csv の行が元の表と違う——pipeline/build/build_index.py を回す")
+    for name in paths.PUBLISHED:
+        if not paths.index(name).exists():
+            bad.append(f"公開面: index/{name}.csv が無い——その表の生成器を回す")
+        for stale in (paths.CATALOG / f"{name}.csv", paths.EVIDENCE / f"{name}.csv"):
+            if stale.exists():
+                bad.append(f"公開面: {stale.relative_to(paths.REPO)} が残っている——表は index/ にだけ置く")
     known = set(paths.INDEX_TABLES) | set(paths.PUBLISHED) | {"manifest", "columns"}
     for p in sorted(paths.INDEX.glob("*.csv")):
         if p.stem not in known:
-            bad.append(f"公開面: index/{p.name} は索引の表でも写しでもない（paths.py に無い）")
+            bad.append(f"公開面: index/{p.name} は索引の表でも公開する表でもない（paths.py に無い）")
     bad += column_dictionary()
     version = paths.INDEX / "VERSION"
     text = version.read_text(encoding="utf-8").strip() if version.exists() else ""
@@ -1359,10 +1348,10 @@ def main() -> int:
     # 目録と証拠は名前で、索引は `index:` を付けて持つ（`registers`・`timers` が
     # 証拠と索引の両方にあるので）。
     t = {name: load(args.tables, name)
-         for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES}
+         for name in paths.SOURCE_TABLES}
     for name in paths.INDEX_TABLES:
         t[f"index:{name}"] = load_index(name)
-    if len(t) != len(paths.CATALOG_TABLES) + len(paths.EVIDENCE_TABLES) + len(paths.INDEX_TABLES):
+    if len(t) != len(paths.SOURCE_TABLES) + len(paths.INDEX_TABLES):
         raise SystemExit("paths.py の表の名前が重複している")
 
     families = {r["family"] for r in t["families"]}
@@ -1436,10 +1425,11 @@ def main() -> int:
         check("errata", r["id"], r["series"], series, "series", ";")
     for r in t["evt_examples"]:
         check("evt_examples", r["example"], r["family"], families, "families")
-    for name in ("operating_conditions", "absolute_maximum_ratings"):
-        for r in t[name]:
-            check(name, r["symbol"], r["series"], series, "series", ";")
-            check(name, r["symbol"], r["datasheet"], documents, "documents")
+    for r in t["operating_conditions"]:
+        check("operating_conditions", r["symbol"], r["series"], series, "series", ";")
+    for r in t["absolute_maximum_ratings"]:
+        check("absolute_maximum_ratings", r["symbol"], r["series"], series, "series", ";")
+        check("absolute_maximum_ratings", r["symbol"], r["datasheet"], documents, "documents")
     for name in ("pins", "pin_functions"):
         for r in t[name]:
             check(name, r["part_number"], r["part_number"], products, "products")

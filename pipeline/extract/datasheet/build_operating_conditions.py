@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""`evidence/operating_conditions.csv`の正本生成器（**最初に移行したCSV**）。
+"""`index/operating_conditions.csv`の正本生成器（**最初に移行したCSV**）。
 
 D18工程4-5。2つの部品を合成する:
 

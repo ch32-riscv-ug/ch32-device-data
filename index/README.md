@@ -124,7 +124,7 @@ Columns left out of the copies (internal bookkeeping): `products` drops its pack
 
 ### `parts.csv` -- product comparison
 
-One row per part. Identity and headline specs from `catalog/products.csv` (`flash_bytes`,
+One row per part. Identity and headline specs from `index/products.csv` (`flash_bytes`,
 `sram_bytes`, `gpio_count`, `temperature`; per-column provenance lives there), `pins` from
 `catalog/packages`, `clock_max` / `vdd_min` / `vdd_max` from `evidence/operating_conditions`
 (`F_MAIN`, else `F_HCLK` -> `F_SYSCLK` -> `F_CORE`; `V_DD` envelope), and the comparison-table

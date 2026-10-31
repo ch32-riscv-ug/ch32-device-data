@@ -34,14 +34,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent / "tools"))
 
 import signal_vocabulary  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent / "tools"))
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1].parent / "tools"))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 PAGES = "https://ch32-riscv-ug.github.io"
@@ -93,7 +87,7 @@ def human_bytes(value: str) -> str:
 def series_bytes(data: "Data", series: dict, column: str) -> str:
     """Series 行の Flash/SRAM。**型番で違う series は実値を全部並べる**（`128K/256K`）。
 
-    `catalog/series.csv` は「その series の全型番で同じ値」だけを持ち、型番で変わる
+    `index/series.csv` は「その series の全型番で同じ値」だけを持ち、型番で変わる
     ものは空にして `confidence` に `varies-by-package` と書く（値は products 側）。
     表示までそれに従うと空欄になり、**資料に無い**のか**1つに決まらない**のかが
     読む側から区別できない。決まらない理由は型番差なので、その差そのものを出す。
@@ -160,7 +154,7 @@ def operating_summary(data: Data, series: str) -> tuple[str, str]:
 
 
 def operating_detail(data: Data, series: str) -> tuple[str, str, str]:
-    """(クロック, VDD範囲) -- evidence/operating_conditions.csv のシリーズ行から。
+    """(クロック, VDD範囲) -- index/operating_conditions.csv のシリーズ行から。
 
     クロックはデータシート1ページ目が謳う系統主頻(F_MAIN)を最優先する。
     電気的特性表のF_HCLKはAHBの上限値で、製品として謳われる周波数とは別物
@@ -530,7 +524,7 @@ def comparison_section(data: Data, series: dict) -> list[str]:
     if missing:
         out += [f"{', '.join(missing)} is not in the datasheet's comparison table, "
                 "so it has no column here; every value it does have is in "
-                "`catalog/products.csv`.", ""]
+                "`index/products.csv`.", ""]
     if differing and len(differing) < len(body):
         out += [f"Only the {len(differing)} rows that differ between these "
                 f"{len(parts)} products; the other {len(body) - len(differing)} "
@@ -660,7 +654,7 @@ def remap_section(data: Data, family: str) -> list[str]:
 
 
 def errata_section(data: Data, family: str) -> list[str]:
-    """Errata rows for this family's series, from evidence/errata.csv."""
+    """Errata rows for this family's series, from index/errata.csv."""
     mine = {s["series"] for s in data.family_series(family)}
     rows = [e for e in data.errata
             if mine & set(e["series"].split(";"))]
@@ -819,9 +813,9 @@ def reference_section(data: Data, family: str) -> list[str]:
             "real -- CH32V307 answers at `0x08000000` and at `0x00000000`.", "",
             "Peripheral base addresses are in "
             "[memory_map.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
-            "/blob/main/evidence/memory_map.csv); interrupt numbers in "
+            "/blob/main/index/memory_map.csv); interrupt numbers in "
             "[interrupts.csv](https://github.com/ch32-riscv-ug/ch32-device-data"
-            "/blob/main/evidence/interrupts.csv).", ""]
+            "/blob/main/index/interrupts.csv).", ""]
     return out
 
 

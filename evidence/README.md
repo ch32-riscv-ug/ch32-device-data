@@ -3,11 +3,11 @@
 [日本語](README.ja.md)
 
 **What the documents say**, copied row by row with its basis (`basis`) and confidence (`confidence`)
-attached -- 43 tables ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
+attached -- 21 tables, the material the index ([`index/`](../index/README.md)) is derived from. The facts published as they are live in `index/` itself ([docs/data-layout.ja.md](../docs/data-layout.ja.md) (Japanese)). Spelling is kept as in the original:
 `pin_functions.signal` varies between `TX1` / `UTX` / `USART1_TX` exactly as the documents do, and `pad` keeps
 decorations such as `PA0-WKUP`. When documents disagree, the value is not corrected; the row is marked `conflict` and both are kept.
 The tables **to look things up in** (names normalised through the vocabulary, joined, split per part number) are in
-[`index/`](../index/README.md), and the key names are in [`catalog/`](../catalog/README.md).
+[`index/`](../index/README.md), together with the key tables (families, series, parts).
 
 **Per-table reliability (how solid each table is, and the known gaps) is in
 [docs/table-reliability.ja.md](../docs/table-reliability.ja.md) (Japanese)**; terminology is in

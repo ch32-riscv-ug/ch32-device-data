@@ -8,9 +8,9 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 
 | | 何か | 読む人 |
 |---|---|---|
-| [`catalog/`](catalog/README.ja.md) 目録 8表 | 何が存在し何と呼ぶか（family・series・型番・package・core・文書・mirror版・上流ツールの版） | 全表の鍵 |
-| [`evidence/`](evidence/README.ja.md) 証拠 43表 | 資料は何と書いているか。**綴りは原典のまま**、行ごとに出所（`basis`）と確度（`confidence`） | 正しさを確かめる人 |
-| [`index/`](index/README.ja.md) 索引 | 証拠から語彙で揃えて組み直した、**引くための表**。1表1ファイル。型番や機能で絞って見るのは viewer（`pins.html`）で | 利用者・generator |
+| [`index/`](index/README.ja.md) 公開面 | 鍵の表（family・series・型番・package・core）、資料の事実をそのまま公開する表、証拠から語彙で揃えて組み直した**引くための表**。型番や機能で絞って見るのは viewer（`pins.html`）で | 利用者・generator |
+| [`evidence/`](evidence/README.ja.md) 証拠 21表 | 索引の材料。資料は何と書いているか。**綴りは原典のまま**、行ごとに出所（`basis`）と確度（`confidence`） | 正しさを確かめる人 |
+| [`catalog/`](catalog/README.ja.md) 目録 3表 | 表を作る元の文書・mirror の commit・上流ツールの版 | 保守する人 |
 
 > [!IMPORTANT]
 > このリポジトリはArduinoコアの対応宣言ではありません。表に載っている型番＝対応、ではありません。
@@ -34,24 +34,24 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `pipeline/common/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run pipeline/common/signal_vocabulary.py --tables evidence`で規則一覧とremap_routes.csvに対する当たり具合を出す
 - `pipeline/build/extract_clock_tree.py` / `pipeline/build/build_clock.py`: EVTの`system_ch32*.c`から
   クロック設定（発振器・各ドメイン周波数・分周・PLL・flash latency・RCC外のレジスタ）を
-  静的に読み、`evidence/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・
+  静的に読み、`index/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・
   `clock_symbols.csv`・`clock_init.csv`へ落とす。`clock_init.csv`だけは順序を持つ——
   `SystemInit`はベタのhexで書かれた分岐の無い一直線で、順序が方針ではなく転記だから
 - `pipeline/build/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
   オフセットから`BLOCK->REGISTER`の絶対アドレスを解く。レジスタ名から場所は決まらない
   （CH32V205だけEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを別の番地に置く）
 - `pipeline/build/build_systick.py`: `core_riscv.h`からSysTickのregister配置を取り
-  `evidence/systick.csv`にする。**CH32V103だけ配置が違い**、`CMP`の位置を他family
+  `index/systick.csv`にする。**CH32V103だけ配置が違い**、`CMP`の位置を他family
   と同じだと思うと`millis()`が動かない
 - `pipeline/build/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
-  AF番号の書き込み先を`evidence/pin_alternate.csv`にする。`pin_functions`の`af-N`が
+  AF番号の書き込み先を`index/pin_alternate.csv`にする。`pin_functions`の`af-N`が
   4,499行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
   EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
-- `pipeline/build/build_interrupts.py`: 割り込みベクタ表を`evidence/interrupts.csv`にする。
+- `pipeline/build/build_interrupts.py`: 割り込みベクタ表を`index/interrupts.csv`にする。
   **出所はreference manualではなくEVTのdevice header**で、`IRQn_Type`列挙が
   番号・名前・説明を全部持っている。variantで番号が入れ替わる（CH32V20xの61番は
   `_D6`で`UART4`、`_D8`で`ETH`）ので`#if`の条件を`condition`列に持つ
-- `pipeline/build/build_memory_map.py`: アドレス空間の地図を`evidence/memory_map.csv`にする。
+- `pipeline/build/build_memory_map.py`: アドレス空間の地図を`index/memory_map.csv`にする。
   EVTの`*_BASE`定数から。**FLASHの番地は2つある**——ヘッダーの`FLASH_BASE`と
   linker scriptの`ORIGIN`は別の窓口を指すので両方持つ
 - `pipeline/extract/datasheet/extract_features.py`: familyが持つ周辺の一覧を`evidence/features.csv`にする。
@@ -79,7 +79,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   異を唱えるか」と「その出所は何と言うか」を取り出すので、**102行は表が採った値と
   相手の値が横に並ぶ**
 - `pipeline/build/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
-  （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと
+  （`CH32V20x_D8W`等）を取り`index/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
 - `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）

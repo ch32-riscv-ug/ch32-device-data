@@ -24,9 +24,8 @@ Read from EVT's system_ch32*.c, which ships one function per configuration the
 vendor supports. Three things about that source shape are load-bearing.
 
 **The copies are not identical.** EVT ships this file once per example -- 390
-times for CH32H417 -- in several distinct versions. `evt_copies` says how many
-copies state a configuration: 162/168 is the mainstream one, 4/168 is
-example-specific. Nothing is dropped, so a consumer can decide.
+times for CH32H417 -- in several distinct versions. Every distinct version is
+kept as its own row, so a consumer can decide.
 
 **A configuration can depend on a compile-time switch.** CH32V307's 144 MHz
 setting writes RCC_PLLMULL18 under `#ifdef CH32V30x_D8` and RCC_PLLMULL18_EXTEN
@@ -70,8 +69,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import extract_clock_tree  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
@@ -83,7 +80,7 @@ MIRRORS = Path("/home/mt/dev_wch")
 CONFIG_COLUMNS = ["family", "config", "source", "condition", "domains",
                   "hpre", "ppre1", "ppre2", "fpre", "pll",
                   "flash_latency", "flash_sck_div", "flash_writes", "outside_rcc",
-                  "#", "confidence", "basis", "evt_copies"]
+                  "#", "confidence", "basis"]
 PRESCALER_COLUMNS = ["family", "field", "divider", "value",
                      "#", "confidence", "basis"]
 SOURCE_COLUMNS = ["family", "consumer", "option", "value", "register", "shift",
@@ -216,7 +213,6 @@ def main() -> int:
                     "flash_writes": ";".join(entry["flash_writes"]),
                     "outside_rcc": ";".join(entry["outside_rcc"]),
                     "confidence": CONFIDENCE, "basis": BASIS,
-                    "evt_copies": entry["copies"],
                 })
     if args.out:
         args.out.mkdir(parents=True, exist_ok=True)

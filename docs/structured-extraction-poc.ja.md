@@ -19,7 +19,7 @@
 1. PDFを、意味を解釈しない構造化JSONへ変換する
 2. JSONの表番号・物理セル・結合・PDF座標を検査する
 3. 承認済みJSONだけから電気特性を抽出する
-4. 中英の値を照合して `evidence/operating_conditions.csv` にする
+4. 中英の値を照合して `index/operating_conditions.csv` にする
 5. JSONから人向けの中英横並びHTMLを生成する
 
 Markdownは検索・翻訳用の派生表示には使えるが、結合セルを表現できないため

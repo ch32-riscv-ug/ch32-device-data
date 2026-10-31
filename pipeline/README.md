@@ -37,7 +37,7 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            as a library. The eighth retirement; no direct PDF read is left in the
            operating_conditions path)
            datasheet/run_operating.py (deleted -- ran the frozen extraction logic on bundle
-           input; reproduces evidence/operating_conditions.csv **byte-identically**,
+           input; reproduces index/operating_conditions.csv **byte-identically**,
            all 1,588 rows -- measured 2026-09-01)
            datasheet/extract_low_power.py (A11: consumption current and wake-up
            times; caption-scoped selection, fragment joining, two-phase zh/en pairing
@@ -381,7 +381,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    `operating_rows.norm_symbol` turns it into the canonical symbol
    (`I\nDD` -> `I_DD`; its `KEEP` pattern accepts nothing else). 1.7.0
    stored only the joined spelling and silently dropped **1,207 `I_DD` rows**
-   from `evidence/operating_conditions.csv`. Since 1.7.1 the cell keeps both
+   from `index/operating_conditions.csv`. Since 1.7.1 the cell keeps both
    faces, the way a table keeps both `cells` and `extracted_rows`:
    `text` is the repaired reading order, `text_split` is what the page laid
    out. `logical_tables.text_grid(merged, "text_split")` reads the second

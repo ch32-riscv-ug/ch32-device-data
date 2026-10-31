@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""RM の電子署名（ESIG）の章 → evidence/esig.csv
+"""RM の電子署名（ESIG）の章 → index/esig.csv
 
 **flash 容量と UID を読む番地**（consumer の依頼 R-35。`getFlashChipSize()`・チップ ID）。
 工場で system 領域に焼かれる読み出し専用のレジスタで、EVT のヘッダには構造体が無い

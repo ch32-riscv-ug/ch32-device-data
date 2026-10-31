@@ -883,7 +883,7 @@ no-op になる（再変換後に測って **0セル**）。冪等で安価、�
 
 ### 踏んだ落とし穴: 壊れた分割が load-bearing だった（1.7.0 → 1.7.1）
 
-1.7.0（繋いだ形だけを残す）で **`evidence/operating_conditions.csv` の `I_DD` 系
+1.7.0（繋いだ形だけを残す）で **`index/operating_conditions.csv` の `I_DD` 系
 1,207行が丸ごと落ちた**。
 
 - `tools/build_operating.norm_symbol` は、pdfplumberがセル内に残す**改行を`_`に変えて**
@@ -2225,7 +2225,7 @@ V2.2 はこれを「普通I/O引脚输出高/低电平电压」の1組（6mA/12m
 
 ### 撤退の内容と再突入の条件
 
-戻したもの: 正本4表（`catalog/sources.csv`・`evidence/operating_conditions.csv`・
+戻したもの: 正本4表（`catalog/sources.csv`・`index/operating_conditions.csv`・
 `index/conflicts.csv`・`index/manifest.csv`）・`structured/CH32X035DS0.zh/manifest.json`・
 `.cache/structured-bundles/CH32X035DS0.zh`（旧原本 147f0d22d073 の控えから）。Markdown は
 human 段まで進んでいないので無傷（差分0）。作業ツリーは HEAD と同一、検査4本通過。
@@ -2901,13 +2901,13 @@ mirror は 1,381ファイル（追加241・削除6・変更1,102）動いた。
 |---|---|---|
 | `catalog/sources.csv` | 1行 | CH32H417 の mirror commit（b3dfa77 → a8ce259） |
 | `evidence/registers.csv` | 4,932 → **4,936** | USB の LINK レジスタ4本が予約バイトから実体になった |
-| `evidence/register_blocks.csv` | hash 4件 | DMA1/DMA2（下記の誤字修正）と USBSSD/USBSSH（新レジスタ） |
+| `index/register_blocks.csv` | hash 4件 | DMA1/DMA2（下記の誤字修正）と USBSSD/USBSSH（新レジスタ） |
 | `evidence/register_fields.csv` | **1行** | 下記の誤字修正 |
 | `index/register_layouts.csv` | 3行 | USBSSD 47 → 50・USBSSH 39 → 40 レジスタ（大きさは 416/180 のまま＝予約と入れ替わった） |
 | `index/registers.csv` | +4 | 上記の派生 |
 | `index/register_map.csv` | +4 | 同上 |
 | `evidence/evt_examples.csv` | 1,604 → **1,608** | Betaflight・RT_Thread・USB host 2件 |
-| `evidence/clock_configs.csv` | 154行のまま | `evt_copies` の分母だけ 390 → 396（例題ディレクトリが増えた） |
+| `index/clock_configs.csv` | 154行のまま | `evt_copies` の分母だけ 390 → 396（例題ディレクトリが増えた） |
 | `index/manifest.csv` | hash | 上記の派生 |
 
 `generated/readme/CH32H417.md` は EVT 例題の数が 233 → 237。
@@ -3459,7 +3459,7 @@ reference になっていた**（`I_IO`・`V_IO-V_SS`・`C_IO`・`V_IO`）。`no
 
 ### 結果
 
-`evidence/operating_conditions.csv` は**3,178行のまま324行の綴りが直った**（増減0）。
+`index/operating_conditions.csv` は**3,178行のまま324行の綴りが直った**（増減0）。
 検算は**字の多重集合**——`_`と空白と `I/O`→`IO` を除いて文字を並べ替えると、消えた324行と
 増えた324行が1対1で対応する（説明できない消失0）。confirmed 2,996 → 2,998・
 reference 162 → 160（`I/O` の統一で2行が相手を得た）・conflict は20のまま。

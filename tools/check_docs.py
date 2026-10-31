@@ -154,7 +154,7 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("evidence/README.ja.md", r"は`member`が空です（(?P<n>[\d,]+)行）", "register_fields_without_member"),
     ("evidence/README.md", r"have an empty `member` \((?P<n>[\d,]+) rows\)",
      "register_fields_without_member"),
-    ("evidence/README.ja.md", r"写した\n(?P<n>\d+) 表です", "evidence_tables"),
+    ("evidence/README.ja.md", r"写した\n(?P<n>\d+) 表で", "evidence_tables"),
     ("evidence/README.md", r"attached -- (?P<n>\d+) tables", "evidence_tables"),
     ("evidence/README.ja.md", r"(?P<n>[\d,]+)行の内訳は value", "clock_symbols"),
     ("evidence/README.ja.md", r"内訳は value (?P<n>[\d,]+)", "clock_symbols:value"),
@@ -175,10 +175,10 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("README.ja.md", r"種類の綴り・(?P<n>[\d,]+)行", "product_attributes"),
     ("docs/worklist.ja.md", r"`index/capabilities.csv`新設（2026-08-29。(?P<n>[\d,]+)行）",
      "index:capabilities"),
-    ("docs/handoff.ja.md", r"目録(?P<n>\d+)表", "catalog_tables"),
-    ("docs/handoff.ja.md", r"証拠(?P<n>\d+)表", "evidence_tables"),
+    ("docs/handoff.ja.md", r"の目録(?P<n>\d+)表", "catalog_tables"),
+    ("docs/handoff.ja.md", r"索引の材料(?P<n>\d+)表", "evidence_tables"),
     ("docs/handoff.ja.md", r"索引(?P<n>\d+)表", "index_tables"),
-    ("docs/handoff.ja.md", r"証拠の写し(?P<n>\d+)表", "published_copies"),
+    ("docs/handoff.ja.md", r"そのまま公開する(?P<n>\d+)表", "published_copies"),
     # 進捗の要約と、下の台帳（F＝既知の穴、G＝表示）。**要約のほうが先に古くなる**ので
     # 台帳から数え直す。
     ("docs/worklist.ja.md", r"\| 既知の穴（F系） \| (?P<n>\d+) \|", "holes_resolved"),
@@ -205,10 +205,10 @@ def rows(name: str) -> list[dict]:
 def quantities() -> dict[str, int]:
     """文書が名指しで書いている数を、生成物から数え直す。"""
     out = {name: len(rows(name)) for name in
-           paths.CATALOG_TABLES + paths.EVIDENCE_TABLES}
+           paths.SOURCE_TABLES}
     out.update({f"index:{name}": len(paths.load_index(name)) for name in paths.INDEX_TABLES})
     # 表ごとの confidence の分布と、product_attributes の属性の種類数。
-    for name in (paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+    for name in (paths.SOURCE_TABLES
                  + tuple(f"index:{n}" for n in paths.INDEX_TABLES)):
         table = rows(name)
         for level in ("confirmed", "reference", "conflict"):
@@ -252,7 +252,7 @@ def quantities() -> dict[str, int]:
         1 for r in paths.load("register_fields") if not r["member"])
     # 証拠の表にある conflict の総数（`*_confidence` 列を持つ表は列ごとに数える）。
     out["conflict_rows"] = sum(
-        1 for name in paths.EVIDENCE_TABLES for r in rows(name)
+        1 for name in paths.SOURCE_TABLES for r in rows(name)
         if any((v or "").strip() == "conflict"
                for k, v in r.items() if k and "confidence" in k))
     # `ledger()` は下で定義している（呼ぶのは main のあと）。
@@ -313,7 +313,7 @@ def check_row_counts(known: dict[str, int]) -> list[str]:
     # ここまでは黙って通ってしまっていた（R-29でconflictsのKEYS漏れが翌日の
     # CIまで気づかれなかったのと同型の穴）。
     covered = {name for names in ROW_COUNTS.values() for name in names}
-    for name in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
+    for name in paths.SOURCE_TABLES:
         if name not in covered:
             bad.append(f"check_docs.py: 表 {name} が ROW_COUNTS のどの行にも無い"
                        "——表を足したら table-reliability の行と ROW_COUNTS を足すこと")
@@ -493,7 +493,7 @@ def check_stable_lists() -> list[str]:
     `clock_*` は `clock_` で始まる表の全部と読む。
     """
     expected = {"published": set(paths.PUBLISHED)}
-    names = set(paths.CATALOG_TABLES) | set(paths.EVIDENCE_TABLES)
+    names = set(paths.SOURCE_TABLES)
     bad = []
     for name, anchor, kind in STABLE_LISTS:
         want = expected[kind]

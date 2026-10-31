@@ -221,7 +221,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, default=None, help="出力先の上書き（試験用）")
     args = ap.parse_args()
 
-    tables = paths.CATALOG_TABLES + paths.EVIDENCE_TABLES
+    tables = paths.SOURCE_TABLES
     missing = [n for n in tables if n not in KEYS]
     if missing:
         print(f"行を名指す鍵が決まっていない表 {missing}"

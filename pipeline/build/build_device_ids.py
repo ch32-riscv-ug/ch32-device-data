@@ -6,7 +6,7 @@
    device headerの`CHIPID_BASE`）。**全12 familyで取れる**（M030は0x1ffff384で他と違う）。
    `memory_map.csv`にCHIPID行があるfamily（L103/V205）とは`check_tables`が突き合わせる。
 
-2. **`evidence/device_ids.csv`**——型番（package）ごとの32bit値。
+2. **`index/device_ids.csv`**——型番（package）ごとの32bit値。
    **出所は公式EVTのChipID List（`*_dbgmcu.c`の`DBGMCU_GetCHIPID`の註）だけ**。
    完全一致または末尾の温度グレード1/6/7だけを省いた名前を採る。IDのrevision
    nibble以外のwildcardや、複数IDを持つ曖昧な行は推測しない。

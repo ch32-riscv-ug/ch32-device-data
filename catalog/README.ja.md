@@ -2,9 +2,10 @@
 
 [English](README.md)
 
-**何が存在し、何と呼ぶか**を決める8つの表です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
-ほかの全部の表（証拠 `evidence/`・索引 `index/`）はここの名前——family・series・型番・
-package・core・文書・mirror の版——を鍵にして結合します。名前の追加や改名は全表に波及するので、
+**何が存在し、何と呼ぶか**を決める表の説明です（[docs/data-layout.ja.md](../docs/data-layout.ja.md)）。
+鍵の5表（`families`・`series`・`products`・`packages`・`cores`）は公開面なので `index/` に置き、
+文書・mirror・上流ツールの3表（`documents`・`sources`・`toolchains`）はこの `catalog/` に置きます。
+ほかの全部の表はここの名前——family・series・型番・package・core・文書・mirror の版——を鍵にして結合します。名前の追加や改名は全表に波及するので、
 [worklist](../docs/worklist.ja.md) に記録して行います。
 
 `products.csv` は識別（型番・series・family・package・掲載 datasheet）に加えて、比較表と

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""main flashの消去/書き込み**手順** → evidence/flash_program_method.csv
+"""main flashの消去/書き込み**手順** → index/flash_program_method.csv
 
 **粒度ではなく順序**（consumer の依頼 R-32 / ch32rv 0004）。`flash_geometry.csv` は
 消去単位と書き込み粒度を持ちますが、**その bit をどの順に叩くか**が無いため、consumer は

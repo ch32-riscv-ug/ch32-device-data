@@ -33,7 +33,7 @@ datasheet を複数持つことがあり（CH32V006 は V002/V004/V006/V007 の 
 書き込み方式（worklist の A8）もここに出る——`2-wire SDI Serial Debug Interface`
 と `1-wire SDI` が見出しとして立っている。
 
-bundle は `catalog/products.csv` の `datasheet` 列（PDF 名）と言語から
+bundle は `index/products.csv` の `datasheet` 列（PDF 名）と言語から
 `.cache/structured-bundles/<stem>.<lang>` で引く。原本と bundle の一致は `regenerate.py` の
 前後照合（`check_sources`）が保証し、ページ record の sha256 は manifest と照合する
 （`pipeline/extract/bundle_pages.py`。3本目の退役で共通化した）。
