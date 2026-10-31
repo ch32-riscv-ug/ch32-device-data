@@ -233,7 +233,7 @@ interrupts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:z
 link_firmware,device,WCH debugger product the firmware is for (e.g. `WCH-LinkE`).,name,never empty,fixed,data
 link_firmware,mcu,"MCU of the debugger that runs the firmware, derived from its first instruction.",name,never empty,fixed,data
 link_firmware,mode,Target architecture mode the firmware serves (`RISC-V` or `ARM`).,enum(ARM|RISC-V),the firmware has one mode only,fixed,data
-link_firmware,role,"`offline` = the application image, which WCH's tools send in IAP mode; `iap` = the same application with the IAP bootloader prepended (its tail is the `offline` file byte for byte), written whole by an external programmer.",enum(iap|offline),never empty,fixed,data
+link_firmware,role,"`application` = the application image, which WCH's tools send in IAP mode; `with-bootloader` = the same application with the IAP bootloader prepended (its tail is the `application` file byte for byte), written whole by an external programmer.",enum(application|with-bootloader),never empty,fixed,data
 link_firmware,file,File name in WCH-LinkUtility.,name,never empty,as-printed,data
 link_firmware,size,File size in bytes.,integer,never empty,,data
 link_firmware,sha256,sha256 of the file; tells whether a local file is the one being distributed now.,name,never empty,,data

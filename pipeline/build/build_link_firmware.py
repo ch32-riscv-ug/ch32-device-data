@@ -153,19 +153,18 @@ CONFIDENCE = "reference"
 # 役割はファイルの実体で決まる: `*APP_IAP*` は IAP の bootloader を先頭に付けた image で、後ろは同じ
 # device・mode の `FIRMWARE_*` とバイト単位で同じ（LinkE・LinkW・DAPLink は先頭 8KiB、CH549 は 3KiB が
 # bootloader）。外部の書込機で丸ごと書くもの。`FIRMWARE_*` が application で、WCH のツールが IAP モードで
-# 流すのはこちら（ch32rv が LinkE 2.22⇄2.13 の往復で実測）。値の綴り `iap`/`offline` は名前から付けた
-# 当初のもので、実体とは逆に読める——次の VERSION で `with-bootloader`/`application` に改める。
+# 流すのはこちら（ch32rv が LinkE 2.22⇄2.13 の往復で実測）。役割の値は `with-bootloader`/`application`。
 CATALOG = {
-    "FIRMWARE_CH549.bin":        ("WCH-Link", "CH549", "RISC-V", "offline"),
-    "WCH-Link_APP_IAP_RV.bin":   ("WCH-Link", "CH549", "RISC-V", "iap"),
-    "FIRMWARE_DAP_CH549.bin":    ("WCH-Link", "CH549", "ARM", "offline"),
-    "WCH-Link_APP_IAP_ARM.bin":  ("WCH-Link", "CH549", "ARM", "iap"),
-    "FIRMWARE_CH32V305.bin":     ("WCH-LinkE", "CH32V305", "", "offline"),
-    "WCH-LinkE-APP-IAP.bin":     ("WCH-LinkE", "CH32V305", "", "iap"),
-    "FIRMWARE_CH32V208.bin":     ("WCH-LinkW", "CH32V208", "", "offline"),
-    "WCH-LinkW-APP-IAP.bin":     ("WCH-LinkW", "CH32V208", "", "iap"),
-    "FIRMWARE_CH32V203.bin":     ("WCH-DAPLink", "CH32V203", "", "offline"),
-    "WCH-DAPLink_APP_IAP.bin":   ("WCH-DAPLink", "CH32V203", "", "iap"),
+    "FIRMWARE_CH549.bin":        ("WCH-Link", "CH549", "RISC-V", "application"),
+    "WCH-Link_APP_IAP_RV.bin":   ("WCH-Link", "CH549", "RISC-V", "with-bootloader"),
+    "FIRMWARE_DAP_CH549.bin":    ("WCH-Link", "CH549", "ARM", "application"),
+    "WCH-Link_APP_IAP_ARM.bin":  ("WCH-Link", "CH549", "ARM", "with-bootloader"),
+    "FIRMWARE_CH32V305.bin":     ("WCH-LinkE", "CH32V305", "", "application"),
+    "WCH-LinkE-APP-IAP.bin":     ("WCH-LinkE", "CH32V305", "", "with-bootloader"),
+    "FIRMWARE_CH32V208.bin":     ("WCH-LinkW", "CH32V208", "", "application"),
+    "WCH-LinkW-APP-IAP.bin":     ("WCH-LinkW", "CH32V208", "", "with-bootloader"),
+    "FIRMWARE_CH32V203.bin":     ("WCH-DAPLink", "CH32V203", "", "application"),
+    "WCH-DAPLink_APP_IAP.bin":   ("WCH-DAPLink", "CH32V203", "", "with-bootloader"),
 }
 # wchlink.wcfg のキー → どのデバイスの版か。
 WCFG_KEY = {
@@ -256,14 +255,14 @@ def main() -> int:
                       else f"wch({origin})+!device(={seen})"),
         })
 
-    # `iap` の image の後ろは、同じ device・mode の `offline` の image そのもの（先頭が bootloader）。
+    # `with-bootloader` の image の後ろは、同じ device・mode の `application` の image そのもの。
     by_role = {(r["device"], r["mode"], r["role"]): blobs[r["file"]] for r in rows}
     for (device, mode, role), image in by_role.items():
-        if role != "iap":
+        if role != "with-bootloader":
             continue
-        application = by_role.get((device, mode, "offline"))
+        application = by_role.get((device, mode, "application"))
         if application is None or not image.endswith(application) or len(image) == len(application):
-            raise SystemExit(f"{device} {mode}: iap の image が bootloader ＋ offline の image になっていない")
+            raise SystemExit(f"{device} {mode}: with-bootloader の image が bootloader ＋ application の image になっていない")
     missing = sorted(set(CATALOG) - {r["file"] for r in rows})
     for name in missing:
         notes.append(f"配布物に無い: {name}")
