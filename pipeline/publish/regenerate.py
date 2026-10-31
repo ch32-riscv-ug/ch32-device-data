@@ -107,7 +107,7 @@ def legacy_steps() -> list[Step]:
         if kind == "new":
             steps.append((Path(name).stem, [name, *extra]))
             continue
-        steps.append((spec, [f"tools/{name}.py", *extra]))
+        steps.append((spec, [f"pipeline/build/{name}.py", *extra]))
     return steps
 
 
@@ -151,7 +151,7 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("flash_geometry", ["pipeline/extract/rm/extract_flash_geometry.py"]),
             ("adc_internal", ["pipeline/extract/datasheet/extract_adc_internal.py"]),
             ("device_id_addresses + device_ids",
-             ["tools/build_device_ids.py"]),
+             ["pipeline/build/build_device_ids.py"]),
             ("esig", ["pipeline/extract/rm/extract_esig.py"]),
         ] + ([
             # 退役 第9号（2026-09-09）。**`--full` のときだけ**走らせる——この5本は
@@ -171,14 +171,14 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
              ["pipeline/extract/rm/extract_flash_program_method.py"]),
         ] if args.full else [])),
         ("index", ([
-            ("feature_tags", ["tools/build_feature_tags.py"]),
-            ("capabilities", ["tools/build_capabilities.py"]),
+            ("feature_tags", ["pipeline/build/build_feature_tags.py"]),
+            ("capabilities", ["pipeline/build/build_capabilities.py"]),
         ] if args.full else []) + [
-            ("debug_interfaces", ["tools/build_debug_interfaces.py"]),
-            ("conflicts", ["tools/build_conflicts.py"]),
-            ("index + manifest", ["tools/build_index.py"]),
+            ("debug_interfaces", ["pipeline/build/build_debug_interfaces.py"]),
+            ("conflicts", ["pipeline/build/build_conflicts.py"]),
+            ("index + manifest", ["pipeline/build/build_index.py"]),
         ] + ([
-            ("family READMEs", ["tools/build_readme.py"]),
+            ("family READMEs", ["pipeline/build/build_readme.py"]),
         ] if args.full else [])),
         ("checks", [
             ("check_tables", ["tools/check_tables.py"]),

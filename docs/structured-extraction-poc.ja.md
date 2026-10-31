@@ -46,7 +46,7 @@ pdfplumberが返す物理セルを、製品非依存の自前JSONへ写す。
 ## 中間JSON 0.1
 
 スキーマは `schemas/structured-document.schema.json`。変換器は
-`tools/convert_structured.py`。
+`pipeline/common/convert_structured.py`。
 
 - 元PDF名、言語、SHA-256、全ページ数、変換対象ページ
 - 変換器と版、座標系
@@ -60,7 +60,7 @@ pdfplumberが返す物理セルを、製品非依存の自前JSONへ写す。
 `.cache/structured/` に置き、正本の `evidence/` には入れない。
 
 ```sh
-uv run tools/convert_structured.py \
+uv run pipeline/common/convert_structured.py \
   /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF \
   --lang en --pages 18-22
 
@@ -76,7 +76,7 @@ V003は中英で表番号列が一致し、検査を通る。V007の電気特性
 
 ## JSONからの抽出結果
 
-PoC抽出器は `tools/extract_operating_structured.py`。PDFを開かず、中間JSONだけを読む。
+PoC抽出器は `pipeline/common/extract_operating_structured.py`。PDFを開かず、中間JSONだけを読む。
 意味の読み方を変えた影響と混ぜないため、記号・単位・複数Typ列の規則は
 `build_operating.py` の作業中実装を再利用している。
 

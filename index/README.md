@@ -2,7 +2,7 @@
 
 [日本語](README.ja.md)
 
-The tables **to look things up in**. `tools/build_index.py` derives them from the
+The tables **to look things up in**. `pipeline/build/build_index.py` derives them from the
 [evidence](../evidence/README.ja.md) (what the documents say, spelled as they spell it) and the
 [catalog](../catalog/README.ja.md) (the names) -- and from nothing else: `tools/check_tables.py`
 verifies on every run that each index row can be traced back to evidence rows. The three-way
@@ -62,7 +62,7 @@ row.
 
 ## Rules
 
-- Names are normalised through `tools/signal_vocabulary.py` (`peripheral`, `role`, `port`, `gpio`).
+- Names are normalised through `pipeline/common/signal_vocabulary.py` (`peripheral`, `role`, `port`, `gpio`).
   **The original spelling sits in the next column** (`signal`, `spelled`, `define`), so every row
   leads back to the evidence.
 - `confidence` is the confidence of the evidence rows used (the weakest, where several were
@@ -107,7 +107,7 @@ row.
 
 ## Copied from catalog and evidence
 
-`tools/build_index.py` copies these tables row for row (`paths.PUBLISHED`); `tools/check_tables.py`
+`pipeline/build/build_index.py` copies these tables row for row (`paths.PUBLISHED`); `tools/check_tables.py`
 checks that each copy equals its source. Column meanings are in the [catalog README](../catalog/README.md)
 and the [evidence README](../evidence/README.md) under the same table name.
 Catalog: `families`, `series`, `products`, `packages`, `cores`.
@@ -211,7 +211,7 @@ channel number reaching a pin, counted from `pinout.csv` -- not the silicon's li
 ### `capabilities.csv` -- part x capability, long format
 
 One row per (part, capability, qualifier, source attribute), from
-`evidence/product_attributes` alone (by `tools/build_capabilities.py`). `parts.csv` is the
+`evidence/product_attributes` alone (by `pipeline/build/build_capabilities.py`). `parts.csv` is the
 comparison table laid out wide and can hold 13 of the 158 attribute spellings as columns; this
 table holds all of them as rows, under a normalised capability name, so a query does not have to
 know that "how many SPI" is spelled `spi` in one family and `communication_interfaces_spi` in
@@ -242,7 +242,7 @@ rather than the comparison table's prose (`Max: 144MHz`).
 ### `conflicts.csv` -- where the sources disagree
 
 One row per `conflict` mark anywhere in `catalog/` and `evidence/` (200 today), by
-`tools/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
+`pipeline/build/build_conflicts.py`. The evidence never resolves a disagreement by picking a side; it
 keeps both and marks the row `conflict`. Those marks were spread over eleven tables, so
 "show me every spec the two editions disagree on" meant grepping all of them.
 
@@ -271,7 +271,7 @@ disputed varies, so those rows leave `field` empty and name the columns inside `
 
 ### `debug_interfaces.csv` -- is the debug wiring 1-wire or 2-wire?
 
-By `tools/build_debug_interfaces.py` (for flashing tools; request R-29). One row per series.
+By `pipeline/build/build_debug_interfaces.py` (for flashing tools; request R-29). One row per series.
 `debug_if` comes from crossing two pieces of evidence: **the datasheet's debug section
 heading** (`evidence/features.csv`: `1-wire` -> `swio`, `2-wire` -> `rvswd`) and **the
 WCH-Link manual's wiring table plus its dual-support note** (`evidence/debug_wiring.csv`);
@@ -285,7 +285,7 @@ the headings say 1-wire -- the heading wins and the manual's dissent is recorded
 
 ### `features.csv`, `register_layouts.csv`, `manifest.csv`
 
-`features.csv` (by `tools/build_feature_tags.py`): one row per (tag, series); `precision` says
+`features.csv` (by `pipeline/build/build_feature_tags.py`): one row per (tag, series); `precision` says
 whether the comparison table (`part`) or a datasheet section heading (`datasheet`) decided it.
 A feature with no section heading at all (CH32V208's Ethernet appears only in the overview and
 block diagram) is tagged from the comparison table alone when the tag already exists from another
@@ -296,8 +296,8 @@ hashes share register definitions. `manifest.csv`: path, row count and sha256 of
 here.
 
 ```sh
-uv run tools/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)
-uv run tools/build_conflicts.py      # conflicts.csv (likewise)
-uv run tools/build_index.py          # rebuild everything (seconds; evidence must be current)
+uv run pipeline/build/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)
+uv run pipeline/build/build_conflicts.py      # conflicts.csv (likewise)
+uv run pipeline/build/build_index.py          # rebuild everything (seconds; evidence must be current)
 uv run tools/check_tables.py         # index ⊆ evidence, manifest matches
 ```

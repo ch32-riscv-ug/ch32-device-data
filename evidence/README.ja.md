@@ -26,7 +26,7 @@
 ここには**無く**、索引にあります。
 
 **証拠の表はどれも契約ではありません。** consumer が読むのは [`index/`](../index/README.ja.md) の下だけで、そこが公開面の
-全部です。公開する証拠の表は同じ名前で `index/` に写してあります（一覧は `tools/paths.py` の `PUBLISHED` と
+全部です。公開する証拠の表は同じ名前で `index/` に写してあります（一覧は `pipeline/common/paths.py` の `PUBLISHED` と
 索引の README）。以前の「安定」印は、全 consumer が `index/` へ移り終えた 2026-10-01 に外しました。
 
 ## 各ファイル
@@ -85,7 +85,7 @@ pad の名前は`LO1`で、括弧はその足が素のCH32V007ではPA0である
 
 CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`PC18`（GPIO）、既定代替功能を`DIO`（＝SWDIO）と書きます。**物理的にはどのfamilyもリセット時にSWDが生きています**（それでデバッガが素で繋がる）。列の違いは資料の書き方の違いです。
 
-**なので「リセット時に生きているか」を引くときは`main`だけを見ないでください。** `main`で引くと7 familyのSWDを落とします。`tools/build_readme.py`が`main`と`default`の両方を見ているのはこのためです。
+**なので「リセット時に生きているか」を引くときは`main`だけを見ないでください。** `main`で引くと7 familyのSWDを落とします。`pipeline/build/build_readme.py`が`main`と`default`の両方を見ているのはこのためです。
 
 `route`は資料の列を保つ（綴りと出所が証拠なので変えない）方針なので、この揺れの吸収は読む側の仕事です。
 
@@ -103,7 +103,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 **`group`は見出しの上の段**です。比較表の見出し列は2段組みで、`label`はそれを繋いだ全体（`Communication interfaces CAN`）を持ちます。下の段だけが要るとき（表示するとき）に上の段を剥がせるよう、分けて持ちます。`group`は必ず`label`の接頭辞です。
 
-剥がすかどうかは読む側が決めます。目安は2つ——剥がすと別の行と同じ名前になるとき（`ADC/TKey Unit`と`HSADC Unit`）と、剥がすと普通の英単語しか残らないとき（`Unit`・`Voltage`）は剥がさない。略語か数を含んでいれば（`CAN`・`Basic (16-bit)`）それ自身が何かを名指しているので剥がせます。`attribute`列（結合キー）は**繋いだ全体から作る**ので、剥がしても衝突しません。見出しの段の切れ目が行末ハイフン（`General-`／`purpose timer`）なら空白を入れずに繋ぎます（`tools/wrap_rules.py`。`attribute`はどちらの綴りでも同じslugになる）。
+剥がすかどうかは読む側が決めます。目安は2つ——剥がすと別の行と同じ名前になるとき（`ADC/TKey Unit`と`HSADC Unit`）と、剥がすと普通の英単語しか残らないとき（`Unit`・`Voltage`）は剥がさない。略語か数を含んでいれば（`CAN`・`Basic (16-bit)`）それ自身が何かを名指しているので剥がせます。`attribute`列（結合キー）は**繋いだ全体から作る**ので、剥がしても衝突しません。見出しの段の切れ目が行末ハイフン（`General-`／`purpose timer`）なら空白を入れずに繋ぎます（`pipeline/common/wrap_rules.py`。`attribute`はどちらの綴りでも同じslugになる）。
 
 ### 同じlead番号を複数のpadが持つ行
 
@@ -444,7 +444,7 @@ and SDIO_D1 is automatically changed to PB14 and PB15` の形で、条件は同�
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 
-EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`tools/extract_clock_tree.py`→`tools/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
+EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1設定で、本体はレジスタ書き込みの列そのものなので、そこから発振器・各クロックドメインの周波数・バス分周・PLL設定・flash latency・RCC外のレジスタを読み出しています（`pipeline/build/extract_clock_tree.py`→`pipeline/build/build_clock.py`）。**PDFもコンパイラも要らず、静的に読むだけ**です。
 
 読み方に注意が要る列が4つあります。
 
@@ -482,7 +482,7 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **`clock_symbols.csv`は`pll`と`outside_rcc`の記号を数値に落とします。** この2列だけは値ではなく**記号名**が入っています（`RCC_PLLMULL18`、`EXTEN_PLL_HSI_PRE`）。名前から値は導けません——CH32V307の`RCC_PLLMULL18`は`0x003C0000`、`RCC_PLLMULL18_EXTEN`は`0x00000000`で、**同じ「×18」が別の値**です（`RCC_PLLMULL15`は`0x00340000`、`_EXTEN`版は`0x00380000`で、ずれ方も一定ではありません）。1行が(family, symbol)で、`value`は**シフト済みの10進**（`clock_prescalers.value`と同じ規約）、`register`は書き込み先を`BLOCK->REGISTER`で、`address`はそのregisterの**絶対アドレス**です。
 
-アドレスを載せているのは、レジスタ名から場所が決まらないからです。EVTは`#define EXTEN_BASE (HBPERIPH_BASE + 0x3800)`のように**base定数の連鎖**で書き、綴りもfamilyで違います（`HBPERIPH_BASE`と`AHBPERIPH_BASE`）。**CH32V205だけがEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを`0x400220C0`に置きます**（他は`BASE+0x3800`）。`tools/extract_addresses.py`がbase連鎖とstructのメンバーオフセット（reserved配列も数える）を解いています。
+アドレスを載せているのは、レジスタ名から場所が決まらないからです。EVTは`#define EXTEN_BASE (HBPERIPH_BASE + 0x3800)`のように**base定数の連鎖**で書き、綴りもfamilyで違います（`HBPERIPH_BASE`と`AHBPERIPH_BASE`）。**CH32V205だけがEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを`0x400220C0`に置きます**（他は`BASE+0x3800`）。`pipeline/build/extract_addresses.py`がbase連鎖とstructのメンバーオフセット（reserved配列も数える）を解いています。
 
 **`evt_variants.csv`は型番→コンパイル時macroです。** `condition`列が`CH32V20x_D8W`や`CH32V30x_D8`といったmacroを参照しますが、どの型番がどれに該当するかはEVTのdevice headerの**コメントにしか書かれていません**。該当するfamilyは3つで、既定値（headerが最初から有効にしているもの）は`default`列が言います:
 
@@ -633,7 +633,7 @@ ID確認はflash書き込み検証を意味しない——ch32rv が erase・pro
 
 ### `link_firmware.csv`
 
-WCHが配るデバッガ用ファームウェアの一覧。生成は`tools/build_link_firmware.py`で、
+WCHが配るデバッガ用ファームウェアの一覧。生成は`pipeline/build/build_link_firmware.py`で、
 `WCH-LinkUtility.ZIP`（またはMounRiver Studio同梱の同じディレクトリ）を読む。
 **`.bin`自体はこのrepositoryに置いていない**——再配布になるため、載せるのは
 sha256・サイズ・取得元URLだけ。
@@ -654,7 +654,7 @@ MCUの割り当ては推測ではなく先頭命令から出している（`02`=
 ### `systick.csv`
 
 SysTickのregister配置。`core_riscv.h`の`SysTick_Type`から機械抽出する
-（`tools/build_systick.py`）。**配置が4種類あり、CH32V103だけ`CMP`の位置が違う**
+（`pipeline/build/build_systick.py`）。**配置が4種類あり、CH32V103だけ`CMP`の位置が違う**
 ——他11 familyは`CMP@0x10`だが、CH32V103は`0x10`が`CMPHR`（上位32bit）で
 比較値の下位は`0x0C`。`write_bits`列が「8bit単位でしか書けない」を言う。
 CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義はreference manualに
@@ -663,7 +663,7 @@ CH32H417は`SysTick`が2本ある（双核なのでコアごと）。bit定義�
 ### `pin_alternate.csv`
 
 **AF番号をどこに書くか。** `pin_functions.csv`の`route = af-N`（4,499行）のNの
-書き込み先で、1行1（family, pad）。`tools/build_pin_alternate.py`。
+書き込み先で、1行1（family, pad）。`pipeline/build/build_pin_alternate.py`。
 
 CH32V205・CH32X315・CH32H417の3 familyは**AFIO remapを持たない世代**で、
 経路をピンごとの4bitのAF番号で選びます。残る9 familyの`remap_fields.csv`と
@@ -744,7 +744,7 @@ EVTのdevice header**で、`IRQn_Type`列挙が番号・名前・1行説明を�
 
 アドレス空間の地図。1行1（family, kind, region）。**DS 1.2章の図ではなくEVTの
 device headerの`*_BASE`定数から**取ります。相対の連鎖
-（`EXTEN_BASE = HBPERIPH_BASE + 0x3800`）の解決は`tools/extract_addresses.py`が
+（`EXTEN_BASE = HBPERIPH_BASE + 0x3800`）の解決は`pipeline/build/extract_addresses.py`が
 持っています。
 
 `kind`は4種類:
@@ -888,7 +888,7 @@ application manual を引く行（`CH32H417RM.PDF p.374`——「批号第五位
 時間の行。基礎行の組み立ては `pipeline/extract/datasheet/operating_rows.py`——凍結 `tools/build_operating.py` の移植で、2026-09-09に元を退役させた）。合成層は凍結ロジックに
 触れずに基礎行の `parameter`/`condition` の文字列だけ整えます——割れた下付きの結合（`V DD`→`VDD`）、
 説明列の全角約物の半角化、ページ跨ぎで切れたセル（`Accuracy of HSI oscillator (after`＋次ページの
-`calibration)`）を bundle の結合gridから補完（括弧が閉じる続きが1つだけのとき）。**行末のハイフンで割れた語**（`high-`⏎`speed`）は繋ぐ——左が全大文字（`V_REF-`のマイナス）か右が接続詞（`low-`⏎`and`の保留ハイフン）のときだけ空白を残す（規則は `tools/wrap_rules.py`）。
+`calibration)`）を bundle の結合gridから補完（括弧が閉じる続きが1つだけのとき）。**行末のハイフンで割れた語**（`high-`⏎`speed`）は繋ぐ——左が全大文字（`V_REF-`のマイナス）か右が接続詞（`low-`⏎`and`の保留ハイフン）のときだけ空白を残す（規則は `pipeline/common/wrap_rules.py`）。
 
 **採る行を記号の一覧では決めません。** 記号は頭字で物理量を名乗る（`V_*` は電圧、`I_*` は電流、
 `t_*` は時間）ので、「その量に単位が合っているか」で採ります（`UNIT_FOR`）。資料の記法は決まって
@@ -957,7 +957,7 @@ application manual を引く行（`CH32H417RM.PDF p.374`——「批号第五位
 
 ### `evt_examples.csv`
 
-EVTに同梱される例題の一覧です。生成は`tools/build_evt_examples.py`。EVTの目録（`EVT/<name>_List_EN.txt`と中国語版。中国語版はGBK）を索引の権威とし、**展開済みEVTツリーに実在するか**を突き合わせます。目録2版＋実体の3根拠のうち2つ以上でconfirmed。
+EVTに同梱される例題の一覧です。生成は`pipeline/build/build_evt_examples.py`。EVTの目録（`EVT/<name>_List_EN.txt`と中国語版。中国語版はGBK）を索引の権威とし、**展開済みEVTツリーに実在するか**を突き合わせます。目録2版＋実体の3根拠のうち2つ以上でconfirmed。
 
 referenceは目録と実体の食い違いで、文書側の事実です（目録が触れていないグループ、実体に無い例題名、目録内の綴りゆれ）。目録に無いグループは生成時にstderrへ報告します（現在: CH32V407のUSBHS、CH32X035のSYSTICK、CH32X315のUSBHS/USBSS）。説明は英語版のみを採用し、中国語版にしか説明が無い行は空にします。
 
@@ -1014,7 +1014,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 ## 画像（現在は未使用）
 
 生成READMEは画像を参照していません。データシートから図を切り出す仕組みは
-用意しましたが（`tools/extract_images.py` / `tools/check_images.py`）、切り出し
+用意しましたが（`pipeline/extract/images/extract_images.py` / `tools/check_images.py`）、切り出し
 品質の調整が済んでいないため、生成物はミラーに置いていません。READMEはピン
 配置図の代わりに、パッケージ→型番→データシートの対応表を出します。
 
@@ -1033,23 +1033,23 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 依存順に構造化bundle入力で回し、検査まで進む（**約12分**。`--full`なしは新経路
 だけの速い再生成）。下の一覧は1表ずつ回すときのもの。**2026-09-10 に原本を直読みする
 生成器は無くなった**ので、どれもそのまま呼べる（読み手は全部 bundle。原本を開くのは
-bundle を作る側と図の描画だけ）。出力先は各ツールが `tools/paths.py` で決めます
+bundle を作る側と図の描画だけ）。出力先は各ツールが `pipeline/common/paths.py` で決めます
 （`--out <dir>` は試験用の上書き）。上から順に。
 
 ```sh
-uv run tools/build_all.py --jobs 1               # .cache/candidates/（型番ごとの抽出候補。bundleから）
-uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run pipeline/build/build_all.py --jobs 1               # .cache/candidates/（型番ごとの抽出候補。bundleから）
+uv run pipeline/build/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
 uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions（bundleから。数分かかる）
-uv run tools/build_remap.py                     # remap_fields/remap_routes（candidates から）
+uv run pipeline/build/build_remap.py                     # remap_fields/remap_routes（candidates から）
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions（新経路・bundle入力。凍結ロジックの基礎行＋A11の行）
 uv run pipeline/extract/datasheet/extract_absolute_maximum.py  # absolute_maximum_ratings（絶対最大定格表だけ。operating_conditions とは別の事実）
-uv run tools/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
-uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
-uv run tools/build_systick.py                   # systick（EVTのcore_riscv.hから）
-uv run tools/build_pin_alternate.py             # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
+uv run pipeline/build/build_evt_examples.py              # evt_examples（EVTツリーと目録から）
+uv run pipeline/build/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init（EVTから）
+uv run pipeline/build/build_systick.py                   # systick（EVTのcore_riscv.hから）
+uv run pipeline/build/build_pin_alternate.py             # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
 uv run pipeline/extract/rm/extract_memory.py         # memory_configs（RMの符号表とEVTのLink.ldをbundleから。数秒）
-uv run tools/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
-uv run tools/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
+uv run pipeline/build/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
+uv run pipeline/build/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_timers.py         # timers（RMのTIMx_CNT見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry（EVTのflash driver＋RMの闪存章をbundleから。数秒）
@@ -1060,20 +1060,20 @@ uv run pipeline/extract/rm/extract_usbpd_plumbing.py      # usbpd_plumbing（clo
 uv run pipeline/extract/rm/extract_registers.py  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読みをbundleから。約16分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）
 uv run pipeline/extract/rm/extract_flash_program_method.py # flash_program_method（register_fieldsの後＝ctlr_bit_names。EVTのflash driver＋RMの闪存章をbundleから）
 uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests（RM zh/en のDMA章の格子をbundleから。数秒）
-uv run tools/build_eval_boards.py               # eval_boards（EVTのPUB/から）
-uv run tools/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
-uv run tools/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）
-uv run tools/build_conflicts.py                 # index/conflicts（catalog/・evidence/ の conflict を全部。PDF不要。同じく build_index より前）
-uv run tools/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
-uv run tools/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
-uv run tools/build_link_firmware.py             # link_firmware（WCHの配布物から）
+uv run pipeline/build/build_eval_boards.py               # eval_boards（EVTのPUB/から）
+uv run pipeline/build/build_feature_tags.py              # index/features（features + 比較表から。PDF不要）
+uv run pipeline/build/build_capabilities.py              # index/capabilities（product_attributes から。PDF不要。manifest が入るので build_index より前）
+uv run pipeline/build/build_conflicts.py                 # index/conflicts（catalog/・evidence/ の conflict を全部。PDF不要。同じく build_index より前）
+uv run pipeline/build/build_sources.py                   # catalog/sources（読んだmirrorの版。**生成の一式の中で回す**）
+uv run pipeline/build/build_evt_variants.py              # evt_variants（EVTのdevice headerから）
+uv run pipeline/build/build_link_firmware.py             # link_firmware（WCHの配布物から）
 uv run pipeline/extract/manual/extract_debug_data.py  # debug_data（EVTのdebug.cのdefine＋QingKeマニュアルのhartinfo表をbundleから。数秒）
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring（WCH-Link manualの配線表＋両対応注記。新経路＝構造化bundle入力）
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields（RMのoption bytes章。新経路＝構造化bundle入力）
-uv run tools/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPIDとChipID List）
+uv run pipeline/build/build_device_ids.py                # device_id_addresses + device_ids（EVTのDBGMCU_GetCHIPIDとChipID List）
 uv run pipeline/extract/rm/extract_esig.py      # esig（RMの電子署名の表を両版、bundleから。数秒）
-uv run tools/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
-uv run tools/build_readme.py                    # generated/readme/*.md（各 family の README）
+uv run pipeline/build/build_index.py                     # **索引**: index/parts, pinout, routes, registers, register_map, dma, timers ＋manifest（秒）
+uv run pipeline/build/build_readme.py                    # generated/readme/*.md（各 family の README）
 uv run pipeline/extract/images/run_extract_images.py  # 各repoのimage/（凍結toolを原本hashゲート経由で。数分かかる）
 uv run tools/check_images.py [--missing|--prune] # 画像の必要一覧と検査
 uv run tools/check_tables.py                    # 全テーブルの参照結合・索引⊆証拠・manifest
@@ -1081,5 +1081,5 @@ uv run tools/check_counts.py                    # 比較表の周辺数 vs pin�
 uv run tools/check_docs.py                      # 文書が書いている行数・穴の状態 vs 実際の表
 node tools/check_viewer.js                      # pins.html の表示（script を DOM 無しで評価）
 uv run pipeline/extract/scan_errata.py                     # エラッタ増分チェック（NEWで終了コード1）
-uv run tools/build_tables.py --family CH32V006  # 1familyだけ
+uv run pipeline/build/build_tables.py --family CH32V006  # 1familyだけ
 ```

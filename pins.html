@@ -120,7 +120,7 @@ const ROUTES = [["default", "default"], ["remap", "remap"], ["af", "AF"],
 // written four ways across the datasheets (USART1_TX / TX1 / UTX / UART_TX,
 // SWDIO / DIO), so a list of spellings here always misses some: this page
 // showed no SWD pins at all for CH32X033/X035, which write DIO and DCK.
-// pinout.csv is pins.csv x pin_functions.csv read through tools/signal_vocabulary.py,
+// pinout.csv is pins.csv x pin_functions.csv read through pipeline/common/signal_vocabulary.py,
 // so the spellings are already folded onto one (peripheral, role) pair.
 const DEFAULT_ROLES = [
   ["SWDIO", p => p === "SDI", r => r === "SWDIO"],
@@ -387,7 +387,7 @@ function matrixHTML(partNames, withPins) {
 // The exception is a group whose own name is only a classification: every leaf
 // under "Communication interface(s)" is a bus name, so keeping the prefix would
 // single out "Ethernet" (one capital, so NAMES_ITSELF misses it).
-// Same rules as tools/build_readme.py's leaf_of / tidy_label.
+// Same rules as pipeline/build/build_readme.py's leaf_of / tidy_label.
 const NAMES_ITSELF = /[A-Z]{2,}|\d/;
 const CLASSIFYING_GROUPS = ["Communication interface", "Communication interfaces",
                             "Communication Interface"];
@@ -498,7 +498,7 @@ function rebuildFeatureBoxes(partNames) {
 // **Every product of the selection, not the first one.** A smaller package can
 // simply not have the pad: CH32V006's first part (D8U7) reaches USART1 only
 // through a remap, so reading partNames[0] left the series line all but empty.
-// 21 of the 27 series have a per-part default set. tools/build_readme.py's
+// 21 of the 27 series have a per-part default set. pipeline/build/build_readme.py's
 // `debug_defaults` already reads it this way ("**1型番だけ見ない**"); this is
 // the same reading, with a mark on what only some products have.
 // **The pin table is the silicon's superset, not this part's peripheral list.**

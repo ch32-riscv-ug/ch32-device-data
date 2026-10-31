@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""凍結した`tools/extract_images.py`を、原本hashの入口ゲート付きで走らせる。
+"""凍結した`pipeline/extract/images/extract_images.py`を、原本hashの入口ゲート付きで走らせる。
 
 extract_imagesはfamily repoの`image/`用にdatasheet/PACKAGE.PDFの図をpixelで
 切り出す（`page.crop().to_image()`）。pixelのcropは原本PDFが要り、bundle互換層
@@ -26,7 +26,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 
 import pdfplumber as _real  # noqa: E402
 import extract_images  # noqa: E402

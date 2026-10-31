@@ -1,5 +1,5 @@
 {
-  "_comment": "Part numbers WCH ships silicon for but has not put in a datasheet comparison table, measured on the physical part and reported by the ArduinoCore-CH32 consumer (worklist F-76). tools/build_tables.py folds these in as the basis `silicon:wch-linke`. This file NEVER creates a row on its own: a row appears only when a WCH document (today: an EVT project file) also names the part, so what is recorded here corroborates values, it does not invent parts.",
+  "_comment": "Part numbers WCH ships silicon for but has not put in a datasheet comparison table, measured on the physical part and reported by the ArduinoCore-CH32 consumer (worklist F-76). pipeline/build/build_tables.py folds these in as the basis `silicon:wch-linke`. This file NEVER creates a row on its own: a row appears only when a WCH document (today: an EVT project file) also names the part, so what is recorded here corroborates values, it does not invent parts.",
   "verified": "2026-09-16",
   "method": "chip ID, flash size and UID read over WCH-LinkE from the official evaluation board, while generating boards.txt for ArduinoCore-CH32",
   "measured": {

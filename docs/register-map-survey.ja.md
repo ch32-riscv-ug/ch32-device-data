@@ -27,7 +27,7 @@ R-20の未確認事項3件（ch32-dataの対応範囲・SVDのライセンス条
 
 ## 対象の12 family
 
-`tools/build_all.py`が処理している family dir と、それが覆う series:
+`pipeline/build/build_all.py`が処理している family dir と、それが覆う series:
 
 | family dir | series |
 |---|---|
@@ -77,7 +77,7 @@ bannerに属さないbit defineは全体で**95件（0.3%）**。つまりバナ
 ```
 
 `RCC_USART1EN`という名前は`APB2PCENR`を含みません。既存の
-`tools/extract_selectors.py`が`AFIO_PCFR1_`接頭辞だけで動けているのは、
+`pipeline/build/extract_selectors.py`が`AFIO_PCFR1_`接頭辞だけで動けているのは、
 AFIOがたまたま接頭辞を持っているからで、他のperipheralには使えません。
 
 D-6（割込み番号）もEVTにあります: `IRQn`列挙が V003 27件 / X035 45件 /
@@ -86,7 +86,7 @@ D-7（DMA channel）はbase addressだけがEVTにあり（14〜48件）、
 peripheral→channelの対応はRM側です。
 
 **registerの絶対アドレスは解けます**（2026-08-21）。R-24追補のA-2で
-`EXTEN->EXTEN_CTR`の番地が必要になったので、`tools/extract_addresses.py`を
+`EXTEN->EXTEN_CTR`の番地が必要になったので、`pipeline/build/extract_addresses.py`を
 書きました。base定数の連鎖（`PERIPH_BASE`→`HBPERIPH_BASE`→`EXTEN_BASE`）と
 `#define EXTEN ((EXTEN_TypeDef *)EXTEN_BASE)`と`typedef struct`のメンバー
 オフセット（reserved配列も数える）を突き合わせて、`BLOCK->REGISTER`を
@@ -202,7 +202,7 @@ register名・field名・bit offset・幅・access・reset値を返します。r
   英語版876件に対し中国語版895件。CH32X035の`TIM1_RM`の経路一覧は英語版が値1の途中で
   切れているのに対し中国語版は値2まで読めます。また英語版だけが1行を小文字で書く
   （`010: mapping (rx/pc17, ...)`）のに対し中国語版は全行が同じ書式です。
-  `tools/build_all.py`は現在**両版を読んで和を取り**、scalarが食い違ったときは
+  `pipeline/build/build_all.py`は現在**両版を読んで和を取り**、scalarが食い違ったときは
   後に読んだ中国語版を採ります
 - **CH32V407/V467のRMは`datasheet_zh/`にあります**（`datasheet_en/`にはDS0だけ）。
   中国語版の`CH32V407RM.PDF`から格子経路434件・21 selectorが取れ、
@@ -244,7 +244,7 @@ EVTの`<PERIPH>_TypeDef`のメンバ列と`<PERIPH>_*` bit define名の集合を
   D-3/D-4を「型で共有する」効果はGPIO・I2C・USART・SPIに出て、RCC/AFIOには出ません
 - M030の`USART_*` bit defineが0件なのは、M030がこのperipheralを **UART** と呼ぶためです。
   `remap_routes.csv`の`peripheral`列が`UART1`になるのと同じ事情
-  （`tools/signal_vocabulary.py`）
+  （`pipeline/common/signal_vocabulary.py`）
 
 つまりD-5は「familyごとに人が1個ずつ足す」ものではなく、**D-3/D-4を抽出した副産物として
 出てくる**。R-20の表でD-5が「手で足している」とされている箇所は、機械化できます。
@@ -259,10 +259,10 @@ operating_conditions / product_attributes。**registerの表は1つもありま�
 これはpin routeのための最小限です。ただしその1件を作る過程で、D-3/D-4に必要な
 仕掛けは既に揃っています。
 
-- EVTヘッダのbit define解析（`tools/extract_selectors.py`）
+- EVTヘッダのbit define解析（`pipeline/build/extract_selectors.py`）
 - RM register表の解析（`pipeline/extract/rm/register_fields.py`。register/field/offset/幅/access/reset）
-- **EVTの関数をホストでコンパイルして挙動を観測する**（`tools/extract_remap_fields.py`）
-- 資料間で名前を揃える語彙規則（`tools/signal_vocabulary.py`）
+- **EVTの関数をホストでコンパイルして挙動を観測する**（`pipeline/build/extract_remap_fields.py`）
+- 資料間で名前を揃える語彙規則（`pipeline/common/signal_vocabulary.py`）
 - 出典と確信度を`#`の右に持つ表の作法（D-8はこの形にそのまま乗る）
 
 ## 先出し1: SysTick（R-24追補3のE-1）

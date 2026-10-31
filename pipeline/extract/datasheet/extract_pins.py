@@ -31,7 +31,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
 import bundle_pages  # noqa: E402

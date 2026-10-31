@@ -27,7 +27,7 @@ Columns derived through the vocabulary (`peripheral`, `role`, `port`, `gpio`, an
 
 **No evidence table is a contract.** Consumers read [`index/`](../index/README.md) only, which is the whole
 public surface; the evidence tables it publishes are copied there under the same name (listed in
-`tools/paths.py` `PUBLISHED` and in the index README). The "stable" mark these tables used to carry was
+`pipeline/common/paths.py` `PUBLISHED` and in the index README). The "stable" mark these tables used to carry was
 retired on 2026-10-01, once every consumer had moved to `index/`.
 
 ## Each file
@@ -86,7 +86,7 @@ Appears in both:                                   CH32V407
 
 CH32L103 writes PA13's primary function as `SWDIO`; CH32X035 writes PC18's primary function as `PC18` (GPIO) and its default alternate function as `DIO` (= SWDIO). **Physically, SWD is alive at reset on every family** (which is why a debugger connects out of the box). The column difference is a difference in how the documents are written.
 
-**So when looking up "is it alive at reset", do not look at `main` alone.** Looking up `main` only drops the SWD of 7 families. This is why `tools/build_readme.py` looks at both `main` and `default`.
+**So when looking up "is it alive at reset", do not look at `main` alone.** Looking up `main` only drops the SWD of 7 families. This is why `pipeline/build/build_readme.py` looks at both `main` and `default`.
 
 Because the policy is that `route` preserves the document's column (spelling and provenance are the evidence, so they are not changed), absorbing this variation is the reader's job.
 
@@ -104,7 +104,7 @@ Holds **all attributes of the comparison table in long form** (except flash/sram
 
 **`group` is the upper tier of the heading.** The heading column of the comparison table is two-tiered, and `label` holds the whole thing joined (`Communication interfaces CAN`). It is kept separately so that the upper tier can be stripped when only the lower tier is needed (for display). `group` is always a prefix of `label`.
 
-Whether to strip is the reader's decision. Two guidelines: do not strip when stripping would give the same name as another row (`ADC/TKey Unit` and `HSADC Unit`), and do not strip when only an ordinary English word would remain (`Unit`, `Voltage`). If it contains an abbreviation or a number (`CAN`, `Basic (16-bit)`), it names something by itself and can be stripped. The `attribute` column (join key) is **built from the whole joined heading**, so stripping causes no collisions. When a heading level ends in a line-end hyphen (`General-` / `purpose timer`) the levels are joined without a space (`tools/wrap_rules.py`; `attribute` slugs identically either way).
+Whether to strip is the reader's decision. Two guidelines: do not strip when stripping would give the same name as another row (`ADC/TKey Unit` and `HSADC Unit`), and do not strip when only an ordinary English word would remain (`Unit`, `Voltage`). If it contains an abbreviation or a number (`CAN`, `Basic (16-bit)`), it names something by itself and can be stripped. The `attribute` column (join key) is **built from the whole joined heading**, so stripping causes no collisions. When a heading level ends in a line-end hyphen (`General-` / `purpose timer`) the levels are joined without a space (`pipeline/common/wrap_rules.py`; `attribute` slugs identically either way).
 
 ### Rows where several pads share the same lead number
 
@@ -447,7 +447,7 @@ alternate-function table (Table 3-4, prefaced "not specific to any model") carry
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
 
-The clock configurations EVT provides in `system_ch32*.c`. One function = one configuration, and the body is nothing but a sequence of register writes, so the oscillator, the frequency of each clock domain, bus dividers, PLL settings, flash latency and registers outside RCC are read out of it (`tools/extract_clock_tree.py` → `tools/build_clock.py`). **No PDF and no compiler are needed; it is read statically.**
+The clock configurations EVT provides in `system_ch32*.c`. One function = one configuration, and the body is nothing but a sequence of register writes, so the oscillator, the frequency of each clock domain, bus dividers, PLL settings, flash latency and registers outside RCC are read out of it (`pipeline/build/extract_clock_tree.py` → `pipeline/build/build_clock.py`). **No PDF and no compiler are needed; it is read statically.**
 
 Four columns need care when reading.
 
@@ -485,7 +485,7 @@ These 2 families **also write it differently** -- instead of touching the regist
 
 **`clock_symbols.csv` resolves the symbols of `pll` and `outside_rcc` to numbers.** These 2 columns alone hold **symbol names**, not values (`RCC_PLLMULL18`, `EXTEN_PLL_HSI_PRE`). The value cannot be derived from the name -- on CH32V307, `RCC_PLLMULL18` is `0x003C0000` and `RCC_PLLMULL18_EXTEN` is `0x00000000`: **the same "×18" is a different value** (`RCC_PLLMULL15` is `0x00340000`, the `_EXTEN` version `0x00380000`; the offset is not constant either). One row is (family, symbol); `value` is **the shifted decimal** (same convention as `clock_prescalers.value`), `register` is the destination as `BLOCK->REGISTER`, and `address` is that register's **absolute address**.
 
-The address is included because the register name does not determine the location. EVT writes it as **a chain of base constants** such as `#define EXTEN_BASE (HBPERIPH_BASE + 0x3800)`, and the spelling differs by family (`HBPERIPH_BASE` versus `AHBPERIPH_BASE`). **Only CH32V205 calls the EXTEN register `CTLR0`, and CH32X315 places EXTEN at `0x400220C0`** (the others at `BASE+0x3800`). `tools/extract_addresses.py` resolves the base chain and the struct member offsets (counting reserved arrays too).
+The address is included because the register name does not determine the location. EVT writes it as **a chain of base constants** such as `#define EXTEN_BASE (HBPERIPH_BASE + 0x3800)`, and the spelling differs by family (`HBPERIPH_BASE` versus `AHBPERIPH_BASE`). **Only CH32V205 calls the EXTEN register `CTLR0`, and CH32X315 places EXTEN at `0x400220C0`** (the others at `BASE+0x3800`). `pipeline/build/extract_addresses.py` resolves the base chain and the struct member offsets (counting reserved arrays too).
 
 **`evt_variants.csv` is part number → compile-time macro.** The `condition` column refers to macros such as `CH32V20x_D8W` and `CH32V30x_D8`, but which part numbers fall under which is **written only in the comments** of the EVT device header. Three families are affected, and the `default` column says the default (what the header enables from the start):
 
@@ -637,7 +637,7 @@ exists, and against every `device_ids.csv` row's `id_addr`.
 
 ### `device_ids.csv`
 
-**The 32-bit device_id per part number.** `tools/build_device_ids.py` reads only
+**The 32-bit device_id per part number.** `pipeline/build/build_device_ids.py` reads only
 the official EVT `DBGMCU_GetCHIPID` ChipID List. EVT names match exactly or omit only
 the trailing temperature grade (1/6/7); package suffixes are never guessed. Source
 commit, file, documented name and ID are recorded in `basis`. Disagreeing IDs stop
@@ -658,7 +658,7 @@ tell ch32rv before listing several IDs for one part (agreed 2026-10-14). No ID i
 
 ### `link_firmware.csv`
 
-The list of debugger firmware distributed by WCH. Generated by `tools/build_link_firmware.py`, which
+The list of debugger firmware distributed by WCH. Generated by `pipeline/build/build_link_firmware.py`, which
 reads `WCH-LinkUtility.ZIP` (or the same directory bundled with MounRiver Studio).
 **The `.bin` files themselves are not placed in this repository** -- that would be redistribution; only
 sha256, size and source URL are listed.
@@ -679,7 +679,7 @@ The MCU assignment is not a guess but derived from the first instruction (`02` =
 ### `systick.csv`
 
 SysTick register layout. Extracted mechanically from `SysTick_Type` in `core_riscv.h`
-(`tools/build_systick.py`). **There are 4 layouts, and only CH32V103 has `CMP` in a different position**
+(`pipeline/build/build_systick.py`). **There are 4 layouts, and only CH32V103 has `CMP` in a different position**
 -- the other 11 families have `CMP@0x10`, but on CH32V103 `0x10` is `CMPHR` (upper 32 bits) and
 the lower half of the compare value is at `0x0C`. The `write_bits` column says "writable only in 8-bit units".
 CH32H417 has two `SysTick`s (dual-core, so one per core). The bit definitions exist only in the reference manual,
@@ -688,7 +688,7 @@ so they were placed in [register-map-survey](../docs/register-map-survey.ja.md#�
 ### `pin_alternate.csv`
 
 **Where to write the AF number.** The destination of the N in `route = af-N` (4,499 rows) of `pin_functions.csv`,
-one row per (family, pad). `tools/build_pin_alternate.py`.
+one row per (family, pad). `pipeline/build/build_pin_alternate.py`.
 
 The 3 families CH32V205, CH32X315 and CH32H417 are **the generation without AFIO remap**;
 they select routes with a 4-bit AF number per pin. This table is the counterpart of `remap_fields.csv`
@@ -769,7 +769,7 @@ which part numbers set that macro (followed the same way as `clock_configs.condi
 
 The map of the address space. One row per (family, kind, region). Taken **from the `*_BASE` constants of the EVT
 device header, not from the figure in DS chapter 1.2**. Resolution of relative chains
-(`EXTEN_BASE = HBPERIPH_BASE + 0x3800`) is in `tools/extract_addresses.py`.
+(`EXTEN_BASE = HBPERIPH_BASE + 0x3800`) is in `pipeline/build/extract_addresses.py`.
 
 `kind` has 4 values:
 
@@ -926,7 +926,7 @@ The combining layer cleans the `parameter`/`condition` text of the base rows wit
 touching the frozen logic: split subscripts are rejoined (`V DD` -> `VDD`), fullwidth
 punctuation in the description columns is normalized, and a cell cut by a page break
 (`Accuracy of HSI oscillator (after` + `calibration)` on the next page) is completed from
-the bundle's merged table grid when exactly one continuation closes the parenthesis. **A word broken by a line-end hyphen** (`high-`⏎`speed`) is joined; a space is kept only when the left side is all capitals (the minus of `V_REF-`) or the right side is a conjunction (the suspended hyphen of `low-`⏎`and`) -- rules in `tools/wrap_rules.py`.
+the bundle's merged table grid when exactly one continuation closes the parenthesis. **A word broken by a line-end hyphen** (`high-`⏎`speed`) is joined; a space is kept only when the left side is all capitals (the minus of `V_REF-`) or the right side is a conjunction (the suspended hyphen of `low-`⏎`and`) -- rules in `pipeline/common/wrap_rules.py`.
 
 **Which rows are taken is not decided by a list of symbols.** A symbol names its physical
 quantity in its stem (`V_*` a voltage, `I_*` a current, `t_*` a time), so a row is taken when
@@ -997,7 +997,7 @@ The rest of the electrical characteristics chapter (absolute maximum ratings, cu
 
 ### `evt_examples.csv`
 
-The list of examples bundled with EVT. Generated by `tools/build_evt_examples.py`. The EVT catalog (`EVT/<name>_List_EN.txt` and its Chinese edition; the Chinese edition is GBK) is the authority for the index, cross-checked against **whether the example actually exists in the unpacked EVT tree**. Confirmed when 2 or more of the 3 bases (the two catalog editions + the actual tree) agree.
+The list of examples bundled with EVT. Generated by `pipeline/build/build_evt_examples.py`. The EVT catalog (`EVT/<name>_List_EN.txt` and its Chinese edition; the Chinese edition is GBK) is the authority for the index, cross-checked against **whether the example actually exists in the unpacked EVT tree**. Confirmed when 2 or more of the 3 bases (the two catalog editions + the actual tree) agree.
 
 reference is a disagreement between catalog and tree, a fact on the document side (groups the catalog does not mention, example names absent from the tree, spelling variations within the catalog). Groups absent from the catalog are reported to stderr at generation time (currently: USBHS of CH32V407, SYSTICK of CH32X035, USBHS/USBSS of CH32X315). Descriptions are taken from the English edition only; rows with a description only in the Chinese edition are left empty.
 
@@ -1054,7 +1054,7 @@ The rules are fixed so that regeneration or mid-file insertion keeps diffs local
 ## Images (currently unused)
 
 The generated READMEs do not reference images. A mechanism to cut figures out of the datasheets was
-prepared (`tools/extract_images.py` / `tools/check_images.py`), but since the tuning of the cut-out
+prepared (`pipeline/extract/images/extract_images.py` / `tools/check_images.py`), but since the tuning of the cut-out
 quality is not finished, the output is not placed in the mirror. Instead of pinout
 figures, the README outputs a package → part number → datasheet correspondence table.
 
@@ -1076,23 +1076,23 @@ new-path-only variant). The list below is for regenerating one table at a time.
 **Since 2026-09-10 no generator reads a PDF directly**, so each can be run as
 it stands (every reader takes structured bundles; the only things that open a
 PDF are the converter that builds the bundles and the figure renderer). Each
-tool decides its output location in `tools/paths.py` (`--out <dir>` is an
+tool decides its output location in `pipeline/common/paths.py` (`--out <dir>` is an
 override for testing). In order from the top.
 
 ```sh
-uv run tools/build_all.py --jobs 1               # .cache/candidates/ (extraction candidates per part number; from bundles)
-uv run tools/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
+uv run pipeline/build/build_all.py --jobs 1               # .cache/candidates/ (extraction candidates per part number; from bundles)
+uv run pipeline/build/build_tables.py                    # catalog: families/series/products/packages/cores/documents  evidence: product_attributes/errata
 uv run pipeline/extract/datasheet/extract_pin_tables.py                # pins/pin_functions (from bundles; takes a few minutes)
-uv run tools/build_remap.py                     # remap_fields/remap_routes (from candidates)
+uv run pipeline/build/build_remap.py                     # remap_fields/remap_routes (from candidates)
 uv run pipeline/extract/datasheet/build_operating_conditions.py  # operating_conditions (new path, bundle input; frozen base rows + A11 rows)
 uv run pipeline/extract/datasheet/extract_absolute_maximum.py  # absolute_maximum_ratings (the absolute-maximum table only; a different fact from operating_conditions)
-uv run tools/build_evt_examples.py              # evt_examples (from the EVT tree and catalog)
-uv run tools/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init (from EVT)
-uv run tools/build_systick.py                   # systick (from EVT's core_riscv.h)
-uv run tools/build_pin_alternate.py             # pin_alternate (from EVT's AFIO structure and GPIO driver)
+uv run pipeline/build/build_evt_examples.py              # evt_examples (from the EVT tree and catalog)
+uv run pipeline/build/build_clock.py                     # clock_configs/clock_prescalers/clock_sources/clock_symbols/clock_init (from EVT)
+uv run pipeline/build/build_systick.py                   # systick (from EVT's core_riscv.h)
+uv run pipeline/build/build_pin_alternate.py             # pin_alternate (from EVT's AFIO structure and GPIO driver)
 uv run pipeline/extract/rm/extract_memory.py         # memory_configs (the RM's code table + EVT's Link.ld, read from the bundles; seconds)
-uv run tools/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
-uv run tools/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
+uv run pipeline/build/build_interrupts.py                # interrupts (from EVT's IRQn_Type enumeration)
+uv run pipeline/build/build_memory_map.py                # memory_map (from EVT's *_BASE and Link.ld ORIGIN)
 uv run pipeline/extract/datasheet/extract_features.py   # features (datasheet functional-description headings, read from the bundles; seconds)
 uv run pipeline/extract/rm/extract_timers.py         # timers (the RM's TIMx_CNT headings, read from the bundles; seconds)
 uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry (EVT flash driver + the RM's flash chapter, read from the bundles; seconds)
@@ -1103,20 +1103,20 @@ uv run pipeline/extract/rm/extract_usbpd_plumbing.py      # usbpd_plumbing (afte
 uv run pipeline/extract/rm/extract_registers.py  # register_blocks/registers/register_fields + index/register_layouts (EVT headers + whole RM, from bundles; about 16 minutes). No cache -- a stale --rm-cache once rolled the canonical back to a pre-revision RM reading
 uv run pipeline/extract/rm/extract_flash_program_method.py # flash_program_method (after register_fields, for ctlr_bit_names. EVT flash driver + RM flash chapter, from bundles)
 uv run pipeline/extract/rm/extract_dma_requests.py   # dma_requests (DMA chapter grids of the RM zh/en, read from the bundles; seconds)
-uv run tools/build_eval_boards.py               # eval_boards (from EVT's PUB/)
-uv run tools/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
-uv run tools/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)
-uv run tools/build_conflicts.py                 # index/conflicts (every conflict mark in catalog/ and evidence/. No PDF needed; likewise before build_index)
-uv run tools/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
-uv run tools/build_evt_variants.py              # evt_variants (from the EVT device headers)
-uv run tools/build_link_firmware.py             # link_firmware (from WCH's distribution)
+uv run pipeline/build/build_eval_boards.py               # eval_boards (from EVT's PUB/)
+uv run pipeline/build/build_feature_tags.py              # index/features (from features + the comparison table. No PDF needed)
+uv run pipeline/build/build_capabilities.py              # index/capabilities (from product_attributes. No PDF needed; before build_index, whose manifest hashes it)
+uv run pipeline/build/build_conflicts.py                 # index/conflicts (every conflict mark in catalog/ and evidence/. No PDF needed; likewise before build_index)
+uv run pipeline/build/build_sources.py                   # catalog/sources (editions of the mirror that was read. **Run as part of the full generation**)
+uv run pipeline/build/build_evt_variants.py              # evt_variants (from the EVT device headers)
+uv run pipeline/build/build_link_firmware.py             # link_firmware (from WCH's distribution)
 uv run pipeline/extract/manual/extract_debug_data.py  # debug_data (defines in EVT debug.c + the QingKe manuals' hartinfo tables, read from the bundles; seconds)
 uv run pipeline/extract/manual/extract_debug_wiring.py  # debug_wiring (WCH-Link manual wiring table + dual-support note; new path, bundle input)
 uv run pipeline/extract/rm/extract_option_bytes.py  # option_bytes + option_byte_fields (RM option-bytes chapter; new path, bundle input)
-uv run tools/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID and ChipID List)
+uv run pipeline/build/build_device_ids.py                # device_id_addresses + device_ids (EVT DBGMCU_GetCHIPID and ChipID List)
 uv run pipeline/extract/rm/extract_esig.py      # esig (the RM's electronic-signature table, both editions, from the bundles; seconds)
-uv run tools/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
-uv run tools/build_readme.py                    # generated/readme/*.md (README for each family)
+uv run pipeline/build/build_index.py                     # **index**: index/parts, pinout, routes, registers, register_map, dma, timers + manifest (seconds)
+uv run pipeline/build/build_readme.py                    # generated/readme/*.md (README for each family)
 uv run pipeline/extract/images/run_extract_images.py  # image/ in each repo (frozen tool via the source-hash gate; takes a few minutes)
 uv run tools/check_images.py [--missing|--prune] # list of required images and check
 uv run tools/check_tables.py                    # reference joins of all tables, index ⊆ evidence, manifest
@@ -1124,5 +1124,5 @@ uv run tools/check_counts.py                    # peripheral counts of the compa
 uv run tools/check_docs.py                      # row counts and hole states claimed by the documents vs the tables
 node tools/check_viewer.js                      # what pins.html shows (its script evaluated without a DOM)
 uv run pipeline/extract/scan_errata.py                     # incremental errata check (exit code 1 on NEW)
-uv run tools/build_tables.py --family CH32V006  # one family only
+uv run pipeline/build/build_tables.py --family CH32V006  # one family only
 ```

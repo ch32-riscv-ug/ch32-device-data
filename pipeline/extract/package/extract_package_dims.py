@@ -9,7 +9,7 @@ with no text layer, so the TOC is the machine-readable statement.
 読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。凍結
 `tools/extract_package_dims.py` の移植＝退役 第11号）。使うのは TOC 6ページの本文だけ。
 
-`extract()` は **bundle 名でも原本PDFのパスでも受ける**——凍結 `tools/build_tables.py`
+`extract()` は **bundle 名でも原本PDFのパスでも受ける**——凍結 `pipeline/build/build_tables.py`
 （退役は別企画）が `MIRRORS/WCH-common/datasheet_<lang>/PACKAGE.PDF` を渡してくるので、
 親ディレクトリから言語を読んで bundle 名（`PACKAGE.zh` / `PACKAGE.en`）に直す。原本は開かない。
 

@@ -19,7 +19,9 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "common"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "build"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import signal_vocabulary  # noqa: E402
 
@@ -215,7 +217,7 @@ def shared_leads(t: dict) -> list[str]:
 
 
 # 表 → その列を決めている生成器と定数。**生成器を書き換えたのに表を作り直して
-# いない**ことを見つけるための対応表で、`tools/paths.py` が「どこに置くか」を1箇所で
+# いない**ことを見つけるための対応表で、`pipeline/common/paths.py` が「どこに置くか」を1箇所で
 # 決めているのと対になる（あちらが場所、こちらが形）。
 #
 # **この検査は実際に2件の取りこぼしを見つけました。** 2026-08-26 の区分やり直しで
@@ -308,8 +310,7 @@ def column_definitions() -> dict[str, list[str]]:
     import ast  # noqa: PLC0415
 
     out: dict[str, list[str]] = {}
-    generators = (list((paths.REPO / "tools").glob("build_*.py"))
-                  # 新経路（D18）の生成器。ファイル名はtools側と衝突しない
+    generators = (list((paths.REPO / "pipeline" / "build").glob("*.py"))
                   + list((paths.REPO / "pipeline" / "extract").rglob("*.py")))
     for path in sorted(generators):
         try:
@@ -332,7 +333,7 @@ def out_option(t: dict) -> list[str]:
     """表を書く生成器が、試験用の出力先 `--out` を受けること。
 
     **受けないと、抽出を変えて様子を見るのに正本を上書きするしか手が無い。**
-    `evidence/README` は「出力先は各ツールが `tools/paths.py` で決めます
+    `evidence/README` は「出力先は各ツールが `pipeline/common/paths.py` で決めます
     （`--out <dir>` は試験用の上書き）」と全 tool について書いていたが、
     `build_evt_examples.py` は argparse 自体を持たず、
     `--out` を渡しても黙って無視して `evidence/` に書いていた——2026-08-29 に
@@ -345,10 +346,8 @@ def out_option(t: dict) -> list[str]:
     import ast  # noqa: PLC0415
 
     out = []
-    # **新経路（`pipeline/extract/<層>/`）の生成器も見る**——正本を書く生成器はいまこちらに
-    # 増えていて、`tools/build_*.py`だけを見ていると網から漏れる（2026-09-09に11本を確認。
-    # 全部`--out`を持っていたので指摘は増えないが、次に足す生成器はここで捕まる）。
-    for path in sorted((paths.REPO / "tools").glob("build_*.py")) + sorted(
+    # 生成器は `pipeline/build/` と `pipeline/extract/<層>/` の2か所にある。
+    for path in sorted((paths.REPO / "pipeline" / "build").glob("*.py")) + sorted(
             (paths.REPO / "pipeline" / "extract").rglob("*.py")):
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -430,14 +429,11 @@ def column_drift(t: dict) -> list[str]:
 
 
 def generator_path(name: str) -> Path | None:
-    """生成器のファイルを**名前で**引く（`tools/`でも`pipeline/extract/<層>/`でもよい）。
+    """生成器のファイルを**名前で**引く（`pipeline/build/` でも `pipeline/extract/<層>/` でもよい）。
 
-    新経路の生成器は層ごとのdirectoryにあるので、`tools/`固定では見つからない
-    ——`operating_rows.py`（`pipeline/extract/datasheet/`）を`CALLED_BY`に登録したとき
-    `tools/build_operating_conditions.py` を読もうとして落ちた（2026-09-09）。
-    ファイル名は両方の木で一意（`column_definitions`も名前で引いている）。
+    ファイル名は両方の木で一意（`column_definitions` も名前で引いている）。
     """
-    direct = paths.REPO / "tools" / name
+    direct = paths.REPO / "pipeline" / "build" / name
     if direct.is_file():
         return direct
     hits = sorted((paths.REPO / "pipeline" / "extract").rglob(name))
@@ -457,8 +453,7 @@ def regeneration_coverage() -> list[str]:
     古いまま残り、しかも列は合っているので `column_drift` にも掛からない。R-32 で
     新設した `build_flash_program_method` が実際にこの穴に落ちていた（2026-09-06）。
     """
-    tools = Path(__file__).resolve().parent
-    text = (tools.parent / "pipeline" / "publish" / "regenerate.py").read_text(encoding="utf-8")
+    text = (paths.REPO / "pipeline" / "publish" / "regenerate.py").read_text(encoding="utf-8")
     out = []
     for name, (source, _) in sorted(COLUMN_SOURCES.items()):
         stem = source[:-3]
@@ -585,7 +580,7 @@ def pin_role_coverage(t: dict) -> list[str]:
         now, before = found.get(signal, 0), KNOWN_ROLE_GAPS.get(signal, 0)
         if now > before:
             out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
-                       f"{now} 行に増えた（tools/signal_vocabulary.py に規則を足すか"
+                       f"{now} 行に増えた（pipeline/common/signal_vocabulary.py に規則を足すか"
                        "、抽出を直す）")
         elif now < before:
             out.append(f"pinout: 語彙で覆えない {signal!r} が {before} 行から "
@@ -979,7 +974,7 @@ def index_checks(t: dict) -> list[str]:
                  if c and "confidence" in c and (v or "").strip() == "conflict")
     if len(t["index:conflicts"]) != marked:
         bad.append(f"conflicts: 索引が {len(t['index:conflicts'])} 行だが、"
-                   f"証拠に conflict は {marked} 行——tools/build_conflicts.py を回し直す")
+                   f"証拠に conflict は {marked} 行——pipeline/build/build_conflicts.py を回し直す")
     for r in t["index:conflicts"]:
         if r["table"] not in paths.CATALOG_TABLES + paths.EVIDENCE_TABLES:
             bad.append(f"conflicts: 知らない表 {r['table']!r}")
@@ -1181,7 +1176,7 @@ def index_checks(t: dict) -> list[str]:
     if listed != actual:
         changed = sorted(set(listed) ^ set(actual)) or sorted(k for k in listed if listed[k] != actual.get(k))
         bad.append(f"manifest: index/ の内容と一致しない（{len(changed)} ファイル。例 {changed[:3]}）"
-                   "——tools/build_index.py を回し直す")
+                   "——pipeline/build/build_index.py を回し直す")
     return bad
 
 
@@ -1334,7 +1329,7 @@ def published_surface(tables: Path | None) -> list[str]:
             header = [c for c in (reader.fieldnames or []) if c not in dropped]
         dest = paths.index(name)
         if not dest.exists():
-            bad.append(f"公開面: index/{name}.csv が無い——tools/build_index.py を回す")
+            bad.append(f"公開面: index/{name}.csv が無い——pipeline/build/build_index.py を回す")
             continue
         with dest.open(newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -1343,7 +1338,7 @@ def published_surface(tables: Path | None) -> list[str]:
         if copy_header != header:
             bad.append(f"公開面: index/{name}.csv の列が元の表（落とす列 {list(dropped)} を除く）と違う")
         elif [[r[c] for c in header] for r in source] != [[r[c] for c in header] for r in copy]:
-            bad.append(f"公開面: index/{name}.csv の行が元の表と違う——tools/build_index.py を回す")
+            bad.append(f"公開面: index/{name}.csv の行が元の表と違う——pipeline/build/build_index.py を回す")
     known = set(paths.INDEX_TABLES) | set(paths.PUBLISHED) | {"manifest", "columns"}
     for p in sorted(paths.INDEX.glob("*.csv")):
         if p.stem not in known:

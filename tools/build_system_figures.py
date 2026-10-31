@@ -22,6 +22,8 @@ from pathlib import Path
 MIRRORS = Path("/home/mt/dev_wch")
 REPO = Path(__file__).resolve().parent.parent
 import sys  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "common"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "build"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import paths  # noqa: E402
 

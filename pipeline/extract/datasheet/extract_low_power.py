@@ -21,7 +21,7 @@ worklist A11の完了判定は行数の突き合わせで行う）:
 I/O出力駆動電流特性（输出驱动电流特性）、ISINK/ISOURCE模块电流特性、
 OPA/CMP特性（低功耗模式）——消費電流ではなく別領域の特性表。
 
-表のパーサ規則（先行PoC `tools/extract_operating_structured.py` で
+表のパーサ規則（先行PoC `pipeline/common/extract_operating_structured.py` で
 V003/L103/H417/V007の全件一致を実証したものを、0.2 bundle向けに移植）:
 
 - **物理断片は`logical_id`で束ね、x座標で1つの格子に結合してから読む**
@@ -58,7 +58,8 @@ from collections import Counter
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "ingest"))
 sys.path.insert(0, str(REPO / "pipeline" / "common"))
 # 単体で走らせても`operating_rows`（同じディレクトリ）を引けるように。

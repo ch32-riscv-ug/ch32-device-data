@@ -172,7 +172,7 @@ tools/ docs/
 consumer は commit を固定しているので、途中の状態で壊れることはない。移行が終わってから lock を進める。
 
 1. **ディレクトリを作って移す**（`tables/*.csv` → `catalog/`・`evidence/`。`pin_roles.csv` は消える）。git の操作はユーザー
-2. **tools のパス**——35本が `tables` を参照（`build_readme` 13箇所、`build_pins`/`build_operating` 4箇所、他は1〜2箇所）。`tools/paths.py` に `CATALOG`/`EVIDENCE`/`INDEX` を置いて全部そこから引く
+2. **tools のパス**——35本が `tables` を参照（`build_readme` 13箇所、`build_pins`/`build_operating` 4箇所、他は1〜2箇所）。`pipeline/common/paths.py` に `CATALOG`/`EVIDENCE`/`INDEX` を置いて全部そこから引く
 3. **証拠の直し**（小さい）: `pin_functions` F-41 の戻し、`register_fields.define`、`registers.member_path`、`dma_requests.request` の戻し、`remap_routes`/`timers` の B 列外し、`product_attributes` の `#` 列
 4. **索引の生成器**（新規4本）: `build_index_parts.py`（`parts.csv`・`pinout.csv`。`build_pin_roles` の語彙処理を引き継ぐ）、`build_index_routes.py`、`build_index_registers.py`（`registers`・`register_map`・`dma`・`timers`）、`manifest.csv` の生成
 5. **検査**の拡張（7章）、`build_readme`・`pins.html` を索引の列名へ
@@ -205,7 +205,7 @@ consumer は commit を固定しているので、途中の状態で壊れるこ
   再構成できないため。利用者向けの比較表は `index/parts.csv`
 - `registers.member_path` は足していない。平坦化名 `sTxMailBox[0].TXMIR` が構造体メンバー名を
   `.` で繋いだものそのままで、情報を失っていない
-- 索引の生成器は1本 `tools/build_index.py`（`--only` で表を選ぶ）。`build_pin_roles.py` は廃止
+- 索引の生成器は1本 `pipeline/build/build_index.py`（`--only` で表を選ぶ）。`build_pin_roles.py` は廃止
 - **分片（型番／family ごとに切ったコピー）は作らない**。案では GitHub で表として読めるように切る予定だったが、CSV は機械が読むもので人は viewer（`pins.html`）で絞ればよく、正本の重複を持つ理由が無い（実施中に判断）
 - `index/registers.csv` は配列の要素（`EXTICR[1]`）に offset を付ける（先頭＋添字×幅）
 - consumer 側（ArduinoCore-CH32 の lock）は別 repository の作業でまだ

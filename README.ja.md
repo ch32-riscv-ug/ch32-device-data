@@ -21,37 +21,37 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 
 ## 構成
 
-- `catalog/`・`evidence/`・`index/`: 上の3区分の表。`#`列より左がデータ、右が出所と確度のメタ。`tools/paths.py` が置き場所を1箇所で決める
+- `catalog/`・`evidence/`・`index/`: 上の3区分の表。`#`列より左がデータ、右が出所と確度のメタ。`pipeline/common/paths.py` が置き場所を1箇所で決める
 - `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`build_pins`/`build_remap`/`build_tables` の入力）
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
 - `tools/check_docs.py`: **文書が書いている行数と穴の状態**を表と worklist の台帳で検算する。データが正しくても説明が古ければ、利用者が読むのは古いほう（2026-08-29 の監査で見つかった腐りの型）
 - `tools/check_viewer.js`: `pins.html` の表示を DOM 無しで評価して確かめる。**表と文書には検査があるのに表示だけ外**で、series view の Defaults が先頭型番だけを見ていた穴（G1）が残っていた。node が要る唯一の検査
-- `tools/extract_selectors.py`、`pipeline/extract/datasheet/extract_pins.py`、`pipeline/extract/rm/extract_remap.py`、`pipeline/extract/rm/register_fields.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
-- `tools/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
-- `tools/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
-- `tools/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run tools/signal_vocabulary.py --tables evidence`で規則一覧とremap_routes.csvに対する当たり具合を出す
-- `tools/extract_clock_tree.py` / `tools/build_clock.py`: EVTの`system_ch32*.c`から
+- `pipeline/build/extract_selectors.py`、`pipeline/extract/datasheet/extract_pins.py`、`pipeline/extract/rm/extract_remap.py`、`pipeline/extract/rm/register_fields.py`: EVTヘッダ・datasheet・RMから候補を抽出するtool
+- `pipeline/build/extract_remap_fields.py`: EVTの`GPIO_PinRemapConfig()`を**ホスト用にコンパイルして実行し**、remap fieldの位置と経路の列挙値を観測する。文書ではなく挙動を読む唯一のtoolで、**host Cコンパイラ（`cc`）が必要**。EVTはその場で読むだけでrepositoryへ複製しない
+- `pipeline/build/build_candidate.py`: 上記4 toolの出力を1つの候補へ結合する
+- `pipeline/common/signal_vocabulary.py`: 資料ごとに違うsignal名・field名の綴りを1つの読みへ揃える語彙規則。上の抽出toolと結合toolはすべてここを通す。`uv run pipeline/common/signal_vocabulary.py --tables evidence`で規則一覧とremap_routes.csvに対する当たり具合を出す
+- `pipeline/build/extract_clock_tree.py` / `pipeline/build/build_clock.py`: EVTの`system_ch32*.c`から
   クロック設定（発振器・各ドメイン周波数・分周・PLL・flash latency・RCC外のレジスタ）を
   静的に読み、`evidence/clock_configs.csv`・`clock_prescalers.csv`・`clock_sources.csv`・
   `clock_symbols.csv`・`clock_init.csv`へ落とす。`clock_init.csv`だけは順序を持つ——
   `SystemInit`はベタのhexで書かれた分岐の無い一直線で、順序が方針ではなく転記だから
-- `tools/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
+- `pipeline/build/extract_addresses.py`: device headerのbase定数の連鎖とstructのメンバー
   オフセットから`BLOCK->REGISTER`の絶対アドレスを解く。レジスタ名から場所は決まらない
   （CH32V205だけEXTENのregisterを`CTLR0`と呼び、CH32X315はEXTENを別の番地に置く）
-- `tools/build_systick.py`: `core_riscv.h`からSysTickのregister配置を取り
+- `pipeline/build/build_systick.py`: `core_riscv.h`からSysTickのregister配置を取り
   `evidence/systick.csv`にする。**CH32V103だけ配置が違い**、`CMP`の位置を他family
   と同じだと思うと`millis()`が動かない
-- `tools/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
+- `pipeline/build/build_pin_alternate.py`: **AFIO remapを持たない3 family**（V205・X315・H417）の
   AF番号の書き込み先を`evidence/pin_alternate.csv`にする。`pin_functions`の`af-N`が
   4,499行あるのにNをどこに書くか誰も言っていなかった。4bitずつという規則は
   EVTの`GPIO_PinAFConfig()`の式を読んで確かめる
-- `tools/build_interrupts.py`: 割り込みベクタ表を`evidence/interrupts.csv`にする。
+- `pipeline/build/build_interrupts.py`: 割り込みベクタ表を`evidence/interrupts.csv`にする。
   **出所はreference manualではなくEVTのdevice header**で、`IRQn_Type`列挙が
   番号・名前・説明を全部持っている。variantで番号が入れ替わる（CH32V20xの61番は
   `_D6`で`UART4`、`_D8`で`ETH`）ので`#if`の条件を`condition`列に持つ
-- `tools/build_memory_map.py`: アドレス空間の地図を`evidence/memory_map.csv`にする。
+- `pipeline/build/build_memory_map.py`: アドレス空間の地図を`evidence/memory_map.csv`にする。
   EVTの`*_BASE`定数から。**FLASHの番地は2つある**——ヘッダーの`FLASH_BASE`と
   linker scriptの`ORIGIN`は別の窓口を指すので両方持つ
 - `pipeline/extract/datasheet/extract_features.py`: familyが持つ周辺の一覧を`evidence/features.csv`にする。
@@ -63,22 +63,22 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   読めない**。reference manualが符号と適用先を、EVTの`Link.ld`が組合せを言い、
   両者を突き合わせる。**「出荷時の組」と言えるものは無い**——RMは復位値を`x`と
   しか書かず、EVTの例題も1組に揃っていない
-- `tools/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
+- `pipeline/build/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
   一覧を`evidence/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
   配布物の版番号（`wchlink.wcfg`）と実機が申告する`major.minor`の対応は
   `wcfg = major*10 + minor`で、`tools/read_link_version.py`が実機から読んだ値と
   突き合わせる（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
-- `tools/build_capabilities.py`: 比較表の属性（154種類の綴り・1,741行）を
+- `pipeline/build/build_capabilities.py`: 比較表の属性（154種類の綴り・1,741行）を
   「型番 × 能力」の縦持ち索引`index/capabilities.csv`にする。`index/parts.csv`は
   横長なので13種類しか列に持てない。属性→能力の対応は**総当たりの辞書**で、
   辞書に無い属性が現れたら生成が落ちる（`adc`はチャネル数、`adc_unit`はユニット数、
   というように似た綴りで意味が違うため規則では畳めない）
-- `tools/build_conflicts.py`: 全表の`conflict`の印を`index/conflicts.csv`に集める。
+- `pipeline/build/build_conflicts.py`: 全表の`conflict`の印を`index/conflicts.csv`に集める。
   証拠は食い違いを片方に寄せず両論を残す規則だが、その記録が11の表に散っていて
   「両版で食い違う仕様を全部」に答えられなかった。`basis`のDSLから「どの出所が
   異を唱えるか」と「その出所は何と言うか」を取り出すので、**102行は表が採った値と
   相手の値が横に並ぶ**
-- `tools/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
+- `pipeline/build/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`evidence/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
@@ -111,7 +111,7 @@ node tools/check_viewer.js      # pins.html の表示（DOM 無しで関数を�
 `cc`が環境にあれば追加の用意は不要です。ローカルへtoolchainを置く場合は`.tools/`（gitignore済み）へ。
 
 ```sh
-uv run tools/extract_remap_fields.py --mirrors <EVT cloneの親> --compare evidence
+uv run pipeline/build/extract_remap_fields.py --mirrors <EVT cloneの親> --compare evidence
 ```
 
 reference manualは**両言語版を読んで和を取ります**。中国語版のほうが新しく、
@@ -122,11 +122,11 @@ scalarが食い違ったときは後に読んだ中国語版を採り、noteに�
 
 ```sh
 uv run tools/check_tables.py                      # 表どうしの参照と、remap表の内部整合
-uv run tools/signal_vocabulary.py --tables tables # signal名の語彙規則と、その当たり具合
+uv run pipeline/common/signal_vocabulary.py --tables tables # signal名の語彙規則と、その当たり具合
 ```
 
 ```sh
-uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h
+uv run pipeline/build/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h
 uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --package TSSOP20
 uv run pipeline/extract/rm/extract_remap.py <manual>.PDF
 uv run pipeline/extract/rm/register_fields.py <manual>.PDF

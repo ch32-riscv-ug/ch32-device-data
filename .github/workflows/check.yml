@@ -14,6 +14,7 @@ on:
       - "evidence/**"
       - "index/**"
       - "tools/**"
+      - "pipeline/**"
       - "curated/**"
       - "manifests/**"
       # The documents claim row counts and hole states; check_docs.py verifies
@@ -27,6 +28,7 @@ on:
       - "evidence/**"
       - "index/**"
       - "tools/**"
+      - "pipeline/**"
       - "curated/**"
       - "manifests/**"
       - "docs/**"
@@ -117,12 +119,12 @@ jobs:
       # freshness is what `catalog/sources.csv` and a manual full run cover.
       - name: Derived tables and READMEs are up to date
         run: |
-          python tools/build_documents.py
-          python tools/build_feature_tags.py
-          python tools/build_capabilities.py
-          python tools/build_conflicts.py
-          python tools/build_debug_interfaces.py
-          python tools/build_index.py
-          python tools/build_readme.py
+          python pipeline/build/build_documents.py
+          python pipeline/build/build_feature_tags.py
+          python pipeline/build/build_capabilities.py
+          python pipeline/build/build_conflicts.py
+          python pipeline/build/build_debug_interfaces.py
+          python pipeline/build/build_index.py
+          python pipeline/build/build_readme.py
           git diff --exit-code -- catalog/documents.csv index/ generated/readme/ \
             || { echo "::error::a generated file is stale -- re-run the generators and commit"; exit 1; }

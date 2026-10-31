@@ -165,7 +165,7 @@ PoC 0.2は実験を早く回すため、ページJSONの中に物理fragmentと�
 
 ## 検証ゲート
 
-PoCの`tools/check_document_bundle.py`はschema、原本・page・geometryのSHA-256、全ページ性、
+PoCの`pipeline/checks/check_document_bundle.py`はschema、原本・page・geometryのSHA-256、全ページ性、
 ID、bbox、表のspan、読み順、review参照を検査する。本実装では、抽出時に原本hashと
 bundleを照合し、欠落・古いbundleでは停止する入口を1つ設ける。PDFへのsilent fallbackは
 置かない。
@@ -274,14 +274,14 @@ uv run tools/convert_document.py \
   /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF \
   --lang en --document-type datasheet
 
-uv run tools/check_document_bundle.py \
+uv run pipeline/checks/check_document_bundle.py \
   .cache/structured-documents/CH32V003DS0.en \
   --source /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF
 
-uv run tools/export_document_markdown.py \
+uv run pipeline/common/export_document_markdown.py \
   .cache/structured-documents/CH32V003DS0.en
 
-uv run tools/render_document.py \
+uv run pipeline/common/render_document.py \
   .cache/structured-documents/CH32V003DS0.en \
   --source /home/mt/dev_wch/CH32V003/datasheet_en/CH32V003DS0.PDF
 ```

@@ -3,7 +3,7 @@ name: Update tool versions
 # Keeps catalog/toolchains.csv in step with what MounRiver publishes: the IDE,
 # the RISC-V toolchain and the vendor chip-support packs the consumer builds
 # against. The download page is a Vue SPA, so the versions come from the JSON
-# API behind it (tools/build_toolchains.py documents the endpoints).
+# API behind it (pipeline/build/build_toolchains.py documents the endpoints).
 #
 # Like the catalogue job, this is meant to fail when upstream moves rather than
 # write down a silently empty answer: the API is undocumented and can change.
@@ -43,7 +43,7 @@ jobs:
       # this runner (the download URL is signed per requesting IP), so the
       # resolve and the HEAD have to happen on the same host.
       - name: Refresh the tool versions
-        run: python tools/build_toolchains.py --write
+        run: python pipeline/build/build_toolchains.py --write
 
       - name: Check table joins
         run: python tools/check_tables.py

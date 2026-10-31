@@ -1838,7 +1838,7 @@ reference）。セル内の折り返し `USART1_T`⏎`X_0` は `cell_tokens` が
 `low- and high-speed`（保留ハイフン）は接続詞ガードで残る。`time-channel`（"dead time-channel 2"、
 判断が割れる）は RM の説明文で正本に届かないので影響無し。
 
-置き場所は `tools/wrap_rules.py`（正規化層。凍結の対象は入力層なので対象外）。
+置き場所は `pipeline/common/wrap_rules.py`（正規化層。凍結の対象は入力層なので対象外）。
 `build_operating.norm_text` と `extract_products` の見出し結合から使う。
 `operating_conditions`: 46行の condition と2行の parameter（`high- level`）が直り、他は不変。
 
@@ -2957,7 +2957,7 @@ PACKAGE.PDF の目次6ページから封装の寸法を読む（図面ページ�
 目次が機械可読な唯一の記述）。`packages.csv` の `body_size`/`pin_pitch` の出所。
 
 `extract()` は **bundle 名でも原本PDFのパスでも受ける**ようにした——凍結
-`tools/build_tables.py`（退役は別企画）が `WCH-common/datasheet_<lang>/PACKAGE.PDF` を
+`pipeline/build/build_tables.py`（退役は別企画）が `WCH-common/datasheet_<lang>/PACKAGE.PDF` を
 渡してくるので、親ディレクトリから言語を読んで `PACKAGE.zh`/`PACKAGE.en` に直す。
 呼ぶ側を触らずに済む。**zh/en とも 105 entry が凍結版と完全一致。**
 
@@ -3062,8 +3062,8 @@ worker が 360MiB 要る」というメモリの話も、bundle のページ rec
 ### いま原本を読むもの
 
 **bundle を作る側**（`pipeline/ingest/convert.py`）と **pixel が要る側**
-（`pipeline/review/render_assets.py`・`tools/extract_images.py`）、それに converter 自身の
-PoC 2本（`tools/convert_structured.py`・`tools/document_converter.py`）だけ。
+（`pipeline/review/render_assets.py`・`pipeline/extract/images/extract_images.py`）、それに converter 自身の
+PoC 2本（`pipeline/common/convert_structured.py`・`pipeline/common/document_converter.py`）だけ。
 D18 の「PDFを直接読む旧`tools/`を実行経路から外す」は**これで達成**。
 
 ## `--full` の `build_all` を並列に戻した——35分が6.7秒になっていた（2026-09-10）

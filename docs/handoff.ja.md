@@ -72,7 +72,7 @@ uv run pipeline/publish/regenerate.py   # 新経路の一括再生成（bundle�
 ```
 
 全生成は `evidence/README.ja.md` の「生成」どおり（`build_all` → `build_tables` →
-`build_pins` → `build_remap` → … → `build_index` → `build_readme`）。出力先は `tools/paths.py` が決める。
+`build_pins` → `build_remap` → … → `build_index` → `build_readme`）。出力先は `pipeline/common/paths.py` が決める。
 `build_all` は2並列で約13〜17分。**mirrorの`git pull`は`build_all`に入れていない**
 （作業中に入力が変わるのを避ける）。読んだ版は `catalog/sources.csv` に残る。
 
@@ -124,7 +124,7 @@ cleanになれば次の周期で入る。
    `manifest.json`のsha256との照合）を見る。無ければ上流にだけあるので、pullを頼む
 2. `uv run pipeline/ingest/convert_all.py` — 増分変換（原本SHAとtool版が一致する文書は跳ばす。
    RM 600ページで約4分）
-3. `uv run tools/build_sources.py` — 読んだmirrorのcommitを `catalog/sources.csv` に記録
+3. `uv run pipeline/build/build_sources.py` — 読んだmirrorのcommitを `catalog/sources.csv` に記録
 4. `uv run pipeline/publish/regenerate.py --full --verify --human` — 原本更新時の正規手順
    （**約12分**。bundle→全CSV→索引→検査→エラッタ増分→図・Markdown・PDFとの差ゼロ検査。
    2026-09-10に原本直読みが無くなって1時間強から縮んだ）。
@@ -168,7 +168,7 @@ cleanになれば次の周期で入る。
   [data-layout.ja.md](data-layout.ja.md)
 - **公開面は`index/`の下だけ**（ユーザー方針、2026-09-30決定・同日実装・2026-10-01に全consumerが移行済み。
   [public-surface.ja.md](public-surface.ja.md)、約束の本文は[index/README の「Contract for consumers」](../index/README.md#contract-for-consumers)）。
-  consumerは`catalog/`・`evidence/`を読まない。公開する目録・証拠の表は`tools/paths.py`の`PUBLISHED`に1行足して
+  consumerは`catalog/`・`evidence/`を読まない。公開する目録・証拠の表は`pipeline/common/paths.py`の`PUBLISHED`に1行足して
   `index/`へ写す（行はそのまま、内部の列だけ落としてよい。`check_tables.published_surface`が元との一致を見る）。
   **consumerが要るデータは依頼を受けて公開面へ載せる**——保証・保守できる表だけ（形が生成器の定数で決まる・全行に
   出所・不変条件が検査に載る・再生成できる）、consumer専用の表は作らない。**`index/VERSION`**（整数）は、公開面の

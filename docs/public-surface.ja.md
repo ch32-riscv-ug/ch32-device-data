@@ -56,7 +56,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | 写し: 依頼で公開（R-33・R-34） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions` | `operating_conditions.datasheet` を落とす（`basis` にある） |
 | 表の説明 | `manifest.csv`（path・行数・sha256。CSV と `VERSION` を覆う）・`VERSION`（整数1つ。いま `1`） | manifest は生成、VERSION は人が上げる |
 
-写しの一覧と落とす列は `tools/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
+写しの一覧と落とす列は `pipeline/common/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
 
 ### 置かなかったもの
 
@@ -87,7 +87,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 ## core が挙げた論点への答え
 
 - **置き場**: `index/` の下が全部。consumer は `TABLE_DIRS` の写しを持たず、`index/<表>.csv` だけを読む。
-  `tools/paths.py` を consumer 向けに出す必要は無い
+  `pipeline/common/paths.py` を consumer 向けに出す必要は無い
 - **lock**: commit ＋ `index/manifest.csv` の sha256 を1つ（manifest に全ファイルの sha256 がある）。
   wch-protocols の読み方がこれ。core の regcheck 分も同じ lock に入る
 - **列の書き方**: 表の README（index の表は `index/README`、写しは元の表の `catalog/README`・`evidence/README`）に

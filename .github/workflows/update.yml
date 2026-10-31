@@ -37,7 +37,7 @@ jobs:
       # Both tools use only the standard library, so nothing is installed here.
       # The validator's optional jsonschema is installed for the checks below.
       - name: Refresh the catalogue
-        run: python tools/sync_catalog.py --write
+        run: python pipeline/build/sync_catalog.py --write
 
       # documents.csv is the catalogue's relational projection; it is the one
       # table whose source changes without a person touching the repository, so
@@ -53,10 +53,10 @@ jobs:
       # seconds; the order is the dependency order (see check.yml).
       - name: Regenerate the derived tables and READMEs, and check table joins
         run: |
-          python tools/build_documents.py
-          python tools/build_feature_tags.py
-          python tools/build_index.py
-          python tools/build_readme.py
+          python pipeline/build/build_documents.py
+          python pipeline/build/build_feature_tags.py
+          python pipeline/build/build_index.py
+          python pipeline/build/build_readme.py
           python tools/check_tables.py
 
       # The freeze ledger follows the catalogue in the same commit, for the same

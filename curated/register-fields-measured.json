@@ -1,5 +1,5 @@
 {
-  "_comment": "Register field positions measured on physical silicon where the device header and the reference manual disagree. pipeline/extract/rm/extract_registers.py appends the measurement to the evidence row's basis as `<method>:<probe>(=<bits>)`; the row stays `conflict` because the documents still disagree. tools/build_index.py adopts the measured bits in index/registers.csv (the same rule as F-41, where the index takes the RM grid's value). This file never creates a field; it only settles a position a document already states.",
+  "_comment": "Register field positions measured on physical silicon where the device header and the reference manual disagree. pipeline/extract/rm/extract_registers.py appends the measurement to the evidence row's basis as `<method>:<probe>(=<bits>)`; the row stays `conflict` because the documents still disagree. pipeline/build/build_index.py adopts the measured bits in index/registers.csv (the same rule as F-41, where the index takes the RM grid's value). This file never creates a field; it only settles a position a document already states.",
   "measured": [
     {
       "family": "CH32L103",

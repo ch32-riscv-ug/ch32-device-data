@@ -80,7 +80,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -756,7 +757,7 @@ def load_measured() -> dict[tuple[str, str, str], dict]:
 
     **行は作らない。** 資料が既に述べている field の位置を決めるためだけに効き、
     証拠の行は `conflict` のまま `basis` に `<method>:<probe>(=<bits>)` が加わる。
-    索引（`tools/build_index.py`）がその位置を採る。
+    索引（`pipeline/build/build_index.py`）がその位置を採る。
     """
     path = REPO / "curated" / "register-fields-measured.json"
     if not path.exists():

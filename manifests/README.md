@@ -49,8 +49,8 @@ The two languages are treated as separate sources; `sources.en` and `sources.zh`
 To run it locally:
 
 ```sh
-uv run tools/sync_catalog.py           # compare against the site and show the diff
-uv run tools/sync_catalog.py --write   # apply the diff (does not overwrite assignments)
+uv run pipeline/build/sync_catalog.py           # compare against the site and show the diff
+uv run pipeline/build/sync_catalog.py --write   # apply the diff (does not overwrite assignments)
 uv run tools/check_mirrors.py          # check that the mirrors are keeping up with the catalog
 ```
 

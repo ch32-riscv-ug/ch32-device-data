@@ -25,6 +25,8 @@ import struct
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "common"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline" / "build"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import paths  # noqa: E402

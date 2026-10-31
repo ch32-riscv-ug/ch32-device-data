@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PDF全ページ → 構造化bundle（本番converter。D18工程1）。
 
-PoCの`tools/document_converter.py`を出発点に、D17の調査
+PoCの`pipeline/common/document_converter.py`を出発点に、D17の調査
 （docs/structured-migration-survey.ja.md）が特定した2つの欠陥を直したもの。
 
 1. **決定性**——pdfminerはinline imageに`id()`（メモリアドレス）由来の名前を

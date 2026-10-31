@@ -27,7 +27,7 @@
 EVT の variant macro を置きます（`interrupts.csv` と同じ持ち方）。
 
 チャネル数と相補出力の有無はこの表には無く、pin 側から数えた導出として索引
-`index/timers.csv` が持ちます（tools/build_index.py。`pinout` の `(TIMn, CHm)` と
+`index/timers.csv` が持ちます（pipeline/build/build_index.py。`pinout` の `(TIMn, CHm)` と
 `(TIMn, CHmN)`。**pinout 単位の下限**であって silicon の上限ではない）。
 
 RM は目録（`catalog/documents.csv` の `repositories`）で引く——凍結tool は mirror の
@@ -49,14 +49,15 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
 import bundle_pages  # noqa: E402
 import paths  # noqa: E402
 
 # `channels`/`complementary`（pin に出ているチャネルから数える導出）は索引
-# `index/timers.csv` が持つ（tools/build_index.py）。ここは RM と EVT の記述だけ。
+# `index/timers.csv` が持つ（pipeline/build/build_index.py）。ここは RM と EVT の記述だけ。
 COLUMNS = ["family", "timer", "kind", "counter_width_bits", "update_vector", "condition",
            "#", "confidence", "basis"]
 

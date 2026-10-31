@@ -13,7 +13,7 @@
 | WCH-LinkUtility.ZIP | `https://file.wch.cn/download/file?id=418`（ページは`https://www.wch.cn/downloads/wch-linkutility_zip.html`） | Windows用ユーティリティ＋`Firmware_Link/` |
 | MounRiver Studio Linux | WCH配布のtar.xz | 同じ`Firmware_Link/`を`resources/app/resources/linux/components/WCH/Others/`以下に同梱 |
 
-`tools/build_link_firmware.py`がどちらからでも読める（`--zip`にZIPか展開済み
+`pipeline/build/build_link_firmware.py`がどちらからでも読める（`--zip`にZIPか展開済み
 ディレクトリを渡す。無指定ならURLから取得）。
 
 ## ファイルの同定

@@ -12,7 +12,7 @@ build/
 *.log
 .nojekyll
 
-# Host C compiler output. tools/extract_remap_fields.py compiles EVT's
+# Host C compiler output. pipeline/build/extract_remap_fields.py compiles EVT's
 # GPIO_PinRemapConfig() for the host to observe what it writes; it builds in a
 # temporary directory, but guard against a run whose cwd is the repository.
 *.o

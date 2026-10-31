@@ -28,7 +28,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 LEDGER = REPO / "pipeline" / "baseline" / "tables.csv"
 COLUMNS = ["table", "rows", "sha256"]
-# 正本CSVはこの3ディレクトリにしか置かない（`tools/paths.py`が場所を1箇所で決めている）。
+# 正本CSVはこの3ディレクトリにしか置かない（`pipeline/common/paths.py`が場所を1箇所で決めている）。
 # **台帳に載っていない正本が1つでもあれば、その表には腐り検出が無い**ので落とす——
 # 凍結後に新設した5表（`option_bytes`ほか）が実際にその状態で漏れていた（2026-09-06）。
 CANONICAL_DIRS = ("catalog", "evidence", "index")

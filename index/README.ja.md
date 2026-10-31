@@ -3,7 +3,7 @@
 [English](README.md)
 
 **利用者が引くための表**です。[証拠 `evidence/`](../evidence/README.ja.md)（資料の綴りのまま）と
-[目録 `catalog/`](../catalog/README.ja.md)（名前）**だけ**から `tools/build_index.py` が組み直したもので、
+[目録 `catalog/`](../catalog/README.ja.md)（名前）**だけ**から `pipeline/build/build_index.py` が組み直したもので、
 新しい事実は足していません——`tools/check_tables.py` が「索引の行は証拠に戻せる」ことを毎回見ます。
 区分の定義は [docs/data-layout.ja.md](../docs/data-layout.ja.md)。
 
@@ -58,7 +58,7 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 
 ## 共通の規則
 
-- 名前は `tools/signal_vocabulary.py` の語彙で揃えてあります（`peripheral`・`role`・`port`・`gpio`）。
+- 名前は `pipeline/common/signal_vocabulary.py` の語彙で揃えてあります（`peripheral`・`role`・`port`・`gpio`）。
   **元の綴りは隣の列**（`signal`・`spelled`・`define`）に残るので、証拠へ戻れます
 - `confidence` は使った証拠行の確度（複数行を畳んだ表はいちばん弱いもの）。`basis` は証拠行と
   1対1のときに写します。`parts.csv` のような横長の表は `basis` を持たず、下に「この列はどの証拠から」を書きます
@@ -96,7 +96,7 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 
 ## 目録・証拠からの写し
 
-`tools/build_index.py` がこれらを行ごとそのまま写します（`paths.PUBLISHED`）。写しが元と等しいことは
+`pipeline/build/build_index.py` がこれらを行ごとそのまま写します（`paths.PUBLISHED`）。写しが元と等しいことは
 `tools/check_tables.py` が見ます。列の意味は同じ名前の表を [目録の README](../catalog/README.ja.md) と
 [証拠の README](../evidence/README.ja.md) で引いてください。
 目録: `families`・`series`・`products`・`packages`・`cores`。
@@ -150,7 +150,7 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 （設定しなくても動く機能として引くため）。語彙で覆えない綴りは載せず、その数は
 `tools/check_tables.py` の `KNOWN_ROLE_GAPS`（いま 0）で固定してあります。
 
-**語彙の周辺名のうち、資料の見出しと同じ綴りでないもの**（`tools/signal_vocabulary.py` の `SYSTEM` に根拠）:
+**語彙の周辺名のうち、資料の見出しと同じ綴りでないもの**（`pipeline/common/signal_vocabulary.py` の `SYSTEM` に根拠）:
 
 | `peripheral` | 何か | 資料の呼び方 |
 |---|---|---|
@@ -223,7 +223,7 @@ channel 固定でなく、`note` にそう書く。variant・channel の意味�
 
 ### `capabilities.csv` — 型番 × 能力（縦持ち）
 
-`tools/build_capabilities.py` が `evidence/product_attributes` **だけ**から作ります。
+`pipeline/build/build_capabilities.py` が `evidence/product_attributes` **だけ**から作ります。
 1行1（型番, 能力, qualifier, 元の属性）。
 
 `parts.csv` は比較表を横に並べたもので、158種類ある属性の綴りのうち列に持てるのは13種類だけです。
@@ -248,7 +248,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 
 `adc` は**ユニット数**、`adc-channel` は**チャネル数**です。資料はどちらも「ADC」と書くことがあり
 （`adc`＝`8+2` はチャネル、`adc_unit`＝`2` はユニット）、規則で畳むと静かに間違えるので、
-属性→能力の対応は**総当たりの辞書**にしてあります（`tools/build_capabilities.py`。
+属性→能力の対応は**総当たりの辞書**にしてあります（`pipeline/build/build_capabilities.py`。
 辞書に無い属性が現れたら生成が落ちます）。
 
 クロック・電圧・Flash・SRAM・GPIO の行も比較表にあるぶんは載せますが、
@@ -257,7 +257,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 
 ### `conflicts.csv` — 資料どうしの食い違い
 
-`tools/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
+`pipeline/build/build_conflicts.py` が `catalog/`・`evidence/` 全表から `conflict` の印を集めたもの
 （200行）。証拠は食い違いを片方に寄せず両論を残す規則ですが、その記録は11の表に散っていて、
 「両版で食い違う仕様を全部」に答えるには全表を grep するしかありませんでした。
 
@@ -284,7 +284,7 @@ family をまたいで「X を持たない型番」を数えないこと。
 
 ### `debug_interfaces.csv` — debug 配線は1線か2線か
 
-`tools/build_debug_interfaces.py` が作ります（書き込みツール向け。R-29）。1行1 series。
+`pipeline/build/build_debug_interfaces.py` が作ります（書き込みツール向け。R-29）。1行1 series。
 2つの証拠の突き合わせで `debug_if` を決めます——**datasheet の debug 節見出しの綴り**
 （`evidence/features.csv`。`1-wire`／`单线`→`swio`、`2-wire`／`2线`→`rvswd`）と、
 **WCH-Link manual の配線表＋両対応の注記**（`evidence/debug_wiring.csv`）。manual が
@@ -302,7 +302,7 @@ pin 表に SWCLK が無く見出しも 1-wire なので、**見出しを採り m
 
 ### `features.csv` — 機能から series を探す
 
-`tools/build_feature_tags.py` が作ります（比較表を優先し、無ければ datasheet の節見出し）。
+`pipeline/build/build_feature_tags.py` が作ります（比較表を優先し、無ければ datasheet の節見出し）。
 1行1（タグ, series）。`precision`＝`part`（比較表が行を持つ。型番単位）／`datasheet`（節見出しに戻る。
 datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも入る）。節見出しだけだと
 `CH32V20x_30xDS0` の Ethernet が V303 にも付く偽陽性が出るので、比較表がある場合はそちらを採ります。
@@ -323,10 +323,10 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 ## 生成と検査
 
 ```sh
-uv run tools/build_capabilities.py     # capabilities.csv（manifest に入るので build_index より前）
-uv run tools/build_conflicts.py        # conflicts.csv（同上）
-uv run tools/build_index.py            # 全部（1〜2秒。証拠の表が揃っていること）
-uv run tools/build_index.py --only pinout,timers
+uv run pipeline/build/build_capabilities.py     # capabilities.csv（manifest に入るので build_index より前）
+uv run pipeline/build/build_conflicts.py        # conflicts.csv（同上）
+uv run pipeline/build/build_index.py            # 全部（1〜2秒。証拠の表が揃っていること）
+uv run pipeline/build/build_index.py --only pinout,timers
 uv run tools/check_tables.py           # 索引 ⊆ 証拠、manifest 一致
 ```
 

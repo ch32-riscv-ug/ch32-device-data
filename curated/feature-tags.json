@@ -1,5 +1,5 @@
 {
-  "_comment": "features.csv の節見出しを『機能から探す』の検索語に揃える規則。見出しの綴りは版とfamilyで揺れるので（General DMA Controller / General-purpose DMA Controller）、括弧内の略語を第一の手がかりにし、括弧が無いものと綴り違いだけをここで決める。**「役に立つ機能か」は判断しない**——機能でないもの（群見出し・CPU）だけexcluded にして、あとは全部タグを付ける。全familyが持つ機能はorg TOP 側で件数を見れば分かる。未登録の見出しが出たら tools/build_feature_tags.py が報告するので、語彙は意図的にだけ増える。",
+  "_comment": "features.csv の節見出しを『機能から探す』の検索語に揃える規則。見出しの綴りは版とfamilyで揺れるので（General DMA Controller / General-purpose DMA Controller）、括弧内の略語を第一の手がかりにし、括弧が無いものと綴り違いだけをここで決める。**「役に立つ機能か」は判断しない**——機能でないもの（群見出し・CPU）だけexcluded にして、あとは全部タグを付ける。全familyが持つ機能はorg TOP 側で件数を見れば分かる。未登録の見出しが出たら pipeline/build/build_feature_tags.py が報告するので、語彙は意図的にだけ増える。",
   "aliases": {
     "FPIC": "PFIC",
     "Tkey": "TKey",

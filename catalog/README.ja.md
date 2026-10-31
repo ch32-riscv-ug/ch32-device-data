@@ -13,8 +13,8 @@ ordering 表を突き合わせた主要仕様（flash・SRAM・GPIO 数・温度
 
 `toolchains.csv` だけは他の表の鍵ではなく、**上流のツールの版**を写した一覧です（結合先を持ちません）。
 
-`tools/build_tables.py` が products/packages/series/families/cores を、`tools/build_documents.py`
-が documents を、`tools/build_sources.py` が sources を、`tools/build_toolchains.py` が
+`pipeline/build/build_tables.py` が products/packages/series/families/cores を、`pipeline/build/build_documents.py`
+が documents を、`pipeline/build/build_sources.py` が sources を、`pipeline/build/build_toolchains.py` が
 toolchains を生成します。確度・根拠の読み方は
 [evidence/README.ja.md](../evidence/README.ja.md) の「確定の基準」「根拠の種類」を参照してください。
 
@@ -87,7 +87,7 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 2. mirrorが更新された
 3. 誰かが再生成を忘れた
 
-のどれなのか区別できません。`tools/build_all.py`は入力とコードが同じなら何度
+のどれなのか区別できません。`pipeline/build/build_all.py`は入力とコードが同じなら何度
 回しても差分が出ない（実測済み）ので、**版さえ控えれば差分は1か3に絞れます**。
 
 **生成時刻は入れていません。** 入れると回すたびに行が変わり、「差分が出たら異常」
@@ -109,7 +109,7 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 版の情報は <https://www.mounriver.com/download> にしか出ませんが、あのページは Vue の SPA で、
 中身は公開 JSON API（`https://api.mounriver.com/mountriver/api/version/…`）から来ています。
-`tools/build_toolchains.py` の docstring にどの endpoint が何を返すかを書いてあります。
+`pipeline/build/build_toolchains.py` の docstring にどの endpoint が何を返すかを書いてあります。
 
 | 列 | 意味 |
 |---|---|
@@ -134,7 +134,7 @@ curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | pyt
 `conflict` = 配信されているサイズが掲載と食い違う、`reference` = 掲載のみ（`--no-verify`）。
 
 **旧版は表に入れません**（「いま最新」だけを持ちます）。IDE の旧版は
-`uv run tools/build_toolchains.py --history` で上流の一覧が出ます。ツールチェーンの旧版は
+`uv run pipeline/build/build_toolchains.py --history` で上流の一覧が出ます。ツールチェーンの旧版は
 上流のAPIが持っていないので、必要なら
 [ch32-riscv-ug/MounRiver_Studio_Community_miror](https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror/releases)
 の release（1.91・1.92）から取ります。
@@ -179,5 +179,5 @@ evt_examples.family                                     → families.family
 *.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
 ```
 
-pins系は`pipeline/extract/datasheet/extract_pin_tables.py`、remap系は`tools/build_remap.py`、clock系は`tools/build_clock.py`、operating_conditions.csvは`pipeline/extract/datasheet/build_operating_conditions.py`、evt_variants.csvは`tools/build_evt_variants.py`、systick.csvは`tools/build_systick.py`、pin_alternate.csvは`tools/build_pin_alternate.py`、eval_boards.csvは`tools/build_eval_boards.py`、feature_tags.csvは`tools/build_feature_tags.py`、sources.csvは`tools/build_sources.py`、interrupts.csvは`tools/build_interrupts.py`、memory_map.csvは`tools/build_memory_map.py`、features.csvは`pipeline/extract/datasheet/extract_features.py`、memory_configs.csvは`pipeline/extract/rm/extract_memory.py`、link_firmware.csvは`tools/build_link_firmware.py`、それ以外は`tools/build_tables.py`が生成します。
+pins系は`pipeline/extract/datasheet/extract_pin_tables.py`、remap系は`pipeline/build/build_remap.py`、clock系は`pipeline/build/build_clock.py`、operating_conditions.csvは`pipeline/extract/datasheet/build_operating_conditions.py`、evt_variants.csvは`pipeline/build/build_evt_variants.py`、systick.csvは`pipeline/build/build_systick.py`、pin_alternate.csvは`pipeline/build/build_pin_alternate.py`、eval_boards.csvは`pipeline/build/build_eval_boards.py`、feature_tags.csvは`pipeline/build/build_feature_tags.py`、sources.csvは`pipeline/build/build_sources.py`、interrupts.csvは`pipeline/build/build_interrupts.py`、memory_map.csvは`pipeline/build/build_memory_map.py`、features.csvは`pipeline/extract/datasheet/extract_features.py`、memory_configs.csvは`pipeline/extract/rm/extract_memory.py`、link_firmware.csvは`pipeline/build/build_link_firmware.py`、それ以外は`pipeline/build/build_tables.py`が生成します。
 

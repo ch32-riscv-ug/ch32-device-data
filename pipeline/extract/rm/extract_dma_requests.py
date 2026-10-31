@@ -41,7 +41,7 @@ mirror の `datasheet_{lang}/*RM.PDF` の先頭を採っていたが、mirror �
 同じ文書になる（切替時に全 family で一致を確認）。原本と bundle の一致は `regenerate.py` の
 前後照合（`check_sources`）が保証する——ここでは PDF を開かない。
 
-`tools/build_index.py` と `tools/check_tables.py` はこのモジュールの正規化規則
+`pipeline/build/build_index.py` と `tools/check_tables.py` はこのモジュールの正規化規則
 （`REMAPPED`・`TYPO`・`peripheral_of`・`COLUMNS`）だけを使う。標準ライブラリだけで import できる。
 ページの読み手は `pipeline/extract/bundle_pages.py`（sha 照合つき。3本目の退役で共通化した）。
 
@@ -59,7 +59,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
 import bundle_pages  # noqa: E402
@@ -68,7 +69,7 @@ import signal_vocabulary  # noqa: E402
 
 # `request` は RM の綴りそのまま（zh 版。`TIM1_UP*` の `*`、X315 の `_0`/`_1` も
 # 残す）。en 版の綴りが違えば `request_en`。印の読み（selectable / default / remap）
-# と peripheral 名は索引 `index/dma.csv` が付ける（tools/build_index.py）。
+# と peripheral 名は索引 `index/dma.csv` が付ける（pipeline/build/build_index.py）。
 COLUMNS = ["family", "variant", "dma", "channel", "request_id", "request", "request_en",
            "note", "#", "confidence", "basis"]
 

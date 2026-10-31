@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """構造化bundle → 人が読むMarkdown（D18 review工程。ゴールは PDF との差ゼロ）。
 
-PoCの`tools/export_document_markdown.py`を出発点に、本番の要件を足したもの。
+PoCの`pipeline/common/export_document_markdown.py`を出発点に、本番の要件を足したもの。
 
 - **既知の取りこぼしは隠さず、その場所で見えるように印を出す**（2026-09-01の
   ユーザー要件）。印を出すのは:

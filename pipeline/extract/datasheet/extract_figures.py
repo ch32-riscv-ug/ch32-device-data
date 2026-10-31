@@ -41,7 +41,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 
 import bundle_pages  # noqa: E402
@@ -50,7 +51,7 @@ import paths  # noqa: E402
 COLUMNS = ["series", "part_number", "kind", "document",
            "page_zh", "page_en", "#", "confidence", "basis"]
 
-# 章の見出し。`引脚分布`・`引脚图` は凍結tool `tools/extract_images.py` から引き継いだ
+# 章の見出し。`引脚分布`・`引脚图` は凍結tool `pipeline/extract/images/extract_images.py` から引き継いだ
 # 綴りで、**中文版の実際の綴りは `引脚排列`**（英語版しか読まない凍結tool では出番が
 # 無かった）。全16冊の中文版がこの綴り。
 PINOUT_CHAPTER = re.compile(r"^\d+\.\d+\s+(?:Pinouts?|引脚分布|引脚排列|引脚图)\s*$", re.I)

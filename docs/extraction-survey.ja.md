@@ -10,7 +10,7 @@ device recordのどこを一次資料から機械抽出でき、どこが人手�
 
 測定は2段階です。まず精度を測るため、すでに人手で作成した3 record（CH32V003F4P6、CH32X035F8U6、CH32M030C8T7）をground truthとして抽出器の出力と照合しました。次に適用範囲を測るため、mirrorしている全datasheetを掃引しました。
 
-抽出器は[`tools/extract_selectors.py`](../tools/extract_selectors.py)、[`pipeline/extract/datasheet/extract_pins.py`](../pipeline/extract/datasheet/extract_pins.py)、[`pipeline/extract/rm/extract_remap.py`](../pipeline/extract/rm/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`tools/build_candidate.py`](../tools/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
+抽出器は[`pipeline/build/extract_selectors.py`](../pipeline/build/extract_selectors.py)、[`pipeline/extract/datasheet/extract_pins.py`](../pipeline/extract/datasheet/extract_pins.py)、[`pipeline/extract/rm/extract_remap.py`](../pipeline/extract/rm/extract_remap.py)、[`pipeline/extract/rm/register_fields.py`](../pipeline/extract/rm/register_fields.py)の4本で、[`pipeline/build/build_candidate.py`](../pipeline/build/build_candidate.py)がそれらを1つの候補へ結合します。いずれも候補を表示するだけでrecordを書き換えません。
 
 ## 前提
 
@@ -410,7 +410,7 @@ EVTヘッダから原理的に取れなかった`valid_values`は、RMのremap�
 
 ## 4資料の統合
 
-[`tools/build_candidate.py`](../tools/build_candidate.py)が上記4抽出器の出力を1つの候補へ結合します。
+[`pipeline/build/build_candidate.py`](../pipeline/build/build_candidate.py)が上記4抽出器の出力を1つの候補へ結合します。
 
 | 資料 | 与えるもの |
 |---|---|
@@ -570,9 +570,9 @@ signalとpadと値から「どのselectorがこの経路を決めるのか」を
 
 ## 全SKUへの適用
 
-[`tools/build_all.py`](../tools/build_all.py)が、比較表が挙げる全SKUに対して候補を生成します。reference manualの読み取りが支配的なので、familyごとに1回解析して各SKUで使い回します。
+[`pipeline/build/build_all.py`](../pipeline/build/build_all.py)が、比較表が挙げる全SKUに対して候補を生成します。reference manualの読み取りが支配的なので、familyごとに1回解析して各SKUで使い回します。
 
-生成結果は`.cache/candidates/`に置きます（commitしない。`tools/build_all.py`が作る）。**人のreviewを経ていない機械出力**で、reviewを経た抽出結果が`evidence/`の表です。
+生成結果は`.cache/candidates/`に置きます（commitしない。`pipeline/build/build_all.py`が作る）。**人のreviewを経ていない機械出力**で、reviewを経た抽出結果が`evidence/`の表です。
 
 | family | SKU | pin取得 | pin | function | 解決経路 | selector |
 |---|---:|---:|---:|---:|---:|---:|
@@ -691,7 +691,7 @@ package判定は3つの独立な根拠で検証できます。
 ## Toolの使い方
 
 ```sh
-uv run tools/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <record>.json
+uv run pipeline/build/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h --compare <record>.json
 uv run pipeline/extract/rm/extract_remap.py <manual>.PDF --compare <record>.json
 uv run pipeline/extract/rm/register_fields.py <manual>.PDF --compare <record>.json
 
@@ -711,7 +711,7 @@ uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --package V006
 4資料をまとめて1候補にするには次を使います。
 
 ```sh
-uv run tools/build_candidate.py \
+uv run pipeline/build/build_candidate.py \
   --header <EVT>/Peripheral/inc/ch32xxx.h \
   --manual <manual>.PDF --datasheet <datasheet>.PDF --package LQFP48 \
   --compare <record>.json
@@ -722,7 +722,7 @@ uv run tools/build_candidate.py \
 ## 未決定事項
 
 1. ~~`build_candidate.py`が導出するsignal名対応表を、canonical signal辞書としてrepositoryへ持つか~~
-   → **決着**。辞書ではなく語彙規則にした（`tools/signal_vocabulary.py`）。pad一致で導出していた
+   → **決着**。辞書ではなく語彙規則にした（`pipeline/common/signal_vocabulary.py`）。pad一致で導出していた
    `signal_aliases`は廃止。1つのpadは複数機能を持つので、pad一致から1対1の対応は原理的に決まらない。
    `remap_routes.csv`の`peripheral`/`role`列が規則の適用結果で、`signal`は原典表記のまま残す
 2. `extract_remap.py`が拾う内部経路（padを持たない`TIM2ITR1_RM`等）を同じschemaへ入れるか分離するか
@@ -737,7 +737,7 @@ uv run tools/build_candidate.py \
 8. CH32V303/V305/V208の省略された接尾辞を、ordering information側と突き合わせて完全な注文型番にする
 9. ~~`valid_values`をどこまで「完全」と言えるか~~
    → **一部決着**（2026-08-21）。gccを抽出時の依存に含めてよいことになったので、
-   `tools/extract_remap_fields.py`がEVTの`GPIO_PinRemapConfig()`をホスト用にコンパイルして
+   `pipeline/build/extract_remap_fields.py`がEVTの`GPIO_PinRemapConfig()`をホスト用にコンパイルして
    実行し、経路の列挙値を観測する。これで4つ目の情報源が入り、`valid_values`は
    「RM remap格子 ∪ datasheet pin表 ∪ ヘッダの列挙 ∪ EVTデコーダの観測」の和になった。
    RM未mirrorのCH32V407/V467がこの恩恵を最も受ける。
@@ -750,7 +750,7 @@ uv run tools/build_candidate.py \
 fieldが途中で切れていました。切れても`valid_values`だけは格子から広い値が入るので、
 **bit幅に収まらない値**という形で表に残っていました（16 selector）。
 
-WCHは同じ「上位半分」を3通りに書きます。いずれも`tools/signal_vocabulary.py`の
+WCHは同じ「上位半分」を3通りに書きます。いずれも`pipeline/common/signal_vocabulary.py`の
 `canonical_field()`が同じ名前へ畳みます。
 
 | 書き方 | 例 | family |
@@ -762,12 +762,12 @@ WCHは同じ「上位半分」を3通りに書きます。いずれも`tools/sig
 CH32V20xのヘッダは`AFIO_PCFR2_`定義を1つも持たないため、ここだけはRM側からしか取れません。
 `build_candidate.py`はヘッダとRMの和を取り、片方にしかないregisterを補完します。
 
-結果は`tools/extract_remap_fields.py`（EVTの`GPIO_PinRemapConfig`をhostでコンパイルして
+結果は`pipeline/build/extract_remap_fields.py`（EVTの`GPIO_PinRemapConfig`をhostでコンパイルして
 実行し、fieldを観測するもの）と突き合わせて検証しています。ヘッダを読むだけで、
 分割fieldを含めて同じ答えになります——**242 selector 一致・不一致0**。
 
 ```sh
-uv run tools/extract_remap_fields.py --mirrors <EVT cloneの親> --compare tables
+uv run pipeline/build/extract_remap_fields.py --mirrors <EVT cloneの親> --compare tables
 ```
 
 ### EVTのデコーダは万能ではない: CH32V407のUSART1

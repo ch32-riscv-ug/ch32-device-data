@@ -49,8 +49,8 @@ WCHのBLE系（CH572/573/583/585/587/592/595/596）はRISC-Vですが現時点�
 手元で動かす場合は次のとおりです。
 
 ```sh
-uv run tools/sync_catalog.py           # サイトと突き合わせて差分を表示
-uv run tools/sync_catalog.py --write   # 差分を反映（割当は上書きしない）
+uv run pipeline/build/sync_catalog.py           # サイトと突き合わせて差分を表示
+uv run pipeline/build/sync_catalog.py --write   # 差分を反映（割当は上書きしない）
 uv run tools/check_mirrors.py          # mirrorがカタログに追随しているか確認
 ```
 

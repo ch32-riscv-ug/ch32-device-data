@@ -26,14 +26,14 @@ gains a PDF, the rules, and the working conventions for the structured-PDF pipel
 
 ## Layout
 
-- `catalog/`, `evidence/`, `index/`: the three kinds of table above. Data columns left of `#`, provenance to the right. `tools/paths.py` is the one place that knows where each table lives
+- `catalog/`, `evidence/`, `index/`: the three kinds of table above. Data columns left of `#`, provenance to the right. `pipeline/common/paths.py` is the one place that knows where each table lives
 - `.cache/candidates/*.json`: per-SKU machine extraction written by `build_all.py` (not committed; input to `build_pins`, `build_remap`, `build_tables`)
 - `curated/`: the few hand-verified overrides (pin-table column headers, errata, series facts)
 - `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it ([manifests/README.md](manifests/README.md))
 - `tools/check_tables.py`, `tools/check_counts.py`: joins, formats and count invariants across the tables
 - `tools/check_docs.py`: the row counts and hole states the documents claim, checked against the tables and the work list -- data can be right while the prose that explains it is stale
 - `tools/check_viewer.js`: what `pins.html` shows, evaluated headlessly against the committed tables -- the viewer used to be the one thing nothing checked
-- `tools/extract_*.py`, `tools/build_*.py`: extraction from EVT headers, datasheets and reference manuals, and table generation (run order in `evidence/README.md`); `tools/build_index.py` derives the index
+- `tools/extract_*.py`, `tools/build_*.py`: extraction from EVT headers, datasheets and reference manuals, and table generation (run order in `evidence/README.md`); `pipeline/build/build_index.py` derives the index
 - `docs/`: Japanese notes -- work list (`worklist.ja.md`), per-table reliability (`table-reliability.ja.md`), handoff, extraction survey, and the archive of resolved items
 
 ## Validation

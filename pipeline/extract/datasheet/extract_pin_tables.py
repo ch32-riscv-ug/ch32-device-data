@@ -12,7 +12,7 @@ as provenance, to the right of the "#" separator.
 A datasheet states each pinout once for a scope of products it names in the
 caption ("CH32V103x8x6", "CH32V006 ... 除CH32V006F4U6以外", "TSSOP20(F8)"), so
 one table's rows fan out to every product it covers. The resolution mirrors
-what tools/build_all.py does for candidates: the product's column is found by
+what pipeline/build/build_all.py does for candidates: the product's column is found by
 part number, then by package, and captions arbitrate when one package appears
 in several tables.
 
@@ -45,7 +45,8 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(REPO / "pipeline" / "common"))
+sys.path.insert(0, str(REPO / "pipeline" / "build"))
 sys.path.insert(0, str(REPO / "pipeline" / "extract"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -454,7 +455,7 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
 
     **値は書き換えない。** この表は証拠（資料が何と書いているか）なので、pin 表の
     値を残し、`conflict` にして basis に `!rm-remap-grid(=remap-N)` を並べる。
-    格子を採るのは索引の側（`index/pinout.csv`。tools/build_index.py）。
+    格子を採るのは索引の側（`index/pinout.csv`。pipeline/build/build_index.py）。
 
     CH32V103 の pin 表は `TIM3_CH1_1` を PB4 と PC6 の**両方**に書くが、RM の
     格子（表10-12）は PB4=2・PC6=3 で、値1はそもそも定義されていない
