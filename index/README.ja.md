@@ -74,6 +74,10 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
   公開を依頼してください（データの依頼）
 - **固定は commit と `manifest.csv` の sha256。** manifest がここの全ファイル（CSV と `VERSION`）の行数と
   sha256 を持ちます
+- **リリース。** tag `v<VERSION>.<n>` を打つと、このディレクトリを1つの zip
+  （`ch32-device-data-index-<tag>.zip`。全 CSV・`VERSION`・README 2つ）にした GitHub の release が出ます。
+  tag の先頭の数はいつも `VERSION` と同じです。ネットワークなしでビルドするときは zip を取り、
+  中の `manifest.csv` で照合してください
 - **列は名前で読む。** 列の並び順は契約に入りません
 - **[`columns.csv`](columns.csv) がここの全表・全列を説明します**: `meaning`（意味）、`format`（`text`・`name`・`integer`・
   `decimal`・`hex`・`bits`・`reg-bits`・`list(;)`・`list(,)`・`list(|)`・`url`・`path`・`marker`・`enum(a|b|...)`）、`empty`

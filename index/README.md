@@ -82,6 +82,10 @@ row.
   not here, ask for it to be published (a data request) rather than reading around the surface.
 - **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (CSV and
   `VERSION`) with its row count and sha256.
+- **Releases.** A tag `v<VERSION>.<n>` publishes a GitHub release carrying this directory as one zip
+  (`ch32-device-data-index-<tag>.zip`: every CSV, `VERSION` and the two READMEs). The tag's first number
+  always equals `VERSION`. Take the zip to build without the network, and check it against its own
+  `manifest.csv`.
 - **Read columns by name, not by position.** Column order is not part of the contract.
 - **[`columns.csv`](columns.csv) describes every column** of every table here: `meaning`, `format`
   (`text`, `name`, `integer`, `decimal`, `hex`, `bits`, `reg-bits`, `list(;)`, `list(,)`, `list(|)`, `url`, `path`,
