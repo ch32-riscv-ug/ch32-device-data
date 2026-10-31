@@ -522,7 +522,7 @@ def pin_numbering(t: dict) -> list[str]:
 
     **これは資料に依らない検査です。** LQFP100 の足は 1〜100 の100本しかなく、
     それは package 名が言っていること——pin 表の読み方が正しいかどうかを、
-    pin 表とは別の出所（`catalog/packages.pin_count`）で測れる唯一の不変条件
+    pin 表とは別の出所（`index/packages.pin_count`）で測れる唯一の不変条件
     です。番号は行のキーなので、抜けても他の行はずれず、読み比べるだけでは
     気付けません。
 
@@ -1128,7 +1128,7 @@ def index_checks(t: dict) -> list[str]:
         for s in r["series"].split(";"):
             heads[(s, r["section"])] = r
     if {r["series"] for r in t["index:debug_interfaces"]} != set(series_family):
-        bad.append("debug_interfaces: series の集合が catalog/series と違う")
+        bad.append("debug_interfaces: series の集合が index/series と違う")
     for r in t["index:debug_interfaces"]:
         who = f"debug_interfaces: {r['series']}"
         if series_family.get(r["series"]) != r["family"]:

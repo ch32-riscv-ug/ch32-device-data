@@ -41,7 +41,7 @@ served from GitHub Pages). There are no per-part copies -- they would only dupli
 
 ## The viewer
 
-`pins.html` reads `catalog/products`, `index/pinout`, `index/capabilities` and two evidence
+`pins.html` reads `index/products`, `index/pinout`, `index/capabilities` and two evidence
 tables (`product_attributes`, `remap_fields`) -- 3.5 MB, 218 KB over the wire, parsed in about
 a quarter of a second. It has no per-series build output on purpose: a display cache would be a
 second copy of the index to keep in step.
@@ -130,7 +130,7 @@ Columns left out of the copies (internal bookkeeping): `products` drops its pack
 
 One row per part. Identity and headline specs from `index/products.csv` (`flash_bytes`,
 `sram_bytes`, `gpio_count`, `temperature`; per-column provenance lives there), `pins` from
-`catalog/packages`, `clock_max` / `vdd_min` / `vdd_max` from `evidence/operating_conditions`
+`index/packages`, `clock_max` / `vdd_min` / `vdd_max` from `index/operating_conditions`
 (`F_MAIN`, else `F_HCLK` -> `F_SYSCLK` -> `F_CORE`; `V_DD` envelope), and the comparison-table
 counts (`usart`, `spi`, `i2c`, `can`, `usb`, `adc`, `dac`, `opa`, `cmp`, `timers_advanced`,
 `timers_general`, `rtc`, `ethernet`) **verbatim** from `evidence/product_attributes` (`4`,
@@ -152,7 +152,7 @@ one row**, so `port`+`gpio` -> lead is a single lookup.
 | `signal` | the datasheet's spelling (`USART1_TX` / `TX1` / `UTX`) |
 | `route` | `main` (primary function, live at reset) / `default` (default alternate function: reachable without remap once in AF mode) / `remap-N` / `af-N`. **`main` and `default` are different things** and which column a datasheet uses varies by family |
 | `selector`, `value` | the AFIO selector that picks this route (`afio-tim2-remap`) and its value; key into `routes.csv`; `0` for `default`/`main`; empty when no selector applies |
-| `af` | N of `af-N` (AF-number families: V205, X315, H41x); the register lives in `evidence/pin_alternate` |
+| `af` | N of `af-N` (AF-number families: V205, X315, H41x); the register lives in `index/pin_alternate` |
 
 Not listed: a pad's own GPIO name as its primary function (`PA9` -> `PA9`) and power pads. Pads
 whose name *is* the function (`NRST`, `OSC_IN`, `BOOT0`) are listed. Spellings the vocabulary
@@ -195,7 +195,7 @@ bits, because it records what the documents say.
 
 ### `register_map.csv` -- absolute addresses
 
-One row per (family, block, register): `evidence/register_blocks` base addresses x `registers`,
+One row per (family, block, register): `index/register_blocks` base addresses x `registers`,
 `address = base + offset`. Blocks whose struct is not in the header (`USBHSH` on V407/X315) get
 one row with `register` empty.
 
@@ -240,7 +240,7 @@ comparison table has no such row", and the table cannot tell the two apart. Do n
 in places (`adc` = `8+2` channels, `adc_unit` = `2` units), which is why the attribute-to-capability
 map is an exhaustive dictionary rather than a set of patterns. Clock, voltage, flash, SRAM and GPIO
 rows are carried too, so the comparison table is fully represented -- but for those,
-`parts.csv` has the better-sourced value (`evidence/operating_conditions`, `catalog/products`)
+`parts.csv` has the better-sourced value (`index/operating_conditions`, `index/products`)
 rather than the comparison table's prose (`Max: 144MHz`).
 
 ### `conflicts.csv` -- where the sources disagree

@@ -17,7 +17,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | consumer | 取り方 | 契約の外 |
 |---|---|---|
 | wch-protocols | `index/` だけ。`index/manifest.csv` の sha256 で照合 | **なし**（手本になる読み方） |
-| ch32rv | 兄弟 path を `cargo xtask db-gen` が読み、生成物を commit。lock なし（生成物の頭に rev だけ） | `evidence/device_ids`・`option_bytes`・`option_byte_fields`（R-34） |
+| ch32rv | 兄弟 path を `cargo xtask db-gen` が読み、生成物を commit。lock なし（生成物の頭に rev だけ） | `index/device_ids`・`option_bytes`・`option_byte_fields`（R-34） |
 | ArduinoCore-CH32RV（2026-10-01 に ArduinoCore-CH32 から改名） | lock（commit＋表ごとの sha256）。ただし bench の `regcheck.py` の分は lock の外 | `evidence/pins`・`pin_functions`・`register_blocks`・`register_fields`・`remap_fields`・`timers`・`errata`・`operating_conditions`（R-33） |
 
 外に出た理由は、契約が**表の名前の列挙**だったこと。「安定」印は evidence の中に混ざっていて、path を
@@ -81,7 +81,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | `evidence/register_fields`（`register`・`field`・`kind`・`bits`） | `index/registers` | 同じ行が `(type, register)` に割って入っている（`ADC_CTLR3` → `ADC`＋`CTLR3`、`AFIO_EXTICR1` → `AFIO`＋`EXTICR1`）。`bits` の `hi:lo` も同じ |
 | `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。`controller` 列は core の依頼で 2026-09-30 に routes へ足した（`remap_fields` から写しただけ。VERSION は 1 のまま） |
 | `evidence/timers`（regcheck） | `index/timers` | index は evidence の上位（`channels`・`complementary` 付き） |
-| `evidence/register_blocks`・`errata`・`operating_conditions`・`device_ids`・`option_bytes`・`option_byte_fields` | `index/` の同名の写し | 公開した（`operating_conditions` は `datasheet` 列が無い） |
+| `index/register_blocks`・`errata`・`operating_conditions`・`device_ids`・`option_bytes`・`option_byte_fields` | `index/` の同名の写し | 公開した（`operating_conditions` は `datasheet` 列が無い） |
 | 前の「安定」evidence 表・`catalog/` の鍵表 | `index/` の同名の写し | 公開した（`products` は packing の列、`clock_configs` は `evt_copies` が無い） |
 
 ## core が挙げた論点への答え

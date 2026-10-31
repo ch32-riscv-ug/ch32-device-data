@@ -621,7 +621,7 @@ function render() {
   history.replaceState(null, "", "?" + params.toString());
 }
 
-Promise.all([load("catalog", "products"), load("index", "pinout"),
+Promise.all([load("index", "products"), load("index", "pinout"),
              load("index", "capabilities"), load("evidence", "product_attributes"),
              load("evidence", "remap_fields")])
 .then(([products, roles, caps, attrs, remap]) => {

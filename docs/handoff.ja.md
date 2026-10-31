@@ -142,6 +142,17 @@ cleanになれば次の周期で入る。
    `pipeline/ingest/convert.py` の `CONVERTER_VERSION` を上げたときも同じ流れ
    （全bundleが増分再変換される。VSCodeの再起動で中断しても文書単位で原子的なので再開できる）
 
+### リリース
+
+公開面（`index/`）の版を出す手順。push と tag は人が行う。
+
+1. `regenerate.py --full --verify --human` が全段成功した状態を commit する（作業ツリーを clean に）
+2. `pipeline/review/publish_preview.sh ../ch32-device-data-preview` — 構造化 Markdown を preview
+   リポジトリに1コミットで置く（元にした commit をメッセージに書く。push はしない）
+3. 人が push する: このリポジトリの main、preview の main（`git -C ../ch32-device-data-preview push --force origin main`）
+4. 人が tag `v<VERSION>.<n>` を打って push する。`.github/workflows/release.yml` が tag と `index/VERSION`
+   の一致と検査を確かめ、`index/` の zip を付けた release を作る
+
 ## 守ること
 
 - **git の書き込み操作（add/commit/push/pull/checkout/stash/reset）はしない。** mirrorも含めて

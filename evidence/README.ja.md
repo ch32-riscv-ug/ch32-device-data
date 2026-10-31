@@ -131,7 +131,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 何も出ていない足にも番号があり、pin表はその行を印刷しています。同じ文書群がその行のpad欄を4通りに綴り——`NC`・`NC.`・`未使用`・`Unused`——型と機能の欄は空です。この行も持ちます。padの綴りは`NC`に揃え、`kind=nc`（露出パッドの番号を`EP`と綴るのと同じ正規化）、`pin_functions`の行は持ちません。5型番の8 lead（CH32V203RBT6の47/48、CH32V205VCT6とCH32V303/307/317VCT6の73）。
 
-**数がそのまま検査になるので落としません。** LQFP100の足は1〜100の100本しかない、と`catalog/packages.pin_count`が言っていて、これはpin表の読みをpin表**以外**の出所で測れる唯一の不変条件です（`tools/check_tables.py`の`pin_numbering`）。落としていたときの実害は「無くなる」だけではありませんでした——pad欄をpad名と見なせないと、CH32V203RBT6のlead 47は**直前の行のpad名を継いで`VDD_2`になり**、LQFP64Mの表がそこに置いていないpadが表に出ていました（worklistのF-49）。
+**数がそのまま検査になるので落としません。** LQFP100の足は1〜100の100本しかない、と`index/packages.pin_count`が言っていて、これはpin表の読みをpin表**以外**の出所で測れる唯一の不変条件です（`tools/check_tables.py`の`pin_numbering`）。落としていたときの実害は「無くなる」だけではありませんでした——pad欄をpad名と見なせないと、CH32V203RBT6のlead 47は**直前の行のpad名を継いで`VDD_2`になり**、LQFP64Mの表がそこに置いていないpadが表に出ていました（worklistのF-49）。
 
 ### `timers.csv`
 

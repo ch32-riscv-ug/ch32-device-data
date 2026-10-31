@@ -62,13 +62,17 @@ function csv(file) {
   });
 }
 
-Object.assign(api.state, {
-  products: csv("index/products.csv"),
-  roles: csv("index/pinout.csv"),
-  caps: csv("index/capabilities.csv"),
-  attrs: csv("evidence/product_attributes.csv"),
-  remap: csv("evidence/remap_fields.csv"),
-});
+// 起動部分が読むファイルを pins.html から取り出して、その同じファイルを食わせる。
+// 一覧をここに書き写すと、表の置き場が変わったときに viewer だけが壊れて検査は通る。
+const loads = [...html.match(/Promise\.all\(\[([\s\S]*?)\]\)/)[1]
+  .matchAll(/load\("([^"]+)", "([^"]+)"\)/g)].map(m => `${m[1]}/${m[2]}.csv`);
+const missing = loads.filter(f => !fs.existsSync(path.join(REPO, f)));
+if (missing.length) {
+  console.error(`pins.html が読むファイルが無い: ${missing.join(", ")}`);
+  process.exit(1);
+}
+const [products, roles, caps, attrs, remap] = loads.map(csv);
+Object.assign(api.state, { products, roles, caps, attrs, remap });
 
 const bad = [];
 const check = (name, ok, saw) => { if (!ok) bad.push(`${name}: ${saw}`); };

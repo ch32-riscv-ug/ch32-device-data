@@ -39,7 +39,7 @@ GitHub Pages で配る）の仕事です。型番ごとに切ったコピーは�
 
 ## viewer
 
-`pins.html` が読むのは `catalog/products`・`index/pinout`・`index/capabilities` と、証拠2表
+`pins.html` が読むのは `index/products`・`index/pinout`・`index/capabilities` と、証拠2表
 （`product_attributes`・`remap_fields`）です。raw 3.5MB・転送 218KB・解析 0.25秒ほど。
 **series 別の表示用キャッシュは意図的に置きません**——索引の複製をもう1つ抱えることになるためです。
 
@@ -121,10 +121,10 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 
 | 列 | 中身 | どの証拠から |
 |---|---|---|
-| `part_number` `series` `family` `package` | 識別 | `catalog/products` |
-| `pins` | lead 数 | `catalog/packages.pin_count` |
-| `flash_bytes` `sram_bytes` `gpio_count` `temperature` | 主要仕様（バイト数・個数・温度範囲） | `catalog/products`（列ごとの根拠はそちらに） |
-| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記 | `evidence/operating_conditions` |
+| `part_number` `series` `family` `package` | 識別 | `index/products` |
+| `pins` | lead 数 | `index/packages.pin_count` |
+| `flash_bytes` `sram_bytes` `gpio_count` `temperature` | 主要仕様（バイト数・個数・温度範囲） | `index/products`（列ごとの根拠はそちらに） |
+| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記 | `index/operating_conditions` |
 | `vdd_min` `vdd_max` | `V_DD` の包絡（V） | 同上 |
 | `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | 比較表の値**そのまま**（`4`・`1/10`・`√`）。属性の綴りが family で違うので `build_index.py` の `ATTRIBUTE_COLUMNS` で列に寄せる。同じ列に2属性が当たれば `;` | `evidence/product_attributes`（`label_zh/en` に資料の見出し） |
 | `confidence` | 仕様列の確度のうちいちばん弱いもの | — |
@@ -147,7 +147,7 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 | `signal` | 資料の綴り（`USART1_TX` / `TX1` / `UTX`） |
 | `route` | `main`（主功能。リセット直後に生きている）／`default`（默认复用功能。AF モードにすれば remap 無しで届く）／`remap-N`／`af-N`。**`main` と `default` は別のこと**で、どちらに書くかは family で違う（[evidence/README](../evidence/README.ja.md) の「`route` の値の意味」） |
 | `selector` `value` | その経路を選ぶ AFIO selector（`afio-tim2-remap`）と値。`routes.csv` の鍵。`default`/`main` は値 `0`。selector を持たない経路は空 |
-| `af` | `af-N` の N（AF 方式の family: V205・X315・H41x）。書き込み先は `evidence/pin_alternate` |
+| `af` | `af-N` の N（AF 方式の family: V205・X315・H41x）。書き込み先は `index/pin_alternate` |
 
 載せないもの: pad 自身の GPIO 名（`PA9` の主機能が `PA9`）と電源の主機能（`VSS` の `VSS`）。
 ただし **`NRST`・`OSC_IN`・`BOOT0` のように自分の名前が機能そのもの**である pad は載せます
@@ -208,7 +208,7 @@ RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal
 
 ### `register_map.csv` — 絶対番地
 
-1行1（family, block, register）。`evidence/register_blocks`（`USART1` の base address）×
+1行1（family, block, register）。`index/register_blocks`（`USART1` の base address）×
 `registers` で `address = base + offset`。型の構造体が無い block（V407/X315 の `USBHSH`）は
 register 空・address＝base の1行。
 
@@ -256,8 +256,8 @@ family をまたいで「X を持たない型番」を数えないこと。
 辞書に無い属性が現れたら生成が落ちます）。
 
 クロック・電圧・Flash・SRAM・GPIO の行も比較表にあるぶんは載せますが、
-**数として引くなら `parts.csv` のほうが出所が良い**です（`evidence/operating_conditions` と
-`catalog/products` から来た数で、比較表の自由文 `Max: 144MHz` ではありません）。
+**数として引くなら `parts.csv` のほうが出所が良い**です（`index/operating_conditions` と
+`index/products` から来た数で、比較表の自由文 `Max: 144MHz` ではありません）。
 
 ### `conflicts.csv` — 資料どうしの食い違い
 
