@@ -1154,6 +1154,10 @@ def errata_rows() -> list[dict]:
     `measured <date> (...)` for a bench measurement.  Both editions agreeing
     makes the row confirmed; a single edition stays reference.  The match
     column only serves scan_errata and is dropped.
+
+    `measured` adds a bench measurement to a row the documents state
+    (`<date> (<record>)`); it joins the basis as `measured:<date>(<record>)` and
+    does not change the confidence, which the documents decide.
     """
     path = REPO / "curated" / "errata.csv"
     if not path.exists():
@@ -1170,6 +1174,10 @@ def errata_rows() -> list[dict]:
                 parts.append(f"{doc}:{lang}({pages})")
         row["description_confidence"] = (
             "confirmed" if len(parts) == 2 else "reference")
+        measured = row.pop("measured", "").strip()
+        if measured:
+            date, _, record = measured.partition(" ")
+            parts.append(f"measured:{date}({record.strip().removeprefix('(').removesuffix(')')})")
         row["description_basis"] = "+".join(parts) or "manual:unsourced"
     return sorted(rows, key=lambda r: r["id"])
 
