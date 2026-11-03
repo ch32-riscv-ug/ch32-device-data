@@ -1158,6 +1158,10 @@ def errata_rows() -> list[dict]:
     `measured` adds a bench measurement to a row the documents state
     (`<date> (<record>)`); it joins the basis as `measured:<date>(<record>)` and
     does not change the confidence, which the documents decide.
+
+    `dissent` is a bench measurement that contradicts the documents' description
+    (`<date> (<record>) | <what it shows>`): the row becomes conflict and the basis
+    names it as `!measured:<date>(<record>)(description=<what it shows>)`.
     """
     path = REPO / "curated" / "errata.csv"
     if not path.exists():
@@ -1178,6 +1182,13 @@ def errata_rows() -> list[dict]:
         if measured:
             date, _, record = measured.partition(" ")
             parts.append(f"measured:{date}({record.strip().removeprefix('(').removesuffix(')')})")
+        dissent = row.pop("dissent", "").strip()
+        if dissent:
+            where, _, shows = dissent.partition(" | ")
+            date, _, record = where.partition(" ")
+            parts.append(f"!measured:{date}({record.strip().removeprefix('(').removesuffix(')')})"
+                         f"(description={shows.strip()})")
+            row["description_confidence"] = "conflict"
         row["description_basis"] = "+".join(parts) or "manual:unsourced"
     return sorted(rows, key=lambda r: r["id"])
 

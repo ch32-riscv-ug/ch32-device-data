@@ -864,7 +864,7 @@ schematic-pdf  family単位の回路図PDF                      12
 
 1行1エラッタ（ロット依存の挙動・ハードウェア注意事項）。ソースは`curated/errata.csv`（手編集）で、`condition`列がどのロット/型番に該当するかを持ちます。**両言語datasheetの記載ページ（source_zh/source_en）が記録済みの行はconfirmed**、片方のみはreferenceです。
 
-**資料が言う行に、実機の測定を裏づけとして足せます**: curated/errata.csv の `measured` 列（`<日付> (<記録>)`）は basis に `measured:<日付>(<記録>)` として入り、確度は変えません（確度は資料が決める）。資料の記述を超えて測定で分かったことは、`measured` を出所にした別の行にします（`x035-adc-unavailable-reads-previous`: ADC のチャネル 3/7/11/15 が使えないロットでは、IN3 と IN7 が1つ前のチャネルの値を返す）。
+**資料が言う行に、実機の測定を裏づけとして足せます**: curated/errata.csv の `measured` 列（`<日付> (<記録>)`）は basis に `measured:<日付>(<記録>)` として入り、確度は変えません（確度は資料が決める）。資料の記述を超えて測定で分かったことは、`measured` を出所にした別の行にします（`x035-adc-unavailable-reads-previous`: ADC のチャネル 3/7/11/15 が使えないロットでは、IN3 と IN7 が1つ前のチャネルの値を返す）。**資料の記述と食い違う測定**は `dissent` 列（`<日付> (<記録>) | <測定が示したこと>`）に書き、その行は `conflict` になって、basis に `!measured:<日付>(<記録>)(description=<測定が示したこと>)` として名指されます。`x035-adc-ch-i2c-unavailable` がそれで、データシートはそのロットで I2C が使えないと書きますが、そのロットの ADC の症状を示す CH32X035F8U6 で route 2（PC16/PC17）のハードウェア I2C が通りました。パッケージの刻印が読めないので、ロットはこの行自身が書く ADC の症状で見分けています。
 
 エラッタは今後のdatasheet改版で増えうるため、`pipeline/extract/scan_errata.py`が全datasheetを走査して既知（curated/errata.csvの`match`列の正規表現で識別）と照合し、未知の記述があれば`NEW`として報告します（終了コード1）。NEWが出たらcurated/errata.csvに行を追加し、再実行でNEW: 0を確認します。
 

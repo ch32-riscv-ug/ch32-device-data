@@ -160,7 +160,7 @@ errata,id,Identifier assigned to the erratum by this repository.,name,never empt
 errata,series,Series the erratum applies to.,list(;),never empty,fixed,data
 errata,condition,Lots or part numbers the erratum applies to.,text,applies without a lot or part-number condition,prose,data
 errata,description,"What the erratum says (lot-dependent behaviour or hardware caution), in English.",text,never empty,prose,data
-errata,description_confidence,"Confidence of `description`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+errata,description_confidence,"Confidence of `description`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = a bench measurement contradicts the documents' description (the `!measured:` term in `description_basis` says what it showed).",enum(confirmed|conflict),never empty,fixed,provenance
 errata,description_basis,Documents and pages that state the erratum (`@V` pins a past edition).,text,never empty,prose,provenance
 esig,family,Family key; joins families.family.,name,never empty,fixed,data
 esig,register,"ESIG register name as the reference manual spells it after `R16_ESIG_`/`R32_ESIG_`: `FLACAP` (flash capacity) or `UNIID1`..`UNIID3` (the ID words, `UNIID1` lowest; measured chips differ only in UNIID1|UNIID2, see erratum `esig-uniid3-not-unique`).",enum(FLACAP|UNIID1|UNIID2|UNIID3),never empty,as-printed,data
