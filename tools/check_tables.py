@@ -1240,7 +1240,7 @@ def column_dictionary() -> list[str]:
         if not r["meaning"].strip() or not r["empty"].strip():
             bad.append(f"{where} の meaning か empty が空")
         # `spelling`: 綴りを誰が決めるか（2026-10-01、core の相談）。`fixed` はこの repository が
-        # 決める鍵・識別子・語彙で、既存の綴りを変えるなら VERSION を上げる。`as-printed` は資料・EVT の
+        # 決める鍵・識別子・語彙で、既存の綴りを変えるのは壊す変更（正式リリースのあとは VERSION を上げる）。`as-printed` は資料・EVT の
         # 綴りのままで、資料の改版で VERSION を上げずに変わりうる。`prose` は照合に使わない文。空は値の列。
         if r["spelling"] not in ("fixed", "as-printed", "prose", ""):
             bad.append(f"{where} の spelling {r['spelling']!r} が語彙に無い")

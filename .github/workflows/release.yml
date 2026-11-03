@@ -8,10 +8,10 @@ name: Release
 # tag `v<VERSION>.<n>` を push すると、公開面 index/ を1つの zip にして release に付ける。
 # 利用者は clone せずに名前の付いた版を1つの URL から取れる。
 #
-# The tag's major number must equal index/VERSION: VERSION is raised before a
-# change that can break a consumer, so a v1 tag on a VERSION 2 surface would
-# promise compatibility the data no longer has.
-# tag の先頭の数は index/VERSION と一致しなければならない（壊す変更は VERSION を上げてから入る）。
+# The tag's major number must equal index/VERSION. VERSION stays 1 until the
+# first formal release and is raised for a breaking change after it, so a tag
+# whose major number differs would promise compatibility the data does not have.
+# tag の先頭の数は index/VERSION と一致しなければならない（VERSION は正式リリースまで 1、その後は壊す変更で上げる）。
 
 on:
   push:

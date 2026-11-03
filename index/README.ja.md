@@ -82,17 +82,18 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
   provenance が右端）
 - **`columns.csv` の `spelling` は、その列の綴りを誰が決めるかを言います**: `fixed` はこの repository が決める
   （鍵、`routes.selector`・`operating_conditions.symbol` のような付けた識別子、`pinout.peripheral`/`role` の
-  ような正規化した語彙）——既存の値を改名するなら `VERSION` を上げるので、照合はこちらで。`as-printed` は
+  ような正規化した語彙）——既存の値の改名は壊す変更（下の `VERSION`）なので、照合はこちらで。`as-printed` は
   datasheet・RM・EVT ヘッダの綴りのまま（`pinout.signal`・`memory_map.region`・`clock_symbols.symbol`・
   `operating_conditions.condition`）——資料に合わせるので、改版で `VERSION` を上げずに変わりえます。
   `prose` は人が読む文で照合に使わない。空は値の列（数・番地）
-- **[`VERSION`](VERSION) は整数1つ。** consumer を壊しうる変更——列の削除・改名、列の書き方の変更、
-  鍵や `fixed` の値の改名——で上げ、この公開面を読むリポジトリも一緒に版を上げます。表・列・行を
-  足すだけなら上げません
+- **[`VERSION`](VERSION) は整数1つで、最初の正式リリースまでは 1 のまま。** それまでは consumer を壊しうる
+  変更も `VERSION` 1 のまま入るので、読み手は commit と `manifest.csv` の sha256 で固定します。正式リリースの
+  あとは、consumer を壊しうる変更——列の削除・改名、列の書き方の変更、鍵や `fixed` の値の改名——で上げ、
+  この公開面を読むリポジトリも一緒に版を上げます。表・列・行を足すだけなら上げません
 - **`family` は WCH の EVT パッケージの単位**で、名前は `<family>EVT.ZIP` から取ります。製品の系列でも、
   datasheet や RM の単位でもありません（`CH32V20x_30xDS0` は CH32V20x と CH32V307 にまたがり、CH32V006 は
-  CH32V002〜CH32V007 と CH32M007 を含む）。WCH が EVT を組み替えたら family もそれに従い、そのとき
-  `VERSION` を上げます
+  CH32V002〜CH32V007 と CH32M007 を含む）。WCH が EVT を組み替えたら family もそれに従い、それは
+  壊す変更です（`VERSION` を参照）
 - **`confidence` は `confirmed`・`reference`・`conflict` のどれか**で、空になるのは、それが言う値が空のときだけ
   です（理由はその列の `empty`）。`confirmed`＝独立した根拠が2つ以上一致、または人が中身を確かめて根拠を
   記録した／`reference`＝根拠が1つで、裏付けも食い違いも無い／`conflict`＝根拠が食い違い、表は片方を採って、

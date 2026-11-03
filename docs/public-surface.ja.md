@@ -94,9 +94,10 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 - **confidence**: 公開面の行は全部このリポジトリの答え。`conflict` は「資料が食い違い、basis の根拠で片方を
   採った」という印で、値は採用した値。使うか捨てるかは consumer が決める（ch32rv の flash は conflict で
   止まる。これは正しい使い方）。両論は `conflicts.csv` にある
-- **family 名・schema の版**: `index/VERSION` を1つ持つ（表ごとではない）。**consumer を壊しうる変更**——
-  列の削除・改名、列の書き方の変更、family などの鍵の改名——は先にこれを上げる。表・列・行を足すだけなら
-  上げない。family は WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る
+- **family 名・schema の版**: `index/VERSION` を1つ持つ（表ごとではない）。最初の正式リリースまでは 1 のままで、
+  その間の壊す変更も 1 のまま入る（読み手は commit と manifest の sha256 で固定する）。正式リリースのあとは、
+  **consumer を壊しうる変更**——列の削除・改名、列の書き方の変更、family などの鍵の改名——で上げる。表・列・行を
+  足すだけなら上げない。family は WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る
 
 ## 守らせ方
 
@@ -121,7 +122,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 1. 公開フォルダは `index/`
 2. index の外の表は、**安定して出せるなら公開面に出す**。そのとき不要な列は落としてよい
    → 前の安定表から `memory_configs` を除いた15表、目録の鍵5表、依頼6表を写した（上の表）
-3. `index/VERSION` を持つ。consumer を壊しうる変更はこれを上げてから
+3. `index/VERSION` を持つ。正式リリースまでは 1、そのあとは consumer を壊しうる変更で上げる
 4. `confidence` の扱いは consumer に任せる
 
 ## 残り

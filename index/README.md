@@ -88,18 +88,20 @@ row.
   against the data (every column covered, enum values, integer/hex shapes, `never empty`, provenance last).
 - **`columns.csv` `spelling` says whose spelling a column carries**: `fixed` = chosen by this repository
   (keys, assigned identifiers such as `routes.selector` and `operating_conditions.symbol`, normalised
-  vocabulary such as `pinout.peripheral`/`role`); renaming an existing value raises `VERSION`, so match on
+  vocabulary such as `pinout.peripheral`/`role`); renaming an existing value is a breaking change (see `VERSION` below), so match on
   these. `as-printed` = the datasheet's, reference manual's or EVT header's own spelling (`pinout.signal`,
   `memory_map.region`, `clock_symbols.symbol`, `operating_conditions.condition`); it follows the documents and
   can change when one is revised, without a `VERSION` change. `prose` = text for people, not for matching.
   Empty = a value column (numbers, addresses).
-- **[`VERSION`](VERSION) is one integer.** A change that can break a consumer -- removing or renaming a
+- **[`VERSION`](VERSION) is one integer, and stays 1 until the first formal release.** Until then, changes
+  that can break a consumer go in with `VERSION` still 1, and readers pin by commit plus the sha256 of
+  `manifest.csv`. After the formal release, a change that can break a consumer -- removing or renaming a
   column, changing how a column is written, renaming a key or a `fixed` value -- raises it, and the
-  repositories that read this surface move with it. Adding tables, columns or rows does not.
+  repositories that read this surface move with it. Adding tables, columns or rows never does.
 - **`family` is a unit of WCH's EVT packages**, named after its archive `<family>EVT.ZIP`. It is not a
   product line and not a datasheet or reference-manual unit (`CH32V20x_30xDS0` spans CH32V20x and CH32V307;
   CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow
-  and `VERSION` is raised.
+  and that is a breaking change (see `VERSION`).
 - **`confidence` is one of `confirmed`, `reference`, `conflict`**, and empty exactly when the value it
   describes is empty (the column's `empty` says why). `confirmed` = two or more independent bases agree, or a
   person checked the content and recorded the basis; `reference` = one basis, neither corroborated nor

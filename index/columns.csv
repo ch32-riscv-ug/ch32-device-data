@@ -176,7 +176,7 @@ evt_variants,part_number,Orderable part number; joins products.part_number.,name
 evt_variants,default,`yes` when this macro is the one the EVT device header enables by default.,enum(yes),not the default variant,fixed,data
 evt_variants,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
 evt_variants,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
-families,family,"Family key. A unit of WCH's EVT packages, named after its archive `<family>EVT.ZIP` without `EVT.ZIP`. Not a product line and not a datasheet or reference-manual unit (CH32V20x_30xDS0 spans CH32V20x and CH32V307; CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow and VERSION is raised.",name,never empty,fixed,data
+families,family,"Family key. A unit of WCH's EVT packages, named after its archive `<family>EVT.ZIP` without `EVT.ZIP`. Not a product line and not a datasheet or reference-manual unit (CH32V20x_30xDS0 spans CH32V20x and CH32V307; CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow (a breaking change).",name,never empty,fixed,data
 families,repository,GitHub mirror repository the family's documents are read from (`owner/name`).,name,never empty,fixed,data
 families,series,Series in the family.,list(;),never empty,fixed,data
 families,series_count,Number of series in the family.,integer,never empty,,data
