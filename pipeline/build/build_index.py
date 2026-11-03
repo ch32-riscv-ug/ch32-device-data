@@ -484,9 +484,9 @@ def parts_rows(products: list[dict], packages: list[dict], attributes: list[dict
 # ---------------------------------------------------------------- manifest
 
 def manifest_files(root: Path) -> list[Path]:
-    """manifest が覆うファイル: index/ の CSV と VERSION（README と manifest 自身は除く）。"""
+    """manifest が覆うファイル: index/ の CSV（README と manifest 自身は除く）。"""
     return sorted(p for p in root.rglob("*")
-                  if p.is_file() and (p.suffix == ".csv" or p.name == "VERSION")
+                  if p.is_file() and p.suffix == ".csv"
                   and p.name != "manifest.csv")
 
 

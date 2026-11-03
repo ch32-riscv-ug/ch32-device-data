@@ -150,8 +150,8 @@ cleanになれば次の周期で入る。
 2. `pipeline/review/publish_preview.sh ../ch32-device-data-preview` — 構造化 Markdown を preview
    リポジトリに1コミットで置く（元にした commit をメッセージに書く。push はしない）
 3. 人が push する: このリポジトリの main、preview の main（`git -C ../ch32-device-data-preview push --force origin main`）
-4. 人が tag `v<VERSION>.<n>` を打って push する。`.github/workflows/release.yml` が tag と `index/VERSION`
-   の一致と検査を確かめ、`index/` の zip を付けた release を作る
+4. 人が tag `v<major>.<minor>…` を打って push する。`.github/workflows/release.yml` が検査を確かめ、`index/` の
+   zip を付けた release を作る。壊す変更があればリリースノートに書く
 
 ## 守ること
 
@@ -182,8 +182,9 @@ cleanになれば次の周期で入る。
   consumerは`catalog/`・`evidence/`を読まない。公開する目録・証拠の表は`pipeline/common/paths.py`の`PUBLISHED`に1行足して
   `index/`へ写す（行はそのまま、内部の列だけ落としてよい。`check_tables.published_surface`が元との一致を見る）。
   **consumerが要るデータは依頼を受けて公開面へ載せる**——保証・保守できる表だけ（形が生成器の定数で決まる・全行に
-  出所・不変条件が検査に載る・再生成できる）、consumer専用の表は作らない。**`index/VERSION`**（整数）は、公開面の
-  列の削除・改名・書き方の変更・familyなどの鍵の改名の**前に**上げる。表・列・行を足すだけなら上げない。
+  出所・不変条件が検査に載る・再生成できる）、consumer専用の表は作らない。データの中に版の番号は持たない
+  （利用者は commit と manifest の sha256 で固定する）。公開面の列の削除・改名・書き方の変更・familyなどの鍵の改名は
+  リリースノートに書く。表・列・行を足すのは壊す変更ではない。
   `confidence`の扱いはconsumerが決める
 - 資料どうしが食い違ったら**片方に寄せず`conflict`＋両論を`basis`に**。
   RMが書いていない値を推測で埋めない

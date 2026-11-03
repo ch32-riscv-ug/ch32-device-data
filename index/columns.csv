@@ -254,8 +254,8 @@ link_firmware_issues,symptom,"What fails, as recorded.",text,never empty,prose,d
 link_firmware_issues,works_in,Firmware version measured to work on the same hardware.,text,no working version measured,fixed,data
 link_firmware_issues,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
 link_firmware_issues,basis,The measurement record: `measured:<date>(<where it is recorded>)`.,text,never empty,prose,provenance
-manifest,path,"File name under index/ (every CSV and `VERSION`, except manifest.csv itself).",path,never empty,,data
-manifest,rows,Row count of the file (lines minus the header; 0 for `VERSION`).,integer,never empty,,data
+manifest,path,"File name under index/ (every CSV except manifest.csv itself).",path,never empty,,data
+manifest,rows,Row count of the file (lines minus the header).,integer,never empty,,data
 manifest,sha256,"SHA-256 of the file's bytes, lower-case hex without prefix.",name,never empty,,data
 memory_configs,part_number,Part whose FLASH/SRAM boundary moves with the user option bytes; joins products.part_number.,name,never empty,fixed,data
 memory_configs,value,Code of the `RAM_CODE_MOD` field (bits; `x` = either value).,text,never empty,as-printed,data

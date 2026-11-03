@@ -1,7 +1,7 @@
 # 公開面の方針
 
 文書基準日: 2026-09-30。**方針は確定**（同日ユーザーが決めた。末尾「決めたこと」）。**実装も同日**
-（`paths.PUBLISHED`・`build_index.py` の写し・`index/VERSION`・`check_tables.published_surface`・
+（`paths.PUBLISHED`・`build_index.py` の写し・`check_tables.published_surface`・
 `check_docs.check_stable_lists`）。残りは末尾「残り」。consumer 向けの約束の本文は
 [index/README の「Contract for consumers」](../index/README.md#contract-for-consumers)（英語・日本語版あり）。
 
@@ -54,7 +54,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | 写し: 目録の鍵 | `families`・`series`・`products`・`packages`・`cores` | `products` の packing の3列を落とす（102行が空。consumer に意味が無い） |
 | 写し: 前の「安定」evidence 15表 | `interrupts`・`memory_map`・`systick`・`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`・`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` | `clock_configs.evt_copies`（一致した EVT 写しの数。生成の記録）を落とす |
 | 写し: 依頼で公開（R-33・R-34） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions` | `operating_conditions.datasheet` を落とす（`basis` にある） |
-| 表の説明 | `manifest.csv`（path・行数・sha256。CSV と `VERSION` を覆う）・`VERSION`（整数1つ） | manifest は生成、VERSION は人が上げる |
+| 表の説明 | `manifest.csv`（path・行数・sha256。全 CSV を覆う） | 生成 |
 
 写しの一覧と落とす列は `pipeline/common/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
 
@@ -77,7 +77,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | `evidence/pins`（`pad`・`kind`） | `index/pinout` | pins の (型番, pad, kind) は**全行** pinout にある |
 | `evidence/pin_functions`（`pad`・`signal`・`route`） | `index/pinout` | route の remap・default・af は同数。**違いが2つ**: `main` 行（pad 自身の GPIO 名）は `port`/`gpio` 列になった。`alias` 行（30行）は無く、括弧の別名から `port`/`gpio` を埋めている。core の「機能名で呼ばれる pad → port 名」は `port`/`gpio` で引ける見込みだが、core 側で確かめてもらう |
 | `evidence/register_fields`（`register`・`field`・`kind`・`bits`） | `index/registers` | 同じ行が `(type, register)` に割って入っている（`ADC_CTLR3` → `ADC`＋`CTLR3`、`AFIO_EXTICR1` → `AFIO`＋`EXTICR1`）。`bits` の `hi:lo` も同じ |
-| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。`controller` 列は core の依頼で 2026-09-30 に routes へ足した（`remap_fields` から写しただけ。VERSION は 1 のまま） |
+| `evidence/remap_fields`（`selector`・`bits`） | `index/routes` | 287 selector が全部 routes にあり、`register`・`bits`（`REG:bit;REG:bit`）も同じ。`controller` 列は core の依頼で 2026-09-30 に routes へ足した（`remap_fields` から写しただけ） |
 | `evidence/timers`（regcheck） | `index/timers` | index は evidence の上位（`channels`・`complementary` 付き） |
 | `index/register_blocks`・`errata`・`operating_conditions`・`device_ids`・`option_bytes`・`option_byte_fields` | `index/` の同名の写し | 公開した（`operating_conditions` は `datasheet` 列が無い） |
 | 前の「安定」evidence 表・`catalog/` の鍵表 | `index/` の同名の写し | 公開した（`products` は packing の列、`clock_configs` は `evt_copies` が無い） |
@@ -94,16 +94,16 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 - **confidence**: 公開面の行は全部このリポジトリの答え。`conflict` は「資料が食い違い、basis の根拠で片方を
   採った」という印で、値は採用した値。使うか捨てるかは consumer が決める（ch32rv の flash は conflict で
   止まる。これは正しい使い方）。両論は `conflicts.csv` にある
-- **family 名・schema の版**: `index/VERSION` を1つ持つ（表ごとではない）。最初の正式リリースまでは 1 のままで、
-  その間の壊す変更も 1 のまま入る（読み手は commit と manifest の sha256 で固定する）。正式リリースのあとは、
-  **consumer を壊しうる変更**——列の削除・改名、列の書き方の変更、family などの鍵の改名——で上げる。表・列・行を
-  足すだけなら上げない。family は WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る
+- **family 名・版**: データの中に版の番号は持たない。読み手は commit と manifest の sha256 で固定するので、
+  **consumer を壊しうる変更**——列の削除・改名、列の書き方の変更、family などの鍵の改名——は、読み手が固定を
+  進めたときに「読む列が無い」ではっきり止まる。リリースはタグで名付け、壊す変更はリリースノートに書く。
+  表・列・行を足すのは壊す変更ではない。family は WCH の EVT パッケージの単位で、名前は `<family>EVT.ZIP` から取る
 
 ## 守らせ方
 
 - このリポジトリ（実装済み）: `check_tables.published_surface` が、写しが元と一致すること、`index/` に
-  索引でも写しでもない CSV が無いこと、`VERSION` が正の整数であることを見る。manifest は `index/` の CSV と
-  `VERSION` を全部覆う。`check_docs.check_stable_lists` が README の写しの一覧と `paths.PUBLISHED` の一致を見る。
+  索引でも写しでもない CSV が無いこと、CSV と README 以外のファイルが無いことを見る。manifest は `index/` の
+  CSV を全部覆う。`check_docs.check_stable_lists` が README の写しの一覧と `paths.PUBLISHED` の一致を見る。
   凍結台帳（`pipeline/baseline/tables.csv`）も写しを覆う
 - consumer: 読む path が全部 `index/` で始まることを、consumer 自身の検査に入れてもらう（lock を
   manifest の sha256 にすれば自然にそうなる）。**公開前のデータが要るときは consumer 側に手持ちで置く**
@@ -112,7 +112,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 ## 移る順
 
 1. ~~ユーザーが決める~~（2026-09-30）
-2. ~~このリポジトリ: 写しと `VERSION` を生成し、検査を足し、README を直す~~（2026-09-30）
+2. ~~このリポジトリ: 写しを生成し、検査を足し、README を直す~~（2026-09-30）
 3. consumer へ連絡: 公開の commit と、上の「index で足りる」対応表（commit の後）
 4. consumer が読み先を移す。**猶予期間は evidence の旧 path も残る**（evidence は消さない。ただし契約ではない）
 5. ~~移り終わったら `paths.STABLE_EVIDENCE` と `evidence/README` の「安定」印を消す~~（2026-10-01。ch32rv ed7a703・core は 5339df5 に固定して移行、wch-protocols は元から `index/` だけ）
@@ -122,7 +122,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 1. 公開フォルダは `index/`
 2. index の外の表は、**安定して出せるなら公開面に出す**。そのとき不要な列は落としてよい
    → 前の安定表から `memory_configs` を除いた15表、目録の鍵5表、依頼6表を写した（上の表）
-3. `index/VERSION` を持つ。正式リリースまでは 1、そのあとは consumer を壊しうる変更で上げる
+3. 版の番号はデータに持たない。commit と manifest の sha256 で固定し、リリースはタグ、壊す変更はリリースノートに書く
 4. `confidence` の扱いは consumer に任せる
 
 ## 残り

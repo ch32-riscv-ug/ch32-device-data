@@ -42,7 +42,6 @@ The split between `index/`, `evidence/` and `catalog/` is defined in
 | Clock tree, interrupts, memory map, operating conditions, errata | see [Published as read](#published-as-read) |
 | What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
-| Version of the public surface | [`VERSION`](VERSION) |
 
 Every table is **one combined file** (every part, every family) and generators read it as is.
 CSV is for programs; people filter by part or feature in the viewer ([`pins.html`](../pins.html),
@@ -73,11 +72,13 @@ row.
 - **Read only files under `index/`.** `catalog/` and `evidence/` are this repository's working layers and
   may change shape at any time. If something you need is not here, ask for it to be published (a data
   request) rather than reading around the surface.
-- **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every file here (every CSV and
-  `VERSION`) with its row count and sha256.
-- **Releases.** A tag `v<VERSION>.<n>` publishes a GitHub release carrying this directory as one zip
-  (`ch32-device-data-index-<tag>.zip`: every CSV, `VERSION` and the two READMEs). The tag's first number
-  always equals `VERSION`. Take the zip to build without the network, and check it against its own
+- **Pin by commit plus the sha256 of `manifest.csv`.** The manifest lists every CSV here with its row count
+  and sha256. There is no version number in the data: a breaking change stops a reader plainly when it moves
+  its pin (a column it reads is gone), and releases are named by tags.
+- **Releases.** A tag `v<major>.<minor>...` publishes a GitHub release carrying this directory as one zip
+  (`ch32-device-data-index-<tag>.zip`: every CSV and the two READMEs). Changes that can break a consumer
+  -- removing or renaming a column, changing how a column is written, renaming a key or a `fixed` value --
+  are listed in the release notes. Take the zip to build without the network, and check it against its own
   `manifest.csv`.
 - **Read columns by name, not by position.** Column order is not part of the contract, and tables and
   columns are added without notice.
@@ -88,20 +89,17 @@ row.
   against the data (every column covered, enum values, integer/hex shapes, `never empty`, provenance last).
 - **`columns.csv` `spelling` says whose spelling a column carries**: `fixed` = chosen by this repository
   (keys, assigned identifiers such as `routes.selector` and `operating_conditions.symbol`, normalised
-  vocabulary such as `pinout.peripheral`/`role`); renaming an existing value is a breaking change (see `VERSION` below), so match on
+  vocabulary such as `pinout.peripheral`/`role`); renaming an existing value is a breaking change (listed in the release notes), so match on
   these. `as-printed` = the datasheet's, reference manual's or EVT header's own spelling (`pinout.signal`,
   `memory_map.region`, `clock_symbols.symbol`, `operating_conditions.condition`); it follows the documents and
-  can change when one is revised, without a `VERSION` change. `prose` = text for people, not for matching.
+  can change when one is revised. `prose` = text for people, not for matching.
   Empty = a value column (numbers, addresses).
-- **[`VERSION`](VERSION) is one integer, and stays 1 until the first formal release.** Until then, changes
-  that can break a consumer go in with `VERSION` still 1, and readers pin by commit plus the sha256 of
-  `manifest.csv`. After the formal release, a change that can break a consumer -- removing or renaming a
-  column, changing how a column is written, renaming a key or a `fixed` value -- raises it, and the
-  repositories that read this surface move with it. Adding tables, columns or rows never does.
+- **Adding tables, columns or rows is not a breaking change**; read columns by name and ignore what you do
+  not know.
 - **`family` is a unit of WCH's EVT packages**, named after its archive `<family>EVT.ZIP`. It is not a
   product line and not a datasheet or reference-manual unit (`CH32V20x_30xDS0` spans CH32V20x and CH32V307;
   CH32V006 covers CH32V002 to CH32V007 and CH32M007). If WCH regroups its EVT packages, the families follow
-  and that is a breaking change (see `VERSION`).
+  and that is a breaking change.
 - **`confidence` is one of `confirmed`, `reference`, `conflict`**, and empty exactly when the value it
   describes is empty (the column's `empty` says why). `confirmed` = two or more independent bases agree, or a
   person checked the content and recorded the basis; `reference` = one basis, neither corroborated nor
@@ -332,8 +330,7 @@ block diagram) is tagged from the comparison table alone when the tag already ex
 datasheet's headings and is the last token of the attribute name; `features`/`sections` are then empty
 and `basis` is `attributes(...)`.
 `register_layouts.csv` (by `pipeline/extract/rm/extract_registers.py`): (family, type) -> layout hash; equal
-hashes share register definitions. `manifest.csv`: path, row count and sha256 of every CSV here and of
-`VERSION`.
+hashes share register definitions. `manifest.csv`: path, row count and sha256 of every CSV here.
 
 ```sh
 uv run pipeline/build/build_capabilities.py   # capabilities.csv (before build_index -- the manifest hashes it)

@@ -1,17 +1,13 @@
 name: Release
 
-# A tag `v<VERSION>.<n>` (e.g. v1.0.0) publishes a GitHub release with the
-# public surface, index/, as one zip. Consumers can then take a named version
+# A tag `v<major>.<minor>...` (e.g. v1.0.0) publishes a GitHub release with the
+# public surface, index/, as one zip. Consumers can then take a named release
 # from one URL instead of cloning the repository, and build without the network
 # from the downloaded file. The zip holds exactly what index/manifest.csv
-# covers plus the two READMEs, so its manifest verifies it.
-# tag `v<VERSION>.<n>` を push すると、公開面 index/ を1つの zip にして release に付ける。
-# 利用者は clone せずに名前の付いた版を1つの URL から取れる。
-#
-# The tag's major number must equal index/VERSION. VERSION stays 1 until the
-# first formal release and is raised for a breaking change after it, so a tag
-# whose major number differs would promise compatibility the data does not have.
-# tag の先頭の数は index/VERSION と一致しなければならない（VERSION は正式リリースまで 1、その後は壊す変更で上げる）。
+# covers plus the two READMEs, so its manifest verifies it. The data carries no
+# version number of its own; breaking changes go in the release notes.
+# tag `v<major>.<minor>…` を push すると、公開面 index/ を1つの zip にして release に付ける。
+# 利用者は clone せずに名前の付いた版を1つの URL から取れる。データの中に版の番号は持たない。
 
 on:
   push:
@@ -30,16 +26,6 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Check the tag against index/VERSION
-        run: |
-          major="${GITHUB_REF_NAME#v}"
-          major="${major%%.*}"
-          version="$(tr -d '[:space:]' < index/VERSION)"
-          if [ "$major" != "$version" ]; then
-            echo "tag $GITHUB_REF_NAME does not match index/VERSION $version" >&2
-            exit 1
-          fi
-
       # The release must be the surface the checks accept, not merely what the
       # tag happens to point at.
       - name: Check tables and documents
@@ -52,7 +38,7 @@ jobs:
         run: |
           name="ch32-device-data-index-${GITHUB_REF_NAME}"
           mkdir -p "dist/$name"
-          cp index/*.csv index/VERSION index/README.md index/README.ja.md "dist/$name/"
+          cp index/*.csv index/README.md index/README.ja.md "dist/$name/"
           (cd dist && zip -qr "$name.zip" "$name")
           echo "ZIP=dist/$name.zip" >> "$GITHUB_ENV"
 
@@ -62,4 +48,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" "$ZIP" \
             --title "$GITHUB_REF_NAME" \
-            --notes "Public surface (index/) at $(git rev-parse --short HEAD). index/VERSION $(cat index/VERSION). Verify the files against manifest.csv."
+            --notes "Public surface (index/) at $(git rev-parse --short HEAD). Verify the files against manifest.csv. Breaking changes, if any, are listed below."

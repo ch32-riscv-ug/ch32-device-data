@@ -1169,11 +1169,11 @@ def index_checks(t: dict) -> list[str]:
     with (paths.INDEX / "manifest.csv").open(encoding="utf-8") as f:
         for r in csv.DictReader(f):
             listed[r["path"]] = r["sha256"]
-    # build_index.manifest_files と同じ範囲（CSV と VERSION）。build_index は pdf 系を import
+    # build_index.manifest_files と同じ範囲（index/ の CSV）。build_index は pdf 系を import
     # するので、標準ライブラリだけで動くこの検査は同じ条件を自分で書く。
     actual = {p.relative_to(paths.INDEX).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
               for p in paths.INDEX.rglob("*")
-              if p.is_file() and (p.suffix == ".csv" or p.name == "VERSION")
+              if p.is_file() and p.suffix == ".csv"
               and p.name != "manifest.csv"}
     if listed != actual:
         changed = sorted(set(listed) ^ set(actual)) or sorted(k for k in listed if listed[k] != actual.get(k))
@@ -1240,8 +1240,8 @@ def column_dictionary() -> list[str]:
         if not r["meaning"].strip() or not r["empty"].strip():
             bad.append(f"{where} の meaning か empty が空")
         # `spelling`: 綴りを誰が決めるか（2026-10-01、core の相談）。`fixed` はこの repository が
-        # 決める鍵・識別子・語彙で、既存の綴りを変えるのは壊す変更（正式リリースのあとは VERSION を上げる）。`as-printed` は資料・EVT の
-        # 綴りのままで、資料の改版で VERSION を上げずに変わりうる。`prose` は照合に使わない文。空は値の列。
+        # 決める鍵・識別子・語彙で、既存の綴りを変えるのは壊す変更（リリースノートに書く）。`as-printed` は資料・EVT の
+        # 綴りのままで、資料の改版で変わりうる。`prose` は照合に使わない文。空は値の列。
         if r["spelling"] not in ("fixed", "as-printed", "prose", ""):
             bad.append(f"{where} の spelling {r['spelling']!r} が語彙に無い")
         if (r["spelling"] == "") != (r["format"] in SPELLING_FREE or r["column"] in VALUE_COLUMNS):
@@ -1344,8 +1344,6 @@ def published_surface(tables: Path | None) -> list[str]:
     - そのまま公開する目録・証拠の表（`paths.PUBLISHED`）は index/ に在り、catalog/・evidence/ に
       同じ名前の表が残っていない（公開面の表は1つだけ）
     - index/ に在る CSV は、索引の表か公開する表のどちらか。名前の無いファイルは公開面に紛れない
-    - `VERSION` は正の整数1つ。consumer を壊す変更（列の削除・改名・書き方・family 名）は
-      これを上げてから入れる。足すだけの変更は上げない
     """
     bad = []
     for name in paths.PUBLISHED:
@@ -1359,10 +1357,10 @@ def published_surface(tables: Path | None) -> list[str]:
         if p.stem not in known:
             bad.append(f"公開面: index/{p.name} は索引の表でも公開する表でもない（paths.py に無い）")
     bad += column_dictionary()
-    version = paths.INDEX / "VERSION"
-    text = version.read_text(encoding="utf-8").strip() if version.exists() else ""
-    if not re.fullmatch(r"[1-9]\d*", text):
-        bad.append(f"公開面: index/VERSION が正の整数1つでない（{text!r}）")
+    stray = sorted(p.name for p in paths.INDEX.iterdir()
+                   if p.is_file() and p.suffix not in (".csv", ".md"))
+    if stray:
+        bad.append(f"公開面: index/ に CSV と README 以外のファイルがある {stray}——版の番号はデータに持たない")
     return bad
 
 
