@@ -1010,12 +1010,16 @@ def family_key(family: str) -> tuple[int, str]:
 
 
 # 「Find by feature」の分類。**選ぶときに効く軸**でまとめる。
+# 分類の中は**ここに書いた順**に並べる（種類の近いもの・親子を隣に。USB の子は親の直後、
+# UART は USART の隣）。持つ series の数では並べ替えない——行の位置が毎回変わり、
+# 似た機能が離れるため（2026-11-04 ユーザー判断）。何 series が持つかは行の長さで分かる。
 # ここに無いタグが現れたら生成を落とす（分類の穴を黙って作らないため）。
 FEATURE_CATEGORIES = (
-    ("Connectivity", ("USB", "USBD", "USBFS", "USBHS", "USBSS", "USB-PD",
-                      "CAN", "ETHERNET", "BLE", "USART", "UART", "I2C", "I3C", "SPI",
-                      "I2S", "SWPMI", "SERDES", "UHSIF", "PIOC")),
-    ("Analog", ("ADC", "TKey", "HSADC", "DAC", "OPA", "CMP", "DFSDM")),
+    ("Connectivity", ("USB", "USBFS", "USBHS", "USBSS", "USBD", "USB-PD",
+                      "USART", "UART", "I2C", "I3C", "SPI", "I2S", "SWPMI",
+                      "CAN", "ETHERNET", "BLE",
+                      "SERDES", "UHSIF", "PIOC")),
+    ("Analog", ("ADC", "TKey", "HSADC", "DFSDM", "DAC", "OPA", "CMP")),
     ("Motor and power drive", ("GATE-DRIVER", "ISP", "ISINK", "ISOURCE", "QII")),
     ("Display, audio and camera", ("LTDC", "DVP", "ARGB", "GPHA", "SAI")),
     ("Memory and storage", ("MEMORY", "PSRAM", "FMC", "FSMC", "QSPI", "SDIO",
@@ -1127,11 +1131,11 @@ def org_profile(data: Data) -> str:
                 cells.append(f"[{family}]({url}) ({names})")
             return f"| **{shown}** | {'<br>'.join(cells)} |"
 
-        # **選定に効く順。** 全 series が持つ機能は「どれを選ぶか」を決めないので
-        # 畳み、少数の series にしかない機能を上に出す（worklist G7）。
+        # 全 series が持つ機能は「どれを選ぶか」を決めないので畳む（worklist G7）。
         def covers(tag: str) -> int:
             return len({s for f in by_tag[tag] for s in by_tag[tag][f]})
-        common = sorted(t for t in by_tag if covers(t) == len(every))
+        order = [t for _, tags in FEATURE_CATEGORIES for t in tags]
+        common = sorted((t for t in by_tag if covers(t) == len(every)), key=order.index)
         feature += ["## Find by feature", "",
                     "Which series have a given peripheral, from the feature "
                     "chapter of each datasheet, grouped by what a choice usually "
@@ -1143,8 +1147,7 @@ def org_profile(data: Data) -> str:
                     "[`index/capabilities.csv`](https://github.com/ch32-riscv-ug/"
                     "ch32-device-data/blob/main/index/capabilities.csv).", ""]
         for name, tags in FEATURE_CATEGORIES:
-            listed = sorted((t for t in tags if t in by_tag and t not in common),
-                            key=lambda t: (covers(t), t))
+            listed = [t for t in tags if t in by_tag and t not in common]
             if not listed:
                 continue
             feature += [f"### {name}", "", "| Feature | Repository (series) |",

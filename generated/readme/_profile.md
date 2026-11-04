@@ -46,83 +46,83 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 
 | Feature | Repository (series) |
 |---|---|
+| **USB** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303\*, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **USB / USBFS** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208\*)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303\*, CH32V305\*, CH32V307\*, CH32V317\*)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **USB / USBHS** | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **USB / USBSS** | [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X315)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
+| **USB / USBD** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208) |
+| **USB / USB-PD** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203\*)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205\*)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **USART** | [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) (CH32V003)<br>[CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007\*, CH32V002\*, CH32V004\*, CH32V005\*, CH32V006\*, CH32V007\*)<br>[CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **UART** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
+| **I3C** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **I2S** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **SWPMI** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **CAN** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **ETHERNET** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
 | **BLE** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V208) |
 | **SERDES** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
 | **UHSIF** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
-| **USB / USBD** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208) |
-| **SWPMI** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USB / USBSS** | [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X315)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
-| **I3C** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 | **PIOC** | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033, CH32X035)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **ETHERNET** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
-| **UART** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
-| **I2S** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USB / USBHS** | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USB / USB-PD** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203\*)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205\*)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **CAN** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USB / USBFS** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208\*)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303\*, CH32V305\*, CH32V307\*, CH32V317\*)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USB** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303\*, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **USART** | [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) (CH32V003)<br>[CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007\*, CH32V002\*, CH32V004\*, CH32V005\*, CH32V006\*, CH32V007\*)<br>[CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 
 ### Analog
 
 | Feature | Repository (series) |
 |---|---|
-| **DFSDM** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **HSADC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **DAC** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 | **ADC / TKey** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32V005\*, CH32V006\*)<br>[CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033\*, CH32X035\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103) |
-| **CMP** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007, CH32V007)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033, CH32X035)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **HSADC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **DFSDM** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **DAC** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 | **OPA** | [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) (CH32V003\*)<br>[CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007, CH32V005, CH32V006, CH32V007)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033, CH32X035)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **CMP** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007, CH32V007)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307)<br>[CH32X035](https://github.com/ch32-riscv-ug/CH32X035) (CH32X033, CH32X035)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 
 ### Motor and power drive
 
 | Feature | Repository (series) |
 |---|---|
+| **GATE-DRIVER** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007\*, CH32V007\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*) |
+| **ISP** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
 | **ISINK** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
 | **ISOURCE** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
-| **ISP** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
 | **QII** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
-| **GATE-DRIVER** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) (CH32M007\*, CH32V007\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030\*) |
 
 ### Display, audio and camera
 
 | Feature | Repository (series) |
 |---|---|
-| **GPHA** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **SAI** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
-| **ARGB** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315) |
 | **LTDC** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 | **DVP** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **ARGB** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315) |
+| **GPHA** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **SAI** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 
 ### Memory and storage
 
 | Feature | Repository (series) |
 |---|---|
-| **FMC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
 | **PSRAM** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V467) |
-| **SDMMC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
-| **QSPI** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
+| **FMC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
 | **FSMC** | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V307)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H417) |
+| **QSPI** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
 | **SDIO** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H417) |
+| **SDMMC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H416, CH32H417) |
 
 ### Timers
 
 | Feature | Repository (series) |
 |---|---|
-| **WDG / IWDG** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*) |
-| **SYSTICK** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103) |
-| **WDG / WWDG** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
 | **LPTIM** | [CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **SYSTICK** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103) |
 | **RTC** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203, CH32V208)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32X315](https://github.com/ch32-riscv-ug/CH32X315) (CH32X305, CH32X315)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103, CH32M103)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
+| **WDG / IWDG** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*) |
+| **WDG / WWDG** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32M030](https://github.com/ch32-riscv-ug/CH32M030) (CH32M030) |
 
 ### Security
 
 | Feature | Repository (series) |
 |---|---|
-| **ECDC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415\*, CH32H416\*, CH32H417\*) |
 | **RNG** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303, CH32V305, CH32V307, CH32V317)<br>[CH32V407](https://github.com/ch32-riscv-ug/CH32V407) (CH32V407, CH32V467)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415, CH32H416, CH32H417) |
 | **CRC** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) (CH32V103\*)<br>[CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) (CH32V203\*, CH32V208\*)<br>[CH32V205](https://github.com/ch32-riscv-ug/CH32V205) (CH32V205\*)<br>[CH32V307](https://github.com/ch32-riscv-ug/CH32V307) (CH32V303\*, CH32V305\*, CH32V307\*, CH32V317\*)<br>[CH32L103](https://github.com/ch32-riscv-ug/CH32L103) (CH32L103\*, CH32M103\*)<br>[CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415\*, CH32H416\*, CH32H417\*) |
+| **ECDC** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) (CH32H415\*, CH32H416\*, CH32H417\*) |
 
 ### System
 
@@ -135,21 +135,21 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 
 | Feature | Repository (series) |
 |---|---|
+| **I2C** | every series |
+| **SPI** | every series |
 | **ADC** | every series |
+| **MEMORY** | every series |
+| **TIM** | every series |
+| **WDG** | every series |
 | **CLOCK** | every series |
 | **DMA** | every series |
 | **EXTI** | every series |
 | **GPIO** | every series |
-| **I2C** | every series |
+| **PFIC** | every series |
+| **SDI** | every series |
+| **POWER** | every series |
 | **LDO** | every series |
 | **LOW-POWER** | every series |
-| **MEMORY** | every series |
-| **PFIC** | every series |
-| **POWER** | every series |
-| **SDI** | every series |
-| **SPI** | every series |
-| **TIM** | every series |
-| **WDG** | every series |
 
 </details>
 
