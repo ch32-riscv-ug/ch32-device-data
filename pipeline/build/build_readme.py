@@ -979,14 +979,14 @@ def org_profile(data: Data) -> str:
     # series、その中に型番。リポジトリ名は family の名前なので（CH32M007 は CH32V006 に、CH32M103 は
     # CH32L103 に入る）、型番からは辿れない——series と型番を family の下に全部並べて、ここで引けるようにする。
     # **型番は viewer への直リンク**——例示だけして行き先が無いと、読む人は型番名をコピーして別の場所を探す。
+    # 1つの表にまとめる（family ごとに表を分けると一覧できない）。family の欄はそのかたまりの最初の行にだけ書く。
     find = ["## Families", "",
             "Each repository holds one family -- one WCH EVT package -- with its datasheets and "
-            "reference manual. Its series and part numbers are listed under it; a part number "
-            "opens that part's pin map.", ""]
+            "reference manual. Its series and part numbers follow it; a part number opens that "
+            "part's pin map.", "",
+            "| Family | Core | Series | Part numbers |", "|---|---|---|---|"]
     for f in families:
         url = f"https://github.com/{f['repository']}"
-        cores = ", ".join(sorted({c for token in f["cores"].split(";")
-                                  for c in token.split(" + ") if c}))
         docs = []
         if f["datasheets"]:
             docs.append(f"DS×{len(f['datasheets'].split(';'))}")
@@ -994,17 +994,20 @@ def org_profile(data: Data) -> str:
             docs.append("RM")
         if f["evt"]:
             docs.append("EVT")
-        count = int(f["part_number_count"])
-        find += [f"### [{f['family']}]({url})", "",
-                 f"{cores} · {count} part{'s' if count != 1 else ''} · {' · '.join(docs)}", "",
-                 "| Series | Part numbers |", "|---|---|"]
+        head = f"**[{f['family']}]({url})**<br>{f['part_number_count']} parts · {' '.join(docs)}"
+        last_core = None
         for s in data.series:
             if s["family"] != f["family"]:
                 continue
             parts = [p["part_number"] for p in data.products if p["series"] == s["series"]]
             shown = ", ".join(f"[{n}]({VIEWER}?chip={n})" for n in parts)
-            find.append(f"| [**{s['series']}**]({VIEWER}?chip={s['series']}) | {shown} |")
-        find.append("")
+            # コアは family の中で前の行と違うときだけ書く（同じ値の繰り返しで表が読みにくくなるため）。
+            core = s["core"] if s["core"] != last_core else ""
+            last_core = s["core"]
+            find.append(f"| {head} | {core} | [**{s['series']}**]({VIEWER}?chip={s['series']}) "
+                        f"| {shown} |")
+            head = ""
+    find.append("")
 
     viewer = ["## Pin-function viewer", "",
               f"**[Pin and alternate-function viewer]({VIEWER})** -- every part "
