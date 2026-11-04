@@ -138,9 +138,7 @@ matches), `conflict` = the size served differs from the one listed, `reference` 
 
 **Older versions are not in the table** (it holds only what is current). For the IDE, upstream's
 archive is printed by `uv run pipeline/build/build_toolchains.py --history`. For the toolchain, upstream's API
-does not keep one; older builds are in the releases of
-[ch32-riscv-ug/MounRiver_Studio_Community_miror](https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror/releases)
-(1.91, 1.92).
+does not keep one.
 
 Note this is a different thing from what the [worklist](../docs/worklist.ja.md) (Japanese) excludes --
 the **per-chip support status** of toolchains. That would have to be transcribed by a person with no

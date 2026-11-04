@@ -168,13 +168,14 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 
 ## Data
 
-- [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data): the normalised tables (series, products, packages, pins, remap) every mirror README is generated from. Each value carries its evidence and confidence.
-
-## Toolchain mirror
-
-- https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror
+- [ch32-device-data](https://github.com/ch32-riscv-ug/ch32-device-data): the tables these pages are generated from -- parts, pins and remap routes, registers, clocks, interrupts, flash and option bytes, errata -- with the evidence and confidence of every value. Programs read [`index/`](https://github.com/ch32-riscv-ug/ch32-device-data/tree/main/index).
 
 ## Arduino IDE
 
-- https://github.com/ch32-riscv-ug/arduino_core_ch32_riscv_noneos   (runs EVT code on the Arduino IDE)
-- https://github.com/ch32-riscv-ug/arduino_core_ch32_riscv_arduino   (Arduino-compatible core)
+- [ArduinoCore-CH32RV](https://github.com/ch32-riscv-ug/ArduinoCore-CH32RV): the Arduino core for CH32 RISC-V.
+  Boards Manager URL: `https://ch32-riscv-ug.github.io/ArduinoCore-CH32RV/package_ch32-riscv-ug_index.json`
+
+## Tools
+
+- [ch32rv](https://github.com/ch32-riscv-ug/ch32rv): one CLI to flash and debug CH32 RISC-V parts through a
+  WCH-Link, an OEP probe or a board's bootloader (installed with the Arduino core)

@@ -136,9 +136,7 @@ curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | pyt
 
 **旧版は表に入れません**（「いま最新」だけを持ちます）。IDE の旧版は
 `uv run pipeline/build/build_toolchains.py --history` で上流の一覧が出ます。ツールチェーンの旧版は
-上流のAPIが持っていないので、必要なら
-[ch32-riscv-ug/MounRiver_Studio_Community_miror](https://github.com/ch32-riscv-ug/MounRiver_Studio_Community_miror/releases)
-の release（1.91・1.92）から取ります。
+上流のAPIが持っていません。
 
 なお [worklist](../docs/worklist.ja.md) の「載せないもの」——ツールチェーンの**チップ別対応状況**
 ——とは別物です。あちらは人が書き写すしかなく検出手段がないので載せません。こちらは上流が
