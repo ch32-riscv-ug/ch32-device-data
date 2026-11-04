@@ -6,6 +6,9 @@ READMEは画像の存在を確認してから節を出すのではなく、**決
 決まります。このツールがその一覧です。
 
   image/architecture_<SERIES>.png       シリーズごとの内部ブロック図
+  image/system_<SERIES>.<png|jpg>       WCH 製品ページの系统框图。公式にある
+                                        series だけ（curated/system-diagrams.csv。
+                                        tools/fetch_system_diagrams.py が取る）
   image/pinout_<PART>_<PACKAGE>.png     ピン配置図。ピン配置が実際に異なる
                                         単位で1枚（同一配置の型番は共有し、
                                         名前はその中で最小の型番を使う）
@@ -62,6 +65,14 @@ def required():
     for s in load("series"):
         need[s["family"]][f"architecture_{s['series']}.png"] = (
             f"{s['series']} internal block diagram")
+    diagrams = paths.CURATED / "system-diagrams.csv"
+    if diagrams.exists():
+        family = {s["series"]: s["family"] for s in load("series")}
+        with diagrams.open(encoding="utf-8", newline="") as f:
+            for r in csv.DictReader(f):
+                suffix = Path(r["image_url"]).suffix.lower() or ".png"
+                need[family[r["series"]]][f"system_{r['series']}{suffix}"] = (
+                    f"{r['series']} system block diagram (WCH product page)")
     for (family, name), parts in pinout_groups().items():
         need[family][name] = "pinout: " + ", ".join(parts)
     for p in load("packages"):

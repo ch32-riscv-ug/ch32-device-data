@@ -694,17 +694,36 @@ PACKAGE_IMAGES = ("https://raw.githubusercontent.com/ch32-riscv-ug/"
                   "WCH-common/main/image")
 
 
+def system_diagrams() -> dict[str, str]:
+    """{series: mirror の画像ファイル名}。WCH の製品ページに「系统框图」がある
+    series だけ（tools/fetch_system_diagrams.py が取って記録する）。"""
+    path = paths.CURATED / "system-diagrams.csv"
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8", newline="") as f:
+        return {r["series"]: f"system_{r['series']}{Path(r['image_url']).suffix.lower() or '.png'}"
+                for r in csv.DictReader(f)}
+
+
 def block_diagrams(data: Data, family: str) -> list[str]:
-    """シリーズごとのブロック図。データシートの第1章から切り出したもので、
-    名前は固定（存在確認はしない）。"""
+    """シリーズごとの図。WCH の製品ページの System Block Diagram は、公式に
+    ある series にだけ出す（無い series のために描かない）。データシートの
+    第1章から切り出した内部構成図は全 series にあるので、畳んで添える。
+    データシートの図の名前は固定（存在確認はしない）。"""
     series = data.family_series(family)
     if not series:
         return []
+    official = system_diagrams()
     out = ["## Block diagrams", ""]
     for s in series:
-        out += [f"### {s['series']}",
-                f'<img src="image/architecture_{s["series"]}.png" '
-                f'alt="{s["series"]} block diagram" />', ""]
+        name = s["series"]
+        out += [f"### {name}", ""]
+        if name in official:
+            out += [f'<img src="image/{official[name]}" alt="{name} system block diagram" />', "",
+                    f"System block diagram from the [WCH product page]({s['product_url_en']}).", ""]
+        out += ["<details><summary>Internal block diagram (datasheet)</summary>", "",
+                f'<img src="image/architecture_{name}.png" alt="{name} internal block diagram" />', "",
+                "</details>", ""]
     return out
 
 
