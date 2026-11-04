@@ -849,11 +849,13 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
 
 # 冒頭のジャンプ行に出す節。(見出し文, 出す名前)。**その README に実際に
 # ある見出しだけ**を出すので、Errata の無い family には Errata が出ない。
+# ページの節の順に並べる。
 NAV = (("Product comparison", "Choose a part"),
+       ("Documents", "Documents"),
        ("Pin maps & alternate functions", "Pin maps"),
+       ("Quick start", "Quick start"),
        ("Errata", "Errata"),
        ("EVT examples", "Examples"),
-       ("Documents", "Documents"),
        ("Address map", "Address map"))
 
 
@@ -874,27 +876,30 @@ def nav_line(body: list[str], family: str, data: Data) -> list[str]:
              for heading, shown in NAV if heading in present]
     series = data.family_series(family)
     if series:
-        links.insert(1, f"[Pin viewer]({VIEWER}?chip={series[0]['series']})")
+        # viewer はピン表の隣に置く（ページの中のピン表と同じものを、型番で絞って見る道具）。
+        at = next((i + 1 for i, link in enumerate(links) if link.startswith("[Pin maps]")), len(links))
+        links.insert(at, f"[Pin viewer]({VIEWER}?chip={series[0]['series']})")
     # 1つしか行き先が無いなら案内にならない（WCH-common は Documents だけ）。
     return [" &middot; ".join(links), ""] if len(links) > 1 else []
 
 
 def render(data: Data, family: str) -> str:
-    # **節の順は U1（初めて触る人）→ U2 → U3。** 以前は U3（開発中の人）向けに
-    # Series・Debug defaults・Documents が先に来ていた。最初に触る人が要るのは
-    # 「どう書き込むか」と「どの型番か」で、資料の一覧はその後（worklist の B4）。
+    # **節の順は大きい単位から小さい単位へ**: family の中の series、型番の比較、chip の構成図、資料、
+    # パッケージ、ピン、書き込みの既定、エラッタ、例題、番地表。
     lines = [f"# {family}", "", NOTICE, ""]
     # mirrorのcommitと日付は**出さない**——生成物が変わらないのにこの行だけ更新され、
     # 差分がそれだけのcommitが増えていた（ユーザー指摘、2026-09-06）。mirrorは翌日には
     # 最新に揃っており、いつの原典から作ったかはgitの履歴と`catalog/sources.csv`で辿れる。
     body: list[str] = []
     lines, out = body, lines  # 以降は body に積み、最後に nav を挟んで戻す
-    lines += quick_start_section(data, family)
     lines += series_section(data, family)
     if data.family_series(family):
         lines += ["## Product comparison", ""]
         for s in data.family_series(family):
             lines += comparison_section(data, s)
+    lines += block_diagrams(data, family)
+    lines += documents_section(data, family)
+    lines += eval_board_lines(data, family)
     lines += pinout_reference(data, family)
     if data.family_series(family):
         # **pin 表は silicon の機能の和で、型番の周辺一覧ではない。** datasheet が
@@ -914,11 +919,9 @@ def render(data: Data, family: str) -> str:
         lines += pin_map_section(data, s, collapse)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
-    lines += block_diagrams(data, family)
+    lines += quick_start_section(data, family)
     lines += errata_section(data, family)
     lines += evt_examples_section(data, family)
-    lines += documents_section(data, family)
-    lines += eval_board_lines(data, family)
     lines += reference_section(data, family)
     lines += extras_section(family)
     lines += ["---",
@@ -966,23 +969,22 @@ FEATURE_CATEGORIES = (
 
 
 def org_profile(data: Data) -> str:
-    """The organisation landing page: which series live in which repository.
+    """The organisation landing page, from the largest unit to the smallest.
 
-    The family repositories are named after document families (CH32V20x holds
-    V203, V205 and V208), which hides what is inside; this table states it.
+    Families (one repository each) first, with their series and part numbers inside;
+    then the features to choose by, the viewer, and the other repositories.
     """
     families = load("families")
-    # **節の順は用途の順**（worklist G4）。以前は「文書 mirror の一覧」が先頭で、
-    # いちばん多い用いられ方である「自分の型番はどこか」がその下にあった。
-    # 資料の置き場所は、探しているものが見つかったあとに要るもの。
-    mirrors = ["## Device documentation mirrors", "",
-               "Where each document family is mirrored. "
-               "Repository names follow the document family, not the part number.", "",
-               "| Repository | Series inside | Cores | Products | Documents |",
-               "|---|---|---|---|---|"]
+    # **大きいものから小さいものへ。** family（WCH の EVT パッケージの単位で、リポジトリ1つ）の中に
+    # series、その中に型番。リポジトリ名は family の名前なので（CH32M007 は CH32V006 に、CH32M103 は
+    # CH32L103 に入る）、型番からは辿れない——series と型番を family の下に全部並べて、ここで引けるようにする。
+    # **型番は viewer への直リンク**——例示だけして行き先が無いと、読む人は型番名をコピーして別の場所を探す。
+    find = ["## Families", "",
+            "Each repository holds one family -- one WCH EVT package -- with its datasheets and "
+            "reference manual. Its series and part numbers are listed under it; a part number "
+            "opens that part's pin map.", ""]
     for f in families:
         url = f"https://github.com/{f['repository']}"
-        series = ", ".join(f["series"].split(";"))
         cores = ", ".join(sorted({c for token in f["cores"].split(";")
                                   for c in token.split(" + ") if c}))
         docs = []
@@ -992,27 +994,17 @@ def org_profile(data: Data) -> str:
             docs.append("RM")
         if f["evt"]:
             docs.append("EVT")
-        mirrors.append(f"| [{f['family']}]({url}) | {series} | {cores} "
-                       f"| {f['part_number_count']} | {' '.join(docs)} |")
-    # 型番から辿れるように。リポジトリ名は文書ファミリーの名前なので、
-    # CH32M007がCH32V006に、CH32M103がCH32L103に入っている等は
-    # 型番を知っているだけでは辿り着けない。
-    # **型番は viewer への直リンクにする**（G4）——例示だけして行き先が無いと、
-    # 読む人はここから型番名をコピーして別の場所を探すことになる。
-    find = ["## Find your part", "",
-            "Look up the series (the first 8 characters of a part number). "
-            "The example part numbers open that part's pin map.", "",
-            "| Series | Repository | Products | Example part numbers |",
-            "|---|---|---|---|"]
-    for s in data.series:
-        parts = [p["part_number"] for p in data.products
-                 if p["series"] == s["series"]]
-        shown = ", ".join(f"[{n}]({VIEWER}?chip={n})" for n in parts[:3])
-        if len(parts) > 3:
-            shown += f", [… all {len(parts)}]({VIEWER}?chip={s['series']})"
-        url = f"https://github.com/ch32-riscv-ug/{s['family']}"
-        find.append(f"| **{s['series']}** | [{s['family']}]({url}) "
-                    f"| {len(parts)} | {shown} |")
+        count = int(f["part_number_count"])
+        find += [f"### [{f['family']}]({url})", "",
+                 f"{cores} · {count} part{'s' if count != 1 else ''} · {' · '.join(docs)}", "",
+                 "| Series | Part numbers |", "|---|---|"]
+        for s in data.series:
+            if s["family"] != f["family"]:
+                continue
+            parts = [p["part_number"] for p in data.products if p["series"] == s["series"]]
+            shown = ", ".join(f"[{n}]({VIEWER}?chip={n})" for n in parts)
+            find.append(f"| [**{s['series']}**]({VIEWER}?chip={s['series']}) | {shown} |")
+        find.append("")
 
     viewer = ["## Pin-function viewer", "",
               f"**[Pin and alternate-function viewer]({VIEWER})** -- every part "
@@ -1101,7 +1093,7 @@ def org_profile(data: Data) -> str:
             feature += [row(t) for t in common]
             feature += ["", "</details>", ""]
 
-    lines = [ORG_INTRO, NOTICE, ""] + find + [""] + feature + viewer + mirrors
+    lines = [ORG_INTRO, NOTICE, ""] + find + feature + viewer
 
     common = sorted(d["document"] for d in data.documents
                     if "WCH-common" in d["repositories"].split(";")

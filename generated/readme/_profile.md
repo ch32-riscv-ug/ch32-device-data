@@ -4,39 +4,120 @@ This is a user group that uses RISC-V chips such as WCH's CH32V series.
 
 <!-- This file is generated from ch32-riscv-ug/ch32-device-data (index/ + evidence/ + pipeline/build/build_readme.py). Edit there, not here. -->
 
-## Find your part
+## Families
 
-Look up the series (the first 8 characters of a part number). The example part numbers open that part's pin map.
+Each repository holds one family -- one WCH EVT package -- with its datasheets and reference manual. Its series and part numbers are listed under it; a part number opens that part's pin map.
 
-| Series | Repository | Products | Example part numbers |
-|---|---|---|---|
-| **CH32H415** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) | 1 | [CH32H415REU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H415REU6) |
-| **CH32H416** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) | 1 | [CH32H416RDU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H416RDU6) |
-| **CH32H417** | [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) | 3 | [CH32H417MEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417MEU6), [CH32H417QEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417QEU6), [CH32H417WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417WEU6) |
-| **CH32L103** | [CH32L103](https://github.com/ch32-riscv-ug/CH32L103) | 6 | [CH32L103C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103C8T6), [CH32L103F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103F8P6), [CH32L103F8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103F8U6), [… all 6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103) |
-| **CH32M007** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 4 | [CH32M007E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007E8R6), [CH32M007E8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007E8U7), [CH32M007G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007G8R6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007) |
-| **CH32M030** | [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) | 5 | [CH32M030C8T7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8T7), [CH32M030C8U3](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U3), [CH32M030C8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U7), [… all 5](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030) |
-| **CH32M103** | [CH32L103](https://github.com/ch32-riscv-ug/CH32L103) | 1 | [CH32M103G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M103G8R6) |
-| **CH32V002** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 5 | [CH32V002A4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002A4M6), [CH32V002D4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002D4U6), [CH32V002F4P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002F4P6), [… all 5](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002) |
-| **CH32V003** | [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) | 4 | [CH32V003A4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003A4M6), [CH32V003F4P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003F4P6), [CH32V003F4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003F4U6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003) |
-| **CH32V004** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 2 | [CH32V004F6P1](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V004F6P1), [CH32V004F6U1](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V004F6U1) |
-| **CH32V005** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 4 | [CH32V005D6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005D6U6), [CH32V005E6R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005E6R6), [CH32V005F6P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005F6P6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005) |
-| **CH32V006** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 8 | [CH32V006D8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006D8U7), [CH32V006E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006E8R6), [CH32V006E8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006E8R7), [… all 8](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006) |
-| **CH32V007** | [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | 4 | [CH32V007E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007E8R6), [CH32V007E8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007E8R7), [CH32V007K8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007K8U6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007) |
-| **CH32V103** | [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) | 4 | [CH32V103C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C6T6), [CH32V103C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8T6), [CH32V103C8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8U6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103) |
-| **CH32V203** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | 13 | [CH32V203C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C6T6), [CH32V203C6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C6U6), [CH32V203C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C8T6), [… all 13](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203) |
-| **CH32V205** | [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) | 3 | [CH32V205CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205CCT6), [CH32V205RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205RCT6), [CH32V205VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205VCT6) |
-| **CH32V208** | [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | 4 | [CH32V208CBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208CBU6), [CH32V208GBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208GBU6), [CH32V208RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208RBT6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208) |
-| **CH32V303** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 5 | [CH32V303CBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303CBT6), [CH32V303RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303RBT6), [CH32V303RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303RCT6), [… all 5](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303) |
-| **CH32V305** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 4 | [CH32V305CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305CCT6), [CH32V305FBP6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305FBP6), [CH32V305GBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305GBU6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305) |
-| **CH32V307** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 3 | [CH32V307RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307RCT6), [CH32V307VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307VCT6), [CH32V307WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307WCU6) |
-| **CH32V317** | [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | 2 | [CH32V317VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317VCT6), [CH32V317WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317WCU6) |
-| **CH32V407** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | 4 | [CH32V407KEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407KEU6), [CH32V407RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6), [CH32V407VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6), [… all 4](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407) |
-| **CH32V467** | [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | 3 | [CH32V467RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6), [CH32V467VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6), [CH32V467WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6) |
-| **CH32X033** | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | 1 | [CH32X033F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X033F8P6) |
-| **CH32X035** | [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | 7 | [CH32X035C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035C8T6), [CH32X035D8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035D8U6), [CH32X035F7P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035F7P6), [… all 7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035) |
-| **CH32X305** | [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) | 1 | [CH32X305RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305RCT6) |
-| **CH32X315** | [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) | 3 | [CH32X315CCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315CCU6), [CH32X315MCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315MCU6), [CH32X315WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315WCU6) |
+### [CH32H417](https://github.com/ch32-riscv-ug/CH32H417)
+
+QingKe V3F, QingKe V5F · 5 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32H415**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H415) | [CH32H415REU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H415REU6) |
+| [**CH32H416**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H416) | [CH32H416RDU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H416RDU6) |
+| [**CH32H417**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417) | [CH32H417MEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417MEU6), [CH32H417QEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417QEU6), [CH32H417WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32H417WEU6) |
+
+### [CH32L103](https://github.com/ch32-riscv-ug/CH32L103)
+
+QingKe V4C · 7 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32L103**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103) | [CH32L103C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103C8T6), [CH32L103F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103F8P6), [CH32L103F8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103F8U6), [CH32L103G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103G8R6), [CH32L103K8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103K8U6), [CH32L103K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32L103K8U7) |
+| [**CH32M103**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M103) | [CH32M103G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M103G8R6) |
+
+### [CH32M030](https://github.com/ch32-riscv-ug/CH32M030)
+
+QingKe V3B · 5 parts · DS×2 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32M030**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030) | [CH32M030C8T7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8T7), [CH32M030C8U3](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U3), [CH32M030C8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030C8U7), [CH32M030G8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030G8R7), [CH32M030K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M030K8U7) |
+
+### [CH32V003](https://github.com/ch32-riscv-ug/CH32V003)
+
+QingKe V2A · 4 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V003**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003) | [CH32V003A4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003A4M6), [CH32V003F4P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003F4P6), [CH32V003F4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003F4U6), [CH32V003J4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V003J4M6) |
+
+### [CH32V006](https://github.com/ch32-riscv-ug/CH32V006)
+
+QingKe V2C · 27 parts · DS×5 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32M007**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007) | [CH32M007E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007E8R6), [CH32M007E8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007E8U7), [CH32M007G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007G8R6), [CH32M007K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32M007K8U7) |
+| [**CH32V002**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002) | [CH32V002A4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002A4M6), [CH32V002D4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002D4U6), [CH32V002F4P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002F4P6), [CH32V002F4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002F4U6), [CH32V002J4M6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V002J4M6) |
+| [**CH32V004**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V004) | [CH32V004F6P1](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V004F6P1), [CH32V004F6U1](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V004F6U1) |
+| [**CH32V005**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005) | [CH32V005D6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005D6U6), [CH32V005E6R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005E6R6), [CH32V005F6P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005F6P6), [CH32V005F6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V005F6U6) |
+| [**CH32V006**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006) | [CH32V006D8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006D8U7), [CH32V006E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006E8R6), [CH32V006E8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006E8R7), [CH32V006F4U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006F4U6), [CH32V006F8P7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006F8P7), [CH32V006F8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006F8U7), [CH32V006K8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006K8U6), [CH32V006K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V006K8U7) |
+| [**CH32V007**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007) | [CH32V007E8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007E8R6), [CH32V007E8R7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007E8R7), [CH32V007K8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007K8U6), [CH32V007K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V007K8U7) |
+
+### [CH32V103](https://github.com/ch32-riscv-ug/CH32V103)
+
+QingKe V3A · 4 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V103**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103) | [CH32V103C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C6T6), [CH32V103C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8T6), [CH32V103C8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103C8U6), [CH32V103R8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V103R8T6) |
+
+### [CH32V205](https://github.com/ch32-riscv-ug/CH32V205)
+
+QingKe V3B · 3 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V205**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205) | [CH32V205CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205CCT6), [CH32V205RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205RCT6), [CH32V205VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V205VCT6) |
+
+### [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x)
+
+QingKe V4B, QingKe V4C · 17 parts · DS×2 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V203**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203) | [CH32V203C6T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C6T6), [CH32V203C6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C6U6), [CH32V203C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C8T6), [CH32V203C8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203C8U6), [CH32V203CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203CCT6), [CH32V203F6P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203F6P6), [CH32V203F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203F8P6), [CH32V203F8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203F8U6), [CH32V203G6U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203G6U6), [CH32V203G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203G8R6), [CH32V203K8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203K8T6), [CH32V203K8U7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203K8U7), [CH32V203RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V203RBT6) |
+| [**CH32V208**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208) | [CH32V208CBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208CBU6), [CH32V208GBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208GBU6), [CH32V208RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208RBT6), [CH32V208WBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V208WBU6) |
+
+### [CH32V307](https://github.com/ch32-riscv-ug/CH32V307)
+
+QingKe V4F · 14 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V303**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303) | [CH32V303CBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303CBT6), [CH32V303RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303RBT6), [CH32V303RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303RCT6), [CH32V303RCT7](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303RCT7), [CH32V303VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V303VCT6) |
+| [**CH32V305**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305) | [CH32V305CCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305CCT6), [CH32V305FBP6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305FBP6), [CH32V305GBU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305GBU6), [CH32V305RBT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V305RBT6) |
+| [**CH32V307**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307) | [CH32V307RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307RCT6), [CH32V307VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307VCT6), [CH32V307WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307WCU6) |
+| [**CH32V317**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317) | [CH32V317VCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317VCT6), [CH32V317WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V317WCU6) |
+
+### [CH32V407](https://github.com/ch32-riscv-ug/CH32V407)
+
+QingKe V3V · 7 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32V407**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407) | [CH32V407KEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407KEU6), [CH32V407RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407RET6), [CH32V407VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407VET6), [CH32V407WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V407WEU6) |
+| [**CH32V467**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467) | [CH32V467RET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467RET6), [CH32V467VET6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467VET6), [CH32V467WEU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V467WEU6) |
+
+### [CH32X035](https://github.com/ch32-riscv-ug/CH32X035)
+
+QingKe V4C · 8 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32X033**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X033) | [CH32X033F8P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X033F8P6) |
+| [**CH32X035**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035) | [CH32X035C8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035C8T6), [CH32X035D8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035D8U6), [CH32X035F7P6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035F7P6), [CH32X035F8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035F8U6), [CH32X035G8R6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035G8R6), [CH32X035G8U6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035G8U6), [CH32X035R8T6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X035R8T6) |
+
+### [CH32X315](https://github.com/ch32-riscv-ug/CH32X315)
+
+QingKe V3F · 4 parts · DS×1 · RM · EVT
+
+| Series | Part numbers |
+|---|---|
+| [**CH32X305**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305) | [CH32X305RCT6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X305RCT6) |
+| [**CH32X315**](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315) | [CH32X315CCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315CCU6), [CH32X315MCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315MCU6), [CH32X315WCU6](https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32X315WCU6) |
 
 ## Find by feature
 
@@ -161,24 +242,6 @@ Which series have a given peripheral, from the feature chapter of each datasheet
 - by part: `https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307VCT6`
 - one function: `https://ch32-riscv-ug.github.io/ch32-device-data/pins.html?chip=CH32V307&features=UART`
 
-## Device documentation mirrors
-
-Where each document family is mirrored. Repository names follow the document family, not the part number.
-
-| Repository | Series inside | Cores | Products | Documents |
-|---|---|---|---|---|
-| [CH32H417](https://github.com/ch32-riscv-ug/CH32H417) | CH32H415, CH32H416, CH32H417 | QingKe V3F, QingKe V5F | 5 | DS×1 RM EVT |
-| [CH32L103](https://github.com/ch32-riscv-ug/CH32L103) | CH32L103, CH32M103 | QingKe V4C | 7 | DS×1 RM EVT |
-| [CH32M030](https://github.com/ch32-riscv-ug/CH32M030) | CH32M030 | QingKe V3B | 5 | DS×2 RM EVT |
-| [CH32V003](https://github.com/ch32-riscv-ug/CH32V003) | CH32V003 | QingKe V2A | 4 | DS×1 RM EVT |
-| [CH32V006](https://github.com/ch32-riscv-ug/CH32V006) | CH32M007, CH32V002, CH32V004, CH32V005, CH32V006, CH32V007 | QingKe V2C | 27 | DS×5 RM EVT |
-| [CH32V103](https://github.com/ch32-riscv-ug/CH32V103) | CH32V103 | QingKe V3A | 4 | DS×1 RM EVT |
-| [CH32V205](https://github.com/ch32-riscv-ug/CH32V205) | CH32V205 | QingKe V3B | 3 | DS×1 RM EVT |
-| [CH32V20x](https://github.com/ch32-riscv-ug/CH32V20x) | CH32V203, CH32V208 | QingKe V4B, QingKe V4C | 17 | DS×2 RM EVT |
-| [CH32V307](https://github.com/ch32-riscv-ug/CH32V307) | CH32V303, CH32V305, CH32V307, CH32V317 | QingKe V4F | 14 | DS×1 RM EVT |
-| [CH32V407](https://github.com/ch32-riscv-ug/CH32V407) | CH32V407, CH32V467 | QingKe V3V | 7 | DS×1 RM EVT |
-| [CH32X035](https://github.com/ch32-riscv-ug/CH32X035) | CH32X033, CH32X035 | QingKe V4C | 8 | DS×1 RM EVT |
-| [CH32X315](https://github.com/ch32-riscv-ug/CH32X315) | CH32X305, CH32X315 | QingKe V3F | 4 | DS×1 RM EVT |
 
 ## Cross-family documents
 
