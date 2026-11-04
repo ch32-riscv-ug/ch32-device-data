@@ -39,7 +39,6 @@ import export_markdown  # noqa: E402  cross-pageまで含めた消費集合を�
 
 BUNDLES = REPO / ".cache" / "structured-bundles"
 MARKDOWN = REPO / ".cache" / "structured-markdown"
-VIEWER = "https://ch32-riscv-ug.github.io/ch32-device-data-preview/viewer.html"
 
 WEIGHTS = {"bitnum_leftover": 5, "nonstd_bitdiagram": 3, "cid": 3, "pua": 3,
            "subscript_orphan": 2, "long_line": 1, "table_issue": 1}
@@ -140,8 +139,7 @@ def audit(doc: str) -> list[dict]:
         sig = page_signals(page, md.read_text(encoding="utf-8"), consumed, regions)
         if sig:
             out.append({"doc": doc, "page": number, "score": score(sig),
-                        "signals": sig,
-                        "viewer": f"{VIEWER}#doc={doc}&p={number}"})
+                        "signals": sig})
     return out
 
 
@@ -170,7 +168,8 @@ def main() -> int:
     for r in rows[:args.top]:
         flags = " ".join(f"{k}={v}" for k, v in
                          sorted(r["signals"].items(), key=lambda kv: -WEIGHTS.get(kv[0], 1)))
-        print(f"  [{r['score']:3}] {r['doc']} p{r['page']:<4} {flags}\n        {r['viewer']}")
+        page = MARKDOWN / r["doc"] / "pages" / f"{r['page']:04d}.md"
+        print(f"  [{r['score']:3}] {r['doc']} p{r['page']:<4} {flags}\n        {page}")
     if args.json:
         args.json.write_text(json.dumps(rows, ensure_ascii=False, indent=1) + "\n",
                              encoding="utf-8")

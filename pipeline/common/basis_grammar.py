@@ -8,7 +8,7 @@
              | kind [":" label] ["(" detail ")"]
     document:= 資料の名前（`catalog/documents.csv` の `document`。`.PDF` で終わる）に、過去の版を指すなら `@V<版>`
     lang    := "zh" | "en"
-    locator := "p." <PDF の通しページ番号> [";" detail]   （preview の `<文書>.<言語>/pages/<NNNN>.md` と同じ数）
+    locator := "p." <PDF の通しページ番号> [";" detail]   （mirror の PDF を `#page=N` で開くときの数）
              | detail
     dissent := "(" column "=" value ("," column "=" value)* ")"
                その出所が言う値を、食い違う列の名前つきで（`!CH32V007DS0.PDF:zh(max=115)`）

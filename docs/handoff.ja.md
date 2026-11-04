@@ -147,10 +147,8 @@ cleanになれば次の周期で入る。
 公開面（`index/`）の版を出す手順。push と tag は人が行う。
 
 1. `regenerate.py --full --verify --human` が全段成功した状態を commit する（作業ツリーを clean に）
-2. `pipeline/review/publish_preview.sh ../ch32-device-data-preview` — 構造化 Markdown を preview
-   リポジトリに1コミットで置く（元にした commit をメッセージに書く。push はしない）
-3. 人が push する: このリポジトリの main、preview の main（`git -C ../ch32-device-data-preview push --force origin main`）
-4. 人が tag `v<major>.<minor>…` を打って push する。`.github/workflows/release.yml` が検査を確かめ、`index/` の
+2. 人が push する
+3. 人が tag `v<major>.<minor>…` を打って push する。`.github/workflows/release.yml` が検査を確かめ、`index/` の
    zip を付けた release を作る。壊す変更があればリリースノートに書く
 
 ## 守ること
@@ -194,7 +192,7 @@ cleanになれば次の周期で入る。
   いる文章も同じ commit で直す。数の綴りを変えたときは `check_docs.py` の `ROW_COUNTS`／`PROSE`
   も直す（当たらなくなったら失敗する）
 - 旧Arduino core・EVT tree・公式PDFをこのrepositoryへコピーしない。
-  `ch32_riscv_tools/PinAlternateFunctions`の手製表を根拠にしない
+  出典を持たない手製の表（旧ツールの pin 表や各 repository の手書き README の表）を根拠にしない
 - 生成物に「Arduinoコアの対応状況」を載せない（上流の状態は陳腐化する）
 
 ## 判断の指針

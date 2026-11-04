@@ -119,9 +119,11 @@ locator  := "p." <PDF の通しページ番号> [";" detail]  |  detail
 dissent  := "(" 列 "=" 値 ("," 列 "=" 値)* ")"
 ```
 
-- `CH32V407DS0.PDF:zh(p.59)` は、その datasheet の中文版の PDF 59 ページ。ページ番号は PDF 自身の通し番号で、
-  構造化 preview のページと同じ数です
-  （`https://ch32-riscv-ug.github.io/ch32-device-data-preview/<文書名>.<言語>/pages/<NNNN>.md`）
+- `CH32V407DS0.PDF:zh(p.59)` は、その datasheet の中文版の PDF 59 ページ。ページ番号は PDF 自身の通し番号なので、
+  原本を mirror からそのページで開けます:
+  `https://ch32-riscv-ug.github.io/<repository>/datasheet_<言語>/<文書>#page=<N>`。`<repository>` は
+  `families.csv` の `datasheets`・`reference_manuals` でその文書を持つ family、QingKe のマニュアル・WCH-Link の
+  マニュアル・パッケージ図なら `WCH-common` です
 - `!CH32V007DS0.PDF:zh(max=115)` は、その出所が `max` を 115 と言い、表はもう一方の値を採ったこと。
   このような項は全部 [`conflicts.csv`](conflicts.csv) に集まります（`field` が列、`kept` が表の値、`alternative` が
   異論の値）

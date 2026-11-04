@@ -1325,7 +1325,7 @@ def basis_syntax(t: dict, documents: set[str]) -> list[str]:
     """全表の `basis` 列（`*_basis` も）が文法どおりであること（pipeline/common/basis_grammar.py）。
 
     文法は公開面の約束。`!` の項は食い違う列を `(列=値)` で名指し、文書は `[kind:]<文書>[:言語][(p.N)]`
-    で書く（preview のページに対応する）。知らない kind や目録に無い文書も落とす。
+    で書く（mirror の PDF のそのページに対応する）。知らない kind や目録に無い文書も落とす。
     """
     import basis_grammar  # noqa: PLC0415
     bad = []

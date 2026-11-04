@@ -130,8 +130,10 @@ dissent  := "(" column "=" value ("," column "=" value)* ")"
 ```
 
 - `CH32V407DS0.PDF:zh(p.59)` = the Chinese edition of that datasheet, PDF page 59. The page number is the
-  PDF's own page index, the same number the structured preview uses
-  (`https://ch32-riscv-ug.github.io/ch32-device-data-preview/<document stem>.<lang>/pages/<NNNN>.md`).
+  PDF's own page index, so the original opens at that page from its mirror:
+  `https://ch32-riscv-ug.github.io/<repository>/datasheet_<lang>/<document>#page=<N>`, where `<repository>` is
+  the family that lists the document in `families.csv` (`datasheets`, `reference_manuals`), or `WCH-common`
+  for the QingKe manuals, the WCH-Link manual and the package drawings.
 - `!CH32V007DS0.PDF:zh(max=115)` = that source states `max` as 115; the table kept the other value.
   [`conflicts.csv`](conflicts.csv) collects every such term: `field` is the column, `kept` the table's value,
   `alternative` the dissenting value.

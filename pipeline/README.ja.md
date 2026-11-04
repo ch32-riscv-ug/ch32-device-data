@@ -620,25 +620,6 @@ uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
 pdfplumber。環境差（別マシン・CI）の検証は`.github/workflows/structured-repro.yml`。
 
 
-## previewリポジトリ（人向けMarkdownの確認）
-
-`structured-markdown`は量が多く（11k ファイル・約95MB）正式リポジトリに入れると
-ログが汚れるので、**使い捨てのpreviewリポジトリ**に1コミットで公開して
-GitHub Pagesで見る。推奨リポジトリ名: **`ch32-device-data-preview`**（org直下）。
-
-```sh
-uv run pipeline/review/export_markdown.py --all        # トップindexも生成される
-pipeline/review/publish_preview.sh ../ch32-device-data-preview
-# → https://ch32-riscv-ug.github.io/ch32-device-data-preview/
-```
-
-スクリプトは毎回orphan branchを作り直してforce pushするので、**リポジトリは
-常に最新の1コミットだけ**を持ち、履歴が育たない。PagesのJekyllは既定で
-`.md`相対リンクの変換とREADMEのindex化をやる（Liquidが特別扱いする並び——
-波括弧の2連続と「波括弧＋percent」——は
-全出力でゼロを確認済み）。11kファイルでPagesのビルドが時間切れになる場合でも、
-github.comのファイルビューが同じMarkdownを描画する。
-
 ## baseline凍結
 
 `baseline/tables.csv`は正本CSV（index manifest込み。凍結時点で54ファイル、現在60
