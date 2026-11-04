@@ -1058,14 +1058,15 @@ def org_profile(data: Data) -> str:
             if by_tag[tag].keys() and {s for f in by_tag[tag]
                                        for s in by_tag[tag][f]} == every:
                 return f"| **{shown}** | every series |"
+            # リポジトリを先に書く（リンクの位置が行頭にそろう）。リポジトリごとに改行する。
             cells = []
             for family in sorted(by_tag[tag]):
                 names = ", ".join(
                     name + ("" if (tag, name) in confirmed else "\\*")
                     for name in sorted(by_tag[tag][family]))
                 url = f"https://github.com/ch32-riscv-ug/{family}"
-                cells.append(f"{names} ([{family}]({url}))")
-            return f"| **{shown}** | {'; '.join(cells)} |"
+                cells.append(f"[{family}]({url}) ({names})")
+            return f"| **{shown}** | {'<br>'.join(cells)} |"
 
         # **選定に効く順。** 全 series が持つ機能は「どれを選ぶか」を決めないので
         # 畳み、少数の series にしかない機能を上に出す（worklist G7）。
@@ -1087,12 +1088,12 @@ def org_profile(data: Data) -> str:
                             key=lambda t: (covers(t), t))
             if not listed:
                 continue
-            feature += [f"### {name}", "", "| Feature | Series (repository) |",
+            feature += [f"### {name}", "", "| Feature | Repository (series) |",
                         "|---|---|"] + [row(t) for t in listed] + [""]
         if common:
             feature += [f"<details><summary>On every series "
                         f"({len(common)} features)</summary>", "",
-                        "| Feature | Series (repository) |", "|---|---|"]
+                        "| Feature | Repository (series) |", "|---|---|"]
             feature += [row(t) for t in common]
             feature += ["", "</details>", ""]
 
