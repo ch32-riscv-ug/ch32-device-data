@@ -950,6 +950,19 @@ ORG_STATIC = """## Toolchain mirror
 """
 
 
+# TOP に並べる family の順。V 系列を先頭に型番の小さい順（V20x は V205 の前）、続いて X・L・M・H の系列。
+# 文字コード順だと H・L・M が V より前に来て、V205 が V20x より前に来るので、ここで決める。
+# ここに無い family が現れたら生成を落とす（並べる場所を人が決める）。
+FAMILY_ORDER = ("CH32V003", "CH32V006", "CH32V103", "CH32V20x", "CH32V205", "CH32V307", "CH32V407",
+                "CH32X035", "CH32X315", "CH32L103", "CH32M030", "CH32H417")
+
+
+def family_key(family: str) -> int:
+    if family not in FAMILY_ORDER:
+        raise SystemExit(f"build_readme: FAMILY_ORDER に無い family {family!r} -- 並べる場所を足すこと")
+    return FAMILY_ORDER.index(family)
+
+
 # 「Find by feature」の分類。**選ぶときに効く軸**でまとめる。
 # ここに無いタグが現れたら生成を落とす（分類の穴を黙って作らないため）。
 FEATURE_CATEGORIES = (
@@ -974,7 +987,7 @@ def org_profile(data: Data) -> str:
     Families (one repository each) first, with their series and part numbers inside;
     then the features to choose by, the viewer, and the other repositories.
     """
-    families = load("families")
+    families = sorted(load("families"), key=lambda f: family_key(f["family"]))
     # **大きいものから小さいものへ。** family（WCH の EVT パッケージの単位で、リポジトリ1つ）の中に
     # series、その中に型番。リポジトリ名は family の名前なので（CH32M007 は CH32V006 に、CH32M103 は
     # CH32L103 に入る）、型番からは辿れない——series と型番を family の下に全部並べて、ここで引けるようにする。
@@ -1060,7 +1073,7 @@ def org_profile(data: Data) -> str:
                 return f"| **{shown}** | every series |"
             # リポジトリを先に書く（リンクの位置が行頭にそろう）。リポジトリごとに改行する。
             cells = []
-            for family in sorted(by_tag[tag]):
+            for family in sorted(by_tag[tag], key=family_key):
                 names = ", ".join(
                     name + ("" if (tag, name) in confirmed else "\\*")
                     for name in sorted(by_tag[tag][family]))
