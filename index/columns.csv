@@ -142,7 +142,7 @@ device_ids,id_addr,Address the device ID is read from.,hex,never empty,,data
 device_ids,dont_care_bits,"Bits of the ID to ignore when matching (silicon revision), written `[hi:lo]`.",text,never empty,fixed,data
 device_ids,id_source,Measurement channel of a real-silicon read (`memory` address read or `attach` probe response).,enum(memory|attach),"documented or imported value, not measured on silicon",fixed,data
 device_ids,note,Remark on the ID format.,text,no remark,prose,data
-device_ids,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),never empty,fixed,provenance
+device_ids,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 device_ids,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 dma,family,Family key; joins families.family.,name,never empty,fixed,data
 dma,variant,EVT variant macros whose DMA configuration the row belongs to (CH32V20x/V30x).,list(|),same for every variant of the family,as-printed,data

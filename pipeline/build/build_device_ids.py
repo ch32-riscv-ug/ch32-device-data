@@ -101,24 +101,42 @@ def evt_ids(family_of: dict[str, str], address_of: dict[str, str]) -> list[dict]
 
 
 def confirm_measurements(rows: list[dict]) -> None:
+    """実測で行を確かめる。実測が資料（EVT）と食い違うときは、curated に
+    `documented_wrong`（理由）がある型番だけ実測を採り、EVT の値を `!` の出所として
+    残して conflict にする。理由の無い食い違いは生成を落とす（読み違いを黙って採らない）。
+
+    attach の応答を記録していない実測（memory 読みだけ）もある。"""
     measured = json.loads((paths.CURATED / "device-ids-measured.json").read_text())
     by_part = {r["part_number"]: r for r in rows}
     for pn, measurement in measured["measured"].items():
         row = by_part[pn]
-        expected = int(row["device_id"], 16) & 0xffffff0f
-        if (int(measurement["memory_id"], 16) & 0xffffff0f != expected or
-                int(measurement["attach_id"], 16) & 0xffffff0f != expected or
-                int(measurement["id_addr"], 16) != int(row["id_addr"], 16)):
-            raise SystemExit(f"{pn}: measurement disagrees with documented ID/address")
+        memory = int(measurement["memory_id"], 16)
+        reads = [memory] + ([int(measurement["attach_id"], 16)] if "attach_id" in measurement else [])
+        if len({x & 0xffffff0f for x in reads}) != 1 or \
+                int(measurement["id_addr"], 16) != int(row["id_addr"], 16):
+            raise SystemExit(f"{pn}: measurements disagree with each other or with the address")
+        tag = f"device-id:wch-linke({measurement['evidence']})"
+        if memory & 0xffffff0f != int(row["device_id"], 16) & 0xffffff0f:
+            if not measurement.get("documented_wrong"):
+                raise SystemExit(f"{pn}: measurement disagrees with documented ID")
+            documented = row["device_id"]
+            row["device_id"] = f"0x{memory:08X}"
+            row["confidence"] = "conflict"
+            row["id_source"] = "memory"
+            row["note"] = measurement["documented_wrong"]
+            row["basis"] = f"{tag}+!{row['basis']}(device_id={documented})"
+            continue
         row["confidence"] = "confirmed"
         row["id_source"] = "memory"
         # ID が読めたことは書き込めることを意味しない。ch32rv が erase+program+readback を
         # その型番で通した記録（`flash_verified`）がある行だけ verified と書く。
         flashed = measurement.get("flash_verified")
-        row["note"] = ("AttachChip and memory IDs agree; flash programming "
+        row["note"] = (("AttachChip and memory IDs agree" if "attach_id" in measurement
+                        else "memory ID read")
+                       + "; flash programming "
                        + ("verified (erase, program and readback matched)" if flashed
-                          else "not verified"))
-        tag = f"device-id:wch-linke({measurement['evidence']})"
+                          else "not verified")
+                       + (f"; {measurement['remark']}" if measurement.get("remark") else ""))
         if tag not in row["basis"].split("+"):
             row["basis"] += f"+{tag}"
         if flashed and f"flash:ch32rv({flashed})" not in row["basis"].split("+"):

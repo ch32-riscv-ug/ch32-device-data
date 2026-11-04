@@ -1,5 +1,5 @@
 {
-  "_comment": "Identity measurements supplied by ch32rv. Mask revision bits [7:4]. An ID read alone does not establish flash capacity or programming support; `flash_verified` names the ch32rv record of an erase + program + readback that matched on that part (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO).",
+  "_comment": "Identity measurements supplied by ch32rv. Mask revision bits [7:4]. An ID read alone does not establish flash capacity or programming support; `flash_verified` names the ch32rv record of an erase + program + readback that matched on that part (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO). `documented_wrong` (a reason) lets a measurement replace an EVT ID it contradicts: the row keeps the measured ID, turns conflict and keeps the EVT value as a `!` source (2026-11-04: CH32V103C8T6, ch32rv 0011). Entries without `attach_id` record a memory read only.",
   "verified": "2026-10-10",
   "measured": {
     "CH32V205RCT6": {
@@ -33,6 +33,18 @@
       "memory_id": "0x4170053d",
       "id_addr": "0x1ffff704",
       "evidence": "ch32rv/docs/data-requests/measured/device-id-h417-2026-10-10.md"
+    },
+    "CH32V103C8T6": {
+      "memory_id": "0x2500410f",
+      "id_addr": "0x1ffff884",
+      "evidence": "ch32rv/docs/data-requests/0011-ch32v103-device-id.ja.md",
+      "documented_wrong": "EVT lists 0x25004102 for CH32V103C8T, but a CH32V103C8T6 (LQFP48) reads 0x2500410F, the same ID as CH32V103R8T6; the ID does not tell C8T6 from R8T6, and no V103 returning 0x25004102 has been seen"
+    },
+    "CH32V103R8T6": {
+      "memory_id": "0x2500410f",
+      "id_addr": "0x1ffff884",
+      "evidence": "ch32rv/docs/data-requests/0011-ch32v103-device-id.ja.md",
+      "remark": "CH32V103C8T6 reads the same ID, so the ID does not tell R8T6 from C8T6"
     }
   }
 }
