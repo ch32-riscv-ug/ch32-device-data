@@ -952,15 +952,13 @@ ORG_STATIC = """## Toolchain mirror
 
 # TOP に並べる family の順。V 系列を先頭に型番の小さい順（V20x は V205 の前）、続いて X・L・M・H の系列。
 # 文字コード順だと H・L・M が V より前に来て、V205 が V20x より前に来るので、ここで決める。
-# ここに無い family が現れたら生成を落とす（並べる場所を人が決める）。
+# ここに無い family は最後に、名前のアルファベット順で並べる。
 FAMILY_ORDER = ("CH32V003", "CH32V006", "CH32V103", "CH32V20x", "CH32V205", "CH32V307", "CH32V407",
                 "CH32X035", "CH32X315", "CH32L103", "CH32M030", "CH32H417")
 
 
-def family_key(family: str) -> int:
-    if family not in FAMILY_ORDER:
-        raise SystemExit(f"build_readme: FAMILY_ORDER に無い family {family!r} -- 並べる場所を足すこと")
-    return FAMILY_ORDER.index(family)
+def family_key(family: str) -> tuple[int, str]:
+    return (FAMILY_ORDER.index(family) if family in FAMILY_ORDER else len(FAMILY_ORDER), family)
 
 
 # 「Find by feature」の分類。**選ぶときに効く軸**でまとめる。
