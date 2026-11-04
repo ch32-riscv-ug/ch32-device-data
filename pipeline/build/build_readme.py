@@ -217,6 +217,16 @@ def series_section(data: Data, family: str) -> list[str]:
     return out
 
 
+def mirror_url(d: dict, family: str, lang: str) -> str:
+    """その family の README から引く mirror の URL。2つの family が共有する文書（CH32FV2x_V3xRM は CH32V20x と
+    CH32V307）は、目録の URL が最初のリポジトリを指すので、その family 自身の mirror に読み替える。"""
+    url = d[f"mirror_url_{lang}"]
+    first = d["repositories"].split(";")[0]
+    if url and first != family and f"/{first}/" in url:
+        url = url.replace(f"/{first}/", f"/{family}/", 1)
+    return url
+
+
 def documents_section(data: Data, family: str) -> list[str]:
     rows = [d for d in data.documents
             if family in d["repositories"].split(";") and d["status"] == "assigned"]
@@ -232,7 +242,7 @@ def documents_section(data: Data, family: str) -> list[str]:
             links = []
             if d[f"page_url_{lang}"]:
                 links.append(f"[page]({d[f'page_url_{lang}']})")
-            mirror = d[f"mirror_url_{lang}"]
+            mirror = mirror_url(d, family, lang)
             if mirror:
                 links.append(f"[mirror]({mirror})")
             version = f" v{d[f'version_{lang}']}" if d[f"version_{lang}"] else ""
@@ -787,6 +797,26 @@ def quick_start_section(data: Data, family: str) -> list[str]:
         out += [f"Programming and debug: **{' / '.join(wires)} SDI** "
                 "(WCH-Link, `Serial Debug Interface`).", ""]
     out += roles_section(data, family, "###")
+    out += datasheet_links(data, family)
+    return out
+
+
+def datasheet_links(data: Data, family: str) -> list[str]:
+    """データシートとリファレンスマニュアルの PDF への直リンク（mirror の GitHub Pages）。上のほうで引けるように。"""
+    rows = [d for d in data.documents
+            if family in d["repositories"].split(";") and d["status"] == "assigned"
+            and d["kind"] in ("datasheet", "reference-manual")]
+    if not rows:
+        return []
+    rows.sort(key=lambda d: (d["kind"] != "datasheet", d["document"]))
+    out = ["### Datasheets and reference manual", ""]
+    for d in rows:
+        links = [f"[{label}]({mirror_url(d, family, lang)})"
+                 for lang, label in (("en", "English"), ("zh", "中文")) if d[f"mirror_url_{lang}"]]
+        if links:
+            kind = "reference manual" if d["kind"] == "reference-manual" else "datasheet"
+            out.append(f"- {d['document']} ({kind}): {' · '.join(links)}")
+    out.append("")
     return out
 
 
@@ -827,7 +857,8 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
     # `repository` は families.csv の列（series.csv には無い）。
     repo = next((f.get("repository") for f in data.families
                  if f["family"] == family and f.get("repository")), None)
-    base = f"https://github.com/{repo}/blob/main" if repo else None
+    # PDF は GitHub Pages の配信で開く（リポジトリのファイル表示ではなく PDF そのもの）。
+    base = (f"https://{repo.split('/')[0]}.github.io/{repo.split('/')[1]}" if repo else None)
     papers = [r for r in rows if r["kind"].startswith(("board-manual", "schematic"))]
     boards = [r for r in rows if r["kind"].startswith("board")
               and not r["kind"].startswith("board-manual")]
@@ -853,7 +884,6 @@ def eval_board_lines(data: Data, family: str) -> list[str]:
 NAV = (("Product comparison", "Choose a part"),
        ("Documents", "Documents"),
        ("Pin maps & alternate functions", "Pin maps"),
-       ("Quick start", "Quick start"),
        ("Errata", "Errata"),
        ("EVT examples", "Examples"),
        ("Address map", "Address map"))
@@ -884,14 +914,15 @@ def nav_line(body: list[str], family: str, data: Data) -> list[str]:
 
 
 def render(data: Data, family: str) -> str:
-    # **節の順は大きい単位から小さい単位へ**: family の中の series、型番の比較、chip の構成図、資料、
-    # パッケージ、ピン、書き込みの既定、エラッタ、例題、番地表。
+    # **節の順**: まず書き込みの既定とデータシートへの直リンク（最初に要るもの）、そこから大きい単位から
+    # 小さい単位へ——family の中の series、型番の比較、chip の構成図、資料、パッケージ、ピン、エラッタ、例題、番地表。
     lines = [f"# {family}", "", NOTICE, ""]
     # mirrorのcommitと日付は**出さない**——生成物が変わらないのにこの行だけ更新され、
     # 差分がそれだけのcommitが増えていた（ユーザー指摘、2026-09-06）。mirrorは翌日には
     # 最新に揃っており、いつの原典から作ったかはgitの履歴と`catalog/sources.csv`で辿れる。
     body: list[str] = []
     lines, out = body, lines  # 以降は body に積み、最後に nav を挟んで戻す
+    lines += quick_start_section(data, family)
     lines += series_section(data, family)
     if data.family_series(family):
         lines += ["## Product comparison", ""]
@@ -919,7 +950,6 @@ def render(data: Data, family: str) -> str:
         lines += pin_map_section(data, s, collapse)
         lines += functions_section(data, s)
     lines += remap_section(data, family)
-    lines += quick_start_section(data, family)
     lines += errata_section(data, family)
     lines += evt_examples_section(data, family)
     lines += reference_section(data, family)
