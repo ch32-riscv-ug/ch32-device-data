@@ -30,6 +30,12 @@ V20x の `RCC_AHBPeriph_RNG`、V103 の `RCC_APB1Periph_CAN1` ほか）。共有
 ArduinoCore-CH32RV の依頼）。項目が rcc.h から消えたり、device header にその周辺のブロックが
 現れたりしたら生成を止める——判定が古くなったのに気付けるように。
 
+**レジスタの block を実在しないと判定した周辺（`curated/register-blocks-absent.json`）は、
+クロック有効化も同じ判定で落とす**（2026-11-06、[core] の V103 DAC の指摘から）。2つの表が
+別々だったので、V103 の TIM5〜17・UART4/5・GPIOE〜G・ADC2/3・DAC・DMA2 は registers から
+落ちているのに clock_enables に残っていた。block の判定は device header に block が在る
+ことが前提なので、ここでは「header に block が在れば止める」の歯止めをかけない。
+
 RM の field は `pipeline/extract/rm/register_fields.py` が bundle から読む
 （凍結 `tools/extract_registers.py` の移植。退役 第9号）。EVT のヘッダは mirror から
 そのまま読む——PDF ではないので構造化の対象外。
@@ -122,6 +128,8 @@ def main() -> int:
     with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
     absent = json.loads((paths.CURATED / "clock-enables-absent.json").read_text(encoding="utf-8"))["absent"]
+    blocks_absent = json.loads((paths.CURATED / "register-blocks-absent.json")
+                               .read_text(encoding="utf-8"))["absent"]
     dropped: list[str] = []
 
     rows: list[dict] = []
@@ -146,11 +154,16 @@ def main() -> int:
             if re.search(rf"#define\s+{re.escape(name)}\d*(?:_\w+)?\s+\(\(\w+_TypeDef", dev_text):
                 raise SystemExit(f"{family}: curated/clock-enables-absent.json の {name} の "
                                  f"ブロックが {dev_h.name} に在る（判定を見直す）")
+        no_block = blocks_absent.get(family, {})
+        overlap = sorted(set(not_here) & set(no_block))
+        if overlap:
+            raise SystemExit(f"{family}: {overlap} が clock-enables-absent.json と "
+                             "register-blocks-absent.json の両方にある（block の判定だけに置く）")
         for m in PERIPH.finditer(rcc_h.read_text(errors="ignore")):
             name, bus, mask = m.group("name"), m.group("bus"), int(m.group("mask"), 16)
             if name.upper() == "ALL" or mask == 0:
                 continue
-            if name in not_here:
+            if name in not_here or name in no_block:
                 dropped.append(f"{family} {name}")
                 continue
             register = f"{bus}PCENR"
@@ -203,7 +216,8 @@ def main() -> int:
     print(f"{dest}: {len(rows)} 行  family {len({r['family'] for r in rows})}  {dict(tally)}",
           file=sys.stderr)
     if dropped:
-        print(f"  - 実在しない周辺として落とした（curated/clock-enables-absent.json）: {', '.join(dropped)}",
+        print(f"  - 実在しない周辺として落とした（curated の clock-enables-absent・register-blocks-absent）: "
+              f"{', '.join(dropped)}",
               file=sys.stderr)
     for note in dict.fromkeys(notes):
         print(f"  - {note}", file=sys.stderr)

@@ -1,5 +1,5 @@
 {
-  "_comment": "EVT の rcc.h が定義しているが、その family に周辺が実在しないクロック有効化（他 family のヘッダからの写し残り）。extract_clock_enables.py がこの表の行を落とす。共有 RM（V20x/V30x の CH32FV2x_V3xRM、V103/F103 の CH32xRM）の *PCENR 表は bit の適用 family を書かないので、EVT と RM が一致して confirmed になってしまう——機械では見分けられず、人が判定した。歯止め: 項目は rcc.h に define として実在し、device header にその周辺のブロックが無いこと（無ければ生成が落ちる）。デバイスヘッダにブロックが無くても実在するもの（H417 の BKP は H417 専用 RM が BKPEN を書く、H417/V205 の PIOC と V103 の USBFS は EVT に例題と専用ヘッダがある）はここに入れない。",
+  "_comment": "EVT の rcc.h が定義しているが、その family に周辺が実在しないクロック有効化（他 family のヘッダからの写し残り）。extract_clock_enables.py がこの表の行を落とす。共有 RM（V20x/V30x の CH32FV2x_V3xRM、V103/F103 の CH32xRM）の *PCENR 表は bit の適用 family を書かないので、EVT と RM が一致して confirmed になってしまう——機械では見分けられず、人が判定した。歯止め: 項目は rcc.h に define として実在し、device header にその周辺のブロックが無いこと（無ければ生成が落ちる）。デバイスヘッダにブロックが無くても実在するもの（H417 の BKP は H417 専用 RM が BKPEN を書く、H417/V205 の PIOC と V103 の USBFS は EVT に例題と専用ヘッダがある）はここに入れない。 register-blocks-absent.json で block を実在しないと判定した周辺は、ここに書かなくてもクロック有効化も落ちる（2026-11-06。両方に書くと生成が落ちる）。ここに置くのは、device header に block が無いのに rcc.h に定数だけ残るもの。",
   "decided": "2026-10-21",
   "absent": {
     "CH32V20x": {
