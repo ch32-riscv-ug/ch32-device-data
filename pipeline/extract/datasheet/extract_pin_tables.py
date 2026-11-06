@@ -224,6 +224,54 @@ def unavailable_usarts(text: str) -> dict[str, set[str]]:
     return dict(excluded)
 
 
+def reset_pins(text: str) -> list[tuple[str, str]]:
+    """データシートの注が言う、型番ごとのリセット端子 [(名前の頭, pad)]。
+
+    CH32V006 の pin 表は NRST を PA7・PC5・PD7 の3本に並べるが、注は「リセット端子は
+    品種ごとに1本」と言う（2026-11-06、[core]・[oep] の実機確認つきの指摘）。名前の末尾の
+    温度グレード（K8U**7**）は外す——グレードで配置は変わらず、K8U6 も PA7 がリセット
+    として効き、PD7 は普通の GPIO だった（oep-bench dccc684）。「其余」の項は `*` を付けた
+    series の頭で返し、先に名前の挙がった型番より後に効く。
+
+    >>> reset_pins("注5：对于CH32V006K8U7芯片，PA7为复位引脚；对于CH32V006E8R和CH32V005E6R6芯片，PC5为复位引脚；对于其余CH32V006和CH32V005芯片，PD7为复位引脚。")
+    [('CH32V006K8U', 'PA7'), ('CH32V006E8R', 'PC5'), ('CH32V005E6R', 'PC5'), ('CH32V006*', 'PD7'), ('CH32V005*', 'PD7')]
+    >>> reset_pins("Note 5: For CH32V006K8U7 chip, PA7 is the reset pin; for CH32V006E8R and CH32V005E6R6 chips, PC5 is\\nthe reset pin; for the rest of CH32V006 and CH32V005 chips, PD7 is the reset pin.")
+    [('CH32V006K8U', 'PA7'), ('CH32V006E8R', 'PC5'), ('CH32V005E6R', 'PC5'), ('CH32V006*', 'PD7'), ('CH32V005*', 'PD7')]
+    >>> reset_pins("PD7、PA7 和 PC5 作为复位引脚时，默认开启上拉电阻")
+    []
+    """
+    out: list[tuple[str, str]] = []
+    name = r"CH32[A-Z]\d{3}[A-Z0-9]*"
+    found = re.findall(rf"对于(其余)?({name}(?:和{name})*)芯片，(P[A-Z]\d+)为复位引脚",
+                       re.sub(r"\s+", "", text))
+    found += [(rest, names.replace(" and ", "和"), pad) for rest, names, pad in re.findall(
+        rf"[Ff]or (the rest of )?({name}(?: and {name})*) chips?, (P[A-Z]\d+) is the reset pin",
+        re.sub(r"\s+", " ", text))]
+    for rest, names, pad in found:
+        for name in names.split("和"):
+            if rest:
+                out.append((name + "*", pad))
+            else:
+                out.append((re.sub(r"(?<=[A-Z])[167]$", "", name), pad))
+    return out
+
+
+def reset_pad_for(part: str, rules: list[tuple[str, str]]) -> str | None:
+    """名前の挙がった項を先に、「其余」の項を後に当てる。
+
+    >>> rules = [('CH32V006K8U', 'PA7'), ('CH32V006E8R', 'PC5'), ('CH32V006*', 'PD7')]
+    >>> [reset_pad_for(p, rules) for p in ('CH32V006K8U6', 'CH32V006E8R7', 'CH32V006F8P7', 'CH32V007E8R6')]
+    ['PA7', 'PC5', 'PD7', None]
+    """
+    for name, pad in rules:
+        if not name.endswith("*") and part.startswith(name):
+            return pad
+    for name, pad in rules:
+        if name.endswith("*") and part.startswith(name[:-1]):
+            return pad
+    return None
+
+
 def pair_leftovers(zh: dict, en: dict) -> dict[tuple, tuple]:
     """Pair unique full part names across captions, then package leftovers.
 
@@ -507,6 +555,7 @@ def main() -> int:
         editions = {}
         excluded: dict[str, set[str]] = collections.defaultdict(set)
         scope_basis: dict[str, list[str]] = collections.defaultdict(list)
+        resets: dict[str, list[tuple[str, str, int]]] = collections.defaultdict(list)
         for lang in ("zh", "en"):
             bundle = f"{Path(datasheet).stem}.{lang}"
             has = (bundle_pages.BUNDLES / bundle / "manifest.json").exists()
@@ -517,6 +566,10 @@ def main() -> int:
                 print(f"{family}/{datasheet} {lang}: 読めません {exc}", file=sys.stderr)
                 editions[lang] = ({}, {}, {})
             if has:
+                # リセット端子の注は pin 表の下にあるので、全ページを読む。
+                for page, text in bundle_pages.texts(bundle):
+                    if (rules := reset_pins(text)):
+                        resets[lang].append((rules, page))
                 for page, text in bundle_pages.texts(bundle, 10):
                     for part, peripherals in unavailable_usarts(text).items():
                         excluded[part].update(peripherals)
@@ -552,11 +605,27 @@ def main() -> int:
                     "confidence": conf, "basis": basis,
                     "table": cell["table"], "datasheet": datasheet,
                 })
+            # 注が言う型番のリセット端子（両版の注が同じ pad を言うときだけ使う）。
+            reset_pad, reset_basis = None, []
+            found = {lang: {reset_pad_for(part, rules) for rules, _ in resets[lang]} - {None}
+                     for lang in ("zh", "en")}
+            if found["zh"] or found["en"]:
+                if len(found["zh"] | found["en"]) != 1:
+                    raise SystemExit(f"{part}: 注のリセット端子が版や注で食い違う {found}")
+                reset_pad = next(iter(found["zh"] | found["en"]))
+                reset_basis = [f"resource-scope:{datasheet}:{lang}(p.{page};reset_pin={reset_pad})"
+                               for lang in ("zh", "en")
+                               for rules, page in resets[lang][:1]
+                               if reset_pad_for(part, rules)]
             for pad in pads:
                 for (signal, route), (conf, basis) in \
                         functions.get((key[0], key[1], pad), {}).items():
                     if signal.split("_", 1)[0] in excluded[part]:
                         continue
+                    if reset_pad and signal == "RST":
+                        if pad != reset_pad:
+                            continue
+                        basis = "+".join([basis, *reset_basis])
                     fn_rows.append({
                         "part_number": part, "pad": pad,
                         "signal": signal, "route": route,

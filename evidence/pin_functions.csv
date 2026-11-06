@@ -9467,7 +9467,7 @@ CH32V005D6U6,PD4,TIM2_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-2,CH32V0
 CH32V005D6U6,PD4,USART1_RTS,remap-9,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005D6U6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005D6U6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005D6U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
+CH32V005D6U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-2,CH32V006DS0.PDF
 CH32V005D6U6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005D6U6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005D6U6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -9613,7 +9613,7 @@ CH32V005E6R6,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005E6R6,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005E6R6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
+CH32V005E6R6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PC5)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PC5),2-2,CH32V006DS0.PDF
 CH32V005E6R6,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -9697,7 +9697,6 @@ CH32V005E6R6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005E6R6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005E6R6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005E6R6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -9797,7 +9796,6 @@ CH32V005F6P6,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005F6P6,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005F6P6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -9905,7 +9903,7 @@ CH32V005F6P6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005F6P6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005F6P6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
+CH32V005F6P6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-2,CH32V006DS0.PDF
 CH32V005F6P6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6P6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -10005,7 +10003,6 @@ CH32V005F6U6,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005F6U6,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005F6U6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -10113,7 +10110,7 @@ CH32V005F6U6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V
 CH32V005F6U6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
-CH32V005F6U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
+CH32V005F6U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-2,CH32V006DS0.PDF
 CH32V005F6U6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
 CH32V005F6U6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-2,CH32V006DS0.PDF
@@ -10250,7 +10247,7 @@ CH32V006D8U7,PD4,TIM2_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32
 CH32V006D8U7,PD4,USART1_RTS,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006D8U7,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006D8U7,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006D8U7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006D8U7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-1-1,CH32V006DS0.PDF
 CH32V006D8U7,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006D8U7,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006D8U7,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -10396,7 +10393,7 @@ CH32V006E8R6,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006E8R6,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006E8R6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006E8R6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PC5)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PC5),2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -10480,7 +10477,6 @@ CH32V006E8R6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006E8R6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006E8R6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -10626,7 +10622,7 @@ CH32V006E8R7,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006E8R7,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006E8R7,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006E8R7,PC5,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PC5)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PC5),2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -10710,7 +10706,6 @@ CH32V006E8R7,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006E8R7,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006E8R7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006E8R7,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -10895,7 +10890,7 @@ CH32V006F4U6,PD6,TIM2_CH3,remap-3,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32
 CH32V006F4U6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
 CH32V006F4U6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
 CH32V006F4U6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
-CH32V006F4U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
+CH32V006F4U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-1-2,CH32V006DS0.PDF
 CH32V006F4U6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
 CH32V006F4U6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
 CH32V006F4U6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-2,CH32V006DS0.PDF
@@ -10995,7 +10990,6 @@ CH32V006F8P7,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006F8P7,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006F8P7,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11103,7 +11097,7 @@ CH32V006F8P7,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006F8P7,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006F8P7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006F8P7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8P7,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11203,7 +11197,6 @@ CH32V006F8U7,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006F8U7,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006F8U7,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11311,7 +11304,7 @@ CH32V006F8U7,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006F8U7,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006F8U7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006F8U7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PD7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PD7),2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006F8U7,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11384,7 +11377,7 @@ CH32V006K8U6,PA5,USART2_RX,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U6,PA6,PA6,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PA6,USART2_TX,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PA7,PA7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U6,PA7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006K8U6,PA7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PA7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PA7),2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PA7,TIM1_BKIN,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PA7,USART2_CTS,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PA7,USART2_CTS,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11494,7 +11487,6 @@ CH32V006K8U6,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U6,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U6,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11602,7 +11594,6 @@ CH32V006K8U6,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U6,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U6,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U6,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11675,7 +11666,7 @@ CH32V006K8U7,PA5,USART2_RX,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U7,PA6,PA6,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PA6,USART2_TX,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PA7,PA7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U7,PA7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
+CH32V006K8U7,PA7,RST,default,confirmed,pin-table:zh+pin-table:en+resource-scope:CH32V006DS0.PDF:zh(p.22;reset_pin=PA7)+resource-scope:CH32V006DS0.PDF:en(p.31;reset_pin=PA7),2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PA7,TIM1_BKIN,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PA7,USART2_CTS,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PA7,USART2_CTS,remap-6,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11785,7 +11776,6 @@ CH32V006K8U7,PC4,USART1_RX,remap-9,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U7,PC4,USART2_TX,remap-5,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PC5,I2C_SCL,remap-2,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PC5,PC5,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U7,PC5,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PC5,SPI_SCK,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PC5,SPI_SCK,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PC5,TIM1_CH2,remap-7,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
@@ -11893,7 +11883,6 @@ CH32V006K8U7,PD6,USART1_RX,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH3
 CH32V006K8U7,PD6,USART1_TX,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PD7,OPA_P1,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PD7,PD7,main,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
-CH32V006K8U7,PD7,RST,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PD7,TIM2_CH4,default,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PD7,TIM2_CH4,remap-1,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
 CH32V006K8U7,PD7,USART1_CTS,remap-4,confirmed,pin-table:zh+pin-table:en,2-1-1,CH32V006DS0.PDF
