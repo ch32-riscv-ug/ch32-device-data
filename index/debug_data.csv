@@ -3,7 +3,7 @@ CH32H417,QingKe V5F + QingKe V3F,0xE0000340,0xE0000344,reference,"manual:qingke-
 CH32L103,QingKe V4C,0xE0000380,0xE0000384,confirmed,evt(EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SDI_Printf/SDI_Printf/Debug/debug.c
 CH32M030,QingKe V3B,0xE0000340,0xE0000344,confirmed,evt(EVT/EXAM/APPLICATION/Electric_Fan/Debug/debug.c; 3 more files)+manual:qingke-v3(dataaddr=read hartinfo)+hartinfo:wch-linke(ch32rv 2026-10-10;default-hart;ch32rv/target/hil-m030-2026-10-10/dmi-12-0.ndjson),EVT/EXAM/APPLICATION/Electric_Fan/Debug/debug.c
 CH32V003,QingKe V2A,0xE00000F4,0xE00000F8,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v2(dataaddr=0x0f4)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
-CH32V006,QingKe V2C,0xE00000F4,0xE00000F8,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c; 2 more files)+manual:qingke-v2(dataaddr=0x0f4),EVT/EXAM/SRC/Debug/debug.c
+CH32V006,QingKe V2C,0xE00000F4,0xE00000F8,confirmed,evt(EVT/EXAM/APPLICATION/Motor/Electric_Fan/Debug/debug.c; 3 more files)+manual:qingke-v2(dataaddr=0x0f4),EVT/EXAM/APPLICATION/Motor/Electric_Fan/Debug/debug.c
 CH32V103,QingKe V3A,0xE0000380,0xE0000384,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v3(dataaddr=read hartinfo)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
 CH32V205,QingKe V3B,0xE0000340,0xE0000344,reference,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v3(dataaddr=read hartinfo),EVT/EXAM/SRC/Debug/debug.c
 CH32V20x,QingKe V4B + QingKe V4C,0xE0000380,0xE0000384,confirmed,evt(EVT/EXAM/SRC/Debug/debug.c)+manual:qingke-v4(dataaddr=0x380)+hartinfo:wch-linke(consumer 2026-08-26),EVT/EXAM/SRC/Debug/debug.c
