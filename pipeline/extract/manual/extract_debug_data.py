@@ -86,7 +86,10 @@ def evt_defines(family_dir: Path) -> tuple[dict[str, str], list[str], list[str]]
     """(番地 {0: addr, 1: addr}, 定義している debug.c の相対パス, 食い違いの注)."""
     found: dict[str, set[str]] = collections.defaultdict(set)
     files: list[str] = []
-    for path in sorted((family_dir / "EVT").rglob("debug.c")):
+    # 代表（先頭）は共通ライブラリの EVT/EXAM/SRC/Debug/debug.c を先にする。名前順だけだと、
+    # 応用サンプルが増えるたびに代表が動く（2026-11-06 の V006 の Electric_Fan で起きた）。
+    common = family_dir / "EVT" / "EXAM" / "SRC" / "Debug" / "debug.c"
+    for path in sorted((family_dir / "EVT").rglob("debug.c"), key=lambda p: (p != common, p)):
         text = path.read_text(encoding="utf-8", errors="replace")
         hits = DEFINE.findall(text)
         if not hits:
