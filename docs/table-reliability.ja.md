@@ -117,7 +117,7 @@
 | debug_interfaces（`index/`） | 27 | confirmed 27 | series ごと1行・`debug_if` の語彙・features の節見出しに戻せること・pads が pinout の SWDIO/SWCLK と一致すること | **全27 seriesが確定**（swio 3・rvswd 11・**both 13**）——datasheetの節見出しと`debug_wiring`（WCH-Link manual）の突き合わせ（2026-09-01にR-29完全解決。未記載だった11 seriesはmanualが埋め、V208もmanualでconfirmed化）。V002/V004はmanualが両対応（SWCLK=PB3）と括るが**pin表にSWCLKが無く見出しも1-wire**——見出しを採り、manualの異議を`!WCH-LinkUserManual.PDF(...)`としてbasisへ（資料側の問題台帳にも記録） | ✅ |
 | features（旧 feature_tags） | 719 | confirmed 710 / ref 9 | 結合 | 節見出し由来の18タグは datasheet 粒度（precision 列が明示）。節見出しの無い機能（V208 の Ethernet ほか25行）は比較表の属性だけで付ける。どこにも見出しの無い V208 の BLE は人が語を決め `attribute_tags` で付ける（2026-10-27） | ✅ |
 | sources | 12 | confirmed | 結合 | 生成時刻は持たない（冪等性のため。仕様） | ✅ |
-| series / families / cores / documents | 128 | 列ごと | 相互結合 | — | ✅ |
+| series / families / cores / documents | 130 | 列ごと | 相互結合 | — | ✅ |
 | toolchains | 15 | confirmed 15 | 語彙・重複・日付・URLの宛先・件数の下限 | 上流（MounRiver）のAPIが「いま最新」と言う配布物の写し。**行ごとに配信側を HEAD して**掲載と突き合わせている（サイズ一致で confirmed）。旧版は持たない（IDE の旧版は `--history`、ツールチェーンの旧版は上流APIに無い） | ✅ |
 
 ### 実機観測を伴うもの

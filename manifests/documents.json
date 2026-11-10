@@ -991,9 +991,10 @@
     },
     {
       "name": "OfflineBurnerTool.ZIP",
-      "kind": "evt",
+      "kind": "other",
       "repositories": [],
-      "status": "unassigned",
+      "status": "excluded",
+      "reason": "CH32の技術データではない（書込・RF試験の道具）",
       "sources": {
         "zh": {
           "file_id": 596,
@@ -1147,9 +1148,10 @@
     },
     {
       "name": "RFTest.ZIP",
-      "kind": "evt",
+      "kind": "other",
       "repositories": [],
-      "status": "unassigned",
+      "status": "excluded",
+      "reason": "CH32の技術データではない（書込・RF試験の道具）",
       "sources": {
         "zh": {
           "file_id": 597,
