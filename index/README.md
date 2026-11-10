@@ -38,7 +38,7 @@ The split between `index/`, `evidence/` and `catalog/` is defined in
 | Absolute maximum ratings | [`absolute_maximum_ratings.csv`](absolute_maximum_ratings.csv) |
 | OPA/CMP and USB-PD register fields | [`opa_cmp_registers.csv`](opa_cmp_registers.csv), [`usbpd_plumbing.csv`](usbpd_plumbing.csv) |
 | FLASH/SRAM split set by the option bytes | [`memory_configs.csv`](memory_configs.csv) |
-| WCH-Link firmware files, and the versions measured to fail | [`link_firmware.csv`](link_firmware.csv), [`link_firmware_issues.csv`](link_firmware_issues.csv) |
+| WCH-Link firmware files (past versions included), and the versions measured to fail | [`link_firmware.csv`](link_firmware.csv), [`link_firmware_issues.csv`](link_firmware_issues.csv) |
 | Clock tree, interrupts, memory map, operating conditions, errata | see [Published as read](#published-as-read) |
 | What every column here means, how it is written, what an empty cell means | [`columns.csv`](columns.csv) |
 | sha256 of every file here | [`manifest.csv`](manifest.csv) |
@@ -166,7 +166,7 @@ From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_
 Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `debug_data`,
 `device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`,
 `absolute_maximum_ratings`, `opa_cmp_registers`, `usbpd_plumbing`, `pin_conditions`, `memory_configs`.
-WCH-LinkUtility: `link_firmware`; measured failures: `link_firmware_issues`.
+WCH-LinkUtility and MounRiver Studio packages: `link_firmware` (past versions included); measured failures: `link_firmware_issues`.
 
 ## Tables
 

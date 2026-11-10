@@ -124,7 +124,7 @@
 
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
-| link_firmware | 10 | 全行 reference | 結合を持たない（配布物の写し）・`reported_version` が `wcfg_version` の復号と一致すること | **版番号は解決済み**（F-11。2026-08-29）。`wcfg_version` は `major*10 + minor`（major は観測した全個体で 2）で、`reported_version` が復号値、`measured_version` が実機の申告値。LinkE と CH549 の2機種は実測で一致（`tools/read_link_version.py`）。残る8行は実機を持っていないぶんで `measured_version` が空 | 🟡 |
+| link_firmware | 86 | reference（`measured_version` と食い違えば conflict） | 結合を持たない（配布物の写し）・1 ファイル（sha256）1 行・`reported_version` が `wcfg_version` の復号と一致すること | **版番号は解決済み**（F-11。2026-08-29）。`wcfg_version` は `major*10 + minor`（major は観測した全個体で 2）で、`reported_version` が復号値、`measured_version` が実機の申告値。**過去の版も載せる**（2026-11-10）: 今の WCH-LinkUtility の10本（`current=yes`）に、MounRiver Studio 1.7.0〜3.0.0 の18の配布物（今も MounRiver の API から落とせる）に入っていた76本を足した。ファイルは非公開の保存庫 wch-binary-archive にあり、ここには指紋だけを `curated/link-firmware-history.csv` に写す（`tools/import_link_firmware_history.py`）。MRS 1.8 以前の wcfg は全 device に同じ数を書いていて、1 ファイルに2つの数が付くもの1件は最初の配布物の数を採り `note` に書いた。MRS 2.2.0 の LinkE の bootloader 付き image は後ろが組のどの application とも一致せず版を空にした。実測で一致したのは CH549 2.12 と LinkE 2.22 の2つのファイル（とその bootloader 付き）だけ | 🟡 |
 | link_firmware_issues | 1 | 全行 reference | 結合（device が link_firmware に在ること）・`basis` が `measured:<日付>(<記録の所在>)` | 実測の記録がある不良だけ。版を試していない device には付けない（WCH-Link CH549 の 2.11 は LinkE では試していない） | ✅ |
 
 この表だけは**資料ではなく配布物と実機**を出所にするので、他の表の「両言語照合」に

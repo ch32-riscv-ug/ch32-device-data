@@ -79,7 +79,12 @@ SOURCE = "https://file.wch.cn/download/file?id=418"
 PAGE = "https://www.wch.cn/downloads/wch-linkutility_zip.html"
 
 COLUMNS = ["device", "mcu", "mode", "role", "file", "size", "sha256",
-           "wcfg_version", "reported_version", "measured_version", "set_version", "confidence", "basis"]
+           "wcfg_version", "reported_version", "measured_version", "set_version",
+           "current", "shipped_in", "first_released", "note", "confidence", "basis"]
+# 過去に配られたファームの指紋（`tools/import_link_firmware_history.py` が非公開の保存庫から写す）。
+# 1 行 = 1 つの配布物に入っていた 1 ファイル。
+HISTORY = paths.CURATED / "link-firmware-history.csv"
+CURRENT_PACKAGE = "WCH-LinkUtility.ZIP"
 # 実測で壊れていると分かっている版（`curated/link-firmware-issues.json`）。配布物の表（上）は「いま配って
 # いるファイル」なので、古い版はそこに行が無い——別の表にして、版と機材と症状を出所つきで持つ。
 ISSUE_COLUMNS = ["device", "mcu", "mode", "version", "wcfg_version", "tool", "target", "symptom",
@@ -277,11 +282,17 @@ def main() -> int:
         application = by_role.get((device, mode, "application"))
         if application is None or not image.endswith(application) or len(image) == len(application):
             raise SystemExit(f"{device} {mode}: with-bootloader の image が bootloader ＋ application の image になっていない")
-    missing = sorted(set(CATALOG) - {r["file"] for r in rows})
+    for r in rows:
+        r.update(current="yes", shipped_in=CURRENT_PACKAGE, first_released="", note="")
+    rows.extend(merge_history(rows))
+
+    missing = sorted(set(CATALOG) - {r["file"] for r in rows if r["current"] == "yes"})
     for name in missing:
         notes.append(f"配布物に無い: {name}")
 
-    rows.sort(key=lambda r: (r["device"], r["mode"], r["role"]))
+    rows.sort(key=lambda r: (r["device"], r["mcu"], r["mode"], r["role"],
+                             tuple(int(x) for x in r["reported_version"].split(".")) if r["reported_version"] else (),
+                             r["first_released"]))
     if args.out:
         args.out.mkdir(parents=True, exist_ok=True)
     dest = paths.table("link_firmware", args.out)
@@ -298,6 +309,67 @@ def main() -> int:
     for note in notes:
         print(f"  - {note}", file=sys.stderr)
     return 0
+
+
+def merge_history(current: list[dict]) -> list[dict]:
+    """過去の配布物の行を足し、今の ZIP にもある行には入っていた配布物を書き足す。
+
+    1 つのファイル（sha256）につき 1 行。版（wcfg_version）は**最初に入っていた配布物**のもの:
+    MRS 1.8.x の wchlink.wcfg は全 device に同じ数（組の版）を書いていて、同じファイルに
+    後の配布物が別の数を付けることがある（CH32V307 の LinkE は 1.8.3 で 27、1.8.4 で 28）。
+    食い違いは note に書く。bootloader 付き image の後ろが同じ組のどの application とも
+    一致しないもの（MRS 2.2.0 の LinkE）は、保存庫が版を空にしているので空のまま。"""
+    with HISTORY.open(encoding="utf-8", newline="") as f:
+        history = list(csv.DictReader(f))
+    by_sha: dict[str, list[dict]] = {}
+    for h in sorted(history, key=lambda h: (h["released"], h["package"])):
+        by_sha.setdefault(h["sha256"], []).append(h)
+    # bootloader 付き image の実測は、同じ配布物・device・mode の application の実測で引く
+    application = {(h["package"], h["device"], h["mode"]): h["sha256"]
+                   for h in history if h["role"] == "application"}
+
+    def note_for(seen: list[dict]) -> str:
+        numbers = []
+        for h in seen:
+            if h["wcfg_version"] and h["wcfg_version"] not in numbers:
+                numbers.append(h["wcfg_version"])
+        if len(numbers) > 1:
+            later = ", ".join(f"{h['package']}={h['wcfg_version']}" for h in seen
+                              if h["wcfg_version"] and h["wcfg_version"] != numbers[0])
+            return f"later packages give another wchlink.wcfg number ({later}); the first package's is kept"
+        if not seen[0]["wcfg_version"]:
+            return ("the application inside does not match any application file of the same package, "
+                    "so the version is unknown")
+        return ""
+
+    by_current = {r["sha256"]: r for r in current}
+    rows = []
+    for sha, seen in by_sha.items():
+        first, last = seen[0], seen[-1]
+        packages = list(dict.fromkeys(h["package"] for h in seen))
+        if sha in by_current:
+            r = by_current[sha]
+            r["shipped_in"] = ";".join(packages + [CURRENT_PACKAGE])
+            r["first_released"] = first["released"]
+            r["basis"] = f"wch({first['package']})+{r['basis']}"
+            continue
+        version = first["wcfg_version"]
+        decoded = reported_version(version)
+        app_sha = sha if first["role"] == "application" else application.get(
+            (first["package"], first["device"], first["mode"]), "")
+        seen_version = MEASURED.get(app_sha, "") if version else ""
+        disagree = bool(seen_version and decoded and seen_version != decoded)
+        basis = "+".join(dict.fromkeys(f"wch({p})" for p in (first["package"], last["package"])))
+        rows.append({
+            "device": first["device"], "mcu": first["mcu"], "mode": first["mode"], "role": first["role"],
+            "file": last["file"], "size": first["size"], "sha256": sha,
+            "wcfg_version": version, "reported_version": decoded, "measured_version": seen_version,
+            "set_version": last["set_version"], "current": "no", "shipped_in": ";".join(packages),
+            "first_released": first["released"], "note": note_for(seen),
+            "confidence": "conflict" if disagree else CONFIDENCE,
+            "basis": basis + (f"+!silicon:read-link-version(reported_version={seen_version})" if disagree else ""),
+        })
+    return rows
 
 
 def write_issues(out_dir: Path | None) -> None:

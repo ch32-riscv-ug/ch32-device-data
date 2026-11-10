@@ -185,3 +185,23 @@ J1短絡またはBOOTキー長押しで給電。
 **`.bin`自体はこのrepositoryに入れていない**。WCHのバイナリ再配布になり、
 ライセンス条件が配布物に明示されていないため。`manifests/documents.json`が
 文書のカタログを持つのと同じ扱いで、取得元を記録して各自が取る形にしている。
+
+## 過去の版（2026-11-10）
+
+WCH は古いファームを配らないが、MounRiver Studio の配布物には版ごとの Firmware_Link が
+同梱されていて、MounRiver の API（`querySoftVList`・`fetchRecentCommunity`）から過去の版も
+今も落とせる。1.7.0〜3.0.0 の18の配布物から取り出したファイルを非公開の保存庫
+（ch32-riscv-ug/wch-binary-archive。再配布にあたるので非公開）に置き、指紋だけを
+`curated/link-firmware-history.csv` に写して `link_firmware` に載せた（`current=no`）。
+
+分かったこと:
+
+- WCH-Link（CH549）は 2.3（MRS 1.7.0、2022-03）から 2.12 まで。1.7.0 は `update/firmware/` に
+  `firmware.bin` と `WCHLINK_V02.03.bin`（先頭 3KiB が bootloader）を置き、`wchlink.wcfg` が無い。
+- LinkE には **CH32V307 で動く初期の個体**があり、MRS 1.8.0〜1.8.4 が `FIRMWARE_CH32V307.bin`
+  （2.4〜2.7）を配っていた。1.8.4 は CH32V305 用と両方を入れていた。
+- MRS 1.8 以前の `wchlink.wcfg` は全 device に同じ数（組の版）を書いている。同じファイルに後の配布物が
+  別の数を付けた例が1つある（CH32V307 の LinkE、1.8.3=27・1.8.4=28）。表は最初の配布物の数を採る。
+- MRS 2.2.0 の `WCH-LinkE-APP-IAP.bin` は、後ろ（8KiB の bootloader の後）が同じ組の
+  `FIRMWARE_CH32V305.bin`（2.17）と一致せず、どの配布物にも application として入っていない版だった。
+  WCH が組の合わないファイルを配っていた。版は分からない。
