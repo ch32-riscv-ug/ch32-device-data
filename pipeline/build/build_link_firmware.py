@@ -108,9 +108,16 @@ ISSUES = paths.CURATED / "link-firmware-issues.json"
 # 純正 LinkE が `minor=0x16`=22 を名乗り、ライブラリの式に入れると
 # `2*16+22-12 = 42` = `CH32V307Ver`。**LinkE の対応づけは正しかった**——#1/#2 が
 # 2.12 だったのは単に古かっただけ。
+#
+# **実測は、そのとき書き込んだ application のファイル（sha256）に結びつける。** device ごとに
+# 持つと、WCH がファームを差し替えたあとも古い実測が新しい行に載り、版が違うのは当然なのに
+# conflict になる（2026-11-10、LinkE が 2.22→2.23 に上がって起きた）。配布物が実測した
+# ファイルと同じときだけ measured_version を出し、違えば空にする。
 MEASURED = {
-    ("WCH-Link", "RISC-V"): "2.12",   # 434A124C5596
-    ("WCH-LinkE", ""): "2.22",        # 0A388F068F0B（最新版で強制更新した個体）
+    # FIRMWARE_CH549.bin  434A124C5596
+    "2f198a4512f9c43dfd7381e0e50ca1c5a52e4022abbdd5ccf1e234185fda81d9": "2.12",
+    # FIRMWARE_CH32V305.bin（WCH-LinkUtility 3.00 同梱、109544 bytes）  0A388F068F0B（強制更新した個体）
+    "9c1cd70565ee339409f8bf1f9e466ed0495e0e903fab4fd1044ac55ceb5d6695": "2.22",
 }
 
 
@@ -223,6 +230,13 @@ def main() -> int:
             wcfg[m.group(1)] = m.group(2)
     set_version = blobs.get("firmware_version.txt", b"").decode("utf-8", "replace").strip()
 
+    def application_sha(device: str, mode: str) -> str:
+        """同じ device・mode の application の sha256（with-bootloader の行もこれで実測を引く）。"""
+        for name, (d, _, m, role) in CATALOG.items():
+            if (d, m, role) == (device, mode, "application") and name in blobs:
+                return hashlib.sha256(blobs[name]).hexdigest()
+        return ""
+
     rows: list[dict] = []
     notes: list[str] = []
     for name, blob in sorted(blobs.items()):
@@ -241,7 +255,7 @@ def main() -> int:
             "sha256": hashlib.sha256(blob).hexdigest(),
             "wcfg_version": (version := wcfg.get(WCFG_KEY.get((device, mode), ""), "")),
             "reported_version": (decoded := reported_version(version)),
-            "measured_version": (seen := MEASURED.get((device, mode), "")),
+            "measured_version": (seen := MEASURED.get(application_sha(device, mode), "")),
             "set_version": set_version,
             # **実機と合わない行は conflict。** `wchlink.wcfg` の数を WCH 自身の式で
             # 復号した版と、実機が名乗る版が食い違うことがある。CH32V307Ver=42 は

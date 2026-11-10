@@ -87,6 +87,12 @@ WCH-LinkUtility 3.00（6月付のファーム同梱）で強制更新した純�
 | `CH549Ver_RV=32` | 2.12 | | `CH32V307Ver=42` | **2.22** |
 | `CH32V203Ver=32` | 2.12 | | | |
 
+**2026-11-10 追記**: 配布の ZIP（`firmware_version.txt` は v40 のまま）で LinkE だけが
+`CH32V307Ver=43`（2.23、9/21 付、`FIRMWARE_CH32V305.bin` 99,388 bytes）に上がった。
+2.23 の実機の申告はまだ読んでいないので、表の `measured_version` は空。実測を
+書き込んだファイルの sha256 に結びつけるよう `build_link_firmware.py` を直した（2.22 の実測は
+109,544 bytes の旧ファイルのもの）。
+
 `libmcuupdate.so` の `McuCompiler_GetDeviceVersion` が応答から数を作る式は閾値で2通りある:
 
 ```

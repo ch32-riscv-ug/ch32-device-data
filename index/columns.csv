@@ -239,7 +239,7 @@ link_firmware,size,File size in bytes.,integer,never empty,,data
 link_firmware,sha256,sha256 of the file; tells whether a local file is the one being distributed now.,name,never empty,,data
 link_firmware,wcfg_version,WCH's own version number from `wchlink.wcfg`.,integer,never empty,,data
 link_firmware,reported_version,"The version the device reports over USB, decoded from `wcfg_version` as `major.minor` (wcfg = major*10 + minor).",text,never empty,fixed,data
-link_firmware,measured_version,The version read from a real device with `tools/read_link_version.py`.,text,not measured,fixed,data
+link_firmware,measured_version,"The version read with `tools/read_link_version.py` from a real device flashed with this exact application file (same sha256). Empty when the file now distributed has not been measured.",text,not measured,fixed,data
 link_firmware,set_version,Version of the WCH-LinkUtility set the files come from.,name,never empty,as-printed,data
 link_firmware,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
 link_firmware,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
