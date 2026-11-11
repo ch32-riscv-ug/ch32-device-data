@@ -65,7 +65,7 @@ CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,MODE1,2:1,0x6,output mode,confirmed,evt(c
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,MODE2,10:9,0x600,output mode,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,MODE3,18:17,0x60000,output mode,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,NSEL1,3,0x8,negative input select,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
-CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,NSEL2,11,0x800,negative input select,reference,evt(ch32l103.h)
+CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,NSEL2,11,0x800,negative input select,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,NSEL3,19,0x80000,negative input select,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,PSEL1,4,0x10,positive input select,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
 CH32L103,OPA,CTLR2,CMP,0x08,0x40026008,PSEL2,12,0x1000,positive input select,confirmed,evt(ch32l103.h)+rm:CH32L103RM.PDF
