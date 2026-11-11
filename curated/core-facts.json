@@ -4,59 +4,80 @@
   "cores": {
     "QingKe V2A": {
       "isa": "RV32EC",
-      "manual": "QingKeV2_Processor_Manual.PDF"
+      "manual": "QingKeV2_Processor_Manual.PDF",
+      "xw": "yes"
     },
     "QingKe V2C": {
       "isa": "RV32EmC",
-      "manual": "QingKeV2_Processor_Manual.PDF"
+      "manual": "QingKeV2_Processor_Manual.PDF",
+      "xw": "yes"
     },
     "QingKe V3A": {
       "isa": "RV32IMAC",
-      "manual": "QingKeV3_Processor_Manual.PDF"
+      "manual": "QingKeV3_Processor_Manual.PDF",
+      "xw": "no",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32V103R8T6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; stopped; the same sketch without XW ran)"
     },
     "QingKe V3B": {
       "isa": "RV32I[M]C[B]",
       "manual": "QingKeV3_Processor_Manual.PDF",
-      "note": "M and B extensions are optional in silicon; each chip's datasheet states the implemented combination"
+      "note": "M and B extensions are optional in silicon; each chip's datasheet states the implemented combination",
+      "xw": "yes",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32V205RCT6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; ran)"
     },
     "QingKe V3C": {
       "isa": "RV32IMCB",
-      "manual": "QingKeV3_Processor_Manual.PDF"
+      "manual": "QingKeV3_Processor_Manual.PDF",
+      "xw": "yes"
     },
     "QingKe V3F": {
       "isa": "RV32IMAFCB",
-      "manual": "QingKeV3_Processor_Manual.PDF"
+      "manual": "QingKeV3_Processor_Manual.PDF",
+      "xw": "yes",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32X315MCU6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; ran)"
     },
     "QingKe V3V": {
       "isa": "RV32IMACB+Zve64x_zvbb",
-      "manual": "QingKeV3_Processor_Manual.PDF"
+      "manual": "QingKeV3_Processor_Manual.PDF",
+      "xw": "yes"
     },
     "QingKe V4A": {
       "isa": "RV32IMAC",
-      "manual": "QingKeV4_Processor_Manual.PDF"
+      "manual": "QingKeV4_Processor_Manual.PDF",
+      "xw": "no"
     },
     "QingKe V4B": {
       "isa": "RV32IMAC",
-      "manual": "QingKeV4_Processor_Manual.PDF"
+      "manual": "QingKeV4_Processor_Manual.PDF",
+      "xw": "yes",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32V203C8T6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; ran)"
     },
     "QingKe V4C": {
       "isa": "RV32IMAC",
-      "manual": "QingKeV4_Processor_Manual.PDF"
+      "manual": "QingKeV4_Processor_Manual.PDF",
+      "xw": "yes",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32L103C8T6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; ran)"
     },
     "QingKe V4F": {
       "isa": "RV32IMACF",
-      "manual": "QingKeV4_Processor_Manual.PDF"
+      "manual": "QingKeV4_Processor_Manual.PDF",
+      "xw": "yes",
+      "xw_measured": "measured:2026-11-11(ArduinoCore-CH32RV docs/clang-evaluation.ja.md 54d3b14c: CH32V307VCT6, clang 23.1.5 -march=..._xwchc image with 5-13 XW lbu/lhu/sb/sh; ran)"
     },
     "QingKe V4J": {
       "isa": "RV32IMAC",
       "manual": "QingKeV4_Processor_Manual.PDF",
-      "note": "With instruction cache (I-Cache)"
+      "note": "With instruction cache (I-Cache)",
+      "xw": "yes"
     },
     "QingKe V5F": {
       "isa": "RV32IMABCF",
-      "manual": "QingKeV5_Processor_Manual.PDF"
+      "manual": "QingKeV5_Processor_Manual.PDF",
+      "xw": "yes"
     }
   },
   "isa_confidence": "confirmed",
-  "isa_basis": "manual:QingKeV2_Processor_Manual.PDF:zh(summary table)+manual:QingKeV2_Processor_Manual.PDF:en(summary table)+manual:QingKeV3_Processor_Manual.PDF:zh(summary table)+manual:QingKeV3_Processor_Manual.PDF:en(summary table)+manual:QingKeV4_Processor_Manual.PDF:zh(summary table)+manual:QingKeV4_Processor_Manual.PDF:en(summary table)+manual:QingKeV5_Processor_Manual.PDF:zh(summary table)+manual:QingKeV5_Processor_Manual.PDF:en(summary table; verified 2026-08-18; V2/V3/V4/V5 all carry the vendor-specific XW extension in addition)"
+  "isa_basis": "manual:QingKeV2_Processor_Manual.PDF:zh(summary table)+manual:QingKeV2_Processor_Manual.PDF:en(summary table)+manual:QingKeV3_Processor_Manual.PDF:zh(summary table)+manual:QingKeV3_Processor_Manual.PDF:en(summary table)+manual:QingKeV4_Processor_Manual.PDF:zh(summary table)+manual:QingKeV4_Processor_Manual.PDF:en(summary table)+manual:QingKeV5_Processor_Manual.PDF:zh(summary table)+manual:QingKeV5_Processor_Manual.PDF:en(summary table; verified 2026-08-18)",
+  "xw_confidence": "confirmed",
+  "xw_basis": "manual:QingKeV2_Processor_Manual.PDF:zh(summary table XW column)+manual:QingKeV2_Processor_Manual.PDF:en(summary table XW column)+manual:QingKeV3_Processor_Manual.PDF:zh(summary table XW column)+manual:QingKeV3_Processor_Manual.PDF:en(summary table XW column)+manual:QingKeV4_Processor_Manual.PDF:zh(summary table XW column)+manual:QingKeV4_Processor_Manual.PDF:en(summary table XW column)+manual:QingKeV5_Processor_Manual.PDF:zh(summary table XW column)+manual:QingKeV5_Processor_Manual.PDF:en(summary table XW column; verified 2026-11-11; V3A and V4A are × in both editions)"
 }

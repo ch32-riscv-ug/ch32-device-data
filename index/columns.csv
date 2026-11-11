@@ -116,10 +116,13 @@ conflicts,alternative,"What the dissenting sources state, from `(=...)` in the b
 conflicts,basis,"Basis of the conflicted row, including its `!` dissenting sources and `(=...)` alternatives.",text,never empty,prose,provenance
 cores,core,QingKe core name.,name,never empty,fixed,data
 cores,isa,Core ISA as the core manual's overview table states it (brackets mark optional extensions).,text,never empty,as-printed,data
+cores,xw,"Whether the core implements WCH's XW custom 16-bit compressed instructions (c.lbu, c.lhu, c.sb, c.sh, c.lbusp, c.lhusp, c.sbsp, c.shsp; LLVM calls them Xwchc), as the core manual's overview table marks it. Code built with them stops with an illegal instruction on a core marked no.",enum(yes|no),never empty,fixed,data
 cores,manual,QingKe processor manual the core is described in.,name,never empty,fixed,data
 cores,note,Remark on the core.,text,no remark,prose,data
 cores,isa_confidence,"Confidence of `isa`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
+cores,xw_confidence,"Confidence of `xw`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
 cores,isa_basis,Sources that support `isa`.,text,never empty,prose,provenance
+cores,xw_basis,Sources that support `xw`.,text,never empty,prose,provenance
 debug_data,family,Family key; joins families.family.,name,never empty,fixed,data
 debug_data,core,Core(s) of the family.,text,never empty,as-printed,data
 debug_data,dm_data0_addr,"Hart-side address of the debug module data0 register (DMDATA0, used by SDI printf).",hex,not stated by any source (CH32H417),,data

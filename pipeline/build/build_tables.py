@@ -808,7 +808,7 @@ FAMILY_COLUMNS = [
     "family", "repository", "series", "series_count", "part_number_count",
     "cores", "datasheets", "reference_manuals", "evt",
 ]
-CORE_COLUMNS = ["core", "isa", "manual", "note"]
+CORE_COLUMNS = ["core", "isa", "xw", "manual", "note"]
 ERRATA_COLUMNS = ["id", "series", "condition", "description"]
 ATTRIBUTE_COLUMNS = ["part_number", "order", "attribute", "value",
                      "group", "label", "label_zh", "label_en"]
@@ -1200,10 +1200,13 @@ def core_rows() -> list[dict]:
     data = json.loads(CORE_FACTS.read_text())
     out = []
     for core, fact in sorted(data.get("cores", {}).items()):
-        entry = {"core": core, "isa": fact.get("isa", ""),
+        entry = {"core": core, "isa": fact.get("isa", ""), "xw": fact["xw"],
                  "manual": fact.get("manual", ""), "note": fact.get("note", "")}
         entry["isa_confidence"] = data.get("isa_confidence", "reference")
         entry["isa_basis"] = data.get("isa_basis", "")
+        entry["xw_confidence"] = data["xw_confidence"]
+        # 実機で確かめたコアは、その記録を足す（ArduinoCore-CH32RV の clang 評価）
+        entry["xw_basis"] = "+".join(filter(None, [data["xw_basis"], fact.get("xw_measured", "")]))
         out.append(entry)
     return out
 
