@@ -1592,9 +1592,12 @@ def page_record(page, lang: str, source_sha256: str,
 
 def convert(pdf_path: Path, lang: str, document_type: str,
             bundles: Path = DEFAULT_BUNDLES,
-            structured: Path = DEFAULT_STRUCTURED) -> Path:
+            structured: Path = DEFAULT_STRUCTURED,
+            name: str | None = None, document: str | None = None) -> Path:
     source_sha256 = hashlib.sha256(pdf_path.read_bytes()).hexdigest()
-    name = f"{pdf_path.stem}.{lang}"
+    # 名前は目録の文書名から付ける。mirror のファイル名が違う文書がある
+    # （EVT の中の英語版は `CHRISC8B-EN.pdf`。目録の名前は `CHRISC8B.PDF`）
+    name = name or f"{pdf_path.stem}.{lang}"
     bundle = bundles / name
     committed = structured / name
 
@@ -1660,7 +1663,7 @@ def convert(pdf_path: Path, lang: str, document_type: str,
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "source": {
-            "document": pdf_path.name,
+            "document": document or pdf_path.name,
             "document_type": document_type,
             "language": lang,
             "sha256": source_sha256,

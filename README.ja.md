@@ -24,7 +24,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `catalog/`・`evidence/`・`index/`: 上の3区分の表。データの列が先、そのあとに確度と根拠の列。`pipeline/common/paths.py` が置き場所を1箇所で決める
 - `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`build_pins`/`build_remap`/`build_tables` の入力）
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
-- `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する（[manifests/README.ja.md](manifests/README.ja.md)）
+- `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する。EVT の中にだけある文書（PIOC・RISC8B）は `manifests/evt-documents.json`（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
 - `tools/check_docs.py`: **文書が書いている行数と穴の状態**を表と worklist の台帳で検算する。データが正しくても説明が古ければ、利用者が読むのは古いほう（2026-08-29 の監査で見つかった腐りの型）
 - `tools/check_viewer.js`: `pins.html` の表示を DOM 無しで評価して確かめる。**表と文書には検査があるのに表示だけ外**で、series view の Defaults が先頭型番だけを見ていた穴（G1）が残っていた。node が要る唯一の検査

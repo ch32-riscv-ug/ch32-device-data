@@ -217,10 +217,27 @@ def series_section(data: Data, family: str) -> list[str]:
     return out
 
 
+def evt_files() -> dict[str, dict[str, dict[str, str]]]:
+    """EVT の中にだけある文書の {文書: {言語: {mirror: パス}}}（`manifests/evt-documents.json`）。"""
+    import json
+    data = json.loads((paths.REPO / "manifests" / "evt-documents.json").read_text(encoding="utf-8"))
+    return {d["name"]: {lang: s["files"] for lang, s in d["sources"].items()} for d in data["documents"]}
+
+
+EVT_FILES = evt_files()
+
+
 def mirror_url(d: dict, family: str, lang: str) -> str:
     """その family の README から引く mirror の URL。2つの family が共有する文書（CH32FV2x_V3xRM は CH32V20x と
-    CH32V307）は、目録の URL が最初のリポジトリを指すので、その family 自身の mirror に読み替える。"""
+    CH32V307）は、目録の URL が最初のリポジトリを指すので、その family 自身の mirror に読み替える。
+
+    EVT の中にだけある文書（PIOC・RISC8B）は、mirror ごとにファイル名の大小やその言語版の有無が違う
+    （CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）。自分の mirror にあればそれを、無ければ
+    目録の URL（その言語版を持つ最初の mirror）を指す。"""
     url = d[f"mirror_url_{lang}"]
+    files = EVT_FILES.get(d["document"], {}).get(lang)
+    if files is not None:
+        return f"https://ch32-riscv-ug.github.io/{family}/{files[family]}" if family in files else url
     first = d["repositories"].split(";")[0]
     if url and first != family and f"/{first}/" in url:
         url = url.replace(f"/{first}/", f"/{family}/", 1)

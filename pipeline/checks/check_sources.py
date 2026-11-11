@@ -110,8 +110,8 @@ def mirror_roots() -> dict[str, Path]:
     """mirrorのルート → そこに原本を置いている文書の数。"""
     roots: dict[Path, int] = {}
     for job in convert_all.targets():
-        # 原本は <mirror>/datasheet_<lang>/<file> に置かれている
-        roots[Path(job["pdf"]).parents[1]] = roots.get(Path(job["pdf"]).parents[1], 0) + 1
+        # 原本は <mirror>/datasheet_<lang>/<file>、EVT の中の文書は <mirror>/EVT/... にある
+        roots[Path(job["mirror"])] = roots.get(Path(job["mirror"]), 0) + 1
     return {str(k): v for k, v in sorted(roots.items())}
 
 

@@ -4,7 +4,8 @@
 対象は`catalog/documents.csv`のassigned行のうち、datasheet・reference-manual・
 core-manual・package-drawing・other（＝WCH-LinkUserManual）。言語は
 `version_zh`/`version_en`の有無で決める。原本はローカルmirror
-（`/home/mt/dev_wch/<repo>/datasheet_<lang>/<document>`）から読む。
+（`/home/mt/dev_wch/<repo>/datasheet_<lang>/<document>`）から読む。EVT の中にだけある
+文書（`manifests/evt-documents.json`。PIOC・RISC8B）は、mirror が展開した EVT の中から読む。
 
 **incremental**: `structured/<stem>.<lang>/manifest.json`が既にあり、原本SHA-256・
 engine版・converter版が全部同じなら変換を跳ばす（`--force`で全部やり直す）。
@@ -39,8 +40,20 @@ TARGET_KINDS = ("datasheet", "reference-manual", "core-manual",
                 "package-drawing", "other")
 
 
+def evt_paths() -> dict[str, dict[str, dict[str, str]]]:
+    """EVT の中にだけある文書の {文書: {言語: {mirror: mirror の中のパス}}}（`manifests/evt-documents.json`）。
+
+    パスは mirror ごとに書いてある——ファイル名の大小と、その言語版があるかが mirror ごとに違う
+    （CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）。
+    """
+    data = json.loads((REPO / "manifests" / "evt-documents.json").read_text(encoding="utf-8"))
+    return {d["name"]: {lang: s["files"] for lang, s in d["sources"].items()}
+            for d in data["documents"]}
+
+
 def targets() -> list[dict]:
     out = []
+    evt = evt_paths()
     with (REPO / "catalog" / "documents.csv").open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             if row["status"] != "assigned" or row["kind"] not in TARGET_KINDS:
@@ -48,15 +61,24 @@ def targets() -> list[dict]:
             for lang in ("zh", "en"):
                 if not row[f"version_{lang}"]:
                     continue
-                hits = [MIRRORS / repo / f"datasheet_{lang}" / row["document"]
-                        for repo in row["repositories"].split(";") if repo]
-                hits = [p for p in hits if p.exists()]
+                repos = [repo for repo in row["repositories"].split(";") if repo]
+                if row["document"] in evt:
+                    # EVT の中にだけある文書（PIOC・RISC8B）。mirror が展開した EVT から読む
+                    files = evt[row["document"]][lang]
+                    hits = [(MIRRORS / repo, MIRRORS / repo / files[repo])
+                            for repo in repos if repo in files]
+                else:
+                    hits = [(MIRRORS / repo, MIRRORS / repo / f"datasheet_{lang}" / row["document"])
+                            for repo in repos]
+                hits = [(m, p) for m, p in hits if p.exists()]
                 if not hits:
                     raise SystemExit(f"mirror not found: {row['document']} {lang} "
                                      f"(repositories={row['repositories']!r})")
                 out.append({
                     "name": f"{Path(row['document']).stem}.{lang}",
-                    "pdf": hits[0],
+                    "document": row["document"],
+                    "pdf": hits[0][1],
+                    "mirror": hits[0][0],
                     "lang": lang,
                     "document_type": row["kind"],
                 })
@@ -83,7 +105,8 @@ def run_one(args: tuple[dict, str, str]) -> tuple[str, float, int]:
     job, bundles, structured = args
     started = time.perf_counter()
     bundle = convert.convert(job["pdf"], job["lang"], job["document_type"],
-                             Path(bundles), Path(structured))
+                             Path(bundles), Path(structured), name=job["name"],
+                             document=job["document"])
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     return job["name"], time.perf_counter() - started, len(manifest["pages"])
 

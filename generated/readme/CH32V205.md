@@ -92,6 +92,8 @@ System block diagram from the [WCH product page](https://www.wch-ic.com/products
 | CH32V205DS0.PDF | datasheet | [page](https://www.wch-ic.com/downloads/CH32V205DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V205/datasheet_en/CH32V205DS0.PDF) v1.3 | [page](https://www.wch.cn/downloads/CH32V205DS0_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V205/datasheet_zh/CH32V205DS0.PDF) v1.3 |
 | CH32V205RM.PDF | reference-manual | [page](https://www.wch-ic.com/downloads/CH32V205RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V205/datasheet_en/CH32V205RM.PDF) v1.2 | [page](https://www.wch.cn/downloads/CH32V205RM_PDF.html) [mirror](https://ch32-riscv-ug.github.io/CH32V205/datasheet_zh/CH32V205RM.PDF) v1.3 |
 | CH32V205EVT.ZIP | evt | - | [page](https://www.wch.cn/downloads/CH32V205EVT_ZIP.html) [mirror](https://github.com/ch32-riscv-ug/CH32V205/tree/main/EVT) v1.5 |
+| CHRISC8B.PDF | core-manual | [mirror](https://ch32-riscv-ug.github.io/CH32H417/EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B-EN.pdf) v2B | [mirror](https://ch32-riscv-ug.github.io/CH32V205/EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B.PDF) v2B |
+| PIOC.PDF | core-manual | [mirror](https://ch32-riscv-ug.github.io/CH32V205/EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC-EN.pdf) v1.0 | [mirror](https://ch32-riscv-ug.github.io/CH32V205/EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC.pdf) v1.1 |
 
 ### Evaluation boards
 

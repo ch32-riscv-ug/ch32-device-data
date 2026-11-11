@@ -42,6 +42,17 @@ WCHのBLE系（CH572/573/583/585/587/592/595/596）はRISC-Vですが現時点�
 
 **repositoryの分離規則はEVT単位（1 repository = 1 EVT archive）です。** update.shはEVTを`./EVT`へ全置換で展開するため、2本のEVTを同居させると後勝ちで壊れます（CH32V205を分離した理由）。family横断の文書（QingKe core manual・WCH-Link manual・PACKAGE寸法図面）は専用mirror **`WCH-common`** が保持します。WCHの原典は中国サイトの可用性が不安定なため、出典（言語別`file_id`と版）はこのカタログが記録し、実体の可用性はGitHub mirrorが担保します。`ch32-device-data`自体はPDFを持ちません。
 
+## EVT の中にだけある文書（`evt-documents.json`）
+
+WCH のダウンロードページに単独の配布物が無く、**EVT の中にだけ入っている文書**は `evt-documents.json` に人が書きます。今は PIOC（一部の CH32 に内蔵された RISC8B コアの eMCU）の2冊で、CH32X035・CH32V205・CH32H417 の EVT の `EXAM/PIOC/Tool_Manual/Manual/` にあります。
+
+- `CHRISC8B.PDF`: RISC8B コアの命令セットとアセンブラ（zh・en とも版 2B）
+- `PIOC.PDF`: PIOC の手册（zh 1.1・en 1.0）
+
+`documents.json` に入れないのは、そちらが**サイトの一覧と毎日同期し、各 mirror のダウンロードの入力も兼ねる**からです。download id の無い行を混ぜると、mirror の取得と「サイトから消えた」の判定を壊します。mirror は EVT を展開するだけで、この2冊のために何もしません。
+
+項目は `documents.json` と同じ（`name`・`kind`・`repositories`・`status`）で、`sources.<lang>` が `version`（**表紙に刷られた版**）と `files`（**mirror ごとの、その mirror の中のパス**）を持ちます。パスを mirror ごとに書くのは、ファイル名の大小とその言語版の有無が mirror ごとに違うからです（CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）。原本は名前順で最初の mirror のもので、各 family の README は自分の mirror のファイルを指します（無ければ原本の mirror）。`catalog/documents.csv` には page・download の URL を空、mirror の URL を EVT の中の PDF にして載り、変換・表・検査はほかの文書と同じに扱います。版が上がったかは `check_sources` が原本の sha で気づくので、そのとき `version` を書き直します。
+
 ## 更新
 
 `.github/workflows/update.yml`が日次で実行します（13:07 UTC）。mirror群の更新は15:07 UTCなので、同じ日のカタログを読ませるため2時間先行しています。

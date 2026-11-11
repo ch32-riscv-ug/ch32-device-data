@@ -42,6 +42,17 @@ The two languages are treated as separate sources; `sources.en` and `sources.zh`
 
 **The rule for splitting repositories is per EVT (1 repository = 1 EVT archive).** update.sh extracts the EVT into `./EVT` with a full replace, so putting two EVTs in one repository breaks it with last-one-wins (the reason CH32V205 was split out). Cross-family documents (QingKe core manual, WCH-Link manual, PACKAGE dimension drawings) are held by the dedicated mirror **`WCH-common`**. Because the availability of WCH's originals on the Chinese site is unstable, this catalog records the provenance (per-language `file_id` and version) while the GitHub mirrors guarantee the availability of the files themselves. `ch32-device-data` itself holds no PDFs.
 
+## Documents that exist only inside an EVT (`evt-documents.json`)
+
+Documents that WCH does not publish on its download pages and that **exist only inside an EVT archive** are written by hand in `evt-documents.json`. Today these are the two PIOC documents (PIOC is the RISC8B-core eMCU embedded in some CH32 chips), found under `EXAM/PIOC/Tool_Manual/Manual/` in the CH32X035, CH32V205 and CH32H417 EVTs.
+
+- `CHRISC8B.PDF`: the RISC8B core instruction set and assembler (version 2B in both zh and en)
+- `PIOC.PDF`: the PIOC manual (zh 1.1, en 1.0)
+
+They are not in `documents.json` because that file is **synced daily with the site listing and is also the mirrors' download input**. Rows without a download id would break the mirrors' fetch and the "disappeared from the site" check. The mirrors only extract their EVT; they do nothing extra for these documents.
+
+The fields match `documents.json` (`name`, `kind`, `repositories`, `status`); `sources.<lang>` holds `version` (**the version printed on the cover**) and `files` (**the path inside each mirror, per mirror**). Paths are listed per mirror because file-name case and whether that language edition exists differ between mirrors (CH32V205 has `PIOC.pdf` and no English CHRISC8B). The original is the first mirror by name; each family's README links its own mirror's file (or the original's mirror when it has none). In `catalog/documents.csv` they appear with empty page and download URLs and a mirror URL pointing at the PDF inside the EVT; conversion, tables and checks treat them like any other document. `check_sources` notices a new edition by the original's sha, and `version` is updated then.
+
 ## Updating
 
 `.github/workflows/update.yml` runs daily (13:07 UTC). The mirrors update at 15:07 UTC, so this runs two hours ahead to let them read the same day's catalog.

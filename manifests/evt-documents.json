@@ -1,0 +1,65 @@
+{
+  "schema_version": "0.1-draft",
+  "description": "EVT の中にだけ入っている文書の一覧（人が持つ）。WCH のダウンロードページに単独の配布物が無いので、documents.json（サイトの一覧と毎日同期し、各 mirror のダウンロードの入力も兼ねる）には入れない。各 mirror が展開した EVT から読む。",
+  "path_note": "sources.<lang>.files は mirror ごとの、その mirror の中のパス。ファイル名の大小や、その言語版があるかは mirror ごとに違う（CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）ので、mirror ごとに書く。原本は files を mirror の名前順に見て最初のもの（目録の mirror_url もそれを指す）。各 family の README は自分の mirror のファイルを指し、無ければ原本の mirror を指す。",
+  "version_note": "version は表紙に刷られた版。WCH のサイトの版ではない。",
+  "documents": [
+    {
+      "name": "CHRISC8B.PDF",
+      "kind": "core-manual",
+      "status": "assigned",
+      "repositories": [
+        "CH32H417",
+        "CH32V205",
+        "CH32X035"
+      ],
+      "note": "PIOC（RISC8B コアの eMCU）の命令セットとアセンブラ（WASM53B）。3 つの EVT で中身は同じ（CH32V205 には en 版が無い）",
+      "sources": {
+        "zh": {
+          "version": "2B",
+          "files": {
+            "CH32H417": "EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B.PDF",
+            "CH32V205": "EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B.PDF",
+            "CH32X035": "EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B.PDF"
+          }
+        },
+        "en": {
+          "version": "2B",
+          "files": {
+            "CH32H417": "EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B-EN.pdf",
+            "CH32X035": "EVT/EXAM/PIOC/Tool_Manual/Manual/CHRISC8B-EN.pdf"
+          }
+        }
+      }
+    },
+    {
+      "name": "PIOC.PDF",
+      "kind": "core-manual",
+      "status": "assigned",
+      "repositories": [
+        "CH32H417",
+        "CH32V205",
+        "CH32X035"
+      ],
+      "note": "可编程协议 I/O 微控制器 PIOC の手册（SFR・タイマ・I/O）。CH32V205 の zh 版は頁見出しの URL が http なだけで本文は同じ",
+      "sources": {
+        "zh": {
+          "version": "1.1",
+          "files": {
+            "CH32H417": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC.PDF",
+            "CH32V205": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC.pdf",
+            "CH32X035": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC.PDF"
+          }
+        },
+        "en": {
+          "version": "1.0",
+          "files": {
+            "CH32H417": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC-EN.pdf",
+            "CH32V205": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC-EN.pdf",
+            "CH32X035": "EVT/EXAM/PIOC/Tool_Manual/Manual/PIOC-EN.pdf"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -29,7 +29,7 @@ gains a PDF, the rules, and the working conventions for the structured-PDF pipel
 - `catalog/`, `evidence/`, `index/`: the three kinds of table above. Data columns first, then the confidence and basis columns. `pipeline/common/paths.py` is the one place that knows where each table lives
 - `.cache/candidates/*.json`: per-SKU machine extraction written by `build_all.py` (not committed; input to `build_pins`, `build_remap`, `build_tables`)
 - `curated/`: the few hand-verified overrides (pin-table column headers, errata, series facts)
-- `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it ([manifests/README.md](manifests/README.md))
+- `manifests/documents.json`: catalogue of the documents to fetch; the mirrors read it. Documents found only inside an EVT (PIOC, RISC8B) are in `manifests/evt-documents.json` ([manifests/README.md](manifests/README.md))
 - `tools/check_tables.py`, `tools/check_counts.py`: joins, formats and count invariants across the tables
 - `tools/check_docs.py`: the row counts and hole states the documents claim, checked against the tables and the work list -- data can be right while the prose that explains it is stale
 - `tools/check_viewer.js`: what `pins.html` shows, evaluated headlessly against the committed tables -- the viewer used to be the one thing nothing checked
