@@ -28,6 +28,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import re
 import sys
 from pathlib import Path
@@ -560,6 +561,84 @@ def check_stable_lists() -> list[str]:
     return bad
 
 
+# `check_tables.py` の `check()` の参照を一覧に書いた文書。見出しの直後の最初のコードの塊が一覧。
+JOIN_LISTS = (("catalog/README.md", "## Join keys across all tables"),
+              ("catalog/README.ja.md", "## 全表の結合キー"))
+# `check()` の値が変数のときの列名（`for token in r["cores"].split(";")`）。
+JOIN_VARIABLE_COLUMNS = {("families", "token"): "cores"}
+
+
+def joins_in_check_tables() -> set[tuple[str, str, str]]:
+    """`check_tables.py` の `check(表, 行, r["列"], 集合, "先")` を (表, 列, 先) で全部取る。
+
+    `for column in ("a", "b")` のような定数の繰り返しは展開する。
+    """
+    tree = ast.parse((REPO / "tools" / "check_tables.py").read_text(encoding="utf-8"))
+    found: set[tuple[str, str, str]] = set()
+
+    def value(node, env):
+        if isinstance(node, ast.Constant):
+            return node.value
+        if isinstance(node, ast.Name):
+            return env.get(node.id, node.id)
+        if isinstance(node, ast.Subscript):
+            return value(node.slice, env)
+        return None
+
+    def walk(node, env):
+        if (isinstance(node, ast.For) and isinstance(node.target, ast.Name)
+                and isinstance(node.iter, ast.Tuple)
+                and all(isinstance(e, ast.Constant) for e in node.iter.elts)):
+            for element in node.iter.elts:
+                for child in node.body:
+                    walk(child, {**env, node.target.id: element.value})
+            return
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id == "check" and len(node.args) >= 5):
+            table, column, target = (value(node.args[i], env) for i in (0, 2, 4))
+            column = JOIN_VARIABLE_COLUMNS.get((table, column), column)
+            found.add((table, column, target))
+        for child in ast.iter_child_nodes(node):
+            walk(child, env)
+
+    walk(tree, {})
+    return found
+
+
+def check_join_lists() -> list[str]:
+    """`check_tables.py` が見る1列の参照が、catalog/README（日英）の結合キーの一覧に全部あること。
+
+    一覧は手で書いていて、検査に足した参照（`link_firmware_issues.target`・
+    `absolute_maximum_ratings` など）が載らないまま古びていた（2026-11-13、英日をそろえた
+    ときに見つかった）。
+    """
+    joins = joins_in_check_tables()
+    bad = []
+    if len(joins) < 30:
+        bad.append(f"tools/check_tables.py: check() の参照が {len(joins)} 件しか取れない"
+                   "——check_docs.py の joins_in_check_tables を直すこと")
+    for name, heading in JOIN_LISTS:
+        text = (REPO / name).read_text(encoding="utf-8")
+        at = text.find(heading)
+        block = re.search(r"```\n(.*?)```", text[at:], re.S) if at >= 0 else None
+        if block is None:
+            bad.append(f"{name}: 結合キーの一覧（{heading!r} の後のコードの塊）が見つからない")
+            continue
+        listed: set[tuple[str, str, str]] = set()
+        for line in block.group(1).splitlines():
+            if "→" not in line:
+                continue
+            left, right = line.split("→", 1)
+            target = right.strip().split(".", 1)[0]
+            for item in left.split(" / "):
+                table, _, column = item.strip().partition(".")
+                listed.add((table, column, target))
+        for table, column, target in sorted(joins - listed):
+            bad.append(f"{name}: 結合キーの一覧に {table}.{column} → {target} が無い"
+                       "（check_tables.py は見ている）")
+    return bad
+
+
 def check_liquid() -> list[str]:
     """コミットするMarkdownにLiquidが特別扱いする並びが無いこと。
 
@@ -593,7 +672,7 @@ def main() -> int:
     holes = ledger()
     bad = (check_row_counts(known) + check_confidence(known) + check_prose(known)
            + check_single_edition() + check_holes(holes) + check_stable_lists()
-           + check_liquid())
+           + check_liquid() + check_join_lists())
     if bad:
         seen: list[str] = []
         for b in bad:

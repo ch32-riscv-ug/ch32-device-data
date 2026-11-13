@@ -146,38 +146,64 @@ curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | pyt
 
 ## 全表の結合キー
 
-`tools/check_tables.py` が全参照の結合可能性を機械検査します:
+`tools/check_tables.py` が全参照の結合可能性を機械検査します。1列の参照（その中の `check()`）:
 
 ```
-series.family / products.family / packages.families   → families.family
-products.series                                        → series.series
-products.package                                       → packages.package
-series.core / families.cores                           → cores.core
-pins.part_number / pin_functions.part_number           → products.part_number
-product_attributes.part_number                          → products.part_number
-index/pinout.(part_number, pad, pin)                    → pins.(part_number, pad, pin)
-index/pinout.(part_number, pad, route, signal)          → pin_functions.（同じ4つ組。route だけ RM 格子の値を採る行がある）
-remap_fields.series                                     → series.series
-remap_routes.(series, selector)                         → remap_fields
-clock_configs.family / clock_prescalers.family / clock_sources.family → families.family
-clock_symbols.family / clock_init.family / evt_variants.family → families.family
-clock_configs.(family, hpre|ppre1|ppre2)                → clock_prescalers.(family, field, divider)
-clock_configs.(family, pll|outside_rccの各記号)          → clock_symbols.(family, symbol)
-clock_configs.condition / clock_sources.condition の macro → evt_variants.(family, macro)
-evt_variants.part_number                                → products.part_number
-memory_configs.part_number                              → products.part_number
-pin_alternate.family                                    → families.family
-interrupts.family / memory_map.family / features.family / sources.family → families.family
-eval_boards.family / feature_tags.family                → families.family
-eval_boards.parts                                       → products.part_number
-feature_tags.series                                     → series.series
-features.series                                         → series.series
-interrupts.condition の macro                            → evt_variants.(family, macro)
-pin_functions(route=af-N).part_number+pad               → pin_alternate.family+pad
-errata.series / operating_conditions.series             → series.series
-evt_examples.family                                     → families.family
-*.datasheet(s) / families.reference_manuals・evt / cores.manual → documents.document
+series.family / products.family / packages.families           → families.family
+adc_internal.family / clock_configs.family / clock_enables.family → families.family
+clock_init.family / clock_prescalers.family / clock_sources.family → families.family
+clock_symbols.family / debug_data.family / dma_requests.family   → families.family
+eval_boards.family / evt_examples.family / evt_variants.family   → families.family
+feature_tags.family / features.family / flash_geometry.family    → families.family
+flash_program_method.family / interrupts.family / memory_map.family → families.family
+opa_cmp_registers.family / pin_alternate.family / register_blocks.family → families.family
+register_fields.family / register_layouts.family / sources.family → families.family
+systick.family / timers.family / usbpd_plumbing.family           → families.family
+option_bytes.family / esig.family / device_id_addresses.family   → families.family
+products.series / remap_fields.series / errata.series            → series.series
+operating_conditions.series / absolute_maximum_ratings.series    → series.series
+feature_tags.series / features.series / pinout.series            → series.series
+pins.part_number / pin_functions.part_number / pinout.part_number → products.part_number
+product_attributes.part_number / evt_variants.part_number        → products.part_number
+memory_configs.part_number / eval_boards.parts / link_firmware_issues.target → products.part_number
+products.package                                                 → packages.package
+series.core / families.cores                                     → cores.core
+series.datasheets / products.datasheet / families.datasheets     → documents.document
+families.reference_manuals / families.evt / cores.manual         → documents.document
+pins.datasheet / pin_functions.datasheet / features.datasheet    → documents.document
+absolute_maximum_ratings.datasheet                               → documents.document
 ```
 
-pins系は`pipeline/extract/datasheet/extract_pin_tables.py`、remap系は`pipeline/build/build_remap.py`、clock系は`pipeline/build/build_clock.py`、operating_conditions.csvは`pipeline/extract/datasheet/build_operating_conditions.py`、evt_variants.csvは`pipeline/build/build_evt_variants.py`、systick.csvは`pipeline/build/build_systick.py`、pin_alternate.csvは`pipeline/build/build_pin_alternate.py`、eval_boards.csvは`pipeline/build/build_eval_boards.py`、feature_tags.csvは`pipeline/build/build_feature_tags.py`、sources.csvは`pipeline/build/build_sources.py`、interrupts.csvは`pipeline/build/build_interrupts.py`、memory_map.csvは`pipeline/build/build_memory_map.py`、features.csvは`pipeline/extract/datasheet/extract_features.py`、memory_configs.csvは`pipeline/extract/rm/extract_memory.py`、link_firmware.csvは`pipeline/build/build_link_firmware.py`、それ以外は`pipeline/build/build_tables.py`が生成します。
+複数列にまたがる参照と、列の中の値を読む参照:
 
+```
+pin_functions.(part_number, pad)                    → pins.(part_number, pad)
+pinout.(part_number, pad, pin)                      → pins.(part_number, pad, pin)
+pinout.(part_number, pad, route, signal)            → pin_functions.（同じ4つ組。route だけ RM 格子の値を採る行がある）
+pin_functions(route=af-N).(part_number, pad)        → pin_alternate.(family, pad)
+remap_routes.(series, selector)                     → remap_fields.(series, selector)
+remap_routes.value                                  → remap_fields.valid_values
+register_blocks.(family, type) / registers.(family, type) → register_layouts.(family, type)
+option_bytes（OB の block）                          → register_blocks.(family, block)
+option_byte_fields.family                           → option_bytes.family
+link_firmware_issues.(device, mcu)                  → link_firmware.(device, mcu)
+clock_configs.(family, hpre|ppre1|ppre2)            → clock_prescalers.(family, field, divider)
+clock_configs.(family, pll|outside_rccの各記号)      → clock_symbols.(family, symbol)
+clock_init.(family, function)                       → clock_configs（の設定）
+clock_configs.condition / clock_sources.condition / interrupts.condition の macro → evt_variants.(family, macro)
+dma_requests の variant                              → evt_variants.(family, macro)
+```
+
+索引の表は、元の証拠の表に含まれることも見ます（`pinout` と conflicts は上か `index/README.ja.md`）:
+
+```
+index/routes                                        → remap_routes
+index/register_map.(family, block)                  → register_blocks
+index/register_map.(family, type, register)         → registers
+index/dma                                           → dma_requests
+index/capabilities                                  → product_attributes
+```
+
+`tools/check_docs.py` が、`tools/check_tables.py` の `check()` の参照がすべて最初の一覧に載っていることを両言語で見るので、参照を足してこの頁に書き忘れることはありません。
+
+表ごとの生成器は `tools/check_tables.py` の `COLUMN_SOURCES`（表の列を決めているモジュール）が一覧で持ちます。それが全部 `pipeline/publish/regenerate.py` の順序に載ることも `check_tables.py` が見ます。生成の順は [pipeline/README.ja.md](../pipeline/README.ja.md) にあります。
