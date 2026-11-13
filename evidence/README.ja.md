@@ -213,7 +213,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 `unit`列が**そのレジスタがOPAのものかCMPのものか**を言います。RMの見出しは`OPA控制寄存器 2（OPA_CTLR2）`としか書かず（blockを言うだけ）、フィールドの説明文（「CMP3正端输入通道选择」対「OPA2正向输入端选择」）の多数決で決めています。RMがそのblockのfieldを1つも書かないfamily（V30x/V407の`CR`、H417）は名前で分かる`CMP_*`以外をOPAとします。
 
-出所はEVTヘッダの構造体（配置）とbit define（`OPA_CTLR2_EN1 ((uint32_t)0x00000001)`）で、**RMのレジスタ表と突き合わせ**ます。bit位置が一致すればconfirmed（293行中199）。**食い違いが5件**あり、両論を`basis`に残しています（F-44/F-45）——CH32X035の`OPA_CTLR2_CMP_LOCK`は`0x2000`（bit13＝`PSEL3`と同じ）と書かれていますがRMはbit31で、**ヘッダの値で書くとCMP3の正入力選択を壊します**。L103の`ITRIMN`/`ITRIMP`はヘッダ5bit・RM6bit、V205の`HYS1_H`/`HYS2_H`はヘッダbit29/30・RMbit19/29。
+出所はEVTヘッダの構造体（配置）とbit define（`OPA_CTLR2_EN1 ((uint32_t)0x00000001)`）で、**RMのレジスタ表と突き合わせ**ます。bit位置が一致すればconfirmed（293行中200）。**食い違いが5件**あり、両論を`basis`に残しています（F-44/F-45）——CH32X035の`OPA_CTLR2_CMP_LOCK`は`0x2000`（bit13＝`PSEL3`と同じ）と書かれていますがRMはbit31で、**ヘッダの値で書くとCMP3の正入力選択を壊します**。L103の`ITRIMN`/`ITRIMP`はヘッダ5bit・RM6bit、V205の`HYS1_H`/`HYS2_H`はヘッダbit29/30・RMbit19/29。
 
 `purpose`はfield名の綴りから機械的に付けます（`EN`→enable、`PSEL`→positive input select…）。名乗っていないものは空です。多bit fieldの値の列挙（`BKIN_CFG_0`/`_1`）はfieldではないので載せません。OPA/CMPのbit defineを持たないfamily（V20x・V103・X315）は行がありません。
 
@@ -223,7 +223,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 出所はEVTの`ch32*_rcc.h`——`RCC_<bus>PeriphClockCmd()`に渡す定数がperipheralごとのbitで、**busの名前がレジスタを言います**（`RCC_AHBPeriph_USBPD`→`RCC->AHBPCENR`）。busの呼び名はfamilyで違います（AHB/APB1/APB2、HB/PB1/PB2、HB/HB1/HB2）。`RCC_<bus>PeriphClockCmd`が`RCC-><bus>PCENR`へ書くことは8 familyのrcc.cで確かめ、例外はありません。
 
-RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**417行中365行がconfirmed、conflict 0**。referenceの52行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
+RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**395行中364行がconfirmed、conflict 0**。referenceの31行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
 
 **rcc.h にはその family に無い周辺の定数も残っています**（他 family のヘッダからの写し）。V20x の`RCC_AHBPeriph_RNG`・`FSMC`・`SDIO`・`USBHS`・`DAC`と、V103 の`FSMC`・`SDIO`・APB1 の`USB`（CH32F103 の USBD）・`CAN1`・`CAN2`・`CEC`の11行です。共有 RM（`CH32FV2x_V3xRM`・`CH32xRM`）の表は bit の適用 family を書かないので EVT と一致して confirmed になっていました——RM の RNG の章は「CH32F20x・CH32V30x・CH32V31x に適用」と書いています。機械では見分けられないので、人の判定を`curated/clock-enables-absent.json`に置いて落とします（2026-10-21、ArduinoCore-CH32RV の依頼。項目が rcc.h から消えるか、device header にその周辺のブロックが現れたら生成が止まる）。device header にブロックが無くても実在するもの——H417 の`BKP`（H417 専用 RM が`BKPEN`を書く）、H417/V205 の`PIOC`と V103 の`USBFS`（EVT に例題と専用ヘッダがある）——は残しています。**V208 の Ethernet のクロックはこの表に無い**のが正しく、RCC ではなく`EXTEN->EXTEN_CTR`の`EXTEN_ETH_10M_EN`（bit2）で入れます（EVT`ETH/NetLib/eth_driver.c`）。
 
@@ -276,10 +276,10 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
 
 | 表 | 1行 | 何が分かるか |
 |---|---|---|
-| `register_blocks` | family × block（`USART1`）676行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（548）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
+| `register_blocks` | family × block（`USART1`）679行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（562）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
 | `registers` | family × 型 × register 5,353行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
-| `register_fields` | family × register × bit define 33,365行（field 24,792・value 8,573） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。fieldの27.5%（6,829）がRMとbit位置一致、38がconflict |
-**`rm_access` とその確度**（2026-10-01 に追加）。`rm_access` は RM 中文版の「访问」欄を印刷どおりに写したもの。どの RM も冒頭で語を定義する: `RO` 読み出し専用（ハードが変える）、`RZ` 読むと 0 に戻る、`WO` 書き込み専用、`WA` Safe モードで書ける、`WZ` 書くと自動で 0、`RW`、`RWA` Safe モードで読み書き、`RW1` 1 の書き込みが有効、`RW0` 0 の書き込みが有効、`RW1Z` 1 を書くと消える。**定義に無い語を刷っている field が16ある**（`W1` 7・`W0` 4・`RWO` 4・`R0` 1。多くは `0` と `O` の取り違えで、L103 `FWAKE_FLAG` は `RWO` と刷りながら説明は「写0清零」）。印刷どおりに残し、`check_tables.KNOWN_ACCESS_MISPRINTS` が名前で固定する。`rm_access_confidence`/`rm_access_basis` は英語版 RM と照合した結果: `confirmed` 両版一致（6,090）、`conflict` 食い違い（26。`rm_access_basis` に `!<RM>:en(=X)`、`index/conflicts.csv` に `field=rm_access` で並ぶ）、`reference` 英語版の field が読めない（757）。行の `confidence`/`basis` は従来どおり bit 位置の確度。英語版の欄には説明の文字が落ちることがある（`RW t`・`1 0 RW0 o a`）ので、定義の語か既知の誤植がちょうど1つあるときだけ数える。
+| `register_fields` | family × register × bit define 33,320行（field 24,602・value 8,718） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。field 24,602 のうち 6,816 がRMとbit位置一致、38 がconflict |
+**`rm_access` とその確度**（2026-10-01 に追加）。`rm_access` は RM 中文版の「访问」欄を印刷どおりに写したもの。どの RM も冒頭で語を定義する: `RO` 読み出し専用（ハードが変える）、`RZ` 読むと 0 に戻る、`WO` 書き込み専用、`WA` Safe モードで書ける、`WZ` 書くと自動で 0、`RW`、`RWA` Safe モードで読み書き、`RW1` 1 の書き込みが有効、`RW0` 0 の書き込みが有効、`RW1Z` 1 を書くと消える。**定義に無い語を刷っている field が16ある**（`W1` 7・`W0` 4・`RWO` 4・`R0` 1。多くは `0` と `O` の取り違えで、L103 `FWAKE_FLAG` は `RWO` と刷りながら説明は「写0清零」）。印刷どおりに残し、`check_tables.KNOWN_ACCESS_MISPRINTS` が名前で固定する。`rm_access_confidence`/`rm_access_basis` は英語版 RM と照合した結果: `confirmed` 両版一致（6,078）、`conflict` 食い違い（30。`rm_access_basis` に `!<RM>:en(=X)`、`index/conflicts.csv` に `field=rm_access` で並ぶ）、`reference` 英語版の field が読めない（749）。行の `confidence`/`basis` は従来どおり bit 位置の確度。英語版の欄には説明の文字が落ちることがある（`RW t`・`1 0 RW0 o a`）ので、定義の語か既知の誤植がちょうど1つあるときだけ数える。
 
 導出の **layout key**（family × 型 → 構造体の形のハッシュ。同じkeyのfamilyは同じレジスタ定義を共有できる）は索引の[`index/register_layouts.csv`](../index/README.ja.md)にあります。register×fieldを結合して絶対番地を付けた引き口も索引（`index/registers.csv`・`index/register_map.csv`）です。
 
@@ -815,7 +815,7 @@ familyを主キーにすると別々の冊子の`1.4.17`が衝突します。
 **`page_zh` と `page_en` を別の列に持つのは、両版で割り付けが違うから**（`CH32V103R8T6` の
 ピン配置図は中文版 p.11・英語版 p.13）。食い違いではないので、この表は構造上 `conflict` を
 持たない——`confirmed` は両版が図を描いていること、`reference` は片版だけということ。いまは
-目録の 103 型番すべてが `confirmed`。
+図のある 104 型番すべてが `confirmed`（目録の残る1つ `CH32V006K8U6` は、下の限定のとおり行を持たない）。
 
 **1枚の図が複数の型番を代表する。** 図の見出しは完全な型番とは限らず、伏字（`CH32V103Cx` は
 C6T6・C8T6・C8U6 を覆う）・温度グレードの桁を省いた形（`...E8R6` に対する `CH32V006E8R`）・スラッシュで連ねた形

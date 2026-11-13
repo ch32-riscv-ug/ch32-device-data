@@ -164,6 +164,50 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("docs/handoff.ja.md", r"索引の材料(?P<n>\d+)表", "evidence_tables"),
     ("docs/handoff.ja.md", r"索引(?P<n>\d+)表", "index_tables"),
     ("docs/handoff.ja.md", r"そのまま公開する(?P<n>\d+)表", "published_copies"),
+    # evidence/README の表ごとの節が書く行数と確度の内訳（2026-11-13、英日をそろえたときに
+    # 両版とも古いまま見つかった——register_fields 33,365・register_blocks 676・clock_enables
+    # 417 など。数を書いた所はここに載せて、腐ったら止まるようにする）。
+    ("evidence/README.ja.md", r"confirmed（(?P<n>\d+)行中\d+）", "opa_cmp_registers"),
+    ("evidence/README.ja.md", r"confirmed（\d+行中(?P<n>\d+)）", "opa_cmp_registers:confirmed"),
+    ("evidence/README.md", r"confirmed \((?P<n>\d+) of \d+ rows\)", "opa_cmp_registers:confirmed"),
+    ("evidence/README.md", r"confirmed \(\d+ of (?P<n>\d+) rows\)", "opa_cmp_registers"),
+    ("evidence/README.ja.md", r"\*\*(?P<n>[\d,]+)行中[\d,]+行がconfirmed、conflict 0", "clock_enables"),
+    ("evidence/README.ja.md", r"行中(?P<n>[\d,]+)行がconfirmed、conflict 0", "clock_enables:confirmed"),
+    ("evidence/README.ja.md", r"referenceの(?P<n>[\d,]+)行はRM側のfield名", "clock_enables:reference"),
+    ("evidence/README.md", r"\*\*(?P<n>[\d,]+) of [\d,]+ rows confirmed, 0 conflict", "clock_enables:confirmed"),
+    ("evidence/README.md", r"of (?P<n>[\d,]+) rows confirmed, 0 conflict", "clock_enables"),
+    ("evidence/README.md", r"The (?P<n>[\d,]+) reference rows are those whose RM field", "clock_enables:reference"),
+    ("evidence/README.ja.md", r"family × block（`USART1`）(?P<n>[\d,]+)行", "register_blocks"),
+    ("evidence/README.md", r"family × block \(`USART1`\), (?P<n>[\d,]+) rows", "register_blocks"),
+    ("evidence/README.ja.md", r"blockはconfirmed（(?P<n>[\d,]+)）", "register_blocks:confirmed"),
+    ("evidence/README.md", r"absolute address table are confirmed \((?P<n>[\d,]+)\)", "register_blocks:confirmed"),
+    ("evidence/README.ja.md", r"bit define (?P<n>[\d,]+)行（field", "register_fields"),
+    ("evidence/README.md", r"bit define, (?P<n>[\d,]+) rows \(field", "register_fields"),
+    ("evidence/README.ja.md", r"行（field (?P<n>[\d,]+)・value", "register_fields:field"),
+    ("evidence/README.ja.md", r"・value (?P<n>[\d,]+)）", "register_fields:value"),
+    ("evidence/README.md", r"rows \(field (?P<n>[\d,]+), value", "register_fields:field"),
+    ("evidence/README.md", r"rows \(field [\d,]+, value (?P<n>[\d,]+)\)", "register_fields:value"),
+    ("evidence/README.ja.md", r"field (?P<n>[\d,]+) のうち [\d,]+ がRMと", "register_fields:field"),
+    ("evidence/README.ja.md", r"のうち (?P<n>[\d,]+) がRMとbit位置一致", "register_fields:field_confirmed"),
+    ("evidence/README.ja.md", r"bit位置一致、(?P<n>[\d,]+) がconflict", "register_fields:field_conflict"),
+    ("evidence/README.md", r"(?P<n>[\d,]+) of the [\d,]+ fields match the RM", "register_fields:field_confirmed"),
+    ("evidence/README.md", r"of the (?P<n>[\d,]+) fields match the RM", "register_fields:field"),
+    ("evidence/README.md", r"RM bit position; (?P<n>[\d,]+) are conflict", "register_fields:field_conflict"),
+    ("evidence/README.ja.md", r"両版一致（(?P<n>[\d,]+)）", "register_fields:rm_access_confirmed"),
+    ("evidence/README.ja.md", r"`conflict` 食い違い（(?P<n>[\d,]+)。", "register_fields:rm_access_conflict"),
+    ("evidence/README.ja.md", r"英語版の field が読めない（(?P<n>[\d,]+)）", "register_fields:rm_access_reference"),
+    ("evidence/README.md", r"both editions agree \((?P<n>[\d,]+)\)", "register_fields:rm_access_confirmed"),
+    ("evidence/README.md", r"`conflict` they differ \((?P<n>[\d,]+);", "register_fields:rm_access_conflict"),
+    ("evidence/README.md", r"could not be read \((?P<n>[\d,]+)\)", "register_fields:rm_access_reference"),
+    ("evidence/README.ja.md", r"図のある (?P<n>\d+) 型番すべてが", "figures:confirmed"),
+    ("evidence/README.md", r"Every one of the (?P<n>\d+) part numbers with a figure", "figures:confirmed"),
+    ("docs/table-reliability.ja.md", r"field (?P<n>[\d,]+) のうち bit 位置は", "register_fields:field"),
+    ("docs/table-reliability.ja.md", r"bit 位置は RM 一致 (?P<n>[\d,]+)・", "register_fields:field_confirmed"),
+    ("docs/table-reliability.ja.md", r"RM 一致 [\d,]+・食い違い (?P<n>[\d,]+)、value", "register_fields:field_conflict"),
+    ("docs/table-reliability.ja.md", r"、value (?P<n>[\d,]+) は全 reference", "register_fields:value"),
+    ("docs/table-reliability.ja.md", r"en 版とも照合\*\*: 一致 (?P<n>[\d,]+)・", "register_fields:rm_access_confirmed"),
+    ("docs/table-reliability.ja.md", r"照合\*\*: 一致 [\d,]+・食い違い (?P<n>[\d,]+)・", "register_fields:rm_access_conflict"),
+    ("docs/table-reliability.ja.md", r"en で読めない (?P<n>[\d,]+)", "register_fields:rm_access_reference"),
     # 進捗の要約と、下の台帳（F＝既知の穴、G＝表示）。**要約のほうが先に古くなる**ので
     # 台帳から数え直す。
     ("docs/worklist.ja.md", r"\| 既知の穴（F系） \| (?P<n>\d+) \|", "holes_resolved"),
@@ -235,6 +279,17 @@ def quantities() -> dict[str, int]:
     out["pinout_leads"] = len(pinout) - len(functions)
     out["register_fields_without_member"] = sum(
         1 for r in paths.load("register_fields") if not r["member"])
+    # register_fields の内訳。行の `confidence` は bit 位置、`rm_access_confidence` は access の
+    # 確度で、上の `register_fields:<level>` は両方の合計なので、文書が別々に書く数はここで分ける。
+    fields = paths.load("register_fields")
+    for kind in ("field", "value"):
+        out[f"register_fields:{kind}"] = sum(1 for r in fields if r["kind"] == kind)
+    for level in ("confirmed", "conflict"):
+        out[f"register_fields:field_{level}"] = sum(
+            1 for r in fields if r["kind"] == "field" and r["confidence"] == level)
+    for level in ("confirmed", "reference", "conflict"):
+        out[f"register_fields:rm_access_{level}"] = sum(
+            1 for r in fields if r["rm_access_confidence"] == level)
     # 証拠の表にある conflict の総数（`*_confidence` 列を持つ表は列ごとに数える）。
     out["conflict_rows"] = sum(
         1 for name in paths.SOURCE_TABLES for r in rows(name)
