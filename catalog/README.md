@@ -18,7 +18,7 @@ which carries every column of it.
 
 `pipeline/build/build_tables.py` generates products/packages/series/families/cores, `pipeline/build/build_documents.py`
 generates documents, `pipeline/build/build_sources.py` generates sources, and `pipeline/build/build_toolchains.py` generates toolchains. For how to read confidence and basis, see
-"Criteria for confirmed" and "Kinds of basis" in [evidence/README.md](../evidence/README.md).
+"Confirmation is an overall judgement of the bases" and "Kinds of basis" in [evidence/README.md](../evidence/README.md).
 
 ### `families.csv` -- top level
 
@@ -26,7 +26,7 @@ One row per family. Which series it contains, and which datasheets, reference ma
 
 ### `series.csv`
 
-One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty, with an empty confidence, and go down to products.csv (**empty here does not mean unknown**: the Series table of the generated README lists every value the parts have instead, as `128K/256K`). **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
+One row per series (CH32V006, CH32V203, ...). Holds the core and ISA, and only the values shared by every package under it. Values that vary by package are left empty, with an empty confidence, and go down to products.csv (**empty here does not mean unknown**: the Series table of the generated README lists every value the parts have instead, as `128K/256K`; 2026-08-27). **Series and datasheets are not one-to-one** (CH32V203CCT6 is listed in CH32V205DS0).
 
 ### `products.csv`
 
@@ -66,7 +66,7 @@ kept in `product_attributes.csv`.
 
 ### `packages.csv`
 
-The **master table**, one row per package name. Body size, pin pitch and lead count are attributes of the package, so they are normalised here and not carried in products. The basis is the aggregate of the ordering-table entries of every product, plus the tables of contents in both languages of PACKAGE.PDF (the package dimension drawings, mirrored in `WCH-common`), plus the digits in the package name. If a package of the same name claims different dimensions across families, it shows up as a conflict (currently 0). Only the lead counts of QFN26C3 and QSOP24 are reference (they disagree with the pin definition table = suspected dropped rows in extraction, `?pin-table`).
+The **master table**, one row per package name. Body size, pin pitch and lead count are attributes of the package, so they are normalised here and not carried in products. The basis is the aggregate of the ordering-table entries of every product, plus the tables of contents in both languages of PACKAGE.PDF (the package dimension drawings, mirrored in `WCH-common`), plus the digits in the package name. If a package of the same name claims different dimensions across families, it shows up as a conflict (currently 0). Every value is currently `confirmed`; for QFN12, QFN20L, QFN26C3 and QSOP24 no product table states the lead count, so it rests on the package name's digits agreeing with the pin definition table (`rule:package-name+pin-table`).
 
 ### `cores.csv`
 
@@ -119,6 +119,7 @@ The docstring of `pipeline/build/build_toolchains.py` records which endpoint ret
 | `edition` | For the IDE, the product line (`mrs1` / `mrs2` / `community`); for `components`, the **vendor** (`wch` and others). Empty for `toolchain` |
 | `os` / `arch` | `windows`, `linux`, `macos` / `x86`, `x64`, `arm64`. The vocabulary is normalised here, not upstream's spelling (`MAC`, `X64`). Where upstream states no bits, it is taken from **the word in the file name** (empty when neither states it) |
 | `version` | Upstream's version number. For `components` alone it is a running index (`verIndex`); the date of the artefact itself is in the file name |
+| `file` | The distributed file name (`MRS_Toolchain_Linux_X64_V240.tar.xz`) |
 | `size_bytes` | The size actually served (checked with a HEAD at generation time) |
 | `released` | The date upstream lists |
 | `download_api` | **The API that returns a URL.** Calling it yields a download URL valid at that moment |

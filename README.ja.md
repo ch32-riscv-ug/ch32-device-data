@@ -18,11 +18,13 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 **どこから読むか**: 引くなら [index/README.ja.md](index/README.ja.md)、表の意味と列は
 [evidence/README.ja.md](evidence/README.ja.md)、表ごとの信頼度は
 [docs/table-reliability.ja.md](docs/table-reliability.ja.md)、作業の状態は [docs/worklist.ja.md](docs/worklist.ja.md)。
+手を入れる人は——人もAIエージェントも——**最初に [docs/handoff.ja.md](docs/handoff.ja.md) を読む**:
+正本の所在、再開手順、mirror に PDF が増えたときの手順、守ること、PDF構造化の作業規約。
 
 ## 構成
 
 - `catalog/`・`evidence/`・`index/`: 上の3区分の表。データの列が先、そのあとに確度と根拠の列。`pipeline/common/paths.py` が置き場所を1箇所で決める
-- `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`build_pins`/`build_remap`/`build_tables` の入力）
+- `.cache/candidates/*.json`: 全型番の機械抽出結果（`build_all.py` の出力。commit しない。`extract_pin_tables`/`build_remap`/`build_tables` の入力）
 - `curated/`: 人手で確認した少数の上書き（pin表の列見出し・エラッタ・series事実）
 - `manifests/documents.json`: 取得すべき文書のカタログ。mirrorはここを読んで取得する。EVT の中にだけある文書（PIOC・RISC8B）は `manifests/evt-documents.json`（[manifests/README.ja.md](manifests/README.ja.md)）
 - `tools/check_tables.py` / `tools/check_counts.py`: 表どうしの参照結合・書式・数の不変量の検査
@@ -58,13 +60,13 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
   比較表は「シリーズ内で差がある列」しか持たないので機能フラグを作れない。
   **機能説明章の節見出し**を採る。節番号は言語に依らないので中英が厳密に対応する
 - `pipeline/extract/rm/extract_memory.py`: FLASH/SRAMの境界がoption byteで動くpartの組合せを
-  `evidence/memory_configs.csv`にする。`products.csv`の`flash_bytes`/`sram_bytes`は
+  `index/memory_configs.csv`にする。`products.csv`の`flash_bytes`/`sram_bytes`は
   datasheetの比較表が載せる1組しか言わないので、**振り直せること自体がそこから
   読めない**。reference manualが符号と適用先を、EVTの`Link.ld`が組合せを言い、
   両者を突き合わせる。**「出荷時の組」と言えるものは無い**——RMは復位値を`x`と
   しか書かず、EVTの例題も1組に揃っていない
 - `pipeline/build/build_link_firmware.py`: WCHが配るWCH-Link系デバッガのファームウェア
-  一覧を`evidence/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
+  一覧を`index/link_firmware.csv`にする。バイナリは置かず指紋と取得元だけ。
   配布物の版番号（`wchlink.wcfg`）と実機が申告する`major.minor`の対応は
   `wcfg = major*10 + minor`で、`tools/read_link_version.py`が実機から読んだ値と
   突き合わせる（[docs/link-firmware-survey.ja.md](docs/link-firmware-survey.ja.md)）
@@ -79,6 +81,8 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - `pipeline/build/build_evt_variants.py`: device headerのコメントから型番→コンパイル時macro
   （`CH32V20x_D8W`等）を取り`index/evt_variants.csv`にする。macroを設定しないと
   既定のvariantで黙って通るので、どの型番がどれかを表にしておく
+- `pipeline/build/build_index.py`: 証拠と目録**だけ**から索引（`index/`）を組む。新しい事実は足さない
+- `pipeline/publish/regenerate.py`: **全表の再生成の入口**。bundle → 証拠 → 索引 → 検査を依存順に回す（段と実行例は [pipeline/README.ja.md](pipeline/README.ja.md) の「実行」）
 - `docs/worklist.ja.md`: 作業リスト（生きている項目・既知の穴・次の作業の優先順・資料側の問題台帳）
 - `docs/table-reliability.ja.md`: テーブル別の信頼度（どこまで信用してよいか・原典サンプル検証の結果）
 - `docs/handoff.ja.md`: **人もAIエージェントも最初に読む作業引継ぎ。** 正本の所在、再開手順、原本（mirror）更新時の手順、守ること、判断の指針、PDF構造化の作業規約
@@ -91,7 +95,7 @@ reference manual・EVT）から**機械抽出したCSV**と、そこから各fam
 - 証拠の表は資料の綴りと値を写すだけで、訂正しない（食い違いは`conflict`で両方残す）。訂正や語彙の揃えは索引の側
 - board固有のLED・connector・clock・upload設定、Arduino core固有のFQBN・variant・build flagは入れない（consumer側の生成物）
 - 対応tierはこのデータから宣言しない
-- 兄弟repositoryは一次資料のmirrorとして参照する。EVTや旧Arduinoコアのsourceをこのrepositoryへ複製しない
+- 兄弟repositoryは一次資料のmirrorとして参照する。公式PDF・EVT・旧Arduinoコアのsource・手書きの旧pin表はこのrepositoryへ複製しない。記録に残すのはURL・hash・版・文書内の位置
 
 ## 検証
 
@@ -102,6 +106,10 @@ uv run tools/check_docs.py      # 文書が書いている行数・穴の状態 
 uv run pipeline/checks/check_doctests.py   # 正規化規則の仕様（各moduleのdoctest）
 node tools/check_viewer.js      # pins.html の表示（DOM 無しで関数を評価して出力を見る）
 ```
+
+最初の3つは**標準ライブラリだけ**で動きます（uv が pdfplumber を解決するのは抽出tool のためで、この3つのためではない）。
+`check_doctests.py` は `pipeline/` と `tools/` の doctest——正規化規則の仕様——を流すので、抽出toolを import し、その package が要ります。
+`check_viewer.js` は `pins.html` の script を DOM 無しで評価し、`node` が要ります。
 
 抽出toolは外部packageを使うため、`pyproject.toml`と`uv.lock`で固定したuv経由で実行します。抽出できる範囲と資料側の崩れは[抽出可能性の事前調査](docs/extraction-survey.ja.md)にまとめています。
 
@@ -120,8 +128,10 @@ scalarが食い違ったときは後に読んだ中国語版を採り、noteに�
 
 ```sh
 uv run tools/check_tables.py                      # 表どうしの参照と、remap表の内部整合
-uv run pipeline/common/signal_vocabulary.py --tables tables # signal名の語彙規則と、その当たり具合
+uv run pipeline/common/signal_vocabulary.py --tables evidence # signal名の語彙規則と、その当たり具合
 ```
+
+抽出toolを1本ずつ流す例:
 
 ```sh
 uv run pipeline/build/extract_selectors.py <EVT>/Peripheral/inc/ch32xxx.h
@@ -129,5 +139,3 @@ uv run pipeline/extract/datasheet/extract_pins.py <datasheet>.PDF --package TSSO
 uv run pipeline/extract/rm/extract_remap.py <manual>.PDF
 uv run pipeline/extract/rm/register_fields.py <manual>.PDF
 ```
-
-全表の生成順は [evidence/README.ja.md](evidence/README.ja.md) の「生成順」を参照。

@@ -65,7 +65,7 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 
 ### `packages.csv`
 
-1行1package名の**マスタ表**。body size・pin pitch・lead数はpackageの属性なのでここに正規化し、productsには持たせません。根拠は全productのordering表記載の集約＋PACKAGE.PDF（封装寸法図面、`WCH-common`にmirror）の両言語目次＋package名の数字です。同名packageが複数ファミリーで違う寸法を主張すればconflictとして現れます（現在0件）。QFN26C3とQSOP24のlead数のみreference（pin定義表と不一致=抽出行落ちの疑い、`?pin-table`）。
+1行1package名の**マスタ表**。body size・pin pitch・lead数はpackageの属性なのでここに正規化し、productsには持たせません。根拠は全productのordering表記載の集約＋PACKAGE.PDF（封装寸法図面、`WCH-common`にmirror）の両言語目次＋package名の数字です。同名packageが複数ファミリーで違う寸法を主張すればconflictとして現れます（現在0件）。今は全部の値が`confirmed`で、QFN12・QFN20L・QFN26C3・QSOP24のlead数は製品の表が言わないため、package名の数字とpin定義表の一致を根拠にします（`rule:package-name+pin-table`）。
 
 ### `cores.csv`
 
@@ -118,6 +118,7 @@ ITCM 128K・DTCM 256K・共有領域 512Kの3行に分けて書きます。合�
 | `edition` | IDE は製品系列（`mrs1` / `mrs2` / `community`）、`components` は**ベンダ名**（`wch` ほか）。`toolchain` は空 |
 | `os` / `arch` | `windows`・`linux`・`macos` / `x86`・`x64`・`arm64`。上流の綴り（`MAC`・`X64`）ではなくこちらで正規化した語彙。上流が bits を言わない行は**配布ファイル名の語**から取る（言っても書いてもいなければ空） |
 | `version` | 上流の版番号。`components` だけは連番（`verIndex`）で、実体の日付はファイル名にある |
+| `file` | 配布ファイル名（`MRS_Toolchain_Linux_X64_V240.tar.xz`） |
 | `size_bytes` | 配信されている実サイズ（生成時に HEAD で確かめた値） |
 | `released` | 上流の掲載日 |
 | `download_api` | **URLを返すAPI**。叩くとその場で有効なダウンロードURLが返る |

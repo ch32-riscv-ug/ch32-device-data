@@ -10,7 +10,7 @@ canonical CSVs are **frozen as the baseline** (ledger:
 [`baseline/tables.csv`](baseline/tables.csv)); output from this path replaces
 them one CSV at a time, only after old-vs-new comparison.
 
-## Placement and persistence
+## Placement and persistence (as in the D17 design)
 
 | What | Where | Persisted |
 |---|---|---|
@@ -22,7 +22,7 @@ them one CSV at a time, only after old-vs-new comparison.
 ## Stages
 
 ```text
-ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 68 catalogued versions)
+ingest/    PDF -> bundle (L0): convert.py (one document), convert_all.py (all 72 catalogued versions)
 common/    logical_tables.py (**L1: joins the physical fragments of a page-spanning
            table into one logical table**. The decision is structural, independent of
            the converter's continuation flag: no caption, first content on its page,
@@ -41,7 +41,7 @@ extract/   pdfcompat.py (bundle compatibility layer + the source-hash entry gate
            all 1,588 rows -- measured 2026-09-01)
            datasheet/extract_low_power.py (A11: consumption current and wake-up
            times; caption-scoped selection, fragment joining, two-phase zh/en pairing
-           -- zero false conflicts)
+           scoped by table number -- zero false conflicts)
            datasheet/build_operating_conditions.py (**generator of record for
            operating_conditions.csv**: frozen-logic base + A11 rows. Accepted
            2026-09-01 -- the **first CSV switched over**, 2,796 rows)
@@ -95,11 +95,11 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            assets -- a whole figure misdetected as one uncaptioned "table"
            (filter-numbering examples, waveforms, response plots) also joins the
            cluster when it sits directly below a caption.
-           Prose references such as "Figure 22-17 illustrates ..." or "figure 21-1."
+           Prose references such as "图19-2是…", "Figure 22-17 illustrates …" or "figure 21-1."
            are not captions -- the shared classifier lives in
            pipeline/common/figure_captions.py)
-           export_markdown.py (the human-readable Markdown -- the end goal is zero
-           difference against the PDF. **Lines the converter dropped from
+           export_markdown.py (the human-readable Markdown -- **the main body of the end
+           goal, zero difference against the PDF**. **Lines the converter dropped from
            `reading_order` whose text is in no table cell either are put back**
            (`logical_tables.recovered_lines`/`reading_stream`, shared with the parity
            check): a figure's labels can land outside the box that the table finder
@@ -202,7 +202,10 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            `Figure` so its ruling lines become the figure cluster (CH32V407RM.en
            p475 `Figure 26-19 Mode D FSMC_BCR1 bit field`, a table in the Chinese
            edition); those 106 tables across 37 documents keep their HTML table
-           inside the collapsible (`logical_tables.looks_ruled`),
+           inside the collapsible (`logical_tables.looks_ruled`; a label grid of
+           figure boxes is excluded -- many holes, a ragged first row, mostly
+           one-character cells, the same words repeated, or 5 rows or fewer with an
+           empty row (`Laye FI|er IFO|1` = the `Layer 1 FIFO` box) is not a table),
            **large-font body blocks that the converter marked as headings are demoted
            back to paragraphs** (a run of 3+ font-size-only headings, a `Note:`/`注：`
            lead-in, >50 characters, or a CJK sentence-ending -- 2,390 lines; numbered
@@ -243,8 +246,8 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            at the same x), and **overlap-remnant one-column tables never anchor a
            page-spanning chain** (a remnant on CH32V407RM.en p145 had swallowed the 11
            continuation rows of Table 11-1, which then vanished from the output), **a table caption that wrapped
-           onto a second line -- an unclosed parenthesis or a dangling `or`/`with` at
-           the line end -- is rendered whole in `<caption>` and the continuation line
+           onto a second line -- an unclosed parenthesis, or a dangling `or`/`with` or a
+           comma at the line end -- is rendered whole in `<caption>` and the continuation line
            leaves the body** (`logical_tables.caption_full`, shared with the
            operating-conditions extractor so the CSV condition prefix is whole too;
            `…SRAM (RISC-V5F` + `+ RISC-V3F)`), **a list item's own bullet is
@@ -255,7 +258,7 @@ review/    render_assets.py (**pixel rendering of figures**: verifies the origin
            render_assets (11 figures were blank), and
            **every known gap is marked visibly in place**: a notice with a PDF page
            link after each figure caption, placeholders for large images, table-issue
-           warnings, undecodable-glyph warnings, and **lost-subscript warnings** --
+           warnings, undecodable-glyph ((cid:N)) warnings, and **lost-subscript warnings** --
            some PDFs print a small asterisk where a subscript belongs (`V*` for
            `V_DD`): the loss is in the document's own typesetting, confirmed on
            2026-09-10 by rendering the cells, so no text engine and no OCR can
@@ -269,14 +272,15 @@ checks/    compare_manifest.py (cross-environment reproducibility)
            the place they were folded into: a wrapped caption's second line must
            appear inside `<caption>`. The check sees existence and order only, so
            an export-side transform is always paired with a semantic PDF-vs-Markdown
-           review as well)
+           review (by a subagent) as well)
            cross_engine.py (**independent verification of the text ingestion**:
            compares the bundle's character multiset against a second PDF engine,
-           pypdfium2 -- order is ignored, only the set of characters. pypdfium2's
+           pypdfium2 -- order is ignored, only the set of characters; it reports the
+           characters pypdfium2 got and the bundle dropped. pypdfium2's
            hyphen misread (`-` -> `\x02`) is normalized. Measured across all 68
            versions: **0 characters missed** apart from 14 known math/unit-glyph
            ToUnicode breakages (garbled in both engines), pinned by name and
-           count. Manual: `uv run --with pypdfium2`)
+           count -- the bundle takes every character the independent engine takes. Manual: `uv run --with pypdfium2`)
 publish/   regenerate.py (**the single regeneration entry point**: bundle
            reconversion -> switched-over evidence -> derived index tables ->
            checks, calling the existing CLIs in order. --verify adds the frozen
@@ -291,23 +295,24 @@ path writes to the frozen CSVs directly (**switched-over and newly added CSVs ar
 the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
 (new) are generated by this path since 2026-09-01).
 
-## What ingest fixes over the PoC (five fixes: 1-2 measured in D17, 3 caught live by CI, 4-5 from reviewing the human output)
+## What ingest fixes over the PoC (1-2 measured in D17, 3 caught live by CI, 4 onward from reviewing the human output)
 
 1. **Determinism**: pdfminer names anonymous inline images after `id()` (a
    memory address); those digit names are dropped -- the converter's own stable
    id (`p66-draw-image-00002`) is the identifier. Same original + same versions
    regenerate the bundle byte-identically.
 2. **Repetition-based header/footer detection**: a first pass collects lines in
-   the top/bottom 12% bands whose digit-folded spelling repeats **at the same
+   the top/bottom 12% bands whose spelling, digits folded to `#`, repeats **at the same
    distance from the page edge** on >= 25% of pages (min 3). The PoC's pure
    y-threshold systematically missed the Chinese editions' footers (93.8% of
-   page height). The repetition check runs before the heading heuristic, and
-   edge distance makes it work on rotated pages too.
+   page height). The repetition check runs before the heading heuristic (on
+   small-font pages such as a TOC, footers were measured turning into
+   headings), and edge distance makes it work on rotated pages too.
    **1.2.0 adds two rules** (the R-30 extraction found "unclassified footer
    breaks the table chain"; a corpus measurement confirmed 67 missed lines):
    within the strict band (6%) the same spelling at the same distance qualifies
    from **3 pages** (per-chapter header variants; documents whose footer moved
-   partway -- V00X RM zh has 32 pages = 14% at a different distance), and a
+   partway -- V00X RM zh has 32 pages from p198 onward = 14% at a different distance), and a
    qualified **spelling counts at any distance** (footers of rotated pin-table
    pages). Page-number-only lines (folded to `#`) are exempt from the new rules
    so numeric body text is never swept in.
@@ -329,23 +334,25 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    headers of the pin-definition tables were mirror-reversed inside cells
    (`6UEW714H` = H417WEU6; 322 tables across 43 documents). The same
    version anchors the **table-caption number regex to the line start** --
-   prose like "Note: the options in Table 21-4 ..." had become captions (6
-   measured). page["text"] is untouched, so the frozen tools' byte-identity
+   prose like "Note: the options in Table 21-4 …" had become captions (6
+   measured). `page["text"]` is untouched, so the frozen tools' byte-identity
    is preserved.
 
 5. **The two columns of a datasheet's overview/features page are split**
    (converter 1.5.0). pdfplumber's line builder merges the left and right
-   columns into one y-row (`- QingKe...core ● 3-group...`, unreadable).
+   columns into one y-row (`- QingKe…core ● 3-group…`, unreadable).
    On datasheet pages with an `Overview/Features/概述` heading, the column
-   boundary is the widest word-x0 gap in the central band, and everything
+   boundary is the widest gap in the central band between the x0 of words
+   outside tables, and everything
    below the heading is re-extracted left-column-then-right (the title
    stays full-width). The heading gate keeps comparison tables, bit
    diagrams and pin tables out (all 51 target pages are overview-type,
-   zero false hits); pages with no clear boundary are left as is.
+   zero false hits); pages with no clear boundary are left as is (the safe
+   side).
 
 6. **Subscripts/superscripts are merged back into the body line**
    (converter 1.6.0). pdfplumber groups lines by top, so the `DD` subscript
-   of `V` (top≈106, 7pt, **bottom aligned with the V**) drops onto its own
+   (top≈106, 7pt, **bottom aligned with the V**) of `V` (top≈102) drops onto its own
    line, leaving `V` and `DD` apart and `V_DD` unreadable (~4,600 across all
    datasheets). Lines smaller than the body are split into clusters by
    internal x-gap, and each cluster is inserted into the body line whose
@@ -354,17 +361,17 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
    in by position -- the chars carry no spaces (`itputs`), so a gap rule
    cannot rebuild word spacing. The vacated space is closed before a symbol
    but kept before a word (so both `(VPOR/PDR)` and `VDD is` come out right).
-   Multiple subscripts on one line (`V...V` with `DD`/`PVD`) are inserted
-   right-to-left per cluster so positions do not drift (`VDD...VPVD`). A
+   Multiple subscripts on one line (`V…V` with `DD`/`PVD`) are inserted
+   right-to-left per cluster so positions do not drift (`VDD…VPVD`). A
    small line is merged only when every cluster lands on a body line;
    otherwise it is kept whole (no dropped glyphs). Figure micro-labels with
    no baseline-aligned body line are left separate. **Whether a line is a
    subscript is judged against the neighbouring base, not the page median**
-   (`small < base * 0.82`, converter 1.6.1): a figure voltage label's `BAT`
-   subscript is 8.2pt (77% of the 10.6 body -- above the global 0.72 gate) yet
+   (`small < base * 0.82`, converter 1.6.1): the `BAT` subscript of a figure
+   voltage label `V_BAT` is 8.2pt (77% of the 10.6 body -- above the global 0.72 gate) yet
    is clearly smaller than its base `V` at 11.9 (L103DS0 p36 orphans 18 -> 0).
-   page["text"] is built
-   by extract_text() independently, so the frozen tools' byte-identity holds.
+   `page["text"]` is built
+   by `extract_text()` independently, so the frozen tools' byte-identity holds.
 
 7. **Subscripts/superscripts inside a table cell are put back where they
    belong** (converter 1.7.0/1.7.1). The same defect as item 6, but for cells:
@@ -497,7 +504,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
 
     `clean_reset_column` also stopped deleting `…`. Its rule "a value with no
     ASCII alphanumeric is debris from the description column" was swallowing the
-    ellipsis that marks "the rows continue" (ten cells on one QingKe page
+    ellipsis `…` that marks "the rows continue" (ten cells on one QingKe page
     alone). This is the same rule whose whitelist gap deleted `W1`/`R0` in
     1.9.1 -- both the allow-list and the negative condition can miss.
 
@@ -570,8 +577,8 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     `IDD12A(1)(2)`, `VHSEH(1)`, `tSU(LSI)(1)`, `VREF-`, `VSS`, `VDD33`.
 
 16. **An uncaptioned table is chained across the page break** (converter
-    1.10.2). `continues_from_previous` was `bool(consecutive and
-    previous_logical_id)` -- it required a *captioned* table to have been seen,
+    1.10.2). `continues_from_previous` was
+    `bool(consecutive and previous_logical_id)` -- it required a *captioned* table to have been seen,
     so **a table with no caption never continued**. The CH32H417DS0.en
     comparison table split into two logical tables and showed three symptoms at
     once: its last cell truncated to `USBHS (USB`, a **ghost row** on the next
@@ -610,7 +617,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     (`drop_empty_boundary_rows`). Item 17's signature cannot tell a box the
     extractor cut from a next-page row that is **legitimately empty in that one
     column**, and firing on the latter pulls the value above down over the row
-    -- **fabricating data**: on CH32M030DS2.zh p3/p4 the pin-25 `ISP1` row came
+    -- **fabricating data**: on `CH32M030DS2.zh` p3/p4 the pin-25 `ISP1` row came
     out holding `PA8`'s `ADC_IN7/MCO/CMP3_OUT0/ISN1` and `SPI_MOSI_3`. Measured
     over the corpus: of 11,015 firings, **1,185 were on a row with its own
     content**; the other 9,830 were on rows `fold_boundary_spills` had emptied.
@@ -643,7 +650,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
 
 20. **A column missing from the grid entirely is filled in** (`fill_grid_holes`,
     converter 1.11.0). When the rules are thin the extractor builds no cell at
-    all for that column: the feature-comparison table on WCH-LinkUserManual.zh
+    all for that column: the feature-comparison table on `WCH-LinkUserManual.zh`
     p4 (15 rows, 5 columns) had a column-0 cell only in the header row, so
     `RISC-V模式`, `ARM-SWD模式-HID设备` and **12 more row labels were in no cell
     at all**. Column 0's coordinates come from the header cell and each row's
@@ -651,14 +658,14 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     The condition is **three or more holes in the same column, three or more of
     them holding glyphs** -- excluding scattered holes (label fragments on pages
     where a figure was read as a table; 90 of them across 50 tables) leaves this
-    single table. It sits in the same layer as `recover_outer_column` (item 15)
+    single table. It sits in the same layer as `recover_outer_column` (item 13)
     for the same reason and leaves `extracted_rows` untouched. The check and
     cross marks in that same table **do not exist as glyphs** (they are vector
     drawings) and cannot be recovered: all 1,019 glyphs on the page leave that
     band empty.
 
-21. **The outer-column recovery (item 15) was relaxed in three ways**
-    (converter 1.12.0). Three separate reports about CH32L103RM.en p13 -- an
+21. **The outer-column recovery (item 13) was relaxed in three ways**
+    (converter 1.12.0). Three separate reports about `CH32L103RM.en` p13 -- an
     empty `Bit` header, a phantom column, and a missing `[31:21]` -- were one
     cause: the p13 fragment's table box starts at x=109.9 and the `Bit` column
     (x 60.5-109.9) lies outside it. (a) **The 8pt gap ceiling is replaced by
@@ -674,8 +681,8 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     Measured: 49 tables become **94 more** (47 left-only, 34 right-only, 13
     both) for **408 cells**, all of them complete `Bit` / `Reset value` /
     `复位值` / `位` / register-name columns. Because each such line's centre is
-    inside the table box, these were **dropped from the reading order too**: on
-    CH32V003RM.en p132 `Reset value 0xFFFF` fell outside the table as body text
+    inside the table box, these were **dropped from `reading_order` too**: on
+    `CH32V003RM.en` p132 `Reset value 0xFFFF` fell outside the table as body text
     reading `Reset` / `value` / `0xFFF` / `F` -- **with the value split in two**.
 
 22. **A recovered column's spelling is handed to `cell_html`'s wrap logic**
@@ -692,12 +699,12 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     and the threshold gives the same answer anywhere from 0.25 to 0.50 -- the
     gaps separate cleanly. No value cell changes.
 
-23. **A diagonally split corner cell emitted twice is de-duplicated**
+23. **A diagonally split corner cell (or wrapped heading) emitted twice is de-duplicated**
     (`strip_duplicated_span_lines`). The extractor sometimes emits a diagonally
     split corner (`Product model` / `Resource differences`) **both** as one
     merged cell **and** again as a cell on the row below. That row then occupies
     more grid columns than the table has, shifting everything after it: on
-    CH32H417DS0.en p3 the part-number suffixes `QEU6`..`REU6` sat **two columns
+    `CH32H417DS0.en` p3 the part-number suffixes `QEU6`..`REU6` sat **two columns
     right** of the pin counts `128`..`60` they label -- a wrong reading, at the
     top of the comparison table, which is the most-read table there is. A cell
     is dropped only when its row exceeds the column count, its column range
@@ -705,8 +712,8 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     lines** and **exactly matches** one of them. **The two-line limit is what
     makes it safe**: a long description cell sometimes swallows the next rows'
     text, and there the small cells are the real data, so removing them would
-    lose it (on QingKeV4_Processor_Manual.en p37 `Floating-point unit status FS
-    FS Meaning 00 OFF ...` swallows nine lines while `FS Meaning` and friends
+    lose it (on `QingKeV4_Processor_Manual.en` p37
+    `Floating-point unit status FS FS Meaning 00 OFF …` swallows nine lines while `FS Meaning` and friends
     exist as their own cells; 40 cases have that shape). Measured: 1,273
     substring matches narrow to 179 overlapping, 149 over-wide, and **74 exact
     matches with at most two lines, across 26 documents** -- all of them real
@@ -717,13 +724,13 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
 24. **A wrapped section heading is joined with its continuation**
     (`join_heading_wraps`, converter 1.13.0). Readers apply the heading regex
     line by line to `extract_text()`, so a wrapped title only yielded its first
-    line: `evidence/features.csv` carried `1.4.19 ... (USBSS) (Not applicable`
+    line: `evidence/features.csv` carried `1.4.19 … (USBSS) (Not applicable`
     with `to CH32X305)` lost. The join is applied to **both `lines` and
     `text`** -- the frozen tools read `text`. Conditions: the previous line is a
     numbered heading, same left margin, immediately below, same bold, the
     continuation is not itself a heading, and **either the heading has an
     unclosed bracket or the continuation starts lowercase**. That last condition
-    is what makes it safe: without it 562 candidates match, mostly `● ...`
+    is what makes it safe: without it 562 candidates match, mostly `● …`
     bullet items that would be destroyed by joining. Corpus-wide: **22 cases**,
     all genuine. The seam is empty next to CJK, a space between alphanumerics
     and after `,;:`, and empty otherwise (`(y` + `= 1/2)`) -- verified correct
@@ -739,22 +746,22 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     **Until then the frozen tools had been reading the original PDFs, not the
     bundles**: "frozen parity byte-identical" only meant "the canonical CSVs
     match a fresh PDF read", and pdfcompat's source-hash gate never ran. The
-    moment substitution worked, the pin tables regressed (three LQFP100 parts
+    moment substitution worked, the pin tables (`pins`) regressed (three LQFP100 parts
     lost every lead): `fix_rotated_cells` (1.3.1) had written the corrected
     orientation of rotated headings into `extracted_rows` too, and
     `extract_pins.read_variant`, which expects mirror text and un-mirrors it,
     re-reversed `LQFP100` into `001PFQL`. `extracted_rows` must stay exactly
     what pdfplumber returns -- that is the frozen tools' premise (the `cells`
     repair stays). Measured right after: of 15 tables, 12 byte-identical,
-    `features` improved by one row, and the pin tables back to identical.
+    `features` improved by one row, and the pin tables (`pins`) back to identical.
 
 26. **Fill the missing outer column of a continuation fragment from the merged
     table's column edges** (`recover_chain_columns`, exporter side). When only
     the fragment on the next page lost the rule of its outer column and has one
     column fewer, that column's values appeared **nowhere in the Markdown**
     (`CH32xRM.zh` p179-180 `R32_USART3_GPR`: the row was nameless,
-    `| 0x40004818 | ... | | 0x00000000 |`; found by the re-check). The converter's
-    `recover_outer_column` (items 15, 21) looks at **one fragment** and requires a
+    `| 0x40004818 | UASRT3保护时间和预分频寄存器 | | 0x00000000 |`; found by the re-check). The converter's
+    `recover_outer_column` (items 13, 21) looks at **one fragment** and requires a
     column-wide glyph run in every row band, so a one-row fragment, or one whose
     outer glyphs have no measurable width, is out of reach. In a merged table the
     first fragment fixes the column's **x-range** (`src_bbox` of single-column
@@ -766,7 +773,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     tables** are added, all inspected: 12 register names, 2 bit ranges, 4 reset
     values, 4 headers (`Bit` / `Reset value` / `复位值`), 3 descriptor names
     (`TDes5-7`), and the two header cells that fell outside the page-bottom header
-    row `RB_UEPn` / `Description: The address...` (`CH32M030RM.en` p226).
+    row `RB_UEPn` / `Description: The address…` (`CH32M030RM.en` p226).
     Human-facing only (after `snap_ghost_columns`; exporter and parity call it in
     the same order). `spell_glyphs` moved to `logical_tables` so both paths share
     it (identical output).
@@ -797,8 +804,9 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     half inside it) on the same visual line; a glyph in the **interior is always the
     other cell's**, one at the **left edge** needs a text line starting with the
     character, one at the **right edge** a line ending with it. Written three times:
-    the version that treated the interior as "not owned" kept a stray `)` at the start
-    of `t\nw(NWE)` next to the two-word merged cell `td(ALE-NWE) th(NWE-ALE)`
+    the version that treated the interior as "not owned" stripped the word-final `)` of
+    the two-word merged cell `td(ALE-NWE) th(NWE-ALE)` and left a stray `)` in the
+    neighbouring `t\nw(NWE)`
     (H417DS0.en p128); a count-based version (glyphs of that character at least half
     inside <= occurrences in the text) broke when the other cell held a second stray of
     the same letter and produced `S\nReserved` next to `IACTS` (M030RM.en p46,
@@ -833,7 +841,7 @@ the exception**: `operating_conditions.csv` (switched) and `debug_wiring.csv`
     exporter side). Register-array bit diagrams put the row label to the left of
     the table (`PFIC_IPRIORx`'s `IPRIOR63`, `PFIC_IALLOCx`'s `IALLOC63`,
     `CH32L103RM.zh` p70's `IPRIOR17` / `IPRIOR16`). Even once the converter picked
-    those up as a column (items 15, 27), `apply_bitfield` assigns cells to columns
+    those up as a column (items 13, 27), `apply_bitfield` assigns cells to columns
     by the x-centres of the bit numbers, so a label containing no centre fell to
     the `near` fallback, landed on the edge bit column, and the final dedup (last
     cell wins per grid slot) **overwrote it with the field** -- `IPRIOR63` on
@@ -863,26 +871,31 @@ uv run pipeline/publish/regenerate.py             # bundles -> evidence -> index
 uv run pipeline/publish/regenerate.py --full      # regenerate every CSV (frozen tools on bundle input; ~1.5h)
 uv run pipeline/publish/regenerate.py --verify --human  # + parity, errata, figures, Markdown
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4    # all 68 versions, incremental
+uv run pipeline/ingest/convert_all.py --jobs 4    # all 72 versions, incremental
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                          # independent verification gate (1.1.0+)
 ```
 
-`convert_all` skips documents whose committed manifest already matches the
+`convert_all` skips documents whose committed manifest (`structured/`) already matches the
 original's SHA-256 and both tool versions (`--force` reconverts everything).
 The engine is pdfplumber, pinned by `uv.lock`. Cross-environment reproducibility
-is checked by `.github/workflows/structured-repro.yml`.
+(another machine, CI) is checked by `.github/workflows/structured-repro.yml`.
 
 
 ## Baseline freeze
 
 `baseline/tables.csv` records rows and SHA-256 of every canonical CSV
-(including the index manifest -- 54 files at freeze time, 60 today: the five
+(including the index manifest -- 54 files at freeze time, 66 today; the five
 tables born after the freeze were added on 2026-09-06 when the coverage hole was
-found). After the freeze the 19 direct-PDF tools in `tools/` stop changing, new
-tools never write to the frozen CSVs directly, and a CSV switches source only
-after the old-vs-new comparison passes the five acceptance criteria (survey
-item 7). Unfreezing is an explicit act that re-records the ledger.
+found). After the freeze:
+
+- the 19 direct-PDF tools in `tools/` stop changing, kept as the reference
+  implementation that reproduces the existing CSVs
+- new tools never write to the frozen CSVs directly; a CSV switches source only
+  after the old-vs-new comparison (`unchanged / added / changed / missing`)
+  passes the five acceptance criteria (survey item 7)
+- when the old side needs a fix after the freeze, unfreeze explicitly and
+  re-record the ledger
 
 **`tools/check_baseline.py` enforces that**, and it exists because nothing did.
 No code read the ledger at all, so forgetting to re-record cost nothing: by

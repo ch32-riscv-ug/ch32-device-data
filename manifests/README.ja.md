@@ -23,7 +23,7 @@ WCHのBLE系（CH572/573/583/585/587/592/595/596）はRISC-Vですが現時点�
 
 ## 言語
 
-**中国語版が原典で、英語版はその翻訳です。** 版数が食い違う場合は中国語版が新しく、英語版が存在しない文書もあります（`CH32V407RM.PDF`、`CH32M030DS2.PDF`、`CH32V006DS2.PDF`）。`primary_language`は`zh`です。
+**中国語版が原典で、英語版はその翻訳です。** 版数が食い違う場合は中国語版が新しく、英語版が存在しない文書もあります（`CH32M030DS2.PDF`、`CH32V006DS2.PDF`）。`primary_language`は`zh`です。
 
 両言語を別ソースとして扱い、`sources.en`と`sources.zh`にそれぞれのdownload idと版数を保持します。
 
@@ -32,10 +32,11 @@ WCHのBLE系（CH572/573/583/585/587/592/595/596）はRISC-Vですが現時点�
 | key | 意味 |
 |---|---|
 | `name` | 配布ファイル名 |
-| `kind` | `datasheet` / `reference-manual` / `evt` / `core-manual` / `other` |
+| `kind` | `datasheet` / `reference-manual` / `evt` / `core-manual` / `package-drawing` / `other` |
 | `repositories` | 取得すべきmirrorリポジトリ。複数可。空なら未割当 |
 | `status` | `assigned` / `unassigned` / `excluded` / `duplicate` |
 | `reason` | 除外・重複の理由 |
+| `duplicate_of` | `duplicate` のとき、代わりに実体を取得する文書 |
 | `sources.<lang>.file_id` | WCHのdownload id。`download_url`のテンプレートに入れる |
 | `sources.<lang>.version` | サイトが表示する版数 |
 | `sources.<lang>.scope` | その文書が覆う製品・SKU（WCH記載のまま） |
@@ -51,7 +52,7 @@ WCH のダウンロードページに単独の配布物が無く、**EVT の中�
 
 `documents.json` に入れないのは、そちらが**サイトの一覧と毎日同期し、各 mirror のダウンロードの入力も兼ねる**からです。download id の無い行を混ぜると、mirror の取得と「サイトから消えた」の判定を壊します。mirror は EVT を展開するだけで、この2冊のために何もしません。
 
-項目は `documents.json` と同じ（`name`・`kind`・`repositories`・`status`）で、`sources.<lang>` が `version`（**表紙に刷られた版**）と `files`（**mirror ごとの、その mirror の中のパス**）を持ちます。パスを mirror ごとに書くのは、ファイル名の大小とその言語版の有無が mirror ごとに違うからです（CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）。原本は名前順で最初の mirror のもので、各 family の README は自分の mirror のファイルを指します（無ければ原本の mirror）。`catalog/documents.csv` には page・download の URL を空、mirror の URL を EVT の中の PDF にして載り、変換・表・検査はほかの文書と同じに扱います。版が上がったかは `check_sources` が原本の sha で気づくので、そのとき `version` を書き直します。
+項目は `documents.json` と同じ（`name`・`kind`・`repositories`・`status`）に人が読む `note` を足したもので、`sources.<lang>` が `version`（**表紙に刷られた版**）と `files`（**mirror ごとの、その mirror の中のパス**）を持ちます。パスを mirror ごとに書くのは、ファイル名の大小とその言語版の有無が mirror ごとに違うからです（CH32V205 は `PIOC.pdf` で、CHRISC8B の en 版を持たない）。原本は名前順で最初の mirror のもので、各 family の README は自分の mirror のファイルを指します（無ければ原本の mirror）。`catalog/documents.csv` には page・download の URL を空、mirror の URL を EVT の中の PDF にして載り、変換・表・検査はほかの文書と同じに扱います。版が上がったかは `check_sources` が原本の sha で気づくので、そのとき `version` を書き直します。
 
 ## 更新
 

@@ -57,7 +57,7 @@ GitHub Pages で配る）の仕事です。
 | `&features=ADC,TIM` | その機能の列だけ（`UART` は `USART` として受ける） |
 | `&routes=default,remap,af,unstated` | その経路だけ |
 | `&q=USART1` | 検索。pad・資料の綴り・正規化した peripheral/role のどれでも当たる |
-| `&tim=split` | TIM を1列にまとめず instance ごとに出す |
+| `&tim=split` | `TIM` を1列にまとめず instance ごとに出す |
 
 `?chip=` が無ければ series と型番の一覧を出します。セルには証拠の確度が付きます——
 `~` は単一出所、`!` は両版の食い違い、remap 値のあとの `?` は selector を決められないもの。
@@ -70,7 +70,7 @@ remap 値をクリックするとその selector のレジスタ行へ飛びま�
 - **固定は commit と `manifest.csv` の sha256。** manifest がここの全 CSV の行数と sha256 を持ちます。
   データの中に版の番号は持ちません——壊す変更は、読み手が固定を進めたときに「読む列が無い」ではっきり止まり、
   リリースの版はタグで表します
-- **リリース。** tag `v<major>.<minor>…` を打つと、このディレクトリを1つの zip
+- **リリース。** tag `v<major>.<minor>...` を打つと、このディレクトリを1つの zip
   （`ch32-device-data-index-<tag>.zip`。全 CSV・README 2つ）にした GitHub の release が出ます。consumer を
   壊しうる変更——列の削除・改名、列の書き方の変更、鍵や `fixed` の値の改名——はリリースノートに書きます。
   ネットワークなしでビルドするときは zip を取り、中の `manifest.csv` で照合してください
@@ -131,7 +131,7 @@ dissent  := "(" 列 "=" 値 ("," 列 "=" 値)* ")"
   （章の冒頭の絶対番地表）、`rm-remap-grid`、`evt(<file>)`、`evt-api(<file>)`、`measured:<日付>(<記録>)`、
   `rule:<名前>` など。全部の一覧と1行の説明は `pipeline/common/basis_grammar.py` の `KINDS` にあり、
   `tools/check_tables.py` は一覧に無い kind で落ちます
-- 括弧はいつも対になります。`detail` と値は、対になった括弧・`,`・`+` を含めてかまいません
+- 括弧はいつも対になります。`detail` と `value` は、対になった括弧・`,`・`+` を含めてかまいません
 
 ## 共通の規則
 
@@ -165,7 +165,7 @@ WCH-LinkUtility と MounRiver Studio の配布物由来: `link_firmware`（過�
 |---|---|---|
 | `part_number` `series` `family` `package` `flash_bytes` `sram_bytes` `gpio_count` `temperature` `packing` `listed_as` `datasheet` | 識別と主要仕様。比較表と ordering 表を突き合わせたもの | 目録 |
 | `pins` | lead 数 | `packages.pin_count` |
-| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記 | `operating_conditions`（使った行の確度と根拠） |
+| `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記（`144/192 MHz`） | `operating_conditions`（使った行の確度と根拠） |
 | `vdd_min` `vdd_max` | `V_DD` の包絡（V） | 同上 |
 | `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | 比較表の値**そのまま**（`4`・`1/10`・`√`）。属性の綴りが family で違うので `build_index.py` の `ATTRIBUTE_COLUMNS` で列に寄せる。同じ列に2属性が当たれば `;` | `evidence/product_attributes` |
 
@@ -213,7 +213,7 @@ WCH-LinkUtility と MounRiver Studio の配布物由来: `link_firmware`（過�
 1行1（series, selector, 値, 信号）。`evidence/remap_fields`（selector の register・bit）と
 `evidence/remap_routes`（値ごとの信号と pad）を結び、`peripheral`/`role`/`port`/`gpio` を付けたもの。
 `controller` は selector の register を持つ block（`afio`、EXTEN block なら `extend`）。`register` が
-`PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき）。
+`PCFR1|PCFR2` のように2つあるときは field が2レジスタにまたがる（`bits` に register 名つき。`PCFR1:1;PCFR2:23`）。
 `peripheral`/`role` が空の行は語彙で読めない綴り（GPIO 名を信号に書く X315 の `PD0`）。周辺を有効に
 したときだけ成り立つ経路は `pin_conditions.csv` が補います。
 
@@ -225,7 +225,7 @@ bit define のある register は field と value の行にだけ現れ、各行
 `count` を持ちます。
 
 **`register` はヘッダの綴りのままなので、同じレジスタが family で違う綴りになる。** AFIO の EXTI 設定は
-多くの family で配列 `EXTICR[0]`〜`EXTICR[3]`（X035 は `[0]`/`[1]`）、V003/V006/M030 は1メンバーの
+多くの family で配列 `EXTICR[0]`〜`EXTICR[3]`（X035 は `EXTICR[0]`/`[1]`）、V003/V006/M030 は1メンバーの
 `EXTICR`、H417 は2メンバーの `EXTICR1`/`EXTICR2`。名前は揃えない（ヘッダに無い名前を作ることになる）。
 「その register の k 番目の語」は、同じ `type` の行を `offset` で並べて引く。
 
@@ -241,7 +241,7 @@ header の bits のまま残します。
 |---|---|
 | `type` | EVT の `*_TypeDef` の名前（`USART`・`DMA_Channel`）。同じ型は family で共有できる（`register_layouts.csv`） |
 | `register` | 構造体メンバー。配列は要素ごと（`EXTICR[1]`。offset は先頭＋添字×幅）、入れ子は `sTxMailBox[0].TXMIR` |
-| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**offset が空の行**は banner の register 名を構造体のメンバーに結べなかった define（bit 位置と define 名は事実なので落とさない） |
+| `offset` `width_bits` `count` | 構造体内 offset・幅・配列数。**`offset` が空の行**は banner の register 名を構造体のメンバーに結べなかった define（bit 位置と define 名は事実なので落とさない） |
 | `field` | 読むための名前（型・register の接頭辞を落とした） |
 | `define` | EVT の綴りそのまま（`RCC_APB2PCENR_USART1EN`）。証拠へ戻る鍵 |
 | `kind` `of_field` `value` | 上の3種と、`value` の行の親の領域と値 |
@@ -252,15 +252,15 @@ header の bits のまま残します。
 ### `register_map.csv` — 絶対番地
 
 1行1（family, block, register）。`register_blocks`（`USART1` の base address）×
-`registers` で `address = base + offset`。型の構造体が無い block（V407/X315 の `USBHSH`）は
-register 空・address＝base の1行。
+`registers` で `address = base + offset`。型の構造体が無い block（H417 の `UHSIF`・V103 の `USBFS`）は
+`register` 空・`address`＝base の1行。
 
 ### `dma.csv` — DMA 要求 → channel
 
 `evidence/dma_requests` の綴り（`spelled`。`TIM1_UP*`・`USART1_TX_1`）を読んだもの:
 `request` は印を落とした要求名、`remap` は印の読み（`selectable`＝`*`、X315 の `_0`/`_1`＝`default`/`remap`）、
 `peripheral` は語彙で揃えた周辺名（`SPI/I2S2_RX` → `SPI2`）。`request_id` を持つ行（H417 の DMAMUX）は
-channel 固定でなく、`note` にそう書く。variant・channel の意味は [evidence/README](../evidence/README.ja.md) の `dma_requests`。
+channel 固定でなく、`note` にそう書く。`variant`・`channel` の意味は [evidence/README](../evidence/README.ja.md) の `dma_requests`。
 
 ### `timers.csv`
 
@@ -283,7 +283,7 @@ channel 固定でなく、`note` にそう書く。variant・channel の意味�
 | `capability` | 揃えた名前（`usart`・`can-fd`・`usb-hs`・`timer-general`・`adc`・`adc-channel` …） |
 | `qualifier` | **資料自身がその能力の中で付けている区別**（`32bit`・`tim1`・`include-phy`・`adc1`・`with-tkey`）。綴りの違いは区別ではないので `attribute` 列に残ります |
 | `stated` | 資料の言い方。`count`＝素の整数／`marker`＝`√`・`Supported`（数を言わずに有ると言っている）／`text`＝それ以外（`8+2`・`3/2`・`10@2`・`MAC+10M/100M PHY`） |
-| `count` | その整数。`stated=count` のときだけ入ります。**数える規則は当てません**——`8+2` を 10 とは読みません |
+| `count` | その整数。`stated` が `count` のときだけ入ります。**数える規則は当てません**——`8+2` を 10 とは読みません |
 | `value` | 資料の値そのまま |
 | `attribute` | 元になった `evidence/product_attributes` の鍵（戻り道） |
 
@@ -345,7 +345,7 @@ datasheet 単位）。`parent` は上位のまとめ（`USBHS` は `USB` にも�
 
 ### `register_layouts.csv`
 
-`pipeline/extract/rm/extract_registers.py` が作ります。(family, 型) → 構造体の形のハッシュ `layout`。同じ `layout`
+`pipeline/extract/rm/extract_registers.py` が作ります。(family, 型) → 構造体と define 名の集合のハッシュ `layout`。同じ `layout`
 の family はレジスタ定義を共有できます。
 
 ### `manifest.csv`

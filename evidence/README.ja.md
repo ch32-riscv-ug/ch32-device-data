@@ -174,7 +174,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 出所は**EVTのflash driverの`@brief`**（`page size 4KB`・`1page = 256Byte`）と**RMの闪存章の本文**（`标准页（1K字节）`・`快速编程按页（128字节）`）の2つで、突き合わせて確度を決めます。**実際に食い違いが1件**あります——CH32V103のdriverは`ProgramPage_Fast ... 256Byte`と書きますが、RMは`快速编程按页（128字节）`、同じdriverの消去側も128B、`ROM_ERASE`の引数条件も`StartAddr%128 == 0`。EVTコメントの写し間違いと判断して値は128、`conflict`で両論を`basis`に残しています。
 
-消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、`erased_read_*`は空のままで`note`にその旨を書きます。`blank_check_word`には値が入ります——どちらもEVTのIAPサンプルからです（CH32V103 は 2026-10 の EVT 改版で加わったサンプル。それまではch32rvがCH32V103R8T6で読んだ実測を`measured:ch32rv(...)`として引用しており、その実測は`note`に独立の裏付けとして残しています）。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
+消去後の読み出し値は同じ闪存章の——標準ページ消去と快速ページ消去の**両方の直後に付く**`注：`——から採り、**中文版を一次**にします（英訳は5通りに揺れ、32bit値の`word`を`byte`と誤訳する版がある）。中文版にこの注が無いのはCH32M030だけで、そこはen版から採って`basis`に`rm-en(...)`と書きます。CH32V003とCH32V103はzh/enとも記述が無く、`erased_read_*`は空のままで`note`にその旨を書きます。`blank_check_word`には値が入ります——どちらもEVTのIAPサンプルからです（CH32V103 は 2026-10 の EVT 改版で加わったサンプル。それまではch32rvがCH32V103R8T6で読んだ実測を`measured:ch32rv(...)`として引用しており、その実測は`note`に独立の裏付けとして残しています）。`blank_check_word`はEVTのIAPサンプルから読み、`basis`にファイルと行番号を書きます。
 
 ### `flash_program_method.csv`
 
@@ -340,7 +340,7 @@ reference manualのDMA章の「DMAx各通道外设映射表」だけが持つ情
 ページ跨ぎ／DMAMUX番号表）のを1つの読み方で読んでいます。セル内の折り返し（`USART2_T`⏎`X_1`）は1語に繋ぎ、その折り返しの**間にページ境界が来た**もの（前ページ最終行の`USART1_T`＋続き表先頭行の`X_0`）も、続き側の断片から前の行へ書き戻して繋ぎます。読み方の規則と資料側の癖は
 `pipeline/extract/rm/extract_dma_requests.py`の冒頭に書きました（凍結tool `tools/build_dma_requests.py` を
 bundle入力でbyte一致を確認して置き換えた新経路の生成器。2026-09-09）。
-**`通道8〜`から始まる表は新しい DMA の始まりではなく、直前の格子の続き**として読みます——CH32V407RM は表題を表の下に置くので、DMA1 の ch8〜13 の表の直後に`Figure 11-3 DMA2 …`が来て、ADC1(ch12)・ADC2(ch13)・USART9/10・I3C・ARGB の8行が DMA2 に化けていました（2026-10-27 に直した。header の DMA1 は ch13 まで、DMA2 は ch11 まで。ArduinoCore-CH32RV が ADC1 を DMA1 ch12 で実機確認）。`check_tables`は (DMA, channel) が header の`DMAx_ChannelN`に実在することを見ます。
+**`通道8〜`から始まる表は新しい DMA の始まりではなく、直前の格子の続き**として読みます——CH32V407RM は表題を表の下に置くので、DMA1 の ch8〜13 の表の直後に`Figure 11-3 DMA2 ...`が来て、ADC1(ch12)・ADC2(ch13)・USART9/10・I3C・ARGB の8行が DMA2 に化けていました（2026-10-27 に直した。header の DMA1 は ch13 まで、DMA2 は ch11 まで。ArduinoCore-CH32RV が ADC1 を DMA1 ch12 で実機確認）。`check_tables`は (DMA, channel) が header の`DMAx_ChannelN`に実在することを見ます。
 
 ### `pin_functions.csv`は**pinout単位**で、型番の機能一覧ではありません
 
@@ -357,7 +357,7 @@ pairs cross-checked 391  agree 352  more on the pin side (superset from a shared
   - counted by the comparison table but on no pin at all: 0 pairs
 ```
 
-`pin側が多い`が共有pinoutの分、`pin側が少ない`はその封装に出ていないinstance（`CMP2`・`LPTIM1`で、入力が内部だけの可能性がある）。**`pin に1つも出ない`が0であること**が、比較表が数える周辺は必ずpinから引けるという保証です。
+「pin側が多い」が共有pinoutの分、「pin側が少ない」はその封装に出ていないinstance（`CMP2`・`LPTIM1`で、入力が内部だけの可能性がある）。**「pin に1つも出ない」が0であること**が、比較表が数える周辺は必ずpinから引けるという保証です。
 
 **`CH32V006K8U6` は `CH32V006K8U7` の列を読みます。** 比較表にも订购情報にも刷られていない唯一の
 目録型番（worklist F-76）ですが、ピンは述べられています——引脚定义の表は
@@ -370,9 +370,11 @@ pairs cross-checked 391  agree 352  more on the pin side (superset from a shared
 
 ### `remap_fields.csv` / `remap_routes.csv`
 
-AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）で、**`confidence` は「2つの資料が一致したか」を言います**——datasheet の pin 表と application manual の両方が述べている経路が `confirmed`（4,354行）、片方だけが `reference`（483行）。manual の述べ方（格子か、レジスタ説明文か）は数に影響しません——食い違いが起きるのは**資料のあいだ**で、同じ manual の zh/en が経路について食い違うことは全corpusで一度もないからです。**値を格子から採った経路は `reference` のまま**です（pin 表はその pad にその signal が在るとは言っていますが、その値だとは言っていません。`CH32V103` の TIM3 は pin 表が PB4 と PC6 の両方に `_1` と書き、manual が値2と値3に置く）。`remap_fields.csv` には**行ごとの確度を付けていません**——行が複合で、列ごとに出所が違うからです。`bits`/`register`/`field` は EVT header と manual の和集合（片方しか名指さない register は他方の抜けで、食い違いではない）、`valid_values` は6つの出所から集めた**下限**、`reset_value` は manual だけ。1つの確度を付けると下限まで「2つの資料が一致」と読めてしまいます。代わりに consumer が実際に書く `bits` を固定してあります——header と manual が**同じ register に違う bit**を言ったらその行は `conflict` になり、manual の言い分が `basis` の `!rm-register-table(bits=…)` に残ります。全corpusで **0 件**です（27件は manual が register を別の綴りで書いたもの、16件は manual が header に無い bit を補ったもので、どちらも処理済み）。**末尾の `:xx` はその経路を述べた manual の版**です。長らく `:en` の決め打ちで、両版を読んでいるのに**中文版しか言っていない経路も `en` を名乗っていました**（説明文由来の503経路。格子由来では en のみが29）。manual が述べていない行には印が付きません。1行だけ `conflict` があります——RM の重映射格子と datasheet の pin 表が**同じ pad に別の selector 値**を与えるところで、値は pin 表を保ち、格子の言い分を `basis` に `!rm-remap-grid(value=N)` と書きます（他の表と同じ `!<出所>(<列>=<値>)` の DSL）。いまは `CH32M030` の `ADC_ETR` で、RM 表6-15 は `ADC_ETRGIN_RM=0`（既定）を PB6・`=1` を PA14 に置き、pin 表は PA14 を既定・PB6 を `ADC_ETR_1` と書きます。**zh/en とも各資料の中では一致**しているので、版の食い違いではなく資料どうしの食い違いです。`index/conflicts.csv` が格子の値を `alternative` に持ちます。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
+AFIO route selectorの定義と、値→経路の対応です。pin_functions.csvの`remap-N`は、remap_routes（selector×値→signal/pad）→remap_fields（どのregisterの何bitか）と辿って解決します。出所はcandidates/（EVTヘッダ+RM register表+RM remap格子+datasheet pin表の結合）で、**`confidence` は「2つの資料が一致したか」を言います**——datasheet の pin 表と application manual の両方が述べている経路が `confirmed`（4,354行）、片方だけが `reference`（483行）。manual の述べ方（格子か、レジスタ説明文か）は数に影響しません——食い違いが起きるのは**資料のあいだ**で、同じ manual の zh/en が経路について食い違うことは全corpusで一度もないからです。**値を格子から採った経路は `reference` のまま**です（pin 表はその pad にその signal が在るとは言っていますが、その値だとは言っていません。`CH32V103` の TIM3 は pin 表が PB4 と PC6 の両方に `_1` と書き、manual が値2と値3に置く）。`remap_fields.csv` には**行ごとの確度を付けていません**——行が複合で、列ごとに出所が違うからです。`bits`/`register`/`field` は EVT header と manual の和集合（片方しか名指さない register は他方の抜けで、食い違いではない）、`valid_values` は6つの出所から集めた**下限**、`reset_value` は manual だけ。1つの確度を付けると下限まで「2つの資料が一致」と読めてしまいます。代わりに consumer が実際に書く `bits` を固定してあります——header と manual が**同じ register に違う bit**を言ったらその行は `conflict` になり、manual の言い分が `basis` の `!rm-register-table(bits=...)` に残ります。全corpusで **0 件**です（27件は manual が register を別の綴りで書いたもの、16件は manual が header に無い bit を補ったもので、どちらも処理済み）。1行だけ `conflict` があります——RM の重映射格子と datasheet の pin 表が**同じ pad に別の selector 値**を与えるところで、値は pin 表を保ち、格子の言い分を `basis` に `!rm-remap-grid(value=N)` と書きます（他の表と同じ `!<出所>(<列>=<値>)` の DSL）。いまは `CH32M030` の `ADC_ETR` で、RM 表6-15 は `ADC_ETRGIN_RM=0`（既定）を PB6・`=1` を PA14 に置き、pin 表は PA14 を既定・PB6 を `ADC_ETR_1` と書きます。**zh/en とも各資料の中では一致**しているので、版の食い違いではなく資料どうしの食い違いです。`index/conflicts.csv` が格子の値を `alternative` に持ちます。H41x/X315系はremapではなくAF番号方式なので対象外（pin_functionsの`af-N`が持つ）。
 
 読み方に注意が要る列が3つあります。
+
+**末尾の `:xx` はその経路を述べた manual の版です。** 長らく `:en` の決め打ちで、両版を読んでいるのに**中文版しか言っていない経路も `en` を名乗っていました**（説明文由来の503経路。格子由来では en のみが29）。manual が述べていない行には印が付きません。
 
 **`bits`はbitごとにregister名を持ちます**——`PCFR1:2;PCFR2:19;PCFR2:20`のように、値のLSBから順に`<register>:<bit>`を`;`で並べます。ほとんどのselectorは1つのregisterに収まりますが、CH32L103 / CH32M103 / CH32V20x / CH32V30x / CH32V4x7では**selectorがPCFR1とPCFR2にまたがります**。PCFR1だけを書くとエラーにならずに別の経路が選ばれるので、上位半分を落とさないための修飾です。`register`列は同じことを`PCFR1|PCFR2`と要約します。
 
@@ -423,11 +425,11 @@ signal の pad が、AFIO の重映射 field ではなく**どの周辺を有効
 series にだけ出すので、載っている signal は必ず条件を2つ以上持ちます。
 
 **datasheet が同じことを散文で言っていて、2つ目の資料として読んでいます。**
-注記は `SDIO_D0和SDIO_D1默认映射自动改到PB14和PB15`／`the default mapping of SDIO_D0
-and SDIO_D1 is automatically changed to PB14 and PB15` の形で、条件は同じ文の前半に
+注記は `SDIO_D0和SDIO_D1默认映射自动改到PB14和PB15`／`the default mapping of SDIO_D0 and SDIO_D1 is automatically changed to PB14 and PB15`
+の形で、条件は同じ文の前半に
 あります（`bit[14]ETHMACEN=1与bit[10]SDIOEN=1`。`CH32V407DS0` の英語版だけは
-`bit [14] (ETHMACEN) and bit [10] (SDIOEN) … are both set to 1`）。`basis` に
-`ds:<言語>(…)` を足すのは、**signal・pad・条件の項の集合が全部一致したときだけ**です
+`bit [14] (ETHMACEN) and bit [10] (SDIOEN) ... are both set to 1`）。`basis` に
+`ds:<言語>(...)` を足すのは、**signal・pad・条件の項の集合が全部一致したときだけ**です
 ——項の順は資料で違うので集合で比べます。3つの注記（`I2S3_SD`・`I2S3_MCK`・
 `SPI3_MOSI`）は条件をビットで書かず「10M以太网とI2S3を同時に使うと」と書くので、
 裏付けにはなりません。
@@ -436,7 +438,7 @@ and SDIO_D1 is automatically changed to PB14 and PB15` の形で、条件は同�
 一部の批号だけ」と言っているのは datasheet だけで、その範囲は `errata.csv` が正規化して
 1箇所に持っているので、範囲そのものは写さず `id` で繋ぎます。どの errata の行かは
 `scan_errata` と同じ契約で決め（`match` を `<mirror相対パス> <注記>` に当てる）、さらに
-**その errata が行の series を名指していること**で絞ります。注記が付いているのに `errata`
+**その errata の `series` が行の series を名指していること**で絞ります。注記が付いているのに `errata`
 が空な行は、**資料がロットの条件を書いていない**という意味です——`CH32V407DS0` の注記には
 そもそも批号の条件が無く、`CH32V317` は**自分の pin 表（表3-2）と自分の注記**を持っていて
 そちらにも批号の句がありません。批号つきの注記は `CH32V303/305/307` の pin 表（表3-1）と、
@@ -450,7 +452,7 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 
 **`domains`は`名前=Hz`を`;`で並べます**——`SYSCLK=400000000;CoreCLK[V5F]=400000000;CoreCLK[V3F]=100000000`。ほとんどのfamilyは`SYSCLK`だけですが、**CH32V407はSYSCLKとHCLKが別**、**CH32X315はSYSCLK/CoreCLK/HCLKの3段**、**CH32H417は双核なのでCoreCLKがコアごと**です。`SYSCLK = HCLK`という1段のモデルではこの3 familyを表せません。名前が周波数を言っていない設定（`SetSysClockToHSE`＝水晶に直結）は**空**にしてあります。水晶の周波数は基板の属性でchipの属性ではないためです。
 
-**`SYSCLK=`は常に本当のSYSCLK**です。EVTの`SetSysClockToN`のNは**HCLK（HPREの後）**なので、HPREが1でない設定は`SYSCLK=N×hpre;HCLK=N`と書きます——CH32M030の`SetSysClockTo72_HSI`はPLL固定のHSI×18＝144MHzをHPRE/2して`SYSCLK=144000000;HCLK=72000000`、X035の8〜24MHzはHSI 48MHzの分周、V003/V006の8MHzは24MHzの/3です（2026-10-22まで`SYSCLK=72000000`と書いていて、ArduinoCore-CH32RVがM030を144MHzのまま走らせて止まった）。
+**`SYSCLK=`は常に本当のSYSCLK**です。EVTの`SetSysClockToN`のNは**HCLK（HPREの後）**なので、HPREが1でない設定は`SYSCLK=N*hpre;HCLK=N`と書きます——CH32M030の`SetSysClockTo72_HSI`はPLL固定のHSI×18＝144MHzをHPRE/2して`SYSCLK=144000000;HCLK=72000000`、X035の8〜24MHzはHSI 48MHzの分周、V003/V006の8MHzは24MHzの/3です（2026-10-22まで`SYSCLK=72000000`と書いていて、ArduinoCore-CH32RVがM030を144MHzのまま走らせて止まった）。
 
 **`condition`はコンパイル時分岐です**。CH32V307の144MHzは`#ifdef CH32V30x_D8`で`RCC_PLLMULL18`、`#else`で`RCC_PLLMULL18_EXTEN`を書きます。**1つの関数が2つの事実**なので、分岐ごとに行を分け、どちらかを`condition`が言います。
 
@@ -528,7 +530,7 @@ EVTが`system_ch32*.c`に用意しているクロック設定です。1関数=1�
 **debug module の data0/data1 レジスタの hart 側アドレス**（consumer の R-27。SDI print＝DMDATA0/1 の
 mailbox 経由の printf が書く番地）。1行1 family。**番地は die で違う**——V2 系（V003/V00x）は
 `0xE00000F4`、V4 系（L103/M103・V20x・V30x・X035）は `0xE0000380`、V3 系の多く（M030・V205・V407・X315）
-は `0xE0000340`、ただし V3A の V103 は `0xE0000380`。core 世代では決まらないので family 単位。
+と H417 の両コアは `0xE0000340`、ただし V3A の V103 は `0xE0000380`。core 世代では決まらないので family 単位。
 
 出所は3つで、揃ったものが `confirmed`:
 
@@ -549,7 +551,7 @@ CH32H417 は EVT に define が無く（SDI_Printf 例が無い）、V5/V3 の�
 **debug配線（1線SWIO／2線SWDIO+SWCLK）のWCH-Link manual側の証拠**（consumerのR-29）。
 1行1 series（26行——manualに載らないM103は行なし。M103のwire数はdatasheetの節見出しが持つ）。
 出所は`WCH-LinkUserManual.PDF`（zh 2.8／en 2.7、WCH-commonにmirror）の2箇所で、zh/enが
-一致した行がconfirmed:
+一致した行が`confirmed`:
 
 - **配線表**（常用芯片型号／SWDIO／SWCLK）→ `swdio_pad`・`swclk_pad`。SWCLK欄が`-`の
   chip（V003・CH641）は`swclk_pad`空＝1線のみ
@@ -582,7 +584,7 @@ family×バイトごとに1行。全11 RMが同じcaptionでこの表を持つ�
   （L103/M030系）。RMが「高バイトはFPECが自動で反码を計算する」と書いていれば
   `; complement auto-computed`を足す。ちょうど1方式に当たらなければ生成が落ちる
 
-zh/enの両版が一致した行がconfirmed。~~CH32V407（RMがzh単独）はreference~~ → **2026-09-04 に V407 の en 版 RM が加わって全98行 confirmed**。
+zh/enの両版が一致した行が`confirmed`。~~CH32V407（RMがzh単独）は`reference`~~ → **2026-09-04 に V407 の en 版 RM が加わって全98行 `confirmed`**。
 
 ### `option_byte_fields.csv`
 
@@ -596,10 +598,10 @@ USER／Data0-Data1／WRPR0-WRPR3）・`bits`・`field`・`default`、WRPR群の�
 **値トークンの列**で行う（周りの散文は言語で違い、文字層では句読点がセルに
 漂着する）。識別子・値は空白とdashだけ畳んで資料どおり。**第三の証拠があるzh/en齟齬は
 裁定済み**（2026-09-02）——X315のbitは`USBHSDLEN`（EVTの`ch32x3x5_flash.h`が
-zhを支持）、FV2x/V3xのSRAM分割fieldは`RAM_CODE_MOD`（OBR読み出し側が支持。
+en版の`USBFSDLEN`ではなくzhを支持）、FV2x/V3xのSRAM分割fieldは`RAM_CODE_MOD`（OBR読み出し側が支持。
 en版は無名のまま）、X035の復位値は`xxxb`（`rule:bit-width`——[7:5]は3bit）——
 いずれもconfirmedで、もう片方の版の異議はbasisに残る。証拠の無い齟齬は
-conflictのまま（文書ごとに逆転するIWDG_SW/IWDGSWの綴り、X315のWRPR粒度）。
+`conflict`のまま（文書ごとに逆転するIWDG_SW/IWDGSWの綴り、X315のWRPR粒度）。
 
 **WCH の EVT が各 field をどう書くか**——`option`・`evt_argument`・`evt_values`。「IWDG をソフト
 モードに」と書き込むには field と極性が要り、それを両方言っている API が EVT の
@@ -630,7 +632,7 @@ R-28——chip IDによるtarget自動判定）。一次資料はEVTの`DBGMCU_G
 
 ### `device_ids.csv`
 
-**型番ごとの32bit device_id**。出所は公式EVTの`DBGMCU_GetCHIPID`のChipID Listだけ。
+**型番ごとの32bit device_id**。`pipeline/build/build_device_ids.py`が読むのは公式EVTの`DBGMCU_GetCHIPID`のChipID Listだけ。
 照合は完全一致か末尾の温度グレード1/6/7の省略だけ。封装の接尾辞は推測しない。
 `basis`にmirrorのcommit、file、資料の型番表記とIDを残す。EVT内でIDが食い違えば
 生成を止め、1型番に複数IDを書くEVT行（CH32V203F6P）は収載しない。
@@ -642,7 +644,7 @@ AttachChip実測に一致した行のみ`confirmed`、`id_source=memory`にす�
 ID確認はflash書き込み検証を意味しない——ch32rv が erase・program・readback をその型番で通した記録（`curated/device-ids-measured.json`の`flash_verified`）がある行だけ`note`を「flash programming verified」にし、`basis`に`flash:ch32rv(...)`を足す（2026-10-22: CH32M030G8R7・CH32V407WEU6、OEP probe の1線SWIO。同じ記録は`flash_program_method`の M030/V407 行の`basis`にも`measured:ch32rv(...)`として入る）。`dont_care_bits`は`[7:4]`。
 105型番のうち98型番を収載。未登録はCH32M007K8U7・CH32V103C6T6・CH32V103C8U6・CH32V203C6U6・CH32V203F6P6・CH32V407KEU6・CH32X035D8U6の7型番（EVTにIDが無いか、複数IDで曖昧）。
 **1型番1行を保つ**——consumer の ch32rv は型番をキーに読む（2行目が黙って上書きされ、
-もう片方の ID のチップを誤って拒否する）。1型番に複数 ID を載せる形にするときは、先に ch32rv へ知らせる（2026-10-14 合意）。
+もう片方の ID のチップを誤って拒否する）。1型番に複数 ID を載せる形にするときは、先に ch32rv へ知らせる（2026-10-14 合意）。兄弟の封装から ID を推測しない。
 
 ### `link_firmware.csv`
 
@@ -655,7 +657,7 @@ sha256・サイズ・取得元URLだけ。
 番号（`wchlink.wcfg`の`CH32V307Ver=42`等）で、実機がUSBで申告する`major.minor`との
 対応は **`wcfg = major*10 + minor`**（majorは観測した全個体で2）。復号した値が
 `reported_version`列で、`tools/read_link_version.py`が実機から読んだ値が
-`measured_version`列。**両者が食い違う行はconflictにする**規則で、いまは全一致
+`measured_version`列。**両者が食い違う行は`conflict`にする**規則で、いまは全一致
 （実機を持っている2機種ぶんだけ埋まり、残り8行は空）。導出と実測の記録は
 [docs/link-firmware-survey.ja.md](../docs/link-firmware-survey.ja.md)。
 「手元のファイルが今配られているものと同じか」は**sha256**で判る。
@@ -816,7 +818,7 @@ familyを主キーにすると別々の冊子の`1.4.17`が衝突します。
 目録の 103 型番すべてが `confirmed`。
 
 **1枚の図が複数の型番を代表する。** 図の見出しは完全な型番とは限らず、伏字（`CH32V103Cx` は
-C6T6・C8T6・C8U6 を覆う）・温度グレードの桁を省いた形（`CH32V006E8R`）・スラッシュで連ねた形
+C6T6・C8T6・C8U6 を覆う）・温度グレードの桁を省いた形（`...E8R6` に対する `CH32V006E8R`）・スラッシュで連ねた形
 （`CH32V303RxT6/CH32V303RCT7`）がある。目録の型番へ展開して1型番1行にし、同じページを指す。
 
 **ページは見出しが載っている版面**で、ピン配置の章（`2.1 引脚排列` / `2.1 Pinouts`）を
@@ -915,7 +917,7 @@ application manual を引く行（`CH32H417RM.PDF p.374`——「批号第五位
 
 **取れていないもの**（理由は tool の docstring に）:
 
-- **条件つきの消費電流**——`I_DD` は動作条件（`F_HCLK = 48MHz`・`开启`）が min の欄に
+- **条件つきの消費電流**——`I_DD` は動作条件（`F_HCLK = 48MHz`・`开启`）が `min` の欄に
   流れ込む表で書かれていて、値として読めません。表の形の問題で、記号の問題ではありません
 - **添字が文字層で `*` に化けた式**（`0.45*V+*0.41`。`0.45*V_DD+0.41` のはず）。兄弟の行を
   見れば人には分かりますが推測なので、埋めずに落とします
@@ -968,7 +970,7 @@ application manual を引く行（`CH32H417RM.PDF p.374`——「批号第五位
 
 発振器やADCの表は本体と別ページにあり（HSI/LSI/外部高速/外部低速/水晶/ADCで6種）、抽出器は**対象表を1つ見つけて打ち切らず全ページを走ります**。さらに**表はページを跨ぎ、続きページはヘッダ行を持ちません**（CH32V003のADCクロック上限の行はキャプションの次ページにしかない）。列数が同じなら直前の列並びを引き継いで読みます。この副作用で同じページにある他の`F_*`（`F_prog`＝flash書き込みクロック、`F_max(IO)out`＝IOの最大出力周波数）も入りますが、いずれも実在の周波数上限です。表の継承（記号セルが空の続き行）は多条件行には正しいものの、別パラメータが続くと記号を取り違えるので、**記号と単位と値の噛み合い**で弾いています（`F_*`にデューティ比の`%`が付く行など）。弾いた行は実行時に一覧で出ます。
 
-電気特性章の残り（絶対最大定格・消費電流・flash耐久・ウェイクアップ時間）は未収集です（docs/extraction-survey.ja.md参照）。
+電気特性章の残りのうち、絶対最大定格は `absolute_maximum_ratings.csv` に、消費電流・flash耐久（`t_RET`・`N_END`）・ウェイクアップ時間はこの表に入っています。まだ取れていない行は上の「取れていないもの」のとおりです（調査は docs/extraction-survey.ja.md）。
 
 ### `evt_examples.csv`
 
@@ -1044,7 +1046,7 @@ referenceは目録と実体の食い違いで、文書側の事実です（目�
 ## 生成
 
 **正面玄関は `uv run pipeline/publish/regenerate.py --full`**——以下の全部を
-依存順に構造化bundle入力で回し、検査まで進む（**約12分**。`--full`なしは新経路
+依存順に構造化bundle入力で回し、検査まで進む（**約12分**。`--full`なしの`regenerate.py`は新経路
 だけの速い再生成）。下の一覧は1表ずつ回すときのもの。**2026-09-10 に原本を直読みする
 生成器は無くなった**ので、どれもそのまま呼べる（読み手は全部 bundle。原本を開くのは
 bundle を作る側と図の描画だけ）。出力先は各ツールが `pipeline/common/paths.py` で決めます

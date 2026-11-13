@@ -26,7 +26,7 @@ Columns derived through the vocabulary (`peripheral`, `role`, `port`, `gpio`, an
 **not** here; they are in the index.
 
 **No evidence table is a contract.** Consumers read [`index/`](../index/README.md) only, which is the whole
-public surface; the evidence tables it publishes are copied there under the same name (listed in
+public surface; the evidence tables it publishes are copied into `index/` under the same name (listed in
 `pipeline/common/paths.py` `PUBLISHED` and in the index README). The "stable" mark these tables used to carry was
 retired on 2026-10-01, once every consumer had moved to `index/`.
 
@@ -164,7 +164,7 @@ The named macros go in `condition` (held the same way as in `interrupts.csv`) an
 | `fast_program_bytes` | Unit of fast page programming |
 | `block_erase_bytes` | Unit of fast block erase (32K; 64K on V205) |
 | `flash_mode_bit` | The flash mode bit that switches the erase sizes (`REGISTER.FIELD[bit]`); today only CH32H417's `FLASH_CFGR0.DBMODE[28]`. `page_erase_bytes`/`block_erase_bytes` hold its 0 (single) values |
-| `page_erase_bytes_dual` / `block_erase_bytes_dual` | Standard page / fast block erase units with the bit set (dual flash mode; 8K / 64K on H417). Taken as the larger size in the driver's @brief (`4KB or 8KB`) and kept only when the RM register table names the same size for DBMODE=1 (`When DBMODE=1, perform a sector (8KB)`), cited as `rm-dbmode(...)`. ch32rv 0010: a PER meant as 4 KiB erased 8 KiB on a DBMODE=1 H417QEU6 |
+| `page_erase_bytes_dual` / `block_erase_bytes_dual` | Standard page / fast block erase units with the bit set (dual flash mode; 8K / 64K on H417). Taken as the larger size in the driver's @brief (`4KB or 8KB`) and kept only when the RM register table names the same size for DBMODE=1 (`When DBMODE=1, perform a sector (8KB)`), cited in `basis` as `rm-dbmode(...)`. ch32rv 0010: a PER meant as 4 KiB erased 8 KiB on a DBMODE=1 H417QEU6 |
 | `program_word` | Whether `FLASH_ProgramWord`/`ProgramHalfWord` exist in the driver. **Empty = fast page only** (L103/M030/V006/V205/X035) |
 | `erased_read_word` / `erased_read_half` / `erased_read_byte_even` / `erased_read_byte_odd` | What a read returns after an erase, **exactly as the RM writes it**. Two systems: `0xFFFFFFFF`-style (the RM writes `字读- 0xFF`, so the column holds `0xFF`) and `0xe339e339`. Only the `0xe339e339` families state all four widths; the others state the word only and the remaining three columns stay **empty** -- the RM does not say them, so they are not derived |
 | `blank_check_word` | **The 32-bit value to compare a word read against** -- normally the value WCH's own EVT IAP sample compares `*(uint32_t*)FLASH_Base` against to decide whether an application is programmed. A separate source from the RM, so a separate column; this is where the word width becomes explicit for the `0xFF` families. CH32V103 long had no blank check in its IAP sample and cited a third-party measurement; the October 2026 EVT release added one (`UART_USB_IAP`), so every family now takes it from the EVT (the measurement stays in `note`) |
@@ -194,7 +194,7 @@ The sources are the RM's numbered procedure (`4）设置FLASH_CTLR寄存器的FT
 
 **The buffer width is not the same for every buffered family.** It is `32` for V003/V006/V205/X035/L103, **`64` for CH32M030** and **`128` for CH32V103**, and loading in a smaller unit than the family's width silently corrupts the page -- there is no error. ch32rv hit exactly this on CH32V103 over DMI: word-at-a-time loads into a 128-bit buffer produced garbage, which is why that family is programmed with standard half-word writes plus the undocumented commit below instead. The RM's numbered procedure does not state the width, so the source is the driver's `FLASH_BufLoad` signature -- one `uint32_t Data` argument per 32 bits (`FLASH_BufLoad(Address, Data0)` = 32, `(Address, Data0, Data1)` = 64, `(Address, Data0..Data3)` = 128) -- and `basis` says `evt-bufload(<N>bit)`.
 
-**One disagreement, and it is the RM's.** The CH32H417 RM writes step 8 of fast page programming as "set FTPG to start fast page programming", but `FTPG` is the enable bit it already set in step 4; the driver uses `CR_PG_STRT` and `register_fields.csv` has `PG_STRT` at bit 21, as on every other family of that system. **The columns therefore hold the driver's reading** (`fast page, direct writes (PAGE_PG, then PG_STRT)`) and the RM's wording is kept in `basis` as `!rm:program_method(...)` -- the same treatment as `fast_program_bytes` on CH32V103, where the judgement went the other way and the RM's value is the one in the column. **The RM's own register table sides with the driver** -- R32_FLASH_CTLR gives bit 21 `PGSTRT` as "Start. Set to 1 to start a page programming", bit 16 `FTPG` as the enable, and bit 17 as Reserved with no FTER. With the table and the driver agreeing and only the procedure text dissenting, the row is `confirmed` (decided 2026-10-21, ch32rv 0010): `basis` cites `rm-register(...)` and keeps `!rm:program_method(...)`. A family whose table cannot be checked the same way stays `conflict`.
+**One disagreement, and it is the RM's.** The CH32H417 RM writes step 8 of fast page programming as "set FTPG to start fast page programming", but `FTPG` is the enable bit it already set in step 4; the driver uses `CR_PG_STRT` and `register_fields.csv` has `PG_STRT` at bit 21, as on every other family of that system. **The columns therefore hold the driver's reading** (`fast page, direct writes (PAGE_PG, then PG_STRT)`) and the RM's wording is kept in `basis` as `!rm:program_method(...)` -- the same treatment as `fast_program_bytes` on CH32V103, where the judgement went the other way and the RM's value is the one in the column. **The RM's own register table sides with the driver** -- R32_FLASH_CTLR gives bit 21 `PGSTRT` as `Start. Set to 1 to start a page programming`, bit 16 `FTPG` as the enable, and bit 17 as Reserved with no FTER. With the table and the driver agreeing and only the procedure text dissenting, the row is `confirmed` (decided 2026-10-21, ch32rv 0010): `basis` cites `rm-register(...)` and keeps `!rm:program_method(...)`. A family whose table cannot be checked the same way stays `conflict`.
 
 **Two families need a step the RM does not document.** CH32V103 and CH32M030 drivers write `0x40022034` after every erase and program, with the address XORed by `0x1000` (V103) or `0x100` (M030). ch32rv reports that on CH32V103 neither erase nor program has any effect without it; CH32M030 was not on their bench, so its note is a warning rather than a measurement.
 
@@ -373,11 +373,11 @@ exclude it -- the rows it produces are byte-identical to `CH32V006K8U7`'s.
 
 ### `remap_fields.csv` / `remap_routes.csv`
 
-Definitions of the AFIO route selectors and the value → route mapping. A `remap-N` in pin_functions.csv is resolved by following remap_routes (selector × value → signal/pad) → remap_fields (which bits of which register). The source is candidates/ (a join of EVT headers + RM register tables + RM remap grid + datasheet pin tables), and **`confidence` says whether two documents agree**: `confirmed` where the datasheet's pin table and the reference manual both state the route (4,354 rows), `reference` where only one does (483). The manual may state it as a grid or inside a register-field description; which of the two does not change the count, because disagreement here is between documents rather than between a manual's editions -- no route in the corpus is stated differently by a manual's Chinese and English editions. Rows whose value was taken from the grid against the pin table stay `reference`: the pin table puts the signal on that pad but does not say that value (CH32V103's TIM3 writes `_1` on both PB4 and PC6, and the manual places them at 2 and 3). `remap_fields.csv` deliberately carries no per-row confidence: its row is a composite whose columns have different provenance -- `bits`/`register`/`field` are the union of the EVT header and the manual (a register only one names is a gap in the other, not a conflict), `valid_values` is a lower bound drawn from six sources, and `reset_value` comes from the manual alone. One confidence for the row would read as "two documents agree" about the lower bound too. What is pinned instead is the claim a consumer writes: if the header and the manual give the same register different bits, the row becomes `conflict` with the manual's reading in `basis` as `!rm-register-table(bits=...)`. Across the corpus that happens **0 times** (27 cases are the manual spelling a register differently and 16 are the manual completing bits the header lacks; both are handled). One row is `conflict`: where the RM's remap grid and the datasheet's pin table give the same pad a different selector value, the pin table's value is kept and the grid's is written into `basis` as `!rm-remap-grid(value=N)`, the same `!<source>(<column>=<value>)` DSL every other table uses. Today that is CH32M030's `ADC_ETR`: the manual's Table 6-15 puts `ADC_ETRGIN_RM=0` (default) on PB6 and `=1` on PA14, while the pin table has PA14 as the default and PB6 as `ADC_ETR_1`. Both editions of each document agree with themselves, so this is a disagreement between documents, not between translations. `index/conflicts.csv` carries it with the grid's value in `alternative`. The H41x/X315 line uses AF numbers rather than remap and is out of scope (held by `af-N` in pin_functions).
+Definitions of the AFIO route selectors and the value → route mapping. A `remap-N` in pin_functions.csv is resolved by following remap_routes (selector × value → signal/pad) → remap_fields (which bits of which register). The source is candidates/ (a join of EVT headers + RM register tables + RM remap grid + datasheet pin tables), and **`confidence` says whether two documents agree**: `confirmed` where the datasheet's pin table and the reference manual both state the route (4,354 rows), `reference` where only one does (483). The manual may state it as a grid or inside a register-field description; which of the two does not change the count, because disagreement here is between documents rather than between a manual's editions -- no route in the corpus is stated differently by a manual's Chinese and English editions. Rows whose value was taken from the grid against the pin table stay `reference`: the pin table puts the signal on that pad but does not say that value (`CH32V103`'s TIM3 writes `_1` on both PB4 and PC6, and the manual places them at 2 and 3). `remap_fields.csv` deliberately carries no per-row confidence: its row is a composite whose columns have different provenance -- `bits`/`register`/`field` are the union of the EVT header and the manual (a register only one names is a gap in the other, not a conflict), `valid_values` is a lower bound drawn from six sources, and `reset_value` comes from the manual alone. One confidence for the row would read as "two documents agree" about the lower bound too. What is pinned instead is the `bits` a consumer writes: if the header and the manual give the same register different bits, the row becomes `conflict` with the manual's reading in `basis` as `!rm-register-table(bits=...)`. Across the corpus that happens **0 times** (27 cases are the manual spelling a register differently and 16 are the manual completing bits the header lacks; both are handled). One row is `conflict`: where the RM's remap grid and the datasheet's pin table give the same pad a different selector value, the pin table's value is kept and the grid's is written into `basis` as `!rm-remap-grid(value=N)`, the same `!<source>(<column>=<value>)` DSL every other table uses. Today that is `CH32M030`'s `ADC_ETR`: the manual's Table 6-15 puts `ADC_ETRGIN_RM=0` (default) on PB6 and `=1` on PA14, while the pin table has PA14 as the default and PB6 as `ADC_ETR_1`. Both editions of each document agree with themselves, so this is a disagreement between documents, not between translations. `index/conflicts.csv` carries it with the grid's value in `alternative`. The H41x/X315 line uses AF numbers rather than remap and is out of scope (held by `af-N` in pin_functions).
 
 Three columns need care when reading.
 
-**The `:xx` tag names the manual editions that stated the route.** It used to be a hardcoded `:en` on every row even though both editions are read, so routes only the Chinese edition states claimed English (503 description-derived routes, and 29 grid-derived routes are English-only). Rows with no manual source carry no tag.
+**The `:xx` tag names the manual editions that stated the route.** It used to be a hardcoded `:en` on every row even though both editions are read, so routes only the Chinese edition states claimed `en` (503 description-derived routes, and 29 grid-derived routes are English-only). Rows with no manual source carry no tag.
 
 **`bits` holds a register name per bit** -- `PCFR1:2;PCFR2:19;PCFR2:20`, listing `<register>:<bit>` separated by `;` from the LSB of the value upwards. Most selectors fit in one register, but on CH32L103 / CH32M103 / CH32V20x / CH32V30x / CH32V4x7 **selectors straddle PCFR1 and PCFR2**. Writing PCFR1 alone selects a different route without any error, so this is the qualification that keeps the upper half from being dropped. The `register` column summarises the same thing as `PCFR1|PCFR2`.
 
@@ -427,7 +427,7 @@ all of them or none, so a listed signal always keeps at least two conditions to 
 
 **The datasheet says the same thing in prose, and is read as a second source.** Its notes run
 `the default mapping of SDIO_D0 and SDIO_D1 is automatically changed to PB14 and PB15`, with the
-bits in the first half of the same sentence (`bit[14]ETHMACEN=1 and bit[10]SDIOEN=1`; CH32V407's
+bits in the first half of the same sentence (`bit[14]ETHMACEN=1 and bit[10]SDIOEN=1`; `CH32V407DS0`'s
 English edition writes `bit [14] (ETHMACEN) and bit [10] (SDIOEN) ... are both set to 1`). A note
 is added to `basis` as `ds:<lang>(...)` only when the signal, the pad **and the set of condition
 terms** all match -- the order of the terms differs between documents, so they are compared as
@@ -439,10 +439,10 @@ the automatic change applies to some lots and not others, and `errata.csv` alrea
 ranges in one normalised spelling, so this column carries that row's `id` rather than repeating
 the range. Which errata row is decided the same way `scan_errata` decides it -- the errata's
 `match` regex against `<mirror-relative path> <note>` -- and then narrowed to errata rows whose
-`series` names this row's series. A row with a note but no `errata` id has no lot qualification:
-the document states none. CH32V407's notes give no lot range, and CH32V317 has its own pin table
+`series` names this row's series. A row with a note but no `errata` `id` has no lot qualification:
+the document states none. `CH32V407DS0`'s notes give no lot range, and `CH32V317` has its own pin table
 (Table 3-2) with its own notes, which state the automatic change with no lot range either -- only
-the notes belonging to the CH32V303/305/307 pin table (Table 3-1) and to the model-agnostic
+the notes belonging to the `CH32V303/305/307` pin table (Table 3-1) and to the model-agnostic
 alternate-function table (Table 3-4, prefaced "not specific to any model") carry one.
 
 ### `clock_configs.csv` / `clock_prescalers.csv` / `clock_sources.csv` / `clock_symbols.csv` / `clock_init.csv` / `evt_variants.csv`
@@ -510,7 +510,7 @@ The source is distinguished by `basis`: **`evt(device-header+system_ch32*.c)` is
 
 The comparison is by **width**, not by position. The convention is that comments give bit numbers *within the field*, so `RCC_SWS[1:0]` does not contradict the mask `0xC` (2 bits placed at 3:2). Comparing by position would flag every family as contradictory.
 
-**`clock_init.csv` is the procedure of `SystemInit` and of every configuration function.** Only this table has an order (`step` column, from 0 within each function), because the order is a **transcription of the order the EVT writes**, not a policy -- `RCC->CTLR |= 1` in `SystemInit` must come before clearing SW or there is no clock left to run on, and a CH32X315 configuration switches only in the order USBHS PLL source and reference → `USBHSPLLON` → wait for ready → PLLSRC/PLLDIV → flash SCK → lower PLLGATE → SW. `function` joins `clock_configs.config` (transcribed from the retained, mainstream copy). Until 2026-10-27 the switching order was left out as "policy"; a consumer that wants to drive the chip the way the EVT does needs the transcription, so it is now kept **as the fact of the EVT's order** (requested by ArduinoCore-CH32RV). Timeout policy, and whether another order would also work, are not stated here. Driver calls (L103's `RCC_HSI_LP_Cmd(ENABLE)`) are not register writes and are not steps; only the HSI trim inside a function (`RCC_AdjustHSICalibrationValue`) appears, as `trim`, where it is called.
+**`clock_init.csv` is the procedure of `SystemInit` and of every configuration function.** Only this table has an order (`step` column, from 0 within each function), because the order is a **transcription of the order the EVT writes**, not a policy -- `RCC->CTLR |= 1` in `SystemInit` must come before clearing SW or there is no clock left to run on, and a CH32X315 configuration switches only in the order USBHS PLL source and reference → `USBHSPLLON` → wait for ready → PLLSRC/PLLDIV → flash SCK → lower PLLGATE → SW. `function` joins `clock_configs.config` (transcribed from the retained copy, the mainstream one by `evt_copies`). Until 2026-10-27 the switching order was left out as "policy"; a consumer that wants to drive the chip the way the EVT does needs the transcription, so it is now kept **as the fact of the EVT's order** (requested by ArduinoCore-CH32RV). Timeout policy, and whether another order would also work, are not stated here. Driver calls (L103's `RCC_HSI_LP_Cmd(ENABLE)`) are not register writes and are not steps; only the HSI trim inside a function (`RCC_AdjustHSICalibrationValue`) appears, as `trim`, where it is called.
 
 This table is needed because `SystemInit` is **written in raw hex, not symbols** (`RCC->CFGR0 &= 0xF8FF0000`). Symbol-based extraction sees nothing of it. `action` is one of 5: `set` (`|=`), `clear` (`&=`), `write` (`=`), `poll` (`while`) and `trim`, and **the `value` of `clear` is the AND mask as in the original** (the bits kept, not the bits dropped). A mask written as a number is kept as is; `&= ~X`, common in the configuration functions, is `~X` over 32 bits (X without the `~` would be the bits dropped -- the opposite meaning).
 
@@ -557,8 +557,8 @@ is `WCH-LinkUserManual.PDF` (zh 2.8 / en 2.7, mirrored in WCH-common), two place
 and a row is `confirmed` when the editions agree:
 
 - the **wiring table** (chip models / SWDIO / SWCLK) -> `swdio_pad`, `swclk_pad`;
-  a `-` in the SWCLK column (V003) means 1-wire only, `swclk_pad` empty
-- the **dual-support note** -> `dual_support=yes`
+  a `-` in the SWCLK column (V003, CH641) means 1-wire only, `swclk_pad` empty
+- the **dual-support note** ("... support both 1-wire (SWDIO) and 2-wire (SWDIO-SWCLK) ...") -> `dual_support=yes`
 
 Extracted on the new path (`pipeline/extract/manual/extract_debug_wiring.py`,
 structured-bundle input; the zh edition's page-spanning table is joined through
@@ -663,10 +663,10 @@ match the EVT; three parts without EVT support and four duplicate V003 rows went
 
 Documented entries are `reference`; matching memory and AttachChip measurements
 from `curated/device-ids-measured.json` make a row `confirmed`, with
-`id_source=memory`. This verifies identity, not flash programming -- only rows with a ch32rv record of a matching erase, program and readback on that part (`flash_verified` in `curated/device-ids-measured.json`) say "flash programming verified" in `note` and add `flash:ch32rv(...)` to `basis` (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO; the same record appears in the M030/V407 rows of `flash_program_method` as `measured:ch32rv(...)`).
+`id_source=memory`. This verifies identity, not flash programming -- only rows with a ch32rv record of a matching erase, program and readback on that part (`flash_verified` in `curated/device-ids-measured.json`) say "flash programming verified" in `note` and add `flash:ch32rv(...)` to `basis` (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO; the same record appears in the `basis` of the M030/V407 rows of `flash_program_method` as `measured:ch32rv(...)`).
 `dont_care_bits` remains `[7:4]`.
 98 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
-CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6.
+CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6 (no ID in the EVT, or ambiguous because it gives several).
 **Keep one row per part.** The consumer ch32rv keys on the part number (a second row
 silently overwrites the first, and a chip reporting the other ID would be rejected);
 tell ch32rv before listing several IDs for one part (agreed 2026-10-14). No ID is inferred from a sibling package.
@@ -837,7 +837,7 @@ The programming interface (worklist A8) also appears here -- `1-wire Serial Debu
 package table lands on the drawing instead of the front cover.
 
 **`page_zh` and `page_en` are separate columns because the two editions paginate differently**
-(CH32V103R8T6's pinout is page 11 in Chinese and page 13 in English). That is not a disagreement,
+(`CH32V103R8T6`'s pinout is page 11 in Chinese and page 13 in English). That is not a disagreement,
 so this table never carries `conflict`: `confirmed` means both editions draw it, `reference` that
 only one does. Every one of the 103 catalogued part numbers is `confirmed` today.
 
@@ -849,7 +849,7 @@ each, all pointing at the same page.
 
 **The page is the one the heading sits on**, found by walking the pinout chapter
 (`2.1 Pinouts` / `2.1 引脚排列`) in reading order. A drawing that sits above the next section's
-heading still belongs to the chapter -- CH32V003's SOP8 drawing is at the top of the page whose
+heading still belongs to the chapter -- `CH32V003`'s SOP8 drawing is at the top of the page whose
 rest is `2.2 Pin Description`.
 
 What `tools/check_tables.py` checks: the part number is catalogued and `document` is that part's
@@ -906,7 +906,7 @@ Rows citing an application manual (`CH32H417RM.PDF p.374` -- the four `h41x-*-lo
 
 **Absolute maximum ratings** -- the limits beyond which the part is damaged. This is a
 **different fact from the recommended operating range** in `operating_conditions.csv`, so it
-is a separate table. Both have `symbol == "V_DD"` with a `min` and a `max`, but they mean
+is a separate table. Both have the `symbol` `V_DD` with a `min` and a `max`, but they mean
 opposite things, and mixed together they cannot be told apart (when they were mixed once, the
 supply voltage in `index/parts.csv` for `CH32L103` turned from `1.8..3.6V` into `-0.3..4.0V`).
 Generated by `pipeline/extract/datasheet/extract_absolute_maximum.py`.
@@ -965,6 +965,8 @@ Values may be a formula rather than a number: an I/O threshold is written agains
 - **rows where two symbols were folded into one** (`t_/t_r(SCK)_f(SCK)`): the values cannot be
   assigned to either symbol
 
+Clocks and operating voltages per series.
+
 - **`F_MAIN`**: the **系统主频 (system main frequency)** advertised in the feature list on page 1 of the datasheet. This is the frequency the product is marketed with
 - `F_HCLK`/`F_PCLK*`/`F_CORE*`: **the maximum** from the "general operating conditions" table in the electrical characteristics chapter. A separate fact from F_MAIN, and the values disagree (CH32V003: 48MHz in the text, 50MHz maximum in the electrical characteristics). The Clock column of the README prefers F_MAIN and falls back to F_HCLK / F_CORE only for the series that lack it (CH32X035, CH32H41x)
 - `V_DD`: operating voltage. There are condition rows such as with ADC in use, with USB in use
@@ -1010,7 +1012,7 @@ The display text comes from the English edition; min/typ/max/unit are confirmed 
 
 The oscillator and ADC tables are on separate pages from the main table (6 kinds: HSI/LSI/external high-speed/external low-speed/crystal/ADC), and the extractor **walks all pages rather than stopping after finding one target table**. Moreover, **tables span pages, and the continuation page has no header row** (the ADC clock maximum row of CH32V003 is only on the page after the caption). If the column count is the same, the previous column layout is inherited for reading. As a side effect, other `F_*` on the same page (`F_prog` = flash programming clock, `F_max(IO)out` = maximum IO output frequency) also come in, but all of them are real frequency limits. Table inheritance (continuation rows with an empty symbol cell) is right for multi-condition rows but picks up the wrong symbol when a different parameter follows, so rows are rejected by **the fit of symbol, unit and value** (e.g. a row where an `F_*` carries a duty-cycle `%`). Rejected rows are listed at run time.
 
-The rest of the electrical characteristics chapter (absolute maximum ratings, current consumption, flash endurance, wake-up time) is not yet collected (see docs/extraction-survey.ja.md (Japanese)).
+Of the rest of the electrical characteristics chapter, absolute maximum ratings are in `absolute_maximum_ratings.csv`, and current consumption, flash endurance (`t_RET`, `N_END`) and wake-up times are in this table. What is still missing is listed under "Not collected" above (survey notes in docs/extraction-survey.ja.md (Japanese)).
 
 ### `evt_examples.csv`
 

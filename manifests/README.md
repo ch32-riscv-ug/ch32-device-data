@@ -23,7 +23,7 @@ WCH's BLE families (CH572/573/583/585/587/592/595/596) are RISC-V but are not co
 
 ## Language
 
-**The Chinese edition is the original; the English edition is its translation.** When the version numbers differ, the Chinese edition is the newer one, and some documents have no English edition at all (`CH32V407RM.PDF`, `CH32M030DS2.PDF`, `CH32V006DS2.PDF`). `primary_language` is `zh`.
+**The Chinese edition is the original; the English edition is its translation.** When the version numbers differ, the Chinese edition is the newer one, and some documents have no English edition at all (`CH32M030DS2.PDF`, `CH32V006DS2.PDF`). `primary_language` is `zh`.
 
 The two languages are treated as separate sources; `sources.en` and `sources.zh` each hold their own download id and version number.
 
@@ -32,10 +32,11 @@ The two languages are treated as separate sources; `sources.en` and `sources.zh`
 | key | meaning |
 |---|---|
 | `name` | Distributed file name |
-| `kind` | `datasheet` / `reference-manual` / `evt` / `core-manual` / `other` |
+| `kind` | `datasheet` / `reference-manual` / `evt` / `core-manual` / `package-drawing` / `other` |
 | `repositories` | Mirror repositories that should fetch it. May be more than one. Empty means unassigned |
 | `status` | `assigned` / `unassigned` / `excluded` / `duplicate` |
 | `reason` | Reason for exclusion or duplication |
+| `duplicate_of` | For `duplicate`, the document whose copy is fetched instead |
 | `sources.<lang>.file_id` | WCH download id. Inserted into the `download_url` template |
 | `sources.<lang>.version` | Version number as displayed on the site |
 | `sources.<lang>.scope` | Products / SKUs the document covers (as written by WCH) |
@@ -51,7 +52,7 @@ Documents that WCH does not publish on its download pages and that **exist only 
 
 They are not in `documents.json` because that file is **synced daily with the site listing and is also the mirrors' download input**. Rows without a download id would break the mirrors' fetch and the "disappeared from the site" check. The mirrors only extract their EVT; they do nothing extra for these documents.
 
-The fields match `documents.json` (`name`, `kind`, `repositories`, `status`); `sources.<lang>` holds `version` (**the version printed on the cover**) and `files` (**the path inside each mirror, per mirror**). Paths are listed per mirror because file-name case and whether that language edition exists differ between mirrors (CH32V205 has `PIOC.pdf` and no English CHRISC8B). The original is the first mirror by name; each family's README links its own mirror's file (or the original's mirror when it has none). In `catalog/documents.csv` they appear with empty page and download URLs and a mirror URL pointing at the PDF inside the EVT; conversion, tables and checks treat them like any other document. `check_sources` notices a new edition by the original's sha, and `version` is updated then.
+The fields match `documents.json` (`name`, `kind`, `repositories`, `status`), plus a `note` for people; `sources.<lang>` holds `version` (**the version printed on the cover**) and `files` (**the path inside each mirror, per mirror**). Paths are listed per mirror because file-name case and whether that language edition exists differ between mirrors (CH32V205 has `PIOC.pdf` and no English CHRISC8B). The original is the first mirror by name; each family's README links its own mirror's file (or the original's mirror when it has none). In `catalog/documents.csv` they appear with empty page and download URLs and a mirror URL pointing at the PDF inside the EVT; conversion, tables and checks treat them like any other document. `check_sources` notices a new edition by the original's sha, and `version` is updated then.
 
 ## Updating
 

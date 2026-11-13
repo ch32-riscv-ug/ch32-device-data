@@ -21,7 +21,7 @@
 ## 工程
 
 ```text
-ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの68版）
+ingest/    PDF → bundle（L0）。convert.py（1文書）・convert_all.py（catalogの72版）
 common/    logical_tables.py（**L1: ページを跨ぐ表の断片を1つの論理表に結合**。
            変換器の継続flagに依存せず構造で判定——無caption・ページ先頭・前ページ
            末尾が表・縦位置の連続・列構造互換。列の対応付けは列数が同じなら位置、
@@ -71,7 +71,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            3,829 asset・**図caption 3,023の全部に実画像（100%・警告0）**——caption無しでも回転文字入りの大クラスタ（封装図・引脚配置図）は独立assetとして描画——
            図全体が1つの無caption表として誤検出される場合（過滤器編号の示例・
            波形図・応答グラフ）もcaption直下ならクラスタへ算入する。
-           本文の参照文（「图19-2是…」「figure 21-1.」等）はcaption扱いしない
+           本文の参照文（「图19-2是…」「Figure 22-17 illustrates …」「figure 21-1.」等）はcaption扱いしない
            ——判定は`pipeline/common/figure_captions.py`に一本化）
            export_markdown.py（人が読むMarkdown。**最終ゴール「PDFとの差ゼロ」の本体**。
            **変換器が`reading_order`から外し、表のセルにも入らなかった行を拾い直す**
@@ -140,7 +140,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            も出る幽霊行**（`BU/RS/T_E/ND`の下の`RS`）はグリッドから落とす。64行）（どちらも図のboxを表と誤検出したもの。
            全corpusで1,115と3,758）。ただし**図領域の中身が本物の罫線表なら表として描く**
            （行3以上・列2以上・非空6以上。`logical_tables.looks_ruled`。原本が表題を
-           `Figure`と名乗ると罫線が図クラスタになる——V407RM.en p475
+           `Figure`と名乗ると罫線が図クラスタになる——CH32V407RM.en p475
            `Figure 26-19 Mode D FSMC_BCR1 bit field`はzh版では`表26-19`。106表・37文書。図の箱のラベル格子は除く——穴が多い/1行目が揃わない/1文字セルばかり/同じ語の反復、
            および5行以下で空行を含むもの（`Laye FI|er IFO|1`＝`Layer 1 FIFO`の箱）は表と見なさない）、**大フォントの本文がheadingに化けたものを段落へ戻す**
            （フォントサイズ由来のheadingが3連続以上・`注：`/`Note:`始まり・50字超・CJK文末
@@ -154,7 +154,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            一続きに潰れていた。1,740箇所・29文書。英単語の折り返し`mode:`は値でないので繋ぐ）、
            **狭いセルで途中折り返した英単語は、そのページの語彙が裏づけるときだけ繋ぐ**
            （`Rese`+`t`→`Reset`・`channe`+`l`。既定は空白のまま——`source is`+`greater`）、
-           **本文の`*`をエスケープ**（`2*ADC(TKey) … 4*OPA`が斜体化して`*`が消えていた。817行・
+           **本文の`*`をエスケープ**（`2*ADC(TKey) … 4*OPA`が斜体化して`2ADC(TKey) … 4OPA`と`*`が消えていた。817行・
            58文書。表のセルはHTMLブロックの中なので触らない）、**pin表・remap表のセルは1行1機能で`<br>`**（`MCO`/`TIM1_CH1`/
            `USART1_CK`が地続きになっていた。`0x…`の転送一覧・`R32_…`の別名も同様）、**セル内で基底から
            離れた下付き/上付きをグリフ寸法と位置で戻す**（`V *2-1.5DD5`→`VDD5*2-1.5`・`f = 2.4MHz S`→
@@ -165,7 +165,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            列見出しを落とし、複数行に折り返した見出しを1行へ畳む**（`Pin`/`name`・`Main`/`function`/
            `(after`/`reset)`）、**境界で二つに割れ境目の文字が両側に入った本文行を繋ぐ**（zh版DS:
            `…対外`/`外多组…`。同じxで3対以上割れているページだけ）、**重なりセルの残骸（1列断片）は
-           ページ跨ぎ連鎖の起点にしない**（V407RM.en p145の残骸が続き11行を引き取って出力から消えていた）、**2行に折り返した表題は`<caption>`に全文を出し、続き行を本文から
+           ページ跨ぎ連鎖の起点にしない**（CH32V407RM.en p145の残骸がTable 11-1の続き11行を引き取って出力から消えていた）、**2行に折り返した表題は`<caption>`に全文を出し、続き行を本文から
            消す**（括弧が閉じていない／`or`・`with`・読点で終わる表題。`logical_tables.caption_full`
            をoperating_conditionsの抽出器と共有し、CSVの条件prefixも全文になる。
            `…SRAM (RISC-V5F`＋`+ RISC-V3F)`）、**箇条書きのbulletを二重にしない**、**太字風の重ね描きで
@@ -174,7 +174,7 @@ review/    render_assets.py（**図のpixel描画**。原本hashを照合して�
            render_assetsが画像streamを直接復号して貼る**（11枚が白紙だった）、
            **既知の取りこぼしはその場所に見える印**——図caption直後の警告＋原本
            ページへのリンク、大きい画像の占位、表issuesの警告、(cid:N)化けの警告、
-           **添字が`*`になっているglyphの警告**（**原本の版面が`*`を刷っている**
+           **添字が`*`になっているglyphの警告**（`V_DD`の所に`V*`のように**原本の版面が`*`を刷っている**
            ——2026-09-10に該当セルを描画して確認。文字層の問題ではないので
            どのengineでも、OCRでも復元できない。806 glyph／14文書を実測。
            判定は`pipeline/common/lost_subscripts.py`に一本化し、parity検査が
@@ -188,7 +188,8 @@ checks/    compare_manifest.py（環境差の検証）
            cross_engine.py（**取り込み正しさの独立検証**。bundleの文字集合を別実装の
            pypdfium2と突き合わせる——順序でなく文字マルチセットを比べ、pypdfium2が
            取れてbundleが落とした文字を報告。pypdfium2のハイフン誤読（`-`→`\x02`）は
-           正規化。全68版で**取りこぼし0**を実測——独立エンジンが取る文字を
+           正規化。全68版で**取りこぼし0**を実測（両エンジンとも化ける数式・単位記号の
+           ToUnicode破損14文字は既知として名前と数で固定）——独立エンジンが取る文字を
            bundleは一文字残らず取る。手動運用: `uv run --with pypdfium2`）
 publish/   regenerate.py（**一括再生成のentry point**。bundle再変換→切替済み
            evidenceの再生成→下流indexの再導出→検査、の順で既存CLIを呼ぶ。
@@ -201,9 +202,9 @@ candidateの置き場は`.cache/pipeline-candidates/`（非コミット）。凍
 toolはこの経路に無い（**切替済み・新設のCSVは例外**——`operating_conditions.csv`
 （切替）と`debug_wiring.csv`（新設）の正本生成元は2026-09-01からこの経路）。
 
-## ingestがPoCと違う点（4つの修正。1と2はD17の実測、3はCIの実戦検出、4は人向け出力の精査）
+## ingestがPoCと違う点（1と2はD17の実測、3はCIの実戦検出、4以降は人向け出力の精査）
 
-1. **決定性**: pdfminerがinline imageへ付ける`id()`由来の数字名を捨てる
+1. **決定性**: pdfminerがinline imageへ付ける`id()`（メモリ番地）由来の数字名を捨てる
    （converter自身の`p66-draw-image-00002`形式が識別子）。同一原本＋同一版なら
    bundleはbyte一致で再生成できる
 2. **header/footerの検出が反復ベース**: 全ページを先に1回歩き、上下12%の帯で
@@ -254,7 +255,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    着地したときだけ統合し、外れたら小行を丸ごと残す（glyph欠落を作らない）。図中の
    極小ラベル（bottomの揃う本文行が無い）は統合されず残る。**下付き判定はページ全体の
    中央値でなく隣接する基底との相対サイズ**（`小 < 基底 × 0.82`）で見る（1.6.1）——
-   図中の電圧ラベル`V_BAT`の下付きは8.2pt（body 10.6の77%）でグローバル閾値0.72には
+   図中の電圧ラベル`V_BAT`の下付き`BAT`は8.2pt（body 10.6の77%）でグローバル閾値0.72には
    収まらないが、基底`V`11.9に対しては明確に小さい（L103DS0 p36の孤立18→0）。
    `page["text"]`は`extract_text()`が別に作るので凍結toolのbyte一致は崩れない
 
@@ -266,7 +267,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
    `logical_tables.reattach_cell_subscripts`——3者が同じ関数を呼ぶので読みがずれない。
 
    **壊れた分割は情報を持っているので、そちらも残す。** pdfplumberが残す改行は
-   下付きの境界で、`operating_rows.norm_symbol`はそれを正規化記号に変える
+   下付きの境界で、凍結の`operating_rows.norm_symbol`はそれを正規化記号に変える
    （`I\nDD`→`I_DD`。`KEEP`はその形しか通さない）。1.7.0で繋いだ形だけを残したら、
    `index/operating_conditions.csv`の**`I_DD`系1,207行がエラーも出さずに消えた**。
    1.7.1からはセルが2つの面を持つ——表が`cells`と`extracted_rows`を両方持つのと
@@ -282,7 +283,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
 
    - **私用領域コードポイント**（9,291個・65文書。`lines`・`words`・`page["text"]`・
      `cells`・`chars`の全部）。PDFが記号フォントのグリフを私用領域の符号位置のまま
-     文字層に書いたもので、``はWingdings 0x6Cの箇条書き記号。実測のコードポイント
+     文字層に書いたもので、`\uf06c`はWingdings 0x6Cの箇条書き記号。実測のコードポイント
      ×フォント: 0xf06c=Wingdings 9,233・NSimSun 1・SimHei 1、0xf0b7=SymbolMT 24・
      SimHei 5、0xf0b4=SymbolMT 18、0xf06e=Wingdings 8、0xf0b1=SymbolMT 1。CJKフォントの
      7件も箇条書きの文脈なのでフォントで分けない。**情報は失われない**——元がどの
@@ -372,7 +373,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
 13. **表領域の外に落ちた最外列を取り込む**（converter 1.10.0）。罫線ベースの表検出が
     最外列の外枠を拾えないと、その列は表bboxの外に残る——しかも**行としても残らない**。
     その行の中心はbbox内なので`reading_order`から外れるからで、結果として値は
-    **Markdownのどこにも出ていなかった**。CH32M030RM.zh p7の表は`名称/访问/描述/复位值`
+    **Markdownのどこにも出ていなかった**。CH32M030RM.zh p7の表は`名称 / 访问 / 描述 / 复位值`
     として出て、`位`列（`[31:15]`・`14`・`[13:12]`。x 78.5-115.2に対しbboxは121.8から）が
     消え、レジスタのフィールドがどのbitなのか読めなかった。`复位值`/`Reset value`列が
     右端の外へ押し出されるのは同じ欠陥の鏡像。
@@ -388,7 +389,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
 14. **走査線に刻まれたrasterを1枚に縫い直す**（converter 1.10.1）。PDFが別行立ての
     数式を**高さ0.72ptの帯277枚**で描くことがある。1枚ずつでは`render_assets`の大きさに
     届かないので、exporterが`<!-- image: … -->`を277行吐き、数式の中身は
-    **Markdownに存在しなかった**（V205DS0.en p64・L103DS0.zh p49）。resource名を持たない
+    **Markdownに存在しなかった**（CH32V205DS0.en p64・CH32L103DS0.zh p49）。resource名を持たない
     小画像をy方向の帯でまとめ、10枚以上で囲いが縦横8pt以上なら1枚にする（278→2）。
     `render_assets`も**横長で面積のある**画像（幅80pt以上・高さ12pt以上・面積1500pt²以上）
     を描くようにした——別行立ての数式は167×24ptで、正方形の閾値40ptに永遠に届かない。
@@ -401,7 +402,7 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     位置が存在しない**のが要点で、以前の緩い fallback が`每2^20个`を`每2个…121pp^20m`に
     壊したのはまさにそこだった。歯止めは2つ——**24字以内のセルだけ**（グリフは空白を
     持たないので散文を組み直すと`Thedatabusisdriven`になる。419件中338件が該当）と、
-    文字集合の完全一致。結果: `VDD12A(1)`・`IDD12A(1)(2)`・`VHSEH(1)`・`tSU(LSI)(1)`。
+    文字集合の完全一致。結果: `VDD12A(1)`・`IDD12A(1)(2)`・`VHSEH(1)`・`tSU(LSI)(1)`・`VREF-`・`VSS`・`VDD33`。
 
 16. **caption の無い表をページ跨ぎで繋ぐ**（converter 1.10.2）。
     `continues_from_previous`は`bool(consecutive and previous_logical_id)`——
@@ -412,16 +413,17 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     `fold_boundary_spills`と`drop_repeated_headers`は結合表の中でしか働かないので
     **どちらも届いていなかった**——1つの根が3つの欠陥に見えていた。繋ぐ条件は列数一致・
     **列境界が2pt以内で一致**・前の表が下端1/4で終わる・この表が上端1/3で始まる。
-    全corpusで該当は**18組**（既に繋がっている5,734組に対して）で、どれも本物の継続表。
+    全corpusで該当は**18組**（既に繋がっている5,734組に対して）で、どれも本物の継続表
+    （割込みベクタ表・比較表・`RW0`/`RW1T`のaccess凡例）。
     `fold_boundary_spills`も「1列のセル」条件を外し、**直上のセルと列範囲が完全に一致**
-    すればcolspanを許すようにした。`logical_id`が動いたが`operating_conditions`は
+    すればcolspanを許すようにした——`USBHS (USB`＋`2.0)`に要ったのがこれ。`logical_id`が動いたが`operating_conditions`は
     2,796行でbyte一致のまま。
 
 17. **ページ境界で切られた縦の結合セルを戻す**（`extend_boundary_spans`。exporter側）。
     背の高い結合セル（`VIL`が標準I/OとFT I/Oの両ブロックを覆う）は2つに切られ、前ページ側
     は下端で止まるセル、後ろ側は**中身の無いセル**になる（箱に上枠が無い）。結合表では
     別の2セルになり、後ろ側は`fold_boundary_spills`が畳む行から始まるため**描画時に落ち、
-    行が1列足りなくなる**——H417DS0.en p104では「FT I/O pin, input low level voltage」の
+    行が1列足りなくなる**——CH32H417DS0.en p104では「FT I/O pin, input low level voltage」の
     3行が7列でなく6列になり、条件がSymbol欄に出て**Unit欄が消えていた**。ページ境界から
     始まり・中身が空で・**直上の非空セルと列範囲が完全に一致**するとき、上へ吸収する。
     見える文字は変わらない（吸収するのは空セル）——変わるのは行の列数が揃うことと、
@@ -459,14 +461,14 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     ヘッダのセルから、行の座標は同じ行の他のセルから決まるので入れ先は一意。条件は
     「**同じ列に3つ以上の穴があり、その3つ以上に文字が在る**」——散発の穴（図を表と
     誤検出したページのラベル断片。全corpus 90個/50表）を外すとこの1表だけになる。
-    `recover_outer_column`（項目15）と同じ族なので同じ層に置き、`extracted_rows`は
+    `recover_outer_column`（項目13）と同じ族なので同じ層に置き、`extracted_rows`は
     触らない。同じ表の✓/✗印は**グリフとして存在しない**（ベクタ描画）ので復元不能
     ——geometryの1,019グリフを数えてもその帯には1文字も無い。
 
-21. **最外列の取り込み（項目15）を3つ緩めた**（converter 1.12.0）。`CH32L103RM.en` p13の
+21. **最外列の取り込み（項目13）を3つ緩めた**（converter 1.12.0）。`CH32L103RM.en` p13の
     「`Bit`列が空・幽霊列が在る・`[31:21]`が消えている」という3つの指摘は1つの根で、
     p13側の断片は表bboxが x=109.9 から始まり`Bit`列（x 60.5〜109.9）が表の外にあった。
-    (a) **隙間の上限8ptを「縁までの全幅が1列ぶん」に置き換え**——隙間は「列幅−文字幅」で
+    (a) **隙間の上限8ptを「縁までの全幅が1列ぶん」に置き換え**——隙間は`列幅−文字幅`で
     決まるので左寄せの広い列では大きくなり、閾値として筋が悪い。p13は**8.4ptで0.4pt
     足りずに落ちていた**。全幅で見ると図の断片（`['Syst','em','Bus']`。隙間219pt）は落ち、
     本物の`Bit`/`Reset value`列は通る。(b) **3行→2行**（bit説明表は「見出し＋1行」の
@@ -497,8 +499,8 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
     落とすのは「行が列数を超え・覆っている結合セルと**列範囲が重なり**・結合セルが
     **2行以内**でその1行と**完全一致**」のときだけ。**2行以内が要**——長い説明セルは
     次の行の文字まで飲み込むことがあり、そのときは小さいセルの方が本物なので消すと
-    データが失われる（`QingKeV4_Processor_Manual.en` p37は`Floating-point unit status
-    FS FS Meaning 00 OFF …`が9行ぶんを飲み、`FS Meaning`等が独立セルで在る。この型が
+    データが失われる（`QingKeV4_Processor_Manual.en` p37は
+    `Floating-point unit status FS FS Meaning 00 OFF …`が9行ぶんを飲み、`FS Meaning`等が独立セルで在る。この型が
     40件）。全corpus実測: 部分一致1,273件→重なり179→列数超え149→**完全一致かつ2行以内
     74件・26文書**で、これは全部本物の二重出力。消しても同じ綴りが結合セルに残るので
     文字は失われない。`strip_boundary_dupes`と同じ「二重取りの除去」なので同じ層に置く
@@ -531,8 +533,8 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
 26. **継続断片に欠けた最外列を、結合表の列境界で埋める**（`recover_chain_columns`。exporter側）。
     ページ跨ぎの結合表で、続きのページの断片だけ最外列の罫線が拾われず列が1つ少ないと、
     その列の値は**Markdownのどこにも出なかった**（`CH32xRM.zh` p179-180の`R32_USART3_GPR`
-    ——行が名無しで`| 0x40004818 | UASRT3保护时间和预分频 | | 0x00000000 |`。再突合の指摘）。
-    converterの`recover_outer_column`（項目15・21）は**断片1つ**を見て「1列ぶんの幅・全行帯に
+    ——行が名無しで`| 0x40004818 | UASRT3保护时间和预分频寄存器 | | 0x00000000 |`。再突合の指摘）。
+    converterの`recover_outer_column`（項目13・21）は**断片1つ**を見て「1列ぶんの幅・全行帯に
     中身」を要るので、1行の断片や外側グリフの幅が決められないものには触れない。結合表なら
     先頭断片が持つ列の**x範囲**（単独列セルの`src_bbox`）が分かるので、入れ先が一意に決まる。
     断片の行帯ごとにその範囲のグリフを`spell_glyphs`で綴り、全行帯に中身があり既にセルが
@@ -585,8 +587,8 @@ toolはこの経路に無い（**切替済み・新設のCSVは例外**——`op
 32. **bit図の外にある行ラベルを列として残す**（`apply_bitfield`。exporter側）。レジスタ配列の
     bit図は行ラベルを表の左外に置く（`PFIC_IPRIORx`の`IPRIOR63`・`PFIC_IALLOCx`の`IALLOC63`・
     `CH32L103RM.zh` p70の`IPRIOR17`/`IPRIOR16`）。converterがそれを列として取り込んでも
-    （項目15・27）、`apply_bitfield`はbit番号のx中心でセルを列へ割り当てるので、中心を1つも
-    含まないラベルはnearフォールバックで端のbit列へ寄せられ、最後のdedup（同じ格子に落ちた
+    （項目13・27）、`apply_bitfield`はbit番号のx中心でセルを列へ割り当てるので、中心を1つも
+    含まないラベルは`near`フォールバックで端のbit列へ寄せられ、最後のdedup（同じ格子に落ちた
     セルは後勝ち）で**フィールドに上書きされて消えていた**——`CH32FV2x_V3xRM.zh` p107の
     `IPRIOR63`はMarkdownのどこにも出ていなかった（再突合の指摘）。
     判定の根拠は**セルのid**。変換器が表の外から拾った列は`-outer-`（`recover_outer_column`）・
@@ -610,7 +612,7 @@ uv run pipeline/publish/regenerate.py                   # 一括再生成（bund
 uv run pipeline/publish/regenerate.py --full            # 全CSVの再生成（旧tool群をbundle入力で。約1.5時間）
 uv run pipeline/publish/regenerate.py --verify --human  # ＋凍結パリティ・エラッタ・図・Markdown・差ゼロ検査
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの68版。incremental
+uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの72版。incremental
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                                        # 独立検証ゲート（1.1.0以降）
 ```
@@ -622,7 +624,7 @@ pdfplumber。環境差（別マシン・CI）の検証は`.github/workflows/stru
 
 ## baseline凍結
 
-`baseline/tables.csv`は正本CSV（index manifest込み。凍結時点で54ファイル、現在60
+`baseline/tables.csv`は正本CSV（index manifest込み。凍結時点で54ファイル、現在66
 ——凍結後に生まれた5表はカバレッジの穴に気づいた2026-09-06に追加した）の行数と
 SHA-256。凍結後は、
 
@@ -637,5 +639,5 @@ SHA-256。凍結後は、
 現行の生成器で再生成してbyte一致を確認）、台帳だけが5日古い状態でした。腐り検出器その
 ものが腐っていたわけです。検査はCIと`regenerate.py`で走り、正本が動いたのに台帳が
 動いていなければ落ちます。落ちたら**まずその変化が意図したものかを確かめてから**
-——生成器を`--out`でスクラッチに走らせ正本とbyte比較——`uv run tools/check_baseline.py
---record`で書き直し、台帳を同じcommitに入れてください。
+——生成器を`--out`でスクラッチに走らせ正本とbyte比較——
+`uv run tools/check_baseline.py --record`で書き直し、台帳を同じcommitに入れてください。
