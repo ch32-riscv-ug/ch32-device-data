@@ -202,6 +202,9 @@ PROSE: tuple[tuple[str, str, str], ...] = (
     ("evidence/README.md", r"could not be read \((?P<n>[\d,]+)\)", "register_fields:rm_access_reference"),
     ("evidence/README.ja.md", r"図のある (?P<n>\d+) 型番すべてが", "figures:confirmed"),
     ("evidence/README.md", r"Every one of the (?P<n>\d+) part numbers with a figure", "figures:confirmed"),
+    # EVT の ChipID List に型番が増えると古くなる（2026-11-13 の V407 EVT 1.51 で 98→99）。
+    ("evidence/README.ja.md", r"105型番のうち(?P<n>\d+)型番を収載", "device_ids"),
+    ("evidence/README.md", r"(?P<n>\d+) of the 105 catalog parts have an ID", "device_ids"),
     ("docs/table-reliability.ja.md", r"field (?P<n>[\d,]+) のうち bit 位置は", "register_fields:field"),
     ("docs/table-reliability.ja.md", r"bit 位置は RM 一致 (?P<n>[\d,]+)・", "register_fields:field_confirmed"),
     ("docs/table-reliability.ja.md", r"RM 一致 [\d,]+・食い違い (?P<n>[\d,]+)、value", "register_fields:field_conflict"),

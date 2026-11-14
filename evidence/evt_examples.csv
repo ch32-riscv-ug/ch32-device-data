@@ -261,9 +261,10 @@ CH32L103,ADC,Discontinuous_mode,discontinuous mode routine,confirmed,evt:tree+ev
 CH32L103,ADC,ExtLines_Trigger,external trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,APPLICATION,PD_Electric_Fan,electric fan routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,APPLICATION,WS2812_LED,Operating WS2812 via SPI\PWM Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,APPLICATION,WUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,APPLICATION,WUI/wui_demo,gui lcd demo,confirmed,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,CAN,CANFD,"CANFD normal mode, standard frame, and extended frame data routines",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,CAN,CAN_Wakeup,CAN wake_up routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,CAN,Networking,"CAN routines: normal mode, standard frame and extended frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -399,6 +400,9 @@ CH32M030,APPLICATION,PD/USBPD_SRC/SRC_GetSinkCap,"After establishing Port0 PD, s
 CH32M030,APPLICATION,PD/USBPD_SRC/SRC_SPR_Request_IsinkVoltChange,"ISINK, Port0 shakes hands with SNK, adjusts the voltage according to SNK's Request message, and establishes PD communication",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,PD/USBPD_SRC/SRC_Vconn_TxSrcCap,"Port0 engages in a handshake with SNK, establishes Vconn power supply, retrieves EMK information, and subsequently transmits SrcCap values of 5V and 9V",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,EXTI,EXTI,External Interrupt Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
@@ -563,8 +567,9 @@ CH32V006,APPLICATION,Motor/BLDC_Motor,Application of sensorless square wave BLDC
 CH32V006,APPLICATION,Motor/Electric_Fan,Low-pressure fan application,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,Motor/voilent_fan,BLDC-based high-speed fan applications,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,APPLICATION,WUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,APPLICATION,WUI/wui_demo,gui lcd demo,confirmed,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,DMA,DMA_MEM2MEM,Memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,DMA,DMA_MEM2PERIP,"Memory to peripheral mode, and peripheral to memory mode routine, see peripheral sub-routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,EXTI,EXTI0,external interrupt line routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
@@ -731,7 +736,9 @@ CH32V205,APPLICATION,CoreMark,CoreMark routine,confirmed,evt:tree+evt:list-en+ev
 CH32V205,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,APPLICATION,WUI,WCHGUI routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,BKP,BKP,BKP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -906,8 +913,9 @@ CH32V20x,APPLICATION,USBPD,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_
 CH32V20x,APPLICATION,USBPD/I2C_OP_CH223,"I2C Operates CH223 routine, only applied to CH32V20x_D8",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,WS2812_LED,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WUI/WUI,WCHGUI routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BKP,BKP,BKP routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,BLE Certification,Product: WCH CH32V208 QDID: 179771,reference,evt:list-en,CH32V20x_List_EN.txt
 CH32V20x,BLE,BLE_UART,"BLE and UART transparent transmission routine, for detailed instructions, please refer to the <description.txt> document in the root directory",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1093,6 +1101,9 @@ CH32V307,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+e
 CH32V307,ADC,Temperature_External_channel,Temperature-External channel Injection alternating inversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,APPLICATION,WS2812_LED,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,BKP,BKP,BKP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1270,7 +1281,7 @@ CH32V407,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,
 CH32V407,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,CherryUSB,CherryUSB repository address and introduction,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,FATFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1280,6 +1291,9 @@ CH32V407,APPLICATION,JPEG_decode_LTDC,LTDC static display decoded JPEG,confirmed
 CH32V407,APPLICATION,LTDC_LVGL,use LTDC driver to display some animations on the LCD,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,RunInPSRAM,Coremark demo run in PSRAM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ARGB,Gradient,ARGB routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ARGB,PollingFilling,Poll and interrupt mode drive ARGB,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,BKP,BKP,BKP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1434,6 +1448,9 @@ CH32X035,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-
 CH32X035,ADC,Auto_Injection,automatic injection mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,ADC,Discontinuous_mode,discontinuous mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,APPLICATION,WS2812_LED,Operating WS2812 via SPI\PWM Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,DMA,DMA_MEM2MEM,Memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,DMA,DMA_MEM2PERIP,"Memory to peripheral mode, and peripheral to memory mode routine, see peripheral sub-routines",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1558,6 +1575,9 @@ CH32X315,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation 
 CH32X315,APPLICATION,FATFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,FATFS/FATFS_SPI_FLASH,This example demonstrates SPI operation Winbond W25Qxx SPIFLASH with FATFS,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,WCHGUI,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,WCHGUI/WCH-GUI-FLASH,GUI FLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,APPLICATION,WCHGUI/WCH-GUI-LIVE,GUI LIVE,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ARGB,Gradient,ARGB routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,ARGB,PollingFilling,Poll and interrupt mode drive ARGB,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,BKP,BKP,,reference,evt:list-zh,CH32X3x5_List_EN.txt

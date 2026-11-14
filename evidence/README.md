@@ -665,8 +665,8 @@ Documented entries are `reference`; matching memory and AttachChip measurements
 from `curated/device-ids-measured.json` make a row `confirmed`, with
 `id_source=memory`. This verifies identity, not flash programming -- only rows with a ch32rv record of a matching erase, program and readback on that part (`flash_verified` in `curated/device-ids-measured.json`) say "flash programming verified" in `note` and add `flash:ch32rv(...)` to `basis` (2026-10-22: CH32M030G8R7 and CH32V407WEU6 over an OEP probe, 1-wire SWIO; the same record appears in the `basis` of the M030/V407 rows of `flash_program_method` as `measured:ch32rv(...)`).
 `dont_care_bits` remains `[7:4]`.
-98 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
-CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6, CH32V407KEU6 and CH32X035D8U6 (no ID in the EVT, or ambiguous because it gives several).
+99 of the 105 catalog parts have an ID; the missing parts are CH32M007K8U7,
+CH32V103C6T6, CH32V103C8U6, CH32V203C6U6, CH32V203F6P6 and CH32X035D8U6 (no ID in the EVT, or ambiguous because it gives several).
 **Keep one row per part.** The consumer ch32rv keys on the part number (a second row
 silently overwrites the first, and a chip reporting the other ID would be rejected);
 tell ch32rv before listing several IDs for one part (agreed 2026-10-14). No ID is inferred from a sibling package.
