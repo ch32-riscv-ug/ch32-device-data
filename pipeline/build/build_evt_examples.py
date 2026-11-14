@@ -3,8 +3,14 @@
 
 各EVTに同梱される目録（`EVT/<name>_List_EN.txt` と中国語版）は、例題ごとに
 1行の説明を持つツリーです。これを解析して「どの周辺にどんな例題があるか」を
-表にします。EVT展開ツリーの実ディレクトリも突き合わせ、**目録2版と実体の
-3つの根拠**で確度を決めます（実体＋どちらかの目録で確定）。
+表にします。EVT展開ツリーの実ディレクトリも突き合わせます。
+
+確度: **実体に在り、目録のどちらかにも載る**ものだけ confirmed。目録2版は同じ
+作り手の写しなので、2版の一致だけでは実在の裏付けにならない（2026-11-13 の改版で
+目録が実在しない `WUIGUI` や消えた `AIoCHub` を載せたまま両版一致していた）。
+目録にしか無い行と、実体にしか無い行は reference。実体の例題は `.wvproj` を持つ
+ディレクトリ（H417 のように `V3F`/`V5F` のコア別に分かれるときはその親）で、
+目録のどの項目でも覆われないものを `evt:tree` だけの行として足す。
 
 実行: uv run python pipeline/build/build_evt_examples.py [--out <dir>]
 """
@@ -34,6 +40,8 @@ FILE_LIKE = re.compile(r"\.[A-Za-z0-9]{1,4}(?:-[A-Za-z]{2})?$")
 # 中国語版だけが中国語名で書いている項目（英語版は別名、実体も無い）。
 # 表示値に中国語は載せられないので落とし、件数だけ報告する。
 CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
+# デュアルコアの例題はコアごとのプロジェクトに分かれる（H417: `GPIO_Toggle/V3F`）。
+CORE_DIR = re.compile(r"^V\d+F$", re.I)
 
 COLUMNS = ["family", "group", "example", "description", "confidence", "basis", "source"]
 
@@ -110,6 +118,30 @@ def disk_coverage(evt_dir, keys):
     return present, unlisted
 
 
+def tree_examples(evt_dir):
+    """実体の例題ディレクトリ（EXAM からの相対パス、実体の綴り）。
+
+    `.wvproj` のあるディレクトリをプロジェクトとし、コア別のディレクトリなら親を採る。
+    グループ（EXAM 直下）そのものがプロジェクトのものは例題に数えない。
+    """
+    exam = evt_dir / "EXAM"
+    found = set()
+    for proj in exam.rglob("*.wvproj"):
+        d = proj.parent
+        if CORE_DIR.match(d.name):
+            d = d.parent
+        rel = d.relative_to(exam).as_posix()
+        if "/" in rel and rel.split("/", 1)[0] not in NOT_EXAMPLE:
+            found.add(rel)
+    return found
+
+
+def covered(path, listed):
+    """実体のパスが目録の項目と同じか、その上か下にあるか（小文字で比べる）。"""
+    p = path.lower()
+    return any(p == k or p.startswith(k + "/") or k.startswith(p + "/") for k in listed)
+
+
 def main():
     # 他の生成器と同じく試験用の出力先を受ける。受けないと、抽出を変えて様子を
     # 見るのに正本を上書きするしか手が無い（`build_operating.py` で実際に事故った）。
@@ -165,10 +197,22 @@ def main():
             rows.append({
                 "family": repo.name, "group": group, "example": example,
                 "description": description,
-                "confidence": "confirmed" if len(evidence) >= 2 else "reference",
+                "confidence": "confirmed" if on_disk and len(evidence) >= 2 else "reference",
                 "basis": "+".join(evidence),
                 "source": lists.get("en", lists.get("zh", ("", {})))[0],
             })
+        # 目録に無い実体の例題。目録の項目に覆われる（同じ・上・下）ものは除く。
+        listed = {f"{g}/{e}".lower() for g, e in keys}
+        tree_only = sorted(p for p in tree_examples(evt) if not covered(p, listed))
+        for path in tree_only:
+            group, example = path.split("/", 1)
+            rows.append({
+                "family": repo.name, "group": group, "example": example,
+                "description": "", "confidence": "reference", "basis": "evt:tree",
+                "source": "",
+            })
+        if tree_only:
+            print(f"{repo.name}: 目録に無い実体の例題 {len(tree_only)} 件", file=sys.stderr)
 
     rows.sort(key=lambda r: (r["family"], r["group"], r["example"]))
     dest = paths.table("evt_examples", args.out)

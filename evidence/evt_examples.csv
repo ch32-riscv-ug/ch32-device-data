@@ -47,7 +47,8 @@ CH32H417,CPU,PFIC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.t
 CH32H417,CPU,PFIC/Interrupt_Nest,interrupt nested routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,PFIC/Interrupt_VTF,VTF IRQ interrupt routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CPU,PMP,Physical memory protection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,CPU,SYSTICK_Interrupt,Systick timer routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,CPU,SYSTICK/SYSTICK_Interrupt,,reference,evt:tree,
+CH32H417,CPU,SYSTICK_Interrupt,Systick timer routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,CRC,CRC_Calculation,CRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DAC,DAC_DMA,DAC DMA conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DAC,DAC_Exit_9_Trig,external trigger DAC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -67,7 +68,7 @@ CH32H417,DFSDM,DFSDM_SerialSPI,External serial input conversion routine,confirme
 CH32H417,DFSDM,DFSDM_Synchronous_Regular,Rule group synchronous conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DFSDM,DFSDM_TIMTrigger,Timer triggers the conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DMA,DoubleBuffer_DMA,Double Buffer mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DMA,TIM_DMA_SLEEP_MODE,DMA routine in sleep mode,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,DVP,DVP_LTDC,The routine demonstrates the image acquisition by a DVP interface camera and its real-time display on a TFTLCD through LTDC,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -101,11 +102,16 @@ CH32H417,FMC,LCD,FSMC operation TFTLCD routine,confirmed,evt:tree+evt:list-en+ev
 CH32H417,FMC,LCD_8bit,8-bit data bus LCD routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,FMC,NAND,FSMC operation NANDFFLASH routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,FMC,NORFLASH,FSMC operation NORFLASH routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,FMC,SDRAM,FSMC operates NOR_SRAM routine through DMA,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,FMC,SDRAM-16bit,FSMC operation 16bit_SDRAM routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,FMC,SDRAM-16bit_DMA,FSMC operates 16bit_SDRAM routine through DMA,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,FMC,SDRAM-32bit,FSMC operation 32bit_SDRAM routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,FMC,SDRAM-32bit_DMA,FSMC operates 32bit_SDRAM routine through DMA,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM,FSMC operates NOR_SRAM routine through DMA,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM-16bit,FSMC operation 16bit_SDRAM routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM-16bit_DMA,FSMC operates 16bit_SDRAM routine through DMA,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM-32bit,FSMC operation 32bit_SDRAM routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM-32bit_DMA,FSMC operates 32bit_SDRAM routine through DMA,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,FMC,SDRAM_16bit,,reference,evt:tree,
+CH32H417,FMC,SDRAM_16bit_DMA,,reference,evt:tree,
+CH32H417,FMC,SDRAM_32bit,,reference,evt:tree,
+CH32H417,FMC,SDRAM_32bit _DMA,,reference,evt:tree,
+CH32H417,FMC,SRAM,,reference,evt:tree,
 CH32H417,GPHA,GPHA_M2M_WithLCD,"The GPHA routine expands the color lookup table image, blends it with a solid color background, and finally displays it on the LCD",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,GPHA,GPHA_R2M,Comparison between GPHA solid color filling and software filling,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,GPIO,GPIO_Toggle,GPIO routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -129,21 +135,22 @@ CH32H417,LPTIM,PWM_OnePulse_SingleMode,"LPTIM output PWM, single pulse, once set
 CH32H417,LTDC,LTDC_Display,LTDC display routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,OPA,CMP,CMP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,OPA,OPA,OPA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,1-Wire,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,1-Wire/1-Wire,1 wire operate WS2812 and DS1820,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,1-Wire/Asm,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,1-Wire,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,1-Wire/1-Wire,1 wire operate WS2812 and DS1820,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,1-Wire/Asm,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_1_Wire,,reference,evt:tree,
 CH32H417,PIOC,PIOC_IIC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_IIC/Asm,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_IIC/Asm,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,PIOC_NEC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_NEC/Asm,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_NEC/Asm,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,PIOC_Single_Wire,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_Single_Wire/Asm,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_Single_Wire/Asm,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,PIOC_UART,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_UART/Asm,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_UART/Asm,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,Tool_Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,Tool_Manual/Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,PIOC,Tool_Manual/Tool,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -162,7 +169,8 @@ CH32H417,RCC,HSI_Calibration,HSI calibrate routine,confirmed,evt:tree+evt:list-e
 CH32H417,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,RNG,RNG,Random number generator routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,RTC,RTC_Calendar,Calendar routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,RTC,RTC_Calibration,RTC calibrate routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,RTC,RTC_Calibration,RTC calibrate routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32H417,SAI,SAI_Play,SAI audio routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SDIO,SDIO_SD,SDIO routine to operate SD card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,SDIO,SDIO_eMMC,SDIO routine to operate EMMC card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -197,8 +205,9 @@ CH32H417,TIM,TIM_Continuous,Timer continuous routine,confirmed,evt:tree+evt:list
 CH32H417,TIM,TIM_DMA,timer DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,TIM,TIM_INT,Timer interput mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,TKey,TKEYLIB,TouchKey Library,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,TKey,TKY_8keys,TouchKey 8Keys detection routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,TKey,TKY_8keys,TouchKey 8Keys detection routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,TKey,TKey,TouchKey Detection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,TKey,TKey_8keys,,reference,evt:tree,
 CH32H417,UHSIF,UHSIF_SLAVE,UHSIF communication routine.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_DMA_EXT,USART send and receive data through DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
@@ -207,53 +216,84 @@ CH32H417,USART,USART_HardwareFlowControl,"hardware flow control mode, master/sla
 CH32H417,USART,USART_Interrupt,"USART interrupt routine, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_MultiProcessorCommunication,multiprocessor communication mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USART,USART_Polling,"polling transceiver mode, master/slave transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USART,USART_Printf,USART Print debugging routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/CH372,Simulate custom USB devices (CH372 devices),confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/Compatibility_HID,Simulate HID devices and transmit data up and down through a serial port.,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keys, and simulate data that can be uploaded through serial port 4.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/CompositeKM_LowSpeed,Simulate a low-speed keyboard and mouse composite device.,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/MSC_CD-ROM,Simulating CDROM requires external installation of SPI Flash,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/MSC_U-Disk,"Simulate a simple USB flash drive, optional use of on-chip Flash or external SPI Flash",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 4 for transmitting and receiving,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 4 for transmission and reception, HID interrupt endpoint for data retrieval and reverse upload.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/Host_Udisk,USB host operation USB drive routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBFS/HOST/Udisk_Lib,USB file system library files,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/CH372,Simulate custom USB devices (CH372 devices),confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/Compatibility_HID,Simulate HID devices and transmit data up and down through a serial port.,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keys, and simulate data that can be uploaded through serial port 4.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/MSC_CD-ROM,Simulating CDROM requires external installation of SPI Flash,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/MSC_U-Disk,"Simulate a simple USB flash drive, optional use of on-chip Flash or external SPI Flash",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 4 for transmission and reception.,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 4 for transmission and reception, HID interrupt endpoint for data retrieval and reverse upload.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBHS/HOST/Udisk_Lib,USB file system library files,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/DEVICE/CH372Device,"Simulate custom USB devices (CH372 devices), with endpoint 1 downloading data and uploading it through endpoint 2, endpoint 2 downloading data and uploading it through endpoint 1, and endpoint 3 independently downloading and uploading data.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/DEVICE/UVC,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/HOST/HOST_SS_ACCESS_SECTOR,USBSS scanning routine,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/HOST/Host_SS_Hub_Access_Sector,"This routine demonstrates CH32H417 acting as a USB host, accessing and reading/writing U-disk sectors via an external USB HUB.",confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
-CH32H417,USB,USBSS/HOST/Host_SS_Hub_Udisk_Exams,This routine demonstrates how the CH32H417 can act as a USB host to control the udisk under the HUB (Support for file system).,confirmed,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USART,USART_Printf,USART Print debugging routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/CH372,Simulate custom USB devices (CH372 devices),reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/Compatibility_HID,Simulate HID devices and transmit data up and down through a serial port.,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keys, and simulate data that can be uploaded through serial port 4.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/CompositeKM_LowSpeed,Simulate a low-speed keyboard and mouse composite device.,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/MSC_CD-ROM,Simulating CDROM requires external installation of SPI Flash,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/MSC_U-Disk,"Simulate a simple USB flash drive, optional use of on-chip Flash or external SPI Flash",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 4 for transmitting and receiving,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 4 for transmission and reception, HID interrupt endpoint for data retrieval and reverse upload.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/Host_Udisk,USB host operation USB drive routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBFS/HOST/Udisk_Lib,USB file system library files,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/CH372,Simulate custom USB devices (CH372 devices),reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/Compatibility_HID,Simulate HID devices and transmit data up and down through a serial port.,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keys, and simulate data that can be uploaded through serial port 4.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/MSC_CD-ROM,Simulating CDROM requires external installation of SPI Flash,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/MSC_U-Disk,"Simulate a simple USB flash drive, optional use of on-chip Flash or external SPI Flash",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 4 for transmission and reception.,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 4 for transmission and reception, HID interrupt endpoint for data retrieval and reverse upload.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBHS/HOST/Udisk_Lib,USB file system library files,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/DEVICE/CH372Device,"Simulate custom USB devices (CH372 devices), with endpoint 1 downloading data and uploading it through endpoint 2, endpoint 2 downloading data and uploading it through endpoint 1, and endpoint 3 independently downloading and uploading data.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/DEVICE/UVC,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST,,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/HOST_SS_ACCESS_SECTOR,USBSS scanning routine,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/Host_SS_Hub_Access_Sector,"This routine demonstrates CH32H417 acting as a USB host, accessing and reading/writing U-disk sectors via an external USB HUB.",reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USB,USBSS/HOST/Host_SS_Hub_Udisk_Exams,This routine demonstrates how the CH32H417 can act as a USB host to control the udisk under the HUB (Support for file system).,reference,evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USBFS,DEVICE/CH372Device,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/CompatibilityHID,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/CompositeKM,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/CompositeKM_LowSpeed,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/MSC_CD-ROM,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/MSC_U-Disk,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/SimulateCDC,,reference,evt:tree,
+CH32H417,USBFS,DEVICE/SimulateCDC-HID,,reference,evt:tree,
+CH32H417,USBFS,HOST/HOST_IAP/APP,,reference,evt:tree,
+CH32H417,USBFS,HOST/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32H417,USBFS,HOST/HOST_MTP_FileSystem,,reference,evt:tree,
+CH32H417,USBFS,HOST/Host_KM,,reference,evt:tree,
+CH32H417,USBFS,HOST/Host_UDisk_Exams,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/CH372Device,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/CompatibilityHID,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/CompositeKM,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/MSC_CD-ROM,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/MSC_U-Disk,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/SimulateCDC,,reference,evt:tree,
+CH32H417,USBHS,DEVICE/SimulateCDC-HID,,reference,evt:tree,
+CH32H417,USBHS,HOST/HOST_IAP/APP,,reference,evt:tree,
+CH32H417,USBHS,HOST/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32H417,USBHS,HOST/Host_KM,,reference,evt:tree,
+CH32H417,USBHS,HOST/Host_UDisk_Exams,,reference,evt:tree,
+CH32H417,USBHS,HOST/MTP_FileSystem,,reference,evt:tree,
 CH32H417,USBPD,USBPD_SNK,PD SNK routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32H417,USBPD,USBPD_SRC,PD SRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
+CH32H417,USBSS,DEVICE/CH372Device,,reference,evt:tree,
+CH32H417,USBSS,DEVICE/UVC/UVC-DVP,,reference,evt:tree,
+CH32H417,USBSS,HOST/Host_SS_Access_Sector,,reference,evt:tree,
+CH32H417,USBSS,HOST/Host_SS_Hub_Access_Sector,,reference,evt:tree,
+CH32H417,USBSS,HOST/Host_SS_Hub_Udisk_Exams,,reference,evt:tree,
 CH32H417,WWDG,WWDG,Window Watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32H417_List_EN.txt
 CH32L103,ADC,ADC_DMA,ADC uses DMA sampling routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,ADC,ADC_FastConvert,ADC high frequency sampling low frequency calibration routines,confirmed,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,ADC,ADC_FastConvent,,reference,evt:tree,
+CH32L103,ADC,ADC_FastConvert,ADC high frequency sampling low frequency calibration routines,reference,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,ADC,ADC_PGA,ADC 4x gain sampling routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,ADC,Auto_Injection,automatic injection mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -270,8 +310,13 @@ CH32L103,CAN,CAN_Wakeup,CAN wake_up routine,confirmed,evt:tree+evt:list-en+evt:l
 CH32L103,CAN,Networking,"CAN routines: normal mode, standard frame and extended frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,CAN,TestMode,"test mode, including silent mode, loopback mode, loopback silent mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,CAN,Time-triggered,time-triggered communication mode,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,CRC,CRC_Calculation,,reference,evt:tree,
 CH32L103,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,EXTI,EXTI0,,reference,evt:tree,
+CH32L103,FLASH,FLASH_Program,,reference,evt:tree,
+CH32L103,GPIO,GPIO_Toggle,,reference,evt:tree,
+CH32L103,HarmonyOS,LiteOS_m,,reference,evt:tree,
 CH32L103,I2C,I2C_10bit_Mode,"10 bit address mode, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,I2C,I2C_7bit_Interrupt_Mode,Send/receive routines using interrupts,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,I2C,I2C_7bit_Mode,"7-bit address mode, master / slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -305,6 +350,7 @@ CH32L103,RCC,Get_CLK,get system-HCLK-HB1-HB2 clock routine,confirmed,evt:tree+ev
 CH32L103,RCC,HSI_Calibration,HSI calibrate routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,RCC,LSI_Calibration,LSI calibrate routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,RT-Thread,rt-thread,,reference,evt:tree,
 CH32L103,RunInRam_LP,RunInRAM_HSI_LP,The program runs in RAM to reduce the power consumption of routines.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,RunInRam_LP,RunInRAM_Select,Some programs run routines in RAM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,RunInRam_LP,RunInRAM_Select_Sleep,Some programs run and sleep routines in RAM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -318,6 +364,7 @@ CH32L103,SPI,SPI_DMA,"SPI uses DMA, master / slave mode transceiver routine",con
 CH32L103,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,SPI,SPI_SDCARD,SPI SD card FatFs routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,SYSTICK,SYSTICK_Interrupt,,reference,evt:tree,
 CH32L103,TIM,Clock_Select,clock source selection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,Encode,Timer encoder mode routines,reference,evt:list-en,CH32L103_List-EN.txt
@@ -332,11 +379,13 @@ CH32L103,TIM,Synchro_Timer,timer synchronization mode,confirmed,evt:tree+evt:lis
 CH32L103,TIM,TIM_DMA,the timer uses DMA routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TIM,TIM_INT,Timer interrupt routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TOUCHKEY,DOC_SCH_PCB,Schematic diagrams and instructions for use,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,TOUCHKEY,TKY,TouchKey: touchkey detection routine,confirmed,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,TOUCHKEY,TKY,TouchKey: touchkey detection routine,reference,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TOUCHKEY,TKYLIB,Touch Button Library,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,TOUCHKEY,TKey,,reference,evt:tree,
 CH32L103,TOUCHKEY,TKey_MulShield,TKey MulShield routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TOUCHKEY,Touch_EX001,Comprehensive demonstration of touch keys,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,TOUCHKEY,Touch_EX002,8 Key Touch Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,TencentOS,TencentOS,,reference,evt:tree,
 CH32L103,USART,USART_DMA,"USART uses DMA, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_DMA_EXT,USART send and receive data through DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USART,USART_HalfDuplex,"1-wire half duplex mode, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -350,8 +399,8 @@ CH32L103,USART,USART_SmartCard,Serial port smart card routine,confirmed,evt:tree
 CH32L103,USART,USART_SynchronousMode,"synchronous mode, master / slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
-CH32L103,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
+CH32L103,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USB,USBFS/DEVICE/CompositeKM_LowSpeed,Simulate low speed keyboard and mouse。,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
 CH32L103,USB,USBFS/DEVICE/MSC_CD-ROM,CDROM routine，requires external SPI-Flash,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32L103_List-EN.txt
@@ -378,7 +427,7 @@ CH32M030,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,conf
 CH32M030,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,Electric_Fan,motor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,Electric_Fan/DOC_SCH,Motor application schematic diagram and description,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
-CH32M030,APPLICATION,Electric_Fan/Electric_Fan,motor routine,confirmed,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,APPLICATION,Electric_Fan/Electric_Fan,motor routine,reference,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,PD,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,PD/Common,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,APPLICATION,PD/Common/DOC_SCH,Motor application schematic diagram and description,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
@@ -408,7 +457,9 @@ CH32M030,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripher
 CH32M030,EXTI,EXTI,External Interrupt Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,FLASH,FLASH_ECC,FLASH ECC Calibration Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,FreeRTOS,FreeRTOS,,reference,evt:tree,
 CH32M030,GPIO,GPIO_Toggle,GPIO routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,HarmonyOS,LiteOS_m,,reference,evt:tree,
 CH32M030,I2C,I2C_10bit_Mode,"10 bit address mode, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,I2C,I2C_7bit_Interrupt_Mode,Use interrupt to receive and send routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,I2C,I2C_7bit_Mode,"7-bit address mode, master / slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
@@ -428,14 +479,15 @@ CH32M030,PWR,Stop_Mode,"low power consumption, stop mode routine",confirmed,evt:
 CH32M030,RCC,GET_CLK,Get Clock Frequency Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,RCC,HSI_Calibration,HSI calibrate routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,RT-Thread,rt-thread,,reference,evt:tree,
 CH32M030,SDI_Printf,SDI_Printf,"debug interface SDI, virtual serial port.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SPI,1Lines_half-duplex,"single wire half duplex mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SPI,SPI_CRC,use CRC error check and master / slave mode transceiver routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SPI,SPI_DMA,"SPI uses DMA, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
-CH32M030,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,confirmed,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
-CH32M030,SPI,SPI_LCD,SPI interface operation FLASH  and LCD peripheral routines,confirmed,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,reference,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,SPI,SPI_LCD,SPI interface operation FLASH  and LCD peripheral routines,reference,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,SYSTICK,SYSTICK_Interrupt,Systick timer routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,TIM,ADC_Capture,Capture ADC Module Signal Edge Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,TIM,Bothedge_Capture,Double Edge Capture Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
@@ -455,6 +507,7 @@ CH32M030,TIM,Synchro_ExtTrigger,"slave mode routine, including reset mode, gatin
 CH32M030,TIM,Synchro_Timer,timer synchronization mode,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,TIM,TIM_DMA,the timer uses DMA routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,TIM,TIM_INT,Timer Interrupt Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,TencentOS,TencentOS,,reference,evt:tree,
 CH32M030,UART,UART_DMA,"UART uses DMA, master / slave mode transceiver routine",reference,evt:list-en,CH32M030_List_EN.txt
 CH32M030,UART,UART_HalfDuplex,"single wire half duplex mode, master / slave mode transceiver routine",reference,evt:list-en,CH32M030_List_EN.txt
 CH32M030,UART,UART_HardwareFlowControl,"hardware flow control mode, master / slave mode, transceiver routine",reference,evt:list-en,CH32M030_List_EN.txt
@@ -474,8 +527,8 @@ CH32M030,USART,USART_Polling,,confirmed,evt:tree+evt:list-zh,CH32M030_List_EN.tx
 CH32M030,USART,USART_Printf,,confirmed,evt:tree+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
-CH32M030,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5 is uploaded from endpoint 4,6 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
-CH32M030,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5 is uploaded from endpoint 4,6 and reversed.",reference,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
+CH32M030,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 1.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,USB,USBFS/DEVICE/CompositeKM_LowSpeed,"Simulate low speed keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 1.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
 CH32M030,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32M030_List_EN.txt
@@ -553,6 +606,8 @@ CH32V003,USART,USART_MultiProcessorCommunication,multiprocessor communication mo
 CH32V003,USART,USART_Polling,"polling transceiver mode, master/slave transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V003,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
+CH32V003,USART_IAP,CH32V003_APP,,reference,evt:tree,
+CH32V003,USART_IAP,CH32V003_IAP,,reference,evt:tree,
 CH32V003,WWDG,WWDG,window watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00x_List_EN.txt
 CH32V006,ADC,ADC_DMA,ADC DMA sampling routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
@@ -592,6 +647,8 @@ CH32V006,OPA,CMP_Poll,CMP OPA polling routine,confirmed,evt:tree+evt:list-en+evt
 CH32V006,OPA,OPA,OPA as the output routine of voltage follower,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,OPA,OPA_PGA,PGA routine of OPA,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,OPA,OPA_Poll,OPA polling routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,PWR,PVD_VoltageJudger,,reference,evt:tree,
+CH32V006,PWR,PVD_Wakeup,,reference,evt:tree,
 CH32V006,PWR,Sleep_Mode,"low power, sleep mode routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,PWR,Standby_Mode,"low power, standby mode routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,RCC,Get_CLK,Get system-HCLK-HB1-HB2 clock routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
@@ -616,9 +673,11 @@ CH32V006,TIM,SLTIM_DMA,Streamlining Timers DMA routine,confirmed,evt:tree+evt:li
 CH32V006,TIM,Synchro_ExtTrigger,"slave mode routine, including reset mode, gating mode and trigger mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,TIM,Synchro_Timer,timer synchronization mode,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,TIM,TIM_DMA,timer DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,TIM,TIM_INT,,reference,evt:tree,
 CH32V006,TOUCHKEY,DOC_SCH_PCB,Schematic diagrams and instructions for use,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,TOUCHKEY,TKEY,,reference,evt:tree,
 CH32V006,TOUCHKEY,TKYLIB,Touch Button Library,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,TOUCHKEY,TOUCHKEY,touchkey detection routine,confirmed,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,TOUCHKEY,TOUCHKEY,touchkey detection routine,reference,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,TOUCHKEY,Touch_EX001,Comprehensive demonstration of touch keys,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,TOUCHKEY,Touch_EX002,8 Key Touch Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
@@ -629,7 +688,9 @@ CH32V006,USART,USART_Interrupt,"USART interrupt routine, master/slave mode trans
 CH32V006,USART,USART_MultiProcessorCommunication,multiprocessor communication mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,USART,USART_Polling,"polling transceiver mode, master/slave transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V006,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
-CH32V006,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",reference,evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
+CH32V006,USART_IAP,CH32V00X_APP,,reference,evt:tree,
+CH32V006,USART_IAP,CH32V00X_IAP,,reference,evt:tree,
 CH32V006,WWDG,WWDG,window watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V00X_List_EN.txt
 CH32V103,ADC,ADC_DMA,ADC uses DMA sampling routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -640,16 +701,18 @@ CH32V103,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,
 CH32V103,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,ADC,Temperature_External_channel,Temperature-External channel Injection alternating inversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,APPLICATION,WS2812_LED,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,BKP,BKP,BKP routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,CRC,CRC_Calculation,CRC routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,EXTI,EXTI0,External Interrupt Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,FreeRTOS,FreeRTOS_Core,FreeRTOS migration routines,confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,FreeRTOS,FreeRTOS,,reference,evt:tree,
+CH32V103,FreeRTOS,FreeRTOS_Core,FreeRTOS migration routines,reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,GPIO,GPIO_Toggle,GPIO routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,HarmonyOS,LiteOS_m,HarmonyOS migration routine,confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,HarmonyOS,LiteOS_M_V103,,reference,evt:tree,
+CH32V103,HarmonyOS,LiteOS_m,HarmonyOS migration routine,reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,I2C,I2C_10bit_Mode,"10 bit address mode, master / slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,I2C,I2C_7bit_Interrupt_Mode,Use interrupt to receive and send routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,I2C,I2C_7bit_Mode,"7-bit address mode, master / slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -672,7 +735,9 @@ CH32V103,RCC,LSI_Calibration,,confirmed,evt:tree+evt:list-zh,CH32V103_List_EN.tx
 CH32V103,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,RT-Thread,RT_Thread_Core,RT-Thread migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,RTC,RTC_Calibrations,,reference,evt:tree,
+CH32V103,SDI_Printf,SDI_Printf,,reference,evt:tree,
 CH32V103,SPI,1Lines_half-duplex,"single wire half duplex mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master / slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -710,8 +775,8 @@ CH32V103,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt
 CH32V103,USART,USART_SynchronousMode,"synchronous mode, master / slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5 is uploaded from endpoint 4,6 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
-CH32V103,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5 is uploaded from endpoint 4,6 and reversed.",reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
+CH32V103,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,USB,USBFS/DEVICE/CompositeKM_LowSpeed,"Simulate low speed keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
 CH32V103,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V103_List_EN.txt
@@ -735,25 +800,34 @@ CH32V205,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,
 CH32V205,APPLICATION,CoreMark,CoreMark routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,APPLICATION,SoftUART,I/O port simulation serial port routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_ExternalFlash,,reference,evt:tree,
+CH32V205,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_Onflash,,reference,evt:tree,
+CH32V205,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO1,,reference,evt:tree,
+CH32V205,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO2,,reference,evt:tree,
 CH32V205,APPLICATION,WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,BKP,BKP,BKP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,CAN,Time-triggered,time triggered communication mode,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,CRC,CRC_Calculation,CRC routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,CRC,CRC,,reference,evt:tree,
+CH32V205,CRC,CRC_Calculation,CRC routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,DMA,DMA_MEM2PERIP,see each peripheral subroutine for memory to peripheral mode and peripheral to memory mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,DMA,DoubleBuffer_DMA,Double buffer DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,DMA,TIM_DMA_SLEEP_MODE,TIM_DMA in sleep mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,EXTI,EXTI,,reference,evt:tree,
 CH32V205,EXTI,EXTI0,,reference,evt:list-zh,CH32V205_List_EN.txt
 CH32V205,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,FSMC,LCD,FSMC routine to operate TFTLCD,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,FSMC,NANDFLASH,FSMC routine to operate NANDFLASH,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,FSMC,NORFLASH,FSMC routine to operate NORFLASH,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,FSMC,NAND,,reference,evt:tree,
+CH32V205,FSMC,NANDFLASH,FSMC routine to operate NANDFLASH,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,FSMC,NOR,,reference,evt:tree,
+CH32V205,FSMC,NORFLASH,FSMC routine to operate NORFLASH,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,FSMC,SRAM,FSMC routine to operate NOR_ SRAM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,FreeRTOS,FreeRTOS_Core,,reference,evt:tree,
 CH32V205,GPIO,GPIO_Toggle,GPIO routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,HarmonyOS,LiteOS_m,HarmonyOS migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,I2C,I2C_10bit_Mode,"10 bit address mode, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -768,24 +842,25 @@ CH32V205,INT,VectorInRAM,Interrupt routines for the interrupt vector table in RA
 CH32V205,IWDG,IWDG,Independent Watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,OPA,CMP,CMP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,OPA,CMP_OPA,OPA polling results to CMP routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,OPA,CMP_WakeUp,comparator wake-up routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,OPA,CMP_WakUp,,reference,evt:tree,
+CH32V205,OPA,CMP_WakeUp,comparator wake-up routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,OPA,OPA,OPA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,OPA,OPA_Poll,OPA polling routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,PIOC_1_Wire,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_1_Wire/1-Wire,1 wire operate WS2812 and DS1820,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_1_Wire/Ams,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_1_Wire/1-Wire,1 wire operate WS2812 and DS1820,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_1_Wire/Ams,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,PIOC_IIC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_IIC/Ams,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_IIC/Ams,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,PIOC_NEC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_NEC/Ams,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_NEC/Ams,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,PIOC_Single_Wire,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_Single_Wire/Ams,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_Single_Wire/Ams,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,PIOC_UART,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_UART/Ams,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_UART/Ams,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,Tool_Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,Tool_Manual/Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,PIOC,Tool_Manual/Tool,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -807,7 +882,8 @@ CH32V205,RCC,LSI_Calibration,LSI calibrate routine,confirmed,evt:tree+evt:list-e
 CH32V205,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,RT-Thread,RT_Thread_Core,RT-Thread migration routine,reference,evt:list-en,CH32V205_List_EN.txt
 CH32V205,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32V205,RTC,RTC_OutputCalibrateClock,RTC Output Calibrate Clock Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,RunInRam_LP,RunInRAM_HSI_LP,The program runs in RAM to reduce the power consumption of routines.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,RunInRam_LP,RunInRAM_Select,Some programs run routines in RAM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -836,10 +912,14 @@ CH32V205,TIM,Synchro_Timer,timer synchronization mode,confirmed,evt:tree+evt:lis
 CH32V205,TIM,TIM_Continuous,Timer continuous routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TIM,TIM_DMA,timer DMA routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TIM,TIM_INT,Timer interput mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,TOUCHKEY,TKEY_205_CS_EX001,Comprehensive demonstration routine of constant current source touch key,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,TOUCHKEY,TKEY_205_CT_EX001,Comprehensive demonstration routine of charge transfer touch key,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,TOUCHKEY,TKEY_205_CT_EX002,Charge transfer 8-key touch routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,TOUCHKEY,TKey,TouchKey Detection Routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,TKEY,TKEY,,reference,evt:tree,
+CH32V205,TKEY,TKEY_205_CS_EX002/TKEY_205_CS_EX002,,reference,evt:tree,
+CH32V205,TKEY,TKEY_205_CT_EX001/TKEY_205_CT_EX001,,reference,evt:tree,
+CH32V205,TKEY,TKEY_205_CT_EX002/TKEY_205_CT_EX002,,reference,evt:tree,
+CH32V205,TOUCHKEY,TKEY_205_CS_EX001,Comprehensive demonstration routine of constant current source touch key,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,TOUCHKEY,TKEY_205_CT_EX001,Comprehensive demonstration routine of charge transfer touch key,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,TOUCHKEY,TKEY_205_CT_EX002,Charge transfer 8-key touch routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,TOUCHKEY,TKey,TouchKey Detection Routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,TencentOS,TencentOS,TencentOS migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_DMA,"USART DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_DMA_EXT,USART send and receive data through DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
@@ -852,45 +932,71 @@ CH32V205,USART,USART_Polling,"polling transceiver mode, master/slave transceiver
 CH32V205,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_SmartCard,Serial port smart card routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/CompositeKM_LowSpeed,Simulate low speed keyboard and mouse,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/CompositeKM_LowSpeed,Simulate low speed keyboard and mouse,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USB,USBFS/HOST/HOST_IAP/APP,"APP used with HOST_IAP, the project has modified the starting location of the program, after compilation, you need to convert the file into a bin file and rename it to APP.bin",reference,evt:list-en,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/HOST_IAP/HOST_IAP,"The host U disk IAP routine based on the U disk read file routine finishing, read the file with the name bit APP.bin from the U disk, write it to the internal flash, check it and jump automatically.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/HOST_KM,"The host operates the keypad, gets the data of the endpoints uploaded by the keypad and prints it, supports U-port under level 1 hub",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/Host_Udisk,USB host operation USB disk routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/MTP_FileSystem,"Enumeration process of a USB host to a device that supports MTP and PTP protocols, supports MTP and PTP protocols, and reads its files",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBFS/HOST/Udisk_Lib,U disk file system library file,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/HOST_IAP/HOST_IAP,"The host U disk IAP routine based on the U disk read file routine finishing, read the file with the name bit APP.bin from the U disk, write it to the internal flash, check it and jump automatically.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/HOST_KM,"The host operates the keypad, gets the data of the endpoints uploaded by the keypad and prints it, supports U-port under level 1 hub",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/Host_Udisk,USB host operation USB disk routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/MTP_FileSystem,"Enumeration process of a USB host to a device that supports MTP and PTP protocols, supports MTP and PTP protocols, and reads its files",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBFS/HOST/Udisk_Lib,U disk file system library file,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USB,USBHS/HOST/HOST_IAP/APP,"APP used with HOST_IAP, the project has modified the starting location of the program, after compilation, you need to convert the file into a bin file and rename it to APP.bin",reference,evt:list-en,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"The host U disk IAP routine based on the U disk read file routine finishing, read the file with the name bit APP.bin from the U disk, write it to the internal flash, check it and jump automatically.",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST/HOST_KM,"The host operates the keypad, gets the data of the endpoints uploaded by the keypad and prints it, supports U-port under level 1 hub",confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"The host U disk IAP routine based on the U disk read file routine finishing, read the file with the name bit APP.bin from the U disk, write it to the internal flash, check it and jump automatically.",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST/HOST_KM,"The host operates the keypad, gets the data of the endpoints uploaded by the keypad and prints it, supports U-port under level 1 hub",reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USB,USBHS/HOST/HOST_MTP_FileSystem,"Enumeration process of a USB host to a device that supports MTP and PTP protocols, supports MTP and PTP protocols, and reads its files",reference,evt:list-en,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST/Host_Udisk,USB host operation USB disk routine,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST/Host_Udisk,USB host operation USB disk routine,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USB,USBHS/HOST/MTP_FileSystem,,reference,evt:list-zh,CH32V205_List_EN.txt
-CH32V205,USB,USBHS/HOST/Udisk_Lib,U disk file system library file,confirmed,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USB,USBHS/HOST/Udisk_Lib,U disk file system library file,reference,evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,USBFS,Device/CH372Device,,reference,evt:tree,
+CH32V205,USBFS,Device/CompatibilityHID,,reference,evt:tree,
+CH32V205,USBFS,Device/CompositeKM,,reference,evt:tree,
+CH32V205,USBFS,Device/CompositeKM_LowSpeed,,reference,evt:tree,
+CH32V205,USBFS,Device/MSC_CD-ROM,,reference,evt:tree,
+CH32V205,USBFS,Device/MSC_U-Disk,,reference,evt:tree,
+CH32V205,USBFS,Device/SimulateCDC,,reference,evt:tree,
+CH32V205,USBFS,Device/SimulateCDC-HID,,reference,evt:tree,
+CH32V205,USBFS,Host/HOST_IAP/APP,,reference,evt:tree,
+CH32V205,USBFS,Host/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32V205,USBFS,Host/HOST_KM,,reference,evt:tree,
+CH32V205,USBFS,Host/HOST_MTP_FileSystem,,reference,evt:tree,
+CH32V205,USBFS,Host/HOST_Udisk,,reference,evt:tree,
+CH32V205,USBHS,Device/CH372Device,,reference,evt:tree,
+CH32V205,USBHS,Device/CompatibilityHID,,reference,evt:tree,
+CH32V205,USBHS,Device/CompositeKM,,reference,evt:tree,
+CH32V205,USBHS,Device/MSC_CD-ROM,,reference,evt:tree,
+CH32V205,USBHS,Device/MSC_U-Disk,,reference,evt:tree,
+CH32V205,USBHS,Device/SimulateCDC,,reference,evt:tree,
+CH32V205,USBHS,Device/SimulateCDC-HID,,reference,evt:tree,
+CH32V205,USBHS,Host/HOST_IAP/APP,,reference,evt:tree,
+CH32V205,USBHS,Host/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32V205,USBHS,Host/HOST_KM,,reference,evt:tree,
+CH32V205,USBHS,Host/HOST_Udisk,,reference,evt:tree,
+CH32V205,USBHS,Host/MTP_FileSystem,,reference,evt:tree,
 CH32V205,USBPD,USBPD_SNK,PD SNK routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,USBPD,USBPD_SRC,PD SRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
 CH32V205,WWDG,WWDG,Window Watchdog Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V205_List_EN.txt
+CH32V205,rt-thread,rt-thread,,reference,evt:tree,
 CH32V20x,ADC,ADC_DMA,ADC DMA sampling routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ADC,Auto_Injection,automatic injection mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -908,14 +1014,18 @@ CH32V20x,ADC,Temperature_External_channel,Temperature External channel Injection
 CH32V20x,APPLICATION,CoreMark,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,CoreMark/CoreMark,"CoreMark routine under 168M（12M_HSE） system conditions——only applied to CH32V20x_D6,168M is only suitable for Commercial Grade applications: 0℃ ≤ TA ≤ 70℃ with good heat dissipation",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,Electric_Hair_Dryer,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,Electric_Hair_Dryer/Electric_Hair_Dryer,Electric_Hair_Dryer routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,Electric_Hair_Dryer/Electric_Hair_Dryer,Electric_Hair_Dryer routine,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,USBPD,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,APPLICATION,USBPD/I2C_OP_CH223,"I2C Operates CH223 routine, only applied to CH32V20x_D8",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_ExternalFlash,,reference,evt:tree,
+CH32V20x,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_Onflash,,reference,evt:tree,
+CH32V20x,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO1,,reference,evt:tree,
+CH32V20x,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO2,,reference,evt:tree,
 CH32V20x,APPLICATION,WS2812_LED,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI,,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BKP,BKP,BKP routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,BLE Certification,Product: WCH CH32V208 QDID: 179771,reference,evt:list-en,CH32V20x_List_EN.txt
 CH32V20x,BLE,BLE_UART,"BLE and UART transparent transmission routine, for detailed instructions, please refer to the <description.txt> document in the root directory",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -926,7 +1036,8 @@ CH32V20x,BLE,Broadcaster,"broadcaster routine, always broadcast when in broadcas
 CH32V20x,BLE,CentPeri,"central-peripheral routine, integrate the function of central routine and peripheral routine and run simultaneously",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,Central,"central routine, actively scan surrounding devices, conect to the specified peripheral address, search custom service and characteristic, execute read/write commands, peripheral routine is needed, and modify the peripheral address to the routine target address, (84:C2:E4:03:02:02) by default",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,CyclingSensor,"cycling sensor routine, upload speed and cadence regularly after connected to the host",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,BLE,DirectTest,"direct test routine, test data packets sent by specified communication channel",confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,DirectTest,"direct test routine, test data packets sent by specified communication channel",reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,BLE,Direct_Test_Mode,,reference,evt:tree,
 CH32V20x,BLE,HAL,Hardware-related files shared by routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,HID_Consumer,"BLE consumer routine, simulate user control device, upload volume key down key regularly after connected to the central",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,BLE,HID_Keyboard,"BLE keyboard routine, simulate a keyboard device, upload key value regularly after connected to the central",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -982,6 +1093,7 @@ CH32V20x,ETH,ETH_CFG,"ETH_CFG routine. Create a UDP Server to communicate with u
 CH32V20x,ETH,ETH_IAP,ETH IAP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ETH,ETH_UART,"ETH_UART routine, to demonstrate data transparent transfer between Ethernet and UART. By default, the 1000000 baud rate (can be modified in bsp_uart.h) is selected for serial port data transmission",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ETH,IPRaw_PING,PING function demonstration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,ETH,MAC_RAW,,reference,evt:tree,
 CH32V20x,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ETH,Mail,to demonstrate reception and transmission of SMTP and POP3 mails,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,ETH,NetLib,Network protocol stack library file,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1014,15 +1126,18 @@ CH32V20x,PWR,Standby_RAM_Application,RAM data holding in standby mode Routine,co
 CH32V20x,PWR,Standby_RAM_LV_Mode,"when LV is enabled in standby mode, RAM 2k and 30K low-power data holding routines",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,PWR,Standby_RAM_Mode,"when LV is not enabled in standby mode, RAM 2k and 30K low-power data holding routines",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,PWR,Stop_Mode,"low power, stop mode routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,PWR,Stop_Mode_RTC_Wakeup,RTC wakeup Stop mode routines,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,PWR,Stop_Mode_RTC_Wakeup,RTC wakeup Stop mode routines,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,PWR,Stop_Mode_RtcWakeUp,,reference,evt:tree,
 CH32V20x,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,RCC,HSE_CLK,HSE frequency check routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,RCC,HSI_Calibration,HSI calibrate routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,RCC,HSI_PLL_Source,HSI or HSI/2 as PLL input clock routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,RT-Thread,RT_Thread_Core,RT-Thread migration routine,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,RT-Thread,RT_Thread_Core,RT-Thread migration routine,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,RT-Thread,rt-thread,,reference,evt:tree,
 CH32V20x,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32V20x,SDI_Printf,SDI_Printf,"debug interface SDI, virtual serial port.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,SPI,1Lines_half-duplex,"single wire half duplex mode, master/slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master/slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1062,7 +1177,7 @@ CH32V20x,USART,USART_SmartCard,USART_SmartCard routines,confirmed,evt:tree+evt:l
 CH32V20x,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBD,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBD/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,USB,USBD/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,USB,USBD/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBD/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBD/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBD/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1070,8 +1185,8 @@ CH32V20x,USB,USBD/SimulateCDC,Simulate a CDC serial port and use serial port 2 t
 CH32V20x,USB,USBD/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
-CH32V20x,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
+CH32V20x,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
 CH32V20x,USB,USBFS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V20x_List_EN.txt
@@ -1099,11 +1214,15 @@ CH32V307,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,conf
 CH32V307,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ADC,Temperature_External_channel,Temperature-External channel Injection alternating inversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_ExternalFlash,,reference,evt:tree,
+CH32V307,APPLICATION,WCHGUI/WCH-GUI-FLASH/GUI_Onflash,,reference,evt:tree,
+CH32V307,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO1,,reference,evt:tree,
+CH32V307,APPLICATION,WCHGUI/WCH-GUI-LIVE/DEMO2,,reference,evt:tree,
 CH32V307,APPLICATION,WS2812_LED,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,APPLICATION,WUIGUI,,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WS2812_LED/WS2812_LED,SPI\PWM Operates WS2812_LED routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI,,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI/WUI-GUI-FLASH,WUI-GUI-FLASH routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,APPLICATION,WUIGUI/WUI-GUI-LIVE,WUI-GUI-LIVE routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,BKP,BKP,BKP routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,CAN,Networking,"CAN routine: normal mode, standard frame and expanded frame data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,CAN,TestMode,"test mode, including silent mode, loopback mode and loopback silent mode",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1133,6 +1252,7 @@ CH32V307,ETH,IPRaw_PING,"IP_RAW routine, to demonstrate that the TCP client rece
 CH32V307,ETH,IoCHub,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ETH,IoCHub/IoCHub_Demo,"IoCHub basic routines, using AT commands to implement IoCHub's basic function demonstration on MCU",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ETH,IoCHub/Lib,IoCHub library file,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,ETH,MAC_RAW,,reference,evt:tree,
 CH32V307,ETH,MQTT,"MQTT routine, to demonstrate MQTT protocol communication based on TCP/IP",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ETH,Mail,"mail routine, to demonstrate reception and transmission of SMTP and POP3 mails",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,ETH,NetLib,Network protocol stack library file,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1161,12 +1281,15 @@ CH32V307,I2C,I2C_PEC,"PEC error check, master/slave mode transceiver routine",co
 CH32V307,I2S,HostRx_SlaveTx,I2S master receiver slave transmitter routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,I2S,I2S_DMA,I2S master transmitter slave receiver DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,I2S,I2S_Interupt,I2S master transmitter slave receiver interrupt routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,IAP,USB+UART,USB+UART IAP routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,IAP,USB+UART,USB+UART IAP routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,IAP,USB_UART/CHV30x_APP,,reference,evt:tree,
+CH32V307,IAP,USB_UART/CHV30x_IAP,,reference,evt:tree,
 CH32V307,INT,Interrupt_Nest,interrupt nested routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,INT,Interrupt_VTF,VTF IRQ interrupt routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,INT,VectorInRAM,Vector in RAM routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,IWDG,IWDG,Independent Watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,OPA,OPA_Voltage_Follower,OPA4 as voltage follower output routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,OPA,OPA,,reference,evt:tree,
+CH32V307,OPA,OPA_Voltage_Follower,OPA4 as voltage follower output routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,PMP,PMP,Physical memory protection Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,PWR,CH32V317_LP_Mode,CH32V317 low power Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,PWR,PVD_VoltageJudger,PVD voltage Judger Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1184,9 +1307,11 @@ CH32V307,RCC,HSI_PLL_Source,HSI or HSI/2 as PLL input clock routine,confirmed,ev
 CH32V307,RCC,LSI_Calibration,LSI calibrate routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,RNG,RNG,：Random number generator routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,RT-Thread,RT_Thread_Core,RT-Thread migration routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,RT-Thread,RT_Thread_Core,RT-Thread migration routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,RT-Thread,rt-thread,,reference,evt:tree,
 CH32V307,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32V307,SDIO,SDIO_EMMC,SDIO routine to operate eMMC card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,SDIO,SDIO_Mode,SDIO Host/Slave mode transceiver routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,SDIO,SDIO_SD,SDIO routine to operate SD card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1229,9 +1354,9 @@ CH32V307,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt
 CH32V307,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBFS/DEVICE/CH372_Double_Buffering,Demonstrates USB double buffering and provides 372 device speed test routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBFS/DEVICE/CH372_Double_Buffering,Demonstrates USB double buffering and provides 372 device speed test routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBFS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBFS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1248,17 +1373,17 @@ CH32V307,USB,USBFS/Host_Udisk,USB host operation USB disk routine,confirmed,evt:
 CH32V307,USB,USBFS/Udisk_Lib,U disk file system library file,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/CH372_Double_Buffering,Demonstrates USB double buffering and provides 372 device speed test routine,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/CH372_Double_Buffering,Demonstrates USB double buffering and provides 372 device speed test routine,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/USB_ECM-NetWorkAdaptor,USB ECM routines,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/USB_NCM-NetWorkAdaptor,USB NCM routines,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
-CH32V307,USB,USBHS/DEVICE/USB_RNDIS-NetWorkAdaptor,USB RNDIS routines,confirmed,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/USB_ECM-NetWorkAdaptor,USB ECM routines,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/USB_NCM-NetWorkAdaptor,USB NCM routines,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
+CH32V307,USB,USBHS/DEVICE/USB_RNDIS-NetWorkAdaptor,USB RNDIS routines,reference,evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/HOST_IAP,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/HOST_IAP/APP,"APP used with HOST_IAP, the project has modified the starting location of the program, after compilation, you need to convert the file into a bin file and rename it to APP.bin",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
 CH32V307,USB,USBHS/HOST_IAP/HOST_IAP,"The host U disk IAP routine based on the U disk read file routine finishing, read the file with the name bit APP.bin from the U disk, write it to the internal flash, check it and jump automatically.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V30x_List_EN.txt
@@ -1281,7 +1406,7 @@ CH32V407,ADC,DualADC_SlowInterleaved,dual ADC slow interleaved sampling routine,
 CH32V407,ADC,ExtLines_Trigger,external lines trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,Internal_Temperature,internal temperature sensor routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ADC,TIM_Trigger,TIM trigger ADC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,APPLICATION,AIoCHub,AIoCHub cloud platform application,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,CherryUSB,CherryUSB repository address and introduction,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,EEPROM_Emulation,The routine demonstrates flash simulation of EEPROM,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,APPLICATION,FATFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1308,14 +1433,15 @@ CH32V407,CPU,OS/HarmonyOS,HarmonyOS migration routine,confirmed,evt:tree+evt:lis
 CH32V407,CPU,OS/TencentOS,TencentOS migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,CPU,OS/rt-thread,RT-Thread migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,CPU,PMP,Physical memory protection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,CPU,SYSTICK_Interrupt,Systick timer routine,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,CPU,SYSTICK/SYSTICK_Interrupt,,reference,evt:tree,
+CH32V407,CPU,SYSTICK_Interrupt,Systick timer routine,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,CRC,CRC_Calculation,CRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DAC_DMA,DAC DMA conversion routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DAC_Exit_9_Trig,external trigger DAC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DAC_Noise_Generation,noise waveform generation routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DAC_Normal_OUT,normal output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DAC_Timer_Trig,timer trigger DAC conversion routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,DAC,DAC_Triangle_Generation,triangular waveform generation routine,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,DAC,DAC_Triangle_Generation,triangular waveform generation routine,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DualDAC_SineWave,dual DAC output sine wave routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DAC,DualDAC_Triangle,dual DAC output triangular wave routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1341,7 +1467,8 @@ CH32V407,ETH,TcpServer,demonstration routine that TCP server receives data after
 CH32V407,ETH,UdpClient,demonstration routine that Udp Client receives data and returns data,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,UdpServer,demonstration routine that Udp Server receives data and returns data,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,ETH,WebServer,"Web Server routine, to demonstrate the configuration of WCHNET device functions through Web browser. As the WCHNET devices have built-in web server, the network parameter configuration and password management of WCHNET can be implemented on the web page.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,EXTI,EXTI0,External Interrupt Routine,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,EXTI,EXTI,,reference,evt:tree,
+CH32V407,EXTI,EXTI0,External Interrupt Routine,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,FSMC,LCD,FSMC routine to operate TFTLCD,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,FSMC,NANDFLASH,FSMC routine to operate NANDFLASH,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1357,7 +1484,9 @@ CH32V407,I2C,I2C_PEC,"PEC error check, master/slave mode transceiver routine",co
 CH32V407,I2S,HostRx_SlaveTx,I2S master receiver slave transmitter routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,I2S,I2S_DMA,I2S master transmitter slave receiver DMA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,I3C,I3C_DMA_Controller,I3C master routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,IAP,USB+UART,USB+UART IAP routine,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,IAP,USB+UART,USB+UART IAP routine,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,IAP,USB_UART/CH32V407_APP,,reference,evt:tree,
+CH32V407,IAP,USB_UART/CH32V407_IAP,,reference,evt:tree,
 CH32V407,INT,Interrupt_VTF,VTF IRQ interrupt routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,IWDG,IWDG,Independent Watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,LTDC,LTDC_Display,LTDC display routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1378,7 +1507,8 @@ CH32V407,RCC,LSI_Calibration,LSI calibrate routine,confirmed,evt:tree+evt:list-e
 CH32V407,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RNG,RNG,Random number generator routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32V407,SDIO,SDIO_EMMC,SDIO routine to operate eMMC card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SDIO,SDIO_SD,SDIO routine to operate SD card,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SDI_Printf,SDI_Printf,"debug interface SDI, virtual serial port.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1389,7 +1519,7 @@ CH32V407,SPI,SPI_CRC,CRC error check and master/slave mode transceiver routine,c
 CH32V407,SPI,SPI_DMA,"SPI uses DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_DMA_EXT,SPI Master and Slave use DMA full-duplex transmission and reception routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,SPI,SPI_LCD,SPI interface operation FLASH  and LCD peripheral routines,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,SPI,SPI_LCD,SPI interface operation FLASH  and LCD peripheral routines,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SPI,SPI_SDCARD,SPI SD card FatFs routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,SYSTICK,SYSTICK_Interrupt,Systick timer routine,reference,evt:list-en,CH32V4x7_List_EN.txt
 CH32V407,TIM,Clock_Select,clock source selection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
@@ -1418,30 +1548,48 @@ CH32V407,USART,USART_MultiProcessorCommunication,multiprocessor communication mo
 CH32V407,USART,USART_Polling,"polling transceiver mode, master/slave transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32V407,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/USB_ECM-NetWorkAdaptor,USB ECM routines,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/USB_NCM-NetWorkAdaptor,USB NCM routines,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE/USB_RNDIS-NetWorkAdaptor,USB RNDIS routines,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE_Host,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/DEVICE_Host/Device_Host_DataTrans,"USB HS keyboard passthrough and macro demo supporting dual USB Host/Device switching, sleep-wakeup, and key expansion functions",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/Dual_device,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/Dual_device/cdc_transfer,Dual USB port CDC transmission,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/Dual_device/rndis_transfer,Dual USB port RNDIS transmission,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
-CH32V407,USB,USBHS/HOST/Udisk_Lib,USB file system library files,confirmed,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/USB_ECM-NetWorkAdaptor,USB ECM routines,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/USB_NCM-NetWorkAdaptor,USB NCM routines,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE/USB_RNDIS-NetWorkAdaptor,USB RNDIS routines,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE_Host,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/DEVICE_Host/Device_Host_DataTrans,"USB HS keyboard passthrough and macro demo supporting dual USB Host/Device switching, sleep-wakeup, and key expansion functions",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/Dual_device,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/Dual_device/cdc_transfer,Dual USB port CDC transmission,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/Dual_device/rndis_transfer,Dual USB port RNDIS transmission,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USB,USBHS/HOST/Udisk_Lib,USB file system library files,reference,evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
+CH32V407,USBHS,Device/CH372Device,,reference,evt:tree,
+CH32V407,USBHS,Device/CompatibilityHID,,reference,evt:tree,
+CH32V407,USBHS,Device/CompositeKM,,reference,evt:tree,
+CH32V407,USBHS,Device/MSC_CD-ROM,,reference,evt:tree,
+CH32V407,USBHS,Device/MSC_U-Disk,,reference,evt:tree,
+CH32V407,USBHS,Device/SimulateCDC,,reference,evt:tree,
+CH32V407,USBHS,Device/SimulateCDC-HID,,reference,evt:tree,
+CH32V407,USBHS,Device/USB_ECM_NetWorkAdaptor,,reference,evt:tree,
+CH32V407,USBHS,Device/USB_NCM_NetWorkAdaptor,,reference,evt:tree,
+CH32V407,USBHS,Device/USB_RNDIS_NetWorkAdaptor,,reference,evt:tree,
+CH32V407,USBHS,Device_Host/Device_Host_DataTrans,,reference,evt:tree,
+CH32V407,USBHS,Dual_device/cdc_transfer,,reference,evt:tree,
+CH32V407,USBHS,Dual_device/rndis_transfer,,reference,evt:tree,
+CH32V407,USBHS,Host/HOST_IAP/APP,,reference,evt:tree,
+CH32V407,USBHS,Host/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32V407,USBHS,Host/HOST_KM,,reference,evt:tree,
+CH32V407,USBHS,Host/HOST_Udisk,,reference,evt:tree,
+CH32V407,USBHS,Host/MTP_FileSystem,,reference,evt:tree,
 CH32V407,WWDG,WWDG,Window Watchdog Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32V4x7_List_EN.txt
 CH32X035,ADC,ADC_DMA,ADC DMA sampling routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,ADC,AnalogWatchdog,analog watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1477,21 +1625,22 @@ CH32X035,OPA,OPA_IRQ,OPA interrupt routine,confirmed,evt:tree+evt:list-en+evt:li
 CH32X035,OPA,OPA_PGA,OPA PGA routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,OPA,OPA_Poll,OPA Poll routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,OPA,OPA_Reset,OPA Reset routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,1-Wire,,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,1-Wire/1-Wire,1 wire operate WS2812 and DS1820,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,1-Wire/Asm,,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,1-Wire,,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,1-Wire/1-Wire,1 wire operate WS2812 and DS1820,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,1-Wire/Asm,,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,1_Wire,,reference,evt:tree,
 CH32X035,PIOC,PIOC_IIC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_IIC/Asm,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,PIOC_IIC/PIOC_IIC,PIOC simulates IIC,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_NEC,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_NEC/Asm,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,PIOC_NEC/PIOC_NEC,PIOC Infrared Remote Control Routine,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_Single_Wire,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_Single_Wire/Asm,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,PIOC_Single_Wire/PIOC_Single_Wire,Single-wire debug interface to read and write external chip RAM data,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,PIOC_UART,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,PIOC_UART/Asm,,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,PIOC_UART/Asm,,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,PIOC,PIOC_UART/PIOC_UART,PIOC simulates UART,reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,Tool_Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,Tool_Manual/Manual,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,PIOC,Tool_Manual/Tool,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1503,6 +1652,7 @@ CH32X035,PWR,Standby_Mode,"low power, standby mode routine",confirmed,evt:tree+e
 CH32X035,PWR,Stop_Mode,"low power, stop mode routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,RT-Thread,rt-thread,,reference,evt:tree,
 CH32X035,RT-Thread,rt_thread,,reference,evt:list-zh,CH32X035_List_EN.txt
 CH32X035,RT-Thread,rt_thread_Core,RT-Thread migration routine,reference,evt:list-en,CH32X035_List_EN.txt
 CH32X035,RunInRam,RunInRAM_Select,Some programs run routines in RAM.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1513,6 +1663,7 @@ CH32X035,SPI,FullDuplex_HardNSS,"Hardware NSS mode, master/slave mode, data tran
 CH32X035,SPI,SPI_CRC,CRC error check and master/slave mode transceiver routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,SPI,SPI_DMA,"SPI DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,SPI,SPI_FLASH,SPI interface operation flash peripheral routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,SYSTICK,SYSTICK_Interrupt,,reference,evt:tree,
 CH32X035,TIM,Clock_Select,clock source selection routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,TIM,ComplementaryOutput_DeadTime,complementary output and deadband insertion mode routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,TIM,Encode,Timer encoder mode routines,reference,evt:list-en,CH32X035_List_EN.txt
@@ -1540,8 +1691,8 @@ CH32X035,USART,USART_SmartCard,Serial port smart card routine,confirmed,evt:tree
 CH32X035,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/DEVICE,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5  is uploaded from endpoint 4, 6 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
-CH32X035,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,USB,USBFS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3, 5 down and 2, 4, 6 up. Data down from endpoint 1 is uploaded from endpoint 2 and not reversed, and data down from endpoint 3, 5  is uploaded from endpoint 4, 6 and reversed.",reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
+CH32X035,USB,USBFS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/DEVICE/CompositeKM_LowSpeed,"Simulate low speed keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
 CH32X035,USB,USBFS/DEVICE/MSC_U-Disk,Simulate a USB flash drive function.,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X035_List_EN.txt
@@ -1586,14 +1737,16 @@ CH32X315,CPU,INT,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.tx
 CH32X315,CPU,INT/Interrupt_VTF,VTF IRQ interrupt routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,CPU,OS,,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,CPU,OS/FreeRTOS,FreeRTOS migration routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,CPU,OS/HarmonyOS,HarmonyOS migration routine,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,CPU,OS/HarmonyOS,HarmonyOS migration routine,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,CPU,OS/TencentOS,TencentOS migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,CPU,OS/rt-thread,RT-Thread migration routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,CPU,SYSTICK_Interrupt,Systick timer routine,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,CPU,SYSTICK/SYSTICK_Interrupt,,reference,evt:tree,
+CH32X315,CPU,SYSTICK_Interrupt,Systick timer routine,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,CRC,CRC_Calculation,CRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,DMA,DMA_MEM2MEM,memory to memory mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,DMA,DoubleBuffer_DMA,Double Buffer mode routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,EXTI,EXTI0,External Interrupt Routine,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,EXTI,EXTI,,reference,evt:tree,
+CH32X315,EXTI,EXTI0,External Interrupt Routine,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,FLASH,FLASH_Program,"FLASH erase/read/write, and fast programming",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,GPIO,GPIO_Toggle,GPIO routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,I2C,I2C_10bit_Mode,"10 bit address mode, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1602,7 +1755,9 @@ CH32X315,I2C,I2C_7bit_Mode,"7-bit address mode, master/slave mode, transceiver r
 CH32X315,I2C,I2C_DMA,"I2C DMA, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,I2C,I2C_EEPROM,I2C interface routine to operate EEPROM peripheral,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,I2C,I2C_PEC,"PEC error check, master/slave mode transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,IAP,USB+UART,USB+UART IAP routine,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,IAP,USB+UART,USB+UART IAP routine,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,IAP,USB_UART/CH32X315_APP,,reference,evt:tree,
+CH32X315,IAP,USB_UART/CH32X315_IAP,,reference,evt:tree,
 CH32X315,IWDG,IWDG,Independent Watchdog routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,PWR,PVD_VoltageJudger,PVD voltage Judger Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,PWR,PVD_Wakeup,STOP mode PVD wakeup MCU Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1613,7 +1768,8 @@ CH32X315,PWR,VDD12_ExternPower,VDD 1.2V external power supply routine,confirmed,
 CH32X315,RCC,Get_CLK,Get system-HCLK-AHB1-AHB2 clock routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,RCC,MCO,MCO pin clock output routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,RTC,RTC_Calendar,Calendar Routines,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,RTC,RTC_Calibration,RTC calibrate Routines,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,RTC,RTC_Calibration,RTC calibrate Routines,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,RTC,RTC_Calibrations,,reference,evt:tree,
 CH32X315,SDI_Printf,SDI_Printf,"debug interface SDI, virtual serial port.",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SPI,1Lines_half-duplex,"single wire half duplex mode, master/slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,SPI,2Lines_FullDuplex,"two-wire full duplex mode, master/slave mode, data transceiver",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
@@ -1646,25 +1802,38 @@ CH32X315,USART,USART_MultiProcessorCommunication,multiprocessor communication mo
 CH32X315,USART,USART_Polling,"polling transceiver mode, master/slave transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_Printf,USART Print debugging routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USART,USART_SynchronousMode,"synchronous mode, master/slave mode, transceiver routine",confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/HOST_IAP,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBHS/HOST/Udisk_Lib,USB file system library files,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBSS,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBSS/DEVICE,,confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
-CH32X315,USB,USBSS/DEVICE/CH372Device,"Simulate custom USB devices (CH372 devices), with endpoint 1 downloading data and uploading it through endpoint 2, endpoint 2 downloading data and uploading it through endpoint 1, and endpoint 3 independently downloading and uploading data.",confirmed,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/CH372,"Simulates a custom USB device (CH372 device) with endpoints 1, 3 down and 2, 4 up. Data down from endpoint 1 is uploaded from endpoint 3 and not reversed, and data down from endpoint 2 is uploaded from endpoint 4 and reversed.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/Compatibility_HID,"Simulates HID devices, with data transmitted up and down through the serial port.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/CompositeKM,"Simulate keyboard and mouse, use IO to simulate keystrokes, while simulated data can be uploaded through serial port 2.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/MSC_CD-ROM,"Simulate CDROM, need external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/MSC_U-Disk,"Smulates a simple USB flash drive, optionally using on-chip Flash or external SPI-Flash",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/SimulateCDC,Simulate a CDC serial port and use serial port 2 to send and receive.,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/DEVICE/SimulateCDC-HID,"Simulate a CDC serial port, use serial port 2 to send and receive, HID interrupt endpoints to send and receive data to reverse and upload.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/HOST_IAP,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/HOST_IAP/HOST_IAP,"A host U-disk IAP routine organized based on the U-disk read file routine, reads a file named APP.bin from the U-disk, writes it to internal flash, and automatically jumps after verification.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/HOST_KM,"Host operation keyboard and mouse, retrieve the endpoint data uploaded by the keyboard and mouse, and print it. Supports level 1 hub under USBFS port",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/Host_Udisk,USB host operation USB drive routine,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/MTP_FileSystem,"List the process from a USB host to a device that supports MTP and PTP protocols, and read its files",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBHS/HOST/Udisk_Lib,USB file system library files,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBSS,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBSS/DEVICE,,reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USB,USBSS/DEVICE/CH372Device,"Simulate custom USB devices (CH372 devices), with endpoint 1 downloading data and uploading it through endpoint 2, endpoint 2 downloading data and uploading it through endpoint 1, and endpoint 3 independently downloading and uploading data.",reference,evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USBHS,Device/CH372Device,,reference,evt:tree,
+CH32X315,USBHS,Device/CompatibilityHID,,reference,evt:tree,
+CH32X315,USBHS,Device/CompositeKM,,reference,evt:tree,
+CH32X315,USBHS,Device/MSC_CD-ROM,,reference,evt:tree,
+CH32X315,USBHS,Device/MSC_U-Disk,,reference,evt:tree,
+CH32X315,USBHS,Device/SimulateCDC,,reference,evt:tree,
+CH32X315,USBHS,Device/SimulateCDC-HID,,reference,evt:tree,
+CH32X315,USBHS,Host/HOST_IAP/APP,,reference,evt:tree,
+CH32X315,USBHS,Host/HOST_IAP/HOST_IAP,,reference,evt:tree,
+CH32X315,USBHS,Host/HOST_KM,,reference,evt:tree,
+CH32X315,USBHS,Host/HOST_Udisk,,reference,evt:tree,
+CH32X315,USBHS,Host/MTP_FileSystem,,reference,evt:tree,
 CH32X315,USBPD,USBPD_SNK,PD SNK routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
 CH32X315,USBPD,USBPD_SRC,PD SRC routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt
+CH32X315,USBSS,DEVICE/CH372Device,,reference,evt:tree,
 CH32X315,WWDG,WWDG,Window Watchdog Routine,confirmed,evt:tree+evt:list-en+evt:list-zh,CH32X3x5_List_EN.txt

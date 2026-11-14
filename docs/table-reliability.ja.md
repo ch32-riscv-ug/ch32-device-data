@@ -100,7 +100,7 @@
 | evt_variants | 57 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
 | clock_configs 他 clock_* 5表 | 2,625 | reference（symbols に conflict 5） | 相互結合・macro・clock_init の function が設定に在り step が関数ごとの連番 | V003 の trim 未出力（既知）。clock_init は 2026-10-27 から各クロック設定の関数の手順も EVT の順で写す（103→1,649行。ArduinoCore-CH32RV の依頼）。F-39 は**修正済み**（V307 の #if 分岐を condition へ・V006 の RMW 手順を採取） | 🔵 |
-| evt_examples | 1,669 | confirmed 1,634 / ref 35 | 結合 | — | ✅ |
+| evt_examples | 1,838 | confirmed 1,407 / ref 431 | 結合 | 2026-11-14 から confirmed は実体＋目録（目録2版の一致だけでは確定しない）。実体にしか無い例題を `evt:tree` だけの行で足した | ✅ |
 | eval_boards | 117 | 全行 confirmed | products と結合・重複禁止 | 型番を決められない board 3枚（`parts` 空・意図的） | ✅ |
 | register_blocks | 679 | confirmed 562 / ref 117 | 結合・layout と一致・address 書式 | R-20 の機械収集ぶん（2026-08-25）。confirmed = RM zh 版の絶対アドレス表と1つ以上の register の番地が一致（2026-08-26）。ref は RM の表に名前が無い block（別 header の USB/BLE 型・PFIC・ESIG 等）。H417 `UHSIF` は型の構造体が header に無く layout 空。2026-10-27 から device header の外も読む（周辺ヘッダの PIOC・`core_riscv.h` の PFIC/SysTick/H417 HSEM・IPC・V103 の番地マクロだけの `USBFS`）。header にあっても family に無い block（V103 の F103 大容量品の写し 27・V307 ADC3）は `curated/register-blocks-absent.json` の判定で落とし、block が全部落ちた型（V103 DAC）は registers/fields/layouts からも落とす。ArduinoCore-CH32RV の周辺の洗い直しから | ✅ |
 | registers | 5,353 | confirmed 2,932 / ref 2,417 / conflict 4 | layouts と結合・offset/幅の書式 | confirmed = RM の絶対アドレス表で base+offset が一致（8,369行中 5,110行照合）またはレジスタ表に同名。**conflict 4 = H417 CAN2 のフィルタ設定 register が RM では +4**（CAN1 は一致。原典側の記録）。union で重なる register は同 offset の2行 | ✅ |

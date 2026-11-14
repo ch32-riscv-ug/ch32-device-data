@@ -798,8 +798,12 @@ def pinout_reference(data: Data, family: str) -> list[str]:
 
 def evt_examples_section(data: Data, family: str) -> list[str]:
     """EVT例題の要約。1600行超あるので周辺グループ単位の件数だけを出し、
-    中身はEVTツリーへのリンクで辿らせる。"""
-    rows = [r for r in data.evt_examples if r["family"] == family]
+    中身はEVTツリーへのリンクで辿らせる。
+
+    数えるのは実体のある行（basis に `evt:tree`）だけ。目録にしか無い行は
+    EVT/EXAM に無い（目録の誤記や消えた例題）ので「EVT/EXAM の例題」に数えない。"""
+    rows = [r for r in data.evt_examples
+            if r["family"] == family and "evt:tree" in r["basis"].split("+")]
     if not rows:
         return []
     groups: dict[str, int] = {}
