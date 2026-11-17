@@ -379,7 +379,8 @@ def run_family(family: Path, out_dir: Path, limit: int | None) -> list[dict]:
                 selectors, reg_fields, routes, evt_values, notes = silicon
                 candidate, notes = build_candidate.join(
                     selectors, reg_fields, routes, pins, evt_values,
-                    list(notes) + pin_notes
+                    list(notes) + pin_notes,
+                    suffix_is_value=datasheet.name not in build_candidate.REMAP_SUFFIX_NOT_VALUE,
                 )
             entry.update(
                 {

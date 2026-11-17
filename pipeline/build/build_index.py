@@ -53,7 +53,7 @@ from extract_dma_requests import REMAPPED, TYPO, peripheral_of  # noqa: E402  �
 # GPIO としての読み（port と番号）はその装飾を落として取る。
 GPIO_PAD = re.compile(r"^P(?P<port>[A-H])(?P<gpio>\d{1,2})(?:[-_]|$)")
 GPIO_NAME = re.compile(r"P[A-H]\d{1,2}")
-GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+)\)")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+(?:;remap-\d+)*)\)")
 
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
                   "peripheral", "role", "signal", "route", "selector", "value", "af", "confidence", "basis"]
@@ -158,25 +158,26 @@ def pinout_rows(products: list[dict], pins: list[dict], functions: list[dict],
             if not found:
                 unresolved[(fn.get("datasheet", ""), signal)] += 1
                 continue
-            route = fn["route"]
             grid = GRID_VALUE.search(fn["basis"])
-            if grid:
-                route = grid.group("route")  # 格子の値を採る（F-41）
-            value = ""
-            if route.startswith("remap-"):
-                value = route[len("remap-"):]
-            elif route in ("default", "main"):
-                value = "0"
-            chosen = selectors.get((product["series"], signal, pad), {}).get(value, []) if value else []
-            af = route[len("af-"):] if route.startswith("af-") else ""
-            for peripheral, role in found:
-                rows.append({**base, "peripheral": peripheral, "role": role, "signal": signal,
-                             "route": route,
-                             "selector": ";".join(sorted(set(chosen))),
-                             "value": value if chosen else "",
-                             "af": af,
-                             "confidence": fn["confidence"], "basis": fn["basis"]})
-                emitted += 1
+            # 格子の値を採る（F-41）。格子が2つ以上の値に置くとき（V103 の PB10 TIM2_CH3 は
+            # 値2と3）は `;` で並ぶので、1つずつを1行にする。
+            for route in (grid.group("route").split(";") if grid else [fn["route"]]):
+                value = ""
+                if route.startswith("remap-"):
+                    value = route[len("remap-"):]
+                elif route in ("default", "main"):
+                    value = "0"
+                chosen = (selectors.get((product["series"], signal, pad), {}).get(value, [])
+                          if value else [])
+                af = route[len("af-"):] if route.startswith("af-") else ""
+                for peripheral, role in found:
+                    rows.append({**base, "peripheral": peripheral, "role": role,
+                                 "signal": signal, "route": route,
+                                 "selector": ";".join(sorted(set(chosen))),
+                                 "value": value if chosen else "",
+                                 "af": af,
+                                 "confidence": fn["confidence"], "basis": fn["basis"]})
+                    emitted += 1
         if not emitted:
             # 機能の行が無い lead（電源・NC・GPIO だけの足）も1行。port+gpio → lead
             # が1表で引けるのはこの行があるから。

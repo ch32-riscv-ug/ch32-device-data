@@ -91,7 +91,7 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 両言語照合で吸収している表記ずれ: 表番号のずれ（X315はzh`表2-1-1`=en`Table 2-1`。表題中のシリーズ名で照合）、列見出しの綴り（`QFN48×7`、`QFN28(6)`、zh`LQFP64M`=en画像`LQFP64`は表内の消去法でペアリング）、1列が複数packageを兼ねる見出し（`LQFP48/QFN48X7`は成分ごとに登録）。
 
-**pin表とRMのremap格子が食い違う行**（CH32V103のTIM3。pin表は`TIM3_CH1_1`をPB4とPC6の両方に書くが、RM格子はPB4=2・PC6=3で値1は定義されていない。F-41）は、**値はpin表のまま**`conflict`にし、basisに`!rm-remap-grid(route=remap-2)`と格子の値を並べています。格子の値を採るのは索引`index/pinout.csv`の側です。
+**pin表とRMのremap格子が食い違う行**（CH32V103のTIM3。pin表は`TIM3_CH1_1`をPB4とPC6の両方に書くが、RM格子はPB4=2・PC6=3で値1は定義されていない。F-41）は、**値はpin表のまま**`conflict`にし、basisに`!rm-remap-grid(route=remap-2)`と格子の値を並べています。格子が同じpadを2つ以上の値に置くときは`;`で並べます（CH32V103のTIM2。pin表は`TIM2_CH3_1`をPB10に書くが、RM表10-11はPB10を値2と値3に置き、値1のCH3はPA2のまま——`!rm-remap-grid(route=remap-2;remap-3)`。値1ではPB10にPWMが出ないことを実機でも確かめた）。CH32V103のdatasheetは接尾辞を値ではなく「remapしている」の印として書くので、remap_routesはこのdatasheetについて**格子が置く値をすべて**採ります（`build_candidate.REMAP_SUFFIX_NOT_VALUE`。pin表がその値だと言っていない経路は`reference`）。格子の値を採るのは索引`index/pinout.csv`の側で、`;`で並んだ値は1つずつ1行になります。
 
 ### `product_attributes.csv`
 

@@ -521,8 +521,11 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
                 for pin in data.get("pins", []):
                     for fn in pin.get("functions", []):
                         if fn.get("_value_from_grid"):
+                            # 格子が値を2つ以上に置くことがある（V103 の PB10 TIM2_CH3 は
+                            # 値2と3）。`;` で並べる（build_index が1行ずつに開く）。
                             found[(pin["pad"], fn["signal"],
-                                   f"remap-{fn['_value_in_pin_table']}")] = fn["route"]
+                                   f"remap-{fn['_value_in_pin_table']}")] = ";".join(
+                                fn.get("_grid_routes") or [fn["route"]])
             corrections[part] = found
         return corrections[part]
 

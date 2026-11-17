@@ -53,6 +53,18 @@ from extract_remap import canonical_field, canonical_signal  # noqa: E402
 COMBINED_SIGNAL = re.compile(r"^(?P<base>[A-Z0-9]+)_(?P<parts>CH\d+N?_ETR)$")
 
 
+# **remap の接尾辞を値として書いていない datasheet。** pin 表は経路を signal の接尾辞で
+# 書き（`TIM3_CH1_1`）、ふつうはその数が selector の値になる。CH32V103 は接尾辞を
+# 「remap している」の印として全部 `_1` と書く——`TIM3_CH1_1` を PB4（RM 表10-12 の値2）と
+# PC6（値3）の**両方**に書き（F-27）、`TIM2_CH3_1` を PB10 に書くが RM 表10-11 は PB10 を
+# 値2（部分 remap 2）と値3（完全 remap）に置き、値1の CH3 は PA2 のまま。EVT の
+# ch32v10x_gpio.h も `GPIO_PartialRemap1_TIM2`=1・`PartialRemap2`=2・`FullRemap`=3 で RM と同じ。
+# 値1で PB10 の PWM が出ないことは実機（CH32V103R8T6）でも確かめられている（ch32rv の
+# [core]、2026-11-17）。この datasheet では、pin 表は「その pad にその機能が在る」ことだけを
+# 言うとみなし、**値は RM の格子が置く値すべて**を採る（格子が名指ししない機能は pin 表の値のまま）。
+REMAP_SUFFIX_NOT_VALUE = {"CH32V103DS0.PDF"}
+
+
 def selector_id(controller: str, field: str) -> str:
     """Spell the id the way existing records do: afio-tim1-remap."""
     return f"{controller}-{field.lower().replace('_', '-')}"
@@ -252,6 +264,7 @@ def join(
     pins: list[dict],
     evt_values: dict[str, set[int]],
     notes: list[str],
+    suffix_is_value: bool = True,
 ) -> tuple[dict, list[str]]:
 
     # Manual-side lookups, keyed the way the documents disagree least. Bits are
@@ -584,11 +597,62 @@ def join(
                 continue
             pin_pads_at[(canonical_signal(fn["signal"]), value)].add(
                 signal_vocabulary.port_pin(pin["pad"]))
+    # 格子が値を持つことのある全ての値（`grid_values` が試す範囲）。
+    grid_universe = sorted({v for slots in grid_value_of.values() for v in slots})
+
+    def grid_values(pin: dict, fn: dict, skip_zero: bool = True) -> set[int]:
+        """格子がこの (signal, pad) を名指ししている値。綴りの揃え方は `route_sources` と同じ。
+
+        **列見出しの誤植への歯止め**も同じ: 同じ (signal, 値) に格子が別の pad も置いて
+        いるなら、その値は採らない（1つの selector 値は 1 pad を選ぶ）。
+        """
+        pad = signal_vocabulary.port_pin(pin["pad"])
+        found = set()
+        for v in grid_universe:
+            if skip_zero and v == 0:
+                continue
+            if "rm-remap-grid" not in route_sources(
+                    pin, fn, v, grid_value_of, grid_at_pad, {}, {}):
+                continue
+            if grid_pads_at.get((canonical_signal(fn["signal"]), v), set()) - {pad}:
+                continue
+            found.add(v)
+        return found
+
+    def add_grid_values(pin: dict, fn: dict, extra: list[int]) -> None:
+        """格子だけが言う値を selection に足す。pin 表はその値だとは言っていないので
+        `grid_only_values` に挙げ、`build_remap` が確度を reference にする（F-75 と同じ理由）。"""
+        if not extra:
+            return
+        sel = fn["selection"]
+        sel["values"] = sorted(set(sel["values"]) | set(extra))
+        sel["grid_only_values"] = sorted(set(sel.get("grid_only_values", [])) | set(extra))
+        sel.setdefault("sources_by_value", {}).update({
+            str(v): {name: sorted(said) for name, said in route_sources(
+                pin, fn, v, grid_value_of, grid_at_pad,
+                said_value_of, said_at_pad, editions=True).items()}
+            for v in extra})
+
     for pin, fn in routed:
         stated = fn["_selector_value"]
         pad = signal_vocabulary.port_pin(pin["pad"])
         says = grid_value_of.get((canonical_signal(fn["signal"]), pad))
-        if says and stated not in says and len(says) == 1:
+        named = set() if suffix_is_value else grid_values(pin, fn)
+        if named:
+            # 接尾辞が値でない datasheet（`REMAP_SUFFIX_NOT_VALUE`）。格子の値を全部採る。
+            if stated not in named:
+                fn["_value_in_pin_table"] = stated
+                fn["_value_from_grid"] = True
+                fn["_grid_routes"] = [f"remap-{v}" for v in sorted(named)]
+                fn["_selector_value"] = min(named)
+                fn["route"] = f"remap-{min(named)}"
+                notes.append(
+                    f"[join] {pin['pad']} {fn['signal']}: pin表の接尾辞は値でない。"
+                    f"pin表は値{stated}と書くが格子は値{sorted(named)}に置く。格子を採った")
+            extra = sorted(named - {fn["_selector_value"]})
+            if extra:
+                fn["_grid_extra_values"] = extra
+        elif says and stated not in says and len(says) == 1:
             corrected = next(iter(says))
             # **格子の誤植への歯止め。** CH32V407 の I3C 格子は列見出しを
             # `I3C_RM=0  I3C_RM=0` と2列とも 0 に誤植していて、鵜呑みにすると
@@ -674,10 +738,11 @@ def join(
             # PC6 の両方に `_1` と書き、RM が値2と値3に置く（F-27）。
             **({"value_from_grid": True} if fn.get("_value_from_grid") else {}),
         }
+        add_grid_values(pin, fn, fn.get("_grid_extra_values") or [])
         if how != "signal":
             fn["_selector_resolved_by"] = how
         used.add(key)
-        attested[key].add(fn["_selector_value"])
+        attested[key].update(fn["selection"]["values"])
 
     # The default route is a selector value like any other -- value 0 -- but no
     # document writes it that way: the pin table has a "default" column and the
@@ -706,8 +771,13 @@ def join(
                     pin, fn, 0, grid_value_of, grid_at_pad,
                     said_value_of, said_at_pad, editions=True).items()},
             }
+            # 接尾辞が値でない datasheet は remap 先の接尾辞も当てにならないので、
+            # 既定の pad が別の値でも使われること（TIM2 の部分 remap 2 で CH1 は PA0 のまま）も
+            # 格子から足す。
+            if not suffix_is_value:
+                add_grid_values(pin, fn, sorted(grid_values(pin, fn)))
             used.add(key)
-            attested[key].add(0)
+            attested[key].update(fn["selection"]["values"])
 
     # Keep only the selectors a pin refers to, completed from the manual.
     kept = []

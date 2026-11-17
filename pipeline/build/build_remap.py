@@ -194,8 +194,10 @@ def main() -> int:
                 for value in selection.get("values") or []:
                     key = (series, selection.get("selector", ""),
                            value, fn.get("signal", ""), pad)
-                    said = selection.get("sources") or (
-                        LEGACY_DEFAULT_BASIS if value == 0 else LEGACY_ROUTE_BASIS)
+                    # 格子だけが言う値は値ごとの出所を持つ（`build_candidate.add_grid_values`）。
+                    said = ((selection.get("sources_by_value") or {}).get(str(value))
+                            or selection.get("sources") or (
+                        LEGACY_DEFAULT_BASIS if value == 0 else LEGACY_ROUTE_BASIS))
                     routes.setdefault(key, set()).update(said)
                     if isinstance(said, dict):
                         for who in said.values():
@@ -205,7 +207,8 @@ def main() -> int:
                     # 出ていないだけのことがある、という `said` と同じ理由）。
                     if selection.get("disputed_by_grid") is not None:
                         disputed[key] = selection["disputed_by_grid"]
-                    if selection.get("value_from_grid"):
+                    if (selection.get("value_from_grid")
+                            or value in (selection.get("grid_only_values") or ())):
                         from_grid.add(key)
 
     field_rows = sorted(fields.values(),

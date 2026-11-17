@@ -92,7 +92,7 @@ TOOLCHAIN_ARCHES = {"", "x86", "x64", "arm64"}
 TOOLCHAIN_API = "https://api.mounriver.com/mountriver/api/version/"
 
 GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
-GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+)\)")
+GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+(?:;remap-\d+)*)\)")
 
 
 def build_index_grid(basis: str) -> str | None:
@@ -1533,7 +1533,9 @@ def main() -> int:
         if key in verbatim:
             continue
         stated = [k for k in verbatim if k[:2] == key[:2] and k[3] == key[3]]
-        if not any(grid_route.get((k[0], k[1], k[3], k[2])) == r["route"] for k in stated):
+        # 格子が値を2つ以上に置くと `route=remap-2;remap-3` で、索引はその1つずつを1行にする。
+        if not any(r["route"] in (grid_route.get((k[0], k[1], k[3], k[2])) or "").split(";")
+                   for k in stated):
             invented.append(key)
     if invented:
         bad.append(f"pinout: pin_functions にない行が {len(invented)} 件ある"
