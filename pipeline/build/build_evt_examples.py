@@ -42,6 +42,10 @@ FILE_LIKE = re.compile(r"\.[A-Za-z0-9]{1,4}(?:-[A-Za-z]{2})?$")
 CJK = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 # デュアルコアの例題はコアごとのプロジェクトに分かれる（H417: `GPIO_Toggle/V3F`）。
 CORE_DIR = re.compile(r"^V\d+F$", re.I)
+# 目録は例題の中の説明書やライブラリのフォルダも項目に並べる（`WCH-GUI-FLASH/DOC`・`WCHGUI_Lib`・
+# `Udisk_Lib`）。例題ではないので落とす。実体があれば「下に `.wvproj` が1つも無い」で、実体が無ければ
+# 名前で決める。
+SUPPORT_DIR = re.compile(r"^(?:DOCS?|LIB|\w+_LIB)$", re.I)
 
 COLUMNS = ["family", "group", "example", "description", "confidence", "basis", "source"]
 
@@ -181,8 +185,15 @@ def main():
         for key in keys:
             variants.setdefault((key[0].lower(), key[1].lower()), []).append(key)
         en_entries = lists.get("en", ("", {}))[1]
+        support = 0
         for same in variants.values():
             on_disk = [disk[k] for k in same if k in disk]
+            leaf = same[0][1].rsplit("/", 1)[-1]
+            if (on_disk and not any(next((evt / "EXAM" / g / e).rglob("*.wvproj"), None)
+                                    for g, e in on_disk)) \
+                    or (not on_disk and SUPPORT_DIR.match(leaf)):
+                support += 1
+                continue
             in_en = [k for k in same if k in en_entries]
             group, example = (in_en or on_disk or sorted(same))[0]
             evidence = []
@@ -213,6 +224,8 @@ def main():
             })
         if tree_only:
             print(f"{repo.name}: 目録に無い実体の例題 {len(tree_only)} 件", file=sys.stderr)
+        if support:
+            print(f"{repo.name}: 目録が並べる説明書・ライブラリのフォルダを外した {support} 件", file=sys.stderr)
 
     rows.sort(key=lambda r: (r["family"], r["group"], r["example"]))
     dest = paths.table("evt_examples", args.out)
