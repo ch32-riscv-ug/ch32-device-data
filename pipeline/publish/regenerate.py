@@ -150,6 +150,9 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             ("memory_configs", ["pipeline/extract/rm/extract_memory.py"]),
             ("flash_geometry", ["pipeline/extract/rm/extract_flash_geometry.py"]),
             ("adc_internal", ["pipeline/extract/datasheet/extract_adc_internal.py"]),
+            # `exti_lines` は `index/interrupts.csv`（legacy 段の `build_interrupts`）を読む。
+            ("exti_lines", ["pipeline/extract/rm/extract_exti_lines.py"]),
+            ("pvd_levels", ["pipeline/extract/datasheet/extract_pvd_levels.py"]),
             ("device_id_addresses + device_ids",
              ["pipeline/build/build_device_ids.py"]),
             ("esig", ["pipeline/extract/rm/extract_esig.py"]),
@@ -164,6 +167,8 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             # 先に走ると空になる（R-32）。
             ("register_blocks + registers + register_fields + register_layouts",
              ["pipeline/extract/rm/extract_registers.py"]),
+            # `register_fields.csv` の EXTSEL の位置と AFIO の remap の bit を読む。
+            ("adc_triggers", ["pipeline/extract/rm/extract_adc_triggers.py"]),
             ("opa_cmp_registers", ["pipeline/extract/rm/extract_opa_cmp_registers.py"]),
             ("clock_enables", ["pipeline/extract/rm/extract_clock_enables.py"]),
             ("usbpd_plumbing", ["pipeline/extract/rm/extract_usbpd_plumbing.py"]),

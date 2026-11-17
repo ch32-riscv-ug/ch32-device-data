@@ -61,7 +61,7 @@ COLUMNS = ["family", "peripheral", "rcc_register", "rcc_bit", "rcc_address",
 # M030 で PD0/PD1 の両方に同じ USB の行が付いて表が2倍に膨れる。
 DEFINE = re.compile(r"^\s*#define\s+(?P<name>(?:AFIO|EXTEN)_\w*USBPD\w*)\s+"
                     r"\(\s*\(\s*u?int\d+_t\s*\)\s*(?P<mask>0[xX][0-9A-Fa-f]+)\s*\)", re.M)
-BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+)\s+register", re.IGNORECASE)
+BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+?)\s*register\b", re.IGNORECASE)
 STRUCT = re.compile(r"typedef\s+struct\s*\{(?P<body>[^{}]*?)\}\s*(?P<name>AFIO|EXTEN)_TypeDef\s*;", re.S)
 MEMBER = re.compile(r"(?:__I?O?\s+|volatile\s+|const\s+)*"
                     r"u?int(?P<width>8|16|32|64)_t\s+(?P<name>\w+)"

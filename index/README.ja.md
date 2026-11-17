@@ -153,7 +153,7 @@ dissent  := "(" 列 "=" 値 ("," 列 "=" 値)* ")"
 鍵: `families`・`series`・`packages`・`cores`。
 EVT ヘッダ由来: `interrupts`・`memory_map`・`systick`・`evt_variants`・`clock_configs`・`clock_prescalers`・
 `clock_sources`・`clock_symbols`・`clock_init`・`clock_enables`・`pin_alternate`。
-RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data`・
+RM・datasheet 由来: `flash_geometry`・`flash_program_method`・`adc_internal`・`adc_triggers`・`exti_lines`・`pvd_levels`・`debug_data`・
 `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`esig`・
 `absolute_maximum_ratings`・`opa_cmp_registers`・`usbpd_plumbing`・`pin_conditions`・`memory_configs`。
 WCH-LinkUtility と MounRiver Studio の配布物由来: `link_firmware`（過去の版を含む）。実測した不良: `link_firmware_issues`。

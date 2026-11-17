@@ -64,6 +64,9 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "opa_cmp_registers": ("opa_cmp_registers",),
     "clock_enables": ("clock_enables",),
     "adc_internal": ("adc_internal",),
+    "adc_triggers": ("adc_triggers",),
+    "exti_lines": ("exti_lines",),
+    "pvd_levels": ("pvd_levels",),
     "usbpd_plumbing": ("usbpd_plumbing",),
     "debug_data": ("debug_data",),
     "debug_wiring": ("debug_wiring",),
@@ -568,7 +571,7 @@ def check_stable_lists() -> list[str]:
 JOIN_LISTS = (("catalog/README.md", "## Join keys across all tables"),
               ("catalog/README.ja.md", "## 全表の結合キー"))
 # `check()` の値が変数のときの列名（`for token in r["cores"].split(";")`）。
-JOIN_VARIABLE_COLUMNS = {("families", "token"): "cores"}
+JOIN_VARIABLE_COLUMNS = {("families", "token"): "cores", ("pvd_levels", "s"): "series"}
 
 
 def joins_in_check_tables() -> set[tuple[str, str, str]]:

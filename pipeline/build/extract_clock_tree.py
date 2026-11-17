@@ -220,7 +220,7 @@ GUARD = re.compile(r"^\s*if\s*\(\s*(?P<name>\w+)\s*(?P<compare>[!=]=\s*\S+?)\s*\
 # thing in the header that says which register a bit define belongs to -- the
 # name does not (RCC_ADCPRE says nothing about CFGR0) -- and it covers all but
 # 0.3% of them across the twelve headers.
-BANNER = re.compile(r"^/\*+\s*Bit definition for (?P<register>\w+) register\s*\**/")
+BANNER = re.compile(r"^/\*+\s*Bit definition for (?P<register>\w+?)\s*register\s*\**/")
 
 
 def banner_registers(header: Path | None) -> dict[str, str]:

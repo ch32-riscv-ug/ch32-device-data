@@ -228,6 +228,22 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**395行
 
 **rcc.h にはその family に無い周辺の定数も残っています**（他 family のヘッダからの写し）。V20x の`RCC_AHBPeriph_RNG`・`FSMC`・`SDIO`・`USBHS`・`DAC`と、V103 の`FSMC`・`SDIO`・APB1 の`USB`（CH32F103 の USBD）・`CAN1`・`CAN2`・`CEC`の11行です。共有 RM（`CH32FV2x_V3xRM`・`CH32xRM`）の表は bit の適用 family を書かないので EVT と一致して confirmed になっていました——RM の RNG の章は「CH32F20x・CH32V30x・CH32V31x に適用」と書いています。機械では見分けられないので、人の判定を`curated/clock-enables-absent.json`に置いて落とします（2026-10-21、ArduinoCore-CH32RV の依頼。項目が rcc.h から消えるか、device header にその周辺のブロックが現れたら生成が止まる）。device header にブロックが無くても実在するもの——H417 の`BKP`（H417 専用 RM が`BKPEN`を書く）、H417/V205 の`PIOC`と V103 の`USBFS`（EVT に例題と専用ヘッダがある）——は残しています。**V208 の Ethernet のクロックはこの表に無い**のが正しく、RCC ではなく`EXTEN->EXTEN_CTR`の`EXTEN_ETH_10M_EN`（bit2）で入れます（EVT`ETH/NetLib/eth_driver.c`）。
 
+### `exti_lines.csv`
+
+EXTI の線ごとに、何がその線を起こすか（`GPIO` の端子・`PVD`・`RTC_ALARM`・`AWU`・`<周辺>_WAKEUP`）と、起こす割り込みのベクタ。生成は`pipeline/extract/rm/extract_exti_lines.py`。RM の表「EXTI中断映射」（zh・en）と EVT の`*_exti.h`（`EXTI_Line16 … Connected to the PVD Output`）を突き合わせ、同じ元を言えば confirmed、片方だけなら reference、違えば conflict。**食い違うときはその family に割り込みのベクタがあるほうを採ります**（V205 の線21 は en 版 RM が LPTIM、EVT と zh 版が USBHS——V205 に LPTIM は無い）。`vector`・`irq` は`index/interrupts.csv`から（GPIO の線は `EXTI9_5` などのまとめたベクタ）。conflict は V407 の線18・20（RM は 18＝USBHS1・20＝USBHS2、EVT の`ch32v4x7_exti.h`は逆。ベクタの名前は RM・startup・ヘッダーで RM と同じ向き）、V20x の線20（RM は USBHS、EVT は USBFS）、X035 の線28（RM は「USB」、EVT は USBFS）、X315 の線20（en 版が RTC wakeup）など。
+
+### `pvd_levels.csv`
+
+PVD（電圧監視）の段ごとの閾値。1行は datasheet × `PLS` の値 × 向き（`rising`/`falling`）。生成は`pipeline/extract/datasheet/extract_pvd_levels.py`。datasheet の表「复位及电压监测」/「Reset and voltage monitor」を、ページをまたぐ続きの断片と`logical_id`でつないでセルとして読みます——`operating_conditions`の`V_PVD`は凍結時の規則でページの本文を読むので、続きの段を落とします（L103 は 8 段のうち 5 段、CH32V007DS0 は 0 段）。同じ series が2つの datasheet に載ることがあるので（V203 は CH32V203DS0 と、V205 のダイの品番を載せる CH32V205DS0）、品番からは`index/parts.csv`の`datasheet`で引きます。zh・en 版が一致すれば confirmed。CH32V004DS0 と CH32M030DS0 は段の表を持たない（電源投入・遮断の閾値だけ）ので行がありません。
+
+### `adc_triggers.csv`
+
+ADC の変換を始める外部トリガ——`ADC_CTLR2` の `EXTSEL`（規則チャネル）と `JEXTSEL`（注入チャネル）の各値が何を選ぶか（タイマのイベント・EXTI の線・外部の端子・ソフトウェア）。family で違い、M030 は 4 bit（`[19:16]`・`[14:11]`）で並びも違います。生成は`pipeline/extract/rm/extract_adc_triggers.py`。EVT の ADC ヘッダの `ADC_ExternalTrigConv_*`／`ADC_ExternalTrigInjecConv_*`（値は mask を `register_fields` の field の位置で割る）と、RM の field の説明（`000：定时器1的CC1事件；…`）を突き合わせ、一致すれば confirmed、RM が別の事象を言えば conflict、RM の説明が値を書かなければ reference です。
+
+**1つの値に候補が2つ並ぶ外部トリガ**（`Ext_IT11_TIM8_TRGO`＝EXTI11 か TIM8 の TRGO、`Ext_PD3_PC2`＝PD3 か PC2）は、AFIO の remap の bit（`AFIO_PCFR1.ADC1_ETRGREG_REMAP` など）が選びます。header がその bit を持つ family では **bit と値ごとに1行**にし（`remap_field`・`remap_value`。0 が先の候補——RM の「0：…与PD3相连；1：…与PC2相连」のとおり）、`trigger` には1つだけ書きます。ADC1 と ADC2 で別の bit を持つ family はそれぞれの bit で行が分かれます。
+
+**header の定義をそのまま採らないもの**: V20x/V30x の header は STM32 の ADC3 用の名前（`T4_CC3`・`T8_CC2`・`T5_TRGO`…）を同じ値に並べ、V205 は値6の中を EXTI15/OPA/TKEY に分ける別の選択子の定義（`Ext_IT15_OPA`=0・`TKEY`=0x01000000）を並べます。同じ値に定義が2つ以上あるときは RM と一致する定義だけを採り、field の外に bit を持つ定義は読みません。現在の conflict は V103 の値6（header は EXTI11/TIM8_TRGO、RM は EXTI11 だけ——V103 は TIM8 を持たない）と V205 の注入の値6（en 版 RM が EXTI15 だけを書く）です。
+
 ### `adc_internal.csv`
 
 **`temperatureRead()`相当のAPIの前提**です。温度センサと内部参考電圧が**ADCのどのチャネルか**はfamilyで違い、温度センサを持たないfamilyもあります（V003/V006/X035/X315は`vrefint`行のみ）。**資料が内部参考電圧を書かないfamilyにも`vrefint`行を置く**——値は空、`confidence=missing`、`basis=searched(<探した資料>)`（いまはCH32M030）。「資料に無い」と「読み落とし」を区別するため。
@@ -279,8 +295,8 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
 |---|---|---|
 | `register_blocks` | family × block（`USART1`）679行 | 型（`USART`）・base address・layout key。`#define USART1 ((USART_TypeDef *) USART1_BASE)`から。**RM zh版の絶対アドレス表と1つ以上のregisterの番地が一致したblockはconfirmed（562）**。型の構造体がdevice headerに無いblockが1つ（H417の`UHSIF`）あり、layoutは空 |
 | `registers` | family × 型 × register 5,353行 | 構造体内のoffset・幅（8/16/32/64）・配列数。入れ子の構造体（CANの`sTxMailBox[0].TXMIR`）は親からのoffsetで平坦化。unionで重なるregister（H417 TIMの`CNT`と`CNT_32`）は同じoffsetの2行。`rm_address_check`はRMの絶対アドレス表との照合（`ok:N`=一致したinstance数、`mismatch:N`）、`rm_reset`はその表の復位値（`0x0000xx83`のように`x`を含むことがある） |
-| `register_fields` | family × register × bit define 33,320行（field 24,602・value 8,718） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。field 24,602 のうち 6,816 がRMとbit位置一致、38 がconflict |
-**`rm_access` とその確度**（2026-10-01 に追加）。`rm_access` は RM 中文版の「访问」欄を印刷どおりに写したもの。どの RM も冒頭で語を定義する: `RO` 読み出し専用（ハードが変える）、`RZ` 読むと 0 に戻る、`WO` 書き込み専用、`WA` Safe モードで書ける、`WZ` 書くと自動で 0、`RW`、`RWA` Safe モードで読み書き、`RW1` 1 の書き込みが有効、`RW0` 0 の書き込みが有効、`RW1Z` 1 を書くと消える。**定義に無い語を刷っている field が16ある**（`W1` 7・`W0` 4・`RWO` 4・`R0` 1。多くは `0` と `O` の取り違えで、L103 `FWAKE_FLAG` は `RWO` と刷りながら説明は「写0清零」）。印刷どおりに残し、`check_tables.KNOWN_ACCESS_MISPRINTS` が名前で固定する。`rm_access_confidence`/`rm_access_basis` は英語版 RM と照合した結果: `confirmed` 両版一致（6,078）、`conflict` 食い違い（30。`rm_access_basis` に `!<RM>:en(=X)`、`index/conflicts.csv` に `field=rm_access` で並ぶ）、`reference` 英語版の field が読めない（749）。行の `confidence`/`basis` は従来どおり bit 位置の確度。英語版の欄には説明の文字が落ちることがある（`RW t`・`1 0 RW0 o a`）ので、定義の語か既知の誤植がちょうど1つあるときだけ数える。
+| `register_fields` | family × register × bit define 33,320行（field 24,602・value 8,718） | bit位置（`hi:lo`）・mask・種類（`field`か、fieldの中の`value`か）・EVTの1行説明・RMのaccess/reset。**`define`はEVTの綴りそのまま**（`RCC_APB2PCENR_USART1EN`）、`field`は型・registerの接頭辞を落とした読みやすい名前。field 24,602 のうち 7,610 がRMとbit位置一致、71 がconflict |
+**`rm_access` とその確度**（2026-10-01 に追加）。`rm_access` は RM 中文版の「访问」欄を印刷どおりに写したもの。どの RM も冒頭で語を定義する: `RO` 読み出し専用（ハードが変える）、`RZ` 読むと 0 に戻る、`WO` 書き込み専用、`WA` Safe モードで書ける、`WZ` 書くと自動で 0、`RW`、`RWA` Safe モードで読み書き、`RW1` 1 の書き込みが有効、`RW0` 0 の書き込みが有効、`RW1Z` 1 を書くと消える。**定義に無い語を刷っている field が16ある**（`W1` 7・`W0` 4・`RWO` 4・`R0` 1。多くは `0` と `O` の取り違えで、L103 `FWAKE_FLAG` は `RWO` と刷りながら説明は「写0清零」）。印刷どおりに残し、`check_tables.KNOWN_ACCESS_MISPRINTS` が名前で固定する。`rm_access_confidence`/`rm_access_basis` は英語版 RM と照合した結果: `confirmed` 両版一致（6,893）、`conflict` 食い違い（30。`rm_access_basis` に `!<RM>:en(=X)`、`index/conflicts.csv` に `field=rm_access` で並ぶ）、`reference` 英語版の field が読めない（762）。行の `confidence`/`basis` は従来どおり bit 位置の確度。英語版の欄には説明の文字が落ちることがある（`RW t`・`1 0 RW0 o a`）ので、定義の語か既知の誤植がちょうど1つあるときだけ数える。
 
 導出の **layout key**（family × 型 → 構造体の形のハッシュ。同じkeyのfamilyは同じレジスタ定義を共有できる）は索引の[`index/register_layouts.csv`](../index/README.ja.md)にあります。register×fieldを結合して絶対番地を付けた引き口も索引（`index/registers.csv`・`index/register_map.csv`）です。
 
@@ -745,6 +761,8 @@ CH32V407   576K+136K ×7  512K+200K ×1
 EVTのdevice header**で、`IRQn_Type`列挙が番号・名前・1行説明を全部持っています。
 コンパイルされる側の定義そのものなので、RMの表を読むより確かです。
 
+**EVTのstartupのベクタ表**（`.word ADC1_2_IRQHandler` の並び）と突き合わせ、その番号にstartupが項目を置いていれば`confirmed`（2026-11-17から。それまでは全行`reference`）。startupの処理関数の名前は`handler`列に持ちます——列挙の名前と違うことがあります（V30xの34は列挙が`ADC`、処理関数が`ADC1_2_IRQHandler`）。variantごとのstartup（`startup_ch32v30x_D8.S`）は名前の末尾が同じmacroの表で、**ヘッダーがvariantの区画に書き落とした番号はstartupから行を足します**（V30xの`_D8`の58 `USBWakeUp`はヘッダーではD8Cの区画にしか無いが、`startup_ch32v30x_D8.S`とRMの表にはある。`reference`）。
+
 `kind`が`exception`（RISC-Vのプロセッサ例外）と`irq`（PFICの周辺割り込み）を分けます。
 **境目の番号はfamilyで違います**——ほとんどは16番からですが、CH32H41xは**32番**から
 で、16〜28はIPC（コア間通信）とHSEMです（2コアなのでプロセッサ側の枠が広い）。
@@ -1070,13 +1088,16 @@ uv run pipeline/build/build_clock.py                     # clock_configs/clock_p
 uv run pipeline/build/build_systick.py                   # systick（EVTのcore_riscv.hから）
 uv run pipeline/build/build_pin_alternate.py             # pin_alternate（EVTのAFIO構造体とGPIOドライバから）
 uv run pipeline/extract/rm/extract_memory.py         # memory_configs（RMの符号表とEVTのLink.ldをbundleから。数秒）
-uv run pipeline/build/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙から）
+uv run pipeline/build/build_interrupts.py                # interrupts（EVTのIRQn_Type列挙とstartupのベクタ表から）
 uv run pipeline/build/build_memory_map.py                # memory_map（EVTの*_BASEとLink.ldのORIGINから）
 uv run pipeline/extract/datasheet/extract_features.py   # features（datasheetの機能説明章の節見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_timers.py         # timers（RMのTIMx_CNT見出しをbundleから。数秒）
 uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry（EVTのflash driver＋RMの闪存章をbundleから。数秒）
 uv run pipeline/extract/rm/extract_opa_cmp_registers.py   # opa_cmp_registers（EVTヘッダ＋RMレジスタ表をbundleから。RM全読みで数分）
 uv run pipeline/extract/rm/extract_clock_enables.py       # clock_enables（EVTのrcc.h＋RMレジスタ表をbundleから。RM全読みで数分）
+uv run pipeline/extract/rm/extract_adc_triggers.py         # adc_triggers（EVT の ADC ヘッダと RM の EXTSEL/JEXTSEL の説明。register_fields の後に）
+uv run pipeline/extract/rm/extract_exti_lines.py           # exti_lines（RM の EXTI 中断映射と EVT の *_exti.h。interrupts の後に）
+uv run pipeline/extract/datasheet/extract_pvd_levels.py    # pvd_levels（datasheet の复位及电压监测の表）
 uv run pipeline/extract/datasheet/extract_adc_internal.py  # adc_internal（datasheet両言語の散文と電気的特性表をbundleから。数秒）
 uv run pipeline/extract/rm/extract_usbpd_plumbing.py      # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RMをbundleから）
 uv run pipeline/extract/rm/extract_registers.py  # register_blocks/registers/register_fields ＋ index/register_layouts（EVTヘッダ＋RM全読みをbundleから。約16分。cacheは使わない——staleな--rm-cacheが正本を改版前の読みへ戻した実績あり）

@@ -150,7 +150,7 @@ curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | pyt
 
 ```
 series.family / products.family / packages.families           → families.family
-adc_internal.family / clock_configs.family / clock_enables.family → families.family
+adc_internal.family / adc_triggers.family / exti_lines.family / clock_configs.family / clock_enables.family → families.family
 clock_init.family / clock_prescalers.family / clock_sources.family → families.family
 clock_symbols.family / debug_data.family / dma_requests.family   → families.family
 eval_boards.family / evt_examples.family / evt_variants.family   → families.family
@@ -163,6 +163,7 @@ option_bytes.family / esig.family / device_id_addresses.family   → families.fa
 products.series / remap_fields.series / errata.series            → series.series
 operating_conditions.series / absolute_maximum_ratings.series    → series.series
 feature_tags.series / features.series / pinout.series            → series.series
+pvd_levels.series                                                 → series.series
 pins.part_number / pin_functions.part_number / pinout.part_number → products.part_number
 product_attributes.part_number / evt_variants.part_number        → products.part_number
 memory_configs.part_number / eval_boards.parts / link_firmware_issues.target → products.part_number
@@ -170,6 +171,7 @@ products.package                                                 → packages.pa
 series.core / families.cores                                     → cores.core
 series.datasheets / products.datasheet / families.datasheets     → documents.document
 families.reference_manuals / families.evt / cores.manual         → documents.document
+pvd_levels.datasheet                                              → documents.document
 pins.datasheet / pin_functions.datasheet / features.datasheet    → documents.document
 absolute_maximum_ratings.datasheet                               → documents.document
 ```

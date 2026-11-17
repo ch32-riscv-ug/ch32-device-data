@@ -44,9 +44,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "build"))
 import paths  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
-COLUMNS = ["family", "number", "name", "kind", "description", "condition", "confidence", "basis"]
-# EVT のヘッダーだけが言う。RM の表が second reading になる。
+COLUMNS = ["family", "number", "name", "handler", "kind", "description", "condition", "confidence", "basis"]
+# ヘッダーだけが言う行は reference。EVT の startup のベクタ表（`.word X_IRQHandler` の並び）が
+# 同じ番号に同じ名前を置けば confirmed、別の名前なら conflict。
 CONFIDENCE = "reference"
+# startup のベクタ表の1項目。`_vector_base:` から数える（1項目 4 byte、`j handle_reset` も1項目）。
+# V103 は項目を `j NMI_Handler` で書く（ほかは `.word`）。どちらも名前を取る。
+VECTOR_ITEM = re.compile(r"^\s*(?:\.word|j)\s+(?P<word>\w+)\s*(?:/\*\s*(?P<comment>.*?)\s*\*/)?\s*$")
 
 ENUM = re.compile(r"typedef\s+enum\s+IRQn\b(?P<body>.*?)\}\s*IRQn_Type\s*;", re.S)
 #   USBHS_IRQn                  = 84,      /* USBHS global Interrupt  */
@@ -148,6 +152,69 @@ def read_enum(header: Path, notes: list[str]) -> list[dict]:
     return rows
 
 
+# startup の項目のコメント（`/* USB Wakeup from suspend */`）。startup にしか無い行の説明に使う。
+COMMENTS: dict[tuple[str, int], str] = {}
+
+
+def read_startup(path: Path) -> dict[int, str]:
+    """startup のベクタ表 → {番号: 処理関数の名前}（`ADC1_2_IRQHandler`）。`0` は空き（持たない）。"""
+    found, index, inside = {}, 0, False
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    # 表は `_vector_base:` から始まる。その label が無い startup（M030・V003・V407 など）は
+    # `_start:` の直後に表を置く（`j handle_reset` が 0 番）。
+    label = "_vector_base:" if any(l.strip() == "_vector_base:" for l in lines) else "_start:"
+    for line in lines:
+        if line.strip().startswith(label):
+            inside = True
+            continue
+        if not inside:
+            continue
+        text = line.strip()
+        if not text or text.startswith(("/*", "*", "//", ".option", ".align")):
+            continue
+        m = VECTOR_ITEM.match(line)
+        if not m:
+            break
+        word = m.group("word")
+        if word and word not in ("0", "_start", "handle_reset"):
+            found[index] = word
+            COMMENTS[(path.name, index)] = m.group("comment") or ""
+        index += 1
+    return found
+
+
+def startup_tables(family_dir: Path, conditions: set[str]) -> list[tuple[str, str, dict[int, str]]]:
+    """[(condition, startup の名前, ベクタ表)]。
+
+    variant ごとの startup（`startup_ch32v30x_D8.S`）は、名前の末尾がヘッダーの `#if` の macro
+    （`CH32V30x_D8`）の末尾と同じなら、その macro の表。当たらなければ（H417 の `_v3f`/`_v5f`
+    はコアごとで中身が同じ）条件なし。中身が同じ表は1つにまとめる。
+    """
+    out: list[tuple[str, str, dict[int, str]]] = []
+    for path in sorted((family_dir / "EVT/EXAM/SRC/Startup").glob("startup_*.S")):
+        table = read_startup(path)
+        if not table:
+            continue
+        suffix = path.stem.rsplit("_", 1)[-1].upper()
+        macro = next((c for c in sorted(conditions)
+                      if c and c.upper().endswith("_" + suffix)), "")
+        if any(c == macro and t == table for c, _, t in out):
+            continue
+        out.append((macro, path.name, table))
+    return out
+
+
+# 例外は header と startup で呼び名が違う（意味は同じ）。比べるときだけ読み替える。
+EXCEPTION_NAMES = {"NONMASKABLEINT": "NMI", "EXC": "HARDFAULT", "SOFTWARE": "SW",
+                   "ECALL_M_MODE": "ECALL_M_MODE", "BREAK_POINT": "BREAK_POINT"}
+
+
+def same_name(name: str) -> str:
+    """名前の綴りの揺れ（`USBHS2Wakeup`／`USBHS2WakeUp`）を比べるときだけ揃える。"""
+    upper = name.upper()
+    return EXCEPTION_NAMES.get(upper, upper)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
@@ -185,9 +252,39 @@ def main() -> int:
                              f"{seen[key]} と {row['name']} で重なる"
                              f"（condition={row['condition'] or 'なし'}）")
             seen[key] = row["name"]
-            rows.append({**row, "family": family,
-                         "confidence": CONFIDENCE,
-                         "basis": f"evt({header.name})"})
+        # **startup のベクタ表と突き合わせる。** 条件なしの行は全部の startup に、条件つきの行は
+        # その macro の startup に当たる。startup にしか無い番号（ヘッダーが variant の区画に
+        # 書き落としたもの。V30x の `_D8` の 58 `USBWakeUp` は D8C の区画にしか無い）は行を足す。
+        startups = startup_tables(args.mirrors / family, {r["condition"] for r in found})
+        # 名前はヘッダーの列挙（`ADC_IRQn` の `ADC`）、処理関数は startup の綴り（`ADC1_2_IRQHandler`）
+        # で、同じ番号でも違うことがある——どちらも事実なので `name` と `handler` に分けて持つ。
+        # startup がその番号に項目を置いていれば、番号の割り当てが2つの出所で一致したとみなす。
+        for row in found:
+            applies = [(c, n, t) for c, n, t in startups
+                       if not row["condition"] or c == row["condition"] or not c]
+            agree = [(n, t[row["number"]]) for c, n, t in applies if row["number"] in t]
+            missing = [n for c, n, t in applies if row["number"] not in t]
+            handlers = list(dict.fromkeys(h for _, h in agree))
+            basis = f"evt({header.name})" + "".join(f"+evt({n})" for n, _ in agree)
+            basis += "".join(f"+!evt({n})(handler=)" for n in missing)
+            rows.append({**row, "family": family, "handler": ";".join(handlers),
+                         "confidence": ("conflict" if missing and agree
+                                        else "confirmed" if agree else CONFIDENCE),
+                         "basis": basis})
+        for condition, name, table in startups:
+            for number, vector in sorted(table.items()):
+                covered = any(r["number"] == number and
+                              (not r["condition"] or not condition or r["condition"] == condition)
+                              for r in found)
+                if covered or number < min((r["number"] for r in found if r["kind"] == "irq"),
+                                           default=0):
+                    continue
+                notes.append(f"{family}: {name} の {number} {vector} がヘッダーに無い（行を足す）")
+                rows.append({"family": family, "number": number,
+                             "name": re.sub(r"_(?:IRQ)?Handler$", "", vector), "handler": vector,
+                             "kind": "irq", "description": COMMENTS.get((name, number), ""),
+                             "condition": condition,
+                             "confidence": CONFIDENCE, "basis": f"evt({name})"})
 
     rows.sort(key=lambda r: (r["family"], r["number"], r["condition"]))
     dest = paths.table("interrupts", args.out)

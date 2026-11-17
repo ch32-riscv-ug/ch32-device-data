@@ -234,6 +234,9 @@ def shared_leads(t: dict) -> list[str]:
 # import せずに見られる。
 COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "adc_internal": ("extract_adc_internal.py", "COLUMNS"),
+    "adc_triggers": ("extract_adc_triggers.py", "COLUMNS"),
+    "exti_lines": ("extract_exti_lines.py", "COLUMNS"),
+    "pvd_levels": ("extract_pvd_levels.py", "COLUMNS"),
     "clock_configs": ("build_clock.py", "CONFIG_COLUMNS"),
     "clock_enables": ("extract_clock_enables.py", "COLUMNS"),
     "clock_init": ("build_clock.py", "INIT_COLUMNS"),
@@ -1281,6 +1284,10 @@ ACCESS_VOCABULARY = {"RO", "RZ", "WO", "WA", "WZ", "RW", "RWA", "RW1", "RW0", "R
 KNOWN_ACCESS_MISPRINTS = {
     ("CH32H417", "PWR_CSR", "VIO18_SR"): "R0",
     ("CH32H417", "RCC_RSTSCKR", "RMVF"): "W0",
+    # 2026-11-17 に RM の `R32_` 付きの register 名を照合できるようにして見えた（zh p.362・p.834）。
+    ("CH32H417", "I3C_CFGR", "CFLUSH"): "W0",
+    ("CH32H417", "I3C_CFGR", "TSFSET"): "W0",
+    **{("CH32H417", "LTDC_CDSR", f): "R0" for f in ("VDES", "HDES", "HSYNCS")},
     ("CH32L103", "FLASH_STATR", "FWAKE_FLAG"): "RWO",  # 説明は「写0清零」＝RW0
     **{("CH32L103", "LPTIM_ICR", f): "W1"
        for f in ("CMPMCF", "ARRMCF", "EXTTRIGCF", "CMPOKCF", "ARROKCF", "UPCF", "DOWNCF")},
@@ -1751,6 +1758,29 @@ def main() -> int:
         check("adc_internal", r["source"], r["family"], families, "families")
         if r["channel"] and not r["channel"].isdigit():
             bad.append(f"adc_internal: {r['family']} {r['source']} の channel が数でない")
+    # adc_triggers: family、値が field の幅に収まること、remap の bit が register_fields に在ること。
+    header_fields = {(r["family"], f"{r['register']}.{r['field']}") for r in t["register_fields"]}
+    for r in t["adc_triggers"]:
+        check("adc_triggers", r["trigger"], r["family"], families, "families")
+        hi, _, lo = r["bits"].partition(":")
+        if not (r["value"].isdigit() and int(r["value"]) < 1 << (int(hi) - int(lo) + 1)):
+            bad.append(f"adc_triggers: {r['family']} {r['field']}={r['value']} が {r['bits']} に収まらない")
+        if r["remap_field"] and (r["family"], r["remap_field"]) not in header_fields:
+            bad.append(f"adc_triggers: {r['family']} の remap_field {r['remap_field']} が register_fields にない")
+        if bool(r["remap_field"]) != (r["remap_value"] != ""):
+            bad.append(f"adc_triggers: {r['family']} {r['field']}={r['value']} の remap_field と remap_value の片方だけがある")
+    # exti_lines: family、ベクタが interrupts に在ること。
+    vectors = {(r["family"], r["name"], r["number"]) for r in t["interrupts"]}
+    for r in t["exti_lines"]:
+        check("exti_lines", r["source"], r["family"], families, "families")
+        if r["vector"] and (r["family"], r["vector"], r["irq"]) not in vectors:
+            bad.append(f"exti_lines: {r['family']} 線{r['line']} のベクタ {r['vector']}({r['irq']}) が interrupts にない")
+    # pvd_levels: datasheet が目録に在り、series が series に在ること。
+    datasheets = {r["document"] for r in t["documents"]}
+    for r in t["pvd_levels"]:
+        check("pvd_levels", r["pls"], r["datasheet"], datasheets, "documents")
+        for s in r["series"].split(";"):
+            check("pvd_levels", r["pls"], s, series, "series")
     # usbpd_plumbing: clock_enables の USBPD 行と一致すること。
     enable_bits = {(r["family"], r["peripheral"]): (r["register"], r["bit"])
                    for r in t["clock_enables"]}

@@ -56,7 +56,7 @@ PUBLISHED = (
     "interrupts", "memory_map", "systick", "evt_variants",
     "clock_configs", "clock_prescalers", "clock_sources", "clock_symbols", "clock_init",
     "clock_enables", "pin_alternate", "flash_geometry", "flash_program_method",
-    "adc_internal", "debug_data",
+    "adc_internal", "adc_triggers", "debug_data", "exti_lines", "pvd_levels",
     # facts read from datasheets and reference manuals
     "device_ids", "option_bytes", "option_byte_fields", "register_blocks",
     "errata", "operating_conditions", "esig", "absolute_maximum_ratings",

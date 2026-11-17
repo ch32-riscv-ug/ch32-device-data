@@ -52,6 +52,9 @@ KEYS: dict[str, tuple[str, ...]] = {
     "errata": ("id",),
     "memory_configs": ("part_number", "value"),
     "adc_internal": ("family", "source", "channel"),
+    "adc_triggers": ("family", "group", "value", "remap_field", "remap_value"),
+    "exti_lines": ("family", "line"),
+    "pvd_levels": ("datasheet", "field", "pls", "edge"),
     "flash_geometry": ("family",),
     "flash_program_method": ("family",),
     "eval_boards": ("family", "board"),
@@ -105,6 +108,12 @@ ASSERTS: dict[str, str] = {
     "remap_routes": "value",
     "pin_conditions": "pad",
     "opa_cmp_registers": "bits",
+    # EVT の定義と RM の説明が、その値で選ばれる事象について食い違う。
+    "adc_triggers": "trigger",
+    # RM と EVT が、その線を起こす元について食い違う。
+    "exti_lines": "source",
+    # datasheet の zh/en 版が段の電圧で食い違う。
+    "pvd_levels": "typ",
 }
 # `operating_conditions` はここに載せない。1行が min/typ/max/unit の4つを主張して
 # いて、争っているのがどれかは行ごとに違う（`basis` の `(min=60,typ=82,…)` が

@@ -119,7 +119,10 @@ def access_term(cell: str) -> str:
     return found[0] if len(found) == 1 else ""
 LAYOUT_COLUMNS = ["family", "type", "layout", "registers", "fields", "size_bytes", "confidence", "basis"]
 
-BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+)\s+register", re.IGNORECASE)
+# 見出しは `register` の前の空白を落とすことがある（`Bit definition for AFIO_PCFR1register`。
+# L103・V00x・V10x・V205・V20x・V30x・X035 の PCFR1、V30x・V407 の PCFR2）。空白を必須にすると見出しを
+# 読み落とし、その register の field が直前の register（AFIO_ECR・GPIO_LCKR）に入っていた（2026-11-17）。
+BANNER = re.compile(r"Bit definition for\s+(?P<register>\w+?)\s*register\b", re.IGNORECASE)
 # `((uint32_t)0x0001)` / `(0x0001)` / `0x0001` / `(0x1U)`。ほかの形（`(1 << 3)`・別名）は採らない。
 DEFINE = re.compile(r"^\s*#define\s+(?P<name>\w+)\s+"
                     r"(?:\(\s*\(\s*u?int(?:8|16|32|64)_t\s*\)\s*)?\(?\s*"
@@ -539,8 +542,18 @@ def resolve_member(register: str, structs: dict[str, Struct]) -> tuple[str, dict
 # ---------------------------------------------------------------- RM
 
 def rm_key(name: str) -> str:
-    """`GPIOx_CFGLR` と `GPIO_CFGLR`、`TIM1_CTLR1` と `TIM_CTLR1` を同じ鍵に。"""
-    head, _, rest = name.upper().partition("_")
+    """`GPIOx_CFGLR` と `GPIO_CFGLR`、`TIM1_CTLR1` と `TIM_CTLR1` を同じ鍵に。
+
+    RM の field 表は register を幅つきで書くことがある（`R32_ARGB_DAT_ARR`。V407・X315 の ARGB 章
+    など）。幅の接頭辞は外す——外さないと鍵が `R_ARGB_DAT_ARR` になって header の `ARGB_DAT_ARR`
+    と結び付かず、bit 位置の照合が素通りしていた（V407 の DAT_ARR は header 12 bit・RM 10 bit。
+    2026-11-17）。
+
+    >>> rm_key("R32_ARGB_DAT_ARR"), rm_key("ARGB_DAT_ARR"), rm_key("GPIOx_CFGLR")
+    ('ARGB_DAT_ARR', 'ARGB_DAT_ARR', 'GPIO_CFGLR')
+    """
+    name = re.sub(r"^R(?:8|16|32)_", "", name.upper())
+    head, _, rest = name.partition("_")
     head = re.sub(r"\d+$|X$", "", head)
     return f"{head}_{rest}"
 

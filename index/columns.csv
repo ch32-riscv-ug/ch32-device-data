@@ -32,6 +32,19 @@ adc_internal,enable_bit,Bit position of that enable bit in `enable_register`.,in
 adc_internal,enable_confidence,"Confidence of `enable`: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|reference),`enable` is empty,fixed,provenance
 adc_internal,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 adc_internal,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+adc_triggers,family,Family key; joins families.family.,name,never empty,fixed,data
+adc_triggers,group,"Conversion group the trigger starts: `regular` (EXTSEL) or `injected` (JEXTSEL).",enum(injected|regular),never empty,fixed,data
+adc_triggers,register,ADC register holding the selector field.,name,never empty,as-printed,data
+adc_triggers,field,Selector field (`EXTSEL` or `JEXTSEL`).,enum(EXTSEL|JEXTSEL),never empty,fixed,data
+adc_triggers,bits,Bit position `hi:lo` of the selector field in `register`.,bits,never empty,,data
+adc_triggers,value,Selector value written to `field`.,integer,never empty,,data
+adc_triggers,trigger,"Event the value selects: `TIMn_CCm`/`TIMn_TRGO` (timer event), `EXTIn` (EXTI line), a pad (`PD3`), `SWSTART`/`JSWSTART` (software), `TKEY` or `OPA`; several joined by `;` when the documents name alternatives and the family has no remap bit choosing between them.",list(;),never empty,fixed,data
+adc_triggers,kind,"Kind of each event in `trigger`, in the same order.",list(;),never empty,fixed,data
+adc_triggers,remap_field,"AFIO remap bit (`register.field`, header spelling) that chooses between the alternatives of an external trigger; joins register_fields (family, register.field).",name,the value has a single event,as-printed,data
+adc_triggers,remap_value,Value of `remap_field` that selects `trigger` (0 = the first alternative the documents name).,integer,`remap_field` is empty,,data
+adc_triggers,define,"EVT define(s) naming this value, joined by `;`.",list(;),never empty,as-printed,data
+adc_triggers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+adc_triggers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 capabilities,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
 capabilities,series,Series key (e.g. `CH32V203`); joins catalog series.series.,name,never empty,fixed,data
 capabilities,family,Family key; joins families.family.,name,never empty,fixed,data
@@ -173,6 +186,14 @@ esig,unit,"Unit of the value read: `KiB` for `FLACAP` (flash capacity in Kbytes,
 esig,description,English description from the English edition's register list.,text,the English edition's register list gives none,prose,data
 esig,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis.",enum(confirmed),never empty,fixed,provenance
 esig,basis,Reference-manual pages the row was read from (`<document>:<lang>(p.N)`); `unit(...)` gives the pages whose field description states the unit.,text,never empty,prose,provenance
+exti_lines,family,Family key; joins families.family.,name,never empty,fixed,data
+exti_lines,line,EXTI line number.,integer,never empty,,data
+exti_lines,source,"What drives the line: `GPIO` (a pin line routed by AFIO_EXTICRx), a pad (`PC18`), `PVD`, `RTC_ALARM`, `AWU` (auto wake-up), `OSCCAL_WAKEUP` or `<peripheral>_WAKEUP`.",name,never empty,fixed,data
+exti_lines,vector,"Interrupt vector the line raises, from interrupts (a shared `EXTI9_5`-style vector for pin lines).",name,the family has no interrupt vector for this source (the line works as an event only),as-printed,data
+exti_lines,irq,Interrupt number of `vector`.,integer,`vector` is empty,,data
+exti_lines,evt_define,EVT define naming the line (`EXTI_Line16`).,name,the EVT header does not define this line,as-printed,data
+exti_lines,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+exti_lines,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 evt_variants,family,Family key; joins families.family.,name,never empty,fixed,data
 evt_variants,macro,EVT compile-time variant macro (e.g. `CH32V20x_D8W`).,name,never empty,as-printed,data
 evt_variants,part_number,Orderable part number; joins products.part_number.,name,never empty,fixed,data
@@ -228,10 +249,11 @@ flash_program_method,basis,"Sources that support the row, joined by `+` (e.g. `p
 interrupts,family,Family key; joins families.family.,name,never empty,fixed,data
 interrupts,number,Interrupt/exception number from the EVT `IRQn_Type` enumeration.,integer,never empty,,data
 interrupts,name,Enumerator name without the `_IRQn` suffix.,name,never empty,as-printed,data
+interrupts,handler,"Handler symbol the EVT startup file places at this number (e.g. `ADC1_2_IRQHandler`); it can differ from `name`, which is the header's `IRQn` enumerator.",name,the startup file has no entry at this number,as-printed,data
 interrupts,kind,`exception` (RISC-V processor exception) or `irq` (PFIC peripheral interrupt).,enum(exception|irq),never empty,fixed,data
-interrupts,description,One-line description from the EVT header.,text,never empty,prose,data
+interrupts,description,One-line description from the EVT header (or the startup file's comment for a number only the startup file has).,text,never empty,prose,data
 interrupts,condition,EVT variant macros under which this number has this name.,list(|),unconditional,as-printed,data
-interrupts,confidence,"Confidence of the row: reference = only one basis, with neither corroboration nor contradiction.",enum(reference),never empty,fixed,provenance
+interrupts,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 interrupts,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 link_firmware,device,WCH debugger product the firmware is for (e.g. `WCH-LinkE`).,name,never empty,fixed,data
 link_firmware,mcu,"MCU of the debugger that runs the firmware, derived from its first instruction.",name,never empty,fixed,data
@@ -447,6 +469,17 @@ pinout,value,Selector value for this route (`0` for `default`/`main`).,integer,n
 pinout,af,N of `af-N` (AF-number families); the register is in pin_alternate.,integer,not applicable (route is not `af-N`),,data
 pinout,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 pinout,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+pvd_levels,datasheet,Datasheet the values come from; a part picks its datasheet through parts.datasheet.,name,never empty,as-printed,data
+pvd_levels,series,"Series the datasheet covers, joined by `;`.",list(;),never empty,fixed,data
+pvd_levels,field,Selector field as printed (`PLS[2:0]`); it lives in PWR_CTLR.,name,never empty,as-printed,data
+pvd_levels,pls,Value written to the PLS field.,integer,never empty,,data
+pvd_levels,edge,"Supply direction the threshold applies to: `rising` or `falling`.",enum(falling|rising),never empty,fixed,data
+pvd_levels,min,Minimum threshold in `unit`.,decimal,not stated by the datasheet,,data
+pvd_levels,typ,Typical threshold in `unit`.,decimal,not stated by the datasheet,,data
+pvd_levels,max,Maximum threshold in `unit`.,decimal,not stated by the datasheet,,data
+pvd_levels,unit,Unit of the thresholds as printed (`V`).,name,never empty,fixed,data
+pvd_levels,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+pvd_levels,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 register_blocks,family,Family key; joins families.family.,name,never empty,fixed,data
 register_blocks,block,"Peripheral instance name (e.g. `USART1`). Collected from the EVT device header, the per-peripheral headers that define a block pointer (`PIOC`), and `core_riscv.h` (`PFIC`, `SysTick`, CH32H417 `HSEM`/`IPC`); blocks a header defines but the family does not have are removed by human judgment (`curated/register-blocks-absent.json`).",name,never empty,as-printed,data
 register_blocks,type,"EVT `*_TypeDef` stem the block uses (e.g. `USART`); `*_Type` for the core blocks of `core_riscv.h` (`PFIC`, `SysTick`); the block name itself when the header defines the registers only as address macros (CH32V103 `USBFS`).",name,never empty,as-printed,data
