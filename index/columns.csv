@@ -188,6 +188,7 @@ esig,confidence,"Confidence of the row: confirmed = two or more independent base
 esig,basis,Reference-manual pages the row was read from (`<document>:<lang>(p.N)`); `unit(...)` gives the pages whose field description states the unit.,text,never empty,prose,provenance
 exti_lines,family,Family key; joins families.family.,name,never empty,fixed,data
 exti_lines,line,EXTI line number.,integer,never empty,,data
+exti_lines,condition,"Variant macros (from evt_variants, joined by `|`) the row applies to, when the reference manual describes the line differently per variant (CH32FV2x_V3xRM line 20: USBHS on `CH32V30x_D8C`, USBFS otherwise).",list(|),the row applies to every variant of the family,as-printed,data
 exti_lines,source,"What drives the line: `GPIO` (a pin line routed by AFIO_EXTICRx), a pad (`PC18`), `PVD`, `RTC_ALARM`, `AWU` (auto wake-up), `OSCCAL_WAKEUP` or `<peripheral>_WAKEUP`.",name,never empty,fixed,data
 exti_lines,vector,"Interrupt vector the line raises, from interrupts (a shared `EXTI9_5`-style vector for pin lines).",name,the family has no interrupt vector for this source (the line works as an event only),as-printed,data
 exti_lines,irq,Interrupt number of `vector`.,integer,`vector` is empty,,data

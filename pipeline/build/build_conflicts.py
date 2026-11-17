@@ -53,7 +53,7 @@ KEYS: dict[str, tuple[str, ...]] = {
     "memory_configs": ("part_number", "value"),
     "adc_internal": ("family", "source", "channel"),
     "adc_triggers": ("family", "group", "value", "remap_field", "remap_value"),
-    "exti_lines": ("family", "line"),
+    "exti_lines": ("family", "line", "condition"),
     "pvd_levels": ("datasheet", "field", "pls", "edge"),
     "flash_geometry": ("family",),
     "flash_program_method": ("family",),

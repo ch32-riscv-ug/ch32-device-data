@@ -1,0 +1,23 @@
+{
+  "_comment": "EXTI line sources measured on physical silicon where the reference manual and the EVT header disagree. pipeline/extract/rm/extract_exti_lines.py adds the measurement to the claims for that line as `measured:<method>(<record>)`; the measured source is the one kept, and the row stays `conflict` because the documents still disagree (the same policy as register-fields-measured.json). This file never creates a line; it only settles a source a document already states.",
+  "measured": [
+    {
+      "family": "CH32V407",
+      "line": 18,
+      "source": "USBHS1_WAKEUP",
+      "method": "selfexti",
+      "date": "2026-11-17",
+      "how": "ch32rv core (f58a1dab) enabled only USBHS1WakeUp (vector 58) for EXTI line 18 and only USBHS2Wakeup (vector 84) for line 20, then fired each line by software interrupt; on CH32V407WEU6 both lines reported attached 1, calls 1 (junit property `swi`). With the reverse mapping neither handler would have run. RM table 9-6 says 18 = USBHS1, 20 = USBHS2; EVT ch32v4x7_exti.h says the reverse.",
+      "record": "ArduinoCore-CH32RV work/hardware-results/core-20261117T221818Z-d3fa53ac cases/v407weu6-p4/selfexti (OEP 30eda0ea068b)"
+    },
+    {
+      "family": "CH32V407",
+      "line": 20,
+      "source": "USBHS2_WAKEUP",
+      "method": "selfexti",
+      "date": "2026-11-17",
+      "how": "see line 18",
+      "record": "ArduinoCore-CH32RV work/hardware-results/core-20261117T221818Z-d3fa53ac cases/v407weu6-p4/selfexti (OEP 30eda0ea068b)"
+    }
+  ]
+}
