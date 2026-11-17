@@ -95,8 +95,11 @@ GPIO_NAME = re.compile(r"^P[A-H]\d{1,2}$")
 GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+(?:;remap-\d+)*)\)")
 
 
+GRID_ALSO = re.compile(r"(?<!!)rm-remap-grid\(route=(?P<route>(?:default|remap-\d+)(?:;(?:default|remap-\d+))*)\)")
+
+
 def build_index_grid(basis: str) -> str | None:
-    m = GRID_VALUE.search(basis)
+    m = GRID_VALUE.search(basis) or GRID_ALSO.search(basis)
     return m.group("route") if m else None
 
 

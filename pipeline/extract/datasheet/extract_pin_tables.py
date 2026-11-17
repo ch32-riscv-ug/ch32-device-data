@@ -520,7 +520,14 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
                 data = json.loads(path.read_text(encoding="utf-8"))
                 for pin in data.get("pins", []):
                     for fn in pin.get("functions", []):
-                        if fn.get("_value_from_grid"):
+                        if fn.get("_suffix_not_value"):
+                            # 接尾辞が値でない datasheet（CH32V103DS0）。pin 表は「remap して
+                            # いる」としか言わないので食い違いではない。格子が置く値を並べる。
+                            routes = fn.get("_grid_routes_all") or []
+                            if routes != [fn["_pin_table_route"]]:
+                                found[(pin["pad"], fn["signal"], fn["_pin_table_route"])] = (
+                                    "also", ";".join(routes))
+                        elif fn.get("_value_from_grid"):
                             # 格子が値を2つ以上に置くことがある（V103 の PB10 TIM2_CH3 は
                             # 値2と3）。`;` で並べる（build_index が1行ずつに開く）。
                             found[(pin["pad"], fn["signal"],
@@ -533,6 +540,9 @@ def apply_grid_corrections(fn_rows: list[dict]) -> list[dict]:
     for row in fn_rows:
         route = table_for(row["part_number"]).get(
             (row["pad"], row["signal"], row["route"]))
+        if isinstance(route, tuple):
+            row["basis"] = f"{row['basis']}+rm-remap-grid(route={route[1]})"
+            continue
         if route:
             row["confidence"] = "conflict"
             row["basis"] = f"{row['basis']}+!rm-remap-grid(route={route})"

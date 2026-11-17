@@ -140,7 +140,10 @@ dissent  := "(" 列 "=" 値 ("," 列 "=" 値)* ")"
 - data 列は英語
 - 証拠と違う値を持つのは1箇所だけ: **pin 表の remap 値が RM の格子と食い違う行**は格子の値を採ります
   （`pinout.route`）。証拠 `pin_functions` は pin 表の値のまま `conflict` で、basis に
-  `!rm-remap-grid(route=remap-N)` があります。格子はその値の定義そのもので、pin 表は写しだからです
+  `!rm-remap-grid(route=remap-N)` があります。格子はその値の定義そのもので、pin 表は写しだからです。
+  接尾辞を値として書かない datasheet（CH32V103DS0。remap している機能を全部 `_1` と書く）の行は、
+  格子が置く値の全部を1値1行で持ちます（証拠の basis に `!` 無しの `rm-remap-grid(route=remap-2;remap-3)`。
+  pin 表が書いた値でない行は `reference`）
 
 ## そのまま公開する表
 

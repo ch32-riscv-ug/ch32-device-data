@@ -153,6 +153,9 @@ dissent  := "(" column "=" value ("," column "=" value)* ")"
   remap value that the reference manual's remap grid contradicts, `pinout.route` takes the grid's value.
   The evidence (`pin_functions`) keeps the pin table's value as `conflict` with `!rm-remap-grid(route=remap-N)` in `basis`;
   the grid *defines* the value, the pin table only quotes it.
+  For a datasheet that does not write the suffix as the value (CH32V103DS0, which writes `_1` on every
+  remapped function), the index has one row per value the grid places (the evidence `basis` carries
+  `rm-remap-grid(route=remap-2;remap-3)` without `!`; rows whose value the pin table did not write are `reference`).
 
 ## Published as read
 

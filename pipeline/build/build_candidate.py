@@ -619,6 +619,17 @@ def join(
             found.add(v)
         return found
 
+    def mark_suffix_not_value(fn: dict) -> None:
+        """接尾辞が値でない datasheet の機能に、採った値の全部を route の綴りで残す。
+
+        `extract_pin_tables` が pin_functions の basis に `rm-remap-grid(route=…)` と並べ、
+        `build_index` が pinout で1値1行に開く。pin 表は値を言っていないので食い違いではない
+        （`!` を付けず、confidence も変えない）。
+        """
+        values = fn["selection"]["values"]
+        fn["_suffix_not_value"] = True
+        fn["_grid_routes_all"] = ["default" if v == 0 else f"remap-{v}" for v in values]
+
     def add_grid_values(pin: dict, fn: dict, extra: list[int]) -> None:
         """格子だけが言う値を selection に足す。pin 表はその値だとは言っていないので
         `grid_only_values` に挙げ、`build_remap` が確度を reference にする（F-75 と同じ理由）。"""
@@ -638,6 +649,8 @@ def join(
         pad = signal_vocabulary.port_pin(pin["pad"])
         says = grid_value_of.get((canonical_signal(fn["signal"]), pad))
         named = set() if suffix_is_value else grid_values(pin, fn)
+        if not suffix_is_value:
+            fn["_pin_table_route"] = fn["route"]
         if named:
             # 接尾辞が値でない datasheet（`REMAP_SUFFIX_NOT_VALUE`）。格子の値を全部採る。
             if stated not in named:
@@ -739,6 +752,8 @@ def join(
             **({"value_from_grid": True} if fn.get("_value_from_grid") else {}),
         }
         add_grid_values(pin, fn, fn.get("_grid_extra_values") or [])
+        if not suffix_is_value:
+            mark_suffix_not_value(fn)
         if how != "signal":
             fn["_selector_resolved_by"] = how
         used.add(key)
@@ -775,7 +790,9 @@ def join(
             # 既定の pad が別の値でも使われること（TIM2 の部分 remap 2 で CH1 は PA0 のまま）も
             # 格子から足す。
             if not suffix_is_value:
+                fn["_pin_table_route"] = fn["route"]
                 add_grid_values(pin, fn, sorted(grid_values(pin, fn)))
+                mark_suffix_not_value(fn)
             used.add(key)
             attested[key].update(fn["selection"]["values"])
 
