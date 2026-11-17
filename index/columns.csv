@@ -467,6 +467,7 @@ pinout,route,"How the function is reached: `main` (live at reset), `default` (de
 pinout,selector,AFIO selector that picks this route; key into routes.,name,not applicable (no selector),fixed,data
 pinout,value,Selector value for this route (`0` for `default`/`main`).,integer,not applicable (no selector),,data
 pinout,af,N of `af-N` (AF-number families); the register is in pin_alternate.,integer,not applicable (route is not `af-N`),,data
+pinout,condition,"Condition under which this route carries the function, from pin_conditions (e.g. `SDIOEN=1&ETHMACEN=1`); several joined by `|`.",text,the documents state no condition for this route,as-printed,data
 pinout,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 pinout,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 pvd_levels,datasheet,Datasheet the values come from; a part picks its datasheet through parts.datasheet.,name,never empty,as-printed,data

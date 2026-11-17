@@ -211,6 +211,8 @@ WCH-LinkUtility と MounRiver Studio の配布物由来: `link_firmware`（過�
 | `TIM1` の `ETR` ← `TIETR` | CH32V003 pin 表の誤植（`I` と `1`） | 表2-3 では `T1ETR` |
 | `BLE` の `ANT` | CH32V208 の専用 pad | 凡例「射频信号输入输出（天线）」 |
 
+`condition` はその経路で機能が出る条件で、`pin_conditions.csv`（datasheet の注と RM の表）から採ります。`default` の経路でも周辺の有効化だけでは出ないものがあり（V30x と V407 の PB14/PB15 の SDIO_D0/D1 は `SDIOEN=1&ETHMACEN=1`）、`remap-N` の行には `_RM=N` を名指す条件が付きます。複数は `|` で並べ、資料が条件を書かなければ空です。
+
 ### `routes.csv` — remap selector の値 → 信号と pad
 
 1行1（series, selector, 値, 信号）。`evidence/remap_fields`（selector の register・bit）と

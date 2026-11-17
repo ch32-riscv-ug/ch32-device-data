@@ -58,7 +58,8 @@ GRID_VALUE = re.compile(r"!rm-remap-grid\(route=(?P<route>remap-\d+(?:;remap-\d+
 GRID_ALSO = re.compile(r"(?<!!)rm-remap-grid\(route=(?P<route>(?:default|remap-\d+)(?:;(?:default|remap-\d+))*)\)")
 
 PINOUT_COLUMNS = ["part_number", "series", "family", "pin", "pad", "port", "gpio", "kind",
-                  "peripheral", "role", "signal", "route", "selector", "value", "af", "confidence", "basis"]
+                  "peripheral", "role", "signal", "route", "selector", "value", "af", "condition",
+                  "confidence", "basis"]
 ROUTES_COLUMNS = ["series", "selector", "controller", "register", "bits", "value", "peripheral", "role",
                   "signal", "pad", "port", "gpio", "confidence", "basis"]
 REGISTERS_COLUMNS = ["family", "type", "register", "offset", "width_bits", "count",
@@ -91,8 +92,28 @@ def gpio_of(pad: str, alias: str = "") -> tuple[str, str]:
 
 # ---------------------------------------------------------------- pinout
 
+def condition_for(found: list[str], route: str) -> str:
+    """その経路に当たる `pin_conditions` の条件。`remap-N` には `_RM=N` を含む条件、`default` には
+    remap の値を立てない条件（V30x/V407 の PB14 の SDIO_D0 は `SDIOEN=1&ETHMACEN=1`）。
+
+    >>> condition_for(["SDIO_RM=1", "SDIOEN=1&ETHMACEN=1"], "default")
+    'SDIOEN=1&ETHMACEN=1'
+    >>> condition_for(["SDIO_RM=1", "SDIOEN=1&ETHMACEN=1"], "remap-1")
+    'SDIO_RM=1'
+    """
+    m = re.fullmatch(r"remap-(\d+)", route)
+    if m:
+        hits = [c for c in found if re.search(rf"_RM={m.group(1)}\b", c)]
+    elif route == "default":
+        hits = [c for c in found if not re.search(r"_RM=[1-9]", c)]
+    else:
+        hits = []
+    return "|".join(sorted(hits))
+
+
 def pinout_rows(products: list[dict], pins: list[dict], functions: list[dict],
-                remap_routes: list[dict]) -> tuple[list[dict], collections.Counter]:
+                remap_routes: list[dict], conditions: list[dict] | None = None,
+                ) -> tuple[list[dict], collections.Counter]:
     """(pinout の行, 語彙で覆えなかった {(datasheet, signal): 行数})。
 
     tools/check_tables.py が同じ計算をして、覆えない数が増えていないかを見る。
@@ -129,6 +150,12 @@ def pinout_rows(products: list[dict], pins: list[dict], functions: list[dict],
         lambda: collections.defaultdict(list))
     for r in remap_routes:
         selectors[(r["series"], r["signal"], r["pad"])][r["value"]].append(r["selector"])
+
+    # **その経路で機能が出る条件**（`pin_conditions`: datasheet の注と RM の表）。default の経路でも
+    # 周辺の有効化だけでは出ないものがある——V30x/V407 の PB14/PB15 の SDIO_D0/D1 は ETHMACEN も要る。
+    condition_of: dict[tuple[str, str, str], list[str]] = collections.defaultdict(list)
+    for c in conditions or []:
+        condition_of[(c["series"], c["signal"], c["pad"])].append(c["condition"])
 
     rows: list[dict] = []
     unresolved: collections.Counter = collections.Counter()
@@ -180,13 +207,16 @@ def pinout_rows(products: list[dict], pins: list[dict], functions: list[dict],
                                  "selector": ";".join(sorted(set(chosen))),
                                  "value": value if chosen else "",
                                  "af": af,
+                                 "condition": condition_for(condition_of.get(
+                                     (product["series"], signal, f"P{port}{gpio}" if port else pad), []),
+                                     route),
                                  "confidence": confidence, "basis": fn["basis"]})
                     emitted += 1
         if not emitted:
             # 機能の行が無い lead（電源・NC・GPIO だけの足）も1行。port+gpio → lead
             # が1表で引けるのはこの行があるから。
             rows.append({**base, "peripheral": "", "role": "", "signal": "", "route": "",
-                         "selector": "", "value": "", "af": "",
+                         "selector": "", "value": "", "af": "", "condition": "",
                          "confidence": pin["confidence"], "basis": pin["basis"]})
     rows.sort(key=lambda r: (r["part_number"], pin_key(r["pin"]), r["pad"],
                              r["peripheral"], r["role"], r["route"], r["signal"]))
@@ -527,7 +557,7 @@ def main() -> int:
     pinout: list[dict] = []
     if {"pinout", "timers"} & only:
         pinout, unresolved = pinout_rows(products, paths.load("pins"), paths.load("pin_functions"),
-                                         paths.load("remap_routes"))
+                                         paths.load("remap_routes"), paths.load("pin_conditions"))
         if "pinout" in only:
             emit("pinout", pinout, PINOUT_COLUMNS)
             if unresolved:

@@ -226,6 +226,8 @@ in `SYSTEM` in `pipeline/common/signal_vocabulary.py`):
 | `ETR` of `TIM1` <- `TIETR` | a typo in CH32V003's pin table (`I` for `1`) | `T1ETR` in table 2-3 |
 | `ANT` of `BLE` | CH32V208's dedicated pad | legend "射频信号输入输出（天线）" |
 
+`condition` is the condition under which that route carries the function, from `pin_conditions.csv` (the datasheet's notes and the RM tables): a `default` route can need more than the peripheral's enable bit (`SDIOEN=1&ETHMACEN=1` on PB14/PB15 for SDIO_D0/D1 of V30x and V407), and a `remap-N` row gets the condition naming `_RM=N`. Several conditions are joined by `|`; empty when the documents state none.
+
 ### `routes.csv` -- remap selector value -> signal and pad
 
 One row per (series, selector, value, signal): `evidence/remap_fields` (register and bits of the
