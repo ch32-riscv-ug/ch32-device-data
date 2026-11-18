@@ -1,37 +1,36 @@
 {
  "schema_version": "0.2",
- "source_sha256": "7dc8e971fad5635e252e20ac9ef0e282f28d4ac70bd788817c288310d4c7b415",
+ "source_sha256": "ae8b973c6c606102c0ec161059887187a50d0d50d86028e62b4a46aff6930edb",
  "status": "partial",
  "decisions": {
-  "p232-table-001": {
+  "p230-table-001": {
    "status": "approved",
    "canonical_table_number": "16-6",
    "note": "printed as 16-7"
   },
-  "p232-table-002": {
+  "p230-table-002": {
    "status": "approved",
    "canonical_table_number": "16-7"
   },
-  "p320-table-003": {
+  "p317-table-003": {
    "status": "approved",
    "canonical_table_number": "22-1",
    "note": "printed as 22-5"
   },
-  "p351-table-001": {
+  "p347-table-001": {
    "status": "approved",
    "canonical_table_number": "24-1"
   },
-  "p352-table-001": {
+  "p348-table-001": {
    "status": "approved",
    "canonical_table_number": "24-2",
-   "note": "printed as 24-1"
+   "note": "the caption line (printed Table 24-2) is at the foot of p.347, so the table carries no caption"
   },
-  "p87-table-005": {
+  "p86-table-010": {
    "status": "approved",
-   "canonical_table_number": "9-5",
-   "note": "printed as 9-6"
+   "canonical_table_number": "9-5"
   },
-  "p202-table-003": {
+  "p200-table-003": {
    "status": "approved",
    "canonical_table_number": "15-2",
    "note": "the en edition prints no caption line for this table; a prose reference precedes it"
