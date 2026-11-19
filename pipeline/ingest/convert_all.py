@@ -29,6 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 import convert  # noqa: E402
+import workers  # noqa: E402
 import runlock  # noqa: E402  原本を読む間の鍵（pull側が見て跳ばす）
 
 REPO = convert.REPO
@@ -113,7 +114,8 @@ def run_one(args: tuple[dict, str, str]) -> tuple[str, float, int]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--jobs", type=int, default=4)
+    # 既定は空きコアから（`workers.default_workers`）。ほかの作業と CPU を取り合わない。
+    ap.add_argument("--jobs", type=int, default=workers.default_workers(cap=4))
     ap.add_argument("--force", action="store_true", help="incremental判定を無視して全部変換")
     ap.add_argument("--only", help="対象を絞る（`CH32V003DS0.en`のようにカンマ区切り）")
     ap.add_argument("--skip", help="据え置く文書（カンマ区切り）。原本が動いた文書を**前の原本の"

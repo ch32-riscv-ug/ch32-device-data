@@ -115,7 +115,7 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
     stages: list[tuple[str, list[Step]]] = [
         ("bundles", [
             ("convert_all (incremental)",
-             ["pipeline/ingest/convert_all.py", "--jobs", str(args.jobs),
+             ["pipeline/ingest/convert_all.py", *(["--jobs", str(args.jobs)] if args.jobs else []),
               *(["--skip", ",".join(held)] if held else [])]),
         ]),
     ]
@@ -234,7 +234,8 @@ def main() -> int:
                     help="凍結toolのパリティ一式とエラッタ増分検査も回す")
     ap.add_argument("--human", action="store_true",
                     help="図の描画と人向けMarkdownと差ゼロ検査も回す")
-    ap.add_argument("--jobs", type=int, default=4, help="convert_allの並列数")
+    ap.add_argument("--jobs", type=int, default=None,
+                    help="convert_allの並列数（既定は convert_all が空きコアから決める）")
     ap.add_argument("--list", action="store_true", help="計画だけ表示して実行しない")
     ap.add_argument("--accept-sources", action="store_true",
                     help="原本が動いている状態で走る（資料更新の取り込みとして。"

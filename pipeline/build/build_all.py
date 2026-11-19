@@ -65,6 +65,7 @@ import extract_ordering  # noqa: E402
 import extract_pins  # noqa: E402
 import extract_products  # noqa: E402
 import paths  # noqa: E402
+import workers  # noqa: E402
 
 MIRRORS = Path("/home/mt/dev_wch")
 # Headings the text layer loses, read off the rendered page by hand.
@@ -477,8 +478,11 @@ def default_jobs() -> int:
     The readers now take structured bundles, where a page is plain JSON: the whole run
     peaks at about **66 MiB** and finishes in seconds. Memory no longer decides this,
     but the cap costs nothing and the WSL caveat is still true, so it stays.
+
+    It also drops to the cores that are free right now (`workers.default_workers`):
+    other work on the same machine competes for the same cores.
     """
-    return max(1, min(6, (os.cpu_count() or 2) - 1))
+    return workers.default_workers(cap=6)
 
 
 def main() -> int:
