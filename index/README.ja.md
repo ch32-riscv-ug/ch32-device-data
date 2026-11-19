@@ -171,8 +171,9 @@ WCH-LinkUtility と MounRiver Studio の配布物由来: `link_firmware`（過�
 | `clock_max` | 系統主頻（`F_MAIN`。無ければ `F_HCLK`→`F_SYSCLK`→`F_CORE` の上限）。条件違いは `/` 併記（`144/192 MHz`） | `operating_conditions`（使った行の確度と根拠） |
 | `vdd_min` `vdd_max` | `V_DD` の包絡（V） | 同上 |
 | `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | 比較表の値**そのまま**（`4`・`1/10`・`√`）。属性の綴りが family で違うので `build_index.py` の `ATTRIBUTE_COLUMNS` で列に寄せる。同じ列に2属性が当たれば `;` | `evidence/product_attributes` |
+| `adc_units` | ADC のユニット数（ADC1・ADC2 …）。比較表の書き方が3通りあるのでそれぞれ読む: `ADC unit` の行（V30x・V407・H417）、`チャネル@ユニット数` の `@` の後ろ（V20x: `10@2` → 2）、ADC ごとのチャネル数の行の数（X315: ADC1〜ADC4 → 4）。比較表がチャネル数しか書かない family（V103・V003 など）は空——レジスタのヘッダは family の上限で、部品の数ではない（CH32V203RB の family ヘッダは ADC2 を持つが `16@1`） | 同上 |
 
-`family`・`listed_as`・`datasheet` は目録が付ける名前なので確度を持ちません。数え方の規則は持ちません
+`family`・`listed_as`・`datasheet` は目録が付ける名前なので確度を持ちません。`adc_units` のほかは数え方の規則を持ちません
 （`OPA/CMP = 4` を OPA 4 と読まない）。数を突き合わせるのは `tools/check_counts.py` の仕事です。
 
 ### `pinout.csv` — 型番 × lead × 機能

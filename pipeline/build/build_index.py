@@ -436,23 +436,63 @@ ATTRIBUTE_COLUMNS: dict[str, re.Pattern] = {
 # datasheet は series と目録が決める名前なので確度を持たない。
 PARTS_COLUMNS = ["part_number", "series", "family", "package", "pins", "flash_bytes", "sram_bytes",
                  "gpio_count", "clock_max", "vdd_min", "vdd_max", "temperature", "usart", "spi", "i2c",
-                 "can", "usb", "adc", "dac", "opa", "cmp", "timers_advanced", "timers_general", "rtc",
-                 "ethernet", "packing", "listed_as", "datasheet", "part_number_confidence",
+                 "can", "usb", "adc", "adc_units", "dac", "opa", "cmp", "timers_advanced", "timers_general",
+                 "rtc", "ethernet", "packing", "listed_as", "datasheet", "part_number_confidence",
                  "series_confidence", "package_confidence", "pins_confidence", "flash_bytes_confidence",
                  "sram_bytes_confidence", "gpio_count_confidence", "clock_max_confidence",
                  "vdd_min_confidence", "vdd_max_confidence", "temperature_confidence",
                  "usart_confidence", "spi_confidence", "i2c_confidence", "can_confidence",
-                 "usb_confidence", "adc_confidence", "dac_confidence", "opa_confidence",
+                 "usb_confidence", "adc_confidence", "adc_units_confidence", "dac_confidence", "opa_confidence",
                  "cmp_confidence", "timers_advanced_confidence", "timers_general_confidence",
                  "rtc_confidence", "ethernet_confidence", "packing_confidence", "part_number_basis",
                  "series_basis", "package_basis", "pins_basis", "flash_bytes_basis", "sram_bytes_basis",
                  "gpio_count_basis", "clock_max_basis", "vdd_min_basis", "vdd_max_basis",
                  "temperature_basis", "usart_basis", "spi_basis", "i2c_basis", "can_basis", "usb_basis",
-                 "adc_basis", "dac_basis", "opa_basis", "cmp_basis", "timers_advanced_basis",
+                 "adc_basis", "adc_units_basis", "dac_basis", "opa_basis", "cmp_basis", "timers_advanced_basis",
                  "timers_general_basis", "rtc_basis", "ethernet_basis", "packing_basis"]
 PARTS_VALUES = [c for c in PARTS_COLUMNS if not c.endswith(("_confidence", "_basis"))]
 PARTS_STATED = [c[:-len("_confidence")] for c in PARTS_COLUMNS if c.endswith("_confidence")]
 assert [c for c in PARTS_VALUES if c in ATTRIBUTE_COLUMNS] == list(ATTRIBUTE_COLUMNS)
+
+
+# ADC のユニット数（ADC1・ADC2 … の数）。比較表は family ごとに書き方が違う（2026-11-19、
+# consumer がデュアルモードを ADC2 のある部品でだけ有効にするのに使う）:
+#   `ADC unit` の行（V30x・V407・H417）      値がそのままユニット数
+#   `ADC/TKey channel@unit count`（V20x）  `10@2` の `@` の後ろ
+#   ADC1〜ADC4 のチャネル数の行（X315）       値のある行の数
+# 比較表がユニット数を言わない family（`adc` がチャネル数だけ。V103・V003 など）は空——
+# レジスタの定義（ヘッダの ADC2）は family の上限で、部品ごとの数ではない（V203RB は ADC2 の
+# レジスタを持つ family で @1）。
+ADC_UNIT_ATTRIBUTE = re.compile(r"^adc(_tkey)?_units?$")
+ADC_PER_UNIT_ATTRIBUTE = re.compile(r"^adc_tkey_channel_unit_?count$")
+ADC_EACH_ATTRIBUTE = re.compile(r"^adc_adc(\d+)_channel$")
+
+
+def adc_units(stated: list[dict]) -> tuple[str, list[dict]]:
+    """部品の比較表の行 → (ユニット数, 使った行)。言わなければ ("", [])。
+
+    >>> row = lambda a, v: {"attribute": a, "value": v}
+    >>> adc_units([row("adc_tkey_channel", "16"), row("adc_tkey_unit", "2")])[0]
+    '2'
+    >>> adc_units([row("adc_tkey_channel_unitcount", "10@2")])[0], adc_units([row("adc_tkey_channel_unit_count", "16@1")])[0]
+    ('2', '1')
+    >>> adc_units([row("adc_adc1_channel", "9+1"), row("adc_adc2_channel", "10"), row("adc_adc3_channel", "-")])[0]
+    '2'
+    >>> adc_units([row("adc", "8")])
+    ('', [])
+    """
+    used = [a for a in stated if ADC_UNIT_ATTRIBUTE.match(a["attribute"]) and a["value"].isdigit()]
+    if used:
+        return ";".join(dict.fromkeys(a["value"] for a in used)), used
+    used = [a for a in stated if ADC_PER_UNIT_ATTRIBUTE.match(a["attribute"])
+            and re.fullmatch(r"\d+@\d+", a["value"])]
+    if used:
+        return ";".join(dict.fromkeys(a["value"].split("@")[1] for a in used)), used
+    used = [a for a in stated if ADC_EACH_ATTRIBUTE.match(a["attribute"])
+            and re.fullmatch(r"\d+(\+\d+)?", a["value"]) and a["value"] != "0"]
+    if used:
+        return str(len({ADC_EACH_ATTRIBUTE.match(a["attribute"]).group(1) for a in used})), used
+    return "", []
 
 
 def joined_basis(rows: list[dict], column: str = "basis") -> str:
@@ -490,7 +530,9 @@ def parts_rows(products: list[dict], packages: list[dict], attributes: list[dict
                operating: list[dict]) -> list[dict]:
     package_of = {p["package"]: p for p in packages}
     attrs: dict[str, dict[str, list[dict]]] = collections.defaultdict(lambda: collections.defaultdict(list))
+    stated_by: dict[str, list[dict]] = collections.defaultdict(list)
     for a in attributes:
+        stated_by[a["part_number"]].append(a)
         for column, pattern in ATTRIBUTE_COLUMNS.items():
             if pattern.search(a["attribute"]):
                 attrs[a["part_number"]][column].append(a)
@@ -511,6 +553,9 @@ def parts_rows(products: list[dict], packages: list[dict], attributes: list[dict
             row[column] = ";".join(dict.fromkeys(a["value"] for a in stated))
             row[f"{column}_confidence"] = weakest(*(a["confidence"] for a in stated))
             row[f"{column}_basis"] = joined_basis(stated)
+        units, used = adc_units(stated_by[p["part_number"]])
+        row.update(adc_units=units, adc_units_confidence=weakest(*(a["confidence"] for a in used)),
+                   adc_units_basis=joined_basis(used))
         rows.append(row)
     rows.sort(key=lambda r: r["part_number"])
     return rows

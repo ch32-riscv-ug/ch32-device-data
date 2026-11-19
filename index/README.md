@@ -184,8 +184,9 @@ The part table. **Every value column has its own `<column>_confidence` and `<col
 | `clock_max` | the system clock's maximum (`F_MAIN`, else the upper limit of `F_HCLK` -> `F_SYSCLK` -> `F_CORE`); values for different conditions are joined with `/` (`144/192 MHz`) | `operating_conditions` (the confidence and basis of the rows used) |
 | `vdd_min` `vdd_max` | the `V_DD` envelope (V) | likewise |
 | `usart` `spi` `i2c` `can` `usb` `adc` `dac` `opa` `cmp` `timers_advanced` `timers_general` `rtc` `ethernet` | the comparison table's values **verbatim** (`4`, `1/10`, `√`). The attribute names differ by family, so `ATTRIBUTE_COLUMNS` in `build_index.py` maps them to columns; two attributes landing in one column are joined with `;` | `evidence/product_attributes` |
+| `adc_units` | the number of ADC units (ADC1, ADC2, ...). The comparison tables state it three ways, so this column reads each: the `ADC unit` entry (V30x, V407, H417), the number after `@` in `channel@unit count` (V20x: `10@2` -> 2), and the count of per-ADC channel entries (X315: ADC1-ADC4 -> 4). Empty where the table gives channels only (V103, V003, ...) -- the register headers give the family's maximum, not the part's (CH32V203RB has ADC2 registers in its family header but `16@1`) | likewise |
 
-`family`, `listed_as` and `datasheet` are names the catalog assigns, so they carry no confidence. No counting
+`family`, `listed_as` and `datasheet` are names the catalog assigns, so they carry no confidence. Apart from `adc_units`, no counting
 rules are applied here (`OPA/CMP = 4` is not read as 4 OPAs) -- `tools/check_counts.py` does the
 reconciliation.
 
