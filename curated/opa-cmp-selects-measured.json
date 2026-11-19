@@ -1,0 +1,15 @@
+{
+  "_comment": "OPA/CMP selector values measured on physical silicon where the reference manual's editions disagree. pipeline/extract/rm/extract_opa_cmp_selects.py adds the measurement to the claims for that value as `measured:<method>(<record>)`; the measured target is the one kept, and the row stays `conflict` because the documents still disagree (the same policy as register-fields-measured.json and exti-lines-measured.json). This file never creates a value; it only settles a target a document already states.",
+  "measured": [
+    {"family": "CH32H417", "register": "OPA_CTLR3", "field": "MODE3", "value": 0, "target": "PA0", "method": "opa-drive", "date": "2026-11-19",
+     "how": "ch32rv core on CH32H417QEU6 wrote OPA_CTLR3 (0x40017808) directly with + on CHP1 and - on CHN1 driven by GPIO, and read the output candidates by ADC: MODE 0 put PA0 at 1013/1 (+ high / - high) with PA4 floating (607/377); MODE 1 put PA4 at 1023/0 with PA0 floating. The zh RM says 0=PA0, 1=PA4; the en RM says the reverse.",
+     "record": "ch32rv [core] report 2026-11-19 (CH32H417QEU6, OPA_CTLR2/3 drive test; core commit bc0eb24c)"},
+    {"family": "CH32H417", "register": "OPA_CTLR3", "field": "MODE3", "value": 1, "target": "PA4", "method": "opa-drive", "date": "2026-11-19", "how": "see MODE3 value 0",
+     "record": "ch32rv [core] report 2026-11-19 (CH32H417QEU6, OPA_CTLR2/3 drive test; core commit bc0eb24c)"},
+    {"family": "CH32H417", "register": "OPA_CTLR2", "field": "MODE2", "value": 1, "target": "PB1", "method": "opa-drive", "date": "2026-11-19",
+     "how": "same procedure on OPA_CTLR2 (0x40017804): MODE 1 put PB1 at 930/0, MODE 0 left PB1 floating (348/361). PE7 is not an ADC channel and could not be read; value 0 = PE7 follows from PB1 not being driven. The zh RM says 0=PE7, 1=PB1; the en RM says the reverse.",
+     "record": "ch32rv [core] report 2026-11-19 (CH32H417QEU6, OPA_CTLR2/3 drive test; core commit bc0eb24c)"},
+    {"family": "CH32H417", "register": "OPA_CTLR2", "field": "MODE2", "value": 0, "target": "PE7", "method": "opa-drive", "date": "2026-11-19", "how": "see MODE2 value 1 (inferred: PE7 is not readable by ADC)",
+     "record": "ch32rv [core] report 2026-11-19 (CH32H417QEU6, OPA_CTLR2/3 drive test; core commit bc0eb24c)"}
+  ]
+}

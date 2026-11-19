@@ -232,7 +232,7 @@ RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**395行
 
 ### `opa_cmp_selects.csv`
 
-OPA・CMP の選択 field の値ごとに、何がつながるか（端子か内部の接続）。生成は`pipeline/extract/rm/extract_opa_cmp_selects.py`。値ごとの端子は RM の field の説明だけが書き（`MODE1 … 1：输出信号通过PA7输出； 0：输出信号通过PB1输出`）、**datasheet のピン表の番号（`OPA_OUT1`/`OPA_OUT2`）は値と一致しない family があります**（V407 の MODE1 は 0 が PB1・1 が PA7）。`target` は端子か英語の記号（`OPAn_OUT`・`DAC_OUT`・`PGA`・`OFF`・`GND`・`VREF`）。説明に区切りの `；` が無い版（L103 zh）があるので次の値の符号までを1つの説明にし、field の幅と違う桁数で書く版（H417 en の 1 bit の MODE2 を `00:`/`01:`）も読みます。zh・en 版が同じ target を言えば confirmed。**H417 の OPA2/OPA3 の MODE は zh 版と en 版で逆**（zh は 0＝PE7/PA0、en は 0＝PB1/PA4）で conflict です。
+OPA・CMP の選択 field の値ごとに、何がつながるか（端子か内部の接続）。生成は`pipeline/extract/rm/extract_opa_cmp_selects.py`。値ごとの端子は RM の field の説明だけが書き（`MODE1 … 1：输出信号通过PA7输出； 0：输出信号通过PB1输出`）、**datasheet のピン表の番号（`OPA_OUT1`/`OPA_OUT2`）は値と一致しない family があります**（V407 の MODE1 は 0 が PB1・1 が PA7）。`target` は端子か英語の記号（`OPAn_OUT`・`DAC_OUT`・`PGA`・`OFF`・`GND`・`VREF`）。説明に区切りの `；` が無い版（L103 zh）があるので次の値の符号までを1つの説明にし、field の幅と違う桁数で書く版（H417 en の 1 bit の MODE2 を `00:`/`01:`）も読みます。zh・en 版が同じ target を言えば confirmed。**H417 の OPA2/OPA3 の MODE は zh 版と en 版で逆**（zh は 0＝PE7/PA0、en は 0＝PB1/PA4）で、**実機では zh 版の向き**でした——ch32rv のコアが CH32H417QEU6 で OPA を駆動し出力の候補を ADC で読んだ（`curated/opa-cmp-selects-measured.json`、basis の `measured:opa-drive(...)`）。資料の食い違いは残るので conflict のまま。
 
 ### `timer_itr.csv`
 

@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -106,6 +107,9 @@ def main() -> int:
 
     with paths.table("families").open(newline="", encoding="utf-8") as f:
         families = [r["family"] for r in csv.DictReader(f)]
+    # 実機で確かめた値（RM の版どうしが食い違う値だけ）。採る target を決めるが、食い違いは残す。
+    measured = {(m["family"], m["register"], m["field"], int(m["value"])): m for m in json.loads(
+        (REPO / "curated" / "opa-cmp-selects-measured.json").read_text(encoding="utf-8"))["measured"]}
     rows = []
     for family in families:
         editions = {}
@@ -130,8 +134,13 @@ def main() -> int:
             for value in sorted({v for s in said.values() for v in s[2]}):
                 claims = {lang: s[2][value] for lang, s in said.items() if value in s[2]}
                 kept = claims.get(kept_lang) or next(iter(claims.values()))
+                m = measured.get((family, register, field, value))
+                if m:
+                    kept = m["target"]
                 document = {lang: editions[lang][0] for lang in claims}
                 basis = "+".join(f"rm:{document[lang]}:{lang}" for lang, t in claims.items() if t == kept)
+                if m:
+                    basis += ("+" if basis else "") + f"measured:{m['method']}({m['date']})"
                 basis += "".join(f"+!rm:{document[lang]}:{lang}(target={t})"
                                  for lang, t in claims.items() if t != kept)
                 rows.append({"family": family, "register": register, "field": field, "bits": bits,
