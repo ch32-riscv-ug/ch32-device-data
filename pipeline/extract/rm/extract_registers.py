@@ -1030,7 +1030,12 @@ def main() -> int:
                         confidence = "conflict"
                         basis.append(f"!rm:{manual_name}(bits={lo + width - 1}:{lo})")
                 fact = measured.get((family, register, fname)) if kind == "field" else None
-                if fact:
+                if fact and fact.get("writable") is False:
+                    # 資料（header と RM）は field を書くが、実機では書けない（X035 の USART1 の
+                    # CTLR2 の LBCL/CPHA/CPOL）。位置は資料のまま、実機を異論として残す。
+                    confidence = "conflict"
+                    basis.append(f"!{fact['method']}:{fact['probe']}(writable=0)")
+                elif fact:
                     basis.append(f"{fact['method']}:{fact['probe']}(bits={fact['bits']})")
                 fields_out.append({
                     "family": family, "register": register, "type": type_name,

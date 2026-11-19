@@ -818,7 +818,7 @@ device header, not from the figure in DS chapter 1.2**. Resolution of relative c
 `kind` has 4 values:
 
 ```
-memory       FLASH, SRAM, OB (用户选择字)
+memory       FLASH, SRAM, OB (用户选择字), PIOC_SRAM (the PIOC code RAM; from PIOC_SRAM_BASE in the EVT PIOC header)
 bus          PERIPH_BASE / APB1PERIPH_BASE / AHBPERIPH_BASE ── the bundling side
 peripheral   TIM2_BASE, GPIOA_BASE … individual peripherals
 link-origin  the start address the EVT linker script actually uses

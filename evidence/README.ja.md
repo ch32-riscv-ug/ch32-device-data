@@ -794,7 +794,7 @@ device headerの`*_BASE`定数から**取ります。相対の連鎖
 `kind`は4種類:
 
 ```
-memory       FLASH・SRAM・OB（用户选择字）
+memory       FLASH・SRAM・OB（用户选择字）・PIOC_SRAM（PIOC のコード用 RAM。EVT の PIOC のヘッダーの PIOC_SRAM_BASE から）
 bus          PERIPH_BASE / APB1PERIPH_BASE / AHBPERIPH_BASE ── 束ねる側
 peripheral   TIM2_BASE・GPIOA_BASE … 個々の周辺
 link-origin  EVTのlinker scriptが実際に使う先頭番地

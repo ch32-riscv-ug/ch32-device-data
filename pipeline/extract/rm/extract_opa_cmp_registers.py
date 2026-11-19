@@ -286,6 +286,7 @@ def main() -> int:
             # 食い違いは残るので conflict のまま（register_fields と同じ扱い。V205 の CMP_CTLR の
             # HYS1_H/HYS2_H は header 29/30、RM 19/29、実機 19/29）。
             m = MEASURED.get((family, register, field))
+            m = m if m and "bits" in m else None
             if m:
                 header_bits = bits
                 bits = m["bits"]

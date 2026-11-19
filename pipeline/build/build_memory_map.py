@@ -55,7 +55,8 @@ VARIANT = re.compile(r"(?<!_)\bCH32[A-Za-z0-9]*_(?:D\d[A-Za-z0-9]*|[A-Z]{2,}[A-Z
 # 束ねる側の名前。個々の周辺と区別する。
 BUS = re.compile(r"^(?:A?HB|APB\d|)PERIPH$|^PERIPH$")
 # `FLASH_R` は FLASH の**制御レジスタ**（0x40022000）で、記憶域ではない。
-MEMORY = {"FLASH", "SRAM", "OB"}
+# `PIOC_SRAM` は PIOC（RISC8B コアの eMCU）のコード用 RAM。PIOC のヘッダーだけが書く（下）。
+MEMORY = {"FLASH", "SRAM", "OB", "PIOC_SRAM"}
 
 # `ORIGIN = 0x20000000+1024` や `ORIGIN = (0x20110000+256)` のような**算術式**が
 # 書かれる。数だけ取ると +1024 が落ちて、CH32V407 の RAM が 0x20000000 に
@@ -153,6 +154,34 @@ def read_link_origins(family_dir: Path) -> dict[tuple[str, str], int]:
     return {key: tally.most_common(1)[0][0] for key, tally in counted.items()}
 
 
+PIOC_SRAM = re.compile(r"^#\s*define\s+PIOC_SRAM_BASE\s+(?P<expr>[^/]+?)\s*(?://|/\*|$)", re.M)
+
+
+def pioc_sram(text: str, resolved: dict[str, int]) -> int | None:
+    """`PIOC_SRAM_BASE` の値。`(0x50040000)`・`SRAM_BASE`・`(SRAM_BASE+0x4000)` の3つの形。
+
+    >>> pioc_sram("#define PIOC_SRAM_BASE      (SRAM_BASE+0x4000)  // x", {"SRAM_BASE": 0x20000000}) == 0x20004000
+    True
+    >>> pioc_sram("#define PIOC_SRAM_BASE      (0x50040000)        // x", {}) == 0x50040000
+    True
+    >>> pioc_sram("#define PIOC_SRAM_BASE      SRAM_BASE        // x", {"SRAM_BASE": 0x20000000}) == 0x20000000
+    True
+    """
+    m = PIOC_SRAM.search(text)
+    if not m:
+        return None
+    expr = m.group("expr").replace("(", "").replace(")", "").replace(" ", "")
+    total = 0
+    for term in expr.split("+"):
+        if re.fullmatch(r"0[xX][0-9A-Fa-f]+|\d+", term):
+            total += int(term, 0)
+        elif term in resolved:
+            total += resolved[term]
+        else:
+            return None
+    return total
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mirrors", type=Path, default=MIRRORS)
@@ -188,6 +217,18 @@ def main() -> int:
                 "confidence": CONFIDENCE,
                 "basis": f"evt({header.name})",
             })
+        # **PIOC のコード用 RAM** はデバイスのヘッダーではなく PIOC のヘッダーが書く
+        # （`ch32h417_pioc.h`・`ch32v205_pioc.h`・X035 は `PIOC_SFR.h`）。値は `SRAM_BASE` からの
+        # 式のことがある（X035 は `SRAM_BASE+0x4000`）ので、デバイスのヘッダーと続けて解く。
+        inc = header.parent
+        for extra in sorted(set(inc.glob("*_pioc.h")) | set(inc.glob("PIOC_SFR.h"))):
+            value = pioc_sram(extra.read_text(errors="ignore"), resolved)
+            if value is not None and not any(r["family"] == family and r["region"] == "PIOC_SRAM"
+                                             for r in rows):
+                rows.append({"family": family, "region": "PIOC_SRAM",
+                             "base_address": f"{value:#010x}", "kind": "memory",
+                             "condition": "", "confidence": CONFIDENCE,
+                             "basis": f"evt({extra.name})"})
         origins = read_link_origins(args.mirrors / family)
         for (what, core), origin in sorted(origins.items()):
             rows.append({

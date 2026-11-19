@@ -100,7 +100,7 @@
 | テーブル | 行数 | confidence | 検査 | 既知の穴 | 総合 |
 |---|---:|---|---|---|---|
 | interrupts | 792 | confirmed 791 / ref 1（2026-11-17 から EVT の startup のベクタ表と照合。ref は startup にしか無い V30x D8 の 58） | 結合・condition の macro・境界不変量 | F-37 は**修正済み**（OR条件を`\|`区切りで全部持つ） | 🔵 |
-| memory_map | 797 | 全行 reference | 結合 | F-38 は**修正済み**（基準リンカを式評価で読む。H417 はコア別2行）。ヘッダ由来の行は検証で全一致 | 🔵 |
+| memory_map | 800 | 全行 reference | 結合 | F-38 は**修正済み**（基準リンカを式評価で読む。H417 はコア別2行）。ヘッダ由来の行は検証で全一致 | 🔵 |
 | systick | 53 | 全行 reference | 結合 | — | 🔵 |
 | evt_variants | 57 | 全行 reference | products と結合 | — | 🔵 |
 | pin_alternate | 240 | 全行 reference | pin_functions(af-N) と結合 | — | 🔵 |
