@@ -871,7 +871,7 @@ uv run pipeline/publish/regenerate.py             # bundles -> evidence -> index
 uv run pipeline/publish/regenerate.py --full      # regenerate every CSV (frozen tools on bundle input; ~1.5h)
 uv run pipeline/publish/regenerate.py --verify --human  # + parity, errata, figures, Markdown
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4    # all 72 versions, incremental
+uv run pipeline/ingest/convert_all.py              # all 72 versions, incremental; workers default to the free cores (pipeline/common/workers.py)
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                          # independent verification gate (1.1.0+)
 ```

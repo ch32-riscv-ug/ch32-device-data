@@ -492,6 +492,13 @@ def resolve_member(register: str, structs: dict[str, Struct]) -> tuple[str, dict
         names = {m["name"]: m for m in st.members}
         if rest in names:
             return type_name, {**names[rest], "struct": st.name, "index": ""}, ""
+    # (a') メンバーが instance 番号付きの型名を前に付ける形（M030 の `TIM_TypeDef` は
+    # `TIM1_AUX1`・`TIM1_AUX2` を持ち、banner は `TIM_AUX1`）。1つだけなら採る。
+    prefixed = [(st, mm) for st in ordered for mm in st.members
+                if re.fullmatch(rf"{re.escape(type_name)}\d+_{re.escape(rest)}", mm["name"])]
+    if len(prefixed) == 1:
+        st, mm = prefixed[0]
+        return type_name, {**mm, "struct": st.name, "index": ""}, ""
     # (d) 入れ子構造体の配列。平坦化した名前 `sTxMailBox[0].TXMIR` と、banner の
     # 最初の数字列を添字として抜いた残り `TXMIR` を突き合わせる。
     first = FIRST_DIGITS.search(rest)

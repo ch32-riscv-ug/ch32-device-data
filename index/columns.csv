@@ -324,6 +324,28 @@ opa_cmp_selects,value,Value written to the field.,integer,never empty,,data
 opa_cmp_selects,target,"What the value connects: a pad (`PB1`; several joined by `;` for a differential PGA), `OPAn_OUT`, `DAC_OUT`, `PGA` (internal feedback, no negative pin), `OFF`, `GND` or `VREF`.",list(;),never empty,fixed,data
 opa_cmp_selects,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 opa_cmp_selects,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+dac_triggers,family,Family key; joins families.family.,name,never empty,fixed,data
+dac_triggers,group,Always `dac` (the column keeps the shape of adc_triggers).,enum(dac),never empty,fixed,data
+dac_triggers,register,DAC register holding the selector field.,name,never empty,as-printed,data
+dac_triggers,field,"Selector field: `TSEL1` (channel 1) or `TSEL2` (channel 2); it applies when `TEN1`/`TEN2` is 1.",enum(TSEL1|TSEL2),never empty,fixed,data
+dac_triggers,bits,Bit position `hi:lo` of the selector field in `register`.,bits,never empty,,data
+dac_triggers,value,Selector value written to `field`.,integer,never empty,,data
+dac_triggers,trigger,"Event the value selects: `TIMn_TRGO` (timer TRGO), `EXTIn` (EXTI line) or `SWTRIG` (software trigger through `DAC_SWTR`).",name,never empty,fixed,data
+dac_triggers,kind,"Kind of the event in `trigger`: `timer`, `exti` or `software`.",enum(exti|software|timer),never empty,fixed,data
+dac_triggers,remap_field,Always empty (no remap bit switches a DAC trigger; the column keeps the shape of adc_triggers).,name,always,as-printed,data
+dac_triggers,remap_value,Always empty (see `remap_field`).,integer,always,,data
+dac_triggers,define,"EVT define naming this value. The define's mask is at the channel-1 position and includes `TEN1`; the SPL shifts it by 16 for channel 2, so `TSEL2` rows name the same define.",name,never empty,as-printed,data
+dac_triggers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+dac_triggers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+adc_dual_modes,family,Family key; joins families.family.,name,never empty,fixed,data
+adc_dual_modes,register,ADC register holding the selector field.,name,never empty,as-printed,data
+adc_dual_modes,field,Selector field (`DUALMOD`; set in ADC1 — reserved in ADC2).,enum(DUALMOD),never empty,fixed,data
+adc_dual_modes,bits,Bit position `hi:lo` of the selector field in `register`.,bits,never empty,,data
+adc_dual_modes,value,Selector value written to `field`.,integer,never empty,,data
+adc_dual_modes,mode,"Mode the value selects, as tokens joined by `+` in the manual's order: `independent`, `regular_simultaneous`, `injected_simultaneous`, `fast_interleaved`, `slow_interleaved`, `alternate_trigger`.",text,never empty,fixed,data
+adc_dual_modes,define,"EVT define naming this value (`ADC_Mode_*`).",name,never empty,as-printed,data
+adc_dual_modes,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+adc_dual_modes,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 operating_conditions,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed,data
 operating_conditions,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `F_HCLK`, `f_ADC`).",name,never empty,fixed,data
 operating_conditions,parameter,"Parameter description in English, as the datasheet writes it.",text,not stated by the sources,as-printed,data

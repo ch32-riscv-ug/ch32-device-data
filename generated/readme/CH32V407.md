@@ -571,7 +571,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 
 | Series | Field | Register | Bits | Values | Reset |
 |---|---|---|---|---|---|
-| CH32V407 | CAN_REMAP | PCFR1 | PCFR1:13;PCFR1:14 | 0;1;2;3 | 0 |
+| CH32V407 | CAN_REMAP | PCFR1 | PCFR1:13;PCFR1:14 | 0;2;3 | 0 |
 | CH32V407 | DVP_REMAP | PCFR2 | PCFR2:13 | 0;1 | 0 |
 | CH32V407 | ETHPHY_LED_REMAP | PCFR1 | PCFR1:31 | 0;1 | 0 |
 | CH32V407 | FSMC_REMAP | PCFR2 | PCFR2:0 | 0;1 | 0 |
@@ -581,7 +581,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32V407 | SDIO_REMAP | PCFR2 | PCFR2:12 | 0;1 | 0 |
 | CH32V407 | SPI1_REMAP | PCFR1 | PCFR1:0 | 0;1 | 0 |
 | CH32V407 | SPI3_REMAP | PCFR1 | PCFR1:28 | 0;1 | 0 |
-| CH32V407 | TIM1_REMAP | PCFR1 | PCFR1:6;PCFR1:7 | 0;1;2;3 | 0 |
+| CH32V407 | TIM1_REMAP | PCFR1 | PCFR1:6;PCFR1:7 | 0;1;3 | 0 |
 | CH32V407 | TIM2_REMAP | PCFR1 | PCFR1:8;PCFR1:9 | 0;1;2;3 | 0 |
 | CH32V407 | TIM3_REMAP | PCFR1 | PCFR1:10;PCFR1:11 | 0;1;2;3 | 0 |
 | CH32V407 | TIM4_REMAP | PCFR1 | PCFR1:12 | 0;1 | 0 |
@@ -596,7 +596,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32V407 | USART7_REMAP | PCFR2 | PCFR2:22;PCFR2:23 | 0;1;2;3 | 0 |
 | CH32V407 | USART8_REMAP | PCFR2 | PCFR2:24;PCFR2:25 | 0;1;2;3 | 0 |
 | CH32V407 | USART9_REMAP | PCFR2 | PCFR2:28;PCFR2:29 | 0;1;2;3 | 0 |
-| CH32V467 | CAN_REMAP | PCFR1 | PCFR1:13;PCFR1:14 | 0;1;2;3 | 0 |
+| CH32V467 | CAN_REMAP | PCFR1 | PCFR1:13;PCFR1:14 | 0;2;3 | 0 |
 | CH32V467 | DVP_REMAP | PCFR2 | PCFR2:13 | 0;1 | 0 |
 | CH32V467 | ETHPHY_LED_REMAP | PCFR1 | PCFR1:31 | 0;1 | 0 |
 | CH32V467 | FSMC_REMAP | PCFR2 | PCFR2:0 | 0;1 | 0 |
@@ -606,7 +606,7 @@ Pin functions (filterable): [ALL](https://ch32-riscv-ug.github.io/ch32-device-da
 | CH32V467 | SDIO_REMAP | PCFR2 | PCFR2:12 | 0;1 | 0 |
 | CH32V467 | SPI1_REMAP | PCFR1 | PCFR1:0 | 0;1 | 0 |
 | CH32V467 | SPI3_REMAP | PCFR1 | PCFR1:28 | 0;1 | 0 |
-| CH32V467 | TIM1_REMAP | PCFR1 | PCFR1:6;PCFR1:7 | 0;1;2;3 | 0 |
+| CH32V467 | TIM1_REMAP | PCFR1 | PCFR1:6;PCFR1:7 | 0;1;3 | 0 |
 | CH32V467 | TIM2_REMAP | PCFR1 | PCFR1:8;PCFR1:9 | 0;1;2;3 | 0 |
 | CH32V467 | TIM3_REMAP | PCFR1 | PCFR1:10;PCFR1:11 | 0;1;2;3 | 0 |
 | CH32V467 | TIM4_REMAP | PCFR1 | PCFR1:12 | 0;1 | 0 |

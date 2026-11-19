@@ -92,7 +92,10 @@ def parse_reset(found: "re.Match[str]") -> int:
 # "001: Mapping (SCL/PA13, SDA/PA14)" and CH32M030 "000: Default mapping
 # (CH1/PC0, CH2/PC1)". A group may list several signals on one pad, as in
 # "CH1/ETR/PA5", where the last token is the pad.
-DESCRIBED_ROUTE = re.compile(r"(?P<value>[01xX]{1,4})\s*:\s*[^()]{0,40}?\(([^()]*)\)")
+# 値の符号と括弧の間に**次の値の符号を挟まない**——CH32xRM の TIM3_RM は
+# `01：保留； 10：部分映射(CH1/PB4，…)` で、挟むのを許すと 10 の経路が値 1 に付いた。
+DESCRIBED_ROUTE = re.compile(
+    r"(?<![0-9A-Za-z])(?P<value>[01xX]{1,4})\s*:\s*(?:(?![01xX]{1,4}\s*:)[^()]){0,40}?\(([^()]*)\)")
 # The manuals are not consistent about case inside a field description:
 # CH32X035 writes "010: mapping (rx/pc17, cts/pb15, tx/pc16, ...)" in lower
 # case for one row of USART4_RM and upper case for the rest. Dropping the
@@ -191,8 +194,18 @@ def extract(bundle: str, want: str | None) -> tuple[list[dict], list[str]]:
                 layout, rows = found, rows[1:]
             elif layout is None:
                 continue
-            for row in rows:
+            for position, row in enumerate(rows):
                 if max(layout[k] for k in ("bit", "name", "access", "reset")) >= len(row):
+                    continue
+                # **ページをまたいだ説明の続き。** 次のページの表の先頭の行が、bit・名前の欄を
+                # 空にして説明の欄だけを持つ（H417 の DUALMOD は 0100 までが前のページ、0101〜1001
+                # がこの行）。同じ register の直前の field の説明につなぐ。
+                if (not found and position == 0 and fields and fields[-1]["register"] == register
+                        and not row[layout["bit"]].strip() and not row[layout["name"]].strip()
+                        and layout.get("description", len(row)) < len(row)
+                        and row[layout["description"]].strip()):
+                    fields[-1]["description"] = (fields[-1]["description"] + " "
+                                                 + row[layout["description"]]).strip()
                     continue
                 bits = parse_bits(row[layout["bit"]])
                 # A field name never contains a space; CH32V003 wraps
@@ -286,6 +299,9 @@ def values_in(field: dict) -> set[int]:
     text = (field.get("description") or "").translate(FULLWIDTH)
     out: set[int] = set()
     for m in ENUMERATED.finditer(text):
+        # 説明が「保留」だけの値は定義された値ではない（CH32xRM の TIM3_RM `01：保留`）。
+        if re.match(r"\s*(?:保留|reserved)\s*[;.；。]?\s*(?:$|[01xX]{1,4}:|注|note)", text[m.end():], re.IGNORECASE):
+            continue
         for bits in _expand_bits(m.group("value").lower()):
             out.add(int("".join(bits), 2))
     return out

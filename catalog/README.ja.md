@@ -150,7 +150,7 @@ curl -s "$(grep MRS_Toolchain_Linux catalog/toolchains.csv | cut -d, -f9)" | pyt
 
 ```
 series.family / products.family / packages.families           → families.family
-adc_internal.family / adc_triggers.family / exti_lines.family / timer_itr.family / opa_cmp_selects.family / clock_configs.family / clock_enables.family → families.family
+adc_internal.family / adc_triggers.family / dac_triggers.family / adc_dual_modes.family / exti_lines.family / timer_itr.family / opa_cmp_selects.family / clock_configs.family / clock_enables.family → families.family
 clock_init.family / clock_prescalers.family / clock_sources.family → families.family
 clock_symbols.family / debug_data.family / dma_requests.family   → families.family
 eval_boards.family / evt_examples.family / evt_variants.family   → families.family

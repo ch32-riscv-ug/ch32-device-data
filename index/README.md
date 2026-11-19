@@ -166,7 +166,7 @@ read from the sources is in the [catalog README](../catalog/README.md) and the
 Keys: `families`, `series`, `packages`, `cores`.
 From EVT headers: `interrupts`, `memory_map`, `systick`, `evt_variants`, `clock_configs`, `clock_prescalers`,
 `clock_sources`, `clock_symbols`, `clock_init`, `clock_enables`, `pin_alternate`.
-Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `adc_triggers`, `exti_lines`, `pvd_levels`, `timer_itr`, `opa_cmp_selects`, `debug_data`,
+Reference manual and datasheet: `flash_geometry`, `flash_program_method`, `adc_internal`, `adc_triggers`, `dac_triggers`, `adc_dual_modes`, `exti_lines`, `pvd_levels`, `timer_itr`, `opa_cmp_selects`, `debug_data`,
 `device_ids`, `option_bytes`, `option_byte_fields`, `register_blocks`, `errata`, `operating_conditions`, `esig`,
 `absolute_maximum_ratings`, `opa_cmp_registers`, `usbpd_plumbing`, `pin_conditions`, `memory_configs`.
 WCH-LinkUtility and MounRiver Studio packages: `link_firmware` (past versions included); measured failures: `link_firmware_issues`.

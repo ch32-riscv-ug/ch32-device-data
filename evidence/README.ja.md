@@ -246,13 +246,21 @@ EXTI の線ごとに、何がその線を起こすか（`GPIO` の端子・`PVD`
 
 PVD（電圧監視）の段ごとの閾値。1行は datasheet × `PLS` の値 × 向き（`rising`/`falling`）。生成は`pipeline/extract/datasheet/extract_pvd_levels.py`。datasheet の表「复位及电压监测」/「Reset and voltage monitor」を、ページをまたぐ続きの断片と`logical_id`でつないでセルとして読みます——`operating_conditions`の`V_PVD`は凍結時の規則でページの本文を読むので、続きの段を落とします（L103 は 8 段のうち 5 段、CH32V007DS0 は 0 段）。同じ series が2つの datasheet に載ることがあるので（V203 は CH32V203DS0 と、V205 のダイの品番を載せる CH32V205DS0）、品番からは`index/parts.csv`の`datasheet`で引きます。zh・en 版が一致すれば confirmed。CH32V004DS0 と CH32M030DS0 は段の表を持たない（電源投入・遮断の閾値だけ）ので行がありません。
 
+### `adc_dual_modes.csv`
+
+ADC のデュアルモード——`ADC_CTLR1` の `DUALMOD[3:0]`（`[19:16]`。ADC1 で設定し、ADC2 では保留の bit）の各値が選ぶモード（ADC1 と ADC2 の同時・交互）。生成は`pipeline/extract/rm/extract_adc_dual_modes.py`（2026-11-19 に ch32rv の依頼で新設）。`mode` は意味を英語の記号で、RM の並びのまま `+` でつなぎます（`0001` は `regular_simultaneous+injected_simultaneous`）。EVT の ADC ヘッダの `ADC_Mode_*` と RM の field の説明を突き合わせ、一致すれば confirmed。RM の説明はページをまたぐことが多いので（H417 は 0100 までが前のページ）、`register_fields.extract` が次のページの表の先頭の続きの行をつないだ説明を読みます。対象は device ヘッダに DUALMOD の field がある family（H417・V103・V20x・V307・V407・X315）。L103・V205 などの ADC ヘッダも `ADC_Mode_*` を並べますが、DUALMOD を持たない（ADC が1つ）ので行がありません。デュアルモードには ADC を2つ持つ品番が要ります。
+
+### `dac_triggers.csv`
+
+DAC の変換を始める外部トリガ——`DAC_CTLR` の `TSEL1`（ch1、`[5:3]`）・`TSEL2`（ch2、`[21:19]`）の各値が何を選ぶか（タイマの TRGO・EXTI の線・ソフトウェア）。`TENx` を 1 にしたときに効きます。生成は`pipeline/extract/rm/extract_dac_triggers.py`（2026-11-19 に ch32rv の依頼で新設）。列は `adc_triggers` と同じで、`group` は `dac`、`remap_field`・`remap_value` はいつも空です（DAC のトリガを切り替える remap の bit は無い）。EVT の DAC ヘッダの `DAC_Trigger_*`（mask は ch1 の位置で `TEN1` を含む。値は mask を `register_fields` の `TSEL1` の位置で割る。`DAC_Trigger_None` は TEN を 0 にする値なので行を持たない）と、RM の field の説明（`000：TIM6 TRGO事件；…`）を突き合わせ、一致すれば confirmed です。ch2 は SPL が定義を 16 bit ずらして使うので、`TSEL2` の行も同じ定義を `define` に書きます。対象は EVT が DAC ヘッダを持つ H417・V307・V407（capabilities も DAC を言う）。V103 の RM（CH32xRM）と device ヘッダは DAC の register を書きますが、datasheet は DAC を持たず EVT にもドライバが無いので行がありません。主タイマを持たない品番があるので（V303 に TIM5〜TIM8 があるかは品番で違う）、品番からは `timers` と合わせて引きます。
+
 ### `adc_triggers.csv`
 
 ADC の変換を始める外部トリガ——`ADC_CTLR2` の `EXTSEL`（規則チャネル）と `JEXTSEL`（注入チャネル）の各値が何を選ぶか（タイマのイベント・EXTI の線・外部の端子・ソフトウェア）。family で違い、M030 は 4 bit（`[19:16]`・`[14:11]`）で並びも違います。生成は`pipeline/extract/rm/extract_adc_triggers.py`。EVT の ADC ヘッダの `ADC_ExternalTrigConv_*`／`ADC_ExternalTrigInjecConv_*`（値は mask を `register_fields` の field の位置で割る）と、RM の field の説明（`000：定时器1的CC1事件；…`）を突き合わせ、一致すれば confirmed、RM が別の事象を言えば conflict、RM の説明が値を書かなければ reference です。
 
 **1つの値に候補が2つ並ぶ外部トリガ**（`Ext_IT11_TIM8_TRGO`＝EXTI11 か TIM8 の TRGO、`Ext_PD3_PC2`＝PD3 か PC2）は、AFIO の remap の bit（`AFIO_PCFR1.ADC1_ETRGREG_REMAP` など）が選びます。header がその bit を持つ family では **bit と値ごとに1行**にし（`remap_field`・`remap_value`。0 が先の候補——RM の「0：…与PD3相连；1：…与PC2相连」のとおり）、`trigger` には1つだけ書きます。ADC1 と ADC2 で別の bit を持つ family はそれぞれの bit で行が分かれます。
 
-**header の定義をそのまま採らないもの**: V20x/V30x の header は STM32 の ADC3 用の名前（`T4_CC3`・`T8_CC2`・`T5_TRGO`…）を同じ値に並べ、V205 は値6の中を EXTI15/OPA/TKEY に分ける別の選択子の定義（`Ext_IT15_OPA`=0・`TKEY`=0x01000000）を並べます。同じ値に定義が2つ以上あるときは RM と一致する定義だけを採り、field の外に bit を持つ定義は読みません。現在の conflict は V103 の値6（header は EXTI11/TIM8_TRGO、RM は EXTI11 だけ——V103 は TIM8 を持たない）と V205 の注入の値6（en 版 RM が EXTI15 だけを書く）です。
+**header の定義をそのまま採らないもの**: V20x/V30x の header は STM32 の ADC3 用の名前（`T4_CC3`・`T8_CC2`・`T5_TRGO`…）を同じ値に並べ、V205 は値6の中を EXTI15/OPA/TKEY に分ける別の選択子の定義（`Ext_IT15_OPA`=0・`TKEY`=0x01000000）を並べます。同じ値に定義が2つ以上あるときは RM と一致する定義だけを採り、field の外に bit を持つ定義は読みません。現在の conflict は V103 の規則・注入の値6（header は EXTI11/TIM8_TRGO・EXTI15/TIM8_CC4、RM は EXTI11・EXTI15 だけ——V103 は TIM8 を持たない）と V205 の注入の値6（en 版 RM が EXTI15 だけを書く）です。
 
 ### `adc_internal.csv`
 
@@ -317,7 +325,7 @@ headerの定義をそのまま写すのではなく、構造（block→型→reg
   RMのレジスタ表と同じ形（`RCC_APB2PCENR`）。構造体のメンバーへの対応は`member`列
   （`RCC.APB2PCENR`）に**付くものだけ付けます**。bannerがinstance番号を含むもの（`DMA_CNTR7`→
   `DMA_Channel.CNTR`）は付きますが、CANのメールボックス/フィルタ（`CAN_TXMI0R`・`CAN_F30R2`）や
-  構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（911行）。**空でも行は消していません**
+  構造体を持たないdefine群（H417の`SERDES_*`・`TKEY_*`、M030の`UART_*`・`CMP_*`）は`member`が空です（843行）。**空でも行は消していません**
   ——bit位置とmaskはheaderが言っているとおりです
 - **`kind=value`はfieldの中の値**。`RCC_PLLMULL_3`は`PLLMULL`の値。`of_field`が親、`value`がその値
   （`mask >> lo`）。`kind=field`だけを数えればfieldの数になります。**全bitを立てる値**（`…_FULLREMAP`＝0b11、`RCC_HPRE_DIV512`＝15）も値として読みます——親と mask が同じなので、同じ親の下により狭い値が他に在るときだけ。末尾が数字だけの名前（`MODE0_1`）はbitの番号の慣例なので対象外
@@ -1106,6 +1114,8 @@ uv run pipeline/extract/rm/extract_flash_geometry.py # flash_geometry（EVTのfl
 uv run pipeline/extract/rm/extract_opa_cmp_registers.py   # opa_cmp_registers（EVTヘッダ＋RMレジスタ表をbundleから。RM全読みで数分）
 uv run pipeline/extract/rm/extract_clock_enables.py       # clock_enables（EVTのrcc.h＋RMレジスタ表をbundleから。RM全読みで数分）
 uv run pipeline/extract/rm/extract_adc_triggers.py         # adc_triggers（EVT の ADC ヘッダと RM の EXTSEL/JEXTSEL の説明。register_fields の後に）
+uv run pipeline/extract/rm/extract_dac_triggers.py         # dac_triggers（EVT の DAC ヘッダと RM の TSEL1/TSEL2 の説明。register_fields の後に）
+uv run pipeline/extract/rm/extract_adc_dual_modes.py       # adc_dual_modes（EVT の ADC ヘッダと RM の DUALMOD の説明。register_fields の後に）
 uv run pipeline/extract/rm/extract_exti_lines.py           # exti_lines（RM の EXTI 中断映射と EVT の *_exti.h。interrupts の後に）
 uv run pipeline/extract/rm/extract_opa_cmp_selects.py      # opa_cmp_selects（RM の OPA/CMP の field の説明）
 uv run pipeline/extract/rm/extract_timer_itr.py            # timer_itr（RM の TIMx/GTPM 内部触发连接。timers の後に）

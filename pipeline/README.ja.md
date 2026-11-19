@@ -612,7 +612,7 @@ uv run pipeline/publish/regenerate.py                   # 一括再生成（bund
 uv run pipeline/publish/regenerate.py --full            # 全CSVの再生成（旧tool群をbundle入力で。約1.5時間）
 uv run pipeline/publish/regenerate.py --verify --human  # ＋凍結パリティ・エラッタ・図・Markdown・差ゼロ検査
 uv run pipeline/ingest/convert.py <PDF> --lang {zh,en} --document-type <type>
-uv run pipeline/ingest/convert_all.py --jobs 4          # catalogの72版。incremental
+uv run pipeline/ingest/convert_all.py                  # catalogの72版。incremental。worker の数は既定で空きコアから（pipeline/common/workers.py）
 uv run pipeline/checks/check_bundle.py .cache/structured-bundles/<stem>.<lang> \
   --source <PDF>                                        # 独立検証ゲート（1.1.0以降）
 ```

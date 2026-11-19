@@ -239,6 +239,8 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "pvd_levels": ("extract_pvd_levels.py", "COLUMNS"),
     "timer_itr": ("extract_timer_itr.py", "COLUMNS"),
     "opa_cmp_selects": ("extract_opa_cmp_selects.py", "COLUMNS"),
+    "dac_triggers": ("extract_dac_triggers.py", "COLUMNS"),
+    "adc_dual_modes": ("extract_adc_dual_modes.py", "COLUMNS"),
     "clock_configs": ("build_clock.py", "CONFIG_COLUMNS"),
     "clock_enables": ("extract_clock_enables.py", "COLUMNS"),
     "clock_init": ("build_clock.py", "INIT_COLUMNS"),
@@ -1801,6 +1803,34 @@ def main() -> int:
         for token in r["target"].split(";"):
             if not re.fullmatch(r"P[A-F]\d{1,2}|OPA\d_OUT|DAC_OUT|PGA|OFF|GND|VREF", token):
                 bad.append(f"opa_cmp_selects: {r['family']} {r['field']}={r['value']} の target {token!r} が語彙に無い")
+    # dac_triggers: family、field が register_fields に在り bits が一致し、値が幅に収まること、
+    # 主タイマの TRGO はその family の timers に在ること。
+    field_bits = {(r["family"], r["register"], r["field"]): r["bits"] for r in t["register_fields"]
+                  if r["kind"] == "field"}
+    for r in t["dac_triggers"]:
+        check("dac_triggers", r["trigger"], r["family"], families, "families")
+        if field_bits.get((r["family"], r["register"], r["field"])) != r["bits"]:
+            bad.append(f"dac_triggers: {r['family']} {r['register']}.{r['field']} の bits {r['bits']} が register_fields と合わない")
+        hi, _, lo = r["bits"].partition(":")
+        if not (r["value"].isdigit() and int(r["value"]) < 1 << (int(hi) - int(lo or hi) + 1)):
+            bad.append(f"dac_triggers: {r['family']} {r['field']}={r['value']} が {r['bits']} に収まらない")
+        m = re.fullmatch(r"(TIM\d+)_TRGO", r["trigger"])
+        if m and (r["family"], m.group(1)) not in family_timers:
+            bad.append(f"dac_triggers: {r['family']} {r['field']}={r['value']} の {m.group(1)} が timers にない")
+        if not m and r["trigger"] not in {"SWTRIG"} and not re.fullmatch(r"EXTI\d+", r["trigger"]):
+            bad.append(f"dac_triggers: {r['family']} {r['field']}={r['value']} の trigger {r['trigger']!r} が語彙に無い")
+    # adc_dual_modes: family、field と bits が register_fields と一致、値が幅に収まること、mode の語彙。
+    for r in t["adc_dual_modes"]:
+        check("adc_dual_modes", r["mode"], r["family"], families, "families")
+        if field_bits.get((r["family"], r["register"], r["field"])) != r["bits"]:
+            bad.append(f"adc_dual_modes: {r['family']} {r['register']}.{r['field']} の bits {r['bits']} が register_fields と合わない")
+        hi, _, lo = r["bits"].partition(":")
+        if not (r["value"].isdigit() and int(r["value"]) < 1 << (int(hi) - int(lo or hi) + 1)):
+            bad.append(f"adc_dual_modes: {r['family']} {r['field']}={r['value']} が {r['bits']} に収まらない")
+        for part in r["mode"].split("+"):
+            if part not in {"independent", "regular_simultaneous", "injected_simultaneous",
+                            "fast_interleaved", "slow_interleaved", "alternate_trigger"}:
+                bad.append(f"adc_dual_modes: {r['family']} {r['field']}={r['value']} の mode {part!r} が語彙に無い")
     # usbpd_plumbing: clock_enables の USBPD 行と一致すること。
     enable_bits = {(r["family"], r["peripheral"]): (r["register"], r["bit"])
                    for r in t["clock_enables"]}

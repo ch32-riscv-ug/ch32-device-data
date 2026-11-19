@@ -1,6 +1,10 @@
 table,family,series,part_number,subject,field,kept,dissenting,alternative,basis
 adc_internal,CH32V20x,,,family=CH32V20x source=temperature_sensor channel=16,avg_slope_uv_c_max,4800,CH32V203DS0.PDF:en,4700,CH32V203DS0.PDF:zh(p.48)+!CH32V203DS0.PDF:en(avg_slope_uv_c_max=4700)+rm-enable:CH32FV2x_V3xRM.PDF:zh+rm-enable:CH32FV2x_V3xRM.PDF:en
 adc_internal,CH32V307,,,family=CH32V307 source=temperature_sensor channel=16,avg_slope_uv_c_max,4800,CH32V20x_30xDS0.PDF:en,4700,CH32V20x_30xDS0.PDF:zh(p.80)+!CH32V20x_30xDS0.PDF:en(avg_slope_uv_c_max=4700)+rm-enable:CH32FV2x_V3xRM.PDF:zh+rm-enable:CH32FV2x_V3xRM.PDF:en
+adc_triggers,CH32V103,,,family=CH32V103 group=injected value=6 remap_field=AFIO_PCFR1.ADC1_ETRGINJ_REMAP remap_value=0,trigger,EXTI15,rm(CH32xRM:zh),EXTI15,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI15)
+adc_triggers,CH32V103,,,family=CH32V103 group=injected value=6 remap_field=AFIO_PCFR1.ADC1_ETRGINJ_REMAP remap_value=1,trigger,TIM8_CC4,rm(CH32xRM:zh),EXTI15,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI15)
+adc_triggers,CH32V103,,,family=CH32V103 group=injected value=6 remap_field=AFIO_PCFR1.ADC2_ETRGINJ_REMAP remap_value=0,trigger,EXTI15,rm(CH32xRM:zh),EXTI15,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI15)
+adc_triggers,CH32V103,,,family=CH32V103 group=injected value=6 remap_field=AFIO_PCFR1.ADC2_ETRGINJ_REMAP remap_value=1,trigger,TIM8_CC4,rm(CH32xRM:zh),EXTI15,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI15)
 adc_triggers,CH32V103,,,family=CH32V103 group=regular value=6 remap_field=AFIO_PCFR1.ADC1_ETRGREG_REMAP remap_value=0,trigger,EXTI11,rm(CH32xRM:zh),EXTI11,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI11)
 adc_triggers,CH32V103,,,family=CH32V103 group=regular value=6 remap_field=AFIO_PCFR1.ADC1_ETRGREG_REMAP remap_value=1,trigger,TIM8_TRGO,rm(CH32xRM:zh),EXTI11,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI11)
 adc_triggers,CH32V103,,,family=CH32V103 group=regular value=6 remap_field=AFIO_PCFR1.ADC2_ETRGREG_REMAP remap_value=0,trigger,EXTI11,rm(CH32xRM:zh),EXTI11,evt(ch32v10x_adc.h)+!rm(CH32xRM:zh)(trigger=EXTI11)

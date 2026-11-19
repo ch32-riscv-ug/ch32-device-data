@@ -172,6 +172,10 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
              ["pipeline/extract/rm/extract_registers.py"]),
             # `register_fields.csv` の EXTSEL の位置と AFIO の remap の bit を読む。
             ("adc_triggers", ["pipeline/extract/rm/extract_adc_triggers.py"]),
+            # `register_fields.csv` の TSEL1/TSEL2 の位置を読む。
+            ("dac_triggers", ["pipeline/extract/rm/extract_dac_triggers.py"]),
+            # `register_fields.csv` の DUALMOD の位置を読む。
+            ("adc_dual_modes", ["pipeline/extract/rm/extract_adc_dual_modes.py"]),
             ("opa_cmp_registers", ["pipeline/extract/rm/extract_opa_cmp_registers.py"]),
             ("clock_enables", ["pipeline/extract/rm/extract_clock_enables.py"]),
             ("usbpd_plumbing", ["pipeline/extract/rm/extract_usbpd_plumbing.py"]),
