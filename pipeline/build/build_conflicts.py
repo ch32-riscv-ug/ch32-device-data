@@ -55,6 +55,8 @@ KEYS: dict[str, tuple[str, ...]] = {
     "adc_triggers": ("family", "group", "value", "remap_field", "remap_value"),
     "exti_lines": ("family", "line", "condition"),
     "pvd_levels": ("datasheet", "field", "pls", "edge"),
+    "timer_itr": ("family", "slave", "itr"),
+    "opa_cmp_selects": ("family", "register", "field", "value"),
     "flash_geometry": ("family",),
     "flash_program_method": ("family",),
     "eval_boards": ("family", "board"),
@@ -114,6 +116,10 @@ ASSERTS: dict[str, str] = {
     "exti_lines": "source",
     # datasheet の zh/en 版が段の電圧で食い違う。
     "pvd_levels": "typ",
+    # RM の zh/en 版が、その ITR につながる主タイマで食い違う。
+    "timer_itr": "master",
+    # RM の zh/en 版が、その値で選ばれる端子・接続で食い違う（H417 の OPA2/OPA3 の MODE は逆）。
+    "opa_cmp_selects": "target",
 }
 # `operating_conditions` はここに載せない。1行が min/typ/max/unit の4つを主張して
 # いて、争っているのがどれかは行ごとに違う（`basis` の `(min=60,typ=82,…)` が

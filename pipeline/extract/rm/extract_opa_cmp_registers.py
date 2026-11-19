@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import collections
 import csv
+import json
 import re
 import sys
 from pathlib import Path
@@ -57,6 +58,8 @@ import paths  # noqa: E402
 import register_fields  # noqa: E402
 MIRRORS = Path("/home/mt/dev_wch")
 
+MEASURED = {(m["family"], m["register"], m["field"]): m for m in json.loads(
+    (REPO / "curated" / "register-fields-measured.json").read_text(encoding="utf-8"))["measured"]}
 COLUMNS = ["family", "block", "register", "unit", "offset", "address", "field", "bits",
            "mask", "purpose", "confidence", "basis"]
 # RM のレジスタ見出し。`12.4.2 比较器控制寄存器（OPA_CTLR2）` の題が**どの周辺の
@@ -278,6 +281,20 @@ def main() -> int:
                     hi = lo + width - 1
                     basis.append(f"!rm:{manual_name}(bits={hi}:{lo})" if hi != lo
                                  else f"!rm:{manual_name}(bits={lo})")
+            # **実測**（curated/register-fields-measured.json）。資料どうしが食い違う bit の位置を
+            # 実機で決めたもの。位置は実測を採り、ヘッダーの位置は異論として basis に残す。資料の
+            # 食い違いは残るので conflict のまま（register_fields と同じ扱い。V205 の CMP_CTLR の
+            # HYS1_H/HYS2_H は header 29/30、RM 19/29、実機 19/29）。
+            m = MEASURED.get((family, register, field))
+            if m:
+                header_bits = bits
+                bits = m["bits"]
+                lo_hi = [int(x) for x in bits.split(":")][::-1] if ":" in bits else [int(bits)] * 2
+                mask = ((1 << (lo_hi[1] - lo_hi[0] + 1)) - 1) << lo_hi[0]
+                basis = ([b for b in basis if not b.startswith(("evt(", "!rm:"))]
+                         + ([f"rm:{manual_name}"] if said else [])
+                         + [f"{m['method']}:{m['probe']}(bits={bits})", f"!evt({header.name})(bits={header_bits})"])
+                confidence = "conflict"
             # 持ち主: RM の見出し。無ければレジスタ名の綴り（M030 の CMP_CTLR、
             # V205 の OPA_CFGR1）、それも無ければ空——推測しない。
             unit = next((units[r] for r in candidates if r in units), "")

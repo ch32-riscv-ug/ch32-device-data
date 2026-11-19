@@ -237,6 +237,8 @@ COLUMN_SOURCES: dict[str, tuple[str, str]] = {
     "adc_triggers": ("extract_adc_triggers.py", "COLUMNS"),
     "exti_lines": ("extract_exti_lines.py", "COLUMNS"),
     "pvd_levels": ("extract_pvd_levels.py", "COLUMNS"),
+    "timer_itr": ("extract_timer_itr.py", "COLUMNS"),
+    "opa_cmp_selects": ("extract_opa_cmp_selects.py", "COLUMNS"),
     "clock_configs": ("build_clock.py", "CONFIG_COLUMNS"),
     "clock_enables": ("extract_clock_enables.py", "COLUMNS"),
     "clock_init": ("build_clock.py", "INIT_COLUMNS"),
@@ -1781,6 +1783,24 @@ def main() -> int:
         check("pvd_levels", r["pls"], r["datasheet"], datasheets, "documents")
         for s in r["series"].split(";"):
             check("pvd_levels", r["pls"], s, series, "series")
+    # timer_itr: family、従タイマがその family の timers に在り、ITR が 0〜3。
+    family_timers = {(r["family"], r["timer"]) for r in t["timers"]}
+    for r in t["timer_itr"]:
+        check("timer_itr", r["slave"], r["family"], families, "families")
+        if (r["family"], r["slave"]) not in family_timers:
+            bad.append(f"timer_itr: {r['family']} の {r['slave']} が timers にない")
+        if r["itr"] not in {"0", "1", "2", "3"}:
+            bad.append(f"timer_itr: {r['family']} {r['slave']} の ITR {r['itr']} が 0〜3 でない")
+    # opa_cmp_selects: family、値が field の幅に収まること、target の語彙。
+    for r in t["opa_cmp_selects"]:
+        check("opa_cmp_selects", r["field"], r["family"], families, "families")
+        hi, _, lo = r["bits"].partition(":")
+        width = int(hi) - int(lo or hi) + 1
+        if not (r["value"].isdigit() and int(r["value"]) < 1 << max(width, 2)):
+            bad.append(f"opa_cmp_selects: {r['family']} {r['field']}={r['value']} が {r['bits']} に収まらない")
+        for token in r["target"].split(";"):
+            if not re.fullmatch(r"P[A-F]\d{1,2}|OPA\d_OUT|DAC_OUT|PGA|OFF|GND|VREF", token):
+                bad.append(f"opa_cmp_selects: {r['family']} {r['field']}={r['value']} の target {token!r} が語彙に無い")
     # usbpd_plumbing: clock_enables の USBPD 行と一致すること。
     enable_bits = {(r["family"], r["peripheral"]): (r["register"], r["bit"])
                    for r in t["clock_enables"]}

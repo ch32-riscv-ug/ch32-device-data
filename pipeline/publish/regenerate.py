@@ -153,6 +153,9 @@ def plan(args: argparse.Namespace, held: list[str] = ()) -> list[tuple[str, list
             # `exti_lines` は `index/interrupts.csv`（legacy 段の `build_interrupts`）を読む。
             ("exti_lines", ["pipeline/extract/rm/extract_exti_lines.py"]),
             ("pvd_levels", ["pipeline/extract/datasheet/extract_pvd_levels.py"]),
+            # `timer_itr` は `evidence/timers.csv`（`timers` の段）を読む。
+            ("timer_itr", ["pipeline/extract/rm/extract_timer_itr.py"]),
+            ("opa_cmp_selects", ["pipeline/extract/rm/extract_opa_cmp_selects.py"]),
             ("device_id_addresses + device_ids",
              ["pipeline/build/build_device_ids.py"]),
             ("esig", ["pipeline/extract/rm/extract_esig.py"]),

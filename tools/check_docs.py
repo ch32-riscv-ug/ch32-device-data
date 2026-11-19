@@ -67,6 +67,8 @@ ROW_COUNTS: dict[str, tuple[str, ...]] = {
     "adc_triggers": ("adc_triggers",),
     "exti_lines": ("exti_lines",),
     "pvd_levels": ("pvd_levels",),
+    "timer_itr": ("timer_itr",),
+    "opa_cmp_selects": ("opa_cmp_selects",),
     "usbpd_plumbing": ("usbpd_plumbing",),
     "debug_data": ("debug_data",),
     "debug_wiring": ("debug_wiring",),

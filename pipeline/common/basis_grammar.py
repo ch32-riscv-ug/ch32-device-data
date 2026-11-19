@@ -64,6 +64,7 @@ KINDS = {
     "measured": "a dated measurement record", "silicon": "read from silicon",
     "hartinfo": "the debug module's hartinfo read from silicon", "device-id": "a chip ID read from silicon",
     "flash": "an erase/program/readback on silicon", "obr-readback": "option bytes read back from silicon",
+    "write-readback": "a register field written and read back on silicon (which bits keep the value)",
     "wch": "a file WCH distributes", "inferred": "inferred from a stated structure (the row is reference)",
     # 目録の運用の表（公開しない）
     "git": "a mirror repository's commit", "api": "an upstream download API", "head": "an HTTP HEAD of the file",

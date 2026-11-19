@@ -202,6 +202,8 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 
 **コンパレータ/OPAクラスの前提**です。baseは`memory_map.csv`、入力padは`index/pinout.csv`が持つので、足りないのは**フィールドの配置**——enable・入力select・出力・gain。
 
+**実測で位置を決めた field は実測を採ります**（`curated/register-fields-measured.json`）。V205 の`CMP_CTLR`の`HYS1_H`/`HYS2_H`は header が bit 29/30、RM の図が 19/29（30 は予約）で、ch32rv のコアが CH32V205RCT6 で書き読みすると bit 19・29 だけが残った（2026-11-19）。`bits`/`mask`は実測の位置で、header の位置は basis の`!evt(...)(bits=…)`に残し、資料の食い違いは残るので conflict のまま。
+
 **blockの置き方がfamilyごとに違い、それがこの表の要る理由です。**
 
 | family | 置き場所 |
@@ -227,6 +229,14 @@ CH32L103はPA13の主功能を`SWDIO`と書き、CH32X035はPC18の主功能を`
 RMのレジスタ表（`RCC_HBPCENR`の`USBPDEN`）と突き合わせ、**395行中364行がconfirmed、conflict 0**。referenceの31行はRM側のfield名がEVTと綴りで一致しなかったもの（`ETH_MAC_Rx`など）で、bitの誤りではありません。GPIOはEVT`GPIOA`/RM`IOPAEN`と綴りが違うので別名として引いています。
 
 **rcc.h にはその family に無い周辺の定数も残っています**（他 family のヘッダからの写し）。V20x の`RCC_AHBPeriph_RNG`・`FSMC`・`SDIO`・`USBHS`・`DAC`と、V103 の`FSMC`・`SDIO`・APB1 の`USB`（CH32F103 の USBD）・`CAN1`・`CAN2`・`CEC`の11行です。共有 RM（`CH32FV2x_V3xRM`・`CH32xRM`）の表は bit の適用 family を書かないので EVT と一致して confirmed になっていました——RM の RNG の章は「CH32F20x・CH32V30x・CH32V31x に適用」と書いています。機械では見分けられないので、人の判定を`curated/clock-enables-absent.json`に置いて落とします（2026-10-21、ArduinoCore-CH32RV の依頼。項目が rcc.h から消えるか、device header にその周辺のブロックが現れたら生成が止まる）。device header にブロックが無くても実在するもの——H417 の`BKP`（H417 専用 RM が`BKPEN`を書く）、H417/V205 の`PIOC`と V103 の`USBFS`（EVT に例題と専用ヘッダがある）——は残しています。**V208 の Ethernet のクロックはこの表に無い**のが正しく、RCC ではなく`EXTEN->EXTEN_CTR`の`EXTEN_ETH_10M_EN`（bit2）で入れます（EVT`ETH/NetLib/eth_driver.c`）。
+
+### `opa_cmp_selects.csv`
+
+OPA・CMP の選択 field の値ごとに、何がつながるか（端子か内部の接続）。生成は`pipeline/extract/rm/extract_opa_cmp_selects.py`。値ごとの端子は RM の field の説明だけが書き（`MODE1 … 1：输出信号通过PA7输出； 0：输出信号通过PB1输出`）、**datasheet のピン表の番号（`OPA_OUT1`/`OPA_OUT2`）は値と一致しない family があります**（V407 の MODE1 は 0 が PB1・1 が PA7）。`target` は端子か英語の記号（`OPAn_OUT`・`DAC_OUT`・`PGA`・`OFF`・`GND`・`VREF`）。説明に区切りの `；` が無い版（L103 zh）があるので次の値の符号までを1つの説明にし、field の幅と違う桁数で書く版（H417 en の 1 bit の MODE2 を `00:`/`01:`）も読みます。zh・en 版が同じ target を言えば confirmed。**H417 の OPA2/OPA3 の MODE は zh 版と en 版で逆**（zh は 0＝PE7/PA0、en は 0＝PB1/PA4）で conflict です。
+
+### `timer_itr.csv`
+
+タイマどうしの内部トリガ——従タイマの ITR0〜ITR3（`TIMx_SMCFGR.TS`）にどのタイマの TRGO がつながるか。生成は`pipeline/extract/rm/extract_timer_itr.py`。RM の表「TIMx内部触发连接」/「GTPM内部触发连接」（en「TIMx internal trigger connection」）を zh・en で読み、同じ主を言えば confirmed。en 版は汎用タイマの表に表題を付けなかったり別の表の表題を付けたりするので、見出しの行（「从定时器」/「Slave timer」と ITR の列）で表を選び、次のページに落ちた続きもつなぎます。主の書き方（`TIM2_TRGO`）は `TIM2` に揃え、並ぶもの（`TIM8/USB/ETH`）は `;` で並べ、空欄・`0`・`-` はつながっていないので行を持ちません。RM を共有する family（V20x/V307）は、その family が持つタイマ（`evidence/timers.csv`）の行だけを持ちます。
 
 ### `exti_lines.csv`
 
@@ -1097,6 +1107,8 @@ uv run pipeline/extract/rm/extract_opa_cmp_registers.py   # opa_cmp_registers（
 uv run pipeline/extract/rm/extract_clock_enables.py       # clock_enables（EVTのrcc.h＋RMレジスタ表をbundleから。RM全読みで数分）
 uv run pipeline/extract/rm/extract_adc_triggers.py         # adc_triggers（EVT の ADC ヘッダと RM の EXTSEL/JEXTSEL の説明。register_fields の後に）
 uv run pipeline/extract/rm/extract_exti_lines.py           # exti_lines（RM の EXTI 中断映射と EVT の *_exti.h。interrupts の後に）
+uv run pipeline/extract/rm/extract_opa_cmp_selects.py      # opa_cmp_selects（RM の OPA/CMP の field の説明）
+uv run pipeline/extract/rm/extract_timer_itr.py            # timer_itr（RM の TIMx/GTPM 内部触发连接。timers の後に）
 uv run pipeline/extract/datasheet/extract_pvd_levels.py    # pvd_levels（datasheet の复位及电压监测の表）
 uv run pipeline/extract/datasheet/extract_adc_internal.py  # adc_internal（datasheet両言語の散文と電気的特性表をbundleから。数秒）
 uv run pipeline/extract/rm/extract_usbpd_plumbing.py      # usbpd_plumbing（clock_enablesの後。EVTヘッダ＋RMをbundleから）

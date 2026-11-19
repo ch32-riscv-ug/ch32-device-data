@@ -316,6 +316,14 @@ opa_cmp_registers,mask,Mask of the define.,hex,never empty,,data
 opa_cmp_registers,purpose,"Role assigned from the field name (`enable`, `positive input select`, `gain` ...).",text,the field name declares no role,fixed,data
 opa_cmp_registers,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
 opa_cmp_registers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+opa_cmp_selects,family,Family key; joins families.family.,name,never empty,fixed,data
+opa_cmp_selects,register,"OPA/CMP register holding the selector field, as the reference manual names it (without the `R32_` width prefix).",name,never empty,as-printed,data
+opa_cmp_selects,field,"Selector field (positive/negative input, output, PGA bias ...), as the reference manual names it.",name,never empty,as-printed,data
+opa_cmp_selects,bits,Bit position `hi:lo` of the field.,bits,never empty,,data
+opa_cmp_selects,value,Value written to the field.,integer,never empty,,data
+opa_cmp_selects,target,"What the value connects: a pad (`PB1`; several joined by `;` for a differential PGA), `OPAn_OUT`, `DAC_OUT`, `PGA` (internal feedback, no negative pin), `OFF`, `GND` or `VREF`.",list(;),never empty,fixed,data
+opa_cmp_selects,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+opa_cmp_selects,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 operating_conditions,series,Series the row applies to (expanded through the datasheet to products join).,list(;),never empty,fixed,data
 operating_conditions,symbol,"Symbol assigned to the parameter (e.g. `V_DD`, `F_HCLK`, `f_ADC`).",name,never empty,fixed,data
 operating_conditions,parameter,"Parameter description in English, as the datasheet writes it.",text,not stated by the sources,as-printed,data
@@ -583,6 +591,13 @@ timers,update_vector,"Interrupt vector name of the timer's update interrupt, fro
 timers,condition,Variant macros the counter width applies to.,list(;),unconditional,as-printed,data
 timers,confidence,"Confidence of the row: conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(conflict|reference),never empty,fixed,provenance
 timers,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
+timer_itr,family,Family key; joins families.family.,name,never empty,fixed,data
+timer_itr,slave,"Slave timer (`TIMn`) whose TIMx_SMCFGR.TS selects the internal trigger; joins timers (family, timer).",name,never empty,fixed,data
+timer_itr,itr,Internal trigger input number (ITRn).,integer,never empty,,data
+timer_itr,ts,Value written to TIMx_SMCFGR.TS to select this ITR.,integer,never empty,,data
+timer_itr,master,"Timer whose TRGO drives the ITR (`TIMn`); several sources the manual names together are joined by `;` (`TIM8;USB;ETH`).",list(;),never empty,as-printed,data
+timer_itr,confidence,"Confidence of the row: confirmed = two or more independent bases agree, or a person checked the content and recorded the basis; conflict = bases contradict each other and need human judgement (the `!` marker in basis says which column is disputed); reference = only one basis, with neither corroboration nor contradiction.",enum(confirmed|conflict|reference),never empty,fixed,provenance
+timer_itr,basis,"Sources that support the row, joined by `+` (e.g. `pin-table:zh`, `products:en`, `evt(...)`, `rm(...)`, `rule:...`, `manual:...`, `measured:...`); a `!` prefix marks a source that contradicts the kept value and `(=...)` gives what it states instead.",text,never empty,prose,provenance
 usbpd_plumbing,family,Family key; joins families.family.,name,never empty,fixed,data
 usbpd_plumbing,peripheral,"USB-PD instance (`USBPD`, or `USBPD0`/`USBPD1` on CH32M030).",name,never empty,as-printed,data
 usbpd_plumbing,rcc_register,RCC register that holds the clock-enable bit.,name,never empty,as-printed,data

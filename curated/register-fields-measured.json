@@ -22,6 +22,28 @@
       "date": "2026-09-25",
       "how": "see DATA0",
       "record": "wch-protocols 856ba44 captures/fixtures/wire-linke-p4-2026-09-25/extra/"
+    },
+    {
+      "family": "CH32V205",
+      "register": "CMP_CTLR",
+      "field": "HYS1_H",
+      "bits": "19",
+      "method": "write-readback",
+      "probe": "ch32rv",
+      "date": "2026-11-19",
+      "how": "ch32rv core unlocked CMP_CTLR with CMP_KEY on a CH32V205RCT6, wrote 1 to bits 19, 29 and 30 and read back: bits 19 and 29 kept the value, bit 30 stayed 0. RM 23.3.4 (the CMP_CTLR figure) places HYS1_H at 19 and HYS2_H at 29 with 30 reserved; the EVT header ch32v205.h defines HYS1_H=0x20000000 (29) and HYS2_H=0x40000000 (30).",
+      "record": "ch32rv [core] report 2026-11-19 (CH32V205RCT6, CMP_KEY unlock, write/readback of CMP_CTLR)"
+    },
+    {
+      "family": "CH32V205",
+      "register": "CMP_CTLR",
+      "field": "HYS2_H",
+      "bits": "29",
+      "method": "write-readback",
+      "probe": "ch32rv",
+      "date": "2026-11-19",
+      "how": "see HYS1_H",
+      "record": "ch32rv [core] report 2026-11-19 (CH32V205RCT6, CMP_KEY unlock, write/readback of CMP_CTLR)"
     }
   ]
 }

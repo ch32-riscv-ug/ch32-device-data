@@ -53,7 +53,7 @@ consumer の契約は2026-08-25から決まっていた（`catalog/` の全表�
 | 導出（前からの index） | `parts`・`pinout`・`routes`・`registers`・`register_map`・`dma`・`timers`・`features`・`capabilities`・`conflicts`・`register_layouts`・`debug_interfaces` | そのまま |
 | 写し: 目録の鍵 | `families`・`series`・`products`・`packages`・`cores` | `products` の packing の3列を落とす（102行が空。consumer に意味が無い） |
 | 写し: 前の「安定」evidence 15表 | `interrupts`・`memory_map`・`systick`・`clock_*`（5表）・`evt_variants`・`clock_enables`・`pin_alternate`・`flash_geometry`・`flash_program_method`・`adc_internal`・`debug_data` | `clock_configs.evt_copies`（一致した EVT 写しの数。生成の記録）を落とす |
-| 写し: 依頼で公開（R-33・R-34。`adc_triggers`・`exti_lines`・`pvd_levels` は 2026-11-17 の ch32rv の依頼） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`adc_triggers`・`exti_lines`・`pvd_levels` | `operating_conditions.datasheet` を落とす（`basis` にある） |
+| 写し: 依頼で公開（R-33・R-34。`adc_triggers`・`exti_lines`・`pvd_levels` は 2026-11-17、`timer_itr`・`opa_cmp_selects` は 2026-11-19 の ch32rv の依頼） | `device_ids`・`option_bytes`・`option_byte_fields`・`register_blocks`・`errata`・`operating_conditions`・`adc_triggers`・`exti_lines`・`pvd_levels`・`timer_itr`・`opa_cmp_selects` | `operating_conditions.datasheet` を落とす（`basis` にある） |
 | 表の説明 | `manifest.csv`（path・行数・sha256。全 CSV を覆う） | 生成 |
 
 写しの一覧と落とす列は `pipeline/common/paths.py` の `PUBLISHED` だけが持つ。表を公開面に足すのはそこに1行足すこと。
